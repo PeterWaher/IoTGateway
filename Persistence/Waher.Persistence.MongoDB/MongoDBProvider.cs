@@ -138,10 +138,8 @@ namespace Waher.Persistence.MongoDB
 				this.serializers[S.ValueType] = S;
 			}
 
-			GenericObjectSerializer GenericObjectSerializer = new GenericObjectSerializer(this);
-
-			this.serializers[typeof(GenericObject)] = GenericObjectSerializer;
-			this.serializers[typeof(object)] = GenericObjectSerializer;
+			this.serializers[typeof(GenericObject)] = new GenericObjectSerializer(this, false);
+			this.serializers[typeof(object)] = new GenericObjectSerializer(this, true);
 		}
 
 		/// <summary>
@@ -481,6 +479,64 @@ namespace Waher.Persistence.MongoDB
 				Collection = this.GetCollection(CollectionName);
 
 			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<object>> Find(string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find<object>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
@@ -964,6 +1020,104 @@ namespace Waher.Persistence.MongoDB
 				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
 
 			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
+
+			return First;
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+		{
+			ObjectId OID;
+
+			if (ObjectId is ObjectId ObjId)
+				OID = ObjId;
+			else if (ObjectId is string s)
+				OID = new ObjectId(s);
+			else if (ObjectId is byte[] A)
+				OID = new ObjectId(A);
+			else if (ObjectId is Guid Guid)
+				OID = GeneratedObjectSerializerBase.GuidToObjectId(Guid);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
+
+			return this.LoadObject<T>(CollectionName, OID);
+		}
+
+		/// <summary>
+		/// Loads an object of a given type and Object ID.
+		/// </summary>
+		/// <typeparam name="T">Type of object to load.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID of object to load.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(string CollectionName, ObjectId ObjectId)
+		{
+			string Key = typeof(T).FullName + " " + ObjectId.ToString();
+
+			if (this.loadCache.TryGetValue(Key, out object Obj) && Obj is T Result)
+				return Result;
+
+			ObjectSerializer S = this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> ReferencedObjects = await this.Find<T>(CollectionName, 0, 2, new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
+			T First = default;
+
+			foreach (T Item in ReferencedObjects)
+			{
+				if (First == null)
+					First = Item;
+				else
+					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
+			}
+
+			if (First == null)
+				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
+
+			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
+
+			return First;
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<object> LoadObject(string CollectionName, object ObjectId)
+		{
+			ObjectId OID;
+
+			if (ObjectId is ObjectId ObjId)
+				OID = ObjId;
+			else if (ObjectId is string s)
+				OID = new ObjectId(s);
+			else if (ObjectId is byte[] A)
+				OID = new ObjectId(A);
+			else if (ObjectId is Guid Guid)
+				OID = GeneratedObjectSerializerBase.GuidToObjectId(Guid);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
+
+			ObjectSerializer S = this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> ReferencedObjects = await this.Find(CollectionName, 0, 2, new FilterFieldEqualTo(S.ObjectIdMemberName, OID));
+			object First = null;
+
+			foreach (object Item in ReferencedObjects)
+			{
+				if (First is null)
+					First = Item;
+				else
+					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
+			}
+
+			if (First is null)
+				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
 
 			return First;
 		}

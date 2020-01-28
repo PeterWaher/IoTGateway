@@ -177,7 +177,7 @@ namespace Waher.Persistence.Serialization
 		{
 			LinkedList<KeyValuePair<string, object>> List = new LinkedList<KeyValuePair<string, object>>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
-			
+
 			foreach (KeyValuePair<string, object> P in this.properties)
 			{
 				if (!this.propertiesByName.TryGetValue(P.Key, out object Value))
@@ -323,14 +323,38 @@ namespace Waher.Persistence.Serialization
 				if (!GenObj.propertiesByName.TryGetValue(P.Key, out object Value))
 					return false;
 
-				if (Value is null ^ P.Value is null)
-					return false;
-
-				if (Value != null && !Value.Equals(P.Value))
+				if (!PropertyEquals(Value, P.Value))
 					return false;
 			}
 
 			return true;
+		}
+
+		private static bool PropertyEquals(object Value1, object Value2)
+		{
+			if (Value1 is null ^ Value2 is null)
+				return false;
+
+			if (Value1 is null || Value1.Equals(Value2))
+				return true;
+
+			if (Value1 is Array A && Value2 is Array B)
+			{
+				int i, c = A.Length;
+
+				if (c != B.Length)
+					return false;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!PropertyEquals(A.GetValue(i), B.GetValue(i)))
+						return false;
+				}
+
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>

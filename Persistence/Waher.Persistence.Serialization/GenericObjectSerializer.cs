@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Serialization
 {
@@ -11,12 +11,26 @@ namespace Waher.Persistence.Serialization
 	/// </summary>
 	public class GenericObjectSerializer : ObjectSerializer
 	{
+		private readonly bool returnTypedObjects;
+
 		/// <summary>
 		/// Provides a generic object serializer.
 		/// </summary>
+		/// <param name="Context">Serializer context.</param>
 		public GenericObjectSerializer(ISerializerContext Context)
+			: this(Context, false)
+		{
+		}
+
+		/// <summary>
+		/// Provides a generic object serializer.
+		/// </summary>
+		/// <param name="Context">Serializer context.</param>
+		/// <param name="ReturnTypedObjects">If typed objects should be returned.</param>
+		public GenericObjectSerializer(ISerializerContext Context, bool ReturnTypedObjects)
 			: base(Context, typeof(GenericObject))
 		{
+			this.returnTypedObjects = ReturnTypedObjects;
 		}
 
 		/// <summary>
@@ -41,6 +55,8 @@ namespace Waher.Persistence.Serialization
 		/// <returns>Deserialized object.</returns>
 		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
 		{
+			StreamBookmark Bookmark = Reader.GetBookmark();
+			uint? DataTypeBak = DataType;
 			uint FieldDataType;
 			ulong FieldCode;
 			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
@@ -172,6 +188,20 @@ namespace Waher.Persistence.Serialization
 					TypeName = this.context.GetFieldName(CollectionName, FieldCode);
 				else
 					TypeName = CollectionName + "." + FieldCode.ToString();
+			}
+
+			if (this.returnTypedObjects && !string.IsNullOrEmpty(TypeName))
+			{
+				Type DesiredType = Types.GetType(TypeName);
+				if (DesiredType is null)
+					DesiredType = typeof(GenericObject);
+
+				if (DesiredType != typeof(GenericObject))
+				{
+					IObjectSerializer Serializer2 = this.context.GetObjectSerializer(DesiredType);
+					Reader.SetBookmark(Bookmark);
+					return Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
+				}
 			}
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();

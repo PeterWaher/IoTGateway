@@ -99,6 +99,23 @@ namespace Waher.Persistence
 		Task<T> LoadObject<T>(object ObjectId);
 
 		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		Task<T> LoadObject<T>(string CollectionName, object ObjectId);
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		Task<object> LoadObject(string CollectionName, object ObjectId);
+
+		/// <summary>
 		/// Performs an export of the entire database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>

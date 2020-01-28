@@ -39,14 +39,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 		private readonly bool isNullable;
 		private readonly Type type;
 		private readonly System.Reflection.TypeInfo typeInfo;
-		private readonly MongoDBProvider provider;
 
-		internal ObjectSerializer(Type Type, MongoDBProvider Provider, bool Null)
+		/// <summary>
+		/// Database provider.
+		/// </summary>
+		protected readonly MongoDBProvider provider;
+
+		internal ObjectSerializer(Type Type, MongoDBProvider Provider, bool IsNullable)
 		{
-			this.isNullable = true;
+			this.isNullable = IsNullable;
 			this.collectionName = null;
 			this.typeNameSerialization = TypeNameSerialization.FullName;
-			this.isNullable = true;
 			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
 			this.provider = Provider;
@@ -489,7 +492,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + this.type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
-				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataType, Embedded);");
+				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataTypeBak, Embedded);");
 				CSharp.AppendLine("\t\t\t}");
 			}
 

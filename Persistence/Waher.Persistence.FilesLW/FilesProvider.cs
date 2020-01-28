@@ -1438,6 +1438,135 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+		{
+			Guid OID;
+
+			if (ObjectId is Guid)
+				OID = (Guid)ObjectId;
+			else if (ObjectId is string)
+				OID = new Guid((string)ObjectId);
+			else if (ObjectId is byte[])
+				OID = new Guid((byte[])ObjectId);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
+
+			return this.LoadObject<T>(CollectionName, OID);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public Task<T> LoadObject<T>(string CollectionName, Guid ObjectId)
+		{
+			return this.LoadObject<T>(CollectionName, ObjectId, null);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(string CollectionName, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(CollectionName);
+
+			if (!(EmbeddedSetter is null))
+			{
+				if (await File.TryBeginRead(0))
+				{
+					try
+					{
+						return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+					}
+					finally
+					{
+						await File.EndRead();
+					}
+				}
+				else
+				{
+					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					return default;
+				}
+			}
+			else
+				return (T)await File.LoadObject(ObjectId, Serializer);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public Task<object> LoadObject(string CollectionName, object ObjectId)
+		{
+			return this.LoadObject(CollectionName, ObjectId, null);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<object> LoadObject(string CollectionName, object ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		{
+			Guid Id;
+
+			if (ObjectId is Guid Guid)
+				Id = Guid;
+			else if (ObjectId is string s)
+				Id = new Guid(s);
+			else if (ObjectId is byte[] Bin)
+				Id = new Guid(Bin);
+			else
+				throw new ArgumentException("Invalid type of Object ID: " + ObjectId.GetType().FullName, nameof(ObjectId));
+
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
+			ObjectBTreeFile File = await this.GetFile(CollectionName);
+
+			if (!(EmbeddedSetter is null))
+			{
+				if (await File.TryBeginRead(0))
+				{
+					try
+					{
+						return await File.LoadObjectLocked(ObjectId, Serializer);
+					}
+					finally
+					{
+						await File.EndRead();
+					}
+				}
+				else
+				{
+					File.QueueForLoad(Id, Serializer, EmbeddedSetter);
+					return null;
+				}
+			}
+			else
+				return await File.LoadObject(Id, Serializer);
+
+		}
+
+		/// <summary>
 		/// Gets the Object ID for a given object.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>

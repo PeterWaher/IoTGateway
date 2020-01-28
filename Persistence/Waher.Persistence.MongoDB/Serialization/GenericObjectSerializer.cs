@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -14,12 +15,25 @@ namespace Waher.Persistence.MongoDB.Serialization
 	/// </summary>
 	public class GenericObjectSerializer : ObjectSerializer
 	{
+		private readonly bool returnTypedObjects;
+
 		/// <summary>
 		/// Provides a generic object serializer.
 		/// </summary>
+		/// <param name="Provider">Database provider.</param>
 		public GenericObjectSerializer(MongoDBProvider Provider)
+			: this(Provider, false)
+		{
+		}
+
+		/// <summary>
+		/// Provides a generic object serializer.
+		/// </summary>
+		/// <param name="Provider">Database provider.</param>
+		public GenericObjectSerializer(MongoDBProvider Provider, bool ReturnTypedObjects)
 			: base(typeof(GenericObject), Provider, true)
 		{
+			this.returnTypedObjects = ReturnTypedObjects;
 		}
 
 		/// <summary>
@@ -44,6 +58,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>Deserialized object.</returns>
 		public object Deserialize(IBsonReader Reader, BsonType? DataType, bool Embedded, bool CheckFieldNames)
 		{
+			BsonReaderBookmark Bookmark = Reader.GetBookmark();
+			BsonType? DataTypeBak = DataType;
+
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBsonType();
 
@@ -190,6 +207,20 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					case "_type":
 						TypeName = Value?.ToString();
+
+						if (this.returnTypedObjects && !string.IsNullOrEmpty(TypeName))
+						{
+							Type DesiredType = Types.GetType(TypeName);
+							if (DesiredType is null)
+								DesiredType = typeof(GenericObject);
+							
+							if (DesiredType != typeof(GenericObject))
+							{
+								IObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);
+								Reader.ReturnToBookmark(Bookmark);
+								return Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
+							}
+						}
 						break;
 
 					case "_collection":

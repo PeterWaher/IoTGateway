@@ -166,6 +166,8 @@ namespace Waher.Persistence.Serialization
 #if NETSTANDARD1_5
 		private readonly FieldInfo objectIdFieldInfo = null;
 		private readonly PropertyInfo objectIdPropertyInfo = null;
+		private readonly MemberInfo objectIdMemberInfo = null;
+		private readonly Type objectIdMemberType = null;
 		private readonly Dictionary<string, object> defaultValues = new Dictionary<string, object>();
 		private readonly Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
 		private readonly Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
@@ -393,8 +395,7 @@ namespace Waher.Persistence.Serialization
 							Ignore = true;
 							break;
 						}
-
-						if (Attr is DefaultValueAttribute DefaultValueAttribute)
+						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
 							DefaultValue = DefaultValueAttribute.Value;
 							NrDefault++;
@@ -539,14 +540,16 @@ namespace Waher.Persistence.Serialization
 
 							CSharp.AppendLine(";");
 						}
-
-						if (Attr is ByReferenceAttribute)
+						else if (Attr is ByReferenceAttribute)
 							ByReference = true;
-
-						if (Attr is ObjectIdAttribute)
+						else if (Attr is ObjectIdAttribute)
 						{
 							this.objectIdFieldInfo = FI;
 							this.objectIdPropertyInfo = PI;
+							this.objectIdMemberInfo = Member;
+							this.objectIdMemberType = MemberType;
+							HasObjectId = true;
+							Ignore = true;
 						}
 					}
 
@@ -568,9 +571,6 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.context.Id + "(ISerializerContext Context)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tthis.context = Context;");
-
-				MemberInfo ObjectIdMember = null;
-				Type ObjectIdMemberType = null;
 
 				foreach (MemberInfo Member in Members)
 				{
@@ -599,10 +599,6 @@ namespace Waher.Persistence.Serialization
 						continue;
 
 					Ignore = false;
-					ByReference = false;
-					Nullable = false;
-					HasObjectId = false;
-					ShortName = null;
 
 					MemberTypeInfo = MemberType.GetTypeInfo();
 					if (MemberTypeInfo.IsGenericType)
@@ -610,7 +606,6 @@ namespace Waher.Persistence.Serialization
 						Type GT = MemberType.GetGenericTypeDefinition();
 						if (GT == typeof(Nullable<>))
 						{
-							Nullable = true;
 							MemberType = MemberType.GenericTypeArguments[0];
 							MemberTypeInfo = MemberType.GetTypeInfo();
 						}
@@ -618,28 +613,14 @@ namespace Waher.Persistence.Serialization
 
 					foreach (Attribute Attr in Member.GetCustomAttributes(true))
 					{
-						if (Attr is IgnoreMemberAttribute)
+						if (Attr is IgnoreMemberAttribute || Attr is ObjectIdAttribute)
 						{
 							Ignore = true;
 							break;
 						}
-
-						if (Attr is ByReferenceAttribute)
-							ByReference = true;
-						else if (Attr is ObjectIdAttribute)
-						{
-							ObjectIdMember = Member;
-							ObjectIdMemberType = MemberType;
-							HasObjectId = true;
-						}
-						else if (Attr is ShortNameAttribute ShortNameAttribute)
-						{
-							ShortName = ShortNameAttribute.Name;
-							ShortNames[Member.Name] = ShortName;
-						}
 					}
 
-					if (Ignore || HasObjectId)
+					if (Ignore)
 						continue;
 
 					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
@@ -680,6 +661,9 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("\t\t\t\t\treturn null;");
 				CSharp.AppendLine("\t\t\t}");
 				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tif (Embedded && Reader.BitOffset > 0 && Reader.ReadBit())");
+				CSharp.AppendLine("\t\t\t\tObjectId = Reader.ReadGuid();");
+				CSharp.AppendLine();
 
 				if (this.normalized)
 					CSharp.AppendLine("\t\t\tFieldCode = Reader.ReadVariableLengthUInt64();");
@@ -716,7 +700,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 					CSharp.AppendLine("\t\t\tif (Embedded)");
-					CSharp.AppendLine("\t\t\t\tReader.ReadVariableLengthUInt64();	// Collection name");
+					CSharp.AppendLine("\t\t\t\tReader.SkipVariableLengthUInt64();	// Collection name");
 
 					CSharp.AppendLine();
 
@@ -727,16 +711,16 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
 					CSharp.AppendLine();
 
-					if (!(ObjectIdMember is null))
+					if (HasObjectId)
 					{
-						if (ObjectIdMemberType == typeof(Guid))
-							CSharp.AppendLine("\t\t\tResult." + ObjectIdMember.Name + " = ObjectId;");
-						else if (ObjectIdMemberType == typeof(string))
-							CSharp.AppendLine("\t\t\tResult." + ObjectIdMember.Name + " = ObjectId.ToString();");
-						else if (ObjectIdMemberType == typeof(byte[]))
-							CSharp.AppendLine("\t\t\tResult." + ObjectIdMember.Name + " = ObjectId.ToByteArray();");
+						if (this.objectIdMemberType == typeof(Guid))
+							CSharp.AppendLine("\t\t\tResult." + this.objectIdMemberInfo.Name + " = ObjectId;");
+						else if (this.objectIdMemberType == typeof(string))
+							CSharp.AppendLine("\t\t\tResult." + this.objectIdMemberInfo.Name + " = ObjectId.ToString();");
+						else if (this.objectIdMemberType == typeof(byte[]))
+							CSharp.AppendLine("\t\t\tResult." + this.objectIdMemberInfo.Name + " = ObjectId.ToByteArray();");
 						else
-							throw new Exception("Type not supported for Object ID fields: " + ObjectIdMemberType.FullName);
+							throw new Exception("Type not supported for Object ID fields: " + this.objectIdMemberType.FullName);
 
 						CSharp.AppendLine();
 					}
@@ -807,11 +791,9 @@ namespace Waher.Persistence.Serialization
 								Ignore = true;
 								break;
 							}
-
-							if (Attr is ByReferenceAttribute)
+							else if (Attr is ByReferenceAttribute)
 								ByReference = true;
-
-							if (Attr is ShortNameAttribute ShortNameAttribute)
+							else if (Attr is ShortNameAttribute ShortNameAttribute)
 								ShortName = ShortNameAttribute.Name;
 						}
 
@@ -1317,6 +1299,30 @@ namespace Waher.Persistence.Serialization
 
 				CSharp.AppendLine();
 
+				if (HasObjectId)
+				{
+					CSharp.AppendLine("\t\t\tif (Embedded && Writer.BitOffset > 0)");
+					CSharp.AppendLine("\t\t\t{");
+
+					if (this.objectIdMemberType == typeof(Guid))
+						CSharp.AppendLine("\t\t\t\tbool WriteObjectId = !Value." + this.objectIdMemberInfo.Name + ".Equals(Guid.Empty);");
+					else if (this.objectIdMemberType == typeof(string))
+						CSharp.AppendLine("\t\t\t\tbool WriteObjectId = !string.IsNullOrEmpty(Value." + this.objectIdMemberInfo.Name + ");");
+					else if (this.objectIdMemberType == typeof(byte[]))
+						CSharp.AppendLine("\t\t\t\tbool WriteObjectId = !(Value." + this.objectIdMemberInfo.Name + " is null);");
+
+					CSharp.AppendLine("\t\t\t\tWriter.WriteBit(WriteObjectId);");
+					CSharp.AppendLine("\t\t\t\tif (WriteObjectId)");
+
+					if (this.objectIdMemberType == typeof(Guid))
+						CSharp.AppendLine("\t\t\t\t\tWriter.Write(Value." + this.objectIdMemberInfo.Name + ");");
+					else 
+						CSharp.AppendLine("\t\t\t\t\tWriter.Write(new Guid(Value." + this.objectIdMemberInfo.Name + "));");
+		
+					CSharp.AppendLine("\t\t\t}");
+					CSharp.AppendLine();
+				}
+
 				if (this.typeNameSerialization == TypeNameSerialization.None)
 					CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");    // Same as Writer.Write("") for non-normalized case.
 				else
@@ -1434,27 +1440,9 @@ namespace Waher.Persistence.Serialization
 
 					CSharp.AppendLine();
 
-					if (HasDefaultValue)
-					{
-						if (DefaultValue is null)
-							CSharp.AppendLine("\t\t\tif (!((object)Value." + Member.Name + " is null))");
-						else if (MemberType == typeof(string) && DefaultValue is string s2 && string.IsNullOrEmpty(s2))
-							CSharp.AppendLine("\t\t\tif (!string.IsNullOrEmpty(Value." + Member.Name + "))");
-						else if (MemberType == typeof(CaseInsensitiveString) && DefaultValue is CaseInsensitiveString s3 && CaseInsensitiveString.IsNullOrEmpty(s3))
-							CSharp.AppendLine("\t\t\tif (!CaseInsensitiveString.IsNullOrEmpty(Value." + Member.Name + "))");
-						else
-							CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
-
-						CSharp.AppendLine("\t\t\t{");
-						Indent = "\t\t\t\t";
-					}
-					else
-						Indent = "\t\t\t";
-
-					CSharp.Append(Indent);
-
 					if (ObjectIdField)
 					{
+						CSharp.Append("\t\t\t");
 						CSharp.Append(MemberType.FullName);
 						CSharp.Append(" ObjectId = Value.");
 						CSharp.Append(Member.Name);
@@ -1462,6 +1450,25 @@ namespace Waher.Persistence.Serialization
 					}
 					else
 					{
+						if (HasDefaultValue)
+						{
+							if (DefaultValue is null)
+								CSharp.AppendLine("\t\t\tif (!((object)Value." + Member.Name + " is null))");
+							else if (MemberType == typeof(string) && DefaultValue is string s2 && string.IsNullOrEmpty(s2))
+								CSharp.AppendLine("\t\t\tif (!string.IsNullOrEmpty(Value." + Member.Name + "))");
+							else if (MemberType == typeof(CaseInsensitiveString) && DefaultValue is CaseInsensitiveString s3 && CaseInsensitiveString.IsNullOrEmpty(s3))
+								CSharp.AppendLine("\t\t\tif (!CaseInsensitiveString.IsNullOrEmpty(Value." + Member.Name + "))");
+							else
+								CSharp.AppendLine("\t\t\tif (!default" + Member.Name + ".Equals(Value." + Member.Name + "))");
+
+							CSharp.AppendLine("\t\t\t{");
+							Indent = "\t\t\t\t";
+						}
+						else
+							Indent = "\t\t\t";
+
+						CSharp.Append(Indent);
+
 						if (this.debug)
 						{
 							CSharp.AppendLine("Console.Out.WriteLine();");
@@ -1939,21 +1946,21 @@ namespace Waher.Persistence.Serialization
 				if (this.debug)
 					CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
-				if (ObjectIdMemberType is null)
+				if (this.objectIdMemberType is null)
 					CSharp.AppendLine("\t\t\t\tWriterBak.Write(this.context.CreateGuid());");
 				else
 				{
-					if (ObjectIdMemberType == typeof(Guid))
+					if (this.objectIdMemberType == typeof(Guid))
 					{
 						CSharp.AppendLine("\t\t\t\tif (!ObjectId.Equals(Guid.Empty))");
 						CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(ObjectId);");
 					}
-					else if (ObjectIdMemberType == typeof(string))
+					else if (this.objectIdMemberType == typeof(string))
 					{
 						CSharp.AppendLine("\t\t\t\tif (!string.IsNullOrEmpty(ObjectId))");
 						CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
 					}
-					else if (ObjectIdMemberType == typeof(byte[]))
+					else if (this.objectIdMemberType == typeof(byte[]))
 					{
 						CSharp.AppendLine("\t\t\t\tif (!(ObjectId is null))");
 						CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
@@ -1966,12 +1973,12 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = this.context.CreateGuid();");
 					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(NewObjectId);");
 
-					if (ObjectIdMemberType == typeof(Guid))
-						CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId;");
-					else if (ObjectIdMemberType == typeof(string))
-						CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId.ToString();");
-					else if (ObjectIdMemberType == typeof(byte[]))
-						CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId.ToByteArray();");
+					if (this.objectIdMemberType == typeof(Guid))
+						CSharp.AppendLine("\t\t\t\t\tValue." + this.objectIdMemberInfo.Name + " = NewObjectId;");
+					else if (this.objectIdMemberType == typeof(string))
+						CSharp.AppendLine("\t\t\t\t\tValue." + this.objectIdMemberInfo.Name + " = NewObjectId.ToString();");
+					else if (this.objectIdMemberType == typeof(byte[]))
+						CSharp.AppendLine("\t\t\t\t\tValue." + this.objectIdMemberInfo.Name + " = NewObjectId.ToByteArray();");
 
 					CSharp.AppendLine("\t\t\t\t}");
 				}
@@ -3147,10 +3154,8 @@ namespace Waher.Persistence.Serialization
 #if NETSTANDARD1_5
 				if (this.compiled)
 				{
-					if (!(this.objectIdFieldInfo is null))
-						return this.objectIdFieldInfo.Name;
-					else if (!(this.objectIdPropertyInfo is null))
-						return this.objectIdPropertyInfo.Name;
+					if (!(this.objectIdMemberInfo is null))
+						return this.objectIdMemberInfo.Name;
 					else
 						return null;
 				}
@@ -3176,7 +3181,7 @@ namespace Waher.Persistence.Serialization
 			{
 #if NETSTANDARD1_5
 				if (this.compiled)
-					return !(this.objectIdFieldInfo is null) || this.objectIdPropertyInfo != null;
+					return !(this.objectIdMemberInfo is null);
 				else
 #endif
 					return !(this.objectIdMember is null);

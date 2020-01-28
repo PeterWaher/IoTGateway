@@ -21,8 +21,6 @@ namespace Waher.Persistence.FilesLW.Test
 	public class DBFilesObjectSerializationTests
 	{
 		private static FilesProvider provider;
-		private static ObjectBTreeFile file1;
-		private static ObjectBTreeFile file2;
 
 		[ClassInitialize]
 		public static async Task ClassInitialize(TestContext Context)
@@ -34,8 +32,8 @@ namespace Waher.Persistence.FilesLW.Test
 #else
 			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 #endif
-			file1 = await provider.GetFile("Default");
-			file2 = await provider.GetFile("Test");
+			await provider.GetFile("Default");
+			await provider.GetFile("Test");
 		}
 
 		[ClassCleanup]
@@ -46,9 +44,6 @@ namespace Waher.Persistence.FilesLW.Test
 				provider.Dispose();
 				provider = null;
 			}
-
-			file1 = null;
-			file2 = null;
 		}
 
 		[TestMethod]

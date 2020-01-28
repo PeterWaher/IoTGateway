@@ -684,6 +684,11 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Current bit-offset.
+		/// </summary>
+		public int BitOffset => this.bitOffset;
+
+		/// <summary>
 		/// Binary data being parsed.
 		/// </summary>
 		public byte[] Data

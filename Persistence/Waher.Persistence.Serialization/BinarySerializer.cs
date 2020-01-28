@@ -569,6 +569,11 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Current bit-offset.
+		/// </summary>
+		public int BitOffset => this.bitOffset;
+
+		/// <summary>
 		/// Resets the serializer, allowing for the serialization of another object using the same resources.
 		/// </summary>
 		public void Restart()

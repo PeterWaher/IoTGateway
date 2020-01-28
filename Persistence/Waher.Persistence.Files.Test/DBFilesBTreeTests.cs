@@ -634,6 +634,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, 100, 1000, false, null);
@@ -641,30 +642,35 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_09_SaveNew_10000_Statistics()
 		{
 			await this.TestMultiple(10000, 100, 100, false, 100);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_10_SaveNew_100000()
 		{
 			await this.TestMultiple(100000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_11_SaveNew_100000_Statistics()
 		{
 			await this.TestMultiple(100000, 100, 1000, false, 1000);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_12_SaveNew_1000000()
 		{
 			await this.TestMultiple(1000000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_13_SaveNew_1000000_Statistics()
 		{
 			await this.TestMultiple(1000000, 100, 1000, false, 10000);
@@ -1004,12 +1010,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_29_UpdateObjects_10000()
 		{
 			await this.DBFiles_BTree_Test_UpdateObjects(10000);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_30_UpdateObjects_100000()
 		{
 			await this.DBFiles_BTree_Test_UpdateObjects(100000);
@@ -1072,12 +1080,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_34_DeleteObject_10000()
 		{
 			await this.DBFiles_BTree_Test_DeleteObjects(10000, 1000, false);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task DBFiles_BTree_Test_35_DeleteObject_100000()
 		{
 			await this.DBFiles_BTree_Test_DeleteObjects(100000, 1000, false);

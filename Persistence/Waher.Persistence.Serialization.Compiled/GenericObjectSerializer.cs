@@ -61,6 +61,8 @@ namespace Waher.Persistence.Serialization
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_OBJECT:
+					if (Embedded && Reader.BitOffset > 0 && Reader.ReadBit())
+						ObjectId = Reader.ReadGuid();
 					break;
 
 				case ObjectSerializer.TYPE_BOOLEAN:
@@ -520,6 +522,14 @@ namespace Waher.Persistence.Serialization
 				}
 				else if (TypedValue is null)
 					throw new NullReferenceException("Value cannot be null.");
+
+				if (Embedded && Writer.BitOffset > 0)
+				{
+					bool WriteObjectId = !TypedValue.ObjectId.Equals(Guid.Empty);
+					Writer.WriteBit(WriteObjectId);
+					if (WriteObjectId)
+						Writer.Write(TypedValue.ObjectId);
+				}
 
 				bool Normalized = this.NormalizedNames;
 

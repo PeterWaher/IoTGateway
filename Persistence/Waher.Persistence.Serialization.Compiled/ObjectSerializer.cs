@@ -1824,7 +1824,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ", 6);");
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = (ObjectSerializer)this.context.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
+										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = (ObjectSerializer)this.context.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
 										CSharp.Append(Indent2);

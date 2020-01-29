@@ -348,7 +348,7 @@ Suffix-operators are written after the operand to which they are applied. The fo
 | `!!`          | Semi-Faculty                                | `n!!`        |
 | Physical unit | Defines a physical quantity.                | `10 m/s`     |
 
-Some suffix operators canbe prefixed by a `?` character, to include a *null check` of the operand. If the operand is `null`, the operator
+Some suffix operators can be prefixed by a `?` character, to include a *null check* of the operand. If the operand is `null`, the operator
 is not evaluated, and `null` is returned. The following table lists null-checked suffix operators:
 
 | Operator       | Description                                 | Example       |

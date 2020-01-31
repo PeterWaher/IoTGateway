@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.PubSub;
@@ -154,6 +155,74 @@ namespace Waher.Networking.XMPP.PEP
 		public void Publish(string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
 		{
 			this.pubSubClient?.Publish(string.Empty, Node, ItemId, PayloadXml, Callback, State);
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <returns>ID of published item.</returns>
+		public Task<string> PublishAsync(string Node)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, this.AsyncCallback, Result);
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="PayloadXml">Payload XML.</param>
+		/// <returns>ID of published item.</returns>
+		public Task<string> PublishAsync(string Node, string PayloadXml)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, PayloadXml, this.AsyncCallback, Result);
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="PersonalEvent">Personal event.</param>
+		/// <returns>ID of published item.</returns>
+		public Task<string> PublishAsync(IPersonalEvent PersonalEvent)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+			string ItemId = PersonalEvent.ItemId;
+
+			if (ItemId is null)
+				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
+			else
+				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
+		
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Publishes an item on a node.
+		/// </summary>
+		/// <param name="Node">Node name.</param>
+		/// <param name="ItemId">Item identity, if available. If used, and an existing item
+		/// is available with that identity, it will be updated with the new content.</param>
+		/// <param name="PayloadXml">Payload XML.</param>
+		/// <returns>ID of published item.</returns>
+		public Task<string> PublishAsync(string Node, string ItemId, string PayloadXml)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+			this.pubSubClient?.Publish(string.Empty, Node, ItemId, PayloadXml, this.AsyncCallback, Result);
+			return Result.Task;
+		}
+
+		private void AsyncCallback(object Sender, ItemResultEventArgs e)
+		{
+			TaskCompletionSource<string> Result = (TaskCompletionSource<string>)e.State;
+
+			if (e.Ok)
+				Result.TrySetResult(e.ItemId);
+			else
+				Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to publish event." : e.ErrorText));
 		}
 
 		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)

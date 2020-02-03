@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content
@@ -20,14 +21,17 @@ namespace Waher.Content
 		private static string[] canEncodeFileExtensions = null;
 		private static string[] canDecodeContentTypes = null;
 		private static string[] canDecodeFileExtensions = null;
+		private static string[] canGetUriSchemes = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
+		private static IContentGetter[] getters = null;
 		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
+		private static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static InternetContent()
 		{
@@ -40,9 +44,11 @@ namespace Waher.Content
 			canEncodeFileExtensions = null;
 			canDecodeContentTypes = null;
 			canDecodeFileExtensions = null;
+			canGetUriSchemes = null;
 			encoders = null;
 			decoders = null;
 			converters = null;
+			getters = null;
 
 			lock (decoderByContentType)
 			{
@@ -58,6 +64,11 @@ namespace Waher.Content
 			{
 				convertersByStep.Clear();
 				convertersByFrom.Clear();
+			}
+
+			lock (gettersByScheme)
+			{
+				gettersByScheme.Clear();
 			}
 		}
 
@@ -769,5 +780,151 @@ namespace Waher.Content
 
 		#endregion
 
+		#region Getting resources
+
+		/// <summary>
+		/// Internet URI Schemes that can be gotten.
+		/// </summary>
+		public static string[] CanGetUriSchemes
+		{
+			get
+			{
+				if (canGetUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentGetter Getter in Getters)
+					{
+						foreach (string Scheme in Getter.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canGetUriSchemes = Schemes;
+				}
+
+				return canGetUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Getters.
+		/// </summary>
+		public static IContentGetter[] Getters
+		{
+			get
+			{
+				if (getters is null)
+					BuildGetters();
+
+				return getters;
+			}
+		}
+
+		private static void BuildGetters()
+		{
+			List<IContentGetter> Getters = new List<IContentGetter>();
+			Type[] GetterTypes = Types.GetTypesImplementingInterface(typeof(IContentGetter));
+			Dictionary<string, List<IContentGetter>> ByScheme = new Dictionary<string, List<IContentGetter>>();
+			IContentGetter Getter;
+			TypeInfo TI;
+
+			foreach (Type T in GetterTypes)
+			{
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					continue;
+
+				try
+				{
+					Getter = (IContentGetter)Activator.CreateInstance(T);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Getters.Add(Getter);
+
+				foreach (string Schema in Getter.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out List<IContentGetter> List))
+					{
+						List = new List<IContentGetter>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Getter);
+				}
+			}
+
+			lock (gettersByScheme)
+			{
+				foreach (KeyValuePair<string, List<IContentGetter>> P in ByScheme)
+					gettersByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			getters = Getters.ToArray();
+		}
+
+		/// <summary>
+		/// If a resource can be gotten, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the decoder decodes the object.</param>
+		/// <param name="Getter">Best getter for the URI.</param>
+		/// <returns>If a resource with the given URI can be gotten.</returns>
+		public static bool CanGet(Uri Uri, out Grade Grade, out IContentGetter Getter)
+		{
+			if (Uri is null)
+				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+
+			if (getters is null)
+				BuildGetters();
+
+			IContentGetter[] Getters;
+
+			lock (gettersByScheme)
+			{
+				if (Uri is null || !gettersByScheme.TryGetValue(Uri.Scheme, out Getters))
+				{
+					Getter = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Getter = null;
+
+			foreach (IContentGetter Getter2 in Getters)
+			{
+				if (Getter2.CanGet(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Getter = Getter2;
+				}
+			}
+
+			return Getter != null;
+		}
+
+		/// <summary>
+		/// Gets a resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Object.</returns>
+		public static Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Getter.GetAsync(Uri, Headers);
+		}
+
+		#endregion
 	}
 }

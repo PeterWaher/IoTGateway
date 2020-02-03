@@ -1314,6 +1314,8 @@ The following functions are available in the `Waher.Script.Content` library.
 |---------------------------------|-------------|---------|
 | `Base64Decode(Data)`            | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
 | `Base64Encode(Data)`            | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
+| `Base64UrlDecode(Data)`         | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
+| `Base64UrlEncode(Data)`         | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
 | `Decode(Content,Type)`          | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
 | `Encode(Object[,Types])`        | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
 | `HtmlAttributeEncode(s)`        | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
@@ -1328,6 +1330,8 @@ The following functions are available in the `Waher.Script.Content` library.
 
 [Base64DecodeExample]: Calculator.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
 [Base64EncodeExample]: Calculator.md?Expression=Base64Encode(Encode("Hello")[0])
+[Base64UrlDecodeExample]: Calculator.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")
+[Base64UrlEncodeExample]: Calculator.md?Expression=Base64UrlEncode(Encode("Hello")[0])
 [DecodeExample]: Calculator.md?Expression=Decode(Csv,%22text/csv%22)
 [EncodeExample]: Calculator.md?Expression=Encode("Hello",[%22text/plain%22])
 [HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)

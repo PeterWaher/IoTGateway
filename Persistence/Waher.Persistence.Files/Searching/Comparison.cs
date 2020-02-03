@@ -222,7 +222,7 @@ namespace Waher.Persistence.Files.Searching
 			if (Value1 is IComparable Comparable)
 				return Comparable.CompareTo(Value2);
 			else if (Value1 is byte[] b1 && Value2 is byte[] b2)
-				return Storage.IndexRecords.BinaryCompare(b1, b1);
+				return Storage.IndexRecords.BinaryCompare(b1, b2);
 			else
 				return null;
 		}

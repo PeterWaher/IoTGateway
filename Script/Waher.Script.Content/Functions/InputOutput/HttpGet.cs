@@ -73,7 +73,6 @@ namespace Waher.Script.Content.Functions.InputOutput
 					Method = HttpMethod.Get
 				})
 				{
-
 					if (Arguments.Length > 1)
 					{
 						object Arg1 = Arguments[1].AssociatedObjectValue;

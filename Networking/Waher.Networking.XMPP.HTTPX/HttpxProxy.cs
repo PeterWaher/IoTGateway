@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// <summary>
 	/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
 	/// </summary>
-	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
+	public partial class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod, IHttpDeleteMethod
 	{
 		private readonly XmppClient defaultXmppClient;
@@ -181,11 +181,11 @@ namespace Waher.Networking.XMPP.HTTPX
 					Url = Url.Substring(1);
 
 				if (!Url.StartsWith("httpx://", StringComparison.OrdinalIgnoreCase))
-					throw new BadRequestException();
+					throw new BadRequestException("Invalid URI. Must use httpx URI scheme.");
 
 				int i = Url.IndexOf('/', 8);
 				if (i < 0)
-					throw new BadRequestException();
+					throw new BadRequestException("Invalid URI.");
 
 				string BareJID = Url.Substring(8, i - 8);
 				string LocalUrl = Url.Substring(i);
@@ -223,11 +223,11 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (Item is null)
 				{
 					if (!XmppClient.BareJidRegEx.IsMatch(BareJID))
-						throw new BadRequestException();
+						throw new BadRequestException("Invalid Bare JID.");
 
 					// TODO: Request presence subscription, if user authenticated and request valid.
 
-					throw new ConflictException();  // TODO: Provide body describing error.
+					throw new ConflictException("No approved presence subscription with " + BareJID + ".");
 				}
 				else
 				{
@@ -253,12 +253,82 @@ namespace Waher.Networking.XMPP.HTTPX
 						return;
 					}
 
-					throw new ServiceUnavailableException();
+					throw new ServiceUnavailableException(BareJID + " not online.");
 				}
 			}
 			catch (Exception ex)
 			{
 				Response.SendResponse(ex);
+			}
+		}
+
+		/// <summary>
+		/// Gets a corresponding <see cref="HttpxClient"/> appropriate for a given request.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>Contains details of the <paramref name="Uri"/> and the corresponding <see cref="HttpxClient"/> to use
+		/// for requesting the resource from the entity.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="Uri"/> parameter is invalid.</exception>
+		/// <exception cref="ConflictException">If an approved presence subscription with the remote entity does not exist.</exception>
+		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
+		public async Task<GetClientResponse> GetClientAsync(Uri Uri)
+		{
+			if (string.Compare(Uri.Scheme, "httpx", true) != 0)
+				throw new ArgumentException("URI must use URI Scheme HTTPX.", nameof(Uri));
+
+			string BareJID = Uri.UserInfo + "@" + Uri.Authority;
+			string LocalUrl = Uri.PathAndQuery + Uri.Fragment;
+
+			RosterItem Item = this.defaultXmppClient.GetRosterItem(BareJID);
+			if (Item is null)
+			{
+				if (!XmppClient.BareJidRegEx.IsMatch(BareJID))
+					throw new BadRequestException("Invalid Bare JID.");
+
+				// TODO: Request presence subscription, if user authenticated and request valid.
+
+				throw new ConflictException("No approved presence subscription with " + BareJID + ".");
+			}
+			else
+			{
+				TaskCompletionSource<HttpxClient> Result = new TaskCompletionSource<HttpxClient>();
+
+				foreach (PresenceEventArgs e in Item.Resources)
+				{
+					if (this.serverlessMessaging != null)
+					{
+						this.serverlessMessaging.GetPeerConnection(e.From, (sender, e2) =>
+						{
+							if (e2.Client is null)
+								Result.TrySetResult(this.httpxClient);
+							else
+							{
+								if (e2.Client.SupportsFeature(HttpxClient.Namespace) &&
+									e2.Client.TryGetTag("HttpxClient", out object Obj) &&
+									Obj is HttpxClient Client)
+								{
+									Result.TrySetResult(Client);
+								}
+								else
+									Result.TrySetResult(this.httpxClient);
+							}
+						}, null);
+					}
+					else
+						Result.TrySetResult(this.httpxClient);
+
+					HttpxClient Client2 = await Result.Task;
+
+					return new GetClientResponse()
+					{
+						FullJid = e.From,
+						BareJid = BareJID,
+						LocalUrl = LocalUrl,
+						HttpxClient = Client2
+					};
+				}
+
+				throw new ServiceUnavailableException(BareJID + " not online.");
 			}
 		}
 
@@ -285,13 +355,11 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				else
 				{
-					HttpxClient HttpxClient;
-
 					if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
 						e.Client.TryGetTag("HttpxClient", out object Obj) &&
-						(HttpxClient = Obj as HttpxClient) != null)
+						Obj is HttpxClient Client)
 					{
-						this.SendRequest(HttpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+						this.SendRequest(Client, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
 							Rec.localUrl, Rec.request, Rec.response);
 					}
 					else

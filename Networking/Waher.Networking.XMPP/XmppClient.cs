@@ -3066,15 +3066,20 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		internal static XmppException GetStreamExceptionObject(XmlElement E)
+		private static string GetErrorText(XmlElement E)
 		{
-			string Msg = string.Empty;
-
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
-				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStreams)
-					Msg = N2.InnerText.Trim();
+				if (N2.LocalName == "text" && (N2.NamespaceURI == NamespaceXmppStreams || N2.NamespaceURI == NamespaceXmppStreams || N2.NamespaceURI == NamespaceXmppSasl))
+					return N2.InnerText.Trim();
 			}
+
+			return string.Empty;
+		}
+
+		internal static XmppException GetStreamExceptionObject(XmlElement E)
+		{
+			string Msg = GetErrorText(E);
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
@@ -3119,13 +3124,7 @@ namespace Waher.Networking.XMPP
 
 		internal static XmppException GetStanzaExceptionObject(XmlElement E)
 		{
-			string Msg = string.Empty;
-
-			foreach (XmlNode N2 in E.ChildNodes)
-			{
-				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStanzas)
-					Msg = N2.InnerText.Trim();
-			}
+			string Msg = GetErrorText(E);
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
@@ -3165,13 +3164,7 @@ namespace Waher.Networking.XMPP
 
 		internal static XmppException GetSaslExceptionObject(XmlElement E)
 		{
-			string Msg = string.Empty;
-
-			foreach (XmlNode N2 in E.ChildNodes)
-			{
-				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStreams)
-					Msg = N2.InnerText.Trim();
-			}
+			string Msg = GetErrorText(E);
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
@@ -3546,7 +3539,7 @@ namespace Waher.Networking.XMPP
 				Xml.Append("'><");
 				Xml.Append(ex2.ErrorStanzaName);
 				Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>");
+				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
 				Xml.Append(XML.Encode(ex2.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");
@@ -3556,7 +3549,7 @@ namespace Waher.Networking.XMPP
 				this.Exception(ex);
 
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>");
+				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
 				Xml.Append(XML.Encode(ex.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");

@@ -431,6 +431,51 @@
             <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
             <returns>Loaded object.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Object)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Guid)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject(System.String,System.Object)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            </summary>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject(System.String,System.Object,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            </summary>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
+            <returns>Loaded object.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetObjectId(System.Object,System.Boolean)">
             <summary>
             Gets the Object ID for a given object.
@@ -524,6 +569,13 @@
             Deletes a collection of objects in the database.
             </summary>
             <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetDictionary(System.String)">
+            <summary>
+            Gets a persistent dictionary containing objects in a collection.
+            </summary>
+            <param name="Collection">Collection Name</param>
+            <returns>Persistent dictionary</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.ExportXml(System.Boolean)">
             <summary>
@@ -3991,6 +4043,11 @@
             <see cref="M:System.Collections.Generic.ICollection`1.Clear"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.ClearAsync">
+            <summary>
+            Clears the dictionary.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.StringDictionary.Contains(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
             <summary>
             <see cref="M:System.Collections.Generic.ICollection`1.Contains(`0)"/>
@@ -4078,6 +4135,11 @@
             <returns>The element with the specified key.</returns>
             <exception cref="T:System.ArgumentNullException">key is null.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and key is not found.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.DeleteAndDispose">
+            <summary>
+            Deletes the dictionary and disposes the object.
+            </summary>
         </member>
     </members>
 </doc>

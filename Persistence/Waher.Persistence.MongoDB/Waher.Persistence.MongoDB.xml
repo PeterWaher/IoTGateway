@@ -4,6 +4,66 @@
         <name>Waher.Persistence.MongoDB</name>
     </assembly>
     <members>
+        <member name="T:Waher.Persistence.MongoDB.DictionaryEntry">
+            <summary>
+            Contains a reference to a thing
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.DictionaryEntry.#ctor">
+            <summary>
+            Contains a reference to a thing
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEntry.ObjectId">
+            <summary>
+            Persisted object ID. Is null if object not persisted.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEntry.Collection">
+            <summary>
+            Dictionary collection
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEntry.Key">
+            <summary>
+            Dictionary key
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEntry.Value">
+            <summary>
+            Dictionary value
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.MongoDB.DictionaryEnumerator">
+            <summary>
+            Dictionary enumerator
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.Generic.IEnumerator`1.Current"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.DictionaryEnumerator.System#Collections#IEnumerator#Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.DictionaryEnumerator.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.DictionaryEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.DictionaryEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.MongoDB.MongoDBProvider">
             <summary>
             MongoDB database provider.
@@ -147,6 +207,30 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Find``1(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="CollectionName">Collection Name</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="CollectionName">Collection Name</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
@@ -161,6 +245,32 @@
             </summary>
             <typeparam name="T">Type of object to load.</typeparam>
             <param name="ObjectId">Object ID of object to load.</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.String,System.Object)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.String,MongoDB.Bson.ObjectId)">
+            <summary>
+            Loads an object of a given type and Object ID.
+            </summary>
+            <typeparam name="T">Type of object to load.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID of object to load.</param>
+            <returns>Loaded object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject(System.String,System.Object)">
+            <summary>
+            Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            </summary>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Update(System.Object)">
@@ -273,6 +383,13 @@
             <summary>
             Persists any pending changes.
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetDictionary(System.String)">
+            <summary>
+            Gets a persistent dictionary containing objects in a collection.
+            </summary>
+            <param name="Collection">Collection Name</param>
+            <returns>Persistent dictionary</returns>
         </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase">
             <summary>
@@ -731,6 +848,13 @@
             <summary>
             Provides a generic object serializer.
             </summary>
+            <param name="Provider">Database provider.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.Serialization.GenericObjectSerializer.#ctor(Waher.Persistence.MongoDB.MongoDBProvider,System.Boolean)">
+            <summary>
+            Provides a generic object serializer.
+            </summary>
+            <param name="Provider">Database provider.</param>
         </member>
         <member name="M:Waher.Persistence.MongoDB.Serialization.GenericObjectSerializer.Deserialize(MongoDB.Bson.IO.IBsonReader,System.Nullable{MongoDB.Bson.BsonType},System.Boolean)">
             <summary>
@@ -1522,6 +1646,11 @@
         <member name="T:Waher.Persistence.MongoDB.Serialization.ObjectSerializer">
             <summary>
             Serializes a type to BSON, taking into account attributes defined in <see cref="N:Waher.Persistence.Attributes"/>.
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.provider">
+            <summary>
+            Database provider.
             </summary>
         </member>
         <member name="M:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.#ctor(System.Type,Waher.Persistence.MongoDB.MongoDBProvider)">
@@ -2547,6 +2676,212 @@
             <param name="Object">Object.</param>
             <param name="FieldType">Corresponding field or property type, if found, or null otherwise.</param>
             <returns>If the corresponding field or property was found.</returns>
+        </member>
+        <member name="T:Waher.Persistence.MongoDB.StringDictionary">
+            <summary>
+            This class manages a string dictionary in a persisted storage.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.#ctor(System.String,Waher.Persistence.MongoDB.MongoDBProvider)">
+            <summary>
+            This class manages a string dictionary in a persisted storage.
+            </summary>
+            <param name="CollectionName">Collection Name.</param>
+            <param name="Provider">Files provider.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.ContainsKey(System.String)">
+            <summary>
+            Determines whether the System.Collections.Generic.IDictionary{string,object} contains an element with the specified key.
+            </summary>
+            <param name="key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
+            <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.ContainsKeyAsync(System.String)">
+            <summary>
+            Determines whether the System.Collections.Generic.IDictionary{string,object} contains an element with the specified key.
+            </summary>
+            <param name="key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
+            <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Add(System.String,System.Object)">
+            <summary>
+            Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
+            </summary>
+            <param name="key">The object to use as the key of the element to add.</param>
+            <param name="value">The object to use as the value of the element to add.</param>
+            <exception cref="T:System.ArgumentNullException">key is null</exception>
+            <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.AddAsync(System.String,System.Object)">
+            <summary>
+            Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
+            </summary>
+            <param name="key">The object to use as the key of the element to add.</param>
+            <param name="value">The object to use as the value of the element to add.</param>
+            <exception cref="T:System.ArgumentNullException">key is null</exception>
+            <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.AddAsync(System.String,System.Object,System.Boolean)">
+            <summary>
+            Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
+            </summary>
+            <param name="key">The object to use as the key of the element to add.</param>
+            <param name="value">The object to use as the value of the element to add.</param>
+            <param name="ReplaceIfExists">If replacement of any existing value is desired.</param>
+            <exception cref="T:System.ArgumentNullException">key is null</exception>
+            <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Remove(System.String)">
+            <summary>
+            Removes the element with the specified key from the System.Collections.IDictionary object.
+            </summary>
+            <param name="key">The key of the element to remove.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.RemoveAsync(System.String)">
+            <summary>
+            Removes the element with the specified key from the System.Collections.IDictionary object.
+            </summary>
+            <param name="key">The key of the element to remove.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.TryGetValue(System.String,System.Object@)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+            <param name="key">The key whose value to get.</param>
+            <param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, 
+            the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
+            <returns>true if the object that implements System.Collections.Generic.IDictionary{string,object} contains an element with the specified key; 
+            otherwise, false.</returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.TryGetValueAsync(System.String)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+            <param name="key">The key whose value to get.</param>
+            <returns>Returns a pair of values:
+            
+            First value is true if the object that implements System.Collections.Generic.IDictionary{string,object} contains an element 
+            with the specified key; otherwise, false.
+            When this method returns, the second value contains the value associated with the key, if the key is found; otherwise, 
+            the default value for the type of the value parameter.</returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.GetValueAsync(System.String)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+            <param name="key">The key whose value to get.</param>
+            <returns>Returns the value associated with the specified key, if the key is found.</returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If <paramref name="key"/> was not found.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Add(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            <see cref="M:System.Collections.Generic.ICollection`1.Add(`0)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Clear">
+            <summary>
+            <see cref="M:System.Collections.Generic.ICollection`1.Clear"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.ClearAsync">
+            <summary>
+            Clears the dictionary.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Contains(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            <see cref="M:System.Collections.Generic.ICollection`1.Contains(`0)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.CopyTo(System.Collections.Generic.KeyValuePair{System.String,System.Object}[],System.Int32)">
+            <summary>
+            <see cref="M:System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.ToArray">
+            <summary>
+            Loads the entire table and returns it as an array.
+            </summary>
+            <returns>Array of key-value pairs.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.ToArrayAsync">
+            <summary>
+            Loads the entire table and returns it as an array.
+            </summary>
+            <returns>Array of key-value pairs.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.Remove(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            <see cref="M:System.Collections.Generic.ICollection`1.Remove(`0)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.Generic.IEnumerable`1.GetEnumerator"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.IEnumerable.GetEnumerator"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.GetEnumeratorAsync">
+            <summary>
+            Gets an enumerator for all entries in the dictionary.
+            </summary>
+            <param name="Locked">If the file should be locked.</param>
+            <returns>Enumerator</returns>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.CollectionName">
+            <summary>
+            Name of corresponding collection name.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.Keys">
+            <summary>
+            <see cref="P:System.Collections.Generic.IDictionary`2.Keys"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.Values">
+            <summary>
+            <see cref="P:System.Collections.Generic.IDictionary`2.Values"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.Count">
+            <summary>
+            <see cref="P:System.Collections.Generic.ICollection`1.Count"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.IsReadOnly">
+            <summary>
+            <see cref="P:System.Collections.Generic.ICollection`1.IsReadOnly"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.StringDictionary.Item(System.String)">
+            <summary>
+            Gets or sets the element with the specified key.
+            </summary>
+            <param name="key">The key of the element to get or set.</param>
+            <returns>The element with the specified key.</returns>
+            <exception cref="T:System.ArgumentNullException">key is null.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and key is not found.</exception>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.DeleteAndDispose">
+            <summary>
+            Deletes the dictionary and disposes the object.
+            </summary>
         </member>
     </members>
 </doc>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -35,10 +36,10 @@ namespace Waher.Security.PKCS
 	/// <summary>
 	/// Encodes data using the Distinguished Encoding Rules (DER), as defined in X.690
 	/// </summary>
-	public class DerEncoder
+	public class DerEncoder : IDisposable
 	{
-		private List<byte> output = new List<byte>();
-		private LinkedList<KeyValuePair<byte, List<byte>>> stack = null;
+		private MemoryStream output = new MemoryStream();
+		private LinkedList<KeyValuePair<byte, MemoryStream>> stack = null;
 
 		/// <summary>
 		/// Encodes data using the Distinguished Encoding Rules (DER), as defined in X.690
@@ -48,11 +49,20 @@ namespace Waher.Security.PKCS
 		}
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
 		/// Clears the output buffer.
 		/// </summary>
 		public void Clear()
 		{
-			this.output.Clear();
+			this.output.Position = 0;
+			this.output.SetLength(0);
 		}
 
 		/// <summary>
@@ -73,13 +83,13 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">BOOLEAN value.</param>
 		public void BOOLEAN(bool Value)
 		{
-			this.output.Add(1);
-			this.output.Add(1);
+			this.output.WriteByte(1);
+			this.output.WriteByte(1);
 
 			if (Value)
-				this.output.Add(0xff);
+				this.output.WriteByte(0xff);
 			else
-				this.output.Add(0x00);
+				this.output.WriteByte(0x00);
 		}
 
 		/// <summary>
@@ -88,13 +98,13 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">INTEGER value.</param>
 		public void INTEGER(long Value)
 		{
-			this.output.Add(2);
+			this.output.WriteByte(2);
 
-			int Pos = this.output.Count;
+			int Pos = (int)this.output.Position;
 			int c = 8;
 			byte b;
 
-			this.output.Add(0);
+			this.output.WriteByte(0);
 
 			if (Value < 0)
 			{
@@ -107,19 +117,19 @@ namespace Waher.Security.PKCS
 				while (b == 0xff);
 
 				if (b < 0x80)
-					this.output.Add(0xff);
+					this.output.WriteByte(0xff);
 
-				this.output.Add(b);
+				this.output.WriteByte(b);
 
 				while (c-- > 0)
 				{
 					b = (byte)(Value >> 56);
-					this.output.Add(b);
+					this.output.WriteByte(b);
 					Value <<= 8;
 				}
 			}
 			else if (Value == 0)
-				this.output.Add(0);
+				this.output.WriteByte(0);
 			else
 			{
 				do
@@ -131,19 +141,19 @@ namespace Waher.Security.PKCS
 				while (b == 0);
 
 				if (b >= 0x80)
-					this.output.Add(0);
+					this.output.WriteByte(0);
 
-				this.output.Add(b);
+				this.output.WriteByte(b);
 
 				while (c-- > 0)
 				{
 					b = (byte)(Value >> 56);
-					this.output.Add(b);
+					this.output.WriteByte(b);
 					Value <<= 8;
 				}
 			}
 
-			this.output[Pos] = (byte)(this.output.Count - Pos - 1);
+			this[Pos] = (byte)(this.output.Position - Pos - 1);
 		}
 
 		/// <summary>
@@ -153,7 +163,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Negative">If the value is negative.</param>
 		public void INTEGER(byte[] Value, bool Negative)
 		{
-			this.output.Add(2);
+			this.output.WriteByte(2);
 
 			if (Negative)
 			{
@@ -192,30 +202,30 @@ namespace Waher.Security.PKCS
 			if (Len >= 0x80)
 			{
 				if (Len <= 0xff)
-					this.output.Add(0x81);
+					this.output.WriteByte(0x81);
 				else
 				{
 					if (Len <= 0xffff)
-						this.output.Add(0x82);
+						this.output.WriteByte(0x82);
 					else
 					{
 						if (Len <= 0xffffff)
-							this.output.Add(0x83);
+							this.output.WriteByte(0x83);
 						else
 						{
-							this.output.Add(0x84);
-							this.output.Add((byte)(Len >> 24));
+							this.output.WriteByte(0x84);
+							this.output.WriteByte((byte)(Len >> 24));
 						}
 
-						this.output.Add((byte)(Len >> 16));
+						this.output.WriteByte((byte)(Len >> 16));
 					}
 
-					this.output.Add((byte)(Len >> 8));
+					this.output.WriteByte((byte)(Len >> 8));
 				}
 			}
 
-			this.output.Add((byte)Len);
-			this.output.AddRange(Bin);
+			this.output.WriteByte((byte)Len);
+			this.output.Write(Bin, 0, Bin.Length);
 		}
 
 		/// <summary>
@@ -224,7 +234,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Bits">BITSTRING value.</param>
 		public void BITSTRING(BitArray Bits)
 		{
-			this.output.Add(3);
+			this.output.WriteByte(3);
 
 			int NrBits = Bits.Length;
 			int Len = (NrBits + 7) / 8 + 1;
@@ -264,7 +274,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Bytes">Bytes containing BITSTRING value.</param>
 		public void BITSTRING(byte[] Bytes)
 		{
-			this.output.Add(3);
+			this.output.WriteByte(3);
 
 			int c = Bytes.Length;
 			byte[] Bytes2 = new byte[c + 1];
@@ -280,7 +290,7 @@ namespace Waher.Security.PKCS
 		public void StartBITSTRING()
 		{
 			this.Start(3);
-			this.output.Add(0);
+			this.output.WriteByte(0);
 		}
 
 		/// <summary>
@@ -297,7 +307,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">OCTET STRING value.</param>
 		public void OCTET_STRING(byte[] Value)
 		{
-			this.output.Add(4);
+			this.output.WriteByte(4);
 			this.EncodeBinary(Value);
 		}
 
@@ -322,8 +332,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public void NULL()
 		{
-			this.output.Add(5);
-			this.output.Add(0);
+			this.output.WriteByte(5);
+			this.output.WriteByte(0);
 		}
 
 		/// <summary>
@@ -366,32 +376,32 @@ namespace Waher.Security.PKCS
 
 			j += OID[1];
 
-			List<byte> Bin = new List<byte>()
+			using (MemoryStream Bin = new MemoryStream())
 			{
-				(byte)j
-			};
+				Bin.WriteByte((byte)j);
 
-			for (i = 2; i < c; i++)
-			{
-				j = OID[i];
+				for (i = 2; i < c; i++)
+				{
+					j = OID[i];
 
-				if (j >= 0x10000000)
-					Bin.Add((byte)(128 + (j >> 28)));
+					if (j >= 0x10000000)
+						Bin.WriteByte((byte)(128 + (j >> 28)));
 
-				if (j >= 0x200000)
-					Bin.Add((byte)(128 + (j >> 21)));
+					if (j >= 0x200000)
+						Bin.WriteByte((byte)(128 + (j >> 21)));
 
-				if (j >= 0x4000)
-					Bin.Add((byte)(128 + (j >> 14)));
+					if (j >= 0x4000)
+						Bin.WriteByte((byte)(128 + (j >> 14)));
 
-				if (j >= 0x80)
-					Bin.Add((byte)(128 + (j >> 7)));
+					if (j >= 0x80)
+						Bin.WriteByte((byte)(128 + (j >> 7)));
 
-				Bin.Add((byte)(j & 127));
+					Bin.WriteByte((byte)(j & 127));
+				}
+
+				this.output.WriteByte(6);
+				this.EncodeBinary(Bin.ToArray());
 			}
-
-			this.output.Add(6);
-			this.EncodeBinary(Bin.ToArray());
 		}
 
 		/// <summary>
@@ -400,7 +410,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">UNICODE STRING (BMPString) value.</param>
 		public void UNICODE_STRING(string Value)
 		{
-			this.output.Add(0x1e);
+			this.output.WriteByte(0x1e);
 			this.EncodeBinary(Encoding.BigEndianUnicode.GetBytes(Value));
 		}
 
@@ -410,7 +420,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">IA5 STRING value.</param>
 		public void IA5_STRING(string Value)
 		{
-			this.output.Add(0x16);
+			this.output.WriteByte(0x16);
 			this.EncodeBinary(Encoding.ASCII.GetBytes(Value));
 		}
 
@@ -423,7 +433,7 @@ namespace Waher.Security.PKCS
 			if (!IsPrintable(Value))
 				throw new ArgumentException("Not a printable string.", nameof(Value));
 
-			this.output.Add(0x13);
+			this.output.WriteByte(0x13);
 			this.EncodeBinary(Encoding.ASCII.GetBytes(Value));
 		}
 
@@ -445,7 +455,7 @@ namespace Waher.Security.PKCS
 		/// <param name="Value">UTF-8 STRING value.</param>
 		public void UTF8_STRING(string Value)
 		{
-			this.output.Add(0x0c);
+			this.output.WriteByte(0x0c);
 			this.EncodeBinary(Encoding.UTF8.GetBytes(Value));
 		}
 
@@ -460,11 +470,11 @@ namespace Waher.Security.PKCS
 		private void Start(byte Expected)
 		{
 			if (this.stack is null)
-				this.stack = new LinkedList<KeyValuePair<byte, List<byte>>>();
+				this.stack = new LinkedList<KeyValuePair<byte, MemoryStream>>();
 
-			this.stack.AddLast(new KeyValuePair<byte, List<byte>>(Expected, this.output));
-
-			this.output = new List<byte>();
+			this.stack.AddLast(new KeyValuePair<byte, MemoryStream>(Expected, this.output));
+			
+			this.output = new MemoryStream();
 		}
 
 		/// <summary>
@@ -484,11 +494,12 @@ namespace Waher.Security.PKCS
 				throw new Exception("Start/End type mismatch.");
 
 			byte[] Bin = this.output.ToArray();
+			this.output.Dispose();
 
 			this.output = this.stack.Last.Value.Value;
 			this.stack.RemoveLast();
 
-			this.output.Add(Type);
+			this.output.WriteByte(Type);
 			this.EncodeBinary(Bin);
 		}
 
@@ -514,8 +525,8 @@ namespace Waher.Security.PKCS
 		/// <param name="Class">Class</param>
 		public void Content(Asn1TypeClass Class)
 		{
-			this.output.Add((byte)((((int)Class) << 6) | 0x20));
-			this.output.Add(0);
+			this.output.WriteByte((byte)((((int)Class) << 6) | 0x20));
+			this.output.WriteByte(0);
 		}
 
 		/// <summary>
@@ -542,7 +553,7 @@ namespace Waher.Security.PKCS
 		/// <param name="DerEncodedBytes">DER encoded bytes.</param>
 		public void Raw(byte[] DerEncodedBytes)
 		{
-			this.output.AddRange(DerEncodedBytes);
+			this.output.Write(DerEncodedBytes, 0, DerEncodedBytes.Length);
 		}
 
 		/// <summary>
@@ -550,7 +561,7 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public int Position
 		{
-			get { return this.output.Count; }
+			get { return (int)this.output.Position; }
 		}
 
 		/// <summary>
@@ -560,8 +571,26 @@ namespace Waher.Security.PKCS
 		/// <returns>Binary byte at position.</returns>
 		public byte this[int Index]
 		{
-			get { return this.output[Index]; }
-			set { this.output[Index] = value; }
+			get 
+			{
+				long PosBak = this.output.Position;
+				byte Result;
+
+				this.output.Position = Index;
+				Result = (byte)this.output.ReadByte();
+				this.output.Position = PosBak;
+
+				return Result;
+			}
+
+			set 
+			{
+				long PosBak = this.output.Position;
+
+				this.output.Position = Index;
+				this.output.WriteByte(value);
+				this.output.Position = PosBak;
+			}
 		}
 
 	}

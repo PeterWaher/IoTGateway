@@ -79,46 +79,48 @@ namespace Waher.Security
 		/// <returns>Array of bytes found in the string, or null if not a hex string.</returns>
 		public static byte[] StringToBinary(string s)
 		{
-			List<byte> Bytes = new List<byte>();
-			int i, c = s.Length;
-			byte b = 0, b2;
-			bool First = true;
-			char ch;
-
-			for (i = 0; i < c; i++)
+			using (MemoryStream Bytes = new MemoryStream())
 			{
-				ch = s[i];
+				int i, c = s.Length;
+				byte b = 0, b2;
+				bool First = true;
+				char ch;
 
-				if (ch >= '0' && ch <= '9')
-					b2 = (byte)(ch - '0');
-				else if (ch >= 'a' && ch <= 'f')
-					b2 = (byte)(ch - 'a' + 10);
-				else if (ch >= 'A' && ch <= 'F')
-					b2 = (byte)(ch - 'A' + 10);
-				else if (ch == ' ' || ch == 160)
-					continue;
-				else
+				for (i = 0; i < c; i++)
+				{
+					ch = s[i];
+
+					if (ch >= '0' && ch <= '9')
+						b2 = (byte)(ch - '0');
+					else if (ch >= 'a' && ch <= 'f')
+						b2 = (byte)(ch - 'a' + 10);
+					else if (ch >= 'A' && ch <= 'F')
+						b2 = (byte)(ch - 'A' + 10);
+					else if (ch == ' ' || ch == 160)
+						continue;
+					else
+						return null;
+
+					if (First)
+					{
+						b = b2;
+						First = false;
+					}
+					else
+					{
+						b <<= 4;
+						b |= b2;
+
+						Bytes.WriteByte(b);
+						First = true;
+					}
+				}
+
+				if (!First)
 					return null;
 
-				if (First)
-				{
-					b = b2;
-					First = false;
-				}
-				else
-				{
-					b <<= 4;
-					b |= b2;
-
-					Bytes.Add(b);
-					First = true;
-				}
+				return Bytes.ToArray();
 			}
-
-			if (!First)
-				return null;
-
-			return Bytes.ToArray();
 		}
 
 		/// <summary>

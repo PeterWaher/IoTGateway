@@ -1791,14 +1791,30 @@ namespace Waher.Persistence.Serialization
 										if (MemberType == typeof(byte[]))
 										{
 											CSharp.Append(Indent2);
-											CSharp.Append("Writer.WriteBits(");
+											CSharp.Append("if (Value.");
+											CSharp.Append(Member.Name);
+											CSharp.AppendLine(" is null)");
+
+											CSharp.Append(Indent2);
+											CSharp.Append("\tWriter.WriteBits(");
+											CSharp.Append(TYPE_NULL);
+											CSharp.AppendLine(", 6);");
+
+											CSharp.Append(Indent2);
+											CSharp.AppendLine("else");
+
+											CSharp.Append(Indent2);
+											CSharp.AppendLine("{");
+											CSharp.Append(Indent2);
+											CSharp.Append("\tWriter.WriteBits(");
 											CSharp.Append(TYPE_BYTEARRAY);
 											CSharp.AppendLine(", 6);");
 
 											CSharp.Append(Indent2);
-											CSharp.Append("Writer.Write(Value.");
+											CSharp.Append("\tWriter.Write(Value.");
 											CSharp.Append(Member.Name);
 											CSharp.AppendLine(");");
+											CSharp.AppendLine("}");
 										}
 										else
 										{
@@ -3028,8 +3044,14 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							case TYPE_BYTEARRAY:
-								Writer.WriteBits(TYPE_BYTEARRAY, 6);
-								Writer.Write((byte[])MemberValue);
+								if (MemberValue is null)
+									Writer.WriteBits(TYPE_NULL, 6);
+								else
+
+								{
+									Writer.WriteBits(TYPE_BYTEARRAY, 6);
+									Writer.Write((byte[])MemberValue);
+								}
 								break;
 
 							case TYPE_ENUM:

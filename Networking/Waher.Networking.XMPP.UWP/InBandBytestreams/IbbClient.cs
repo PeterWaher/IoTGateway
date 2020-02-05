@@ -224,6 +224,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 				Input.Dispose();
 			}
+
+			e.IqResult(string.Empty);
 		}
 
 		private void AssertCacheCreated()

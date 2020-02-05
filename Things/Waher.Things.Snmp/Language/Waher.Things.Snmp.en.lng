@@ -2,7 +2,7 @@
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Snmp">
-      <String id="1"></String>
+      <String id="1">SNMP</String>
     </Namespace>
 	</Language>
 </Translation>

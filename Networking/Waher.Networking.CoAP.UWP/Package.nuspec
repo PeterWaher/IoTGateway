@@ -15,13 +15,13 @@
     <copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</copyright>
     <tags>networking communication coap core dtls uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.22"/>
+      <dependency id="Waher.Content" version="1.0.23"/>
       <dependency id="Waher.Events" version="1.0.9"/>
       <dependency id="Waher.Networking" version="1.0.13"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.11"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.2"/>
-      <dependency id="Waher.Security" version="1.0.3"/>
+      <dependency id="Waher.Security" version="1.0.4"/>
       <dependency id="Waher.Security.DTLS" version="1.0.3"/>
     </dependencies>
   </metadata>

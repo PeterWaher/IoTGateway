@@ -14,9 +14,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>internet content data type encoding decoding</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.22</AssemblyVersion>
-    <FileVersion>1.0.22</FileVersion>
-    <Version>1.0.22</Version>
+    <AssemblyVersion>1.0.23</AssemblyVersion>
+    <FileVersion>1.0.23</FileVersion>
+    <Version>1.0.23</Version>
     <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content\</UpgradeBackupLocation>

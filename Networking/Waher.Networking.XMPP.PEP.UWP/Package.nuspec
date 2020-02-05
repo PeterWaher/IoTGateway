@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.PEP.UWP</id>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <title>Waher.Networking.XMPP.PEP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -21,13 +21,13 @@ XEP-0118: User Tune</description>
     <copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</copyright>
     <tags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.22"/>
+      <dependency id="Waher.Content" version="1.0.23"/>
       <dependency id="Waher.Content.Xml" version="1.0.7"/>
       <dependency id="Waher.Events" version="1.0.9"/>
       <dependency id="Waher.Networking" version="1.0.13"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="1.0.43"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="1.0.44"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="1.0.7"/>
-			<dependency id="Waher.Security" version="1.0.3"/>
+			<dependency id="Waher.Security" version="1.0.4"/>
 		</dependencies>
   </metadata>
   <files>

@@ -14,8 +14,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private Socks5Client client;
 		private TemporaryFile tempFile;
 		private readonly IEndToEndEncryption e2e;
-        private readonly string e2eReference;
-        private readonly string sid;
+		private readonly string e2eReference;
+		private readonly string sid;
 		private readonly string from;
 		private readonly string to;
 		private object state = null;
@@ -26,16 +26,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private bool done;
 		private bool aborted = false;
 
-        /// <summary>
-        /// Class managing the transmission of a SOCKS5 bytestream.
-        /// </summary>
-        /// <param name="StreamId">Stream ID.</param>
-        /// <param name="From">From</param>
-        /// <param name="To">To</param>
-        /// <param name="BlockSize">Block size</param>
-        /// <param name="E2E">End-to-end encryption, if used.</param>
-        /// <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
-        public OutgoingStream(string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E, string EndpointReference)
+		/// <summary>
+		/// Class managing the transmission of a SOCKS5 bytestream.
+		/// </summary>
+		/// <param name="StreamId">Stream ID.</param>
+		/// <param name="From">From</param>
+		/// <param name="To">To</param>
+		/// <param name="BlockSize">Block size</param>
+		/// <param name="E2E">End-to-end encryption, if used.</param>
+		/// <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
+		public OutgoingStream(string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E, string EndpointReference)
 		{
 			this.client = null;
 			this.sid = StreamId;
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.to = To;
 			this.blockSize = BlockSize;
 			this.e2e = E2E;
-            this.e2eReference = EndpointReference;
+			this.e2eReference = EndpointReference;
 			this.isWriting = false;
 			this.done = false;
 			this.tempFile = new TemporaryFile();
@@ -105,11 +105,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.aborted = true;
 
-			if (this.tempFile != null)
-			{
-				this.tempFile.Dispose();
-				this.tempFile = null;
-			}
+			this.tempFile?.Dispose();
+			this.tempFile = null;
 		}
 
 		/// <summary>
@@ -144,12 +141,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void WriteBlockLocked()
 		{
-			int BlockSize;
-
-			if (this.done)
-				BlockSize = (int)Math.Min(this.tempFile.Length - this.pos, this.blockSize);
-			else
-				BlockSize = this.blockSize;
+			int BlockSize = (int)Math.Min(this.tempFile.Length - this.pos, this.blockSize);
 
 			if (BlockSize == 0)
 				this.SendClose();
@@ -174,7 +166,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				this.tempFile.Position = this.pos;
 				int NrRead = this.tempFile.Read(Block, i, BlockSize);
-				if (NrRead <= 0)
+				if (NrRead < BlockSize)
 				{
 					this.Close();
 					this.Dispose();
@@ -203,8 +195,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Array.Copy(Encrypted, 0, Block, 2, i);
 				}
 
-				this.client.Send(Block);
 				this.isWriting = true;
+				this.client.Send(Block);
 			}
 		}
 
@@ -215,8 +207,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			lock (this.tempFile)
 			{
-                if (this.aborted)
-                    return;
+				if (this.aborted)
+					return;
 
 				long NrLeft = this.tempFile.Length - this.pos;
 
@@ -264,7 +256,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private void SendClose()
 		{
 			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
-			this.client.Send(new byte[] { 0, 0 }); 
+			this.client.Send(new byte[] { 0, 0 });
 			this.client.CloseWhenDone();
 			this.Dispose();
 		}

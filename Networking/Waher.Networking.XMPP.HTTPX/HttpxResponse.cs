@@ -101,8 +101,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.ReturnResponse();
                         
 						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e, this.e2eReference);
-
-						this.socks5Output.OnAbort += this.IbbOutput_OnAbort;
+						this.socks5Output.OnAbort += this.OnAbort;
 
 						this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
 					}
@@ -114,7 +113,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.ReturnResponse();
 
 						this.ibbOutput = this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId, this.e2e);
-						this.ibbOutput.OnAbort += this.IbbOutput_OnAbort;
+						this.ibbOutput.OnAbort += this.OnAbort;
 					}
 					else
 					{
@@ -143,10 +142,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (e.Ok)
 				this.socks5Output.Opened(e.Stream);
 			else
-				this.IbbOutput_OnAbort(null, new EventArgs());
+				this.OnAbort(null, new EventArgs());
 		}
 
-		private void IbbOutput_OnAbort(object sender, EventArgs e)
+		private void OnAbort(object sender, EventArgs e)
 		{
 			this.Cancel();
 		}

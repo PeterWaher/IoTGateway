@@ -554,48 +554,49 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void Request(Command Command, IPAddress DestinationAddress, int Port)
 		{
-			List<byte> Req = new List<byte>()
+			using (MemoryStream Req = new MemoryStream())
 			{
-				5,
-				(byte)Command,
-				0
-			};
+				Req.WriteByte(5);
+				Req.WriteByte((byte)Command);
+				Req.WriteByte(0);
 
-			if (DestinationAddress.AddressFamily == AddressFamily.InterNetwork)
-				Req.Add(1);
-			else if (DestinationAddress.AddressFamily == AddressFamily.InterNetworkV6)
-				Req.Add(4);
-			else
-				throw new ArgumentException("Invalid address family.", nameof(DestinationAddress));
+				if (DestinationAddress.AddressFamily == AddressFamily.InterNetwork)
+					Req.WriteByte(1);
+				else if (DestinationAddress.AddressFamily == AddressFamily.InterNetworkV6)
+					Req.WriteByte(4);
+				else
+					throw new ArgumentException("Invalid address family.", nameof(DestinationAddress));
 
-			Req.AddRange(DestinationAddress.GetAddressBytes());
-			Req.Add((byte)(Port >> 8));
-			Req.Add((byte)Port);
+				byte[] Addr = DestinationAddress.GetAddressBytes();
+				Req.Write(Addr, 0, Addr.Length);
+				Req.WriteByte((byte)(Port >> 8));
+				Req.WriteByte((byte)Port);
 
-			this.SendPacket(Req.ToArray());
+				this.SendPacket(Req.ToArray());
+			}
 		}
 
 		private void Request(Command Command, string DestinationDomainName, int Port)
 		{
-			List<byte> Req = new List<byte>()
+			using (MemoryStream Req = new MemoryStream())
 			{
-				5,
-				(byte)Command,
-				0,
-				3
-			};
+				Req.WriteByte(5);
+				Req.WriteByte((byte)Command);
+				Req.WriteByte(0);
+				Req.WriteByte(3);
 
-			byte[] Bytes = Encoding.ASCII.GetBytes(DestinationDomainName);
-			int c = Bytes.Length;
-			if (c > 255)
-				throw new IOException("Domain name too long.");
+				byte[] Bytes = Encoding.ASCII.GetBytes(DestinationDomainName);
+				int c = Bytes.Length;
+				if (c > 255)
+					throw new IOException("Domain name too long.");
 
-			Req.Add((byte)c);
-			Req.AddRange(Bytes);
-			Req.Add((byte)(Port >> 8));
-			Req.Add((byte)Port);
+				Req.WriteByte((byte)c);
+				Req.Write(Bytes, 0, Bytes.Length);
+				Req.WriteByte((byte)(Port >> 8));
+				Req.WriteByte((byte)Port);
 
-			this.SendPacket(Req.ToArray());
+				this.SendPacket(Req.ToArray());
+			}
 		}
 
 		/// <summary>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define	LOG_SOCKS5_EVENTS
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -507,7 +509,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				if (ClientRec != null)
 				{
-					//this.client.Information("Accepting SOCKS5 stream from " + e.From);
+#if LOG_SOCKS5_EVENTS
+					this.client.Information("Accepting SOCKS5 stream from " + e.From);
+#endif
 					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, 
                         ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
 				}
@@ -548,8 +552,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
 			{
-				//this.client.Information(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
-
+#if LOG_SOCKS5_EVENTS
+				this.client.Information(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
+#endif
 				byte[] Data = e.Data;
 				int i = 0;
 				int c = e.Data.Length;
@@ -605,8 +610,9 @@ namespace Waher.Networking.XMPP.HTTPX
 									}
 								}
 
-								//this.client.Information("Chunk " + Rx.Nr.ToString() + " received and forwarded.");
-
+#if LOG_SOCKS5_EVENTS
+								this.client.Information("Chunk " + Rx.Nr.ToString() + " received and forwarded.");
+#endif
 								Rec.ChunkReceived(Rx.Nr++, false, Rx.Block);
 								Rx.State = 0;
 							}
@@ -616,16 +622,18 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else
 			{
-				//this.client.Warning(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + " and discarded.");
-
+#if LOG_SOCKS5_EVENTS
+				this.client.Warning(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + " and discarded.");
+#endif
 				e.Stream.Dispose();
 			}
 		}
 
 		private void Socks5StreamClosed(object Sender, P2P.SOCKS5.StreamEventArgs e)
 		{
-			//this.client.Information("SOCKS5 stream closed.");
-
+#if LOG_SOCKS5_EVENTS
+			this.client.Information("SOCKS5 stream closed.");
+#endif
 			Socks5Receiver Rx = (Socks5Receiver)e.State;
 
 			HttpxChunks.chunkedStreams.Remove(Rx.Key);

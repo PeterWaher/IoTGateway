@@ -52,6 +52,8 @@
     <Compile Include=".bak\Waher.Content\Audio\AudioDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
+    <Compile Include=".bak\Waher.Content\Getters\WebGetter.cs" />
+    <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\AlternativeCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\ContentAlternatives.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\EmbeddedContent.cs" />

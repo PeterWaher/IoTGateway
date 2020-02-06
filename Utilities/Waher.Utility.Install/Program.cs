@@ -356,8 +356,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Parsing " + DepsJsonFileName);
 
-			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps is null)
+			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading manifest file.");
@@ -627,8 +626,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Parsing " + DepsJsonFileName);
 
-			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps is null)
+			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading manifest file.");
@@ -1015,8 +1013,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Parsing " + DepsJsonFileName);
 
-			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps is null)
+			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading package file.");
@@ -1222,10 +1219,30 @@ namespace Waher.Utility.Install
 				int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
 				byte[] Buffer = new byte[c];
 
-				if (OnlyIfNewer && File.Exists(OutputFileName) && File.GetLastWriteTimeUtc(OutputFileName) >= LastWriteTimeUtc)
-					return;
+				if (OnlyIfNewer && File.Exists(OutputFileName))
+				{
+					DateTime ExistingLastWriteTime = File.GetLastWriteTimeUtc(OutputFileName);
+					if (ExistingLastWriteTime >= LastWriteTimeUtc)
+					{
+						SkipBytes(Input, Bytes, Buffer);
+						return;
+					}
+				}
 
-				using (FileStream f = File.Create(OutputFileName))
+				FileStream f;
+
+				try
+				{
+					f = File.Create(OutputFileName);
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex);
+					SkipBytes(Input, Bytes, Buffer);
+					return;
+				}
+
+				try
 				{
 					while (Bytes > 0)
 					{
@@ -1238,6 +1255,10 @@ namespace Waher.Utility.Install
 						Bytes -= (uint)d;
 					}
 				}
+				finally
+				{
+					f.Dispose();
+				}
 
 				File.SetAttributes(OutputFileName, Attr);
 				File.SetCreationTimeUtc(OutputFileName, CreationTimeUtc);
@@ -1247,6 +1268,21 @@ namespace Waher.Utility.Install
 			catch (Exception ex)
 			{
 				Log.Error(ex);
+			}
+		}
+
+		private static void SkipBytes(Stream Input, ulong Bytes, byte[] Buffer)
+		{
+			int c = Buffer.Length;
+
+			while (Bytes > 0)
+			{
+				int d = (int)Math.Min(Bytes, (ulong)c);
+
+				if (Input.Read(Buffer, 0, d) != d)
+					throw new EndOfStreamException("Reading past end-of-file.");
+
+				Bytes -= (uint)d;
 			}
 		}
 
@@ -1294,8 +1330,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Parsing " + DepsJsonFileName);
 
-			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-			if (Deps is null)
+			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
 				throw new Exception("Invalid deps.json file. Unable to install.");
 
 			Log.Informational("Loading package file.");

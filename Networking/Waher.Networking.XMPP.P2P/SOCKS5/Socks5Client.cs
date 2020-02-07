@@ -151,6 +151,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					}
 				}
 			}
+			catch (IOException)
+			{
+				this.State = Socks5State.Error;
+			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
@@ -240,22 +244,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			if (this.stream != null)
 			{
-				this.stream.Flush();
+				this.stream?.Flush();
 				this.stream.Dispose();
 				this.stream = null;
 			}
 
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 
-			if (this.queue != null)
-			{
-				this.queue.Clear();
-				this.queue = null;
-			}
+			this.queue?.Clear();
+			this.queue = null;
 		}
 
 		/// <summary>

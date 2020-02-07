@@ -9,31 +9,31 @@ using Waher.Script.Objects;
 namespace Waher.Script.Content.Functions.InputOutput
 {
 	/// <summary>
-	/// HttpGet(Url)
+	/// Get(Url)
 	/// </summary>
-	public class HttpGet : FunctionMultiVariate
+	public class Get : FunctionMultiVariate
 	{
 		/// <summary>
-		/// HttpGet(Url)
+		/// Get(Url)
 		/// </summary>
 		/// <param name="Url">URL.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public HttpGet(ScriptNode Url, int Start, int Length, Expression Expression)
+		public Get(ScriptNode Url, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Url }, new ArgumentType[] { ArgumentType.Scalar }, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// HttpGet(Url,Headers)
+		/// Get(Url,Headers)
 		/// </summary>
 		/// <param name="Url">URL.</param>
 		/// <param name="Headers">Request headers.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public HttpGet(ScriptNode Url, ScriptNode Headers, int Start, int Length, Expression Expression)
+		public Get(ScriptNode Url, ScriptNode Headers, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Url, Headers }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
@@ -81,7 +81,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 					};
 				}
 				else
-					throw new ScriptRuntimeException("Invalid second parameter to HttpGet. Should be either an accept string, or an object with HTTP headers.", this);
+					throw new ScriptRuntimeException("Invalid second parameter to Get. Should be either an accept string, or an object with protocol-specific headers or options.", this);
 			}
 
 			object Result = InternetContent.GetAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;

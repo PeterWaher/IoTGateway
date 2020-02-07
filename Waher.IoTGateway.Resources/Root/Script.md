@@ -1318,9 +1318,9 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Base64UrlEncode(Data)`         | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
 | `Decode(Content,Type)`          | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
 | `Encode(Object[,Types])`        | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
+| `Get(Url[,Accept/Headers])`     | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. | [Example][GetExample] |
 | `HtmlAttributeEncode(s)`        | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
 | `HtmlValueEncode(s)`            | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `HttpGet(Url[,Accept/Headers])` | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom HTTP headers, if an object. | [Example][HttpGetExample] |
 | `LoadFile(FileName)`            | Loads a file and decodes it, in accordance with its file extension. | [Example][LoadFileExample] |
 | `SaveFile(Obj,FileName)`        | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
 | `UrlDecode(s)`                  | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
@@ -1334,9 +1334,9 @@ The following functions are available in the `Waher.Script.Content` library.
 [Base64UrlEncodeExample]: Calculator.md?Expression=Base64UrlEncode(Encode("Hello")[0])
 [DecodeExample]: Calculator.md?Expression=Decode(Csv,%22text/csv%22)
 [EncodeExample]: Calculator.md?Expression=Encode("Hello",[%22text/plain%22])
+[GetExample]: Calculator.md?Expression=Get(%22URL%22)
 [HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
 [HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
-[HttpGetExample]: Calculator.md?Expression=HttpGet(%22URL%22)
 [LoadFileExample]: Calculator.md?Expression=LoadFile(%22FileName%22)
 [SaveFileExample]: Calculator.md?Expression=SaveFile(Graph,%22Graph.png%22)
 [UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)

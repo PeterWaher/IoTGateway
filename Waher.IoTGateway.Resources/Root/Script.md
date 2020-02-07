@@ -1320,7 +1320,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Encode(Object[,Types])`        | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
 | `HtmlAttributeEncode(s)`        | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
 | `HtmlValueEncode(s)`            | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `HttpGet(Url[,Accept/Headers])` | Retrieves a resource using the HTTP protocol and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom HTTP headers, if an object. | [Example][HttpGetExample] |
+| `HttpGet(Url[,Accept/Headers])` | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom HTTP headers, if an object. | [Example][HttpGetExample] |
 | `LoadFile(FileName)`            | Loads a file and decodes it, in accordance with its file extension. | [Example][LoadFileExample] |
 | `SaveFile(Obj,FileName)`        | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
 | `UrlDecode(s)`                  | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
@@ -1466,6 +1466,21 @@ The following predefined variables are available in web pages hosted by the IoT 
 |:--------------:|----------------------------------------------------------|
 | `Language`     | The language object of the current session.              |
 | `Namespace`    | The language namespace object of the current page.       |
+
+=========================================================================================================================================================
+
+URI Schemes
+------------------
+
+URI Schemes recognized by the system depends on what modules are loaded. Classes with default constructors, implementing the
+`Waher.Content.IContentGetter` interface will automatically be used when resources are requested using corresponding URI schemes.
+The following table lists recognized URI schemes:
+
+| URI Scheme | Module                        | Description |
+|:-----------|:------------------------------|:------------|
+| `http`     | `Waher.Content`               | Resource retrieved using the HTTP protocol. |
+| `https`    | `Waher.Content`               | Resource retrieved using the HTTPS protocol (HTTP+SSL/TLS). |
+| `httpx`    | `Waher.Networking.XMPP.HTTPX` | Resource retrieved using the [XEP-0332: HTTP over XMPP transport](https://xmpp.org/extensions/xep-0332.html) protocol. |
 
 
 =========================================================================================================================================================

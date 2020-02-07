@@ -925,6 +925,21 @@ namespace Waher.Content
 			return Getter.GetAsync(Uri, Headers);
 		}
 
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Getter.GetTempFileAsync(Uri, TimeoutMs, Headers);
+		}
+
 		#endregion
 	}
 }

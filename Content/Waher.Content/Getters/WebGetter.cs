@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
@@ -64,22 +65,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Get
 				})
 				{
-					if (!(Headers is null))
-					{
-						foreach (KeyValuePair<string, string> Header in Headers)
-						{
-							switch (Header.Key)
-							{
-								case "Accept":
-									Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Header.Value));
-									break;
-
-								default:
-									Request.Headers.Add(Header.Key, Header.Value);
-									break;
-							}
-						}
-					}
+					this.PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 					Response.EnsureSuccessStatusCode();
@@ -92,5 +78,70 @@ namespace Waher.Content.Getters
 				}
 			}
 		}
+
+		private void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers)
+		{
+			if (!(Headers is null))
+			{
+				foreach (KeyValuePair<string, string> Header in Headers)
+				{
+					switch (Header.Key)
+					{
+						case "Accept":
+							Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Header.Value));
+							break;
+
+						default:
+							Request.Headers.Add(Header.Key, Header.Value);
+							break;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public async Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			using (HttpClient HttpClient = new HttpClient()
+			{
+				Timeout = TimeSpan.FromMilliseconds(10000)
+			})
+			{
+				using (HttpRequestMessage Request = new HttpRequestMessage()
+				{
+					RequestUri = Uri,
+					Method = HttpMethod.Get
+				})
+				{
+					this.PrepareHeaders(Request, Headers);
+
+					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
+					Response.EnsureSuccessStatusCode();
+
+					string ContentType = Response.Content.Headers.ContentType.ToString();
+					TemporaryFile File = new TemporaryFile();
+					try
+					{
+						await Response.Content.CopyToAsync(File);
+					}
+					catch (Exception ex)
+					{
+						File.Dispose();
+						File = null;
+
+						ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+
+					return new KeyValuePair<string, TemporaryFile>(ContentType, File);
+				}
+			}
+		}
+
 	}
 }

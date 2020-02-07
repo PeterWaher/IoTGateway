@@ -83,8 +83,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <returns>Decoded object.</returns>
 		public async Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			KeyValuePair<HttpResponse, TemporaryFile> Rec = await this.GetTempFileAsync(Uri, TimeoutMs, Headers);
-			HttpResponse Response = Rec.Key;
+			KeyValuePair<string, TemporaryFile> Rec = await this.GetTempFileAsync(Uri, TimeoutMs, Headers);
+			string ContentType = Rec.Key;
 			TemporaryFile File = Rec.Value;
 
 			try
@@ -102,18 +102,16 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (await File.ReadAsync(Bin, 0, Len) != Len)
 					throw new IOException("Unable to read from file.");
 
-				string ContentType = Response.ContentType;
 				return InternetContent.Decode(ContentType, Bin, Uri);
 			}
 			finally
 			{
 				File?.Dispose();
-				Response.Dispose();
 			}
 		}
 
 		/// <summary>
-		/// Gets a resource, using a Uniform Resource Identifier (or Locator).
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
@@ -123,8 +121,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ConflictException">If an approved presence subscription with the remote entity does not exist.</exception>
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
-		/// <returns>Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<HttpResponse, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public async Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (proxy is null)
 			{
@@ -214,12 +212,15 @@ namespace Waher.Networking.XMPP.HTTPX
 				TemporaryFile Result = State.File;
 				State.File = null;
 
-				return new KeyValuePair<HttpResponse, TemporaryFile>(State.HttpResponse, Result);
+				return new KeyValuePair<string, TemporaryFile>(State.HttpResponse?.ContentType, Result);
 			}
 			finally
 			{
 				State.File?.Dispose();
 				State.File = null;
+
+				State.HttpResponse?.Dispose();
+				State.HttpResponse = null;
 
 				Timer?.Dispose();
 				Timer = null;

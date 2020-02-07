@@ -153,12 +153,20 @@ namespace Waher.Security.CallStack
 			if (AsynchTask && WaherPersistence && !Other)
 				return;	// In asynch call - stack trace not showing asynchronous call stack. If loading from database, i.e. populating object asynchronously, (possibly, check is vulnerable), give check a pass. Access will be restricted at a later stage, when accessing properties synchronously.
 
-			Frame = new StackFrame(2);
+			Frame = new StackFrame(i = 2);
 			Method = Frame.GetMethod();
 			Type = Method.DeclaringType;
+
+			if (Method.Name == "InvokeMethod" && Type == typeof(RuntimeMethodHandle))
+			{
+				Frame = new StackFrame(--i);
+				Method = Frame.GetMethod();
+				Type = Method.DeclaringType;
+			}
+
 			Assembly = Type.Assembly;
 
-			StackTrace Trace = new StackTrace(2, false);
+			StackTrace Trace = new StackTrace(i, false);
 			
 			Log.Warning("Unauthorized access detected and prevented.", Type.FullName + "." + Method.Name, string.Empty,
 				"UnauthorizedAccess", EventLevel.Major, string.Empty, Assembly.FullName, Trace.ToString(),

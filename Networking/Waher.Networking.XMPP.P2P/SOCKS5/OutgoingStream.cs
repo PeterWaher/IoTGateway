@@ -126,11 +126,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Count">Number of bytes to start.</param>
 		public void Write(byte[] Data, int Offset, int Count)
 		{
-			if (this.tempFile is null || this.aborted || this.done)
-				throw new IOException("Stream not open");
-
 			lock (this.tempFile)
 			{
+				if (this.tempFile is null || this.aborted || this.done)
+					throw new IOException("Stream not open");
+
 				this.tempFile.Position = this.tempFile.Length;
 				this.tempFile.Write(Data, Offset, Count);
 
@@ -233,8 +233,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Client.OnWriteQueueEmpty += this.WriteQueueEmpty;
 			this.client = Client;
 
-			if (!this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
-				this.WriteBlockLocked();
+			if (!(this.tempFile is null))
+			{
+				lock (this.tempFile)
+				{
+					if (!this.isWriting && (this.tempFile.Length - this.pos >= this.blockSize ||
+						(this.done && this.tempFile.Length > this.pos)))
+					{
+						this.WriteBlockLocked();
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -244,12 +253,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.done = true;
 
-			if (this.client != null && !this.isWriting)
+			if (!(this.tempFile is null))
 			{
-				if (this.tempFile.Length > this.pos)
-					this.WriteBlockLocked();
-				else
-					this.SendClose();
+				lock (this.tempFile)
+				{
+					if (this.client != null && !this.isWriting)
+					{
+						if (this.tempFile.Length > this.pos)
+							this.WriteBlockLocked();
+						else
+							this.SendClose();
+					}
+				}
 			}
 		}
 

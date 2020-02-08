@@ -26,10 +26,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 	/// </summary>
 	public class ObjectSerializer : IObjectSerializer, IBsonDocumentSerializer
 	{
+		private static readonly Type[] obsoleteMethodTypes = new Type[] { typeof(Dictionary<string, object>) };
+
 		private readonly Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private readonly Dictionary<string, object> defaultValues = new Dictionary<string, object>();
 		private readonly Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
 		private readonly Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
+		private readonly MethodInfo obsoleteMethod;
 		private readonly string collectionName;
 		private readonly string typeFieldName;
 		private readonly IObjectSerializer customSerializer;
@@ -84,6 +87,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 			{
 				this.typeFieldName = TypeNameAttribute.FieldName;
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
+			}
+
+			ObsoleteMethodAttribute ObsoleteMethodAttribute = this.typeInfo.GetCustomAttribute<ObsoleteMethodAttribute>(true);
+			if (!(ObsoleteMethodAttribute is null))
+			{
+				this.obsoleteMethod = this.type.GetRuntimeMethod(ObsoleteMethodAttribute.MethodName, obsoleteMethodTypes);
+				if (this.obsoleteMethod is null)
+					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " does not exist on " + this.type.FullName);
+
+				ParameterInfo[] Parameters = this.obsoleteMethod.GetParameters();
+				if (Parameters.Length != 1 || Parameters[0].ParameterType != typeof(Dictionary<string, object>))
+					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " on " + this.type.FullName + " has invalid arguments.");
 			}
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
@@ -458,6 +473,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
 			CSharp.AppendLine("\t\t\tBsonReaderBookmark Bookmark = Reader.GetBookmark();");
 			CSharp.AppendLine("\t\t\tBsonType? DataTypeBak = DataType;");
+			CSharp.AppendLine("\t\t\tDictionary<string, object> Obsolete = null;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
 			CSharp.AppendLine("\t\t\t{");
@@ -1413,13 +1429,102 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 
 				CSharp.AppendLine("\t\t\t\t\tdefault:");
-				CSharp.AppendLine("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + FieldName);");
+				CSharp.AppendLine("\t\t\t\t\t\tobject FieldValue;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldType)");
+				CSharp.AppendLine("\t\t\t\t\t\t{");
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Document:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = GeneratedObjectSerializerBase.ReadEmbeddedObject(this.provider, Reader, FieldType);");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = null;");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadBoolean();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadInt32();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadInt64();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Decimal128:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadDecimal128();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadDouble();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.DateTime:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadDateTime();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadSymbol();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadString();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScript:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadJavaScript();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScriptWithScope:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadJavaScriptWithScope();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Binary:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadBinaryData().Bytes;");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadObjectId().ToString();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine(); 
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.RegularExpression:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadRegularExpression().Pattern;");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Timestamp:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadTimestamp();");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Array:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = GeneratedObjectSerializerBase.ReadArray<object>(this.provider, Reader, FieldType);");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+				CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Value expected for \" + FieldName + \". Data Type read: \" + FieldType.ToString());");
+				CSharp.AppendLine("\t\t\t\t\t\t}");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\tif (Obsolete is null)");
+				CSharp.AppendLine("\t\t\t\t\t\t\tObsolete = new Dictionary<string, object>();");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\t\t\tObsolete[FieldName] = FieldValue;");
+				CSharp.AppendLine("\t\t\t\t\t\tbreak;");
 
 				CSharp.AppendLine("\t\t\t\t}");
 				CSharp.AppendLine("\t\t\t}");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tReader.ReadEndDocument();");
 				CSharp.AppendLine();
+
+				if (!(this.obsoleteMethod is null))
+				{
+					CSharp.AppendLine("\t\t\tif (!(Obsolete is null))");
+					CSharp.AppendLine("\t\t\t\tResult." + this.obsoleteMethod.Name + "(Obsolete);");
+					CSharp.AppendLine();
+				}
+
 				CSharp.AppendLine("\t\t\treturn Result;");
 			}
 

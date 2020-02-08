@@ -153,6 +153,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public const uint TYPE_OBJECT = 31;
 
+		private static readonly Type[] obsoleteMethodTypes = new Type[] { typeof(Dictionary<string, object>) };
+
 		/// <summary>
 		/// Serialization context.
 		/// </summary>
@@ -180,6 +182,7 @@ namespace Waher.Persistence.Serialization
 		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
 		private readonly PropertyInfo archiveProperty = null;
 		private readonly FieldInfo archiveField = null;
+		private readonly MethodInfo obsoleteMethod = null;
 		private readonly int archiveDays = 0;
 		private readonly bool archive = false;
 		private readonly bool isNullable;
@@ -264,6 +267,18 @@ namespace Waher.Persistence.Serialization
 				this.typeNameSerialization = TypeNameSerialization.FullName;
 			else
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
+
+			ObsoleteMethodAttribute ObsoleteMethodAttribute = this.typeInfo.GetCustomAttribute<ObsoleteMethodAttribute>(true);
+			if (!(ObsoleteMethodAttribute is null))
+			{
+				this.obsoleteMethod = this.type.GetRuntimeMethod(ObsoleteMethodAttribute.MethodName, obsoleteMethodTypes);
+				if (this.obsoleteMethod is null)
+					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " does not exist on " + this.type.FullName);
+
+				ParameterInfo[] Parameters = this.obsoleteMethod.GetParameters();
+				if (Parameters.Length != 1 || Parameters[0].ParameterType != typeof(Dictionary<string, object>))
+					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " on " + this.type.FullName + " has invalid arguments.");
+			}
 
 			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
 			if (ArchivingTimeAttribute is null)
@@ -653,6 +668,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("\t\t\tuint? DataTypeBak = DataType;");
 				CSharp.AppendLine("\t\t\tGuid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();");
 				CSharp.AppendLine("\t\t\tulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();");
+				CSharp.AppendLine("\t\t\tDictionary<string, object> Obsolete = null;");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
 				CSharp.AppendLine("\t\t\t{");
@@ -1246,17 +1262,132 @@ namespace Waher.Persistence.Serialization
 
 					if (this.normalized)
 					{
-						CSharp.Append("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + this.context.GetFieldName(\"");
+						CSharp.Append("\t\t\t\t\t\tstring FieldName = this.context.GetFieldName(\"");
 						if (!string.IsNullOrEmpty(this.collectionName))
 							CSharp.Append(Escape(this.collectionName));
-						CSharp.AppendLine("\", FieldCode));");
+						CSharp.AppendLine("\", FieldCode);");
 					}
-					else
-						CSharp.AppendLine("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + FieldName);");
 
+					CSharp.AppendLine("\t\t\t\t\t\tobject FieldValue;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
+					CSharp.AppendLine("\t\t\t\t\t\t{");
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_OBJECT + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadEmbeddedObject(this.context, Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = null;");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadBoolean(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadByte(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadInt16(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadInt32(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadInt64(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadSByte(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadUInt16(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadUInt32(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadUInt64(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadDecimal(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadDouble(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadSingle(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DATETIME + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadDateTime(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DATETIMEOFFSET + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadDateTimeOffset(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_TIMESPAN + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadTimeSpan(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CHAR + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadChar(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadString(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CI_STRING + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadString(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTEARRAY + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadByteArray(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadGuid(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_ENUM + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadString(Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_ARRAY + ":");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = ReadArray<Waher.Persistence.Serialization.GenericObject>(this.context, Reader, FieldDataType);");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Value expected for \" + FieldName + \". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType));");
+					CSharp.AppendLine("\t\t\t\t\t\t}");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\tif (Obsolete is null)");
+					CSharp.AppendLine("\t\t\t\t\t\t\tObsolete = new Dictionary<string, object>();");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\tObsolete[FieldName] = FieldValue;");
+					CSharp.AppendLine("\t\t\t\t\t\tbreak;");
 					CSharp.AppendLine("\t\t\t\t}");
 					CSharp.AppendLine("\t\t\t}");
 					CSharp.AppendLine();
+
+					if (!(this.obsoleteMethod is null))
+					{
+						CSharp.AppendLine("\t\t\tif (!(Obsolete is null))");
+						CSharp.AppendLine("\t\t\t\tResult." + this.obsoleteMethod.Name + "(Obsolete);");
+						CSharp.AppendLine();
+					}
+
 					CSharp.AppendLine("\t\t\treturn Result;");
 				}
 
@@ -1316,9 +1447,9 @@ namespace Waher.Persistence.Serialization
 
 					if (this.objectIdMemberType == typeof(Guid))
 						CSharp.AppendLine("\t\t\t\t\tWriter.Write(Value." + this.objectIdMemberInfo.Name + ");");
-					else 
+					else
 						CSharp.AppendLine("\t\t\t\t\tWriter.Write(new Guid(Value." + this.objectIdMemberInfo.Name + "));");
-		
+
 					CSharp.AppendLine("\t\t\t}");
 					CSharp.AppendLine();
 				}
@@ -2242,7 +2373,6 @@ namespace Waher.Persistence.Serialization
 
 			return Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Database))), TI.Module.ScopeName);
 		}
-#endif
 
 		private static string GenericParameterName(Type Type)
 		{
@@ -2258,6 +2388,7 @@ namespace Waher.Persistence.Serialization
 
 			return Type.FullName;
 		}
+#endif
 
 		/// <summary>
 		/// Escapes a string to be enclosed between double quotes.
@@ -2380,6 +2511,7 @@ namespace Waher.Persistence.Serialization
 				ulong FieldCode;
 				string FieldName;
 				object Result;
+				Dictionary<string, object> Obsolete = null;
 				StreamBookmark Bookmark = Reader.GetBookmark();
 				uint? DataTypeBak = DataType;
 				Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
@@ -2485,366 +2617,486 @@ namespace Waher.Persistence.Serialization
 					if (this.normalized)
 					{
 						if (!this.membersByFieldCode.TryGetValue(FieldCode, out Member))
-							throw new Exception("Field name not recognized: " + this.context.GetFieldName(this.collectionName, FieldCode));
+							Member = null;
 					}
 					else
 					{
 						if (!this.membersByName.TryGetValue(FieldName, out Member))
-							throw new Exception("Field name not recognized: " + FieldName);
+							Member = null;
 					}
 
-					switch (Member.MemberFieldDataTypeCode)
+					if (Member is null)
 					{
-						case TYPE_BOOLEAN:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableBoolean(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadBoolean(Reader, FieldDataType));
-							break;
+						if (this.normalized)
+							FieldName = this.context.GetFieldName(this.collectionName, FieldCode);
 
-						case TYPE_BYTE:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableByte(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadByte(Reader, FieldDataType));
-							break;
+						object FieldValue;
 
-						case TYPE_CHAR:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableChar(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadChar(Reader, FieldDataType));
-							break;
+						switch (FieldDataType)
+						{
+							case TYPE_OBJECT:
+								FieldValue = GeneratedObjectSerializerBase.ReadEmbeddedObject(this.context, Reader, FieldDataType);
+								break;
 
-						case TYPE_DATETIME:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTime(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTime(Reader, FieldDataType));
-							break;
+							case TYPE_NULL:
+								FieldValue = null;
+								break;
 
-						case TYPE_DATETIMEOFFSET:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTimeOffset(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTimeOffset(Reader, FieldDataType));
-							break;
+							case TYPE_BOOLEAN:
+								FieldValue = GeneratedObjectSerializerBase.ReadBoolean(Reader, FieldDataType);
+								break;
 
-						case TYPE_DECIMAL:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDecimal(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadDecimal(Reader, FieldDataType));
-							break;
+							case TYPE_BYTE:
+								FieldValue = GeneratedObjectSerializerBase.ReadByte(Reader, FieldDataType);
+								break;
 
-						case TYPE_DOUBLE:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDouble(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadDouble(Reader, FieldDataType));
-							break;
+							case TYPE_INT16:
+								FieldValue = GeneratedObjectSerializerBase.ReadInt16(Reader, FieldDataType);
+								break;
 
-						case TYPE_INT16:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt16(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt16(Reader, FieldDataType));
-							break;
+							case TYPE_INT32:
+								FieldValue = GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType);
+								break;
 
-						case TYPE_INT32:
-							if (Member.IsEnum)
-							{
+							case TYPE_INT64:
+								FieldValue = GeneratedObjectSerializerBase.ReadInt64(Reader, FieldDataType);
+								break;
+
+							case TYPE_SBYTE:
+								FieldValue = GeneratedObjectSerializerBase.ReadSByte(Reader, FieldDataType);
+								break;
+
+							case TYPE_UINT16:
+								FieldValue = GeneratedObjectSerializerBase.ReadUInt16(Reader, FieldDataType);
+								break;
+
+							case TYPE_UINT32:
+								FieldValue = GeneratedObjectSerializerBase.ReadUInt32(Reader, FieldDataType);
+								break;
+
+							case TYPE_UINT64:
+								FieldValue = GeneratedObjectSerializerBase.ReadUInt64(Reader, FieldDataType);
+								break;
+
+							case TYPE_DECIMAL:
+								FieldValue = GeneratedObjectSerializerBase.ReadDecimal(Reader, FieldDataType);
+								break;
+
+							case TYPE_DOUBLE:
+								FieldValue = GeneratedObjectSerializerBase.ReadDouble(Reader, FieldDataType);
+								break;
+
+							case TYPE_SINGLE:
+								FieldValue = GeneratedObjectSerializerBase.ReadSingle(Reader, FieldDataType);
+								break;
+
+							case TYPE_DATETIME:
+								FieldValue = GeneratedObjectSerializerBase.ReadDateTime(Reader, FieldDataType);
+								break;
+
+							case TYPE_DATETIMEOFFSET:
+								FieldValue = GeneratedObjectSerializerBase.ReadDateTimeOffset(Reader, FieldDataType);
+								break;
+
+							case TYPE_TIMESPAN:
+								FieldValue = GeneratedObjectSerializerBase.ReadTimeSpan(Reader, FieldDataType);
+								break;
+
+							case TYPE_CHAR:
+								FieldValue = GeneratedObjectSerializerBase.ReadChar(Reader, FieldDataType);
+								break;
+
+							case TYPE_STRING:
+								FieldValue = GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType);
+								break;
+
+							case TYPE_CI_STRING:
+								FieldValue = GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType);
+								break;
+
+							case TYPE_BYTEARRAY:
+								FieldValue = GeneratedObjectSerializerBase.ReadByteArray(Reader, FieldDataType);
+								break;
+
+							case TYPE_GUID:
+								FieldValue = GeneratedObjectSerializerBase.ReadGuid(Reader, FieldDataType);
+								break;
+
+							case TYPE_ENUM:
+								FieldValue = GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType);
+								break;
+
+							case TYPE_ARRAY:
+								FieldValue = GeneratedObjectSerializerBase.ReadArray<Waher.Persistence.Serialization.GenericObject>(this.context, Reader, FieldDataType);
+								break;
+
+							default:
+								throw new Exception("Value expected for " + FieldName + ". Data Type read: " + ObjectSerializer.GetFieldDataTypeName(FieldDataType));
+						}
+
+						if (Obsolete is null)
+							Obsolete = new Dictionary<string, object>();
+
+						Obsolete[FieldName] = FieldValue;
+					}
+					else
+					{
+						switch (Member.MemberFieldDataTypeCode)
+						{
+							case TYPE_BOOLEAN:
 								if (Member.Nullable)
-									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableEnum(Reader, FieldDataType, Member.MemberType));
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableBoolean(Reader, FieldDataType));
 								else
-									Member.Set(Result, Enum.ToObject(Member.MemberType, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType)));
-							}
-							else
-							{
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadBoolean(Reader, FieldDataType));
+								break;
+
+							case TYPE_BYTE:
 								if (Member.Nullable)
-									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt32(Reader, FieldDataType));
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableByte(Reader, FieldDataType));
 								else
-									Member.Set(Result, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType));
-							}
-							break;
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadByte(Reader, FieldDataType));
+								break;
 
-						case TYPE_INT64:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt64(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt64(Reader, FieldDataType));
-							break;
+							case TYPE_CHAR:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableChar(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadChar(Reader, FieldDataType));
+								break;
 
-						case TYPE_SBYTE:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSByte(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadSByte(Reader, FieldDataType));
-							break;
+							case TYPE_DATETIME:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTime(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTime(Reader, FieldDataType));
+								break;
 
-						case TYPE_SINGLE:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSingle(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadSingle(Reader, FieldDataType));
-							break;
+							case TYPE_DATETIMEOFFSET:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTimeOffset(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTimeOffset(Reader, FieldDataType));
+								break;
 
-						case TYPE_STRING:
-							Member.Set(Result, GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType));
-							break;
+							case TYPE_DECIMAL:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDecimal(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadDecimal(Reader, FieldDataType));
+								break;
 
-						case TYPE_CI_STRING:
-							Member.Set(Result, new CaseInsensitiveString(GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType)));
-							break;
+							case TYPE_DOUBLE:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDouble(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadDouble(Reader, FieldDataType));
+								break;
 
-						case TYPE_UINT16:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt16(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt16(Reader, FieldDataType));
-							break;
+							case TYPE_INT16:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt16(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadInt16(Reader, FieldDataType));
+								break;
 
-						case TYPE_UINT32:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt32(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt32(Reader, FieldDataType));
-							break;
-
-						case TYPE_UINT64:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt64(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt64(Reader, FieldDataType));
-							break;
-
-						case TYPE_TIMESPAN:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableTimeSpan(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadTimeSpan(Reader, FieldDataType));
-							break;
-
-						case TYPE_GUID:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableGuid(Reader, FieldDataType));
-							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadGuid(Reader, FieldDataType));
-							break;
-
-						case TYPE_NULL:
-						default:
-							throw new Exception("Invalid member type: " + Member.MemberType.FullName);
-
-						case TYPE_ARRAY:
-							Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.context, Reader, FieldDataType));
-							break;
-
-						case TYPE_BYTEARRAY:
-							Member.Set(Result, Reader.ReadByteArray());
-							break;
-
-						case TYPE_ENUM:
-							switch (FieldDataType)
-							{
-								case TYPE_BOOLEAN:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadBoolean() ? 1 : 0));
-									break;
-
-								case TYPE_BYTE:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadByte()));
-									break;
-
-								case TYPE_INT16:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadInt16()));
-									break;
-
-								case TYPE_INT32:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt32()));
-									break;
-
-								case TYPE_INT64:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt64()));
-									break;
-
-								case TYPE_SBYTE:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSByte()));
-									break;
-
-								case TYPE_UINT16:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadUInt16()));
-									break;
-
-								case TYPE_UINT32:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt32()));
-									break;
-
-								case TYPE_UINT64:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt64()));
-									break;
-
-								case TYPE_DECIMAL:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDecimal()));
-									break;
-
-								case TYPE_DOUBLE:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDouble()));
-									break;
-
-								case TYPE_SINGLE:
-									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSingle()));
-									break;
-
-								case TYPE_STRING:
-								case TYPE_CI_STRING:
-									Member.Set(Result, Enum.Parse(Member.MemberType, Reader.ReadString()));
-									break;
-
-								case TYPE_ENUM:
-									Member.Set(Result, Reader.ReadEnum(Member.MemberType));
-									break;
-
-								case TYPE_NULL:
-									Member.Set(Result, null);
-									break;
-
-								default:
-									throw new Exception("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
-										GetFieldDataTypeName(FieldDataType) + ".");
-							}
-							break;
-
-						case TYPE_OBJECT:
-							if (Member.ByReference)
-							{
-								switch (FieldDataType)
+							case TYPE_INT32:
+								if (Member.IsEnum)
 								{
-									case TYPE_GUID:
-										Guid RefObjectId = Reader.ReadGuid();
-										Task<object> SetTask = this.context.LoadObject(Member.MemberType, RefObjectId,
-											(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
-
-										if (!SetTask.Wait(10000))
-											throw new Exception("Unable to load referenced object. Database timed out.");
-
-										Member.Set(Result, SetTask.Result);
-										break;
-
-									case TYPE_NULL:
-										Member.Set(Result, null);
-										break;
-
-									default:
-										throw new Exception("Object ID expected for " + Member.Name + ".");
+									if (Member.Nullable)
+										Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableEnum(Reader, FieldDataType, Member.MemberType));
+									else
+										Member.Set(Result, Enum.ToObject(Member.MemberType, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType)));
 								}
-							}
-							else
-							{
+								else
+								{
+									if (Member.Nullable)
+										Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt32(Reader, FieldDataType));
+									else
+										Member.Set(Result, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType));
+								}
+								break;
+
+							case TYPE_INT64:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt64(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadInt64(Reader, FieldDataType));
+								break;
+
+							case TYPE_SBYTE:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSByte(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadSByte(Reader, FieldDataType));
+								break;
+
+							case TYPE_SINGLE:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSingle(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadSingle(Reader, FieldDataType));
+								break;
+
+							case TYPE_STRING:
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType));
+								break;
+
+							case TYPE_CI_STRING:
+								Member.Set(Result, new CaseInsensitiveString(GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType)));
+								break;
+
+							case TYPE_UINT16:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt16(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt16(Reader, FieldDataType));
+								break;
+
+							case TYPE_UINT32:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt32(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt32(Reader, FieldDataType));
+								break;
+
+							case TYPE_UINT64:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt64(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt64(Reader, FieldDataType));
+								break;
+
+							case TYPE_TIMESPAN:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableTimeSpan(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadTimeSpan(Reader, FieldDataType));
+								break;
+
+							case TYPE_GUID:
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableGuid(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadGuid(Reader, FieldDataType));
+								break;
+
+							case TYPE_NULL:
+							default:
+								throw new Exception("Invalid member type: " + Member.MemberType.FullName);
+
+							case TYPE_ARRAY:
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.context, Reader, FieldDataType));
+								break;
+
+							case TYPE_BYTEARRAY:
+								Member.Set(Result, Reader.ReadByteArray());
+								break;
+
+							case TYPE_ENUM:
 								switch (FieldDataType)
 								{
-									case TYPE_OBJECT:
-										Member.Set(Result, Member.NestedSerializer.Deserialize(Reader, FieldDataType, true));
-										break;
-
-									case TYPE_NULL:
-										Member.Set(Result, null);
-										break;
-
 									case TYPE_BOOLEAN:
-										Member.Set(Result, Reader.ReadBoolean());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadBoolean() ? 1 : 0));
 										break;
 
 									case TYPE_BYTE:
-										Member.Set(Result, Reader.ReadByte());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadByte()));
 										break;
 
 									case TYPE_INT16:
-										Member.Set(Result, Reader.ReadInt16());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadInt16()));
 										break;
 
 									case TYPE_INT32:
-										Member.Set(Result, Reader.ReadInt32());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt32()));
 										break;
 
 									case TYPE_INT64:
-										Member.Set(Result, Reader.ReadInt64());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt64()));
 										break;
 
 									case TYPE_SBYTE:
-										Member.Set(Result, Reader.ReadSByte());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSByte()));
 										break;
 
 									case TYPE_UINT16:
-										Member.Set(Result, Reader.ReadUInt16());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadUInt16()));
 										break;
 
 									case TYPE_UINT32:
-										Member.Set(Result, Reader.ReadUInt32());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt32()));
 										break;
 
 									case TYPE_UINT64:
-										Member.Set(Result, Reader.ReadUInt64());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt64()));
 										break;
 
 									case TYPE_DECIMAL:
-										Member.Set(Result, Reader.ReadDecimal());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDecimal()));
 										break;
 
 									case TYPE_DOUBLE:
-										Member.Set(Result, Reader.ReadDouble());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDouble()));
 										break;
 
 									case TYPE_SINGLE:
-										Member.Set(Result, Reader.ReadSingle());
-										break;
-
-									case TYPE_DATETIME:
-										Member.Set(Result, Reader.ReadDateTime());
-										break;
-
-									case TYPE_DATETIMEOFFSET:
-										Member.Set(Result, Reader.ReadDateTimeOffset());
-										break;
-
-									case TYPE_TIMESPAN:
-										Member.Set(Result, Reader.ReadTimeSpan());
-										break;
-
-									case TYPE_CHAR:
-										Member.Set(Result, Reader.ReadChar());
+										Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSingle()));
 										break;
 
 									case TYPE_STRING:
-										Member.Set(Result, Reader.ReadString());
-										break;
-
 									case TYPE_CI_STRING:
-										Member.Set(Result, new CaseInsensitiveString(Reader.ReadString()));
-										break;
-
-									case TYPE_BYTEARRAY:
-										Member.Set(Result, Reader.ReadByteArray());
-										break;
-
-									case TYPE_GUID:
-										Member.Set(Result, Reader.ReadGuid());
+										Member.Set(Result, Enum.Parse(Member.MemberType, Reader.ReadString()));
 										break;
 
 									case TYPE_ENUM:
-										Member.Set(Result, Reader.ReadString());
+										Member.Set(Result, Reader.ReadEnum(Member.MemberType));
 										break;
 
-									case TYPE_ARRAY:
-										Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(typeof(GenericObject), this.context, Reader, FieldDataType));
+									case TYPE_NULL:
+										Member.Set(Result, null);
 										break;
 
 									default:
-										throw new Exception("Object expected for " + Member.Name + ". Data Type read: " + GetFieldDataTypeName(FieldDataType));
+										throw new Exception("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
+											GetFieldDataTypeName(FieldDataType) + ".");
 								}
-							}
-							break;
+								break;
+
+							case TYPE_OBJECT:
+								if (Member.ByReference)
+								{
+									switch (FieldDataType)
+									{
+										case TYPE_GUID:
+											Guid RefObjectId = Reader.ReadGuid();
+											Task<object> SetTask = this.context.LoadObject(Member.MemberType, RefObjectId,
+												(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
+
+											if (!SetTask.Wait(10000))
+												throw new Exception("Unable to load referenced object. Database timed out.");
+
+											Member.Set(Result, SetTask.Result);
+											break;
+
+										case TYPE_NULL:
+											Member.Set(Result, null);
+											break;
+
+										default:
+											throw new Exception("Object ID expected for " + Member.Name + ".");
+									}
+								}
+								else
+								{
+									switch (FieldDataType)
+									{
+										case TYPE_OBJECT:
+											Member.Set(Result, Member.NestedSerializer.Deserialize(Reader, FieldDataType, true));
+											break;
+
+										case TYPE_NULL:
+											Member.Set(Result, null);
+											break;
+
+										case TYPE_BOOLEAN:
+											Member.Set(Result, Reader.ReadBoolean());
+											break;
+
+										case TYPE_BYTE:
+											Member.Set(Result, Reader.ReadByte());
+											break;
+
+										case TYPE_INT16:
+											Member.Set(Result, Reader.ReadInt16());
+											break;
+
+										case TYPE_INT32:
+											Member.Set(Result, Reader.ReadInt32());
+											break;
+
+										case TYPE_INT64:
+											Member.Set(Result, Reader.ReadInt64());
+											break;
+
+										case TYPE_SBYTE:
+											Member.Set(Result, Reader.ReadSByte());
+											break;
+
+										case TYPE_UINT16:
+											Member.Set(Result, Reader.ReadUInt16());
+											break;
+
+										case TYPE_UINT32:
+											Member.Set(Result, Reader.ReadUInt32());
+											break;
+
+										case TYPE_UINT64:
+											Member.Set(Result, Reader.ReadUInt64());
+											break;
+
+										case TYPE_DECIMAL:
+											Member.Set(Result, Reader.ReadDecimal());
+											break;
+
+										case TYPE_DOUBLE:
+											Member.Set(Result, Reader.ReadDouble());
+											break;
+
+										case TYPE_SINGLE:
+											Member.Set(Result, Reader.ReadSingle());
+											break;
+
+										case TYPE_DATETIME:
+											Member.Set(Result, Reader.ReadDateTime());
+											break;
+
+										case TYPE_DATETIMEOFFSET:
+											Member.Set(Result, Reader.ReadDateTimeOffset());
+											break;
+
+										case TYPE_TIMESPAN:
+											Member.Set(Result, Reader.ReadTimeSpan());
+											break;
+
+										case TYPE_CHAR:
+											Member.Set(Result, Reader.ReadChar());
+											break;
+
+										case TYPE_STRING:
+											Member.Set(Result, Reader.ReadString());
+											break;
+
+										case TYPE_CI_STRING:
+											Member.Set(Result, new CaseInsensitiveString(Reader.ReadString()));
+											break;
+
+										case TYPE_BYTEARRAY:
+											Member.Set(Result, Reader.ReadByteArray());
+											break;
+
+										case TYPE_GUID:
+											Member.Set(Result, Reader.ReadGuid());
+											break;
+
+										case TYPE_ENUM:
+											Member.Set(Result, Reader.ReadString());
+											break;
+
+										case TYPE_ARRAY:
+											Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(typeof(GenericObject), this.context, Reader, FieldDataType));
+											break;
+
+										default:
+											throw new Exception("Object expected for " + Member.Name + ". Data Type read: " + GetFieldDataTypeName(FieldDataType));
+									}
+								}
+								break;
+						}
 					}
 				}
+
+				if (!(this.obsoleteMethod is null) && (!(Obsolete is null)))
+					this.obsoleteMethod.Invoke(Result, new object[] { Obsolete });
 
 				return Result;
 #if NETSTANDARD1_5

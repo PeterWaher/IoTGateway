@@ -1091,5 +1091,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 			return new Guid(A);
 		}
 
+		/// <summary>
+		/// Reads an embedded object.
+		/// </summary>
+		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>Deserialized object.</returns>
+		public static object ReadEmbeddedObject(MongoDBProvider Provider, IBsonReader Reader, BsonType FieldDataType)
+		{
+			IObjectSerializer Serializer = Provider.GetObjectSerializer(typeof(object));
+			return Serializer.Deserialize(Reader, FieldDataType, true);
+		}
+
 	}
 }

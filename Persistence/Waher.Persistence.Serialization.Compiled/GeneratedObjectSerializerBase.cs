@@ -1065,5 +1065,18 @@ namespace Waher.Persistence.Serialization
 			}
 		}
 
+		/// <summary>
+		/// Reads an embedded object.
+		/// </summary>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
+		/// <returns>Deserialized object.</returns>
+		public static object ReadEmbeddedObject(ISerializerContext Context, BinaryDeserializer Reader, uint? DataType)
+		{
+			IObjectSerializer Serializer = Context.GetObjectSerializer(typeof(object));
+			return Serializer.Deserialize(Reader, DataType, true);
+		}
+
 	}
 }

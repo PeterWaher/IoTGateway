@@ -16,7 +16,7 @@ namespace Waher.Persistence.MongoDB.Test
 	public class MongoDBTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(MongoDBProvider).Assembly, 
 				typeof(MongoDBTests).Assembly, 
@@ -27,20 +27,26 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_Insert()
+		public void Test_01_Serializer()
+		{
+			((MongoDBProvider)Database.Provider).GetObjectSerializer(typeof(ThingReference));
+		}
+
+		[TestMethod]
+		public async Task Test_02_Insert()
 		{
 			ThingReference Node = new ThingReference("Node1");
 			await Database.Insert(Node);
 		}
 
 		[TestMethod]
-		public async Task Test_02_InsertMany()
+		public async Task Test_03_InsertMany()
 		{
 			await Database.Insert(new ThingReference("Node2"), new ThingReference("Node3"), new ThingReference("Node4"));
 		}
 
 		[TestMethod]
-		public async Task Test_03_InsertManyDifferent()
+		public async Task Test_04_InsertManyDifferent()
 		{
 			ThingReference Ref = new ThingReference("Node1");
 			DateTime TP = DateTime.Now;
@@ -55,7 +61,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_Find()
+		public async Task Test_05_Find()
 		{
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>();
 
@@ -64,7 +70,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_FindFilter()
+		public async Task Test_06_FindFilter()
 		{
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
 
@@ -73,7 +79,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_FindFilterSort()
+		public async Task Test_07_FindFilterSort()
 		{
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>(new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
 
@@ -82,7 +88,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_FindInherited()
+		public async Task Test_08_FindInherited()
 		{
 			IEnumerable<Field> Fields = await Database.Find<Field>();
 
@@ -91,7 +97,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_Update()
+		public async Task Test_09_Update()
 		{
 			IEnumerable<ThingReference> ThingReferences = await Database.Find<ThingReference>();
 
@@ -107,7 +113,7 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_Delete()
+		public async Task Test_10_Delete()
 		{
 			IEnumerable<Field> Fields = await Database.Find<Field>();
 			await Database.Delete(Fields);

@@ -839,6 +839,15 @@
             <param name="ObjectId">Object ID</param>
             <returns>Object ID</returns>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase.ReadEmbeddedObject(Waher.Persistence.MongoDB.MongoDBProvider,MongoDB.Bson.IO.IBsonReader,MongoDB.Bson.BsonType)">
+            <summary>
+            Reads an embedded object.
+            </summary>
+            <param name="Provider">Database provider object.</param>
+            <param name="Reader">Binary reader.</param>
+            <param name="FieldDataType">Field data type.</param>
+            <returns>Deserialized object.</returns>
+        </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GenericObjectSerializer">
             <summary>
             Provides a generic object serializer.

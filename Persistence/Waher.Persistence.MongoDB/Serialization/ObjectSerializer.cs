@@ -2057,6 +2057,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
 				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
 				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
 				{ GetLocation(typeof(Types)), true },
 				{ GetLocation(typeof(Database)), true },
 				{ GetLocation(typeof(ObjectSerializer)), true },

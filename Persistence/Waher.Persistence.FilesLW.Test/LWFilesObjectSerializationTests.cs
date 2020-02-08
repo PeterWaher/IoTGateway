@@ -1548,6 +1548,121 @@ namespace Waher.Persistence.FilesLW.Test
 			this.AssertBinaryLength(Data, Reader);
 		}
 
+		[TestMethod]
+		public void DBFiles_ObjSerialization_15_ObsoleteMethod()
+		{
+			ObsoleteMethod Obj = new ObsoleteMethod()
+			{
+				Boolean1 = true,
+				Boolean2 = false,
+				Byte = 15,
+				Short = -1234,
+				Int = -23456789,
+				Long = -345456456456456345,
+				SByte = -45,
+				UShort = 23456,
+				UInt = 334534564,
+				ULong = 4345345345345345,
+				Char = '☀',
+				Decimal = 12345.6789M,
+				Double = 12345.6789,
+				Single = 12345.6789f,
+				String = "Today, there will be a lot of ☀.",
+				DateTime = DateTime.Now,
+				DateTimeOffset = DateTimeOffset.Now,
+				Guid = Guid.NewGuid(),
+				NormalEnum = NormalEnum.Option3,
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4,
+				CIString = "Hello World!"
+			};
+
+			Obj.TimeSpan = Obj.DateTime.TimeOfDay;
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObsoleteMethod));
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			AssertEx.Same(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			AssertEx.Same(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			AssertEx.Same(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			AssertEx.Same(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			AssertEx.Same(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			AssertEx.Same(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			AssertEx.Same(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			AssertEx.Same(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			AssertEx.Same(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			AssertEx.Same(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			AssertEx.Same(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTimeOffset", Obj, out Value));
+			AssertEx.Same(Obj.DateTimeOffset, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			AssertEx.Same(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			AssertEx.Same(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			AssertEx.Same(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			AssertEx.Same(Obj.FlagsEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
+			AssertEx.Same(Obj.CIString, Value);
+
+			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+
+			S.Serialize(Writer, false, false, Obj);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+
+			ObsoleteMethod Obj2 = (ObsoleteMethod)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (ObsoleteMethod)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
 		private void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
 		{
 			AssertEx.Same(Obj.Boolean, Obj2.Boolean);

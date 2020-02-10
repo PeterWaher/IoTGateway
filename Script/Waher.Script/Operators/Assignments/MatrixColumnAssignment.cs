@@ -36,23 +36,20 @@ namespace Waher.Script.Operators.Assignments
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement Left = this.left.Evaluate(Variables);
-            IMatrix M = Left as IMatrix;
-            if (M is null)
+            if (!(Left is IMatrix M))
                 throw new ScriptRuntimeException("Matrix column vector assignment can only be performed on matrices.", this);
 
             IElement Index = this.middle.Evaluate(Variables);
-            DoubleNumber IE = Index as DoubleNumber;
-            double d;
+			double d;
 
-            if (IE is null || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+			if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
                 throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
             IElement Value = this.right.Evaluate(Variables);
-            IVector V = Value as IVector;
-            if (V is null)
-                throw new ScriptRuntimeException("Matrix columns must be vectors.", this);
+			if (!(Value is IVector V))
+				throw new ScriptRuntimeException("Matrix columns must be vectors.", this);
 
-            if (M.Rows != V.Dimension)
+			if (M.Rows != V.Dimension)
                 throw new ScriptRuntimeException("Vector dimension does not match number of rows in matrix.", this);
 
             M.SetColumn((int)d, V);

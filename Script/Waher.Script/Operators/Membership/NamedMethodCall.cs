@@ -147,7 +147,6 @@ namespace Waher.Script.Operators.Membership
 						this.methods = this.GetMethods(T);
 
 					List<KeyValuePair<string, int>> ByRef = null;
-					VariableReference Ref;
 					ParameterValues = null;
 					Extend = null;
 
@@ -184,7 +183,7 @@ namespace Waher.Script.Operators.Membership
 								if (ByRef is null)
 									ByRef = new List<KeyValuePair<string, int>>();
 
-								if (!((Ref = this.parameters[i] as VariableReference) is null))
+								if (!(!(this.parameters[i] is VariableReference Ref)))
 									ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
 								else
 									ByRef.Add(new KeyValuePair<string, int>(null, i));

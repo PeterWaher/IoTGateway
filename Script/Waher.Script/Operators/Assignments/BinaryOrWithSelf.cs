@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class BinaryOrWithSelf : Assignment 
 	{
-        private Or or;
+        private readonly Or or;
 
         /// <summary>
         /// Binary Or with self operator.

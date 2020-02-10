@@ -35,18 +35,15 @@ namespace Waher.Script.Operators.Assignments
         public override IElement Evaluate(Variables Variables)
         {
             IElement Left = this.left.Evaluate(Variables);
-            IMatrix M = Left as IMatrix;
-            if (M is null)
+            if (!(Left is IMatrix M))
                 throw new ScriptRuntimeException("Matrix element assignment can only be performed on matrices.", this);
 
             IElement ColIndex = this.middle.Evaluate(Variables);
             IElement RowIndex = this.middle2.Evaluate(Variables);
-            DoubleNumber X = ColIndex as DoubleNumber;
-            DoubleNumber Y = RowIndex as DoubleNumber;
             double x, y;
 
-            if (X is null || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
-                Y is null || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
+            if (!(ColIndex is DoubleNumber X) || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
+                !(RowIndex is DoubleNumber Y) || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
             {
                 throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
             }

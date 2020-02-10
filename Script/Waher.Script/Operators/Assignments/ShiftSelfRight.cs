@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class ShiftSelfRight : Assignment 
 	{
-        private ShiftRight shiftRight;
+        private readonly ShiftRight shiftRight;
 
         /// <summary>
         /// Shift self right operator.

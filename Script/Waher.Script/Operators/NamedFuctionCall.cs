@@ -58,11 +58,10 @@ namespace Waher.Script.Operators
 		public override IElement Evaluate(Variables Variables)
 		{
 			string s = this.arguments.Length.ToString();
-			ILambdaExpression f;
 
 			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   ((f = v.ValueElement as ILambdaExpression) is null))
+			   (!(v.ValueElement is ILambdaExpression f)))
 			{
 				if (this.nullCheck)
 					return ObjectValue.Null;

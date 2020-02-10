@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class Assignment : UnaryOperator 
 	{
-		private string variableName;
+		private readonly string variableName;
 
 		/// <summary>
 		/// Assignment operator.

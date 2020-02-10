@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Assignments
     /// </summary>
     public class FunctionDefinition : LambdaDefinition
     {
-        private string functionName;
+        private readonly string functionName;
 
         /// <summary>
         /// Function definition operator.

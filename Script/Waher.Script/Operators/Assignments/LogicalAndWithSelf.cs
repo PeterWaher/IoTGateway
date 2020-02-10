@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class LogicalAndWithSelf : Assignment 
 	{
-        private And and;
+        private readonly And and;
 
         /// <summary>
         /// Logical And with self operator.

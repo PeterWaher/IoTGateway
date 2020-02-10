@@ -38,10 +38,7 @@ namespace Waher.Script.Operators.Vectors
 			if (Left.Dimension != 3 || Right.Dimension != 3)
 				throw new ScriptRuntimeException("Cross product works on vectors of dimesion 3.", this);
 
-			DoubleVector dv1 = Left as DoubleVector;
-			DoubleVector dv2 = Right as DoubleVector;
-
-			if (!(dv1 is null) && !(dv2 is null))
+			if (Left is DoubleVector dv1 && Right is DoubleVector dv2)
 			{
 				double[] d1 = dv1.Values;
 				double[] d2 = dv2.Values;

@@ -34,16 +34,14 @@ namespace Waher.Script.Operators.Sets
 		public override IElement Evaluate(Variables Variables)
 		{
             IElement L = this.left.Evaluate(Variables);
-            ISet S1 = L as ISet;
-            if (S1 is null)
-                S1 = new FiniteSet(new IElement[] { L });
+			if (!(L is ISet S1))
+				S1 = new FiniteSet(new IElement[] { L });
 
-            IElement R = this.right.Evaluate(Variables);
-            ISet S2 = R as ISet;
-            if (S2 is null)
-                S2 = new FiniteSet(new IElement[] { R });
+			IElement R = this.right.Evaluate(Variables);
+			if (!(R is ISet S2))
+				S2 = new FiniteSet(new IElement[] { R });
 
-            return new IntersectionSet(S1, S2);
+			return new IntersectionSet(S1, S2);
         }
     }
 }

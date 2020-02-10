@@ -36,8 +36,7 @@ namespace Waher.Script.Operators.Membership
         /// <returns>Result</returns>
         public override IElement Evaluate(IElement Left, IElement Right, Variables Variables)
         {
-            TypeValue TypeValue;
-            if (!((TypeValue = Right as TypeValue) is null))
+            if (Right is TypeValue TypeValue)
             {
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;
@@ -60,8 +59,7 @@ namespace Waher.Script.Operators.Membership
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
-            TypeValue TypeValue;
-            if (!((TypeValue = Right as TypeValue) is null))
+            if (Right is TypeValue TypeValue)
             {
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;

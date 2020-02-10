@@ -14,7 +14,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class SetUnit : UnaryScalarOperator
 	{
-		private Unit unit;
+		private readonly Unit unit;
 
 		/// <summary>
 		/// Sets a physical unit
@@ -46,16 +46,12 @@ namespace Waher.Script.Operators
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
-			DoubleNumber D = Operand as DoubleNumber;
-			if (!(D is null))
+			if (Operand is DoubleNumber D)
 				return new PhysicalQuantity(D.Value, this.unit);
 
-			PhysicalQuantity Q = Operand as PhysicalQuantity;
-			if (!(Q is null))
+			if (Operand is PhysicalQuantity Q)
 			{
-				double Magnitude;
-
-				if (Unit.TryConvert(Q.Magnitude, Q.Unit, this.unit, out Magnitude))
+				if (Unit.TryConvert(Q.Magnitude, Q.Unit, this.unit, out double Magnitude))
 					return new PhysicalQuantity(Magnitude, this.unit);
 				else
 					throw new ScriptRuntimeException("Unable to convert from " + Q.Unit.ToString() + " to " + this.unit.ToString() + ".", this);

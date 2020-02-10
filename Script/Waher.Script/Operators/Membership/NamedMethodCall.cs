@@ -183,7 +183,7 @@ namespace Waher.Script.Operators.Membership
 								if (ByRef is null)
 									ByRef = new List<KeyValuePair<string, int>>();
 
-								if (!(!(this.parameters[i] is VariableReference Ref)))
+								if (this.parameters[i] is VariableReference Ref)
 									ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
 								else
 									ByRef.Add(new KeyValuePair<string, int>(null, i));

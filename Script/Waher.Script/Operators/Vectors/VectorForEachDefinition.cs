@@ -15,7 +15,7 @@ namespace Waher.Script.Operators.Vectors
 	/// </summary>
 	public class VectorForEachDefinition : BinaryOperator
 	{
-        private string variableName;
+        private readonly string variableName;
 
 		/// <summary>
 		/// Creates a vector using a FOREACH statement.
@@ -46,8 +46,7 @@ namespace Waher.Script.Operators.Vectors
         public override IElement Evaluate(Variables Variables)
 		{
             IElement S = this.left.Evaluate(Variables);
-            ICollection<IElement> Elements = S as ICollection<IElement>;
-            if (Elements is null)
+            if (!(S is ICollection<IElement> Elements))
             {
                 if (S is IVector Vector)
                     Elements = Vector.VectorElements;

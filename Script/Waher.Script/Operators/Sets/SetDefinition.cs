@@ -62,10 +62,9 @@ namespace Waher.Script.Operators.Sets
 		{
 			ScriptNode[] Elements = this.Elements;
 
-            ISet Set = CheckAgainst as ISet;
             int? Size;
 
-			if (Set is null)
+            if (!(CheckAgainst is ISet Set))
 				return PatternMatchResult.NoMatch;
 
 			if (!(Size = Set.Size).HasValue)

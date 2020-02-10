@@ -173,11 +173,10 @@ namespace Waher.Script.Operators.Vectors
 		{
 			ScriptNode[] Elements = this.Elements;
 
-            IVector Vector = CheckAgainst as IVector;
-			if (Vector is null || Vector.Dimension != Elements.Length)
-				return PatternMatchResult.NoMatch;
+            if (!(CheckAgainst is IVector Vector) || Vector.Dimension != Elements.Length)
+                return PatternMatchResult.NoMatch;
 
-			PatternMatchResult Result;
+            PatternMatchResult Result;
 			int i = 0;
 
             foreach (IElement E in Vector.VectorElements)

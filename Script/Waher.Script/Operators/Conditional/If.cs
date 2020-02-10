@@ -35,9 +35,8 @@ namespace Waher.Script.Operators.Conditional
         public override IElement Evaluate(Variables Variables)
         {
             IElement Condition = this.left.Evaluate(Variables);
-            BooleanValue b = Condition as BooleanValue;
 
-            if (!(b is null))
+            if (Condition is BooleanValue b)
             {
                 if (b.Value)
                     return this.middle.Evaluate(Variables);
@@ -57,9 +56,7 @@ namespace Waher.Script.Operators.Conditional
         {
             if (Condition.IsScalar)
             {
-                BooleanValue b = Condition as BooleanValue;
-
-                if (!(b is null))
+                if (Condition is BooleanValue b)
                 {
                     if (b.Value)
                         return IfTrue;
@@ -84,8 +81,8 @@ namespace Waher.Script.Operators.Conditional
                 }
 
                 IEnumerator<IElement> e1 = ConditionElements.GetEnumerator();
-                IEnumerator<IElement> e2 = !(IfTrueElements is null) ? IfTrueElements.GetEnumerator() : null;
-                IEnumerator<IElement> e3 = !(IfFalseElements is null) ? IfFalseElements.GetEnumerator() : null;
+                IEnumerator<IElement> e2 = IfTrueElements?.GetEnumerator();
+                IEnumerator<IElement> e3 = IfFalseElements?.GetEnumerator();
 
                 while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
                     Elements.AddLast(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));

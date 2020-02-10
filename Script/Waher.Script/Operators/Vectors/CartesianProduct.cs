@@ -40,7 +40,7 @@ namespace Waher.Script.Operators.Vectors
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 			IEnumerator<IElement> e1 = Left.VectorElements.GetEnumerator();
 			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
-			IElement v1 = null;
+			IElement v1;
 
 			while (e1.MoveNext())
 			{

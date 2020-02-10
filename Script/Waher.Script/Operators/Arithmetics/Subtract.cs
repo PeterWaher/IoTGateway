@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Arithmetics
 			IElement Result;
 			IGroupElement Temp;
 
-			if (!(!(Left is IGroupElement LE)) && !(!(Right is IGroupElement RE)))
+			if (Left is IGroupElement LE && Right is IGroupElement RE)
 			{
 				Temp = RE.Negate();
 				if (!(Temp is null))

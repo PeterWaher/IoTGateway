@@ -14,7 +14,7 @@ namespace Waher.Script.Operators.Conditional
     /// </summary>
     public class For : QuaternaryOperator
     {
-        private string variableName;
+        private readonly string variableName;
 
         /// <summary>
         /// FOR operator.
@@ -48,16 +48,13 @@ namespace Waher.Script.Operators.Conditional
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            ICommutativeRingWithIdentityElement From = this.left.Evaluate(Variables) as ICommutativeRingWithIdentityElement;
-            if (From is null)
+            if (!(this.left.Evaluate(Variables) is ICommutativeRingWithIdentityElement From))
                 throw new ScriptRuntimeException("Invalid range.", this);
 
-            ICommutativeRingWithIdentityElement To = this.middle.Evaluate(Variables) as ICommutativeRingWithIdentityElement;
-            if (To is null)
+            if (!(this.middle.Evaluate(Variables) is ICommutativeRingWithIdentityElement To))
                 throw new ScriptRuntimeException("Invalid range.", this);
 
-            IOrderedSet S = From.AssociatedSet as IOrderedSet;
-            if (S is null)
+            if (!(From.AssociatedSet is IOrderedSet S))
                 throw new ScriptRuntimeException("Cannot compare range.", this);
 
             IElement Step, Last;

@@ -1771,6 +1771,10 @@ You can call methods and access fields and properties on an object, using the me
 	n:=L.Count;
 	L.ToArray();
 
+If an object has the index property `Item` defined, it can be accessed using the index operator:
+
+	ID["FIRST"]
+
 =========================================================================================================================================================
 
 Physical Quantities

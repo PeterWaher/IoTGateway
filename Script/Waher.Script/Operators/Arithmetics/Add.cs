@@ -49,10 +49,9 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateAddition(IElement Left, IElement Right, ScriptNode Node)
 		{
-			ISemiGroupElement RE = Right as ISemiGroupElement;
 			IElement Result;
 
-			if (Left is ISemiGroupElement LE && !(RE is null))
+			if (Left is ISemiGroupElement LE && !(!(Right is ISemiGroupElement RE)))
 			{
 				Result = LE.AddRight(RE);
 				if (!(Result is null))

@@ -48,11 +48,10 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateDivision(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IRingElement RE = Right as IRingElement;
 			IElement Result;
 			IRingElement Temp;
 
-			if (Left is IRingElement LE && !(RE is null))
+			if (Left is IRingElement LE && !(!(Right is IRingElement RE)))
 			{
 				Temp = RE.Invert();
 				if (!(Temp is null))

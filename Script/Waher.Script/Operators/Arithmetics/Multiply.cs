@@ -48,10 +48,9 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateMultiplication(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IRingElement RE = Right as IRingElement;
 			IElement Result;
 
-			if (Left is IRingElement LE && !(RE is null))
+			if (Left is IRingElement LE && !(!(Right is IRingElement RE)))
 			{
 				Result = LE.MultiplyRight(RE);
 				if (!(Result is null))

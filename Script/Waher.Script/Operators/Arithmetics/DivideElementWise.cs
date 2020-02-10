@@ -36,9 +36,7 @@ namespace Waher.Script.Operators.Arithmetics
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			DoubleNumber DR = Right as DoubleNumber;
-
-			if (Left is DoubleNumber DL && !(DR is null))
+			if (Left is DoubleNumber DL && !(!(Right is DoubleNumber DR)))
 				return new DoubleNumber(DL.Value / DR.Value);
 			else
 				return Divide.EvaluateDivision(Left, Right, this);

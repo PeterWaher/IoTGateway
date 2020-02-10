@@ -50,11 +50,10 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateDivision(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IRingElement RE = Right as IRingElement;
 			IElement Result;
 			IRingElement Temp;
 
-			if (Left is IRingElement LE && !(RE is null))
+			if (Left is IRingElement LE && !(!(Right is IRingElement RE)))
 			{
 				// TODO: Optimize in case of matrices. It's more efficient to employ a solve algorithm than to compute the inverse and the multiply.
 
@@ -126,9 +125,7 @@ namespace Waher.Script.Operators.Arithmetics
 				}
 				else
 				{
-					ISet Set2 = Right as ISet;
-
-					if (Left is ISet Set1 && !(Set2 is null))
+					if (Left is ISet Set1 && !(!(Right is ISet Set2)))
 						return new SetDifference(Set1, Set2);
 					else
 					{

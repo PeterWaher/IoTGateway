@@ -48,12 +48,10 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public static IElement EvaluateSubtraction(IElement Left, IElement Right, ScriptNode Node)
 		{
-			IGroupElement LE = Left as IGroupElement;
-			IGroupElement RE = Right as IGroupElement;
 			IElement Result;
 			IGroupElement Temp;
 
-			if (!(LE is null) && !(RE is null))
+			if (!(!(Left is IGroupElement LE)) && !(!(Right is IGroupElement RE)))
 			{
 				Temp = RE.Negate();
 				if (!(Temp is null))

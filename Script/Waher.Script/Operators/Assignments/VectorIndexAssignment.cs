@@ -34,24 +34,22 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            IElement Left = this.left.Evaluate(Variables);
-            IVector V = Left as IVector;
-            if (V is null)
-                throw new ScriptRuntimeException("Vector element assignment can only be performed on vectors.", this);
+			IElement Left = this.left.Evaluate(Variables);
+			if (!(Left is IVector V))
+				throw new ScriptRuntimeException("Vector element assignment can only be performed on vectors.", this);
 
-            IElement Index = this.middle.Evaluate(Variables);
-            DoubleNumber IE = Index as DoubleNumber;
-            double d;
+			IElement Index = this.middle.Evaluate(Variables);
+			double d;
 
-            if (IE is null || (d=IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
+			if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+				throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
-            IElement Value = this.right.Evaluate(Variables);
-            
-            V.SetElement((int)d, Value);
+			IElement Value = this.right.Evaluate(Variables);
 
-            return Value;
-        }
+			V.SetElement((int)d, Value);
 
-    }
+			return Value;
+		}
+
+	}
 }

@@ -258,6 +258,24 @@
             <param name="Client">XMPP Client to use.</param>
             <param name="ComponentAddress">Address to the contracts component.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
+            <summary>
+            Adds support for legal identities, smart contracts and signatures to an XMPP client.
+            
+            The interface is defined in the IEEE XMPP IoT extensions:
+            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+            <param name="ComponentAddress">Address to the contracts component.</param>
+            <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetAllowedSources(System.Object[])">
+            <summary>
+            If access to sensitive methods is only accessible from a set of approved sources.
+            </summary>
+            <param name="ApprovedSources">Approved sources.</param>
+            <exception cref="T:System.NotSupportedException">If trying to change previously set sources.</exception>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Dispose">
             <summary>
             Disposes of the extension.

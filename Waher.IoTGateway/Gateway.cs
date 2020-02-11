@@ -416,7 +416,7 @@ namespace Waher.IoTGateway
 					AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
 
 				MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
-				
+
 				if (!(MI is null))
 				{
 					T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
@@ -826,7 +826,8 @@ namespace Waher.IoTGateway
 					startingServer?.Dispose();
 					startingServer = null;
 
-					xmppClient.Connect();
+					if (xmppClient.State != XmppState.Connected)
+						xmppClient.Connect();
 				}
 			});
 
@@ -1952,7 +1953,7 @@ namespace Waher.IoTGateway
 			{
 				if (DoLog)
 					Log.Debug("No local login: No session.");
-		
+
 				return;
 			}
 

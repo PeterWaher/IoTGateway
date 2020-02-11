@@ -11,6 +11,7 @@
       <String id="7">Backup</String>
       <String id="8">Introduction</String>
       <String id="9">Restore</String>
+      <String id="10">Legal Identity</String>
     </Namespace>
 	</Language>
 </Translation>

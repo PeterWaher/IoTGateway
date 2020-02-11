@@ -41,6 +41,9 @@
     <None Remove="Root\Settings\Domain.js" />
     <None Remove="Root\Settings\Domain.md" />
     <None Remove="Root\Settings\Introduction.md" />
+    <None Remove="Root\Settings\LegalIdentities.md" />
+    <None Remove="Root\Settings\LegalIdentity.js" />
+    <None Remove="Root\Settings\LegalIdentity.md" />
     <None Remove="Root\Settings\Master.md" />
     <None Remove="Root\Settings\Next.js" />
     <None Remove="Root\Settings\Notification.js" />
@@ -104,6 +107,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Database\MongoDB.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\LegalIdentities.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\LegalIdentity.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\LegalIdentity.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Notification.js">

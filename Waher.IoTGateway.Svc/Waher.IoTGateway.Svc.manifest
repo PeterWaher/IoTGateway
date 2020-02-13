@@ -523,6 +523,7 @@
     <Content fileName='ClockStatXmlToCsv.xslt'/>
     <Content fileName='ClockStatXmlToHtml.xslt'/>
     <Content fileName='ClockStatXmlToTsv.xslt'/>
+    <Content fileName='ContractToMarkdown.xslt'/>
     <Content fileName='DbStatXmlToHtml.xslt'/>
     <Content fileName='EventXmlToHtml.xslt'/>
     <Content fileName='SnifferXmlToHtml.xslt'/>

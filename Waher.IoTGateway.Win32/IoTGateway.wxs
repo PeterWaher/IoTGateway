@@ -1419,14 +1419,16 @@
 							<File Id='ClockStatXmlToCsv.xslt' Name='ClockStatXmlToCsv.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToCsv.xslt' KeyPath='yes'/>
 							<File Id='ClockStatXmlToHtml.xslt' Name='ClockStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToHtml.xslt'/>
 							<File Id='ClockStatXmlToTsv.xslt' Name='ClockStatXmlToTsv.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToTsv.xslt'/>
-							<File Id='DbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\DbStatXmlToHtml.xslt'/>
-							<File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\EventXmlToHtml.xslt'/>
+              <File Id='ContractToMarkdown.xslt' Name='ContractToMarkdown.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ContractToMarkdown.xslt'/>
+              <File Id='DbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\DbStatXmlToHtml.xslt'/>
+              <File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\EventXmlToHtml.xslt'/>
               <File Id='SnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\SnifferXmlToHtml.xslt'/>
 							<RemoveFile Id='RemoveClockStatXmlToCsv.xslt' Name='ClockStatXmlToCsv.xslt' On='uninstall'/>
 							<RemoveFile Id='RemoveClockStatXmlToHtml.xslt' Name='ClockStatXmlToHtml.xslt' On='uninstall'/>
 							<RemoveFile Id='RemoveClockStatXmlToTsv.xslt' Name='ClockStatXmlToTsv.xslt' On='uninstall'/>
-							<RemoveFile Id='RemoveDbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' On='uninstall'/>
-							<RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
+              <RemoveFile Id='RemoveContractToMarkdown.xslt' Name='ContractToMarkdown.xslt' On='uninstall'/>
+              <RemoveFile Id='RemoveDbStatXmlToHtml.xslt' Name='DbStatXmlToHtml.xslt' On='uninstall'/>
+              <RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
 							<RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
 						</Component>
           </Directory>

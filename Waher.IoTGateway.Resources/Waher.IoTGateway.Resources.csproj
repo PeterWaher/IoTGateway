@@ -125,6 +125,7 @@
     <None Remove="Transforms\ClockStatXmlToCsv.xslt" />
     <None Remove="Transforms\ClockStatXmlToHtml.xslt" />
     <None Remove="Transforms\ClockStatXmlToTsv.xslt" />
+    <None Remove="Transforms\ContractToMarkdown.xslt" />
     <None Remove="Transforms\EventXmlToHtml.xslt" />
     <None Remove="Transforms\SnifferXmlToHtml.xslt" />
     <None Remove="Waher.IoTGateway.Resources.manifest" />
@@ -429,6 +430,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Transforms\ClockStatXmlToHtml.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Transforms\ContractToMarkdown.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Transforms\DbStatXmlToHtml.xslt">

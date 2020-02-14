@@ -4,15 +4,17 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Security;
@@ -729,6 +731,226 @@ namespace Waher.IoTGateway.Setup
 
 			return null;
 		}
+
+
+		#region Create Contract
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public static void CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			SmartContractEventHandler Callback, object State)
+		{
+			Gateway.ContractsClient.CreateContract(ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public static void CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			SmartContractEventHandler Callback, object State)
+		{
+			Gateway.ContractsClient.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
+		public static Task<Contract> CreateContractAsync(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return Gateway.ContractsClient.CreateContractAsync(ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		/// <summary>
+		/// Creates a new contract.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ForMachines">Machine-readable content.</param>
+		/// <param name="ForHumans">Human-readable localized content. Provide one object for each language supported by the contract.</param>
+		/// <param name="Roles">Roles defined in contract.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
+		public static Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
+			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return Gateway.ContractsClient.CreateContractAsync(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, 
+				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		#endregion
+
+		#region Create Contract From Template
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public static void CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+		{
+			Gateway.ContractsClient.CreateContract(TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, ArchiveRequired, ArchiveOptional, 
+				SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public static void CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+		{
+			Gateway.ContractsClient.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
+		public static Task<Contract> CreateContractAsync(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
+			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return Gateway.ContractsClient.CreateContractAsync(TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		/// <summary>
+		/// Creates a new contract from a template.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="TemplateId">ID of contract to be used as a template.</param>
+		/// <param name="Parts">Parts defined in contract. Can be empty or null, if creating an open contract or a template.</param>
+		/// <param name="Parameters">Any contractual parameters defined for the contract.</param>
+		/// <param name="Visibility">Visibility of the contract.</param>
+		/// <param name="PartsMode">How parts are defined in the contract. If equal to <see cref="ContractParts.ExplicitlyDefined"/>,
+		/// then the explicitly defined parts must be provided in <paramref name="Parts"/>.</param>
+		/// <param name="Duration">Duration of the contract, once signed.</param>
+		/// <param name="ArchiveRequired">Required archivation duration, after signed contract has become obsolete.</param>
+		/// <param name="ArchiveOptional">Optional archivation duration, after required archivation duration has elapsed.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point in time, if provided.</param>
+		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
+		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
+		/// <returns>Contract.</returns>
+		public static Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
+			ContractVisibility Visibility, ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional,
+			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+		{
+			return Gateway.ContractsClient.CreateContractAsync(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, 
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
+		}
+
+		#endregion
+
 
 	}
 }

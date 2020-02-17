@@ -76,7 +76,6 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <summary>
 		/// Bare JID of avatar.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string BareJid
 		{
 			get { return this.bareJid; }

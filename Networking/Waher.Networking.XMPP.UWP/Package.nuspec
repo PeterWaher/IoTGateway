@@ -48,7 +48,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <dependencies>
       <dependency id="Waher.Content" version="1.0.23"/>
       <dependency id="Waher.Content.Xml" version="1.0.7"/>
-      <dependency id="Waher.Events" version="1.0.9"/>
+      <dependency id="Waher.Events" version="1.0.10"/>
       <dependency id="Waher.Networking" version="1.0.13"/>
       <dependency id="Waher.Persistence" version="1.0.14"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>

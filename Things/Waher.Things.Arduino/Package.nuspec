@@ -16,7 +16,7 @@
     <tags>UWP IoT Arduino Firmata</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.23"/>
-      <dependency id="Waher.Events" version="1.0.9"/>
+      <dependency id="Waher.Events" version="1.0.10"/>
       <dependency id="Waher.IoTGateway" version="1.0.88"/>
       <dependency id="Waher.Networking.XMPP" version="1.0.44"/>
       <dependency id="Waher.Persistence" version="1.0.14"/>

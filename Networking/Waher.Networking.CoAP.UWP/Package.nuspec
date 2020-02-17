@@ -16,7 +16,7 @@
     <tags>networking communication coap core dtls uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.23"/>
-      <dependency id="Waher.Events" version="1.0.9"/>
+      <dependency id="Waher.Events" version="1.0.10"/>
       <dependency id="Waher.Networking" version="1.0.13"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.11"/>

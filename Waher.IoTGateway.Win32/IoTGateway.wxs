@@ -33,7 +33,7 @@
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
-            <Component Id='InstallFolder' Guid='7853CEA7-FF91-4090-8F64-CCAC390BAD9C'>
+            <Component Id='InstallFolder' Guid='7853CEA7-FF91-4090-8F64-CCAC390BAD9C' KeyPath='yes'>
               <CreateFolder>
                 <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
               </CreateFolder>
@@ -1196,7 +1196,7 @@
               </Component>
             </Directory>
             <Directory Id='InstallUtility' Name='InstallUtility'>
-              <Component Id='InstallUtilityFolder' Guid='C4400475-1681-4971-A5A1-AA30667F939C'>
+              <Component Id='InstallUtilityFolder' Guid='C4400475-1681-4971-A5A1-AA30667F939C' KeyPath='yes'>
                 <CreateFolder>
                   <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
                 </CreateFolder>

@@ -50,7 +50,6 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// String ID.
 		/// </summary>
-		[DefaultValue(0)]
 		public int Id
 		{
 			get { return this.id; }

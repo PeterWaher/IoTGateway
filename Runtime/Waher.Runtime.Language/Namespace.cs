@@ -52,7 +52,6 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// Namespace.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Name
 		{
 			get { return this.name; }

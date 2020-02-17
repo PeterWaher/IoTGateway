@@ -46,7 +46,6 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// Language code.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Code
 		{
 			get { return this.code; }

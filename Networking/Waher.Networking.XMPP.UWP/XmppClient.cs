@@ -3070,7 +3070,7 @@ namespace Waher.Networking.XMPP
 		{
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
-				if (N2.LocalName == "text" && (N2.NamespaceURI == NamespaceXmppStreams || N2.NamespaceURI == NamespaceXmppStreams || N2.NamespaceURI == NamespaceXmppSasl))
+				if (N2.LocalName == "text" && (N2.NamespaceURI == NamespaceXmppStanzas || N2.NamespaceURI == NamespaceXmppStreams || N2.NamespaceURI == NamespaceXmppSasl))
 					return N2.InnerText.Trim();
 			}
 

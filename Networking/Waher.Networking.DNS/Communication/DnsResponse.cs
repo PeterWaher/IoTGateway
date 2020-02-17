@@ -43,7 +43,6 @@ namespace Waher.Networking.DNS.Communication
 		/// <summary>
 		/// Domain name
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Name
 		{
 			get => this.name;
@@ -53,7 +52,6 @@ namespace Waher.Networking.DNS.Communication
 		/// <summary>
 		/// Question TYPE
 		/// </summary>
-		[DefaultValue(QTYPE.A)]
 		public QTYPE Type
 		{
 			get => this.type;
@@ -63,7 +61,6 @@ namespace Waher.Networking.DNS.Communication
 		/// <summary>
 		/// Question CLASS
 		/// </summary>
-		[DefaultValue(QCLASS.IN)]
 		public QCLASS Class
 		{
 			get => this._class;

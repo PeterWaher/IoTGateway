@@ -84,7 +84,6 @@ namespace Waher.Things
 		/// <summary>
 		/// Optional ID of source containing node.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		[ShortName("s")]
 		public string SourceId
 		{
@@ -95,7 +94,6 @@ namespace Waher.Things
 		/// <summary>
 		/// Optional partition in which the Node ID is unique.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		[ShortName("p")]
 		public string Partition
 		{

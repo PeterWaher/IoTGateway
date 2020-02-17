@@ -10,7 +10,7 @@ namespace Waher.Things.Metering
 	[CollectionName("MeteringMessages")]
 	[TypeName(TypeNameSerialization.None)]
 	[ArchivingTime(731)]	// 2 years
-	[Index("NodeId", "Timestamp")]
+	[Index("NodeId", "Created")]
 	public class MeteringMessage
 	{
 		private Guid objectId = Guid.Empty;

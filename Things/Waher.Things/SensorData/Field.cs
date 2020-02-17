@@ -189,7 +189,6 @@ namespace Waher.Things.SensorData
 		/// Reference to the thing to which the field belongs.
 		/// </summary>
 		[ByReference]
-		[DefaultValueNull]
 		public ThingReference Thing
 		{
 			get { return this.thing; }
@@ -200,7 +199,6 @@ namespace Waher.Things.SensorData
 		/// Timestamp of field value.
 		/// </summary>
 		[ShortName("ts")]
-		[DefaultValueDateTimeMinValue]
 		public DateTime Timestamp
 		{
 			get { return this.timestamp; }
@@ -275,7 +273,6 @@ namespace Waher.Things.SensorData
 		/// Unlocalized field name.
 		/// </summary>
 		[ShortName("n")]
-		[DefaultValueStringEmpty]
 		public string Name
 		{
 			get { return this.name; }

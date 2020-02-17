@@ -41,7 +41,6 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// <summary>
 		/// XML query.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Xml
 		{
 			get { return this.xml; }
@@ -51,7 +50,6 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// <summary>
 		/// Method
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Method
 		{
 			get { return this.method; }
@@ -71,7 +69,6 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// <summary>
 		/// Last time rule was used.
 		/// </summary>
-		[DefaultValueDateTimeMinValue]
 		public DateTime LastUsed
 		{
 			get { return this.lastUsed; }

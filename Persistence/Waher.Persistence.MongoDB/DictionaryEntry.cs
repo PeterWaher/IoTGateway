@@ -39,7 +39,6 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Dictionary collection
 		/// </summary>
-		[DefaultValueStringEmpty]
 		[ShortName("c")]
 		public string Collection
 		{
@@ -50,7 +49,6 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Dictionary key
 		/// </summary>
-		[DefaultValueStringEmpty]
 		[ShortName("k")]
 		public string Key
 		{

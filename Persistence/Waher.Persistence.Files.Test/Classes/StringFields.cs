@@ -19,9 +19,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 	{
 		[ObjectId]
 		public Guid ObjectId;
-		[DefaultValueStringEmpty]
 		public string A = string.Empty;
-		[DefaultValueStringEmpty]
 		public string B = string.Empty;
 		[DefaultValueStringEmpty]
 		public string C = string.Empty;

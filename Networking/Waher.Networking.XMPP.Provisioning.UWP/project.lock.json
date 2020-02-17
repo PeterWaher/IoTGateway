@@ -2564,7 +2564,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2606,7 +2606,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -5141,7 +5141,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5183,7 +5183,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -7754,7 +7754,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7796,7 +7796,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -10340,7 +10340,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10382,7 +10382,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -12962,7 +12962,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13004,7 +13004,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -15548,7 +15548,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15590,7 +15590,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     },
@@ -18170,7 +18170,7 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Runtime.Language/1.0.1": {
+      "Waher.Runtime.Language/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18212,7 +18212,7 @@
           "Waher.Content": "1.0.23",
           "Waher.Content.Xml": "1.0.7",
           "Waher.Events": "1.0.10",
-          "Waher.Runtime.Language": "1.0.1"
+          "Waher.Runtime.Language": "1.0.2"
         }
       }
     }
@@ -28166,7 +28166,7 @@
       "path": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj"
     },
-    "Waher.Runtime.Language/1.0.1": {
+    "Waher.Runtime.Language/1.0.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"

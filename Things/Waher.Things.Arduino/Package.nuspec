@@ -21,7 +21,7 @@
       <dependency id="Waher.Networking.XMPP" version="1.0.44"/>
       <dependency id="Waher.Persistence" version="1.0.14"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.11"/>
-      <dependency id="Waher.Runtime.Language" version="1.0.1"/>
+      <dependency id="Waher.Runtime.Language" version="1.0.2"/>
       <dependency id="Waher.Script" version="1.0.34"/>
       <dependency id="Waher.Things" version="1.0.27"/>
       <dependency id="Waher.Things.Metering" version="1.0.20"/>

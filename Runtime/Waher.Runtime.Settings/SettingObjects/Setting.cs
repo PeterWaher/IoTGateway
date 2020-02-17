@@ -49,7 +49,6 @@ namespace Waher.Runtime.Settings.SettingObjects
 		/// <summary>
 		/// Key name.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Key
 		{
 			get { return this.key; }

@@ -96,7 +96,6 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Object ID of parent node in persistence layer.
 		/// </summary>
-		[DefaultValueGuidEmpty]
 		public Guid ParentId
 		{
 			get { return this.parentId; }

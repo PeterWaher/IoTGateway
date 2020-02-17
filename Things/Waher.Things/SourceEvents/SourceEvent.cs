@@ -44,7 +44,6 @@ namespace Waher.Things.SourceEvents
 		/// <summary>
 		/// Data source identity.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		[ShortName("s")]
 		public string SourceId
 		{
@@ -55,7 +54,6 @@ namespace Waher.Things.SourceEvents
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		[DefaultValueDateTimeMinValue]
 		[ShortName("ts")]
 		public DateTime Timestamp
 		{

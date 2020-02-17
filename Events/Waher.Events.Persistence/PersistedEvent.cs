@@ -87,7 +87,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		[DefaultValueDateTimeMinValue]
 		public DateTime Timestamp
 		{
 			get { return this.timestamp; }
@@ -97,7 +96,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Type of event.
 		/// </summary>
-		[DefaultValue(EventType.Informational)]
 		public EventType Type
 		{
 			get { return this.type; }
@@ -150,7 +148,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Object related to the event.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Object
 		{
 			get { return this.obj; }
@@ -160,7 +157,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Actor responsible for the action causing the event.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Actor
 		{
 			get { return this.actor; }
@@ -170,7 +166,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Computer-readable Event ID identifying type of even.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string EventId
 		{
 			get { return this.eventId; }
@@ -180,7 +175,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Facility can be either a facility in the network sense or in the system sense.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string Facility
 		{
 			get { return this.facility; }

@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 #endif
+using Waher.Events;
 using Waher.Persistence.Serialization.Model;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
@@ -313,9 +314,15 @@ namespace Waher.Persistence.Serialization
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
 
 			List<string[]> Indices = new List<string[]>();
+			Dictionary<string, bool> IndexFields = new Dictionary<string, bool>();
 
 			foreach (IndexAttribute IndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
+			{
 				Indices.Add(IndexAttribute.FieldNames);
+
+				foreach (string FieldName in IndexAttribute.FieldNames)
+					IndexFields[FieldName] = true;
+			}
 
 			this.indices = Indices.ToArray();
 
@@ -412,148 +419,153 @@ namespace Waher.Persistence.Serialization
 						}
 						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
-							DefaultValue = DefaultValueAttribute.Value;
-							NrDefault++;
-
-							this.defaultValues[Member.Name] = DefaultValue;
-
-							CSharp.Append("\t\tprivate static readonly ");
-
-							if (DefaultValue is null)
-								CSharp.Append("object");
-							else
-								CSharp.Append(MemberType.FullName);
-
-							CSharp.Append(" default");
-							CSharp.Append(Member.Name);
-							CSharp.Append(" = ");
-
-							if (DefaultValue is null)
-								CSharp.Append("null");
+							if (IndexFields.ContainsKey(Member.Name))
+								Log.Notice("Default value for " + Type.FullName + "." + Member.Name + " ignored, as field is used to index objects.");
 							else
 							{
-								if (DefaultValue.GetType() != MemberType)
-								{
-									CSharp.Append('(');
+								DefaultValue = DefaultValueAttribute.Value;
+								NrDefault++;
+
+								this.defaultValues[Member.Name] = DefaultValue;
+
+								CSharp.Append("\t\tprivate static readonly ");
+
+								if (DefaultValue is null)
+									CSharp.Append("object");
+								else
 									CSharp.Append(MemberType.FullName);
-									CSharp.Append(')');
-								}
 
-								if (DefaultValue is string s2)
-								{
-									if (string.IsNullOrEmpty(s2))
-									{
-										if (MemberType == typeof(CaseInsensitiveString))
-											CSharp.Append("CaseInsensitiveString.Empty");
-										else
-											CSharp.Append("string.Empty");
-									}
-									else
-									{
-										CSharp.Append("\"");
-										CSharp.Append(Escape(DefaultValue.ToString()));
-										CSharp.Append("\"");
-									}
-								}
-								else if (DefaultValue is DateTime TP)
-								{
-									if (TP == DateTime.MinValue)
-										CSharp.Append("DateTime.MinValue");
-									else if (TP == DateTime.MaxValue)
-										CSharp.Append("DateTime.MaxValue");
-									else
-									{
-										CSharp.Append("new DateTime(");
-										CSharp.Append(TP.Ticks.ToString());
-										CSharp.Append(", DateTimeKind.");
-										CSharp.Append(TP.Kind.ToString());
-										CSharp.Append(")");
-									}
-								}
-								else if (DefaultValue is TimeSpan TS)
-								{
-									if (TS == TimeSpan.MinValue)
-										CSharp.Append("TimeSpan.MinValue");
-									else if (TS == TimeSpan.MaxValue)
-										CSharp.Append("TimeSpan.MaxValue");
-									else
-									{
-										CSharp.Append("new TimeSpan(");
-										CSharp.Append(TS.Ticks.ToString());
-										CSharp.Append(")");
-									}
-								}
-								else if (DefaultValue is Guid Guid)
-								{
-									if (Guid.Equals(Guid.Empty))
-										CSharp.Append("Guid.Empty");
-									else
-									{
-										CSharp.Append("new Guid(\"");
-										CSharp.Append(Guid.ToString());
-										CSharp.Append("\")");
-									}
-								}
-								else if (DefaultValue is Enum e)
-								{
-									Type DefaultValueType = DefaultValue.GetType();
+								CSharp.Append(" default");
+								CSharp.Append(Member.Name);
+								CSharp.Append(" = ");
 
-									if (DefaultValueType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false))
+								if (DefaultValue is null)
+									CSharp.Append("null");
+								else
+								{
+									if (DefaultValue.GetType() != MemberType)
 									{
-										bool First = true;
+										CSharp.Append('(');
+										CSharp.Append(MemberType.FullName);
+										CSharp.Append(')');
+									}
 
-										foreach (object Value in Enum.GetValues(DefaultValueType))
+									if (DefaultValue is string s2)
+									{
+										if (string.IsNullOrEmpty(s2))
 										{
-											if (!e.HasFlag((Enum)Value))
-												continue;
+											if (MemberType == typeof(CaseInsensitiveString))
+												CSharp.Append("CaseInsensitiveString.Empty");
+											else
+												CSharp.Append("string.Empty");
+										}
+										else
+										{
+											CSharp.Append("\"");
+											CSharp.Append(Escape(DefaultValue.ToString()));
+											CSharp.Append("\"");
+										}
+									}
+									else if (DefaultValue is DateTime TP)
+									{
+										if (TP == DateTime.MinValue)
+											CSharp.Append("DateTime.MinValue");
+										else if (TP == DateTime.MaxValue)
+											CSharp.Append("DateTime.MaxValue");
+										else
+										{
+											CSharp.Append("new DateTime(");
+											CSharp.Append(TP.Ticks.ToString());
+											CSharp.Append(", DateTimeKind.");
+											CSharp.Append(TP.Kind.ToString());
+											CSharp.Append(")");
+										}
+									}
+									else if (DefaultValue is TimeSpan TS)
+									{
+										if (TS == TimeSpan.MinValue)
+											CSharp.Append("TimeSpan.MinValue");
+										else if (TS == TimeSpan.MaxValue)
+											CSharp.Append("TimeSpan.MaxValue");
+										else
+										{
+											CSharp.Append("new TimeSpan(");
+											CSharp.Append(TS.Ticks.ToString());
+											CSharp.Append(")");
+										}
+									}
+									else if (DefaultValue is Guid Guid)
+									{
+										if (Guid.Equals(Guid.Empty))
+											CSharp.Append("Guid.Empty");
+										else
+										{
+											CSharp.Append("new Guid(\"");
+											CSharp.Append(Guid.ToString());
+											CSharp.Append("\")");
+										}
+									}
+									else if (DefaultValue is Enum e)
+									{
+										Type DefaultValueType = DefaultValue.GetType();
+
+										if (DefaultValueType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false))
+										{
+											bool First = true;
+
+											foreach (object Value in Enum.GetValues(DefaultValueType))
+											{
+												if (!e.HasFlag((Enum)Value))
+													continue;
+
+												if (First)
+													First = false;
+												else
+													CSharp.Append(" | ");
+
+												CSharp.Append(DefaultValueType.FullName);
+												CSharp.Append('.');
+												CSharp.Append(Value.ToString());
+											}
 
 											if (First)
-												First = false;
-											else
-												CSharp.Append(" | ");
-
-											CSharp.Append(DefaultValueType.FullName);
-											CSharp.Append('.');
-											CSharp.Append(Value.ToString());
+												CSharp.Append('0');
 										}
-
-										if (First)
-											CSharp.Append('0');
+										else
+										{
+											CSharp.Append(DefaultValue.GetType().FullName);
+											CSharp.Append('.');
+											CSharp.Append(DefaultValue.ToString());
+										}
 									}
-									else
+									else if (DefaultValue is bool b)
 									{
-										CSharp.Append(DefaultValue.GetType().FullName);
-										CSharp.Append('.');
-										CSharp.Append(DefaultValue.ToString());
+										if (b)
+											CSharp.Append("true");
+										else
+											CSharp.Append("false");
 									}
-								}
-								else if (DefaultValue is bool b)
-								{
-									if (b)
-										CSharp.Append("true");
+									else if (DefaultValue is long)
+									{
+										CSharp.Append(DefaultValue.ToString());
+										CSharp.Append("L");
+									}
+									else if (DefaultValue is char ch)
+									{
+										CSharp.Append('\'');
+
+										if (ch == '\'')
+											CSharp.Append('\\');
+
+										CSharp.Append(ch);
+										CSharp.Append('\'');
+									}
 									else
-										CSharp.Append("false");
+										CSharp.Append(DefaultValue.ToString());
 								}
-								else if (DefaultValue is long)
-								{
-									CSharp.Append(DefaultValue.ToString());
-									CSharp.Append("L");
-								}
-								else if (DefaultValue is char ch)
-								{
-									CSharp.Append('\'');
 
-									if (ch == '\'')
-										CSharp.Append('\\');
-
-									CSharp.Append(ch);
-									CSharp.Append('\'');
-								}
-								else
-									CSharp.Append(DefaultValue.ToString());
+								CSharp.AppendLine(";");
 							}
-
-							CSharp.AppendLine(";");
 						}
 						else if (Attr is ByReferenceAttribute)
 							ByReference = true;
@@ -1555,8 +1567,11 @@ namespace Waher.Persistence.Serialization
 						}
 						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
-							HasDefaultValue = true;
-							DefaultValue = DefaultValueAttribute.Value;
+							if (!IndexFields.ContainsKey(Member.Name))
+							{
+								HasDefaultValue = true;
+								DefaultValue = DefaultValueAttribute.Value;
+							}
 						}
 						else if (Attr is ShortNameAttribute ShortNameAttribute)
 							ShortName = ShortNameAttribute.Name;
@@ -2321,16 +2336,19 @@ namespace Waher.Persistence.Serialization
 						}
 						else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 						{
-							DefaultValue = DefaultValueAttribute.Value;
-							NrDefault++;
+							if (!IndexFields.ContainsKey(MemberInfo.Name))
+							{
+								DefaultValue = DefaultValueAttribute.Value;
+								NrDefault++;
 
-							if (DefaultValue is string s && Member.MemberType == typeof(CaseInsensitiveString))
-								DefaultValue = new CaseInsensitiveString(s);
+								if (DefaultValue is string s && Member.MemberType == typeof(CaseInsensitiveString))
+									DefaultValue = new CaseInsensitiveString(s);
 
-							if (!(DefaultValue is null) && DefaultValue.GetType() != Member.MemberType)
-								DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);
+								if (!(DefaultValue is null) && DefaultValue.GetType() != Member.MemberType)
+									DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);
 
-							Member.DefaultValue = DefaultValue;
+								Member.DefaultValue = DefaultValue;
+							}
 						}
 						else if (Attr is ByReferenceAttribute)
 							Member.ByReference = true;

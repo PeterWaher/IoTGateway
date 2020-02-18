@@ -127,7 +127,7 @@ more information about their approval procedure.
 
 <p>Press the Apply button to apply for the legal identity above to be approved.</p>
 <p id="ApplyError" class="error" style="display:none">Unable to apply for a legal identity. Error reported: <span id='Error'></span></p>
-<p id="NextMessage" class="message"{{Config.Step>=1 ? ' style="display:none"':''}}>Application successfully sent. You can wait here until the identity becomes approved, or choose to continue, by clicking the Next button.</p>
+<p id="NextMessage" class="message"{{Config.Step=0 ? ' style="display:none"':''}}>Application successfully sent. You can wait here until the identity becomes approved, or choose to continue, by clicking the Next button.</p>
 
 <button type='button' onclick='ApplyIdentity()'>Apply</button>
 {{if Configuring then 

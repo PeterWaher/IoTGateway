@@ -19,7 +19,7 @@ namespace Waher.Persistence
 		public CaseInsensitiveString(string Value)
 		{
 			this.value = Value;
-			this.lowerCase = Value.ToLower();
+			this.lowerCase = Value?.ToLower();
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Waher.Persistence
 		/// <returns>A 32-bit signed integer hash code.</returns>
 		public override int GetHashCode()
 		{
-			return this.lowerCase.GetHashCode();
+			return this.lowerCase?.GetHashCode() ?? 0;
 		}
 
 		/// <summary>
@@ -61,9 +61,9 @@ namespace Waher.Persistence
 		public override bool Equals(object obj)
 		{
 			if (obj is CaseInsensitiveString S)
-				return this.lowerCase.Equals(S.lowerCase);
+				return this.lowerCase?.Equals(S.lowerCase) ?? (S.lowerCase is null);
 			else if (obj is string S2)
-				return this.lowerCase.Equals(S2.ToLower());
+				return this.lowerCase?.Equals(S2?.ToLower()) ?? (S2 is null);
 			else
 				return false;
 		}

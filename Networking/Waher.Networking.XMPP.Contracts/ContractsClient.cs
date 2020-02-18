@@ -170,6 +170,11 @@ namespace Waher.Networking.XMPP.Contracts
         /// </summary>
         public override string[] Extensions => new string[] { };
 
+        /// <summary>
+        /// Component address.
+        /// </summary>
+        public string ComponentAddress => this.componentAddress;
+
         #region Server Public Keys
 
         /// <summary>
@@ -1393,8 +1398,6 @@ namespace Waher.Networking.XMPP.Contracts
             Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
             SmartContractEventHandler Callback, object State)
         {
-            this.AssertAllowed();
-
             StringBuilder Xml = new StringBuilder();
 
             Xml.Append("<createContract xmlns=\"");
@@ -1816,8 +1819,6 @@ namespace Waher.Networking.XMPP.Contracts
         public void SignContract(string Address, Contract Contract, string Role, bool Transferable,
             SmartContractEventHandler Callback, object State)
         {
-            this.AssertAllowed();
-
             StringBuilder Xml = new StringBuilder();
             Contract.Serialize(Xml, false, false, false, false, false);
             byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
@@ -2065,8 +2066,6 @@ namespace Waher.Networking.XMPP.Contracts
         public void ObsoleteContract(string Address, string ContractId,
             SmartContractEventHandler Callback, object State)
         {
-            this.AssertAllowed();
-
             StringBuilder Xml = new StringBuilder();
 
             Xml.Append("<obsoleteContract xmlns='");
@@ -2137,8 +2136,6 @@ namespace Waher.Networking.XMPP.Contracts
         public void DeleteContract(string Address, string ContractId,
             SmartContractEventHandler Callback, object State)
         {
-            this.AssertAllowed();
-
             StringBuilder Xml = new StringBuilder();
 
             Xml.Append("<deleteContract xmlns='");
@@ -2257,8 +2254,6 @@ namespace Waher.Networking.XMPP.Contracts
         public void UpdateContract(string Address, Contract Contract,
             SmartContractEventHandler Callback, object State)
         {
-            this.AssertAllowed();
-
             StringBuilder Xml = new StringBuilder();
 
             Xml.Append("<updateContract xmlns='");

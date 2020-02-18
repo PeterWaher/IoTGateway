@@ -286,6 +286,11 @@
             Implemented extensions.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractsClient.ComponentAddress">
+            <summary>
+            Component address.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
             Gets the server public key.

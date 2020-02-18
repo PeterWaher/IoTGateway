@@ -1588,7 +1588,7 @@ where
 
 #### UPDATE
 
-Simplified SQL `UPDATE` statements can be executed against the object database. The number of objects deleted is returned.
+Simplified SQL `UPDATE` statements can be executed against the object database. The number of objects updated is returned.
 
 Syntax:
 
@@ -1615,7 +1615,7 @@ where
 
 #### DELETE
 
-Simplified SQL `DELETE` statements can be executed against the object database. The number of objects updated is returned.
+Simplified SQL `DELETE` statements can be executed against the object database. The number of objects deleted is returned.
 
 Syntax:
 

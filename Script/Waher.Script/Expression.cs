@@ -4608,14 +4608,22 @@ namespace Waher.Script
 		/// <returns>If conversion was successful.</returns>
 		public static bool TryConvert<T>(object Value, out T Result)
 		{
-			if (!TryConvert(Value, typeof(T), out object Obj) || !(Obj is T Result2))
+			if (TryConvert(Value, typeof(T), out object Obj))
 			{
-				Result = default;
-				return false;
+				if (Obj is T Result2)
+				{
+					Result = Result2;
+					return true;
+				}
+				else if (Value is null && !typeof(T).GetTypeInfo().IsValueType)
+				{
+					Result = default;
+					return true;
+				}
 			}
 
-			Result = Result2;
-			return true;
+			Result = default;
+			return false;
 		}
 
 		/// <summary>
@@ -4627,6 +4635,12 @@ namespace Waher.Script
 		/// <returns>If conversion was successful.</returns>
 		public static bool TryConvert(object Value, Type DesiredType, out object Result)
 		{
+			if (Value is null)
+			{
+				Result = null;
+				return !DesiredType.GetTypeInfo().IsValueType;
+			}
+
 			Type T = Value.GetType();
 			TypeInfo TI = T.GetTypeInfo();
 

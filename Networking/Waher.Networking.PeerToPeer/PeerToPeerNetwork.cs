@@ -194,7 +194,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			try
 			{
-				while (!this.disposed)
+				while (!this.disposed && !(this.tcpListener is null))
 				{
 					try
 					{

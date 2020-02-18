@@ -982,7 +982,7 @@ The script engine can be extended by modules that are run in the environment. Th
 made available in different modules available by default on the gateway. This list does not include funcion extensions made available
 by applications that are not part of the **IoT Gateway**.
 
-#### Color functions
+#### Color functions (Waher.Script.Graphs)
 
 The following functions are available in the `Waher.Script.Graphs` library.
 
@@ -1277,7 +1277,7 @@ The following functions can be used to create fractal images based on Iterated F
 | `TwintrianVariation`	  |							   |					   |
 | `WavesVariation`		  |							   |					   |
 
-#### Persistence-related functions
+#### Persistence-related functions (Waher.Script.Persistence)
 
 The following functions are available in the `Waher.Script.Persistence` library.
 
@@ -1288,9 +1288,9 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
 | `UpdateObject(Obj)` | Updaes an object in the underlying persistence layer. | `UpdateObject(Obj)` |
 
-#### Statistics-related functions
+#### Statistics-related functions (Waher.Script.Statistics)
 
-The following functions are available in the [Waher.Script.Statistics](../Waher.Script.Statistics) library.
+The following functions are available in the `Waher.Script.Statistics` library.
 
 | Function | Description | Example |
 |----------|-------------|---------|
@@ -1466,6 +1466,16 @@ The following predefined variables are available in web pages hosted by the IoT 
 |:--------------:|----------------------------------------------------------|
 | `Language`     | The language object of the current session.              |
 | `Namespace`    | The language namespace object of the current page.       |
+
+#### Serialization-related functions (Waher.Service.NeuroLedger)
+
+The following functions are available in the `Waher.Service.NeuroLedger` library, which is part of the Neuro-Ledger^TM.
+
+| Function                     | Description                                                                                                                                                                                   | Example |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `Deserialize(Bin[,BaseType]) | Deserializes a byte array into an object, or vector of objects. If serialization does not include type information, a base type can be provided. If not, a generic deserializer will be used. | `Deserialize(Base64Decode(s))` |
+| `Serialize(Object)`          | Serializes an object to a byte array.                                                                                                                                                         | `Base64Encode(Serialize(Obj))` |
+| `Serialize(Vector)`          | Serializes a vector of objects to a byte array.                                                                                                                                               | `Base64Encode(Serialize([Obj1,Obj2,Obj3]))` |
 
 =========================================================================================================================================================
 

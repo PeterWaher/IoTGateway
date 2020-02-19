@@ -31,11 +31,11 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
@@ -66,11 +66,11 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <summary>
 		/// Serializes an object to a binary destination.
 		/// </summary>
-		/// <param name="Writer">Binary destination.</param>
+		/// <param name="Writer">Serializer.</param>
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			long? Value2 = (long?)Value;
 

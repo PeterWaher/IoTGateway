@@ -205,7 +205,7 @@ namespace Waher.IoTGateway.Console
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				Encrypted, false, true);
+				Encrypted, true);
 
 			return Task.FromResult<IDatabaseProvider>(Result);
 		}

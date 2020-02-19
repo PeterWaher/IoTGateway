@@ -26,10 +26,10 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			DBFilesBTreeTests.DeleteFiles();
 
-#if !LW
-			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-#else
+#if LW
 			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+#else
+			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 			file = await provider.GetFile("Default");
 		}

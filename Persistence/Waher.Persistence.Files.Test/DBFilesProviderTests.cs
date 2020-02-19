@@ -35,7 +35,11 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			DBFilesBTreeTests.DeleteFiles();
 
+#if LW
+			this.provider = new FilesProvider("Data", DBFilesBTreeTests.CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000);
+#else
 			this.provider = new FilesProvider("Data", DBFilesBTreeTests.CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
+#endif
 			this.file = await this.provider.GetFile("Default");
 		}
 

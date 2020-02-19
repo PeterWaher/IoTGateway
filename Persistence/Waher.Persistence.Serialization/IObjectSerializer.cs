@@ -29,20 +29,20 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded);
+		object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
 
 		/// <summary>
 		/// Serializes an object to a binary destination.
 		/// </summary>
-		/// <param name="Writer">Binary destination.</param>
+		/// <param name="Writer">Serializer.</param>
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
+		void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 
 		/// <summary>
 		/// Gets the value of a field or property of an object, given its name.

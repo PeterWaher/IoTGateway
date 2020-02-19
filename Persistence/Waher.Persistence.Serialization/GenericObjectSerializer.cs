@@ -36,11 +36,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			return this.Deserialize(Reader, DataType, Embedded, true);
 		}
@@ -48,12 +48,12 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="CheckFieldNames">If field names are to be extended.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
+		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
 		{
 			StreamBookmark Bookmark = Reader.GetBookmark();
 			uint? DataTypeBak = DataType;
@@ -331,7 +331,7 @@ namespace Waher.Persistence.Serialization
 			return new GenericObject(CollectionName, TypeName, ObjectId, Properties);
 		}
 
-		private Array ReadGenericArray(BinaryDeserializer Reader)
+		private Array ReadGenericArray(IDeserializer Reader)
 		{
 			ulong NrElements = Reader.ReadVariableLengthUInt64();
 			uint ElementDataType = Reader.ReadBits(6);
@@ -366,7 +366,7 @@ namespace Waher.Persistence.Serialization
 			}
 		}
 
-		private T[] ReadArray<T>(BinaryDeserializer Reader, ulong NrElements, uint ElementDataType)
+		private T[] ReadArray<T>(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
 			List<T> Elements = new List<T>();
 			IObjectSerializer S = this.context.GetObjectSerializer(typeof(T));
@@ -383,7 +383,7 @@ namespace Waher.Persistence.Serialization
 			return Elements.ToArray();
 		}
 
-		private Array[] ReadArrayOfArrays(BinaryDeserializer Reader, ulong NrElements)
+		private Array[] ReadArrayOfArrays(IDeserializer Reader, ulong NrElements)
 		{
 			List<Array> Elements = new List<Array>();
 
@@ -393,7 +393,7 @@ namespace Waher.Persistence.Serialization
 			return Elements.ToArray();
 		}
 
-		private GenericObject[] ReadArrayOfObjects(BinaryDeserializer Reader, ulong NrElements, uint ElementDataType)
+		private GenericObject[] ReadArrayOfObjects(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
 			List<GenericObject> Elements = new List<GenericObject>();
 
@@ -403,7 +403,7 @@ namespace Waher.Persistence.Serialization
 			return Elements.ToArray();
 		}
 
-		private object[] ReadArrayOfNullableElements(BinaryDeserializer Reader, ulong NrElements)
+		private object[] ReadArrayOfNullableElements(IDeserializer Reader, ulong NrElements)
 		{
 			List<object> Elements = new List<object>();
 			uint ElementDataType;
@@ -518,11 +518,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Serializes an object to a binary destination.
 		/// </summary>
-		/// <param name="Writer">Binary destination.</param>
+		/// <param name="Writer">Serializer.</param>
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (Value is null)
 			{
@@ -533,12 +533,12 @@ namespace Waher.Persistence.Serialization
 			}
 			else if (Value is GenericObject TypedValue)
 			{
-				BinarySerializer WriterBak = Writer;
+				ISerializer WriterBak = Writer;
 				IObjectSerializer Serializer;
 				object Obj;
 
 				if (!Embedded)
-					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.context.Debug);
+					Writer = Writer.CreateNew();
 
 				if (WriteTypeCode)
 				{

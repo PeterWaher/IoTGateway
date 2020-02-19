@@ -19,8 +19,11 @@ namespace Waher.Persistence.Files.Test
 			}
 			catch
 			{
-				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192,
-					Encoding.UTF8, 10000, true));
+#if LW
+				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000));
+#else
+				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000, true));
+#endif
 			}
 		}
 

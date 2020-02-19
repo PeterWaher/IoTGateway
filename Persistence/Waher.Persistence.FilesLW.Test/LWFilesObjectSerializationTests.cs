@@ -27,10 +27,10 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			DBFilesBTreeTests.DeleteFiles();
 
-#if !LW
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true, true);
-#else
+#if LW
 			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+#else
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
 #endif
 			await provider.GetFile("Default");
 			await provider.GetFile("Test");
@@ -125,7 +125,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
 			AssertEx.Same(Obj.CIString, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -134,7 +134,10 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -231,7 +234,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
-		private void AssertBinaryLength(byte[] Data, BinaryDeserializer Reader)
+		private void AssertBinaryLength(byte[] Data, IDeserializer Reader)
 		{
 			Reader.Restart(Data, 0);
 
@@ -316,14 +319,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -454,14 +457,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -568,14 +571,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -710,14 +713,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -793,14 +796,14 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(SimpleArrays));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			SimpleArrays Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -898,14 +901,14 @@ namespace Waher.Persistence.FilesLW.Test
 
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(NullableArrays));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			NullableArrays Obj2 = (NullableArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1027,7 +1030,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Container));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -1036,7 +1039,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			Container Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1120,7 +1123,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(string.IsNullOrEmpty(Obj.ObjectId));
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObjectIdString));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -1129,7 +1132,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			ObjectIdString Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1175,7 +1178,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsNull(Obj.ObjectId);
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObjectIdByteArray));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -1184,7 +1187,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			ObjectIdByteArray Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1240,8 +1243,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S1 = provider.GetObjectSerializer(typeof(LocalNameSubclass1));
 			IObjectSerializer S2 = provider.GetObjectSerializer(typeof(LocalNameSubclass2));
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(LocalNameBase));
-			BinarySerializer Writer1 = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
-			BinarySerializer Writer2 = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S1.Serialize(Writer1, false, false, Obj1);
 			S2.Serialize(Writer2, false, false, Obj2);
@@ -1254,8 +1257,8 @@ namespace Waher.Persistence.FilesLW.Test
 			this.WriteData(Data1);
 			this.WriteData(Data2);
 
-			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue, true);
-			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue, true);
+			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
+			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
 
 			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
@@ -1336,8 +1339,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S1 = provider.GetObjectSerializer(typeof(FullNameSubclass1));
 			IObjectSerializer S2 = provider.GetObjectSerializer(typeof(FullNameSubclass2));
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(FullNameBase));
-			BinarySerializer Writer1 = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
-			BinarySerializer Writer2 = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S1.Serialize(Writer1, false, false, Obj1);
 			S2.Serialize(Writer2, false, false, Obj2);
@@ -1350,8 +1353,8 @@ namespace Waher.Persistence.FilesLW.Test
 			this.WriteData(Data1);
 			this.WriteData(Data2);
 
-			BinaryDeserializer Reader1 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue, true);
-			BinaryDeserializer Reader2 = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue, true);
+			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
+			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
 
 			FullNameSubclass1 Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			FullNameSubclass2 Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
@@ -1422,14 +1425,14 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(CollectionTest));
-			BinarySerializer Writer = new BinarySerializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1494,14 +1497,14 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(ArraysOfArrays));
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			ArraysOfArrays Obj2 = (ArraysOfArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1627,7 +1630,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
 			AssertEx.Same(Obj.CIString, Value);
 
-			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -1636,7 +1639,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			ObsoleteMethod Obj2 = (ObsoleteMethod)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 

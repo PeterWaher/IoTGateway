@@ -60,9 +60,12 @@ namespace Waher.Persistence.FilesLW.Test
 				File.Delete(BlobFileName);
 			}
 
+#if LW
+			this.provider = new FilesProvider(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000);
+#else
 			this.provider = new FilesProvider(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
+#endif
 			this.file = new StringDictionary(FileName, BlobFileName, CollectionName, this.provider, false);
-
 			this.start = DateTime.Now;
 		}
 

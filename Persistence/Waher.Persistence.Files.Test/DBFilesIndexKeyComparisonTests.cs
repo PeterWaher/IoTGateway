@@ -22,10 +22,10 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext Context)
 		{
-#if !LW
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
-#else
+#if LW
 			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+#else
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 #endif
 		}
 

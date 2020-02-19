@@ -73,7 +73,11 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			DeleteFiles();
 
+#if LW
+			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+#else
 			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+#endif
 			this.file = await this.provider.GetFile(CollectionName);
 			this.start = DateTime.Now;
 		}

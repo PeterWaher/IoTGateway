@@ -40,14 +40,6 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// If the provider is run in debug mode.
-		/// </summary>
-		bool Debug
-		{
-			get;
-		}
-
-		/// <summary>
 		/// If normalized names are to be used or not. Normalized names reduces the number
 		/// of bytes required to serialize objects, but do not work in a decentralized
 		/// architecture.

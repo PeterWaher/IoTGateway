@@ -187,7 +187,6 @@ namespace Waher.Persistence.Serialization
 		private readonly int archiveDays = 0;
 		private readonly bool archive = false;
 		private readonly bool isNullable;
-		private readonly bool debug;
 		private readonly bool normalized;
 
 		internal ObjectSerializer(ISerializerContext Context, Type Type)    // Note order.
@@ -196,7 +195,6 @@ namespace Waher.Persistence.Serialization
 			this.typeInfo = Type.GetTypeInfo();
 			this.context = Context;
 			this.normalized = Context.NormalizedNames;
-			this.debug = false;
 #if NETSTANDARD1_5
 			this.compiled = false;
 #endif
@@ -229,7 +227,6 @@ namespace Waher.Persistence.Serialization
 			this.typeInfo = Type.GetTypeInfo();
 			this.context = Context;
 			this.normalized = Context.NormalizedNames;
-			this.debug = Context.Debug;
 
 #if NETSTANDARD1_5
 			this.compiled = Compiled;
@@ -360,7 +357,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
 				CSharp.AppendLine("{");
-				CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + this.context.Id + " : GeneratedObjectSerializerBase");
+				CSharp.AppendLine("\tpublic class Serializer" + TypeName + this.context.Id + " : GeneratedObjectSerializerBase");
 				CSharp.AppendLine("\t{");
 				CSharp.AppendLine("\t\tprivate ISerializerContext context;");
 
@@ -595,7 +592,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.context.Id + "(ISerializerContext Context)");
+				CSharp.AppendLine("\t\tpublic Serializer" + TypeName + this.context.Id + "(ISerializerContext Context)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tthis.context = Context;");
 
@@ -666,7 +663,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\tpublic override bool IsNullable { get { return " + (this.isNullable ? "true" : "false") + "; } }");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)");
+				CSharp.AppendLine("\t\tpublic override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tuint FieldDataType;");
 
@@ -1405,17 +1402,13 @@ namespace Waher.Persistence.Serialization
 
 				CSharp.AppendLine("\t\t}");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
+				CSharp.AppendLine("\t\tpublic override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
-				CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
+				CSharp.AppendLine("\t\t\tISerializer WriterBak = Writer;");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tif (!Embedded)");
-
-				if (this.debug)
-					CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);");
-				else
-					CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.CollectionName, Writer.Encoding, false);");
+				CSharp.AppendLine("\t\t\t\tWriter = Writer.CreateNew();");
 
 				CSharp.AppendLine();
 
@@ -1470,9 +1463,6 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");    // Same as Writer.Write("") for non-normalized case.
 				else
 				{
-					if (this.debug)
-						CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
-
 					if (this.normalized)
 					{
 						CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(");
@@ -1614,16 +1604,6 @@ namespace Waher.Persistence.Serialization
 							Indent = "\t\t\t";
 
 						CSharp.Append(Indent);
-
-						if (this.debug)
-						{
-							CSharp.AppendLine("Console.Out.WriteLine();");
-							CSharp.Append(Indent);
-							CSharp.Append("Console.Out.WriteLine(\"");
-							CSharp.Append(Escape(Member.Name));
-							CSharp.AppendLine("\");");
-							CSharp.Append(Indent);
-						}
 
 						if (this.normalized)
 						{
@@ -2097,16 +2077,11 @@ namespace Waher.Persistence.Serialization
 				}
 
 				CSharp.AppendLine();
-				if (this.debug)
-					CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
-
 				CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");    // Same as Writer.Write("") for non-normalized case.
 
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tif (!Embedded)");
 				CSharp.AppendLine("\t\t\t{");
-				if (this.debug)
-					CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
 				if (this.objectIdMemberType is null)
 					CSharp.AppendLine("\t\t\t\tWriterBak.Write(this.context.CreateGuid());");
@@ -2200,9 +2175,6 @@ namespace Waher.Persistence.Serialization
 					{ GetLocation(typeof(MultiReadSingleWriteObject)), true }
 				};
 
-				if (this.debug)
-					Dependencies[GetLocation(typeof(Console))] = true;
-
 				System.Reflection.TypeInfo LoopInfo;
 				Type Loop = Type;
 				string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
@@ -2281,7 +2253,7 @@ namespace Waher.Persistence.Serialization
 				try
 				{
 					A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
-					Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.context.Id);
+					Type T = A.GetType(Type.Namespace + ".Binary.Serializer" + TypeName + this.context.Id);
 					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
 				}
 				catch (FileLoadException)
@@ -2514,11 +2486,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Deserializes a value.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Data type of object.</param>
 		/// <param name="Embedded">If the object is embedded in another object.</param>
 		/// <returns>A deserialized value.</returns>
-		public virtual object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public virtual object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)
@@ -3126,11 +3098,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Serializes a value.
 		/// </summary>
-		/// <param name="Writer">Binary serializer.</param>
+		/// <param name="Writer">Serializer.</param>
 		/// <param name="WriteTypeCode">If a type code is to be written.</param>
 		/// <param name="Embedded">If the object is embedded in another object.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public virtual void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public virtual void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)
@@ -3138,10 +3110,10 @@ namespace Waher.Persistence.Serialization
 			else
 			{
 #endif
-				BinarySerializer WriterBak = Writer;
+				ISerializer WriterBak = Writer;
 
 				if (!Embedded)
-					Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.debug);
+					Writer = Writer.CreateNew();
 
 				if (WriteTypeCode)
 				{
@@ -3836,7 +3808,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
 				case ObjectSerializer.TYPE_ARRAY: return typeof(Array);
 				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
-				default: throw new Exception("Unrecognized field code: " + FieldDataTypeCode.ToString());
+				default: throw new Exception("Unrecognized data type code: " + FieldDataTypeCode.ToString());
 			}
 		}
 

@@ -42,7 +42,7 @@ namespace Waher.Networking.CoAP.Test
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);
 		}
 

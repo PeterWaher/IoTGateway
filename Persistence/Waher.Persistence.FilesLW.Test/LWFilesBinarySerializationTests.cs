@@ -36,7 +36,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_BinSerialization_Test_01_Serialization()
 		{
-			BinarySerializer Serializer = new BinarySerializer(string.Empty, Encoding.UTF8, true);
+			ISerializer Serializer = new DebugSerializer(new BinarySerializer(string.Empty, Encoding.UTF8), Console.Out);
 
 			Serializer.Write(true);
 			Serializer.Write(false);
@@ -79,7 +79,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Serializer.Write(FlagsEnum.Option2 | FlagsEnum.Option4);
 
 			byte[] Data = Serializer.GetSerialization();
-			BinaryDeserializer Deserializer = new BinaryDeserializer(string.Empty, Encoding.UTF8, Data, uint.MaxValue, true);
+			IDeserializer Deserializer = new DebugDeserializer(new BinaryDeserializer(string.Empty, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
 			AssertEx.Same(true, Deserializer.ReadBoolean());
 			AssertEx.Same(false, Deserializer.ReadBoolean());

@@ -181,8 +181,7 @@ namespace Waher.IoTGateway.App
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				false);
+				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value));
 
 			return Task.FromResult<IDatabaseProvider>(Result);
 		}

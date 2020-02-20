@@ -725,7 +725,10 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 					CSharp.AppendLine("\t\t\tif (Embedded)");
-					CSharp.AppendLine("\t\t\t\tReader.SkipVariableLengthUInt64();	// Collection name");
+					if (this.normalized)
+						CSharp.AppendLine("\t\t\t\tReader.SkipVariableLengthUInt64();	// Collection name");
+					else
+						CSharp.AppendLine("\t\t\t\tReader.SkipString();");
 
 					CSharp.AppendLine();
 

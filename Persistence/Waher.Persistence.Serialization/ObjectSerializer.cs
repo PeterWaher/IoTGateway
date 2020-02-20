@@ -2519,6 +2519,9 @@ namespace Waher.Persistence.Serialization
 						return null;
 				}
 
+				if (Embedded && Reader.BitOffset > 0 && Reader.ReadBit())
+					ObjectId = Reader.ReadGuid();
+
 				if (this.normalized)
 				{
 					FieldCode = Reader.ReadVariableLengthUInt64();

@@ -37,7 +37,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public override string ToString()
 		{
-			return this.value;
+			return this.value ?? string.Empty;
 		}
 
 		/// <summary>

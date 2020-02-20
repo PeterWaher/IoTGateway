@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 
 			if (!string.IsNullOrEmpty(this.language))
 			{
-				Xml.Append(" xml=\"");
+				Xml.Append(" xml:lang=\"");
 				Xml.Append(XML.Encode(this.language));
 				Xml.Append('"');
 			}

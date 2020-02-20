@@ -59,7 +59,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 			{
 				if (v.ValueObject is Runtime.Language.Language Language)
 					return Language;
-				else if (v.ValueObject is string LanguageCode)
+				else if (v.ValueObject is string LanguageCode && !string.IsNullOrEmpty(LanguageCode))
 					return await Translator.GetLanguageAsync(LanguageCode);
 			}
 

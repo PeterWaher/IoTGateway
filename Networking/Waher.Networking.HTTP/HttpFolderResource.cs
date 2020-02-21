@@ -15,7 +15,7 @@ namespace Waher.Networking.HTTP
 	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
 	/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 	/// </summary>
-	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod, 
+	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod,
 		IHttpPutMethod, IHttpPutRangesMethod, IHttpDeleteMethod, IHttpPostMethod
 	{
 		private const int BufferSize = 32768;
@@ -158,15 +158,15 @@ namespace Waher.Networking.HTTP
 
 		private string GetFullPath(HttpRequest Request)
 		{
-            string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+			string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
 
-            if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
-                throw new ForbiddenException("Path control characters not permitted.");
+			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
+				throw new ForbiddenException("Path control characters not permitted.");
 
-            return this.folderPath + s;
+			return this.folderPath + s;
 		}
 
-        private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
+		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
 
 		private class CacheRec
 		{
@@ -185,12 +185,12 @@ namespace Waher.Networking.HTTP
 		{
 			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
-            {
-                Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
-                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
-            }
+			{
+				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+			}
 
-            DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			CacheRec Rec;
 
 			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
@@ -199,45 +199,48 @@ namespace Waher.Networking.HTTP
 			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
+			if (Response.ResponseSent)
+				return;
+
 			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
 		}
 
-        /// <summary>
-        /// Sends a file-based response back to the client.
-        /// </summary>
-        /// <param name="FullPath">Full path of file.</param>
-        /// <param name="ContentType">Content Type.</param>
-        /// <param name="ETag">ETag of resource.</param>
-        /// <param name="LastModified">When resource was last modified.</param>
-        /// <param name="Response">HTTP response object.</param>
-        public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
-            HttpResponse Response)
-        {
-            SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
-        }
+		/// <summary>
+		/// Sends a file-based response back to the client.
+		/// </summary>
+		/// <param name="FullPath">Full path of file.</param>
+		/// <param name="ContentType">Content Type.</param>
+		/// <param name="ETag">ETag of resource.</param>
+		/// <param name="LastModified">When resource was last modified.</param>
+		/// <param name="Response">HTTP response object.</param>
+		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+			HttpResponse Response)
+		{
+			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
+		}
 
-        /// <summary>
-        /// Sends a file-based response back to the client.
-        /// </summary>
-        /// <param name="FullPath">Full path of file.</param>
-        /// <param name="ContentType">Content Type.</param>
-        /// <param name="ETag">ETag of resource.</param>
-        /// <param name="LastModified">When resource was last modified.</param>
-        /// <param name="Response">HTTP response object.</param>
-        /// <param name="Request">HTTP request object.</param>
-        public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+		/// <summary>
+		/// Sends a file-based response back to the client.
+		/// </summary>
+		/// <param name="FullPath">Full path of file.</param>
+		/// <param name="ContentType">Content Type.</param>
+		/// <param name="ETag">ETag of resource.</param>
+		/// <param name="LastModified">When resource was last modified.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Request">HTTP request object.</param>
+		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
 			HttpResponse Response, HttpRequest Request)
 		{
 			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request);
 		}
 
-		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag, 
-            DateTime LastModified, HttpResponse Response, HttpRequest Request)
+		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
+			DateTime LastModified, HttpResponse Response, HttpRequest Request)
 		{
 			ReadProgress Progress = new ReadProgress()
 			{
 				Response = Response,
-                Request = Request,
+				Request = Request,
 				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
 				Next = null,
 				Boundary = null,
@@ -534,7 +537,7 @@ namespace Waher.Networking.HTTP
 		{
 			public ByteRangeInterval Next;
 			public HttpResponse Response;
-            public HttpRequest Request;
+			public HttpRequest Request;
 			public Stream f;
 			public string Boundary;
 			public string ContentType;
@@ -596,19 +599,19 @@ namespace Waher.Networking.HTTP
 						Response.WriteLine("--" + this.Boundary + "--");
 					}
 
-                    Variables Session;
+					Variables Session;
 
-                    if (!(this.Request is null) && 
-                        this.Request.Header.Method == "GET" && 
-                        !((Session = this.Request.Session) is null) &&
-                        Session.ContainsVariable(" LastPost "))
-                    {
-                        Session.Remove(" LastPost ");
-                        Session.Remove(" LastPostResource ");
-                        Session.Remove(" LastPostReferer ");
-                    }
+					if (!(this.Request is null) &&
+						this.Request.Header.Method == "GET" &&
+						!((Session = this.Request.Session) is null) &&
+						Session.ContainsVariable(" LastPost "))
+					{
+						Session.Remove(" LastPost ");
+						Session.Remove(" LastPostResource ");
+						Session.Remove(" LastPostReferer ");
+					}
 
-                    this.Dispose();
+					this.Dispose();
 				}
 				catch (Exception ex)
 				{
@@ -658,13 +661,13 @@ namespace Waher.Networking.HTTP
 		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
 			string FullPath = this.GetFullPath(Request);
-            if (!File.Exists(FullPath))
-            {
-                Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
-                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
-            }
+			if (!File.Exists(FullPath))
+			{
+				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+			}
 
-            HttpRequestHeader Header = Request.Header;
+			HttpRequestHeader Header = Request.Header;
 			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			DateTimeOffset? Limit;
 			CacheRec Rec;
@@ -683,10 +686,13 @@ namespace Waher.Networking.HTTP
 			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
+			if (Response.ResponseSent)
+				return;
+
 			ReadProgress Progress = new ReadProgress()
 			{
 				Response = Response,
-                Request = Request,
+				Request = Request,
 				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 			};
 
@@ -850,9 +856,9 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-                throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 
-            Response.SendResponse();
+			Response.SendResponse();
 		}
 
 		/// <summary>

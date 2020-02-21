@@ -43,7 +43,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "httpget"; }
+			get { return "get"; }
 		}
 
 		/// <summary>

@@ -524,17 +524,20 @@ namespace Waher.Networking.HTTP
 
 						string ContentType = ex2.ContentType;
 
-						foreach (KeyValuePair<string, string> P in ex2.HeaderFields)
+						if (!(ex2.HeaderFields is null))
 						{
-							if (string.Compare(P.Key, "Content-Type", true) == 0)
+							foreach (KeyValuePair<string, string> P in ex2.HeaderFields)
 							{
-								if (string.IsNullOrEmpty(ContentType))
-									ContentType = P.Value;
+								if (string.Compare(P.Key, "Content-Type", true) == 0)
+								{
+									if (string.IsNullOrEmpty(ContentType))
+										ContentType = P.Value;
 
-								continue;
+									continue;
+								}
+
+								this.SetHeader(P.Key, P.Value);
 							}
-
-							this.SetHeader(P.Key, P.Value);
 						}
 
 						this.SetHeader("Connection", "close");

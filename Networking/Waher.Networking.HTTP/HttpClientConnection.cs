@@ -563,7 +563,7 @@ namespace Waher.Networking.HTTP
 
 					Location.Append(s);
 
-					if (UpgradePort.Value != HttpServer.DefaultHttpsPort)
+					if (!(UpgradePort is null) && UpgradePort.Value != HttpServer.DefaultHttpsPort)
 					{
 						Location.Append(':');
 						Location.Append(UpgradePort.Value.ToString());
@@ -583,9 +583,9 @@ namespace Waher.Networking.HTTP
 						Location.Append(Header.Fragment);
 					}
 
-					this.SendResponse(Request, new HttpException(307, "Moved Temporarily", null), false,
+					this.SendResponse(Request, new HttpException(307, "Moved Temporarily", 
 						new KeyValuePair<string, string>("Location", Location.ToString()),
-						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests"));
+						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests")), false);
 				}
 				else
 #endif

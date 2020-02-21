@@ -4494,7 +4494,7 @@ namespace Waher.Script
 		/// <returns>Converted value.</returns>
 		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
 		{
-			return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.
+			return Convert.ChangeType(Value.AssociatedObjectValue, DesiredType);	// TODO: Implement .NET type conversion.
 		}
 
 		/// <summary>

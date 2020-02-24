@@ -286,7 +286,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static string operator +(CaseInsensitiveString S1, string S2)
 		{
-			return S1.value + S2;
+			return S1?.value + S2;
 		}
 
 		/// <summary>

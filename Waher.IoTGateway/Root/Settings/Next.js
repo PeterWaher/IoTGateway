@@ -30,5 +30,8 @@ function ConfigComplete(Command)
 
 function Ok()
 {
-    window.history.back();
+    if (window.history.length === 1)
+        window.close();
+    else
+        window.history.back();
 }

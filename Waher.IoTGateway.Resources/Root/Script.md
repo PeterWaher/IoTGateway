@@ -10,7 +10,7 @@ Script syntax reference
 
 The **IoT Gateway** contains a powerful script parser and evaluation engine. The script engine is not ECMA-compliant. Instead, its focus
 is to provide an efficient and compact script language using mathemathical notation. Following is a brief overview of the syntax different 
-script elements. You can also use the [Calculator](Calculator.md) to experiment with script syntax.
+script elements. You can also use the [Prompt](Prompt.md) to experiment with script syntax.
 
 ![Table of Contents](ToC)
 
@@ -1022,21 +1022,21 @@ will return a vector corresponding to the point under the mouse.
 | `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
 | `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
-[HorizontalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BHorizontalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BHorizontalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
-[Plot2DAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2darea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2darea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
-[Plot2DCurveExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)
-[Plot2DCurveAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
-[Plot2DLayeredAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredarea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredarea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
-[Plot2DLayeredCurveAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
-[Plot2DLayeredLineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
-[Plot2DLayeredsplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredsplinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredsplinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dspline(x%2Cy)%2Bplot2dspline(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
-[Plot2DLineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dline(x,y)
-[Plot2DLineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
-[Plot2DSplineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dspline(x,y)
-[Plot2DSplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurve(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurve(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
-[Polygon2DExample]: Calculator.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
-[Scatter2DExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
-[VerticalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
+[HorizontalBarsExample]: Prompt.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BHorizontalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BHorizontalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
+[Plot2DAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2darea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2darea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
+[Plot2DCurveExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)
+[Plot2DCurveAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Plot2DLayeredAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredarea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredarea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
+[Plot2DLayeredCurveAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Plot2DLayeredLineAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
+[Plot2DLayeredsplineAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x%2F2)%3Bplot2dlayeredsplinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlayeredsplinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dspline(x%2Cy)%2Bplot2dspline(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Plot2DLineExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dline(x,y)
+[Plot2DLineAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
+[Plot2DSplineExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dspline(x,y)
+[Plot2DSplineAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurve(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurve(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Polygon2DExample]: Prompt.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
+[Scatter2DExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
+[VerticalBarsExample]: Prompt.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 
 The following table lists variables that control graph output:
 
@@ -1328,21 +1328,21 @@ The following functions are available in the `Waher.Script.Content` library.
 | `XmlDecode(s)`                  | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
 | `XmlEncode(s)`                  | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
-[Base64DecodeExample]: Calculator.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
-[Base64EncodeExample]: Calculator.md?Expression=Base64Encode(Encode("Hello")[0])
-[Base64UrlDecodeExample]: Calculator.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")
-[Base64UrlEncodeExample]: Calculator.md?Expression=Base64UrlEncode(Encode("Hello")[0])
-[DecodeExample]: Calculator.md?Expression=Decode(Csv,%22text/csv%22)
-[EncodeExample]: Calculator.md?Expression=Encode("Hello",[%22text/plain%22])
-[GetExample]: Calculator.md?Expression=Get(%22URL%22)
-[HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
-[HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
-[LoadFileExample]: Calculator.md?Expression=LoadFile(%22FileName%22)
-[SaveFileExample]: Calculator.md?Expression=SaveFile(Graph,%22Graph.png%22)
-[UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
-[UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
-[XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
-[XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
+[Base64DecodeExample]: Prompt.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
+[Base64EncodeExample]: Prompt.md?Expression=Base64Encode(Encode("Hello")[0])
+[Base64UrlDecodeExample]: Prompt.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")
+[Base64UrlEncodeExample]: Prompt.md?Expression=Base64UrlEncode(Encode("Hello")[0])
+[DecodeExample]: Prompt.md?Expression=Decode(Csv,%22text/csv%22)
+[EncodeExample]: Prompt.md?Expression=Encode("Hello",[%22text/plain%22])
+[GetExample]: Prompt.md?Expression=Get(%22URL%22)
+[HtmlAttributeEncodeExample]: Prompt.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
+[HtmlValueEncodeExample]: Prompt.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
+[LoadFileExample]: Prompt.md?Expression=LoadFile(%22FileName%22)
+[SaveFileExample]: Prompt.md?Expression=SaveFile(Graph,%22Graph.png%22)
+[UrlDecodeExample]: Prompt.md?Expression=UrlDecode(%22Hello%2bWorld%22)
+[UrlEncodeExample]: Prompt.md?Expression=UrlEncode(%22Hello%20World%22)
+[XmlDecodeExample]: Prompt.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
+[XmlEncodeExample]: Prompt.md?Expression=XmlEncode(%22%3Ctag%3E%22)
 
 #### XML-related functions (Waher.Script.Xml)
 
@@ -1369,9 +1369,9 @@ The following predefined context-specific constants (read-only variables) are av
 | `StartPosition` | The starting position of the current script in the markdown document. |
 | `EndPosition`   | The ending position of the script in the markdown document.           |
 
-[LoadMarkdownExample]: Calculator.md?Expression=LoadMarkdown(%22File.md%22)
-[MarkdownEncodeExample]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)
-[PreprocessMarkdownExample]: Calculator.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
+[LoadMarkdownExample]: Prompt.md?Expression=LoadMarkdown(%22File.md%22)
+[MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_sister%22)
+[PreprocessMarkdownExample]: Prompt.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
 
 #### XSL-related functions (Waher.Content.Xsl)
 
@@ -1381,7 +1381,7 @@ The following functions are available in the `Waher.Content.Xsl` library.
 |--------------------------|-------------|---------|
 | `Transform(XML,XSLT)`    | Transforms an XML document using an XSL Transform (XSLT). | [Example][TransformExample] |
 
-[TransformExample]: Calculator.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
+[TransformExample]: Prompt.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
 
 #### Web Extensions (Waher.Networking.HTTP\[.UWP\])
 

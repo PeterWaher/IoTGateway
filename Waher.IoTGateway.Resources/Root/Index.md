@@ -20,7 +20,7 @@ make sure the `HTTP GET` method includes `Accept: text/markdown` in its header.
 
 You can make your markdown pages dynamic by the use of [Script](Script.md). Script allows you to perform calculations, draw graphs and access 
 logic in your back-end applications, such as accessing databases, etc. The script engine is extensible, and is very easy to extend by modules
-loaded by the web server. Check out the [Script reference](Script.md) page for more details. You can also use the [Calculator](Calculator.md)
+loaded by the web server. Check out the [Script reference](Script.md) page for more details. You can also use the [Prompt](Prompt.md)
 to play around with script.
 
 You can also host dynamic CSS (`CSSX`) files, containing script embedded between sun characters `¤`. Such script will execute on the server, 

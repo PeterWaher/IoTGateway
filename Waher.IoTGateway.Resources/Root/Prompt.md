@@ -1,10 +1,10 @@
-﻿Title: Calculator
-Description: Calculator based on script, as understood by the IoT Gateway.
+﻿Title: Prompt
+Description: Prompt allowing the operator to evaluate script.
 Date: 2016-03-01
 Author: Peter Waher
 Copyright: /Copyright.md
 Master: /Master.md
-JavaScript: Calculator.js
+JavaScript: Prompt.js
 Parameter: Expression
 UserVariable: User
 Login: /Login.md

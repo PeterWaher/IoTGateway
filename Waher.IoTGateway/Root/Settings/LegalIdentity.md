@@ -5,7 +5,6 @@ Author: Peter Waher
 Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
-JavaScript: /Calculator.js
 JavaScript: /Settings/LegalIdentity.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js

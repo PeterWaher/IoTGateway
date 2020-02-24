@@ -79,8 +79,8 @@
 	</Folder>
 	<Folder name="Root">
 		<Content fileName="Smileys.md"/>
-		<Content fileName="Calculator.js"/>
-		<Content fileName="Calculator.md"/>
+		<Content fileName="Prompt.js"/>
+		<Content fileName="Prompt.md"/>
 		<Content fileName="Emojis.md"/>
 		<Content fileName="Entities.md"/>
 		<Content fileName="Index.md"/>

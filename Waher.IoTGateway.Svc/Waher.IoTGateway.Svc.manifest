@@ -428,8 +428,8 @@
     </Folder>
   </Folder>
   <Folder name="Root">
-    <Content fileName='Calculator.js'/>
-    <Content fileName='Calculator.md'/>
+    <Content fileName='Prompt.js'/>
+    <Content fileName='Prompt.md'/>
     <Content fileName='Copyright.md'/>
     <Content fileName='Emojis.md'/>
     <Content fileName='Entities.md'/>

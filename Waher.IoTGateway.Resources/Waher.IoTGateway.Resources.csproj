@@ -100,8 +100,6 @@
     <None Remove="Highlight\styles\zenburn.css" />
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.mp3" />
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.wav" />
-    <None Remove="Root\Calculator.js" />
-    <None Remove="Root\Calculator.md" />
     <None Remove="Root\Emojis.md" />
     <None Remove="Root\Entities.md" />
     <None Remove="Root\Images\Banner1 - 1400x425.png" />
@@ -113,6 +111,8 @@
     <None Remove="Root\Index.md" />
     <None Remove="Root\Markdown.md" />
     <None Remove="Root\Master.md" />
+    <None Remove="Root\Prompt.js" />
+    <None Remove="Root\Prompt.md" />
     <None Remove="Root\Script.md" />
     <None Remove="Root\Smileys.md" />
     <None Remove="Root\Templates\Repeat.md" />
@@ -366,12 +366,6 @@
     <Content Include="Root\Audio\glass_ping-Go445-1207030150.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Calculator.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Root\Calculator.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Root\Emojis.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -397,6 +391,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Master.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Prompt.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Prompt.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Script.md">

@@ -29,7 +29,7 @@ namespace Waher.WebService.Script
 		public WaitHandle Start()
 		{
 			if (Types.TryGetModuleParameter("HTTP", out object Obj) && (this.webServer = Obj as HttpServer) != null)
-				this.webServer.Register(this.instance = new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms.
+				this.webServer.Register(this.instance = new ScriptService("/Evaluate"));
 
 			return null;
 		}

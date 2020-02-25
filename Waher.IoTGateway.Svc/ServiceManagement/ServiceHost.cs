@@ -140,8 +140,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 			try
 			{
-				Gateway.Stop();
-				Log.Terminate();
+				Gateway.Terminate();
 			}
 			catch (Exception ex)
 			{

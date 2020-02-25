@@ -168,6 +168,8 @@ namespace Waher.IoTGateway.App
 
 		private void Gateway_OnTerminate(object sender, EventArgs e)
 		{
+			Gateway.Stop();
+			Log.Terminate();
 			Window.Current.Close();
 		}
 
@@ -343,8 +345,7 @@ namespace Waher.IoTGateway.App
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 
-			Gateway.Stop();
-			Log.Terminate();
+			Gateway.Terminate();
 
 			deferral.Complete();
 		}

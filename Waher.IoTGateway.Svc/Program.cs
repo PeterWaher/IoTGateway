@@ -357,7 +357,7 @@ namespace Waher.IoTGateway.Svc
 
 				ManualResetEvent Done = new ManualResetEvent(false);
 				Gateway.OnTerminate += (sender, e) => Done.Set();
-				Console.CancelKeyPress += (sender, e) => Done.Set();
+				Console.CancelKeyPress += (sender, e) => Gateway.Terminate();
 
 				try
 				{
@@ -369,7 +369,7 @@ namespace Waher.IoTGateway.Svc
 							case CtrlTypes.CTRL_CLOSE_EVENT:
 							case CtrlTypes.CTRL_C_EVENT:
 							case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-								Done.Set();
+								Gateway.Terminate();
 								break;
 
 							case CtrlTypes.CTRL_LOGOFF_EVENT:
@@ -394,6 +394,7 @@ namespace Waher.IoTGateway.Svc
 			finally
 			{
 				Gateway.Stop();
+				Log.Terminate();
 			}
 		}
 

@@ -24,9 +24,13 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Gateway.config" />
     <None Remove="Waher.IoTGateway.Svc.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Gateway.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Waher.IoTGateway.Svc.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

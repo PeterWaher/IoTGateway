@@ -271,11 +271,17 @@ namespace Waher.Persistence.Serialization
 			{
 				this.obsoleteMethod = this.type.GetRuntimeMethod(ObsoleteMethodAttribute.MethodName, obsoleteMethodTypes);
 				if (this.obsoleteMethod is null)
-					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " does not exist on " + this.type.FullName);
+				{
+					throw new SerializationException("Obsolete method " + ObsoleteMethodAttribute.MethodName +
+						" does not exist on " + this.type.FullName, this.type);
+				}
 
 				ParameterInfo[] Parameters = this.obsoleteMethod.GetParameters();
 				if (Parameters.Length != 1 || Parameters[0].ParameterType != typeof(Dictionary<string, object>))
-					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " on " + this.type.FullName + " has invalid arguments.");
+				{
+					throw new SerializationException("Obsolete method " + ObsoleteMethodAttribute.MethodName + " on " +
+						this.type.FullName + " has invalid arguments.", this.type);
+				}
 			}
 
 			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
@@ -294,12 +300,12 @@ namespace Waher.Persistence.Serialization
 						this.archiveProperty = null;
 
 						if (this.archiveField is null)
-							throw new Exception("Archiving time property or field not found: " + ArchivingTimeAttribute.PropertyName);
+							throw new SerializationException("Archiving time property or field not found: " + ArchivingTimeAttribute.PropertyName, this.type);
 						else if (this.archiveField.FieldType != typeof(int))
-							throw new Exception("Invalid field type for the archiving time: " + this.archiveField.Name);
+							throw new SerializationException("Invalid field type for the archiving time: " + this.archiveField.Name, this.type);
 					}
 					else if (this.archiveProperty.PropertyType != typeof(int))
-						throw new Exception("Invalid property type for the archiving time: " + this.archiveProperty.Name);
+						throw new SerializationException("Invalid property type for the archiving time: " + this.archiveProperty.Name, this.type);
 					else
 						this.archiveField = null;
 				}
@@ -308,7 +314,7 @@ namespace Waher.Persistence.Serialization
 			}
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
-				throw new Exception("Serializers for abstract classes require type names to be serialized.");
+				throw new SerializationException("Serializers for abstract classes require type names to be serialized.", this.type);
 
 			List<string[]> Indices = new List<string[]>();
 			Dictionary<string, bool> IndexFields = new Dictionary<string, bool>();
@@ -719,7 +725,7 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (this.typeInfo.IsAbstract)
-					CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of the abstract class " + this.type.FullName + ".\");");
+					CSharp.AppendLine("\t\t\tthrow new SerializationException(\"Unable to create an instance of the abstract class " + this.type.FullName + ".\", this.ValueType);");
 				else
 				{
 					CSharp.AppendLine();
@@ -733,7 +739,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine();
 
 					CSharp.AppendLine("\t\t\tif (DataType.Value != " + TYPE_OBJECT + ")");
-					CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Object expected.\");");
+					CSharp.AppendLine("\t\t\t\tthrow new SerializationException(\"Object expected.\", this.ValueType);");
 
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
@@ -748,7 +754,7 @@ namespace Waher.Persistence.Serialization
 						else if (this.objectIdMemberType == typeof(byte[]))
 							CSharp.AppendLine("\t\t\tResult." + this.objectIdMemberInfo.Name + " = ObjectId.ToByteArray();");
 						else
-							throw new Exception("Type not supported for Object ID fields: " + this.objectIdMemberType.FullName);
+							throw new SerializationException("Type not supported for Object ID fields: " + this.objectIdMemberType.FullName, this.type);
 
 						CSharp.AppendLine();
 					}
@@ -909,7 +915,7 @@ namespace Waher.Persistence.Serialization
 
 							CSharp.AppendLine();
 							CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType) + \".\");");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new SerializationException(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType) + \".\", this.ValueType);");
 							CSharp.AppendLine("\t\t\t\t\t\t}");
 						}
 						else
@@ -1020,7 +1026,7 @@ namespace Waher.Persistence.Serialization
 
 								case TypeCode.Empty:
 								default:
-									throw new Exception("Invalid member type: " + MemberType.FullName);
+									throw new SerializationException("Invalid member type: " + MemberType.FullName, this.type);
 
 								case TypeCode.Object:
 									if (MemberType.IsArray)
@@ -1051,7 +1057,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object ID expected for " + Member.Name + ".\");");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new SerializationException(\"Object ID expected for " + Member.Name + ".\", this.ValueType);");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									else if (MemberType == typeof(TimeSpan))
@@ -1259,7 +1265,7 @@ namespace Waher.Persistence.Serialization
 
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object expected for " + Member.Name + ". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType));");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new SerializationException(\"Object expected for " + Member.Name + ". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType), this.ValueType);");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									break;
@@ -1381,7 +1387,7 @@ namespace Waher.Persistence.Serialization
 					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-					CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Value expected for \" + FieldName + \". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType));");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new SerializationException(\"Value expected for \" + FieldName + \". Data Type read: \" + ObjectSerializer.GetFieldDataTypeName(FieldDataType), this.ValueType);");
 					CSharp.AppendLine("\t\t\t\t\t\t}");
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\t\t\t\tif (Obsolete is null)");
@@ -1912,7 +1918,7 @@ namespace Waher.Persistence.Serialization
 									break;
 
 								default:
-									throw new Exception("Invalid member type: " + MemberType.FullName);
+									throw new SerializationException("Invalid member type: " + MemberType.FullName, this.type);
 
 								case TypeCode.Object:
 									if (MemberType.IsArray)
@@ -2106,7 +2112,7 @@ namespace Waher.Persistence.Serialization
 						CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
 					}
 					else
-						throw new Exception("Invalid Object ID type.");
+						throw new SerializationException("Invalid Object ID type.", this.type);
 
 					CSharp.AppendLine("\t\t\t\telse");
 					CSharp.AppendLine("\t\t\t\t{");
@@ -2247,8 +2253,8 @@ namespace Waher.Persistence.Serialization
 					sb.AppendLine();
 					sb.AppendLine(CSharpCode);
 
-					throw new Exception("Unable to serialize objects of type " + Type.FullName +
-						". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
+					throw new SerializationException("Unable to serialize objects of type " + Type.FullName +
+						". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString(), this.type);
 				}
 				Output.Position = 0;
 				Assembly A;
@@ -2558,7 +2564,7 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (this.typeInfo.IsAbstract)
-					throw new Exception("Unable to create an instance of the abstract class " + this.type.FullName + ".");
+					throw new SerializationException("Unable to create an instance of the abstract class " + this.type.FullName + ".", this.type);
 
 				if (Embedded)
 				{
@@ -2569,7 +2575,7 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (DataType.Value != TYPE_OBJECT)
-					throw new Exception("Object expected.");
+					throw new SerializationException("Object expected.", this.type);
 
 				Result = Activator.CreateInstance(this.type);
 
@@ -2590,7 +2596,7 @@ namespace Waher.Persistence.Serialization
 							break;
 
 						default:
-							throw new Exception("Type not supported for Object ID fields: " + this.objectIdMember.MemberType.FullName);
+							throw new SerializationException("Type not supported for Object ID fields: " + this.objectIdMember.MemberType.FullName, this.type);
 					}
 				}
 
@@ -2728,7 +2734,7 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							default:
-								throw new Exception("Value expected for " + FieldName + ". Data Type read: " + ObjectSerializer.GetFieldDataTypeName(FieldDataType));
+								throw new SerializationException("Value expected for " + FieldName + ". Data Type read: " + ObjectSerializer.GetFieldDataTypeName(FieldDataType), this.type);
 						}
 
 						if (Obsolete is null)
@@ -2879,7 +2885,7 @@ namespace Waher.Persistence.Serialization
 
 							case TYPE_NULL:
 							default:
-								throw new Exception("Invalid member type: " + Member.MemberType.FullName);
+								throw new SerializationException("Invalid member type: " + Member.MemberType.FullName, this.type);
 
 							case TYPE_ARRAY:
 								Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.context, Reader, FieldDataType));
@@ -2954,8 +2960,8 @@ namespace Waher.Persistence.Serialization
 										break;
 
 									default:
-										throw new Exception("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
-											GetFieldDataTypeName(FieldDataType) + ".");
+										throw new SerializationException("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
+											GetFieldDataTypeName(FieldDataType) + ".", this.type);
 								}
 								break;
 
@@ -2970,7 +2976,7 @@ namespace Waher.Persistence.Serialization
 												(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
 
 											if (!SetTask.Wait(10000))
-												throw new Exception("Unable to load referenced object. Database timed out.");
+												throw new TimeoutException("Unable to load referenced object. Database timed out.");
 
 											Member.Set(Result, SetTask.Result);
 											break;
@@ -2980,7 +2986,7 @@ namespace Waher.Persistence.Serialization
 											break;
 
 										default:
-											throw new Exception("Object ID expected for " + Member.Name + ".");
+											throw new SerializationException("Object ID expected for " + Member.Name + ".", this.type);
 									}
 								}
 								else
@@ -3084,7 +3090,7 @@ namespace Waher.Persistence.Serialization
 											break;
 
 										default:
-											throw new Exception("Object expected for " + Member.Name + ". Data Type read: " + GetFieldDataTypeName(FieldDataType));
+											throw new SerializationException("Object expected for " + Member.Name + ". Data Type read: " + GetFieldDataTypeName(FieldDataType), this.type);
 									}
 								}
 								break;
@@ -3286,7 +3292,7 @@ namespace Waher.Persistence.Serialization
 
 							case TYPE_NULL:
 							default:
-								throw new Exception("Invalid member type: " + Member.MemberType.FullName);
+								throw new SerializationException("Invalid member type: " + Member.MemberType.FullName, this.type);
 
 							case TYPE_ARRAY:
 								GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.context, Writer, (Array)MemberValue);
@@ -3330,7 +3336,7 @@ namespace Waher.Persistence.Serialization
 										Writer.Write(WriteTask.Result);
 									}
 									else
-										throw new Exception("Objects of type " + Member.MemberType.FullName + " cannot be stored by reference.");
+										throw new SerializationException("Objects of type " + Member.MemberType.FullName + " cannot be stored by reference.", this.type);
 								}
 								else
 									Member.NestedSerializer.Serialize(Writer, true, true, MemberValue);
@@ -3381,7 +3387,7 @@ namespace Waher.Persistence.Serialization
 							}
 						}
 						else
-							throw new Exception("Invalid Object ID type.");
+							throw new SerializationException("Invalid Object ID type.", this.type);
 
 						if (!HasGuid)
 						{
@@ -3589,7 +3595,7 @@ namespace Waher.Persistence.Serialization
 			if (Obj is null || (Obj is Guid && Obj.Equals(Guid.Empty)))
 			{
 				if (!InsertIfNotFound)
-					throw new Exception("Object has no Object ID defined.");
+					throw new SerializationException("Object has no Object ID defined.", this.type);
 
 				Guid ObjectId = await this.context.SaveNewObject(Value);
 				Type T;

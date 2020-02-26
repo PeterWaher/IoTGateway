@@ -19,6 +19,7 @@ namespace Waher.Persistence.Files
 		private readonly FilesProvider provider;
 		private readonly Aes aes;
 		private readonly string fileName;
+		private readonly string collectionName;
 		private readonly byte[] aesKey;
 		private readonly byte[] ivSeed;
 		private readonly int ivSeedLen;
@@ -34,9 +35,10 @@ namespace Waher.Persistence.Files
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
+		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-		public SerialFile(string FileName, int TimeoutMilliseconds)
-			: this(FileName, TimeoutMilliseconds, false, null)
+		public SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds)
+			: this(FileName, CollectionName, TimeoutMilliseconds, false, null)
 		{
 		}
 
@@ -44,16 +46,18 @@ namespace Waher.Persistence.Files
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
+		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		public SerialFile(string FileName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+		public SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
 		{
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			this.provider = Provider;
 			this.fileName = FileName;
+			this.collectionName = CollectionName;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.encrypted = Encrypted;
 
@@ -85,6 +89,11 @@ namespace Waher.Persistence.Files
 		/// File name.
 		/// </summary>
 		public string FileName => this.fileName;
+
+		/// <summary>
+		/// Collection name.
+		/// </summary>
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Gets the length of the file, in bytes.
@@ -138,7 +147,7 @@ namespace Waher.Persistence.Files
 
 				int NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
 				if (NrRead < NrBytes)
-					throw new EndOfStreamException("Unexpected end of file " + this.fileName + ".");
+					throw new FileException("Unexpected end of file " + this.fileName + ".", this.fileName, this.collectionName);
 			}
 			finally
 			{
@@ -177,12 +186,12 @@ namespace Waher.Persistence.Files
 				Offset += 7;
 
 				if (Offset > 31)
-					throw new IOException("Invalid block length. Possible corruption of file: " + this.fileName);
+					throw new FileException("Invalid block length. Possible corruption of file: " + this.fileName, this.fileName, this.collectionName);
 			}
 			while ((b & 0x80) != 0);
 
 			if (c <= 0 || c > int.MaxValue)
-				throw new IOException("Invalid length. Possible corruption of file: " + this.fileName);
+				throw new FileException("Invalid length. Possible corruption of file: " + this.fileName, this.fileName, this.collectionName);
 
 			int BlockSize = c + Pos;
 			int Tail = BlockSize % MinBlockSize;

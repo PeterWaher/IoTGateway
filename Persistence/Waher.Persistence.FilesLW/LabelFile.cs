@@ -16,8 +16,8 @@ namespace Waher.Persistence.Files
 		private readonly Dictionary<string, uint> codesByLabel = new Dictionary<string, uint>();
 		private readonly Dictionary<uint, string> labelsByCode = new Dictionary<uint, string>();
 
-		private LabelFile(string FileName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
-			: base(FileName, TimeoutMilliseconds, Encrypted, Provider)
+		private LabelFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+			: base(FileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider)
 		{
 		}
 
@@ -65,7 +65,7 @@ namespace Waher.Persistence.Files
 			string FileName = Provider.GetFileName(CollectionName);
 			string LabelsFileName = FileName + ".labels";
 			bool LabelsExists = File.Exists(LabelsFileName);
-			LabelFile Result = new LabelFile(LabelsFileName, TimeoutMilliseconds, Encrypted, Provider);
+			LabelFile Result = new LabelFile(LabelsFileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider);
 			uint LastCode = 0;
 						uint Code = 1;
 
@@ -180,7 +180,7 @@ namespace Waher.Persistence.Files
 				{
 					Result = (uint)this.labelsByCode.Count;
 					if (Result == int.MaxValue)
-						throw new Exception("Too many labels in " + this.FileName);
+						throw new FileException("Too many labels in " + this.FileName, this.FileName, this.CollectionName);
 
 					await this.WriteLabelLocked(FieldName);
 

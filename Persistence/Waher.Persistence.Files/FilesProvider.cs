@@ -466,7 +466,7 @@ namespace Waher.Persistence.Files
 		public ObjectSerializer GetObjectSerializerEx(Type Type)
 		{
 			if (!(this.GetObjectSerializer(Type) is ObjectSerializer Serializer))
-				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
+				throw new SerializationException("Objects of type " + Type.FullName + " must be embedded.", Type);
 
 			return Serializer;
 		}

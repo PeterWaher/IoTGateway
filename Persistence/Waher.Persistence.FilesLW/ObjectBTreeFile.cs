@@ -579,7 +579,7 @@ namespace Waher.Persistence.Files
 
             int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
             if (this.blockSize != NrRead)
-				throw new IOException("Read past end of file " + this.fileName + ".");
+				throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 			this.nrBlockLoads++;
 
@@ -797,7 +797,7 @@ namespace Waher.Persistence.Files
         internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
         {
             if (this.blobFile is null)
-                throw new IOException("BLOBs not supported in this file.");
+                throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
             BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
             this.recordHandler.SkipKey(Reader);
@@ -867,7 +867,7 @@ namespace Waher.Persistence.Files
         internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
         {
             if (this.blobFile is null)
-                throw new IOException("BLOBs not supported in this file.");
+                throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
             BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
             object ObjectId = this.recordHandler.GetKey(Reader);
@@ -892,7 +892,7 @@ namespace Waher.Persistence.Files
             while (i < Len)
             {
                 if (BlobBlockIndex == uint.MaxValue)
-                    throw new IOException("BLOB " + ObjectId.ToString() + " ended prematurely.");
+                    throw new FileException("BLOB " + ObjectId.ToString() + " ended prematurely.", this.fileName, this.collectionName);
 
                 PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
@@ -901,7 +901,7 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-					throw new IOException("Read past end of file " + this.fileName + ".");
+					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 				this.nrBlobBlockLoads++;
 
@@ -918,7 +918,10 @@ namespace Waher.Persistence.Files
                 Reader.Restart(DecryptedBlock, 0);
                 ObjectId2 = this.recordHandler.GetKey(Reader);
                 if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-                    throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName + ") was actually marked as " + ObjectId2.ToString() + ".");
+                {
+                    throw new FileException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
+                        ") was actually marked as " + ObjectId2.ToString() + ".", this.fileName, this.collectionName);
+                }
 
                 Prev = Reader.ReadUInt32();
                 if (Prev != ExpectedPrev)
@@ -941,10 +944,10 @@ namespace Waher.Persistence.Files
             }
 
             if (BlobBlockIndex != uint.MaxValue)
-                throw new IOException("BLOB " + ObjectId.ToString() + " did not end when expected.");
+                throw new FileException("BLOB " + ObjectId.ToString() + " did not end when expected.", this.fileName, this.collectionName);
 
             if (!(BlobBlocksReferenced is null) && ChainError)
-                throw new IOException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.");
+                throw new FileException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.", this.fileName, this.collectionName);
 
             Reader.Restart(Result, Bookmark);
 
@@ -954,7 +957,7 @@ namespace Waher.Persistence.Files
         private async Task DeleteBlobLocked(byte[] Bin, int Offset)
         {
             if (this.blobFile is null)
-                throw new IOException("BLOBs not supported in this file.");
+                throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
             SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
             LinkedList<KeyValuePair<uint, byte[]>> ReplacementBlocks = new LinkedList<KeyValuePair<uint, byte[]>>();
@@ -988,7 +991,7 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-					throw new IOException("Read past end of file " + this.fileName + ".");
+					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 				this.nrBlockLoads++;
 
@@ -1031,7 +1034,7 @@ namespace Waher.Persistence.Files
 
                 NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                 if (NrRead != this.blobBlockSize)
-					throw new IOException("Read past end of file " + this.fileName + ".");
+					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 				this.nrBlockLoads++;
 
@@ -1101,7 +1104,7 @@ namespace Waher.Persistence.Files
 
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-						throw new IOException("Read past end of file " + this.fileName + ".");
+						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 					this.nrBlockLoads++;
 
@@ -1141,7 +1144,7 @@ namespace Waher.Persistence.Files
 
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-						throw new IOException("Read past end of file " + this.fileName + ".");
+						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 					this.nrBlockLoads++;
 
@@ -1301,7 +1304,7 @@ namespace Waher.Persistence.Files
                 Leaf = await this.FindLeafNodeLocked(ObjectId);
 
                 if (Leaf is null)
-                    throw new IOException("Object with same Object ID already exists.");
+                    throw new FileException("Object with same Object ID already exists.", this.fileName, this.collectionName);
             }
             else
             {
@@ -1539,8 +1542,8 @@ namespace Waher.Persistence.Files
                         {
                             this.isCorrupt = true;
 
-                            throw new IOException("Parent link points to parent block (" + ParentLink.ToString() +
-                                ") with no reference to child block (" + LeftLink.ToString() + ").");
+                            throw new FileException("Parent link points to parent block (" + ParentLink.ToString() +
+                                ") with no reference to child block (" + LeftLink.ToString() + ").", this.fileName, this.collectionName);
                         }
                     }
 
@@ -1873,7 +1876,7 @@ namespace Waher.Persistence.Files
         /// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public Task UpdateObject(object Object)
         {
             Type ObjectType = Object.GetType();
@@ -1889,7 +1892,7 @@ namespace Waher.Persistence.Files
         /// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task UpdateObject(object Object, ObjectSerializer Serializer)
         {
             Guid ObjectId = await Serializer.GetObjectId(Object, false);
@@ -1905,7 +1908,7 @@ namespace Waher.Persistence.Files
         /// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task UpdateObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
         {
             object Old;
@@ -1943,7 +1946,7 @@ namespace Waher.Persistence.Files
         /// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task UpdateObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
         {
             LinkedList<object> Olds = new LinkedList<object>();
@@ -2157,8 +2160,8 @@ namespace Waher.Persistence.Files
                         {
                             this.isCorrupt = true;
 
-                            throw new IOException("Parent link points to parent block (" + ParentLink.ToString() +
-                                ") with no reference to child block (" + LeftLink.ToString() + ").");
+                            throw new FileException("Parent link points to parent block (" + ParentLink.ToString() +
+                                ") with no reference to child block (" + LeftLink.ToString() + ").", this.fileName, this.collectionName);
                         }
                     }
 
@@ -2189,7 +2192,7 @@ namespace Waher.Persistence.Files
         /// <returns>Object that was deleted.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public Task<object> DeleteObject(object Object)
         {
             Type ObjectType = Object.GetType();
@@ -2207,7 +2210,7 @@ namespace Waher.Persistence.Files
         /// <returns>Object that was deleted.</returns>
         /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
         /// or if the corresponding property type is not supported.</exception>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
         {
             Guid ObjectId = await Serializer.GetObjectId(Object, false);
@@ -2219,7 +2222,7 @@ namespace Waher.Persistence.Files
         /// </summary>
         /// <param name="ObjectId">Object ID of the object to delete.</param>
         /// <returns>Object that was deleted.</returns>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public Task<object> DeleteObject(Guid ObjectId)
         {
             return this.DeleteObject(ObjectId, (IObjectSerializer)this.genericSerializer);
@@ -2231,7 +2234,7 @@ namespace Waher.Persistence.Files
         /// <param name="ObjectId">Object ID of the object to delete.</param>
         /// <param name="Serializer">Binary serializer.</param>
         /// <returns>Object that was deleted.</returns>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task<object> DeleteObject(Guid ObjectId, IObjectSerializer Serializer)
         {
             object DeletedObject;
@@ -2258,7 +2261,7 @@ namespace Waher.Persistence.Files
         /// <param name="ObjectIds">Object IDs of the objects to delete.</param>
         /// <param name="Serializer">Binary serializer.</param>
         /// <returns>Object that was deleted.</returns>
-        /// <exception cref="IOException">If the object is not found in the database.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
         public async Task<IEnumerable<object>> DeleteObjects(IEnumerable<Guid> ObjectIds, IObjectSerializer Serializer)
         {
             LinkedList<object> DeletedObjects = new LinkedList<object>();
@@ -4079,7 +4082,7 @@ namespace Waher.Persistence.Files
                 {
                     NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
                     if (NrRead != this.blobBlockSize)
-						throw new IOException("Read past end of file " + this.fileName + ".");
+						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 
 					this.nrBlobBlockLoads++;
 
@@ -4476,7 +4479,7 @@ namespace Waher.Persistence.Files
         /// </summary>
         /// <param name="ObjectId">Object ID</param>
         /// <returns>Rank of object in database.</returns>
-        /// <exception cref="IOException">If the object is not found.</exception>
+        /// <exception cref="KeyNotFoundException">If the object is not found.</exception>
         public async Task<ulong> GetRank(Guid ObjectId)
         {
             await this.LockRead();

@@ -137,7 +137,7 @@ namespace Waher.Persistence.Files
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
 				if (Leaf is null)
-					throw new IOException("Object is already available in index.");
+					throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
 
 				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 			}
@@ -172,7 +172,7 @@ namespace Waher.Persistence.Files
 
 					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
 					if (Leaf is null)
-						throw new IOException("Object is already available in index.");
+						throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
 
 					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 				}
@@ -445,7 +445,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Rank of object in database.</returns>
-		/// <exception cref="IOException">If the object is not found.</exception>
+		/// <exception cref="KeyNotFoundException">If the object is not found.</exception>
 		public async Task<ulong> GetRank(Guid ObjectId)
 		{
 			object Object = await this.objectFile.LoadObject(ObjectId);

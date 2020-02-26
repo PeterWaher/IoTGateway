@@ -69,6 +69,10 @@
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />
+    <Compile Include=".bak\Waher.Events\IActor.cs" />
+    <Compile Include=".bak\Waher.Events\IEventId.cs" />
+    <Compile Include=".bak\Waher.Events\IObject.cs" />
+    <Compile Include=".bak\Waher.Events\ITags.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />

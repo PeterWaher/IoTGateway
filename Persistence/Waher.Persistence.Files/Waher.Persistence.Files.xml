@@ -47,6 +47,34 @@
             Sets the enumerator to its initial position, which is before the first element in the collection.
             </summary>
         </member>
+        <member name="T:Waher.Persistence.Files.FileException">
+            <summary>
+            Exception related to a file.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileException.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Exception related to a file.
+            </summary>
+            <param name="Message">Exception message</param>
+            <param name="FileName">File Name</param>
+            <param name="Collection">Corresponding collection.</param>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileException.Object">
+            <summary>
+            File name.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileException.Collection">
+            <summary>
+            Collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileException.Tags">
+            <summary>
+            Tags related to the object.
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Files.CustomKeyHandler">
             <summary>
             Delegate for custom key callback methods.
@@ -944,7 +972,7 @@
             </summary>
             <param name="ObjectId">Object ID</param>
             <returns>Rank of object in database.</returns>
-            <exception cref="T:System.IO.IOException">If the object is not found.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.IndexBTreeFile.Regenerate">
             <summary>
@@ -1561,7 +1589,7 @@
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer)">
             <summary>
@@ -1572,7 +1600,7 @@
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Guid,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
             <summary>
@@ -1584,7 +1612,7 @@
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObjects(System.Collections.Generic.IEnumerable{System.Guid},System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.IObjectSerializer)">
             <summary>
@@ -1596,7 +1624,7 @@
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object)">
             <summary>
@@ -1607,7 +1635,7 @@
             <returns>Object that was deleted.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer)">
             <summary>
@@ -1619,7 +1647,7 @@
             <returns>Object that was deleted.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Guid)">
             <summary>
@@ -1627,7 +1655,7 @@
             </summary>
             <param name="ObjectId">Object ID of the object to delete.</param>
             <returns>Object that was deleted.</returns>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Guid,Waher.Persistence.Serialization.IObjectSerializer)">
             <summary>
@@ -1636,7 +1664,7 @@
             <param name="ObjectId">Object ID of the object to delete.</param>
             <param name="Serializer">Binary serializer.</param>
             <returns>Object that was deleted.</returns>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObjects(System.Collections.Generic.IEnumerable{System.Guid},Waher.Persistence.Serialization.IObjectSerializer)">
             <summary>
@@ -1645,7 +1673,7 @@
             <param name="ObjectIds">Object IDs of the objects to delete.</param>
             <param name="Serializer">Binary serializer.</param>
             <returns>Object that was deleted.</returns>
-            <exception cref="T:System.IO.IOException">If the object is not found in the database.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetCurrentStateReport(System.Boolean,System.Boolean)">
             <summary>
@@ -1729,7 +1757,7 @@
             </summary>
             <param name="ObjectId">Object ID</param>
             <returns>Rank of object in database.</returns>
-            <exception cref="T:System.IO.IOException">If the object is not found.</exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Add(System.Object)">
             <summary>
@@ -3251,18 +3279,20 @@
             Maximum time to wait for access to underlying database (ms)
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.Int32)">
+        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Int32)">
             <summary>
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
             </summary>
             <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
             <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
             </summary>
             <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
             <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
             <param name="Encrypted">If file is encrypted.</param>
             <param name="Provider">Provider of encryption keys.</param>
@@ -3270,6 +3300,11 @@
         <member name="P:Waher.Persistence.Files.SerialFile.FileName">
             <summary>
             File name.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.SerialFile.CollectionName">
+            <summary>
+            Collection name.
             </summary>
         </member>
         <member name="M:Waher.Persistence.Files.SerialFile.GetLength">

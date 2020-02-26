@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.ExceptionServices;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -69,37 +70,90 @@ namespace Waher.Script.Operators.Membership
 				if (T != this.type)
 				{
 					this.type = T;
+					this.field = null;
+					this._event = null;
+					this.methods = null;
+					this.nameIndex = null;
 					this.property = T.GetRuntimeProperty(this.name);
-					if (!(this.property is null))
-					{
-						this.field = null;
-						this.nameIndex = null;
-					}
-					else
+					if (this.property is null)
 					{
 						this.field = T.GetRuntimeField(this.name);
-						if (!(this.field is null))
-							this.nameIndex = null;
-						else
+						if (this.field is null)
 						{
-							this.property = T.GetRuntimeProperty("Item");
-							if (this.property is null)
-								this.nameIndex = null;
-							else if (this.nameIndex is null)
-								this.nameIndex = new string[] { this.name };
+							this._event = T.GetRuntimeEvent(this.name);
+							if (this._event is null)
+							{
+								List<MethodLambda> Methods = null;
+
+								foreach (MethodInfo MI in T.GetRuntimeMethods())
+								{
+									if (MI.Name == Name)
+									{
+										if (Methods is null)
+											Methods = new List<MethodLambda>();
+
+										Methods.Add(new MethodLambda(Instance, MI));
+									}
+								}
+
+								this.methods = Methods?.ToArray();
+								if (this.methods is null)
+								{
+									this.property = T.GetRuntimeProperty("Item");
+									if (!(this.property is null))
+										this.nameIndex = new string[] { this.name };
+								}
+							}
 						}
 					}
 				}
 
+				object Result = null;
+
 				if (!(this.property is null))
 				{
-					if (!(this.nameIndex is null))
-						return Expression.Encapsulate(this.property.GetValue(Instance, this.nameIndex));
-					else
-						return Expression.Encapsulate(this.property.GetValue(Instance, null));
+					try
+					{
+						if (!(this.nameIndex is null))
+							Result = this.property.GetValue(Instance, this.nameIndex);
+						else
+							Result = this.property.GetValue(Instance, null);
+					}
+					catch (Exception ex)
+					{
+						if (Instance is null)
+							Result = this.property;
+						else
+							ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+
+					return Expression.Encapsulate(Result);
 				}
 				else if (!(this.field is null))
-					return Expression.Encapsulate(this.field.GetValue(Instance));
+				{
+					try
+					{
+						Result = this.field.GetValue(Instance);
+					}
+					catch (Exception ex)
+					{
+						if (Instance is null)
+							Result = this.field;
+						else
+							ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+
+					return Expression.Encapsulate(Result);
+				}
+				else if (!(this._event is null))
+					return Expression.Encapsulate(this._event);
+				else if (!(this.methods is null))
+				{
+					if (this.methods.Length == 1)
+						return Expression.Encapsulate(this.methods[0]);
+					else
+						return Expression.Encapsulate(this.methods);
+				}
 				else if (Operand.IsScalar)
 					throw new ScriptRuntimeException("Member '" + this.name + "' not found on type '" + T.FullName + "'.", this);
 			}
@@ -115,6 +169,8 @@ namespace Waher.Script.Operators.Membership
 		private Type type = null;
 		private PropertyInfo property = null;
 		private FieldInfo field = null;
+		private EventInfo _event = null;
+		private MethodLambda[] methods = null;
 		private string[] nameIndex = null;
 		private readonly object synchObject = new object();
 

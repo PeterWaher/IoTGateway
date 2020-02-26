@@ -838,7 +838,7 @@ namespace Waher.Events
 					Event(Type, ex2, Object, Actor, EventId, Level, Facility, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, Object, Actor, EventId, Level, Facility, Tags));
+				Event(new Event(Type, Exception, Object, Actor, EventId, Level, Facility, Exception.Source, Tags));
 		}
 
 		/// <summary>
@@ -867,7 +867,7 @@ namespace Waher.Events
 					Event(Type, ex2, Object, Actor, EventId, Level, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, Object, Actor, EventId, Level, string.Empty, Tags));
+				Event(new Event(Type, Exception, Object, Actor, EventId, Level, string.Empty, Exception.Source, Tags));
 		}
 
 		/// <summary>
@@ -894,7 +894,7 @@ namespace Waher.Events
 					Event(Type, ex2, Object, Actor, EventId, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, Tags));
+				Event(new Event(Type, Exception, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, Exception.Source, Tags));
 		}
 
 		/// <summary>
@@ -920,7 +920,7 @@ namespace Waher.Events
 					Event(Type, ex2, Object, Actor, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, Tags));
+				Event(new Event(Type, Exception, Object, Actor, string.Empty, EventLevel.Minor, string.Empty, Exception.Source, Tags));
 		}
 
 		/// <summary>
@@ -945,7 +945,7 @@ namespace Waher.Events
 					Event(Type, ex2, Object, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, Object, string.Empty, string.Empty, EventLevel.Minor, string.Empty, Tags));
+				Event(new Event(Type, Exception, Object, string.Empty, string.Empty, EventLevel.Minor, string.Empty, Exception.Source, Tags));
 		}
 
 		/// <summary>
@@ -968,7 +968,7 @@ namespace Waher.Events
 					Event(Type, ex2, Tags);
 			}
 			else
-				Event(new Event(Type, Exception, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, Tags));
+				Event(new Event(Type, Exception, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, Exception.Source, Tags));
 		}
 
 		#endregion

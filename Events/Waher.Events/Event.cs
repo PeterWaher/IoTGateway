@@ -100,41 +100,14 @@ namespace Waher.Events
 			this.timestamp = DateTime.Now;
 			this.type = Type;
 			this.message = Exception.Message;
-			this.obj = Object;
-			this.actor = Actor;
-			this.eventId = EventId;
+			this.obj = string.IsNullOrEmpty(Object) && Exception is IObject Obj ? Obj.Object : Object;
+			this.actor = string.IsNullOrEmpty(Actor) && Exception is IActor Act ? Act.Actor : Actor;
+			this.eventId = string.IsNullOrEmpty(EventId) && Exception is IEventId EvtId ? EvtId.EventId : EventId;
 			this.level = Level;
 			this.facility = Facility;
 			this.module = Module;
 			this.stackTrace = Exception.StackTrace;
-			this.tags = Tags;
-		}
-
-		/// <summary>
-		/// Class representing an event.
-		/// </summary>
-		/// <param name="Type">Event Type.</param>
-		/// <param name="Exception">Exception object.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Actor">Actor responsible for the action causing the event.</param>
-		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
-		/// <param name="Level">Event Level.</param>
-		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public Event(EventType Type, Exception Exception, string Object, string Actor, string EventId, EventLevel Level, string Facility,
-			params KeyValuePair<string, object>[] Tags)
-		{
-			this.timestamp = DateTime.Now;
-			this.type = Type;
-			this.message = Exception.Message;
-			this.obj = Object;
-			this.actor = Actor;
-			this.eventId = string.IsNullOrEmpty(EventId) ? Exception.GetType().FullName : EventId;
-			this.level = Level;
-			this.facility = Facility;
-			this.module = Exception.Source;
-			this.stackTrace = Exception.StackTrace;
-			this.tags = Tags;
+			this.tags = (Tags is null || Tags.Length == 0) && Exception is ITags Tgs ? Tgs.Tags : Tags;
 		}
 
 		/// <summary>

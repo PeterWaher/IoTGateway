@@ -20,6 +20,7 @@ namespace Waher.Persistence.Filters
 	public abstract class Filter
 	{
 		private Filter parent;
+		private object tag;
 
 		/// <summary>
 		/// Base class for all filter classes.
@@ -27,6 +28,7 @@ namespace Waher.Persistence.Filters
 		public Filter()
 		{
 			this.parent = null;
+			this.tag = null;
 		}
 
 		/// <summary>
@@ -34,8 +36,17 @@ namespace Waher.Persistence.Filters
 		/// </summary>
 		public Filter ParentFilter
 		{
-			get { return this.parent; }
-			internal set { this.parent = value; }
+			get => this.parent;
+			internal set => this.parent = value;
+		}
+
+		/// <summary>
+		/// Tag object that can be attached to the filter by caller.
+		/// </summary>
+		public object Tag
+		{
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>

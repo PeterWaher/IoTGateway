@@ -5785,6 +5785,31 @@ namespace Waher.Persistence.Files
         {
             if (Filter is null)
                 return null;
+
+            if (!(Filter.Tag is null) && Filter.Tag is Searching.IApplicableFilter Result)
+                return Result;
+            
+            if (Filter is FilterFieldValue FilterFieldValue)
+            {
+                object Value = FilterFieldValue.Value;
+
+                if (Filter is FilterFieldEqualTo)
+                    Result = new Searching.FilterFieldEqualTo(FilterFieldValue.FieldName, Value);
+                else if (Filter is FilterFieldNotEqualTo)
+                    Result = new Searching.FilterFieldNotEqualTo(FilterFieldValue.FieldName, Value);
+                else if (Filter is FilterFieldGreaterThan)
+                    Result = new Searching.FilterFieldGreaterThan(FilterFieldValue.FieldName, Value);
+                else if (Filter is FilterFieldGreaterOrEqualTo)
+                    Result = new Searching.FilterFieldGreaterOrEqualTo(FilterFieldValue.FieldName, Value);
+                else if (Filter is FilterFieldLesserThan)
+                    Result = new Searching.FilterFieldLesserThan(FilterFieldValue.FieldName, Value);
+                else if (Filter is FilterFieldLesserOrEqualTo)
+                    Result = new Searching.FilterFieldLesserOrEqualTo(FilterFieldValue.FieldName, Value);
+                else
+                    throw this.UnknownFilterType(Filter);
+            }
+            else if (Filter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
+                Result = new Searching.FilterFieldLikeRegEx(FilterFieldLikeRegEx.FieldName, FilterFieldLikeRegEx.RegularExpression);
             else if (Filter is FilterChildren FilterChildren)
             {
                 Filter[] ChildFilters = FilterChildren.ChildFilters;
@@ -5799,45 +5824,25 @@ namespace Waher.Persistence.Files
                 }
 
                 if (Filter is FilterAnd)
-                    return new Searching.FilterAnd(ApplicableFilters, ConvertedChildFilters);
+                    Result = new Searching.FilterAnd(ApplicableFilters, ConvertedChildFilters);
                 else if (Filter is FilterOr)
-                    return new Searching.FilterOr(ApplicableFilters, ConvertedChildFilters);
+                    Result = new Searching.FilterOr(ApplicableFilters, ConvertedChildFilters);
                 else
                     throw this.UnknownFilterType(Filter);
             }
             else if (Filter is FilterChild FilterChild)
             {
                 if (Filter is FilterNot)
-                    return new Searching.FilterNot(this.ConvertFilter(FilterChild.ChildFilter));
-                else
-                    throw this.UnknownFilterType(Filter);
-            }
-            else if (Filter is FilterFieldValue FilterFieldValue)
-            {
-                object Value = FilterFieldValue.Value;
-
-                if (Filter is FilterFieldEqualTo)
-                    return new Searching.FilterFieldEqualTo(FilterFieldValue.FieldName, Value);
-                else if (Filter is FilterFieldNotEqualTo)
-                    return new Searching.FilterFieldNotEqualTo(FilterFieldValue.FieldName, Value);
-                else if (Filter is FilterFieldGreaterThan)
-                    return new Searching.FilterFieldGreaterThan(FilterFieldValue.FieldName, Value);
-                else if (Filter is FilterFieldGreaterOrEqualTo)
-                    return new Searching.FilterFieldGreaterOrEqualTo(FilterFieldValue.FieldName, Value);
-                else if (Filter is FilterFieldLesserThan)
-                    return new Searching.FilterFieldLesserThan(FilterFieldValue.FieldName, Value);
-                else if (Filter is FilterFieldLesserOrEqualTo)
-                    return new Searching.FilterFieldLesserOrEqualTo(FilterFieldValue.FieldName, Value);
+                    Result = new Searching.FilterNot(this.ConvertFilter(FilterChild.ChildFilter));
                 else
                     throw this.UnknownFilterType(Filter);
             }
             else
-            {
-                if (Filter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
-                    return new Searching.FilterFieldLikeRegEx(FilterFieldLikeRegEx.FieldName, FilterFieldLikeRegEx.RegularExpression);
-                else
-                    throw this.UnknownFilterType(Filter);
-            }
+                throw this.UnknownFilterType(Filter);
+
+            Filter.Tag = Result;
+
+            return Result;
         }
 
         private Exception UnknownFilterType(Filter Filter)

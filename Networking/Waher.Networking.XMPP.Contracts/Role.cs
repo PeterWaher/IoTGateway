@@ -8,21 +8,11 @@ namespace Waher.Networking.XMPP.Contracts
 	/// <summary>
 	/// Class defining a role
 	/// </summary>
-	public class Role
+	public class Role : LocalizableDescription
 	{
-		private HumanReadableText[] descriptions = null;
 		private string name = string.Empty;
 		private int minCount = 0;
 		private int maxCount = 0;
-
-		/// <summary>
-		/// Discriptions of the role, in different languages.
-		/// </summary>
-		public HumanReadableText[] Descriptions
-		{
-			get => this.descriptions;
-			set => this.descriptions = value;
-		}
 
 		/// <summary>
 		/// Name of the role.

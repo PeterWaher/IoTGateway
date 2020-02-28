@@ -1223,5 +1223,141 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
+		/// <summary>
+		/// Default language for contract.
+		/// </summary>
+		public string DefaultLanguage
+		{
+			get
+			{
+				if (!(this.forHumans is null))
+				{
+					foreach (HumanReadableText Text in this.forHumans)
+						return Text.Language;
+				}
+
+				return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// Gets available languages encoded in contract.
+		/// </summary>
+		/// <returns>Array of languages.</returns>
+		public string[] GetLanguages()
+		{
+			SortedDictionary<string, bool> Languages = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
+
+			this.Add(Languages, this.forHumans);
+
+			if (!(this.roles is null))
+			{
+				foreach (Role Role in this.roles)
+					this.Add(Languages, Role.Descriptions);
+			}
+
+			if (!(this.parameters is null))
+			{
+				foreach (Parameter Parameter in this.parameters)
+					this.Add(Languages, Parameter.Descriptions);
+			}
+
+			string[] Result = new string[Languages.Count];
+			Languages.Keys.CopyTo(Result, 0);
+
+			return Result;
+		}
+
+		private void Add(SortedDictionary<string, bool> Languages, HumanReadableText[] Texts)
+		{
+			if (Texts is null)
+				return;
+
+			foreach (HumanReadableText Text in Texts)
+			{
+				if (!string.IsNullOrEmpty(Text.Language))
+					Languages[Text.Language] = true;
+			}
+		}
+
+		/// <summary>
+		/// Creates a human-readable Markdown document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <returns>Markdown</returns>
+		public string ToMarkdown(string Language)
+		{
+			return this.ToMarkdown(this.forHumans, Language);
+		}
+
+		/// <summary>
+		/// Creates a human-readable HTML document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <returns>Markdown</returns>
+		public string ToHTML(string Language)
+		{
+			return this.ToHTML(this.forHumans, Language);
+		}
+
+		/// <summary>
+		/// Creates a human-readable Plain Trext document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <returns>Markdown</returns>
+		public string ToPlainText(string Language)
+		{
+			return this.ToPlainText(this.forHumans, Language);
+		}
+
+		/// <summary>
+		/// Creates a human-readable XAML document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <returns>Markdown</returns>
+		public string ToXAML(string Language)
+		{
+			return this.ToXAML(this.forHumans, Language);
+		}
+
+		internal string ToMarkdown(HumanReadableText[] Text, string Language)
+		{
+			return Select(Text, Language)?.GenerateMarkdown(this);
+		}
+
+		internal string ToPlainText(HumanReadableText[] Text, string Language)
+		{
+			return Select(Text, Language)?.GeneratePlainText(this);
+		}
+
+		internal string ToHTML(HumanReadableText[] Text, string Language)
+		{
+			return Select(Text, Language)?.GenerateHTML(this);
+		}
+
+		internal string ToXAML(HumanReadableText[] Text, string Language)
+		{
+			return Select(Text, Language)?.GenerateXAML(this);
+		}
+
+		internal HumanReadableText Select(HumanReadableText[] Text, string Language)
+		{
+			if (Text is null)
+				return null;
+
+			HumanReadableText First = null;
+
+			foreach (HumanReadableText T in Text)
+			{
+				if (string.Compare(T.Language, Language, StringComparison.CurrentCultureIgnoreCase) == 0)
+					return T;
+
+				if (First is null)
+					First = T;
+			}
+
+			return First;
+		}
+
 	}
 }

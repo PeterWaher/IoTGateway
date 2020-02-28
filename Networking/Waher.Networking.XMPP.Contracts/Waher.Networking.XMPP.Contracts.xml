@@ -230,6 +230,45 @@
             <param name="Key"></param>
             <returns></returns>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.DefaultLanguage">
+            <summary>
+            Default language for contract.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.GetLanguages">
+            <summary>
+            Gets available languages encoded in contract.
+            </summary>
+            <returns>Array of languages.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToMarkdown(System.String)">
+            <summary>
+            Creates a human-readable Markdown document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToHTML(System.String)">
+            <summary>
+            Creates a human-readable HTML document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToPlainText(System.String)">
+            <summary>
+            Creates a human-readable Plain Trext document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.ToXAML(System.String)">
+            <summary>
+            Creates a human-readable XAML document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <returns>Markdown</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractsClient">
             <summary>
             Adds support for legal identities, smart contracts and signatures to an XMPP client.
@@ -2453,6 +2492,48 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LocalizableDescription">
+            <summary>
+            Abstract base class for contractual parameters
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LocalizableDescription.Descriptions">
+            <summary>
+            Discriptions of the object, in different languages.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToMarkdown(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Creates a human-readable Markdown document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <param name="Contract">Contract hosting the object.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToHTML(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Creates a human-readable HTML document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <param name="Contract">Contract hosting the object.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToPlainText(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Creates a human-readable Plain Trext document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <param name="Contract">Contract hosting the object.</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToXAML(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Creates a human-readable XAML document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <param name="Contract">Contract hosting the object.</param>
+            <returns>Markdown</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.NetworkIdentity">
             <summary>
             Contains a network identity related to a legal identity
@@ -2504,11 +2585,6 @@
         <member name="T:Waher.Networking.XMPP.Contracts.Parameter">
             <summary>
             Abstract base class for contractual parameters
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Descriptions">
-            <summary>
-            Discriptions of the role, in different languages.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Name">
@@ -2607,11 +2683,6 @@
         <member name="T:Waher.Networking.XMPP.Contracts.Role">
             <summary>
             Class defining a role
-            </summary>
-        </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.Role.Descriptions">
-            <summary>
-            Discriptions of the role, in different languages.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Role.Name">

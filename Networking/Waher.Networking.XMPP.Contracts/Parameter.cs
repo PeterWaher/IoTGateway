@@ -8,19 +8,9 @@ namespace Waher.Networking.XMPP.Contracts
 	/// <summary>
 	/// Abstract base class for contractual parameters
 	/// </summary>
-	public abstract class Parameter
+	public abstract class Parameter : LocalizableDescription
 	{
-		private HumanReadableText[] descriptions = null;
 		private string name;
-
-		/// <summary>
-		/// Discriptions of the role, in different languages.
-		/// </summary>
-		public HumanReadableText[] Descriptions
-		{
-			get => this.descriptions;
-			set => this.descriptions = value;
-		}
 
 		/// <summary>
 		/// Parameter name

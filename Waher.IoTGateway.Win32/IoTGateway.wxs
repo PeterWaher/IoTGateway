@@ -1285,8 +1285,9 @@
 								<File Id='PersonalData.md' Name='PersonalData.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.md'/>
 								<File Id='Restore.js' Name='Restore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.js'/>
 								<File Id='Restore.md' Name='Restore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.md'/>
-								<File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
-								<File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
+                <File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
+                <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.md' />
+                <File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
 								<File Id='Theme.md' Name='Theme.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.md'/>
 								<File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
@@ -1308,8 +1309,9 @@
 								<RemoveFile Id='RemovePersonalData.md' Name='PersonalData.md' On='uninstall'/>
 								<RemoveFile Id='RemoveRestore.js' Name='Restore.js' On='uninstall'/>
 								<RemoveFile Id='RemoveRestore.md' Name='Restore.md' On='uninstall'/>
-								<RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
-								<RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
+                <RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
+                <RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
+                <RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.md' Name='Theme.md' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>

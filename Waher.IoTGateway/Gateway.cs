@@ -27,15 +27,16 @@ using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Setup;
+using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
+using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
-using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.PEP;
@@ -49,6 +50,7 @@ using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
@@ -2251,14 +2253,6 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
-		/// XMPP Contracts Client, if such a compoent is available on the XMPP broker.
-		/// </summary>
-		public static ContractsClient ContractsClient
-		{
-			get { return contractsClient; }
-		}
-
-		/// <summary>
 		/// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
 		/// </summary>
 		public static SoftwareUpdateClient SoftwareUpdateClient
@@ -2929,6 +2923,11 @@ namespace Waher.IoTGateway
 			sb.Append("://");
 			if (DomainConfiguration.Instance.UseDomainName)
 				sb.Append(domain);
+			/*else if (httpxProxy?.ServerlessMessaging?.Network.State == PeerToPeerNetworkState.Ready)
+				sb.Append(httpxProxy.ServerlessMessaging.Network.ExternalAddress.ToString());
+			
+				TODO: P2P & Serverless messaging: Recognize HTTP request, and redirect to local HTTP Server, and return response.
+			 */
 			else
 			{
 				IPAddress IP4 = null;
@@ -3034,6 +3033,145 @@ namespace Waher.IoTGateway
 			}
 
 			return Result.ToArray();
+		}
+
+		#endregion
+
+		#region
+
+		/// <summary>
+		/// XMPP Contracts Client, if such a compoent is available on the XMPP broker.
+		/// </summary>
+		public static ContractsClient ContractsClient
+		{
+			get { return contractsClient; }
+		}
+
+		/// <summary>
+		/// Requests the operator to sign a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to sign. Must be ready to sign.</param>
+		/// <param name="Role">Role to sign for. Must be available in contract.</param>
+		/// <param name="Purpose">Purpose of contract. Must be one row.</param>
+		/// <exception cref="ArgumentException">Any of the arguments are invalid.</exception>
+		public static async Task RequestContractSignature(Contract Contract, string Role, string Purpose)
+		{
+			bool RoleFound = false;
+
+			if (Contract is null)
+				throw new ArgumentException("Contract cannot be null.", nameof(Contract));
+
+			// TODO: Check contract server signature is valid.
+
+			foreach (Role R in Contract.Roles)
+			{
+				if (R.Name == Role)
+				{
+					RoleFound = true;
+					break;
+				}
+			}
+
+			if (!RoleFound)
+				throw new ArgumentException("Invalid role.", nameof(Role));
+
+			if (string.IsNullOrEmpty(Purpose) || Purpose.IndexOfAny(CommonTypes.CRLF) >= 0)
+				throw new ArgumentException("Invalid purpose.", nameof(Purpose));
+
+			try
+			{
+				string Module = string.Empty;
+				int Skip = 1;
+
+				while (true)
+				{
+					StackFrame Frame = new StackFrame(Skip);
+					MethodBase Method = Frame.GetMethod();
+					if (Method is null)
+						break;
+
+					Type Type = Method.DeclaringType;
+					Assembly Assembly = Type.Assembly;
+					Module = Assembly.GetName().Name;
+
+					if (Type != typeof(Gateway) && !Module.StartsWith("System."))
+						break;
+
+					Skip++;
+				}
+
+				string Markdown;
+				ContractSignatureRequest Request = await Database.FindFirstIgnoreRest<ContractSignatureRequest>(new FilterAnd(
+					new FilterFieldEqualTo("ContractId", Contract.ContractId),
+					new FilterFieldEqualTo("Role", Role),
+					new FilterFieldEqualTo("Module", Module),
+					new FilterFieldEqualTo("Provider", Contract.Provider),
+					new FilterFieldEqualTo("Purpose", Purpose)));
+
+
+				if (Request is null)
+				{
+					Request = new ContractSignatureRequest()
+					{
+						Contract = Contract,
+						Received = DateTime.Now,
+						Signed = null,
+						ContractId = Contract.ContractId,
+						Role = Role,
+						Module = Module,
+						Provider = Contract.Provider,
+						Purpose = Purpose
+					};
+
+					await Database.Insert(Request);
+
+					Markdown = File.ReadAllText(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
+
+					int i = Markdown.IndexOf("~~~~~~");
+					int c = Markdown.Length;
+
+					if (i >= 0)
+					{
+						i += 6;
+						while (i < c && Markdown[i] == '~')
+							i++;
+
+						Markdown = Markdown.Substring(i).TrimStart();
+					}
+
+					i = Markdown.IndexOf("~~~~~~");
+					if (i > 0)
+						Markdown = Markdown.Substring(0, i).TrimEnd();
+
+					Variables Variables = new Variables(
+						new Variable("RequestId", Request.ObjectId),
+						new Variable("Request", Request));
+					MarkdownSettings Settings = new MarkdownSettings(emoji1_24x24, false, Variables);
+					Markdown = MarkdownDocument.Preprocess(Markdown, Settings);
+
+					StringBuilder sb = new StringBuilder(Markdown);
+
+					sb.AppendLine();
+					sb.Append("Link: [`");
+					sb.Append(Request.ContractId);
+					sb.Append("](");
+					sb.Append(GetUrl("/Settings/SignatureRequest.md?RequestId=" + Request.ObjectId));
+					sb.AppendLine(")");
+
+					Markdown = sb.ToString();
+				}
+				else
+				{
+					Markdown = "**Reminder**: Smart Contract [" + Request.ContractId + "](" +
+						GetUrl("/Settings/SignatureRequest.md?RequestId=" + Request.ObjectId) + ") is waiting for your signature.";
+				}
+
+				SendNotification(Markdown);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		#endregion

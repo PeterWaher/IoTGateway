@@ -725,6 +725,7 @@ namespace Waher.IoTGateway.Setup
 					throw new BadRequestException("Invalid ID or password.");
 			}
 
+			// TODO
 		}
 
 		private static LegalIdentity GetApproved(string LegalId)

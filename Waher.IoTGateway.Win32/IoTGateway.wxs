@@ -1229,8 +1229,8 @@
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
-              <File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.js' />
-              <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.md' />
+              <File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.js' />
+              <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.md' />
               <File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
 							<RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>

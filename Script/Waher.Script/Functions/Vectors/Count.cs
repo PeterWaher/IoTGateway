@@ -71,7 +71,7 @@ namespace Waher.Script.Functions.Vectors
 			else if (Arguments[0] is ISet S)
 				ChildElements = S.ChildElements;
 			else
-				throw new ScriptRuntimeException("First argument expected to be a vector or a set.", this);
+				ChildElements = new IElement[] { Arguments[0] };
 
 			if (Arguments.Length == 1)
 				return new DoubleNumber(ChildElements.Count);

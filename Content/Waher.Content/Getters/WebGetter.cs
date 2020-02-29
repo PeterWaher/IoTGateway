@@ -88,7 +88,8 @@ namespace Waher.Content.Getters
 					switch (Header.Key)
 					{
 						case "Accept":
-							Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Header.Value));
+							if (!Request.Headers.Accept.TryParseAdd(Header.Value))
+								throw new InvalidOperationException("Invalid Accept header value: " + Header.Value);
 							break;
 
 						default:

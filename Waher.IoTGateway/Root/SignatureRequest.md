@@ -4,7 +4,9 @@ Date: 2020-02-28
 Author: Peter Waher
 Copyright: /Copyright.md
 Master: /Master.md
-JavaScript: /Events.js
+JavaScript: Events.js
+JavaScript: SignatureRequest.js
+JavaScript: Settings/Next.js
 UserVariable: User
 Login: /Login.md
 Parameter: RequestId
@@ -136,17 +138,17 @@ Signature
 If you want to sign the contract as **((MarkdownEncode(Page.Request.Role) ))**, click the *Sign* button below.
 You can choose to reject the contract, by pressing the *Reject* button below.[[;
 
-	if LegalIdentityConfiguration.Instance.ProtectWithPassword then
+	if (Protect:=LegalIdentityConfiguration.Instance.ProtectWithPassword) then
 		]] The legal identity used for signatures is protected by a password. You will also need to provide the password below.
 
 Password:  
 <input id="Password" name="Password" type="password" style="width:20em" />
-
-<button type="button">Sign</button>
-<button type="button">Reject</button>
 [[;
-
 	]]
+
+<button type="button" onclick="ContractAction('((RequestId))',((Protect?"true":"false")),true)">Sign</button>
+<button type="button" onclick="ContractAction('((RequestId))',((Protect?"true":"false")),false)">Reject</button>
+
 </form>[[
 )
 else

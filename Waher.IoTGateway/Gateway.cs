@@ -3155,7 +3155,7 @@ namespace Waher.IoTGateway
 					sb.Append("Link: [`");
 					sb.Append(Request.ContractId);
 					sb.Append("](");
-					sb.Append(GetUrl("/Settings/SignatureRequest.md?RequestId=" + Request.ObjectId));
+					sb.Append(GetUrl("/SignatureRequest.md?RequestId=" + Request.ObjectId));
 					sb.AppendLine(")");
 
 					Markdown = sb.ToString();
@@ -3163,7 +3163,7 @@ namespace Waher.IoTGateway
 				else
 				{
 					Markdown = "**Reminder**: Smart Contract [" + Request.ContractId + "](" +
-						GetUrl("/Settings/SignatureRequest.md?RequestId=" + Request.ObjectId) + ") is waiting for your signature.";
+						GetUrl("/SignatureRequest.md?RequestId=" + Request.ObjectId) + ") is waiting for your signature.";
 				}
 
 				SendNotification(Markdown);

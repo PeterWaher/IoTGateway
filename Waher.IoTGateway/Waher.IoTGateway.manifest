@@ -1,12 +1,12 @@
 ﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
   <Assembly fileName="Waher.IoTGateway.dll"/>
+  <!-- Make sure content files are mirrored in the Waher.IoTGateway.Svc.manifest file as well. -->
   <Folder name="Root">
     <Content fileName="Copyright.md"/>
     <Content fileName="Events.js"/>
     <Content fileName="Login.md"/>
-    <Folder name="Language">
-      <Content fileName="Waher.IoTGateway.en.lng"/>
-    </Folder>
+    <Content fileName="SignatureRequest.js"/>
+    <Content fileName="SignatureRequest.md"/>
     <Folder name="Settings">
       <Content fileName="Backup.md"/>
       <Content fileName="Backup.js"/>
@@ -27,7 +27,6 @@
       <Content fileName="PersonalData.md"/>
       <Content fileName="Restore.js"/>
       <Content fileName="Restore.md"/>
-      <Content fileName="SignatureRequest.md"/>
       <Content fileName="Theme.js"/>
       <Content fileName="Theme.md"/>
       <Content fileName="XMPP.js"/>
@@ -43,5 +42,8 @@
         <Content fileName="WebPages.md"/>
       </Folder>
     </Folder>
+  </Folder>
+  <Folder name="Language">
+    <Content fileName="Waher.IoTGateway.en.lng"/>
   </Folder>
 </Module>

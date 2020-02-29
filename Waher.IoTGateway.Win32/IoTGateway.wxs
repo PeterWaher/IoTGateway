@@ -1229,6 +1229,8 @@
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
+              <File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.js' />
+              <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.md' />
               <File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
 							<RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
@@ -1241,6 +1243,8 @@
 							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
               <RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
               <RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
+              <RemoveFile Id='RemoveSignatureRequest.js' Name='SignatureRequest.js' On='uninstall'/>
+              <RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
               <RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
             </Component>
             <Directory Id='Audio' Name='Audio'>
@@ -1286,7 +1290,6 @@
 								<File Id='Restore.js' Name='Restore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.js'/>
 								<File Id='Restore.md' Name='Restore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.md'/>
                 <File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
-                <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\SignatureRequest.md' />
                 <File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
 								<File Id='Theme.md' Name='Theme.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.md'/>
@@ -1310,7 +1313,6 @@
 								<RemoveFile Id='RemoveRestore.js' Name='Restore.js' On='uninstall'/>
 								<RemoveFile Id='RemoveRestore.md' Name='Restore.md' On='uninstall'/>
                 <RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
-                <RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
                 <RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.md' Name='Theme.md' On='uninstall'/>

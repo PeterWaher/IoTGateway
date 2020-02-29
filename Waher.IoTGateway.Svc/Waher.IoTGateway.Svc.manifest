@@ -346,6 +346,7 @@
   <Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
+  <!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
   <Folder name="Graphics">
     <Content fileName='Emoji1.zip'/>
   </Folder>
@@ -428,8 +429,6 @@
     </Folder>
   </Folder>
   <Folder name="Root">
-    <Content fileName='Prompt.js'/>
-    <Content fileName='Prompt.md'/>
     <Content fileName='Copyright.md'/>
     <Content fileName='Emojis.md'/>
     <Content fileName='Entities.md'/>
@@ -438,7 +437,11 @@
     <Content fileName='Login.md'/>
     <Content fileName='Markdown.md'/>
     <Content fileName='Master.md'/>
+    <Content fileName='Prompt.js'/>
+    <Content fileName='Prompt.md'/>
     <Content fileName='Script.md'/>
+    <Content fileName="SignatureRequest.js"/>
+    <Content fileName="SignatureRequest.md"/>
     <Content fileName='Smileys.md'/>
     <Folder name='Audio'>
       <Content fileName='glass_ping-Go445-1207030150.mp3'/>
@@ -459,14 +462,17 @@
       <Content fileName='Domain.js'/>
       <Content fileName='Domain.md'/>
       <Content fileName='Introduction.md'/>
+      <Content fileName="LegalIdentities.md"/>
+      <Content fileName="LegalIdentity.js"/>
+      <Content fileName="LegalIdentity.md"/>
+      <Content fileName="Master.md"/>
+      <Content fileName="Next.js"/>
       <Content fileName='Notification.js'/>
       <Content fileName='Notification.md'/>
       <Content fileName='PersonalData.js'/>
       <Content fileName='PersonalData.md'/>
       <Content fileName='Restore.js'/>
       <Content fileName='Restore.md'/>
-      <Content fileName='Master.md' />
-      <Content fileName='Next.js'/>
       <Content fileName='Theme.js'/>
       <Content fileName='Theme.md'/>
       <Content fileName='XMPP.js'/>
@@ -529,6 +535,7 @@
     <Content fileName='SnifferXmlToHtml.xslt'/>
   </Folder>
   <Folder name='Language'>
+    <Content fileName="Waher.IoTGateway.en.lng"/>
     <Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
     <Content fileName='Waher.Things.IP.en.lng'/>
     <Content fileName='Waher.Things.Metering.en.lng'/>

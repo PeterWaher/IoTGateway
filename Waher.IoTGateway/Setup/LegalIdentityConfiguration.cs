@@ -4,15 +4,14 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Events;
+using Waher.IoTGateway.Setup.Legal;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
-using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -52,6 +51,7 @@ namespace Waher.IoTGateway.Setup
 		private static LegalIdentity[] approvedIdentities = null;
 
 		private HttpResource applyLegalIdentity = null;
+		private HttpResource contractAction = null;
 
 		private bool useLegalIdentity = false;
 		private bool protectWithPassword = false;
@@ -462,8 +462,21 @@ namespace Waher.IoTGateway.Setup
 		public override Task InitSetup(HttpServer WebServer)
 		{
 			this.applyLegalIdentity = WebServer.Register("/Settings/ApplyLegalIdentity", null, this.ApplyLegalIdentity, true, false, true);
+			this.contractAction = WebServer.Register("/Settings/ContractAction", null, this.ContractAction, false, false, true);
 
 			return base.InitSetup(WebServer);
+		}
+
+		/// <summary>
+		/// Unregisters the setup object.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override Task UnregisterSetup(HttpServer WebServer)
+		{
+			WebServer.Unregister(this.applyLegalIdentity);
+			WebServer.Unregister(this.contractAction);
+
+			return base.UnregisterSetup(WebServer);
 		}
 
 		/// <summary>
@@ -479,17 +492,6 @@ namespace Waher.IoTGateway.Setup
 			this.AddHandlers();
 
 			return base.SetupConfiguration(WebServer);
-		}
-
-		/// <summary>
-		/// Unregisters the setup object.
-		/// </summary>
-		/// <param name="WebServer">Current Web Server object.</param>
-		public override Task UnregisterSetup(HttpServer WebServer)
-		{
-			WebServer.Unregister(this.applyLegalIdentity);
-
-			return base.UnregisterSetup(WebServer);
 		}
 
 		private void ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
@@ -702,32 +704,6 @@ namespace Waher.IoTGateway.Setup
 			return Properties.ToArray();
 		}
 
-		public void Sign(string Content, string LegalId, string Password)
-		{
-			LegalIdentity ID = GetApproved(LegalId);
-			if (ID is null)
-				throw new BadRequestException("Invalid ID or password.");
-
-			if (this.protectWithPassword)
-			{
-				bool? Match = null;
-
-				foreach (AlternativeField F in this.passwordHashes)
-				{
-					if (F.Key == LegalId)
-					{
-						Match = (this.CalcPasswordhash(ID, Password) == F.Value);
-						break;
-					}
-				}
-
-				if (!Match.HasValue || !Match.Value)
-					throw new BadRequestException("Invalid ID or password.");
-			}
-
-			// TODO
-		}
-
 		private static LegalIdentity GetApproved(string LegalId)
 		{
 			if (approvedIdentities is null)
@@ -746,6 +722,98 @@ namespace Waher.IoTGateway.Setup
 
 			return null;
 		}
+
+		private async void ContractAction(HttpRequest Request, HttpResponse Response)
+		{
+			try
+			{
+				Gateway.AssertUserAuthenticated(Request);
+
+				if (!Request.HasData)
+					throw new BadRequestException("No content.");
+
+				string Password;
+				object Obj = Request.DecodeData();
+				if (!(Obj is Dictionary<string, object> Parameters))
+					throw new BadRequestException("Invalid content.");
+
+				if (!Parameters.TryGetValue("requestId", out Obj) || !(Obj is string RequestId) ||
+					!Parameters.TryGetValue("sign", out Obj) || !(Obj is bool Sign) ||
+					!Parameters.TryGetValue("protect", out Obj) || !(Obj is bool Protect))
+				{
+					throw new BadRequestException("Invalid request.");
+				}
+
+				if (Protect)
+				{
+					if (!Parameters.TryGetValue("password", out Obj) || !(Obj is string s))
+						throw new BadRequestException("No password.");
+
+					Password = s;
+				}
+				else
+					Password = string.Empty;
+
+				ContractSignatureRequest SignatureRequest = await Database.LoadObject<ContractSignatureRequest>(RequestId);
+				if (SignatureRequest.Signed.HasValue)
+					throw new BadRequestException("Contract has already been signed.");
+
+				if (Protect)
+				{
+					if (approvedIdentities is null || approvedIdentities.Length == 0)
+						throw new BadRequestException("No approved legal identity found with which to sign the contract.");
+
+					string Id = null;
+
+					foreach (LegalIdentity ID in approvedIdentities)
+					{
+						string H = this.CalcPasswordhash(ID, Password);
+
+						foreach (AlternativeField F in passwordHashes)
+						{
+							if (F.Key == ID.Id)
+							{
+								if (F.Value == H)
+									Id = F.Key;
+
+								break;
+							}
+						}
+
+						if (!string.IsNullOrEmpty(Id))
+							break;
+					}
+
+					if (string.IsNullOrEmpty(Id))
+						throw new BadRequestException("Invalid password.");
+				}
+				else if (this.protectWithPassword)
+					throw new BadRequestException("Legal identities protected with password.");
+
+				if (Sign)
+				{
+					SignatureRequest.Contract = await Gateway.ContractsClient.SignContractAsync(SignatureRequest.Contract, SignatureRequest.Role, false);
+					SignatureRequest.Signed = DateTime.Now;
+					await Database.Update(SignatureRequest);
+				}
+				else
+					await Database.Delete(SignatureRequest);
+
+				Response.StatusCode = 200;
+				Response.ContentType = "application/json";
+				Response.Write(JSON.Encode(Sign, false));
+				Response.SendResponse();
+			}
+			catch (KeyNotFoundException)
+			{
+				Response.SendResponse(new NotFoundException("Content Signature Request not found."));
+			}
+			catch (Exception ex)
+			{
+				Response.SendResponse(ex);
+			}
+		}
+
 
 	}
 }

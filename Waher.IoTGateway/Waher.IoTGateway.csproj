@@ -57,6 +57,7 @@
     <None Remove="Root\Settings\PersonalData\WebPages.md" />
     <None Remove="Root\Settings\Restore.js" />
     <None Remove="Root\Settings\Restore.md" />
+    <None Remove="Root\Settings\SignatureRequest.js" />
     <None Remove="Root\Settings\SignatureRequest.md" />
     <None Remove="Root\Settings\Theme.js" />
     <None Remove="Root\Settings\Theme.md" />
@@ -83,7 +84,10 @@
     <Content Include="Language\Waher.IoTGateway.en.lng">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\SignatureRequest.md">
+    <Content Include="Root\SignatureRequest.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\SignatureRequest.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Backup.js">

@@ -308,7 +308,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Registration">Registration to be performed.</param>
 		/// <param name="TcpPortMapped">What TCP Ports are already mapped.</param>
 		/// <param name="UdpPortMapped">What UDP Ports are already mapped.</param>
-		protected override void BeforeRegistration(InternetGatewayRegistration Registration, 
+		protected override void BeforeRegistration(InternetGatewayRegistration Registration,
 			Dictionary<ushort, bool> TcpPortMapped, Dictionary<ushort, bool> UdpPortMapped)
 		{
 			try
@@ -319,18 +319,13 @@ namespace Waher.Networking.PeerToPeer
 					this.tcpListener.Start(this.backlog);
 
 					int i = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
-					Registration.LocalPort = (ushort)i;
-					if (Registration.ExternalPort == 0)
-						Registration.ExternalPort = Registration.LocalPort;
 
 					if (i < 0 || i > ushort.MaxValue ||
-						TcpPortMapped.ContainsKey((ushort)Registration.ExternalPort) || 
-						UdpPortMapped.ContainsKey((ushort)Registration.ExternalPort))
+						TcpPortMapped.ContainsKey((ushort)i) ||
+						UdpPortMapped.ContainsKey((ushort)i))
 					{
 						this.tcpListener.Stop();
 						this.tcpListener = null;
-
-						throw new ArgumentException("External port already assigned to another application in the network.", nameof(Registration));
 					}
 					else
 					{
@@ -338,6 +333,14 @@ namespace Waher.Networking.PeerToPeer
 						{
 							this.udpClient = new UdpClient(this.tcpListener.LocalEndpoint.AddressFamily);
 							this.udpClient.Client.Bind((IPEndPoint)this.tcpListener.LocalEndpoint);
+
+							Registration.LocalPort = (ushort)i;
+							if (Registration.ExternalPort == 0 ||
+								TcpPortMapped.ContainsKey((ushort)Registration.ExternalPort) ||
+								UdpPortMapped.ContainsKey((ushort)Registration.ExternalPort))
+							{
+								Registration.ExternalPort = Registration.LocalPort;
+							}
 						}
 						catch (Exception)
 						{
@@ -347,7 +350,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 				}
 				while (this.tcpListener is null);
-
+			
 				this.localEndpoint = new IPEndPoint(this.localAddress, Registration.LocalPort);
 				this.externalEndpoint = new IPEndPoint(this.externalAddress, Registration.ExternalPort);
 

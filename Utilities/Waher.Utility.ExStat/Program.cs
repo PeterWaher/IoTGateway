@@ -114,7 +114,8 @@ namespace Waher.Utility.ExStat
 					NewLineHandling = NewLineHandling.Entitize,
 					NewLineOnAttributes = false,
 					OmitXmlDeclaration = false,
-					WriteEndDocumentOnClose = true
+					WriteEndDocumentOnClose = true, 
+					CheckCharacters = false
 				};
 
 				FileOutput = File.Create(XmlFileName);
@@ -157,66 +158,73 @@ namespace Waher.Utility.ExStat
 
 						Console.Out.WriteLine(FileName + "...");
 
-						using (FileStream fs = File.OpenRead(FileName))
+						try
 						{
-							do
+							using (FileStream fs = File.OpenRead(FileName))
 							{
-								SkipHyphens = false;
-								i = 0;
-
-								if (Last > 0)
+								do
 								{
-									if (Last < BufSize)
-										Array.Copy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
-									else
-										SkipHyphens = true;
-
-									Last = 0;
-								}
-
-								NrRead = fs.Read(Buffer, i, BufSize - i);
-								if (NrRead <= 0)
-									break;
-
-								if (SkipHyphens)
-								{
-									while (i < BufSize && NrRead > 0 && Buffer[i] == '-')
-										i++;
-
-									Last = i;
-								}
-								else
-								{
-									NrRead += i;
+									SkipHyphens = false;
 									i = 0;
-								}
 
-								j = NrRead - 4;
-								while (i < j)
-								{
-									if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
-										Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
+									if (Last > 0)
 									{
-										s = Encoding.Default.GetString(Buffer, Last, i - Last);
-										Process(s, Statistics);
+										if (Last < BufSize)
+											Array.Copy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
+										else
+											SkipHyphens = true;
 
-										i += 5;
-										while (i < NrRead && Buffer[i] == '-')
+										Last = 0;
+									}
+
+									NrRead = fs.Read(Buffer, i, BufSize - i);
+									if (NrRead <= 0)
+										break;
+
+									if (SkipHyphens)
+									{
+										while (i < BufSize && NrRead > 0 && Buffer[i] == '-')
 											i++;
 
 										Last = i;
 									}
 									else
-										i++;
+									{
+										NrRead += i;
+										i = 0;
+									}
+
+									j = NrRead - 4;
+									while (i < j)
+									{
+										if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
+											Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
+										{
+											s = Encoding.Default.GetString(Buffer, Last, i - Last);
+											Process(s, Statistics);
+
+											i += 5;
+											while (i < NrRead && Buffer[i] == '-')
+												i++;
+
+											Last = i;
+										}
+										else
+											i++;
+									}
+								}
+								while (NrRead == BufSize);
+
+								if (Last < NrRead)
+								{
+									s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
+									Process(s, Statistics);
 								}
 							}
-							while (NrRead == BufSize);
-
-							if (Last < NrRead)
-							{
-								s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
-								Process(s, Statistics);
-							}
+						}
+						catch (Exception ex)
+						{
+							Console.Out.WriteLine(ex.Message);
 						}
 					}
 

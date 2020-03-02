@@ -26,6 +26,7 @@ using Waher.Events.Files;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.IoTGateway.Events;
+using Waher.IoTGateway.Exceptions;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
@@ -319,6 +320,29 @@ namespace Waher.IoTGateway
 									Directory.CreateDirectory(exceptionFolder);
 
 								DateTime Now = DateTime.Now;
+								string[] ExceptionFiles = Directory.GetFiles(exceptionFolder, "*.txt", SearchOption.TopDirectoryOnly);
+								foreach (string ExceptionFile in ExceptionFiles)
+								{
+									try
+									{
+										DateTime TP = File.GetCreationTime(ExceptionFile);
+										if ((TP - Now).TotalDays > 90)
+											File.Delete(ExceptionFile);
+										else
+										{
+											string XmlFile = Path.ChangeExtension(ExceptionFile, "xml");
+											if (!File.Exists(XmlFile))
+											{
+												Log.Informational("Processing " + ExceptionFile);
+												Analyze.Process(ExceptionFile, XmlFile);
+											}
+										}
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex, ExceptionFile);
+									}
+								}
 
 								exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
 									" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
@@ -330,11 +354,11 @@ namespace Waher.IoTGateway
 
 								AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
 								{
-									if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
-										return;
-
 									lock (exceptionFile)
 									{
+										if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+											return;
+
 										exceptionFile.WriteLine(new string('-', 80));
 										exceptionFile.Write("Type: ");
 
@@ -1520,10 +1544,10 @@ namespace Waher.IoTGateway
 
 				if (exportExceptions)
 				{
-					exportExceptions = false;
-
 					lock (exceptionFile)
 					{
+						exportExceptions = false;
+
 						exceptionFile.WriteLine(new string('-', 80));
 						exceptionFile.Write("End of export: ");
 						exceptionFile.WriteLine(DateTime.Now.ToString());

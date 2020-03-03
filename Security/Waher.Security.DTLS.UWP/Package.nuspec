@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="3.2">
+    <id>Waher.Security.DTLS.UWP</id>
+    <version>1.0.3</version>
+    <title>Waher.Security.DTLS.UWP</title>
+    <authors>Peter Waher</authors>
+    <owners>Waher Data AB</owners>
+    <license type="file">Meta\LICENSE.txt</license>
+    <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Security.DTLS.UWP</projectUrl>
+    <icon>Meta\Icon_64x64.png</icon>
+    <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Light-weight class library implementing Datagram Transport Layer Security (DTLS) Version 1.2, as defined in RFC 6347. Supports Pre-shared keys and AES CCM. Loosely coupled communication layer interface. DTLS over UDP has predefined interfaces.</description>
+    <copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</copyright>
+    <tags>security DTLS UDP</tags>
+    <dependencies>
+      <dependency id="Waher.Events" version="1.0.10"/>
+      <dependency id="Waher.Networking.UWP" version="1.0.13"/>
+      <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.11"/>
+      <dependency id="Waher.Runtime.Timing" version="1.0.2"/>
+      <dependency id="Waher.Security" version="1.0.4"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\Images\Icon_64x64.png" target="Meta" />
+    <file src="..\..\LICENSE.txt" target="Meta" />
+
+    <!-- Architecture-independent reference library for use at compile-time. -->
+    <file src="bin\Release\Waher.Security.DTLS.UWP.dll" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Security.DTLS.UWP.pdb" target="ref\uap10.0" />
+
+    <!-- XML documentation file goes together with the reference library. -->
+    <file src="bin\Release\Waher.Security.DTLS.UWP.XML" target="ref\uap10.0" />
+
+    <!-- Resource files go together with the reference library. -->
+    <file src="bin\Release\Waher.Security.DTLS.UWP.pri" target="ref\uap10.0" />
+
+    <!-- The architecture-specific files go in architecture-specific directories. -->
+    <file src="bin\x86\Release\Waher.Security.DTLS.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Release\Waher.Security.DTLS.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
+
+    <file src="bin\x64\Release\Waher.Security.DTLS.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Release\Waher.Security.DTLS.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
+
+    <file src="bin\arm\Release\Waher.Security.DTLS.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Release\Waher.Security.DTLS.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
+  </files>
+</package>

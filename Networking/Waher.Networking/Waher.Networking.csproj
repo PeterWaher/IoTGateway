@@ -6,7 +6,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Library that provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc.</Description>
+    <Description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, etc.</Description>
     <Copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking</PackageProjectUrl>

@@ -2265,8 +2265,9 @@ namespace Waher.Persistence.Serialization
 					Type T = A.GetType(Type.Namespace + ".Binary.Serializer" + TypeName + this.context.Id);
 					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
 				}
-				catch (FileLoadException)
+				catch (FileLoadException ex)
 				{
+					Log.Notice(ex.Message, Type.FullName);
 					this.customSerializer = new ObjectSerializer(Type, Context, false);
 				}
 			}

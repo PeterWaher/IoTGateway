@@ -8,7 +8,7 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// Exception related to a file.
 	/// </summary>
-	public class FileException : IOException, IObject, ITags
+	public class FileException : IOException, IEventObject, IEventTags
 	{
 		private readonly string fileName;
 		private readonly string collection;

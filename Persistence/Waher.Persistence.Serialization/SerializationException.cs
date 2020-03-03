@@ -8,7 +8,7 @@ namespace Waher.Persistence.Serialization
 	/// <summary>
 	/// Exception ocurring during serialization or deserialization of objects.
 	/// </summary>
-	public class SerializationException : Exception, IObject
+	public class SerializationException : Exception, IEventObject
 	{
 		private readonly Type type;
 

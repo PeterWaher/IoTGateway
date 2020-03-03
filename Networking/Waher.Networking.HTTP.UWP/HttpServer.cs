@@ -990,7 +990,7 @@ namespace Waher.Networking.HTTP
 				if (!this.resources.ContainsKey(Resource.ResourceName))
 					this.resources[Resource.ResourceName] = Resource;
 				else
-					throw new Exception("Resource name already registered.");
+					throw new Exception("Resource name already registered: " + Resource.ResourceName);
 			}
 
 			Resource.AddReference(this);

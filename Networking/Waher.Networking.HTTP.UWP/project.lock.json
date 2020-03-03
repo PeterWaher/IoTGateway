@@ -2447,11 +2447,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -4955,11 +4954,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -7499,11 +7497,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -10016,11 +10013,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -12569,11 +12565,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -15086,11 +15081,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -17639,11 +17633,10 @@
           "Waher.Events": "1.0.10"
         }
       },
-      "Waher.Networking/1.0.13": {
+      "Waher.Networking.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.10"
         }
       },
@@ -27557,10 +27550,10 @@
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"
     },
-    "Waher.Networking/1.0.13": {
+    "Waher.Networking.UWP/1.0.0": {
       "type": "project",
-      "path": "../Waher.Networking/Waher.Networking.csproj",
-      "msbuildProject": "../Waher.Networking/Waher.Networking.csproj"
+      "path": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj",
+      "msbuildProject": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj"
     },
     "Waher.Runtime.Cache/1.0.2": {
       "type": "project",
@@ -27627,8 +27620,8 @@
             "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"

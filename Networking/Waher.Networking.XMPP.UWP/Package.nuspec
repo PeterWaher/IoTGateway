@@ -49,7 +49,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
       <dependency id="Waher.Content" version="1.0.23"/>
       <dependency id="Waher.Content.Xml" version="1.0.7"/>
       <dependency id="Waher.Events" version="1.0.10"/>
-      <dependency id="Waher.Networking" version="1.0.13"/>
+      <dependency id="Waher.Networking.UWP" version="1.0.13"/>
       <dependency id="Waher.Persistence" version="1.0.14"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.2"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.0.11"/>
@@ -65,7 +65,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <file src="bin\Release\Waher.Networking.XMPP.UWP.pdb" target="ref\uap10.0" />
 
     <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\x86\Release\Waher.Networking.XMPP.UWP.XML" target="ref\uap10.0" />
+    <file src="bin\Release\Waher.Networking.XMPP.UWP.XML" target="ref\uap10.0" />
 
     <!-- Resource files go together with the reference library. -->
     <file src="bin\Release\Waher.Networking.XMPP.UWP.pri" target="ref\uap10.0" />

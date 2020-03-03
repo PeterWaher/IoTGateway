@@ -187,9 +187,9 @@
       <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj">
-      <Project>{889eb36c-e000-4afe-b4e5-1398db29c919}</Project>
-      <Name>Waher.Security.DTLS</Name>
+    <ProjectReference Include="..\..\Security\Waher.Security.DTLS.UWP\Waher.Security.DTLS.UWP.csproj">
+      <Project>{8b4c7493-0cc3-40c1-926b-00915dcd0ba2}</Project>
+      <Name>Waher.Security.DTLS.UWP</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
@@ -199,9 +199,9 @@
       <Project>{d179c961-74c2-4f9e-886d-f219f0435948}</Project>
       <Name>Waher.Networking.CoAP.UWP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
+    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
+      <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
+      <Name>Waher.Networking.UWP</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

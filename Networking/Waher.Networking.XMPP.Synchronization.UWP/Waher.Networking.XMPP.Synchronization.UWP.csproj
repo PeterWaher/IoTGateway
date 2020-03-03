@@ -129,13 +129,13 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
+      <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
+      <Name>Waher.Networking.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.UWP\Waher.Networking.XMPP.UWP.csproj">
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -46,12 +46,12 @@ namespace Waher.Networking
 		private readonly CancellationTokenSource source;
 #endif
 		private readonly object synchObj = new object();
+		private readonly bool sniffBinary;
 		private bool connecting = false;
 		private bool connected = false;
 		private bool disposing = false;
 		private bool disposed = false;
 		private bool sending = false;
-		private bool sniffBinary;
 
 		/// <summary>
 		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>

@@ -5,7 +5,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+#if WINDOWS_UWP
+using Windows.Foundation;
+using Windows.Networking;
+using Windows.Networking.Sockets;
+using Windows.Security.Cryptography;
+using Windows.Storage.Streams;
+#endif
 using Waher.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking
 {
@@ -21,36 +29,70 @@ namespace Waher.Networking
 	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
 	/// permitted pace.
 	/// </summary>
-	public class BinaryTcpClient : IDisposable, IBinaryTransportLayer
+	public class BinaryTcpClient : Sniffable, IDisposable, IBinaryTransportLayer
 	{
 		private const int BufferSize = 65536;
 
 		private readonly LinkedList<KeyValuePair<byte[], EventHandler>> queue = new LinkedList<KeyValuePair<byte[], EventHandler>>();
+#if WINDOWS_UWP
+		private readonly MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
+		private readonly StreamSocket client;
+		private readonly IBuffer buffer = null;
+		private DataWriter dataWriter = null;
+#else
 		private readonly byte[] buffer = new byte[BufferSize];
-		private readonly object synchObj = new object();
-		private readonly CancellationTokenSource source;
 		private readonly TcpClient tcpClient;
 		private Stream stream = null;
+		private readonly CancellationTokenSource source;
+#endif
+		private readonly object synchObj = new object();
 		private bool connecting = false;
 		private bool connected = false;
 		private bool disposing = false;
 		private bool disposed = false;
 		private bool sending = false;
+		private bool sniffBinary;
 
 		/// <summary>
 		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
 		/// safe, making sure it can be disposed, even during an active connection attempt.
 		/// </summary>
-		public BinaryTcpClient()
+		/// <param name="Sniffers">Sniffers.</param>
+		public BinaryTcpClient(params ISniffer[] Sniffers)
+			: this(true, Sniffers)
 		{
-			this.tcpClient = new TcpClient();
-			this.source = new CancellationTokenSource();
 		}
 
+		/// <summary>
+		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt.
+		/// </summary>
+		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected BinaryTcpClient(bool SniffBinary, params ISniffer[] Sniffers)
+			: base(Sniffers)
+		{
+			this.sniffBinary = SniffBinary;
+#if WINDOWS_UWP
+			this.buffer = Windows.Storage.Streams.Buffer.CreateCopyFromMemoryBuffer(this.memoryBuffer);
+			this.client = new StreamSocket();
+#else
+			this.tcpClient = new TcpClient();
+			this.source = new CancellationTokenSource();
+#endif
+		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Underlying <see cref="StreamSocket"/> object.
+		/// </summary>
+		public StreamSocket Client => this.client;
+#else
 		/// <summary>
 		/// Underlying <see cref="TcpClient"/> object.
 		/// </summary>
 		public TcpClient Client => this.tcpClient;
+#endif
 
 		/// <summary>
 		/// Connects to a host using TCP.
@@ -61,8 +103,13 @@ namespace Waher.Networking
 		public async Task<bool> ConnectAsync(string Host, int Port)
 		{
 			this.PreConnect();
+#if WINDOWS_UWP
+			await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);
+			return await this.PostConnect();
+#else
 			await this.tcpClient.ConnectAsync(Host, Port);
 			return this.PostConnect();
+#endif
 		}
 
 		/// <summary>
@@ -74,10 +121,16 @@ namespace Waher.Networking
 		public async Task<bool> ConnectAsync(IPAddress Address, int Port)
 		{
 			this.PreConnect();
+#if WINDOWS_UWP
+			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
+			return await this.PostConnect();
+#else
 			await this.tcpClient.ConnectAsync(Address, Port);
 			return this.PostConnect();
+#endif
 		}
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Connects to a host using TCP.
 		/// </summary>
@@ -90,6 +143,7 @@ namespace Waher.Networking
 			await this.tcpClient.ConnectAsync(Addresses, Port);
 			return this.PostConnect();
 		}
+#endif
 
 		private void PreConnect()
 		{
@@ -108,8 +162,16 @@ namespace Waher.Networking
 			}
 		}
 
+#if WINDOWS_UWP
+		private async Task<bool> PostConnect()
+#else
 		private bool PostConnect()
+#endif
 		{
+#if WINDOWS_UWP
+			bool DoDispose = false;
+#endif
+
 			lock (this.synchObj)
 			{
 				this.connecting = false;
@@ -118,21 +180,29 @@ namespace Waher.Networking
 					return false;
 
 				if (this.disposing)
+#if WINDOWS_UWP
+					DoDispose = true;
+#else
 				{
-					this.stream = null;
-					this.disposed = true;
-					this.disposing = false;
-					this.connected = false;
-					this.queue.Clear();
-					this.source.Cancel();
-					this.tcpClient.Dispose();
+					this.DoDisposeLocked();
 					return false;
 				}
-
-				this.connected = true;
+#endif
+				else
+					this.connected = true;
 			}
 
+#if WINDOWS_UWP
+			if (DoDispose)
+			{
+				await this.DoDispose();
+				return false;
+			}
+
+			this.dataWriter = new DataWriter(this.client.OutputStream);
+#else
 			this.stream = this.tcpClient.GetStream();
+#endif
 			this.BeginRead();
 
 			return true;
@@ -150,25 +220,52 @@ namespace Waher.Networking
 					throw new ObjectDisposedException("Object already disposed.");
 
 				if (this.connecting)
-					this.disposing = true;
-				else
 				{
-					this.disposed = true;
-					this.connecting = false;
-					this.connected = false;
-					this.stream = null;
-					this.queue.Clear();
-					this.source.Cancel();
-					this.tcpClient.Dispose();
+					this.disposing = true;
+					return;
 				}
+
+#if !WINDOWS_UWP
+				this.DoDisposeLocked();
+#endif
 			}
+
+#if WINDOWS_UWP
+			Task _ = this.DoDispose();
+#endif
+		}
+
+#if WINDOWS_UWP
+		private async Task DoDispose()
+#else
+		private void DoDisposeLocked()
+#endif
+		{
+			this.disposed = true;
+			this.connecting = false;
+			this.connected = false;
+			this.queue.Clear();
+#if WINDOWS_UWP
+			await this.client.CancelIOAsync();
+			this.client.Dispose();
+			this.memoryBuffer.Dispose();
+			this.dataWriter.Dispose();
+#else
+			this.stream = null;
+			this.source.Cancel();
+			this.tcpClient.Dispose();
+#endif
 		}
 
 		private async void BeginRead()
 		{
 			try
 			{
+#if WINDOWS_UWP
+				IInputStream InputStream;
+#else
 				Stream Stream;
+#endif
 				int NrRead;
 
 				while (true)
@@ -178,21 +275,41 @@ namespace Waher.Networking
 						if (this.disposing || this.disposed)
 							break;
 
+#if WINDOWS_UWP
+						InputStream = this.client.InputStream;
+						if (InputStream is null)
+							break;
+#else
 						Stream = this.stream;
 						if (Stream is null)
 							break;
+#endif
 					}
 
-					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.source.Token);
-					if (this.stream is null || NrRead <= 0)
+#if WINDOWS_UWP
+					IBuffer DataRead = await InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
+					if (DataRead.Length == 0)
 						break;
+
+					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Packet);
+					if (Packet is null)
+						break;
+
+					NrRead = Packet.Length;
+					if (this.disposed || NrRead <= 0)
+						break;
+#else
+					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.source.Token);
+					if (this.disposed || NrRead <= 0)
+						break;
+
+					byte[] Packet = new byte[NrRead];
+					Array.Copy(this.buffer, 0, Packet, 0, NrRead);
+#endif
 
 					try
 					{
-						byte[] Packet = new byte[NrRead];
-						Array.Copy(this.buffer, 0, Packet, 0, NrRead);
-
-						this.BinaryDataReceived(Packet);
+						await this.BinaryDataReceived(Packet);
 					}
 					catch (Exception ex)
 					{
@@ -210,9 +327,12 @@ namespace Waher.Networking
 		/// Method called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary data received.</param>
-		protected virtual void BinaryDataReceived(byte[] Data)
+		protected virtual Task BinaryDataReceived(byte[] Data)
 		{
-			this.OnReceived?.Invoke(this, Data);
+			if (this.sniffBinary && this.HasSniffers)
+				this.ReceiveBinary(Data);
+
+			return this.OnReceived?.Invoke(this, Data) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -223,6 +343,9 @@ namespace Waher.Networking
 		{
 			try
 			{
+				if (this.HasSniffers)
+					this.Error(ex.Message);
+
 				OnError?.Invoke(this, ex);
 			}
 			catch (Exception ex2)
@@ -267,7 +390,11 @@ namespace Waher.Networking
 
 			try
 			{
+#if WINDOWS_UWP
+				DataWriter DataWriter;
+#else
 				Stream Stream;
+#endif
 
 				while (true)
 				{
@@ -310,19 +437,29 @@ namespace Waher.Networking
 							}
 						}
 
+#if WINDOWS_UWP
+						DataWriter = this.dataWriter;
+						if (DataWriter is null)
+#else
 						Stream = this.stream;
 						if (Stream is null)
+#endif
 						{
 							this.sending = false;
 							break;
 						}
 					}
 
+#if WINDOWS_UWP
+					DataWriter.WriteBytes(Packet);
+					await this.dataWriter.StoreAsync();
+#else
 					await Stream.WriteAsync(Packet, 0, Packet.Length, this.source.Token);
+#endif
 
 					try
 					{
-						this.BinaryDataSent(Packet);
+						await this.BinaryDataSent(Packet);
 					}
 					catch (Exception ex)
 					{
@@ -355,14 +492,18 @@ namespace Waher.Networking
 		/// Method called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary data received.</param>
-		protected virtual void BinaryDataSent(byte[] Data)
+		protected virtual Task BinaryDataSent(byte[] Data)
 		{
-			this.OnSent?.Invoke(this, Data);
+			if (this.sniffBinary && this.HasSniffers)
+				this.TransmitBinary(Data);
+
+			return this.OnSent?.Invoke(this, Data) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
 		public event BinaryEventHandler OnSent;
+
 	}
 }

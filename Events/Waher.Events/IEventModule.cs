@@ -5,15 +5,15 @@ using System.Text;
 namespace Waher.Events
 {
 	/// <summary>
-	/// Implement this interface on exception classes to allow the log to extract object information in corresponding events.
+	/// Implement this interface on exception classes to allow the log to extract module information in corresponding events.
 	/// Interface can also be used on other types of classes.
 	/// </summary>
-	public interface IObject
+	public interface IEventModule
 	{
 		/// <summary>
-		/// Object identifier related to the object.
+		/// Module identifier related to the object.
 		/// </summary>
-		string Object
+		string Module
 		{
 			get;
 		}

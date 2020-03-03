@@ -8,7 +8,7 @@ namespace Waher.Events
 	/// Implement this interface on exception classes to allow the log to extract actor information in corresponding events.
 	/// Interface can also be used on other types of classes.
 	/// </summary>
-	public interface IActor
+	public interface IEventActor
 	{
 		/// <summary>
 		/// Actor identifier related to the object.

@@ -44,13 +44,6 @@ using Waher.Security;
 namespace Waher.Networking.XMPP
 {
 	/// <summary>
-	/// Connection error event handler delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Exception">Information about error received.</param>
-	public delegate void XmppExceptionEventHandler(object Sender, Exception Exception);
-
-	/// <summary>
 	/// Event handler delegate for state change events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
@@ -797,7 +790,7 @@ namespace Waher.Networking.XMPP
 
 		internal void ConnectionError(Exception ex)
 		{
-			XmppExceptionEventHandler h = this.OnConnectionError;
+			ExceptionEventHandler h = this.OnConnectionError;
 			if (h != null)
 			{
 				try
@@ -830,7 +823,7 @@ namespace Waher.Networking.XMPP
 			{
 				this.Error(Exception.Message);
 
-				XmppExceptionEventHandler h = this.OnError;
+				ExceptionEventHandler h = this.OnError;
 				if (h != null)
 				{
 					try
@@ -848,12 +841,12 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a connection to a broker could not be made.
 		/// </summary>
-		public event XmppExceptionEventHandler OnConnectionError = null;
+		public event ExceptionEventHandler OnConnectionError = null;
 
 		/// <summary>
 		/// Event raised when an error was encountered.
 		/// </summary>
-		public event XmppExceptionEventHandler OnError = null;
+		public event ExceptionEventHandler OnError = null;
 
 		/// <summary>
 		/// Host or IP address of XMPP server.

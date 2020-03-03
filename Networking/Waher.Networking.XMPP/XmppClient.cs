@@ -691,19 +691,24 @@ namespace Waher.Networking.XMPP
 
 				if (this.textTransportLayer is null)
 				{
-#if WINDOWS_UWP
-					this.client = new StreamSocket();
-					await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
-
-					this.dataReader = new DataReader(this.client.InputStream);
-					this.dataWriter = new DataWriter(this.client.OutputStream);
-#else
-					this.client = new TcpClient();
 					try
 					{
-						await this.client.ConnectAsync(Host, Port);
-						if (this.client is null)
+#if WINDOWS_UWP
+						StreamSocket TempClient = this.client = new StreamSocket();
+						await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
+						if (this.client != TempClient)
 							return;
+
+						this.dataReader = new DataReader(this.client.InputStream);
+						this.dataWriter = new DataWriter(this.client.OutputStream);
+#else
+						TcpClient TempClient = this.client = new TcpClient();
+						await this.client.ConnectAsync(Host, Port);
+						if (this.client != TempClient)
+							return;
+
+						this.stream = new NetworkStream(this.client.Client, false);
+#endif
 					}
 					catch (NullReferenceException)
 					{
@@ -718,8 +723,6 @@ namespace Waher.Networking.XMPP
 						return; // Disposed
 					}
 
-					this.stream = new NetworkStream(this.client.Client, false);
-#endif
 					this.State = XmppState.StreamNegotiation;
 
 					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
@@ -1127,20 +1130,24 @@ namespace Waher.Networking.XMPP
 			}
 
 #if WINDOWS_UWP
+			StreamSocket TempClient = this.client;
+			this.client = null;
+
 			this.dataReader?.Dispose();
 			this.dataReader = null;
 
 			this.dataWriter?.Dispose();
 			this.dataWriter = null;
 
-			this.client?.Dispose();
-			this.client = null;
+			TempClient?.Dispose();
 #else
+			TcpClient TempClient = this.client;
+			this.client = null;
+
 			this.stream?.Dispose();
 			this.stream = null;
 
-			this.client?.Dispose();
-			this.client = null;
+			TempClient?.Dispose();
 #endif
 			if (this.textTransportLayer is IAlternativeTransport AlternativeTransport)
 				AlternativeTransport.CloseSession();
@@ -1909,20 +1916,24 @@ namespace Waher.Networking.XMPP
 		{
 			this.inputState = -1;
 #if WINDOWS_UWP
+			StreamSocket TempClient = this.client;
+			this.client = null;
+
 			this.dataWriter?.Dispose();
 			this.dataWriter = null;
 
 			this.dataReader?.Dispose();
 			this.dataReader = null;
 
-			this.client?.Dispose();
-			this.client = null;
+			TempClient?.Dispose();
 #else
+			TcpClient TempClient = this.client;
+			this.client = null;
+
 			this.stream?.Dispose();
 			this.stream = null;
 
-			this.client?.Dispose();
-			this.client = null;
+			TempClient?.Dispose();
 #endif
 			ITextTransportLayer TTL;
 

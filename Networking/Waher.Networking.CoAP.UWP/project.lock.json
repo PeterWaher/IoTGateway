@@ -2443,6 +2443,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -4962,6 +4963,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -7517,6 +7519,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -10045,6 +10048,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -12609,6 +12613,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -15137,6 +15142,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },
@@ -17701,6 +17707,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.8",
           "Waher.Events": "1.0.10"
         }
       },

@@ -72,8 +72,8 @@ namespace Waher.Networking.XMPP.Test
 			};
 			//this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
-			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new ExceptionEventHandler(Client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 
 			this.client.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
@@ -89,8 +89,8 @@ namespace Waher.Networking.XMPP.Test
 
 			this.component.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 
-			this.component.OnConnectionError += new XmppExceptionEventHandler(Component_OnConnectionError);
-			this.component.OnError += new XmppExceptionEventHandler(Component_OnError);
+			this.component.OnConnectionError += new ExceptionEventHandler(Component_OnConnectionError);
+			this.component.OnError += new ExceptionEventHandler(Component_OnError);
 			this.component.OnStateChanged += new StateChangedEventHandler(Component_OnStateChanged);
 
 			this.WaitConnected(10000);

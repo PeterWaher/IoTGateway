@@ -207,7 +207,7 @@ namespace Waher.Networking.XMPP
 
 		private void ConnectionError(Exception ex)
 		{
-			XmppExceptionEventHandler h = this.OnConnectionError;
+			ExceptionEventHandler h = this.OnConnectionError;
 			if (h != null)
 			{
 				try
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.Error(ex.Message);
 
-			XmppExceptionEventHandler h = this.OnError;
+			ExceptionEventHandler h = this.OnError;
 			if (h != null)
 			{
 				try
@@ -248,12 +248,12 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a connection to a broker could not be made.
 		/// </summary>
-		public event XmppExceptionEventHandler OnConnectionError = null;
+		public event ExceptionEventHandler OnConnectionError = null;
 
 		/// <summary>
 		/// Event raised when an error was encountered.
 		/// </summary>
-		public event XmppExceptionEventHandler OnError = null;
+		public event ExceptionEventHandler OnError = null;
 
 		/// <summary>
 		/// Host or IP address of XMPP server.
@@ -2413,6 +2413,7 @@ namespace Waher.Networking.XMPP
 		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
 		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>

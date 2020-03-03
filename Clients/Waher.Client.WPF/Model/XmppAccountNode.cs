@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using Waher.Events;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -183,7 +184,7 @@ namespace Waher.Client.WPF.Model
 				this.client.AddRange(Sniffers);
 
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
-			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnError += new ExceptionEventHandler(Client_OnError);
 			this.client.OnPresence += new PresenceEventHandler(Client_OnPresence);
 			this.client.OnPresenceSubscribe += new PresenceEventHandler(Client_OnPresenceSubscribe);
 			this.client.OnPresenceUnsubscribe += new PresenceEventHandler(Client_OnPresenceUnsubscribe);

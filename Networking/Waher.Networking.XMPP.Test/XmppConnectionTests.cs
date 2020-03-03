@@ -62,8 +62,8 @@ namespace Waher.Networking.XMPP.Test
 
 			this.client.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 
-			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new ExceptionEventHandler(Client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.Connect();
 		}
@@ -216,8 +216,8 @@ namespace Waher.Networking.XMPP.Test
 			this.Connection_Test_03_Disconnect();
 
 			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
-			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new ExceptionEventHandler(Client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.Connect();
 

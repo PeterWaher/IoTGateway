@@ -11,7 +11,8 @@ namespace Waher.Networking
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Packet">Binary packet.</param>
-	public delegate Task BinaryEventHandler(object Sender, byte[] Packet);
+	/// <returns>If the process should be continued.</returns>
+	public delegate Task<bool> BinaryEventHandler(object Sender, byte[] Packet);
 
 	/// <summary>
 	/// Interface for binary transport layers.

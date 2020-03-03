@@ -623,13 +623,13 @@ namespace Waher.Networking.XMPP
 			this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
 		}
 
-		private bool TextTransportLayer_OnSent(object Sender, string Packet)
+		private Task<bool> TextTransportLayer_OnSent(object _, string Packet)
 		{
 			this.TransmitText(Packet);
-			return true;
+			return Task.FromResult<bool>(true);
 		}
 
-		private bool TextTransportLayer_OnReceived(object Sender, string Packet)
+		private Task<bool> TextTransportLayer_OnReceived(object _, string Packet)
 		{
 			if (this.openBracketReceived)
 			{
@@ -641,12 +641,12 @@ namespace Waher.Networking.XMPP
 			else
 				this.ReceiveText(Packet);
 
-			return this.ProcessFragment(Packet);
+			return Task.FromResult<bool>(this.ProcessFragment(Packet));
 		}
 
-		private bool TextTransportLayer_OnReceived_NoSniff(object Sender, string Packet)
+		private Task<bool> TextTransportLayer_OnReceived_NoSniff(object _, string Packet)
 		{
-			return this.ProcessFragment(Packet);
+			return Task.FromResult<bool>(this.ProcessFragment(Packet));
 		}
 
 		/// <summary>

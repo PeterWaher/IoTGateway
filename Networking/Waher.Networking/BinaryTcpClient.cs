@@ -52,6 +52,7 @@ namespace Waher.Networking
 		private bool disposing = false;
 		private bool disposed = false;
 		private bool sending = false;
+		private bool reading = false;
 
 		/// <summary>
 		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
@@ -257,6 +258,22 @@ namespace Waher.Networking
 #endif
 		}
 
+		/// <summary>
+		/// Continues reading from the socket, if paused in an event handler.
+		/// </summary>
+		public void Continue()
+		{
+			lock (this.synchObj)
+			{
+				if (this.reading)
+					throw new InvalidOperationException("Already in a reading state.");
+
+				this.reading = true;
+			}
+
+			this.BeginRead();
+		}
+
 		private async void BeginRead()
 		{
 			try
@@ -267,8 +284,9 @@ namespace Waher.Networking
 				Stream Stream;
 #endif
 				int NrRead;
+				bool Continue = true;
 
-				while (true)
+				while (Continue)
 				{
 					lock (this.synchObj)
 					{
@@ -309,7 +327,7 @@ namespace Waher.Networking
 
 					try
 					{
-						await this.BinaryDataReceived(Packet);
+						Continue = await this.BinaryDataReceived(Packet);
 					}
 					catch (Exception ex)
 					{
@@ -321,18 +339,23 @@ namespace Waher.Networking
 			{
 				this.Error(ex);
 			}
+			finally
+			{
+				this.reading = false;
+			}
 		}
 
 		/// <summary>
 		/// Method called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary data received.</param>
-		protected virtual Task BinaryDataReceived(byte[] Data)
+		/// <returns>If the process should be continued.</returns>
+		protected virtual Task<bool> BinaryDataReceived(byte[] Data)
 		{
 			if (this.sniffBinary && this.HasSniffers)
 				this.ReceiveBinary(Data);
 
-			return this.OnReceived?.Invoke(this, Data) ?? Task.CompletedTask;
+			return this.OnReceived?.Invoke(this, Data) ?? Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
@@ -489,9 +512,9 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Method called when binary data has been received.
+		/// Method called when binary data has been sent.
 		/// </summary>
-		/// <param name="Data">Binary data received.</param>
+		/// <param name="Data">Binary data sent.</param>
 		protected virtual Task BinaryDataSent(byte[] Data)
 		{
 			if (this.sniffBinary && this.HasSniffers)

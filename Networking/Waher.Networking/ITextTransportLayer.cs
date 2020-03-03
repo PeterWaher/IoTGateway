@@ -12,7 +12,7 @@ namespace Waher.Networking
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Packet">Text packet.</param>
 	/// <returns>If the process should be continued.</returns>
-	public delegate bool TextEventHandler(object Sender, string Packet);
+	public delegate Task<bool> TextEventHandler(object Sender, string Packet);
 
 	/// <summary>
 	/// Interface for text transport layers.

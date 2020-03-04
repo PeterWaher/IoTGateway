@@ -27,12 +27,14 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public TextTcpClient(Encoding Encoding, params ISniffer[] Sniffers)
-			: this(Encoding, false, Sniffers)
+			: this(Encoding, true, Sniffers)
 		{
 		}
 
 		/// <summary>
-		/// Implements a text-based TCP Client.
+		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+		/// permitted pace.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
@@ -43,6 +45,66 @@ namespace Waher.Networking
 			this.encoding = Encoding;
 			this.sniffText = SniffText;
 		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+		/// permitted pace.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public TextTcpClient(StreamSocket Client, Encoding Encoding, params ISniffer[] Sniffers)
+			: this(Client, Encoding, true, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+		/// permitted pace.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected TextTcpClient(StreamSocket Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
+			: base(Client, false, Sniffers)
+		{
+			this.encoding = Encoding;
+			this.sniffText = SniffText;
+		}
+#else
+		/// <summary>
+		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+		/// permitted pace.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public TextTcpClient(TcpClient Client, Encoding Encoding, params ISniffer[] Sniffers)
+			: this(Client, Encoding, true, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+		/// permitted pace.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected TextTcpClient(TcpClient Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
+			: base(Client, false, Sniffers)
+		{
+			this.encoding = Encoding;
+			this.sniffText = SniffText;
+		}
+#endif
 
 		/// <summary>
 		/// Text encoding to use.

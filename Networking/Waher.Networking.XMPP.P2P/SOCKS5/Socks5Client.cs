@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Security;
@@ -58,21 +59,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class Socks5Client : Sniffable, IDisposable
 	{
-		private const int BufferSize = 65536;
-
-		private TcpClient client;
-		private NetworkStream stream = null;
+		private BinaryTcpClient client;
 		private Socks5State state = Socks5State.Offline;
-		private LinkedList<byte[]> queue = new LinkedList<byte[]>();
+		private readonly object synchObj = new object();
 		private readonly string host;
 		private readonly int port;
 		private readonly string jid;
-		private byte[] inputBuffer;
-		private bool isWriting = false;
 		private bool closeWhenDone = false;
 		private bool disposed = false;
 		private object callbackState;
 		private object tag = null;
+		private bool isWriting = false;
 
 		/// <summary>
 		/// Client used for SOCKS5 communication.
@@ -91,8 +88,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.State = Socks5State.Connecting;
 			this.Information("Connecting to " + this.host + ":" + this.port.ToString());
 
-			this.client = new TcpClient();
-
+			this.client = new BinaryTcpClient();
 			this.Connect();
 		}
 
@@ -100,15 +96,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			try
 			{
+				this.client.OnReceived += this.Client_OnReceived;
+				this.client.OnSent += this.Client_OnSent;
+				this.client.OnError += this.Client_OnError;
+				this.client.OnDisconnected += this.Client_OnDisconnected;
+				this.client.OnWriteQueueEmpty += this.Client_OnWriteQueueEmpty;
+
 				await this.client.ConnectAsync(this.host, this.port);
 				if (this.disposed)
 					return;
 
 				this.Information("Connected to " + this.host + ":" + this.port.ToString());
-
-				this.stream = this.client.GetStream();
-				this.inputBuffer = new byte[BufferSize];
-				this.Read();
 
 				this.state = Socks5State.Initializing;
 				this.SendPacket(new byte[] { 5, 1, 0 });
@@ -120,30 +118,26 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
-		private async void Read()
+		private void Client_OnWriteQueueEmpty(object sender, EventArgs e)
 		{
-			try
+			bool DoDispose;
+
+			lock (this.synchObj)
 			{
-				while (!this.disposed)
+				this.isWriting = false;
+				DoDispose = this.closeWhenDone;
+			}
+
+			if (DoDispose)
+				this.Dispose();
+			else
+			{
+				EventHandler h = this.OnWriteQueueEmpty;
+				if (h != null)
 				{
-					int NrRead = await this.stream.ReadAsync(this.inputBuffer, 0, BufferSize);
-					if (this.disposed)
-						break;
-
-					if (NrRead <= 0)
-					{
-						this.State = Socks5State.Offline;
-						break;
-					}
-
-					byte[] Bin = new byte[NrRead];
-					Array.Copy(this.inputBuffer, 0, Bin, 0, NrRead);
-
-					this.ReceiveBinary(Bin);
-
 					try
 					{
-						this.ParseIncoming(Bin);
+						h(this, e);
 					}
 					catch (Exception ex)
 					{
@@ -151,14 +145,38 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					}
 				}
 			}
-			catch (IOException)
+		}
+
+		private void Client_OnDisconnected(object sender, EventArgs e)
+		{
+			this.State = Socks5State.Offline;
+		}
+
+		private void Client_OnError(object Sender, Exception Exception)
+		{
+			this.State = Socks5State.Error;
+		}
+
+		private Task<bool> Client_OnSent(object Sender, byte[] Packet)
+		{
+			this.TransmitBinary(Packet);
+			return Task.FromResult<bool>(true);
+		}
+
+		private Task<bool> Client_OnReceived(object Sender, byte[] Packet)
+		{
+			this.ReceiveBinary(Packet);
+
+			try
 			{
-				this.State = Socks5State.Error;
+				this.ParseIncoming(Packet);
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
+
+			return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
@@ -242,18 +260,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.disposed = true;
 			this.State = Socks5State.Offline;
 
-			if (this.stream != null)
-			{
-				this.stream?.Flush();
-				this.stream.Dispose();
-				this.stream = null;
-			}
-
 			this.client?.Dispose();
 			this.client = null;
-
-			this.queue?.Clear();
-			this.queue = null;
 		}
 
 		/// <summary>
@@ -268,68 +276,15 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.SendPacket(Data);
 		}
 
-		private async void SendPacket(byte[] Data)
+		private void SendPacket(byte[] Data)
 		{
-			try
+			lock (this.synchObj)
 			{
-				Data = (byte[])Data.Clone();
-
-				lock (this.queue)
-				{
-					if (this.isWriting)
-					{
-						this.queue.AddLast(Data);
-						return;
-					}
-					else
-						this.isWriting = true;
-				}
-
-				while (Data != null)
-				{
-					this.TransmitBinary(Data);
-					await this.stream.WriteAsync(Data, 0, Data.Length);
-					if (this.disposed || this.state == Socks5State.Offline)
-						return;
-
-					lock (this.queue)
-					{
-						if (this.queue.First is null)
-						{
-							this.isWriting = false;
-							Data = null;
-						}
-						else
-						{
-							Data = this.queue.First.Value;
-							this.queue.RemoveFirst();
-						}
-					}
-				}
-
-				if (this.closeWhenDone)
-					this.Dispose();
-				else
-				{
-					EventHandler h = this.OnWriteQueueEmpty;
-					if (h != null)
-					{
-						try
-						{
-							h(this, new EventArgs());
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}
-				}
+				this.isWriting = true;
 			}
-			catch (Exception ex)
-			{
-				this.State = Socks5State.Offline;
-				Log.Critical(ex);
-			}
+
+			Data = (byte[])Data.Clone();
+			this.client.Send(Data);
 		}
 
 		/// <summary>
@@ -342,7 +297,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public void CloseWhenDone()
 		{
-			lock (this.queue)
+			lock (this.synchObj)
 			{
 				if (this.isWriting)
 				{

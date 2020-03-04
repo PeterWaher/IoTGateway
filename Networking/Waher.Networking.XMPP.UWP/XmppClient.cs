@@ -660,11 +660,12 @@ namespace Waher.Networking.XMPP
 				if (this.textTransportLayer is null)
 				{
 					this.client = new TextTcpClient(this.encoding);
-					this.client.OnReceived += OnReceived;
-					this.client.OnSent += OnSent;
+					this.client.OnReceived += this.OnReceived;
+					this.client.OnSent += this.OnSent;
 					this.client.OnError += this.Error;
+					this.client.OnDisconnected += this.Client_OnDisconnected;
 
-					if (await this.client.ConnectAsync(Host, Port))
+					if (await this.client.ConnectAsync(this.host, this.port))
 					{
 						this.State = XmppState.StreamNegotiation;
 
@@ -674,7 +675,7 @@ namespace Waher.Networking.XMPP
 					}
 					else
 					{
-						this.ConnectionError(new System.Exception("Unable to connect to " + Host + ":" + Port.ToString()));
+						this.ConnectionError(new System.Exception("Unable to connect to " + this.host + ":" + this.port.ToString()));
 						return;
 					}
 				}
@@ -690,6 +691,13 @@ namespace Waher.Networking.XMPP
 			{
 				this.ConnectionError(ex);
 			}
+		}
+
+		private void Client_OnDisconnected(object sender, EventArgs e)
+		{
+			this.Information("Disconnected.");
+			if (this.state != XmppState.Error)
+				this.State = XmppState.Offline;
 		}
 
 		private Task<bool> OnSent(object _, string Text)

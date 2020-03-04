@@ -467,7 +467,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private void P2pNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
-			IPEndPoint Endpoint = (IPEndPoint)Peer.Tcp.Client.RemoteEndPoint;
+			IPEndPoint Endpoint = (IPEndPoint)Peer.Tcp.Client.Client.RemoteEndPoint;
 
 #if LineListener
 			Console.Out.WriteLine("Receiving connection from " + Endpoint.ToString());

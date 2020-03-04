@@ -198,18 +198,19 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						TcpClient Client = await this.tcpListener.AcceptTcpClientAsync();
+						TcpClient TcpClient = await this.tcpListener.AcceptTcpClientAsync();
 						if (this.disposed)
 							return;
 
-						if (!(Client is null))
+						if (!(TcpClient is null))
 						{
 							PeerConnection Connection = null;
 
 							try
 							{
+								BinaryTcpClient Client = new BinaryTcpClient(TcpClient);
 								Connection = new PeerConnection(Client, this,
-									(IPEndPoint)Client.Client.RemoteEndPoint, this.encapsulatePackets);
+									(IPEndPoint)TcpClient.Client.RemoteEndPoint, this.encapsulatePackets);
 
 								this.State = PeerToPeerNetworkState.Ready;
 
@@ -414,18 +415,18 @@ namespace Waher.Networking.PeerToPeer
 			if (this.State != PeerToPeerNetworkState.Ready)
 				throw new IOException("Peer-to-peer network not ready.");
 
-			TcpClient Client = new TcpClient();
-			IPEndPoint RemoteEndPoint2;
+			BinaryTcpClient Client = new BinaryTcpClient();
+			IPEndPoint RemoteEndPoint2 = RemoteEndPoint;
 
 			try
 			{
 				RemoteEndPoint2 = this.CheckLocalRemoteEndpoint(RemoteEndPoint);
 				await Client.ConnectAsync(RemoteEndPoint2.Address, RemoteEndPoint2.Port);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				Client.Dispose();
-				throw;
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
 			PeerConnection Result = new PeerConnection(Client, this, RemoteEndPoint2, this.encapsulatePackets);

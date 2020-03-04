@@ -94,6 +94,60 @@ namespace Waher.Networking
 
 #if WINDOWS_UWP
 		/// <summary>
+		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected BinaryTcpClient(StreamSocket Client, params ISniffer[] Sniffers)
+			: this(Client, true, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected BinaryTcpClient(StreamSocket Client, bool SniffBinary, params ISniffer[] Sniffers)
+			: base(Sniffers)
+		{
+			this.sniffBinary = SniffBinary;
+			this.buffer = Windows.Storage.Streams.Buffer.CreateCopyFromMemoryBuffer(this.memoryBuffer);
+			this.client = Client;
+		}
+#else
+		/// <summary>
+		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public BinaryTcpClient(TcpClient Client, params ISniffer[] Sniffers)
+			: this(Client, true, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
+		/// safe, making sure it can be disposed, even during an active connection attempt.
+		/// </summary>
+		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		protected BinaryTcpClient(TcpClient Client, bool SniffBinary, params ISniffer[] Sniffers)
+			: base(Sniffers)
+		{
+			this.sniffBinary = SniffBinary;
+			this.tcpClient = Client;
+			this.source = new CancellationTokenSource();
+		}
+#endif
+
+#if WINDOWS_UWP
+		/// <summary>
 		/// Underlying <see cref="StreamSocket"/> object.
 		/// </summary>
 		public StreamSocket Client => this.client;
@@ -157,6 +211,14 @@ namespace Waher.Networking
 			return this.PostConnect();
 		}
 #endif
+		/// <summary>
+		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
+		/// </summary>
+		public void Bind()
+		{
+			this.PreConnect();
+			this.PostConnect();
+		}
 
 		private void PreConnect()
 		{
@@ -335,11 +397,17 @@ namespace Waher.Networking
 
 					NrRead = Packet.Length;
 					if (this.disposed || NrRead <= 0)
+					{
+						this.Disconnected();
 						break;
+					}
 #else
 					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.source.Token);
 					if (this.disposed || NrRead <= 0)
+					{
+						this.Disconnected();
 						break;
+					}
 
 					byte[] Packet = new byte[NrRead];
 					Array.Copy(this.buffer, 0, Packet, 0, NrRead);
@@ -362,6 +430,21 @@ namespace Waher.Networking
 			finally
 			{
 				this.reading = false;
+			}
+		}
+
+		/// <summary>
+		/// Method called when the connection has been disconnected.
+		/// </summary>
+		protected virtual void Disconnected()
+		{
+			try
+			{
+				this.OnDisconnected?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -406,6 +489,11 @@ namespace Waher.Networking
 		/// Event raised when an error has occurred.
 		/// </summary>
 		public event ExceptionEventHandler OnError;
+
+		/// <summary>
+		/// Event raised when the connection has been disconnected.
+		/// </summary>
+		public event EventHandler OnDisconnected;
 
 		/// <summary>
 		/// Sends a binary packet.
@@ -523,6 +611,19 @@ namespace Waher.Networking
 
 					Packet = null;
 				}
+
+				EventHandler h = this.OnWriteQueueEmpty;
+				if (!(h is null))
+				{
+					try
+					{
+						h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -530,6 +631,11 @@ namespace Waher.Networking
 				this.Error(ex);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when the write queue is empty.
+		/// </summary>
+		public event EventHandler OnWriteQueueEmpty = null;
 
 		/// <summary>
 		/// Method called when binary data has been sent.

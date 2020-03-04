@@ -1,42 +1,15 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
-using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-#if WINDOWS_UWP
-using Windows.Foundation;
-using Windows.Networking;
-using Windows.Networking.Sockets;
-using Windows.Security;
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Security.Cryptography.Certificates;
-using Windows.Storage.Streams;
-#else
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography;
-#endif
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP.Authentication;
-using Waher.Networking.XMPP.AuthenticationErrors;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
-using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.ServiceDiscovery;
-using Waher.Networking.XMPP.SoftwareVersion;
-using Waher.Networking.XMPP.Search;
 using Waher.Runtime.Cache;
 using Waher.Security;
 
@@ -55,7 +28,6 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class XmppComponent : Sniffable, IDisposable
 	{
-		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 1000000;
 
@@ -70,17 +42,7 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Cache<string, uint> pendingPresenceRequests;
 		private readonly object rosterSyncObject = new object();
-#if WINDOWS_UWP
-		private StreamSocket client = null;
-		private DataWriter dataWriter = null;
-		private DataReader dataReader = null;
-		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
-		private IBuffer buffer = null;
-#else
-		private TcpClient client = null;
-		private Stream stream = null;
-		private readonly byte[] buffer = new byte[BufferSize];
-#endif
+		private TextTcpClient client = null;
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
 		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
@@ -88,7 +50,6 @@ namespace Waher.Networking.XMPP
 		private int fragmentLength = 0;
 		private XmppState state;
 		private readonly Random gen = new Random();
-		private DateTime writeStarted = DateTime.MinValue;
 		private readonly object synchObject = new object();
 		private readonly string identityCategory;
 		private readonly string identityType;
@@ -111,9 +72,9 @@ namespace Waher.Networking.XMPP
 		private int maxAssuredMessagesPendingTotal = 100;
 		private int nrAssuredMessagesPending = 0;
 		private bool defaultDropOff = true;
-		private bool isWriting = false;
 		private bool supportsPing = true;
 		private bool pingResponse = true;
+		private bool openBracketReceived = false;
 
 		/// <summary>
 		/// Manages an XMPP component connection, as defined in XEP-0114:
@@ -149,37 +110,30 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
+			this.openBracketReceived = false;
 
 			try
 			{
-#if WINDOWS_UWP
-				this.client = new StreamSocket();
-				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
+				this.client = new TextTcpClient(this.encoding);
+				this.client.OnReceived += this.OnReceived;
+				this.client.OnSent += this.OnSent;
+				this.client.OnError += this.Error;
+				this.client.OnDisconnected += this.Client_OnDisconnected;
 
-				this.State = XmppState.StreamNegotiation;
+				if (await this.client.ConnectAsync(this.host, this.port))
+				{
+					this.State = XmppState.StreamNegotiation;
 
-				this.dataReader = new DataReader(this.client.InputStream);
-				this.dataWriter = new DataWriter(this.client.OutputStream);
+					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
+						"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
 
-				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) + 
-					"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
-
-				this.ResetState(false);
-				this.BeginRead();
-#else
-				this.client = new TcpClient();
-				await this.client.ConnectAsync(Host, Port);
-
-				this.stream = new NetworkStream(this.client.Client, false);
-
-				this.State = XmppState.StreamNegotiation;
-
-				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
-					"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
-
-				this.ResetState(false);
-				this.BeginRead();
-#endif
+					this.ResetState();
+				}
+				else
+				{
+					this.ConnectionError(new System.Exception("Unable to connect to " + this.host + ":" + this.port.ToString()));
+					return;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -196,7 +150,7 @@ namespace Waher.Networking.XMPP
 			this.RegisterIqGetHandler("ping", XmppClient.NamespacePing, this.PingRequestHandler, true);
 		}
 
-		private void ResetState(bool Authenticated)
+		private void ResetState()
 		{
 			this.inputState = 0;
 			this.inputDepth = 0;
@@ -220,14 +174,21 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			this.Error(ex);
+			this.Error(this, ex);
 
 			this.inputState = -1;
 			this.DisposeClient();
 			this.State = XmppState.Error;
 		}
 
-		private void Error(Exception ex)
+		private void Client_OnDisconnected(object sender, EventArgs e)
+		{
+			this.Information("Disconnected.");
+			if (this.state != XmppState.Error)
+				this.State = XmppState.Offline;
+		}
+
+		private void Error(object _, Exception ex)
 		{
 			this.Error(ex.Message);
 
@@ -243,6 +204,27 @@ namespace Waher.Networking.XMPP
 					Exception(ex2);
 				}
 			}
+		}
+
+		private Task<bool> OnSent(object _, string Text)
+		{
+			this.TransmitText(Text);
+			return Task.FromResult<bool>(true);
+		}
+
+		private Task<bool> OnReceived(object _, string Text)
+		{
+			if (this.openBracketReceived)
+			{
+				this.openBracketReceived = false;
+				this.ReceiveText("<" + Text);
+			}
+			else if (Text == "<")
+				this.openBracketReceived = true;
+			else
+				this.ReceiveText(Text);
+
+			return Task.FromResult<bool>(this.ParseIncoming(Text));
 		}
 
 		/// <summary>
@@ -355,56 +337,16 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (this.secondTimer != null)
-			{
-				this.secondTimer.Dispose();
-				this.secondTimer = null;
-			}
+			this.secondTimer?.Dispose();
+			this.secondTimer = null;
 
 			this.DisposeClient();
-
-#if WINDOWS_UWP
-			if (this.memoryBuffer != null)
-			{
-				this.memoryBuffer.Dispose();
-				this.memoryBuffer = null;
-			}
-#endif
 		}
 
 		private void DisposeClient()
 		{
-#if WINDOWS_UWP
-			if (this.dataReader != null)
-			{
-				this.dataReader.Dispose();
-				this.dataReader = null;
-			}
-
-			if (this.dataWriter != null)
-			{
-				this.dataWriter.Dispose();
-				this.dataWriter = null;
-			}
-
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
-#else
-			if (this.stream != null)
-			{
-				this.stream.Dispose();
-				this.stream = null;
-			}
-
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
-#endif
+			this.client?.Dispose();
+			this.client = null;
 		}
 
 		/// <summary>
@@ -435,176 +377,8 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				DateTime Now = DateTime.Now;
-				bool Queued;
-
-				lock (this.outputQueue)
-				{
-					if (this.isWriting)
-					{
-						Queued = true;
-						this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Xml, Callback));
-
-						if ((Now - this.writeStarted).TotalSeconds > 5)
-						{
-							KeyValuePair<string, EventHandler> P = this.outputQueue.First.Value;
-							this.outputQueue.RemoveFirst();
-
-							Xml = P.Key;
-							Callback = P.Value;
-
-							byte[] Packet = this.encoding.GetBytes(Xml);
-
-							this.writeStarted = Now;
-							this.DoBeginWriteLocked(Packet, Callback);
-						}
-					}
-					else
-					{
-						byte[] Packet = this.encoding.GetBytes(Xml);
-
-						Queued = false;
-						this.isWriting = true;
-						this.writeStarted = Now;
-						this.DoBeginWriteLocked(Packet, Callback);
-					}
-				}
-
-				if (Queued)
-					Information("Packet queued for transmission.");
-				else
-					TransmitText(Xml);
-			}
-		}
-
-		private async void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
-		{
-			try
-			{
-				while (Packet != null)
-				{
-#if WINDOWS_UWP
-					this.dataWriter.WriteBytes(Packet);
-					await this.dataWriter.StoreAsync();
-#else
-					await this.stream.WriteAsync(Packet, 0, Packet.Length);
-					if (this.stream is null)
-					{
-						this.isWriting = false;
-						return;
-					}
-#endif
-					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-
-					if (Callback != null)
-					{
-						try
-						{
-							Callback(this, new EventArgs());
-						}
-						catch (Exception ex)
-						{
-							Exception(ex);
-						}
-					}
-
-					string Xml;
-
-					lock (this.outputQueue)
-					{
-						LinkedListNode<KeyValuePair<string, EventHandler>> Next = this.outputQueue.First;
-
-						if (Next is null)
-						{
-							Xml = null;
-							Packet = null;
-							this.isWriting = false;
-						}
-						else
-						{
-							Packet = this.encoding.GetBytes(Xml = Next.Value.Key);
-							Callback = Next.Value.Value;
-
-							this.outputQueue.RemoveFirst();
-							this.writeStarted = DateTime.Now;
-						}
-					}
-
-					if (Xml != null)
-						TransmitText(Xml);
-				}
-			}
-			catch (Exception ex)
-			{
-				lock (this.outputQueue)
-				{
-					this.outputQueue.Clear();
-					this.isWriting = false;
-				}
-
-				this.ConnectionError(ex);
-			}
-		}
-
-		private async void BeginRead()
-		{
-			try
-			{
-				while (true)
-				{
-#if WINDOWS_UWP
-					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
-					if (DataRead.Length == 0)
-						break;
-
-					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
-					if (Data is null)
-						break;
-
-					int NrRead = Data.Length;
-
-					if (NrRead > 0)
-					{
-						string s = this.encoding.GetString(Data, 0, NrRead);
-						this.ReceiveText(s);
-
-						if (!this.ParseIncoming(s))
-							break;
-					}
-					else
-						break;
-#else
-					if (this.stream is null)
-						break;
-
-					int NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
-					string s;
-
-					if (this.stream is null)
-						break;
-
-					if (NrRead > 0)
-					{
-						s = this.encoding.GetString(this.buffer, 0, NrRead);
-						this.ReceiveText(s);
-
-						if (!this.ParseIncoming(s))
-							break;
-					}
-#endif
-				}
-			}
-			catch (NullReferenceException)
-			{
-				// Client closed.
-			}
-			catch (ObjectDisposedException)
-			{
-				// Client closed.
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
+				this.client.Send(Xml, Callback);
+				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 		}
 
@@ -1073,28 +847,8 @@ namespace Waher.Networking.XMPP
 		private void ToError()
 		{
 			this.inputState = -1;
-#if WINDOWS_UWP
-			if (this.dataWriter != null)
-			{
-				this.dataWriter.Dispose();
-				this.dataWriter = null;
-
-				this.dataReader.Dispose();
-				this.dataReader = null;
-
-				this.client.Dispose();
-				this.client = null;
-			}
-#else
-			if (this.stream != null)
-			{
-				this.stream.Dispose();
-				this.stream = null;
-
-				this.client.Dispose();
-				this.client = null;
-			}
-#endif
+			this.client?.Dispose();
+			this.client = null;
 			this.State = XmppState.Error;
 		}
 
@@ -2410,10 +2164,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
-			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
+		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body, 
+			string Subject, string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
 		{
-			throw new NotImplementedException();
+			this.SendMessage(QoS, Type, string.Empty, From, To, CustomXml, Body, Subject, Language, ThreadId, ParentThreadId, DeliveryCallback, State);
 		}
 
 		/// <summary>

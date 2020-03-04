@@ -274,6 +274,11 @@ namespace Waher.Networking
 			this.BeginRead();
 		}
 
+		/// <summary>
+		/// If the reading is paused.
+		/// </summary>
+		public bool Paused => this.connected && !this.reading;
+
 		private async void BeginRead()
 		{
 			try

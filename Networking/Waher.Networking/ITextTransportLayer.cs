@@ -41,5 +41,18 @@ namespace Waher.Networking
 		/// Event received when text data has been received.
 		/// </summary>
 		event TextEventHandler OnReceived;
+
+		/// <summary>
+		/// If the reading is paused.
+		/// </summary>
+		bool Paused
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
+		/// </summary>
+		void Continue();
 	}
 }

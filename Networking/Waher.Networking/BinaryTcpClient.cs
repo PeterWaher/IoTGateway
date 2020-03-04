@@ -10,7 +10,12 @@ using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Certificates;
 using Windows.Storage.Streams;
+#else
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -47,12 +52,16 @@ namespace Waher.Networking
 #endif
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
+		private string hostName;
 		private bool connecting = false;
 		private bool connected = false;
 		private bool disposing = false;
 		private bool disposed = false;
 		private bool sending = false;
 		private bool reading = false;
+		private bool upgrading = false;
+		private bool trustServer = false;
+		private bool serverCertificateValid = false;
 
 		/// <summary>
 		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
@@ -103,6 +112,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(string Host, int Port)
 		{
+			this.hostName = Host;
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);
@@ -121,6 +131,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(IPAddress Address, int Port)
 		{
+			this.hostName = Address.ToString();
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
@@ -140,6 +151,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(IPAddress[] Addresses, int Port)
 		{
+			this.hostName = null;
 			this.PreConnect();
 			await this.tcpClient.ConnectAsync(Addresses, Port);
 			return this.PostConnect();
@@ -161,6 +173,9 @@ namespace Waher.Networking
 
 				this.connecting = true;
 			}
+
+			this.serverCertificate = null;
+			this.serverCertificateValid = false;
 		}
 
 #if WINDOWS_UWP
@@ -533,5 +548,221 @@ namespace Waher.Networking
 		/// </summary>
 		public event BinaryEventHandler OnSent;
 
+#if WINDOWS_UWP
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, false);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsClient(Certificate ClientCertificate, SocketProtectionLevel Protocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, false);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="TrustServer">If the server should be trusted.</param>
+		public async Task UpgradeToTlsAsClient(Certificate ClientCertificate, SocketProtectionLevel Protocols, bool TrustServer)
+		{
+			lock (this.synchObj)
+			{
+				if (this.reading)
+					throw new InvalidOperationException("Connection cannot be upgraded to TLS while in a reading state.");
+
+				if (this.upgrading)
+					throw new InvalidOperationException("Upgrading connection.");
+
+				if (this.upgraded)
+					throw new InvalidOperationException("Connection already upgraded.");
+
+				this.upgrading = true;
+				this.trustServer = TrustServer;
+			}
+
+			try
+			{
+				this.dataWriter.DetachStream();
+
+				if (this.trustServer)
+				{
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.WrongUsage);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.RevocationInformationMissing);
+					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.RevocationFailure);
+				}
+
+				await this.client.UpgradeToSslAsync(Protocols, new HostName(this.hostName));
+				this.serverCertificate = this.client.Information.ServerCertificate;
+				this.serverCertificateValid = true;
+
+				this.dataWriter = new DataWriter(this.client.OutputStream);
+				this.upgraded = true;
+			}
+			finally
+			{
+				this.trustServer = false;
+				this.upgrading = false;
+			}
+		}
+
+		private Certificate serverCertificate = null;
+		private bool upgraded = false;
+
+		/// <summary>
+		/// Certificate used by the server.
+		/// </summary>
+		public Certificate ServerCertificate => this.serverCertificate;
+
+#else
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="TrustServer">If the server should be trusted.</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustServer)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustServer);
+		}
+
+		/// <summary>
+		/// Upgrades connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustServer">If the server should be trusted.</param>
+		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustServer)
+		{
+			lock (this.synchObj)
+			{
+				if (this.reading)
+					throw new InvalidOperationException("Connection cannot be upgraded to TLS while in a reading state.");
+
+				if (this.upgrading)
+					throw new InvalidOperationException("Upgrading connection.");
+
+				if (this.stream is SslStream)
+					throw new InvalidOperationException("Connection already upgraded.");
+
+				this.upgrading = true;
+				this.certValidation = CertificateValidationCheck;
+				this.trustServer = TrustServer;
+			}
+
+			try
+			{
+				X509Certificate2Collection ClientCertificates = null;
+				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
+
+				if (!(ClientCertificate is null))
+				{
+					ClientCertificates = new X509Certificate2Collection()
+					{
+						ClientCertificate
+					};
+				}
+
+				this.stream = SslStream;
+				await SslStream.AuthenticateAsClientAsync(this.hostName ?? ((IPEndPoint)this.Client.Client.LocalEndPoint).Address.ToString(),
+					ClientCertificates, Protocols, true);
+			}
+			finally
+			{
+				this.certValidation = null;
+				this.trustServer = false;
+				this.upgrading = false;
+			}
+		}
+
+		private RemoteCertificateValidationCallback certValidation = null;
+		private X509Certificate serverCertificate = null;
+
+		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		{
+			this.serverCertificate = certificate;
+
+			if (sslPolicyErrors == SslPolicyErrors.None)
+				this.serverCertificateValid = true;
+			else
+			{
+				this.serverCertificateValid = false;
+				return this.trustServer;
+			}
+
+			if (this.certValidation is null)
+				return true;
+			else
+			{
+				try
+				{
+					return this.certValidation(sender, certificate, chain, sslPolicyErrors);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Certificate used by the server.
+		/// </summary>
+		public X509Certificate ServerCertificate => this.serverCertificate;
+#endif
+
+		/// <summary>
+		/// If the server certificate is valid.
+		/// </summary>
+		public bool ServerCertificateValid => this.serverCertificateValid;
 	}
 }

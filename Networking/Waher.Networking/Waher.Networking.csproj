@@ -42,6 +42,9 @@
     <EmbeddedResource Include="Schema\SnifferOutput.xsd" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Net.Security" Version="4.3.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
 </Project>

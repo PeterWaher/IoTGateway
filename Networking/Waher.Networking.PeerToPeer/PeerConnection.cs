@@ -31,6 +31,7 @@ namespace Waher.Networking.PeerToPeer
 		private bool writing = false;
 		private bool closed = false;
 		private bool disposed = false;
+		private bool reading = false;
 		private readonly bool encapsulatePackets;
 
 		internal PeerConnection(TcpClient TcpConnection, PeerToPeerNetwork Network, IPEndPoint RemoteEndpoint,
@@ -174,7 +175,7 @@ namespace Waher.Networking.PeerToPeer
 					{
 						try
 						{
-							h(this, EncodedPacket);
+							await h(this, EncodedPacket);
 						}
 						catch (Exception ex)
 						{
@@ -224,7 +225,7 @@ namespace Waher.Networking.PeerToPeer
 			if (!this.encapsulatePackets)
 				return Packet;
 
-			ushort PacketNr = 0;
+			ushort PacketNr;
 			int i = Packet.Length;
 			int j = 0;
 			int c = 1;
@@ -334,14 +335,20 @@ namespace Waher.Networking.PeerToPeer
 
 		private async void BeginReadTcp()
 		{
-			BinaryEventHandler h = null;
+			if (this.reading)
+				throw new InvalidOperationException("Already in a reading state.");
+
+			this.reading = true;
+
+			BinaryEventHandler h;
 			int Pos;
 			int NrLeft;
 			byte b;
+			bool Continue = true;
 
 			try
 			{
-				while (!this.disposed)
+				while (Continue && !this.disposed)
 				{
 					int NrRead = await this.stream.ReadAsync(this.incomingBuffer, 0, BufferSize);
 					if (NrRead <= 0 || this.disposed)
@@ -389,7 +396,7 @@ namespace Waher.Networking.PeerToPeer
 											{
 												try
 												{
-													h(this, this.packetBuffer);
+													Continue = await h(this, this.packetBuffer);
 												}
 												catch (Exception ex)
 												{
@@ -422,7 +429,7 @@ namespace Waher.Networking.PeerToPeer
 							{
 								try
 								{
-									h(this, this.packetBuffer);
+									Continue = await h(this, this.packetBuffer);
 								}
 								catch (Exception ex)
 								{
@@ -437,6 +444,23 @@ namespace Waher.Networking.PeerToPeer
 			{
 				this.Closed();
 			}
+			finally
+			{
+				this.reading = false;
+			}
+		}
+
+		/// <summary>
+		/// If reading has been paused.
+		/// </summary>
+		public bool Paused => !this.reading && !this.closed;
+
+		/// <summary>
+		/// Continues a paused connection.
+		/// </summary>
+		public void Continue()
+		{
+			this.BeginReadTcp();
 		}
 
 		/// <summary>
@@ -502,7 +526,7 @@ namespace Waher.Networking.PeerToPeer
 			set { this.stateObject = value; }
 		}
 
-		internal void UdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		internal void UdpDatagramReceived(object _, UdpDatagramEventArgs e)
 		{
 			if (this.encapsulatePackets)
 			{

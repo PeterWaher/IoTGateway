@@ -38,6 +38,19 @@ namespace Waher.Networking.XMPP
 		public abstract void Send(string Packet, EventHandler DeliveryCallback);
 
 		/// <summary>
+		/// If the reading is paused.
+		/// </summary>
+		public abstract bool Paused
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
+		/// </summary>
+		public abstract void Continue();
+
+		/// <summary>
 		/// How well the alternative transport handles the XMPP credentials provided.
 		/// </summary>
 		/// <param name="URI">URI defining endpoint.</param>

@@ -110,6 +110,19 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
+		/// <summary>
+		/// If reading has been paused.
+		/// </summary>
+		public bool Paused => this.peer.Paused;
+
+		/// <summary>
+		/// Continues a paused connection.
+		/// </summary>
+		public void Continue()
+		{
+			this.peer.Continue();
+		}
+
 		private void RemoveHandlers()
 		{
 			if (this.peer != null)

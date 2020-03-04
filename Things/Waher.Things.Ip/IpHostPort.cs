@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking;
+using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -30,16 +31,28 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
-		/// Connect to the remote host and port using TCP.
+		/// Connect to the remote host and port using a binary protocol over TCP.
 		/// </summary>
-		/// <returns>TCP transport.</returns>
-		public async Task<TcpTransport> ConnectTcp()
+		/// <param name="Sniffers">Sniffers</param>
+		/// <returns>Binary TCP transport.</returns>
+		public async Task<BinaryTcpClient> ConnectTcp(params ISniffer[] Sniffers)
 		{
-			TcpClient Client = new TcpClient();
-
+			BinaryTcpClient Client = new BinaryTcpClient(Sniffers);
 			await Client.ConnectAsync(this.Host, this.port);
+			return Client;
+		}
 
-			return new TcpTransport(Client);
+		/// <summary>
+		/// Connect to the remote host and port using a text-based protocol over TCP.
+		/// </summary>
+		/// <param name="Encoding">Encoding to use.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		/// <returns>Text-based TCP transport.</returns>
+		public async Task<TextTcpClient> ConnectTcp(Encoding Encoding, params ISniffer[] Sniffers)
+		{
+			TextTcpClient Client = new TextTcpClient(Encoding, Sniffers);
+			await Client.ConnectAsync(this.Host, this.port);
+			return Client;
 		}
 
 		/// <summary>

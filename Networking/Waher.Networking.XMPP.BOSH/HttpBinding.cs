@@ -7,6 +7,7 @@ using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -160,38 +161,44 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 		}
 
-		private void RaiseOnSent(string Payload)
+		private async Task<bool> RaiseOnSent(string Payload)
 		{
 			TextEventHandler h = this.OnSent;
+			bool Result = true;
 
 			if (h != null)
 			{
 				try
 				{
-					h(this, Payload);
+					Result = await h(this, Payload);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
 			}
+
+			return Result;
 		}
 
-		private void RaiseOnReceived(string Payload)
+		private async Task<bool> RaiseOnReceived(string Payload)
 		{
 			TextEventHandler h = this.OnReceived;
+			bool Result = true;
 
 			if (h != null)
 			{
 				try
 				{
-					h(this, Payload);
+					Result = await h(this, Payload);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
 			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -421,7 +428,7 @@ namespace Waher.Networking.XMPP.BOSH
 					this.active[i] = false;
 				}
 
-				this.BodyReceived(XmlResponse, true);
+				await this.BodyReceived(XmlResponse, true);
 			}
 			catch (Exception ex)
 			{
@@ -588,7 +595,7 @@ namespace Waher.Networking.XMPP.BOSH
 					{
 						foreach (KeyValuePair<string, EventHandler> P in Queued)
 						{
-							this.RaiseOnSent(P.Key);
+							await this.RaiseOnSent(P.Key);
 							Xml.Append(P.Key);
 
 							if (P.Value != null)
@@ -607,7 +614,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					if (Packet != null)
 					{
-						this.RaiseOnSent(Packet);
+						await this.RaiseOnSent(Packet);
 						Xml.Append(Packet);
 
 						if (DeliveryCallback != null)
@@ -688,7 +695,7 @@ namespace Waher.Networking.XMPP.BOSH
 					if (this.xmppClient.HasSniffers)
 						this.xmppClient.ReceiveText(XmlResponse);
 
-					this.BodyReceived(XmlResponse, false);
+					await this.BodyReceived(XmlResponse, false);
 				}
 				while (!this.disposed && (Queued != null || (AllInactive && this.xmppClient.State == XmppState.Connected)));
 
@@ -706,7 +713,7 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 		}
 
-		private void BodyReceived(string Xml, bool First)
+		private Task<bool> BodyReceived(string Xml, bool First)
 		{
 			string Body;
 			int i, j;
@@ -793,8 +800,6 @@ namespace Waher.Networking.XMPP.BOSH
 
 					if (First)
 					{
-						First = false;
-
 						StringBuilder sb = new StringBuilder();
 
 						sb.Append('<');
@@ -857,7 +862,23 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 
 			if (Xml != null)
-				this.RaiseOnReceived(Xml);
+				return this.RaiseOnReceived(Xml);
+			else
+				return Task.FromResult<bool>(true);
 		}
+
+		/// <summary>
+		/// If reading has been paused.
+		/// </summary>
+		public override bool Paused => false;
+
+		/// <summary>
+		/// Continues a paused connection.
+		/// </summary>
+		public override void Continue()
+		{
+			throw new InvalidOperationException("BOSH connections do not support pause & continue.");
+		}
+
 	}
 }

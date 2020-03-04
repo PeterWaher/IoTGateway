@@ -220,6 +220,11 @@ namespace Waher.Networking
 			this.PostConnect();
 		}
 
+		/// <summary>
+		/// If the connection is open.
+		/// </summary>
+		public bool Connected => this.connected && !this.disposing && !this.disposed;
+
 		private void PreConnect()
 		{
 			lock (this.synchObj)

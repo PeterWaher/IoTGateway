@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#else
+using System.Net.Sockets;
+#endif
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking

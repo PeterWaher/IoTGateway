@@ -69,8 +69,16 @@
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />
+    <Compile Include=".bak\Waher.Events\GenericException.cs" />
     <Compile Include=".bak\Waher.Events\IActor.cs" />
+    <Compile Include=".bak\Waher.Events\IEventActor.cs" />
+    <Compile Include=".bak\Waher.Events\IEventFacility.cs" />
     <Compile Include=".bak\Waher.Events\IEventId.cs" />
+    <Compile Include=".bak\Waher.Events\IEventLevel.cs" />
+    <Compile Include=".bak\Waher.Events\IEventModule.cs" />
+    <Compile Include=".bak\Waher.Events\IEventObject.cs" />
+    <Compile Include=".bak\Waher.Events\IEventTags.cs" />
+    <Compile Include=".bak\Waher.Events\IEventType.cs" />
     <Compile Include=".bak\Waher.Events\IObject.cs" />
     <Compile Include=".bak\Waher.Events\ITags.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />

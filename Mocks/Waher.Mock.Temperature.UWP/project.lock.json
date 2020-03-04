@@ -30300,7 +30300,6 @@
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
-    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Temperature.UWP\\Waher.Mock.Temperature.UWP.csproj",
       "projectName": "Waher.Mock.Temperature.UWP",

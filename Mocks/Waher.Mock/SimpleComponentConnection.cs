@@ -229,7 +229,7 @@ namespace Waher.Mock
 					}
 
 					if (!Ok)
-						throw;
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 #else
 				ConsoleColor FgBak = Console.ForegroundColor;

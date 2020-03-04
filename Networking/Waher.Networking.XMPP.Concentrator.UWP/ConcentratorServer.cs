@@ -522,13 +522,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		internal static async Task<Language> GetLanguage(XmlElement E, string DefaultLanguageCode)
 		{
 			string LanguageCode = XML.Attribute(E, "xml:lang");
-			bool Default = LanguageCode == DefaultLanguageCode;
 
 			if (string.IsNullOrEmpty(LanguageCode))
-			{
 				LanguageCode = DefaultLanguageCode;
-				Default = true;
-			}
 
 			Language Language = await Translator.GetLanguageAsync(LanguageCode);
 			if (Language is null)
@@ -835,7 +831,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Node.HasCommands)
 				Xml.Append("' hasCommands='true");
 
-			if (Node is ISniffable Sniffable)
+			if (Node is ISniffable)
 				Xml.Append("' sniffable='true");
 
 			IThingReference Parent = Node.Parent;
@@ -2994,7 +2990,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 							Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
 							Query.Abort();
-							throw;
+							System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 						}
 						finally
 						{
@@ -4258,8 +4254,6 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task<ControlParameter[]> ControlServer_OnGetControlParameters(IThingReference Node)
 		{
-			DateTime Now = DateTime.Now;
-
 			try
 			{
 				if (!(Node is INode Node2))

@@ -1159,12 +1159,12 @@ namespace Waher.IoTGateway.Setup
 								Bin.Write(Data, 0, Data.Length);
 							}
 						}
-						catch (Exception)
+						catch (Exception ex)
 						{
 							if (ReadSubtree)
 								r.Dispose();
 
-							throw;
+							System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 						}
 					}
 					else if (r.NodeType == XmlNodeType.EndElement)

@@ -2104,7 +2104,7 @@ namespace Waher.IoTGateway
 				if (DoLog)
 					Log.Critical(ex);
 
-				throw;
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 			catch (Exception ex)
 			{

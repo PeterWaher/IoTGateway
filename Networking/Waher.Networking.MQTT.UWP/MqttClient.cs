@@ -570,7 +570,7 @@ namespace Waher.Networking.MQTT
 		private readonly LinkedList<OutputRecord> outputQueue = new LinkedList<OutputRecord>();
 		private readonly SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
 		private readonly SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
-		private Random rnd = new Random();
+		private readonly Random rnd = new Random();
 		private bool isWriting = false;
 
 		private class OutputRecord

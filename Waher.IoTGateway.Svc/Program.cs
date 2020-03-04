@@ -321,7 +321,7 @@ namespace Waher.IoTGateway.Svc
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				throw;
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 			finally
 			{

@@ -307,7 +307,7 @@ namespace Waher.Networking.PeerToPeer
 				catch (AggregateException ex)
 				{
 					if (!(ex.InnerException is UPnPException))
-						throw;
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 				catch (UPnPException)
 				{

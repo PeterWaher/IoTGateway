@@ -28,7 +28,7 @@
     <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="1.68.0" />
+    <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />

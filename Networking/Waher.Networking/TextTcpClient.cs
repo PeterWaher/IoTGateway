@@ -99,6 +99,7 @@ namespace Waher.Networking
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 			base.Send(Data, Callback);
+			this.TextDataSent(Packet);
 		}
 
 		/// <summary>

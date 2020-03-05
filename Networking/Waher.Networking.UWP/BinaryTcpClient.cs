@@ -164,16 +164,28 @@ namespace Waher.Networking
 		/// <param name="Host">Host Name or IP Address in string format.</param>
 		/// <param name="Port">Port number.</param>
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
-		public async Task<bool> ConnectAsync(string Host, int Port)
+		public Task<bool> ConnectAsync(string Host, int Port)
+		{
+			return this.ConnectAsync(Host, Port, false);
+		}
+
+		/// <summary>
+		/// Connects to a host using TCP.
+		/// </summary>
+		/// <param name="Host">Host Name or IP Address in string format.</param>
+		/// <param name="Port">Port number.</param>
+		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+		public async Task<bool> ConnectAsync(string Host, int Port, bool Paused)
 		{
 			this.hostName = Host;
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);
-			return await this.PostConnect();
+			return await this.PostConnect(Paused);
 #else
 			await this.tcpClient.ConnectAsync(Host, Port);
-			return this.PostConnect();
+			return this.PostConnect(Paused);
 #endif
 		}
 
@@ -183,16 +195,28 @@ namespace Waher.Networking
 		/// <param name="Address">IP Address of the host.</param>
 		/// <param name="Port">Port number.</param>
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
-		public async Task<bool> ConnectAsync(IPAddress Address, int Port)
+		public Task<bool> ConnectAsync(IPAddress Address, int Port)
+		{
+			return this.ConnectAsync(Address, Port, false);
+		}
+
+		/// <summary>
+		/// Connects to a host using TCP.
+		/// </summary>
+		/// <param name="Address">IP Address of the host.</param>
+		/// <param name="Port">Port number.</param>
+		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+		public async Task<bool> ConnectAsync(IPAddress Address, int Port, bool Paused)
 		{
 			this.hostName = Address.ToString();
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
-			return await this.PostConnect();
+			return await this.PostConnect(Paused);
 #else
 			await this.tcpClient.ConnectAsync(Address, Port);
-			return this.PostConnect();
+			return this.PostConnect(Paused);
 #endif
 		}
 
@@ -203,23 +227,66 @@ namespace Waher.Networking
 		/// <param name="Addresses">IP Addresses of the host.</param>
 		/// <param name="Port">Port number.</param>
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
-		public async Task<bool> ConnectAsync(IPAddress[] Addresses, int Port)
+		public Task<bool> ConnectAsync(IPAddress[] Addresses, int Port)
+		{
+			return this.ConnectAsync(Addresses, Port, false);
+		}
+
+		/// <summary>
+		/// Connects to a host using TCP.
+		/// </summary>
+		/// <param name="Addresses">IP Addresses of the host.</param>
+		/// <param name="Port">Port number.</param>
+		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+		public async Task<bool> ConnectAsync(IPAddress[] Addresses, int Port, bool Paused)
 		{
 			this.hostName = null;
 			this.PreConnect();
 			await this.tcpClient.ConnectAsync(Addresses, Port);
-			return this.PostConnect();
+			return this.PostConnect(Paused);
 		}
 #endif
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
+		/// </summary>
+		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+		public Task<bool> Bind()
+		{
+			return this.Bind(false);
+		}
+
+		/// <summary>
+		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
+		/// </summary>
+		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+		public Task<bool> Bind(bool Paused)
+		{
+			this.PreConnect();
+			return this.PostConnect(Paused);
+		}
+#else
 		/// <summary>
 		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
 		/// </summary>
 		public void Bind()
 		{
-			this.PreConnect();
-			this.PostConnect();
+			this.Bind(false);
 		}
 
+		/// <summary>
+		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
+		/// </summary>
+		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+		public void Bind(bool Paused)
+		{
+			this.PreConnect();
+			this.PostConnect(Paused);
+		}
+#endif
 		/// <summary>
 		/// If the connection is open.
 		/// </summary>
@@ -246,9 +313,9 @@ namespace Waher.Networking
 		}
 
 #if WINDOWS_UWP
-		private async Task<bool> PostConnect()
+		private async Task<bool> PostConnect(bool Paused)
 #else
-		private bool PostConnect()
+		private bool PostConnect(bool Paused)
 #endif
 		{
 #if WINDOWS_UWP
@@ -286,7 +353,8 @@ namespace Waher.Networking
 #else
 			this.stream = this.tcpClient.GetStream();
 #endif
-			this.BeginRead();
+			if (!Paused)
+				this.BeginRead();
 
 			return true;
 		}

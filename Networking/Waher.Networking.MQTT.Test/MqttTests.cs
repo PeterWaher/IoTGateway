@@ -14,7 +14,7 @@ namespace Waher.Networking.MQTT.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new MqttClient("iot.eclipse.org", this.Port, this.Encypted, "UnitTest", string.Empty,
+			this.client = new MqttClient("mqtt.eclipse.org", this.Port, this.Encypted, "UnitTest", string.Empty,
 				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 		}
 
@@ -31,11 +31,8 @@ namespace Waher.Networking.MQTT.Test
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client != null)
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 		}
 
 		[TestMethod]

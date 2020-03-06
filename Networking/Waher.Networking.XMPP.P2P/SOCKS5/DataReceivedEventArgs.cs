@@ -18,29 +18,51 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class DataReceivedEventArgs : EventArgs
 	{
-		private readonly byte[] data;
+		private readonly byte[] buffer;
+		private readonly int offset;
+		private readonly int count;
 		private readonly Socks5Client stream;
 		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for data reception events.
 		/// </summary>
-		/// <param name="Data">Data received.</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte received.</param>
+		/// <param name="Count">Number of bytes received.</param>
 		/// <param name="Stream">SOCKS5 client stream.</param>
 		/// <param name="State">State</param>
-		internal DataReceivedEventArgs(byte[] Data, Socks5Client Stream, object State)
+		internal DataReceivedEventArgs(byte[] Buffer, int Offset, int Count, Socks5Client Stream, object State)
 		{
-			this.data = Data;
+			this.buffer = Buffer;
+			this.offset = Offset;
+			this.count = Count;
 			this.stream = Stream;
 			this.state = State;
 		}
 
 		/// <summary>
-		/// Data received.
+		/// Buffer holding received data.
 		/// </summary>
-		public byte[] Data
+		public byte[] Buffer
 		{
-			get { return this.data; }
+			get { return this.buffer; }
+		}
+
+		/// <summary>
+		/// Start index of first byte received.
+		/// </summary>
+		public int Offset
+		{
+			get { return this.offset; }
+		}
+
+		/// <summary>
+		/// Number of bytes received.
+		/// </summary>
+		public int Count
+		{
+			get { return this.count; }
 		}
 
 		/// <summary>

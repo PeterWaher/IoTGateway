@@ -157,19 +157,22 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.State = Socks5State.Error;
 		}
 
-		private Task<bool> Client_OnSent(object Sender, byte[] Packet)
+		private Task Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			this.TransmitBinary(Packet);
+			if (this.HasSniffers)
+				this.TransmitBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+
 			return Task.FromResult<bool>(true);
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, byte[] Packet)
+		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			this.ReceiveBinary(Packet);
+			if (this.HasSniffers)
+				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
 			try
 			{
-				this.ParseIncoming(Packet);
+				this.ParseIncoming(Buffer, Offset, Count);
 			}
 			catch (Exception ex)
 			{
@@ -284,7 +287,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 
 			Data = (byte[])Data.Clone();
-			this.client.Send(Data);
+			this.client.SendAsync(Data);
 		}
 
 		/// <summary>
@@ -309,7 +312,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.Dispose();
 		}
 
-		private void ParseIncoming(byte[] Data)
+		private void ParseIncoming(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.state == Socks5State.Connected)
 			{
@@ -318,7 +321,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						h(this, new DataReceivedEventArgs(Data, this, this.callbackState));
+						h(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
 					}
 					catch (Exception ex)
 					{
@@ -328,13 +331,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 			else if (this.state == Socks5State.Initializing)
 			{
-				if (Data.Length < 2 || Data[0] < 5)
+				if (Count < 2 || Buffer[Offset++] < 5)
 				{
 					this.ToError();
 					return;
 				}
 
-				byte Method = Data[1];
+				byte Method = Buffer[Offset++];
 
 				switch (Method)
 				{
@@ -349,13 +352,15 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 			else
 			{
-				if (Data.Length < 5 || Data[0] < 5)
+				int c = Offset + Count;
+
+				if (Count < 5 || Buffer[Offset++] < 5)
 				{
 					this.ToError();
 					return;
 				}
 
-				byte REP = Data[1];
+				byte REP = Buffer[Offset++];
 
 				switch (REP)
 				{
@@ -409,16 +414,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						break;
 				}
 
-				byte ATYP = Data[3];
-				int i = 4;
-				int c = Data.Length;
+				Offset++;
+
+				byte ATYP = Buffer[Offset++];
 				IPAddress Addr = null;
 				string DomainName = null;
 
 				switch (ATYP)
 				{
 					case 1: // IPv4.
-						if (i + 4 > c)
+						if (Offset + 4 > c)
 						{
 							this.Error("Expected more bytes.");
 							this.ToError();
@@ -426,26 +431,26 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 
 						byte[] A = new byte[4];
-						Array.Copy(Data, i, A, 0, 4);
-						i += 4;
+						Array.Copy(Buffer, Offset, A, 0, 4);
+						Offset += 4;
 						Addr = new IPAddress(A);
 						break;
 
 					case 3: // Domain name.
-						byte NrBytes = Data[i++];
-						if (i + NrBytes > c)
+						byte NrBytes = Buffer[Offset++];
+						if (Offset + NrBytes > c)
 						{
 							this.Error("Expected more bytes.");
 							this.ToError();
 							return;
 						}
 
-						DomainName = Encoding.ASCII.GetString(Data, i, NrBytes);
-						i += NrBytes;
+						DomainName = Encoding.ASCII.GetString(Buffer, Offset, NrBytes);
+						Offset += NrBytes;
 						break;
 
 					case 4: // IPv6.
-						if (i + 16 > c)
+						if (Offset + 16 > c)
 						{
 							this.Error("Expected more bytes.");
 							this.ToError();
@@ -453,8 +458,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 
 						A = new byte[16];
-						Array.Copy(Data, i, A, 0, 16);
-						i += 16;
+						Array.Copy(Buffer, Offset, A, 0, 16);
+						Offset += 16;
 						Addr = new IPAddress(A);
 						break;
 
@@ -463,16 +468,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						return;
 				}
 
-				if (i + 2 != c)
+				if (Offset + 2 != c)
 				{
 					this.Error("Invalid number of bytes received.");
 					this.ToError();
 					return;
 				}
 
-				int Port = Data[i++];
+				int Port = Buffer[Offset++];
 				Port <<= 8;
-				Port |= Data[i++];
+				Port |= Buffer[Offset++];
 
 				ResponseEventHandler h = this.OnResponse;
 				if (h != null)

@@ -119,11 +119,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when binary data has been received.
 		/// </summary>
-		/// <param name="Data">Binary data received.</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte read.</param>
+		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		protected override Task<bool> BinaryDataReceived(byte[] Data)
+		protected override Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
 		{
-			string Text = this.encoding.GetString(Data);
+			string Text = this.encoding.GetString(Buffer, Offset, Count);
 			return this.TextDataReceived(Text);
 		}
 
@@ -161,7 +163,7 @@ namespace Waher.Networking
 		public void Send(string Packet, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
-			base.Send(Data, Callback);
+			base.SendAsync(Data, Callback);
 			this.TextDataSent(Packet);
 		}
 

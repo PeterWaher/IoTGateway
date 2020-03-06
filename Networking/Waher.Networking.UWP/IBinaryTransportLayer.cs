@@ -10,30 +10,36 @@ namespace Waher.Networking
 	/// Event handler for binary packet events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Packet">Binary packet.</param>
+	/// <param name="Buffer">Binary Data Buffer</param>
+	/// <param name="Offset">Start index of first byte written.</param>
+	/// <param name="Count">Number of bytes written.</param>
 	/// <returns>If the process should be continued.</returns>
-	public delegate Task<bool> BinaryEventHandler(object Sender, byte[] Packet);
+	public delegate Task BinaryDataWrittenEventHandler(object Sender, byte[] Buffer, int Offset, int Count);
+
+	/// <summary>
+	/// Event handler for binary packet events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Buffer">Binary Data Buffer</param>
+	/// <param name="Offset">Start index of first byte read.</param>
+	/// <param name="Count">Number of bytes read.</param>
+	/// <returns>If the process should be continued.</returns>
+	public delegate Task<bool> BinaryDataReadEventHandler(object Sender, byte[] Buffer, int Offset, int Count);
 
 	/// <summary>
 	/// Interface for binary transport layers.
 	/// </summary>
-	public interface IBinaryTransportLayer : IDisposable
+	public interface IBinaryTransportLayer : IBinaryTransmission
 	{
-		/// <summary>
-		/// Sends a binary packet.
-		/// </summary>
-		/// <param name="Packet">Binary packet.</param>
-		void Send(byte[] Packet);
-
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
-		event BinaryEventHandler OnSent;
+		event BinaryDataWrittenEventHandler OnSent;
 
 		/// <summary>
 		/// Event received when binary data has been received.
 		/// </summary>
-		event BinaryEventHandler OnReceived;
+		event BinaryDataReadEventHandler OnReceived;
 
 		/// <summary>
 		/// If the reading is paused.

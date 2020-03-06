@@ -150,14 +150,6 @@ namespace Waher.Networking.HTTP.WebSockets
 		{
 			get { return this.httpRequest?.clientConnection?.Encrypted ?? false; }
 		}
-
-		/// <summary>
-		/// Underlying stream used by web-socket.
-		/// </summary>
-		public Stream Stream
-		{
-			get { return this.httpRequest?.clientConnection?.Stream; }
-		}
 #endif
 		/// <summary>
 		/// Disposes the object.

@@ -136,11 +136,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Data received from a peer.
 		/// </summary>
-		/// <param name="Sender">Sender</param>
-		/// <param name="Packet">Binary data.</param>
-		public Task<bool> Peer_OnReceived(object Sender, byte[] Packet)
+		/// <param name="Sender">Sender of event</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte read.</param>
+		/// <param name="Count">Number of bytes read.</param>
+		/// <returns>If the process should be continued.</returns>
+		public Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			string s = this.encoding.GetString(Packet, 0, Packet.Length);
+			string s = this.encoding.GetString(Buffer, Offset, Count);
 
 			this.lastActivity = DateTime.Now;
 			if (this.xmppClient is null)
@@ -911,14 +914,14 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private Task<bool> Peer_OnSent(object Sender, byte[] Packet)
+		private Task Peer_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			TextEventHandler h = this.OnSent;
 			if (h != null)
 			{
 				try
 				{
-					string s = this.encoding.GetString(Packet);
+					string s = this.encoding.GetString(Buffer, Offset, Count);
 					h(this, s);
 				}
 				catch (Exception ex)

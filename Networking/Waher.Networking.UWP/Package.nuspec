@@ -11,7 +11,7 @@
     <icon>Meta\Icon_64x64.png</icon>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, etc.</description>
+    <description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, simplified communication libraries for text and/or binary protocols, etc.</description>
     <copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</copyright>
     <tags>networking communication uwp</tags>
     <dependencies>

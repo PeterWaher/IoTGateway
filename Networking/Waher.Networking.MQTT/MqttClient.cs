@@ -11,13 +11,8 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 #if WINDOWS_UWP
-using Windows.Foundation;
-using Windows.Networking;
 using Windows.Networking.Sockets;
-using Windows.Security;
-using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Certificates;
-using Windows.Storage.Streams;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -62,17 +57,15 @@ namespace Waher.Networking.MQTT
 	{
 		private const int KeepAliveTimeSeconds = 30;
 
+#if !WINDOWS_UWP
+		private readonly X509Certificate clientCertificate = null;
+#endif
 		private readonly SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
 		private readonly SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
 		private readonly Random rnd = new Random();
 		private readonly object synchObj = new object();
 		private readonly Dictionary<ushort, MqttContent> contentCache = new Dictionary<ushort, MqttContent>();
 		private readonly string clientId = Guid.NewGuid().ToString().Substring(0, 23);
-#if WINDOWS_UWP
-		private readonly Certificate clientCertificate = null;
-#else
-		private readonly X509Certificate clientCertificate = null;
-#endif
 		private BinaryTcpClient client = null;
 		private readonly byte[] willData = null;
 		private Timer secondTimer = null;
@@ -90,6 +83,7 @@ namespace Waher.Networking.MQTT
 		private readonly bool will = false;
 		private readonly bool willRetain = false;
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 		/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
@@ -98,14 +92,11 @@ namespace Waher.Networking.MQTT
 		/// <param name="Port">Port to connect to.</param>
 		/// <param name="ClientCertificate">Client certificate.</param>
 		/// <param name="Sniffers">Sniffers to use.</param>
-#if WINDOWS_UWP
-		public MqttClient(string Host, int Port, Certificate ClientCertificate, params ISniffer[] Sniffers)
-#else
 		public MqttClient(string Host, int Port, X509Certificate ClientCertificate, params ISniffer[] Sniffers)
-#endif
 			: this(Host, Port, ClientCertificate, null, MqttQualityOfService.AtMostOnce, false, null, Sniffers)
 		{
 		}
+#endif
 
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
@@ -122,6 +113,7 @@ namespace Waher.Networking.MQTT
 		{
 		}
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 		/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
@@ -134,13 +126,8 @@ namespace Waher.Networking.MQTT
 		/// <param name="WillRetain">If last will and testament should be retained, in case the connection drops unexpectedly.</param>
 		/// <param name="WillData">Data of last will and testament, in case the connection drops unexpectedly.</param>
 		/// <param name="Sniffers">Sniffers to use.</param>
-#if WINDOWS_UWP
-		public MqttClient(string Host, int Port, Certificate ClientCertificate, string WillTopic,
-			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
-#else
 		public MqttClient(string Host, int Port, X509Certificate ClientCertificate, string WillTopic,
 			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
-#endif
 			: base(Sniffers)
 		{
 			this.host = Host;
@@ -161,6 +148,7 @@ namespace Waher.Networking.MQTT
 
 			Task.Run(() => this.BeginConnect());
 		}
+#endif
 
 		/// <summary>
 		/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
@@ -185,7 +173,9 @@ namespace Waher.Networking.MQTT
 			this.tls = Tls;
 			this.userName = UserName;
 			this.password = Password;
+#if !WINDOWS_UWP
 			this.clientCertificate = null;
+#endif
 			this.state = MqttState.Offline;
 			this.will = !string.IsNullOrEmpty(WillTopic) && WillData != null;
 			this.willTopic = WillTopic;
@@ -223,7 +213,7 @@ namespace Waher.Networking.MQTT
 				{
 					this.State = MqttState.StartingEncryption;
 #if WINDOWS_UWP
-					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SocketProtectionLevel.Tls12, this.trustServer);
+					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
 					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
 #endif
@@ -377,14 +367,15 @@ namespace Waher.Networking.MQTT
 					this.packetByTimeout[Timeout] = new OutputRecord()
 					{
 						Packet = Packet,
-						PacketIdentifier = PacketIdentifier
+						PacketIdentifier = PacketIdentifier,
+						Callback = Callback
 					};
 
 					this.timeoutByPacketIdentifier[PacketIdentifier] = Timeout;
 				}
 			}
 
-			this.client.Send(Packet, Callback);
+			this.client.SendAsync(Packet, Callback);
 			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 		}
 
@@ -394,24 +385,25 @@ namespace Waher.Networking.MQTT
 				this.State = MqttState.Offline;
 		}
 
-		private Task<bool> Client_OnSent(object Sender, byte[] Packet)
+		private Task<bool> Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			this.TransmitBinary(Packet);
+			if (this.HasSniffers)
+				this.TransmitBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+
 			return Task.FromResult<bool>(true);
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, byte[] Packet)
+		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			this.ReceiveBinary(Packet);
+			if (this.HasSniffers)
+				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
-			int NrRead = Packet.Length;
-			int i;
 			byte b;
 			bool Result = true;
 
-			for (i = 0; i < NrRead; i++)
+			while (Count-- > 0)
 			{
-				b = Packet[i];
+				b = Buffer[Offset++];
 
 				switch (this.inputState)
 				{
@@ -895,13 +887,13 @@ namespace Waher.Networking.MQTT
 		public X509Certificate ServerCertificate
 #endif
 		{
-			get { return this.client?.ServerCertificate; }
+			get { return this.client?.RemoteCertificate; }
 		}
 
 		/// <summary>
 		/// If the server certificate is valid.
 		/// </summary>
-		public bool ServerCertificateValid => this.client?.ServerCertificateValid ?? false;
+		public bool ServerCertificateValid => this.client?.RemoteCertificateValid ?? false;
 
 		/// <summary>
 		/// Current state of connection.

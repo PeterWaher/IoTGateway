@@ -18,13 +18,11 @@ namespace Waher.Networking.HTTP
 	{
 		private readonly HttpRequestHeader header;
 		private Stream dataStream;
-		private Stream responseStream;
 		private readonly string remoteEndPoint;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
 		private HttpResource resource = null;
-		private readonly long dataLength;
 		internal HttpClientConnection clientConnection = null;
 
 		/// <summary>
@@ -32,22 +30,15 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
-		/// <param name="ResponseStream">Response stream.</param>
 		/// <param name="RemoteEndPoint">Remote end-point.</param>
-		public HttpRequest(HttpRequestHeader Header, Stream Data, Stream ResponseStream, string RemoteEndPoint)
+		public HttpRequest(HttpRequestHeader Header, Stream Data, string RemoteEndPoint)
 		{
 			this.header = Header;
 			this.dataStream = Data;
-			this.responseStream = ResponseStream;
 			this.remoteEndPoint = RemoteEndPoint;
 
-			if (this.dataStream is null)
-				this.dataLength = 0;
-			else
-			{
-				this.dataLength = this.dataStream.Position;
+			if (!(this.dataStream is null))
 				this.dataStream.Position = 0;
-			}
 		}
 
 		/// <summary>
@@ -55,7 +46,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public bool HasData
 		{
-			get { return this.dataStream != null; }
+			get { return !(this.dataStream is null); }
 		}
 
 		/// <summary>
@@ -80,7 +71,7 @@ namespace Waher.Networking.HTTP
 			if (ContentType is null)
 				return Data;
 
-			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields, 
+			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
 				new Uri(this.header.GetURL(false, false)));
 		}
 
@@ -119,14 +110,14 @@ namespace Waher.Networking.HTTP
 			set { this.user = value; }
 		}
 
-        /// <summary>
-        /// Contains session states, if the resource requires sessions, or null otherwise.
-        /// </summary>
-        public Variables Session
-        {
-            get { return this.session; }
-            set { this.session = value; }
-        }
+		/// <summary>
+		/// Contains session states, if the resource requires sessions, or null otherwise.
+		/// </summary>
+		public Variables Session
+		{
+			get { return this.session; }
+			set { this.session = value; }
+		}
 
 		/// <summary>
 		/// Resource being accessed.
@@ -150,13 +141,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.dataStream != null)
-			{
-				this.dataStream.Dispose();
-				this.dataStream = null;
-
-				this.responseStream = null;
-			}
+			this.dataStream?.Dispose();
+			this.dataStream = null;
 		}
 	}
 }

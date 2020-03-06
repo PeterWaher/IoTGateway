@@ -121,6 +121,8 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BinaryOutputStream.cs" />
+    <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="TextTcpClient.cs" />
     <Compile Include="BinaryTcpClient.cs" />
     <Compile Include="IBinaryTransportLayer.cs" />

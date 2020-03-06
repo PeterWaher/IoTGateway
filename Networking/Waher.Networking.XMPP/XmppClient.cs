@@ -9,12 +9,8 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
-using Windows.Foundation;
-using Windows.Networking;
 using Windows.Networking.Sockets;
-using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Certificates;
-using Windows.Storage.Streams;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -225,6 +221,7 @@ namespace Waher.Networking.XMPP
 		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private static Type[] alternativeBindingMechanisms = null;
 
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 40000000;
@@ -248,9 +245,7 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
 		private readonly List<IXmppExtension> extensions = new List<IXmppExtension>();
 		private AuthenticationMethod authenticationMethod = null;
-#if WINDOWS_UWP
-		private readonly Certificate clientCertificate = null;
-#else
+#if !WINDOWS_UWP
 		private readonly X509Certificate clientCertificate = null;
 #endif
 		private TextTcpClient client;
@@ -320,6 +315,7 @@ namespace Waher.Networking.XMPP
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
 
+#if WINDOWS_UWP
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
 		/// </summary>
@@ -331,13 +327,71 @@ namespace Waher.Networking.XMPP
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string Password, string Language, Assembly AppAssembly,
-#if WINDOWS_UWP
 			params ISniffer[] Sniffers)
-			: this(Host, Port, UserName, Password, Language, AppAssembly, (Certificate)null, Sniffers)
+			: base(Sniffers)
+		{
+			this.host = this.domain = Host;
+			this.port = Port;
+			this.userName = UserName;
+			this.password = Password;
+			this.passwordHash = string.Empty;
+			this.passwordHashMethod = string.Empty;
+			this.language = Language;
+			this.state = XmppState.Offline;
+
+			this.Init(AppAssembly);
+		}
+
+		/// <summary>
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
+		/// </summary>
+		/// <param name="Host">Host name or IP address of XMPP server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="PasswordHash">Password hash.</param>
+		/// <param name="PasswordHashMethod">Password hash method.</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
+			Assembly AppAssembly, params ISniffer[] Sniffers)
+			: base(Sniffers)
+		{
+			this.host = this.domain = Host;
+			this.port = Port;
+			this.userName = UserName;
+			this.password = string.Empty;
+			this.passwordHash = PasswordHash;
+			this.passwordHashMethod = PasswordHashMethod;
+			this.language = Language;
+			this.state = XmppState.Offline;
+			this.Init(AppAssembly);
+		}
+
+		/// <summary>
+		/// Manages an XMPP client connection. Connection information is defined in
+		/// <paramref name="Credentials"/>.
+		/// </summary>
+		/// <param name="Credentials">Client credentials.</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
+			: base(Sniffers)
 #else
+		/// <summary>
+		/// Manages an XMPP client connection over a traditional binary socket connection. 
+		/// </summary>
+		/// <param name="Host">Host name or IP address of XMPP server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public XmppClient(string Host, int Port, string UserName, string Password, string Language, Assembly AppAssembly,
 			params ISniffer[] Sniffers)
 			: this(Host, Port, UserName, Password, Language, AppAssembly, (X509Certificate)null, Sniffers)
-#endif
 		{
 		}
 
@@ -353,11 +407,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ClientCertificate">Optional client certificate.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string Password, string Language, Assembly AppAssembly,
-#if WINDOWS_UWP
-			Certificate ClientCertificate, params ISniffer[] Sniffers)
-#else
 			X509Certificate ClientCertificate, params ISniffer[] Sniffers)
-#endif
 			: base(Sniffers)
 		{
 			this.host = this.domain = Host;
@@ -384,14 +434,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language, Assembly AppAssembly,
-#if WINDOWS_UWP
-			params ISniffer[] Sniffers)
+		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
+			Assembly AppAssembly, params ISniffer[] Sniffers)
 			: this(Host, Port, UserName, PasswordHash, PasswordHashMethod, Language, AppAssembly, null, Sniffers)
-#else
-			params ISniffer[] Sniffers)
-			: this(Host, Port, UserName, PasswordHash, PasswordHashMethod, Language, AppAssembly, null, Sniffers)
-#endif
 		{
 		}
 
@@ -408,11 +453,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ClientCertificate">Optional client certificate.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language, Assembly AppAssembly,
-#if WINDOWS_UWP
-			Certificate ClientCertificate, params ISniffer[] Sniffers)
-#else
 			X509Certificate ClientCertificate, params ISniffer[] Sniffers)
-#endif
 			: base(Sniffers)
 		{
 			this.host = this.domain = Host;
@@ -424,11 +465,8 @@ namespace Waher.Networking.XMPP
 			this.language = Language;
 			this.state = XmppState.Offline;
 			this.clientCertificate = ClientCertificate;
-
 			this.Init(AppAssembly);
 		}
-
-		private static Type[] alternativeBindingMechanisms = null;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Connection information is defined in
@@ -439,7 +477,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
-            : base(Sniffers)
+			: base(Sniffers)
+#endif
 		{
 			this.host = this.domain = Credentials.Host;
 			this.port = Credentials.Port;
@@ -505,8 +544,9 @@ namespace Waher.Networking.XMPP
 
 			this.language = Language;
 			this.state = XmppState.Offline;
+#if !WINDOWS_UWP
 			this.clientCertificate = Credentials.ClientCertificate;
-
+#endif
 			this.Init(AppAssembly);
 
 			this.allowCramMD5 = Credentials.AllowCramMD5;
@@ -892,7 +932,7 @@ namespace Waher.Networking.XMPP
 		public X509Certificate ServerCertificate
 #endif
 		{
-			get { return this.client.ServerCertificate; }
+			get { return this.client.RemoteCertificate; }
 		}
 
 		/// <summary>
@@ -900,7 +940,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool ServerCertificateValid
 		{
-			get { return this.client.ServerCertificateValid; }
+			get { return this.client.RemoteCertificateValid; }
 		}
 
 		/// <summary>
@@ -2286,18 +2326,18 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (h is null)
-            {
-                string Xml = "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>";
+			{
+				string Xml = "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>";
 
-                if (e.UsesE2eEncryption)
-                {
-                    e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
-                        e.Id, e.From, Xml);
-                }
-                else
-                    this.SendIqError(e.Id, e.From, Xml);
-            }
-            else
+				if (e.UsesE2eEncryption)
+				{
+					e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
+						e.Id, e.From, Xml);
+				}
+				else
+					this.SendIqError(e.Id, e.From, Xml);
+			}
+			else
 			{
 				try
 				{
@@ -2305,13 +2345,13 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex)
 				{
-                    if (e.UsesE2eEncryption)
-                    {
-                        e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
-                            e.Id, e.From, ExceptionToXmppXml(ex));
-                    }
-                    else
-					    this.SendIqError(e.Id, e.From, ex);
+					if (e.UsesE2eEncryption)
+					{
+						e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E,
+							e.Id, e.From, ExceptionToXmppXml(ex));
+					}
+					else
+						this.SendIqError(e.Id, e.From, ex);
 				}
 			}
 		}
@@ -2931,7 +2971,7 @@ namespace Waher.Networking.XMPP
 			{
 				this.State = XmppState.StartingEncryption;
 #if WINDOWS_UWP
-				await this.client.UpgradeToTlsAsClient(this.clientCertificate, SocketProtectionLevel.Tls12, this.trustServer);
+				await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
 				await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
 #endif
@@ -2987,18 +3027,18 @@ namespace Waher.Networking.XMPP
 			get { return this.domain; }
 		}
 
-        /// <summary>
-        /// Current Stream ID
-        /// </summary>
-        public string StreamId
-        {
-            get { return this.streamId; }
-        }
+		/// <summary>
+		/// Current Stream ID
+		/// </summary>
+		public string StreamId
+		{
+			get { return this.streamId; }
+		}
 
-        /// <summary>
-        /// Bare JID
-        /// </summary>
-        public string BareJID
+		/// <summary>
+		/// Bare JID
+		/// </summary>
+		public string BareJID
 		{
 			get { return this.bareJid; }
 		}
@@ -3278,7 +3318,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
 		public uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State,
-		    int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest = null;
 			DateTime TP;

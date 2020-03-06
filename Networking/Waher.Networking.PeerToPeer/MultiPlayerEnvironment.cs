@@ -482,8 +482,8 @@ namespace Waher.Networking.PeerToPeer
 				}
 			}
 
-			Peer.OnClosed += new EventHandler(Peer_OnClosed);
-			Peer.OnReceived += new BinaryEventHandler(Peer_OnReceived);
+			Peer.OnClosed += this.Peer_OnClosed;
+			Peer.OnReceived += this.Peer_OnReceived;
 
 			BinaryOutput Output = new BinaryOutput();
 
@@ -494,14 +494,15 @@ namespace Waher.Networking.PeerToPeer
 			Peer.SendTcp(Output.GetPacket());
 		}
 
-		private Task<bool> Peer_OnReceived(object Sender, byte[] Packet)
+		private Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player;
+			byte[] Packet;
 
 			if (Connection.StateObject is null)
 			{
-				BinaryInput Input = new BinaryInput(Packet);
+				BinaryInput Input = new BinaryInput(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 				Guid PlayerId;
 				IPAddress PlayerRemoteAddress;
 				IPEndPoint PlayerRemoteEndpoint;
@@ -565,7 +566,10 @@ namespace Waher.Networking.PeerToPeer
 					return Task.FromResult<bool>(true);
 			}
 			else
+			{
 				Player = (Player)Connection.StateObject;
+				Packet = BinaryTcpClient.ToArray(Buffer, Offset, Count);
+			}
 
 			this.GameDataReceived(Player, Connection, Packet);
 
@@ -826,8 +830,8 @@ namespace Waher.Networking.PeerToPeer
 						PeerConnection Connection = await this.p2pNetwork.ConnectToPeer(Player.PublicEndpoint);
 
 						Connection.StateObject = Player;
-						Connection.OnClosed += new EventHandler(Peer_OnClosed);
-						Connection.OnReceived += new BinaryEventHandler(Connection_OnReceived);
+						Connection.OnClosed += this.Peer_OnClosed;
+						Connection.OnReceived += this.Connection_OnReceived;
 
 						Connection.Start();
 					}
@@ -841,7 +845,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private Task<bool> Connection_OnReceived(object Sender, byte[] Packet)
+		private Task<bool> Connection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Guid PlayerId;
@@ -850,7 +854,7 @@ namespace Waher.Networking.PeerToPeer
 
 			try
 			{
-				BinaryInput Input = new BinaryInput(Packet);
+				BinaryInput Input = new BinaryInput(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
 				PlayerId = Input.ReadGuid();
 				PlayerRemoteAddress = IPAddress.Parse(Input.ReadString());
@@ -877,10 +881,9 @@ namespace Waher.Networking.PeerToPeer
 
 			Connection.RemoteEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-			Connection.OnReceived -= new BinaryEventHandler(Connection_OnReceived);
-			Connection.OnReceived += new BinaryEventHandler(Peer_OnReceived);
-
-			Connection.OnSent += new BinaryEventHandler(Connection_OnSent);
+			Connection.OnReceived -= this.Connection_OnReceived;
+			Connection.OnReceived += this.Peer_OnReceived;
+			Connection.OnSent += this.Connection_OnSent;
 
 			BinaryOutput Output = new BinaryOutput();
 
@@ -906,13 +909,13 @@ namespace Waher.Networking.PeerToPeer
 			return Task.FromResult<bool>(true);
 		}
 
-		private Task<bool> Connection_OnSent(object Sender, byte[] Packet)
+		private Task<bool> Connection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player = (Player)Connection.StateObject;
 			bool AllConnected;
 
-			Connection.OnSent -= new BinaryEventHandler(Connection_OnSent);
+			Connection.OnSent -= this.Connection_OnSent;
 
 			lock (this.remotePlayersByEndpoint)
 			{

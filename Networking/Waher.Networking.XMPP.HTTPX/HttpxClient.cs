@@ -553,25 +553,25 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
 			{
 #if LOG_SOCKS5_EVENTS
-				this.client.Information(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
+				this.client.Information(e.Count.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
 #endif
-				byte[] Data = e.Data;
-				int i = 0;
-				int c = e.Data.Length;
+				byte[] Buffer = e.Buffer;
+				int Offset = e.Offset;
+				int Count = e.Count;
 				int d;
 
-				while (i < c)
+				while (Count-- > 0)
 				{
 					switch (Rx.State)
 					{
 						case 0:
-							Rx.BlockSize = Data[i++];
+							Rx.BlockSize = Buffer[Offset++];
 							Rx.State++;
 							break;
 
 						case 1:
 							Rx.BlockSize <<= 8;
-							Rx.BlockSize |= Data[i++];
+							Rx.BlockSize |= Buffer[Offset++];
 
 							if (Rx.BlockSize == 0)
 							{
@@ -589,12 +589,10 @@ namespace Waher.Networking.XMPP.HTTPX
 							break;
 
 						case 2:
-							d = c - i;
-							if (d > Rx.BlockSize - Rx.BlockPos)
-								d = Rx.BlockSize - Rx.BlockPos;
+							d = Math.Min(Count, Rx.BlockSize - Rx.BlockPos);
 
-							Array.Copy(Data, i, Rx.Block, Rx.BlockPos, d);
-							i += d;
+							Array.Copy(Buffer, Offset, Rx.Block, Rx.BlockPos, d);
+							Offset += d;
 							Rx.BlockPos += d;
 
 							if (Rx.BlockPos >= Rx.BlockSize)
@@ -623,7 +621,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			else
 			{
 #if LOG_SOCKS5_EVENTS
-				this.client.Warning(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + " and discarded.");
+				this.client.Warning(e.Count.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + " and discarded.");
 #endif
 				e.Stream.Dispose();
 			}

@@ -28,11 +28,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
 		/// </summary>
-		public override void ContentSent()
+		public override Task<bool> ContentSentAsync()
 		{
 			this.task.TrySetResult(true);
 			this.timeoutTimer?.Dispose();
 			this.timeoutTimer = null;
+			return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
@@ -58,13 +59,14 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
-		/// <param name="NrAccepted">Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the
-		/// rest is part of a separate message.</param>
-		/// <returns>If the encoding of the content is complete.</returns>
-		public override bool Decode(byte[] Data, int Offset, int NrRead, out int NrAccepted)
+		/// <returns>
+		/// Bits 0-31: >Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the rest is part of a separate message.
+		/// Bit 32: If decoding has completed.
+		/// Bit 33: If transmission to underlying stream failed.
+		/// </returns>
+		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
-			NrAccepted = 0;
-			return false;
+			return Task.FromResult<ulong>(0);
 		}
 
 		/// <summary>
@@ -73,17 +75,19 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override void Encode(byte[] Data, int Offset, int NrBytes)
+		public override Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
 			this.ms.Write(Data, Offset, NrBytes);
+			return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override void Flush()
+		public override Task<bool> FlushAsync()
 		{
 			this.ms.Flush();
+			return Task.FromResult<bool>(true);
 		}
 	}
 }

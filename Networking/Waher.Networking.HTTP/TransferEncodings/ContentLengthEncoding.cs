@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.Sniffers;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {
@@ -19,7 +16,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ContentLength">Content Length</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal ContentLengthEncoding(Stream Output, long ContentLength, HttpClientConnection ClientConnection)
+		internal ContentLengthEncoding(IBinaryTransmission Output, long ContentLength, HttpClientConnection ClientConnection)
 			: base(Output, ClientConnection)
 		{
 			this.bytesLeft = ContentLength;
@@ -31,25 +28,32 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
-		/// <param name="NrAccepted">Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the
-		/// rest is part of a separate message.</param>
-		/// <returns>If the encoding of the content is complete.</returns>
-		public override bool Decode(byte[] Data, int Offset, int NrRead, out int NrAccepted)
+		/// <returns>
+		/// Bits 0-31: >Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the rest is part of a separate message.
+		/// Bit 32: If decoding has completed.
+		/// Bit 33: If transmission to underlying stream failed.
+		/// </returns>
+		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
-			if (NrRead > this.bytesLeft)
+			ulong NrAccepted;
+			if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
+				this.transferError = true;
+
+			if (NrRead >= this.bytesLeft)
 			{
-				this.output.Write(Data, Offset, (int)this.bytesLeft);
-				NrAccepted = (int)this.bytesLeft;
+				NrAccepted = (uint)this.bytesLeft;
 				this.bytesLeft = 0;
 			}
 			else
 			{
-				this.output.Write(Data, Offset, NrRead);
-				NrAccepted = NrRead;
+				NrAccepted = (uint)NrRead;
 				this.bytesLeft -= NrRead;
 			}
 
-			return this.bytesLeft == 0;
+			if (this.bytesLeft == 0)
+				NrAccepted |= 0x100000000UL;
+
+			return NrAccepted;
 		}
 
 		/// <summary>
@@ -58,7 +62,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override void Encode(byte[] Data, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
 			if (this.clientConnection != null)
 			{
@@ -78,7 +82,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 			if (this.bytesLeft <= NrBytes)
 			{
-				this.output.Write(Data, Offset, (int)this.bytesLeft);
+				if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
+					return false;
+
 				NrBytes -= (int)this.bytesLeft;
 				this.bytesLeft = 0;
 
@@ -87,25 +93,29 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 			else
 			{
-				this.output.Write(Data, Offset, NrBytes);
+				if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, NrBytes))
+					return false;
+
 				this.bytesLeft -= NrBytes;
 			}
+
+			return true;
 		}
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override void Flush()
+		public override Task<bool> FlushAsync()
 		{
-			this.output.Flush();
+			return this.output.FlushAsync();
 		}
 
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
 		/// </summary>
-		public override void ContentSent()
+		public override Task<bool> ContentSentAsync()
 		{
-			this.output.Flush();
+			return this.output.FlushAsync();
 		}
 	}
 }

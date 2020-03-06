@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Text;
-using Waher.Networking.Sniffers;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {
@@ -11,7 +9,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
-		private byte[] chunk = null;
+		private readonly byte[] chunk;
 		private int state = 0;
 		private int chunkSize = 0;
 		private int pos;
@@ -21,9 +19,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal ChunkedTransferEncoding(Stream Output, HttpClientConnection ClientConnection)
+		internal ChunkedTransferEncoding(IBinaryTransmission Output, HttpClientConnection ClientConnection)
 			: base(Output, ClientConnection)
 		{
+			this.chunk = null;
 		}
 
 		/// <summary>
@@ -32,7 +31,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ChunkSize">Chunk size.</param>
 		/// <param name="ClientConnection">Client conncetion.</param>
-		internal ChunkedTransferEncoding(Stream Output, int ChunkSize, HttpClientConnection ClientConnection)
+		internal ChunkedTransferEncoding(IBinaryTransmission Output, int ChunkSize, HttpClientConnection ClientConnection)
 			: base(Output, ClientConnection)
 		{
 			this.chunkSize = ChunkSize;
@@ -46,10 +45,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
-		/// <param name="NrAccepted">Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the
-		/// rest is part of a separate message.</param>
-		/// <returns>If the encoding of the content is complete.</returns>
-		public override bool Decode(byte[] Data, int Offset, int NrRead, out int NrAccepted)
+		/// <returns>
+		/// Bits 0-31: >Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the rest is part of a separate message.
+		/// Bit 32: If decoding has completed.
+		/// Bit 33: If transmission to underlying stream failed.
+		/// </returns>
+		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
 			int i, j, c;
 			byte b;
@@ -78,10 +79,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else if (b == '\n')
 						{
 							if (this.chunkSize == 0)
-							{
-								NrAccepted = i - Offset + 1;
-								return true;
-							}
+								return ((uint)(i - Offset + 1)) | 0x100000000UL;
 							else
 								this.state = 4; // Receive data.
 						}
@@ -95,9 +93,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						}
 						else
 						{
-							NrAccepted = 0;
 							this.invalidEncoding = true;
-							return true;
+							return 0x100000000UL;
 						}
 						break;
 
@@ -122,9 +119,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					case 4:     // Data
 						if (i + this.chunkSize <= c)
 						{
-							this.output.Write(Data, i, this.chunkSize);
+							if (!(this.output is null) && !await this.output.SendAsync(Data, i, this.chunkSize))
+								this.transferError = true;
+
 							if (this.clientConnection != null)
 								this.clientConnection.Server.DataTransmitted(this.chunkSize);
+							
 							i += this.chunkSize;
 							this.chunkSize = 0;
 							this.state++;
@@ -132,9 +132,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else
 						{
 							j = c - i;
-							this.output.Write(Data, i, j);
+							if (!(this.output is null) && !await this.output.SendAsync(Data, i, j))
+								this.transferError = true;
+
 							if (this.clientConnection != null)
 								this.clientConnection.Server.DataTransmitted(j);
+							
 							this.chunkSize -= j;
 							i = c;
 						}
@@ -145,16 +148,14 @@ namespace Waher.Networking.HTTP.TransferEncodings
 							this.state = 0;
 						else if (b > 32)
 						{
-							NrAccepted = 0;
 							this.invalidEncoding = true;
-							return true;
+							return 0x100000000UL;
 						}
 						break;
 				}
 			}
 
-			NrAccepted = i - Offset;
-			return false;
+			return (uint)(i - Offset);
 		}
 
 		/// <summary>
@@ -163,7 +164,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override void Encode(byte[] Data, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
 			int NrLeft;
 
@@ -178,7 +179,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					NrBytes -= NrLeft;
 					this.pos += NrLeft;
 
-					this.WriteChunk(true);
+					if (!await this.WriteChunk(true))
+						return false;
 				}
 				else
 				{
@@ -187,9 +189,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					NrBytes = 0;
 				}
 			}
+
+			return true;
 		}
 
-		private void WriteChunk(bool Flush)
+		private async Task<bool> WriteChunk(bool Flush)
 		{
 			if (this.output != null)
 			{
@@ -204,10 +208,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				Chunk[Len] = (byte)'\r';
 				Chunk[Len + 1] = (byte)'\n';
 
-				this.output.Write(Chunk, 0, Len + 2);
+				await this.output?.SendAsync(Chunk, 0, Len + 2);
 
 				if (Flush)
-					this.output.Flush();
+					await this.output.FlushAsync();
 
 				if (this.clientConnection != null)
 				{
@@ -217,37 +221,47 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 
 			this.pos = 0;
+
+			return true;
 		}
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override void Flush()
+		public override Task<bool> FlushAsync()
 		{
 			if (this.pos > 0)
-				this.WriteChunk(true);
+				return this.WriteChunk(true);
+			else
+				return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
 		/// </summary>
-		public override void ContentSent()
+		public override async Task<bool> ContentSentAsync()
 		{
 			if (this.output is null)
-				return;
+				return false;
 
 			if (this.pos > 0)
-				this.WriteChunk(false);
+			{
+				if (!await this.WriteChunk(false))
+					return false;
+			}
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
-			this.output.Write(Chunk, 0, 5);
-			this.output.Flush();
+			this.output?.SendAsync(Chunk, 0, 5);
+			if (!await this.output.FlushAsync())
+				return false;
 
 			if (this.clientConnection != null)
 			{
 				this.clientConnection.Server.DataTransmitted(5);
 				this.clientConnection.TransmitBinary(Chunk);
 			}
+
+			return true;
 		}
 
 	}

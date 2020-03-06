@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.Sniffers;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -14,12 +12,17 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Stream for decoded output.
 		/// </summary>
-		protected Stream output;
+		protected IBinaryTransmission output;
 
 		/// <summary>
 		/// If the received data was invalid.
 		/// </summary>
 		protected bool invalidEncoding = false;
+
+		/// <summary>
+		/// If the transfer failed.
+		/// </summary>
+		protected bool transferError = false;
 
 		/// <summary>
 		/// Client connection.
@@ -38,7 +41,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal TransferEncoding(Stream Output, HttpClientConnection ClientConnection)
+		internal TransferEncoding(IBinaryTransmission Output, HttpClientConnection ClientConnection)
 		{
 			this.output = Output;
 			this.clientConnection = ClientConnection;
@@ -49,8 +52,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Response">HTTP Response object.</param>
 		/// <param name="ExpectContent">If content is expected.</param>
-		public virtual void BeforeContent(HttpResponse Response, bool ExpectContent)
+		public virtual Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
 		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -59,10 +63,12 @@ namespace Waher.Networking.HTTP
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
-		/// <param name="NrAccepted">Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the
-		/// rest is part of a separate message.</param>
-		/// <returns>If the encoding of the content is complete.</returns>
-		public abstract bool Decode(byte[] Data, int Offset, int NrRead, out int NrAccepted);
+		/// <returns>
+		/// Bits 0-31: >Number of bytes accepted by the transfer encoding. If less than <paramref name="NrRead"/>, the rest is part of a separate message.
+		/// Bit 32: If decoding has completed.
+		/// Bit 33: If transmission to underlying stream failed.
+		/// </returns>
+		public abstract Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead);
 
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
@@ -70,17 +76,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public abstract void Encode(byte[] Data, int Offset, int NrBytes);
+		public abstract Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes);
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public abstract void Flush();
+		public abstract Task<bool> FlushAsync();
 
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
 		/// </summary>
-		public abstract void ContentSent();
+		public abstract Task<bool> ContentSentAsync();
 
 		/// <summary>
 		/// If encoding of data was invalid.
@@ -88,6 +94,14 @@ namespace Waher.Networking.HTTP
 		public bool InvalidEncoding
 		{
 			get { return this.invalidEncoding; }
+		}
+
+		/// <summary>
+		/// If the transfer failed.
+		/// </summary>
+		public bool TransferError
+		{
+			get { return this.transferError; }
 		}
 
 	}

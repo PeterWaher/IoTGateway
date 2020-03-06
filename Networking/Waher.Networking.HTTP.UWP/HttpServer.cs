@@ -1,26 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Authentication;
 using System.IO;
 using System.Net;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
-using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
-using Windows.Security;
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Certificates;
-using Windows.Storage.Streams;
 #else
+using System.Security.Authentication;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
 #endif
-using Waher.Content.Multipart;
 using Waher.Events;
 using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
@@ -185,7 +178,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
 		/// <param name="AdaptToNetworkChanges">If the server is to adapt to network changes automatically.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, bool AdaptToNetworkChanges, 
+		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, bool AdaptToNetworkChanges,
 			params ISniffer[] Sniffers)
 #endif
 			: base(Sniffers)
@@ -234,39 +227,6 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// If the server is to adapt to network changes automatically.
-		/// </summary>
-		public bool AdaptToNetworkChanges
-		{
-			get => this.adaptToNetworkChanges;
-
-			set
-			{
-				if (value != this.adaptToNetworkChanges)
-				{
-					this.adaptToNetworkChanges = value;
-
-					if (value)
-					{
-#if WINDOWS_UWP
-						NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
-#else
-						NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
-#endif
-					}
-					else
-					{
-#if WINDOWS_UWP
-						NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
-#else
-						NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
-#endif
-					}
-				}
-			}
-		}
-
-		/// <summary>
 		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
 		/// </summary>
 		public void NetworkChanged()
@@ -301,6 +261,39 @@ namespace Waher.Networking.HTTP
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// If the server is to adapt to network changes automatically.
+		/// </summary>
+		public bool AdaptToNetworkChanges
+		{
+			get => this.adaptToNetworkChanges;
+
+			set
+			{
+				if (value != this.adaptToNetworkChanges)
+				{
+					this.adaptToNetworkChanges = value;
+
+					if (value)
+					{
+#if WINDOWS_UWP
+						NetworkInformation.NetworkStatusChanged += NetworkChange_NetworkAddressChanged;
+#else
+						NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
+#endif
+					}
+					else
+					{
+#if WINDOWS_UWP
+						NetworkInformation.NetworkStatusChanged -= NetworkChange_NetworkAddressChanged;
+#else
+						NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
+#endif
+					}
+				}
 			}
 		}
 
@@ -820,7 +813,8 @@ namespace Waher.Networking.HTTP
 
 				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, DefaultBufferSize, false, this.Sniffers);
+				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
 			}
 			catch (SocketException)
 			{
@@ -853,14 +847,15 @@ namespace Waher.Networking.HTTP
 						{
 							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
+							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+
 							if (Tls)
 							{
-								Task T = this.SwitchToTls(Client);
+								Task T = this.SwitchToTls(BinaryTcpClient);
 							}
 							else
 							{
-								NetworkStream Stream = Client.GetStream();
-								HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false, this.Sniffers);
+								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
 							}
 						}
 					}
@@ -895,7 +890,7 @@ namespace Waher.Networking.HTTP
 						if (Found)
 							Log.Critical(ex);
 						else
-							break;	// Removed, for instance due to network change
+							break;  // Removed, for instance due to network change
 					}
 				}
 			}
@@ -908,21 +903,15 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task SwitchToTls(TcpClient Client)
+		private async Task SwitchToTls(BinaryTcpClient Client)
 		{
 			try
 			{
 				this.Information("Switching to TLS.");
-
-				NetworkStream NetworkStream = Client.GetStream();
-				SslStream SslStream = new SslStream(NetworkStream);
-
-				await SslStream.AuthenticateAsServerAsync(this.serverCertificate, false,
-					SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, true);
-
+				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, false);
 				this.Information("TLS established.");
 
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true, this.Sniffers);
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
 
 				if (this.HasSniffers)
 				{
@@ -1510,8 +1499,7 @@ namespace Waher.Networking.HTTP
 			{
 				using (MemoryStream ms = new MemoryStream())
 				{
-					HttpRequest Request = new HttpRequest(new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", "http"), null,
-						ms, string.Empty)
+					HttpRequest Request = new HttpRequest(new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", "http"), null, "Internal")
 					{
 						Session = Session,
 						SubPath = SubPath,

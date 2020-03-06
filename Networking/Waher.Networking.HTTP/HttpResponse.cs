@@ -38,8 +38,8 @@ namespace Waher.Networking.HTTP
 		private bool onlyHeader = false;
 		private bool closeAfterResponse = false;
 
-		private Stream responseStream;
 		private TransferEncoding transferEncoding = null;
+		private IBinaryTransmission responseStream;
 		private readonly TransferEncoding desiredTransferEncoding = null;
 		private readonly HttpServer httpServer;
 		private readonly HttpRequest httpRequest;
@@ -85,8 +85,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ClientConnection">Client connection.</param>
 		/// <param name="HttpServer">HTTP Server serving the request.</param>
 		/// <param name="Request">Request being served.</param>
-		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection,
-			HttpServer HttpServer, HttpRequest Request)
+		internal HttpResponse(IBinaryTransmission ResponseStream, HttpClientConnection ClientConnection, HttpServer HttpServer, HttpRequest Request)
 			: base()
 		{
 			this.responseStream = ResponseStream;
@@ -384,24 +383,10 @@ namespace Waher.Networking.HTTP
 		{
 			this.disposed = true;
 
-			if (this.clientConnection != null)
-				this.clientConnection.Flush();
-			else if (this.responseStream != null)
-				this.responseStream.Flush();
-
 			if (this.closeAfterResponse)
 			{
-				if (this.clientConnection != null)
-				{
-					this.clientConnection.Dispose();
-					this.clientConnection = null;
-					this.responseStream = null;
-				}
-				else if (this.responseStream != null)
-				{
-					this.responseStream.Dispose();
-					this.responseStream = null;
-				}
+				this.clientConnection?.Dispose();
+				this.clientConnection = null;
 			}
 
 			if (!this.responseSent)
@@ -427,7 +412,7 @@ namespace Waher.Networking.HTTP
 		public override void Flush()
 		{
 			if (this.transferEncoding != null)
-				this.transferEncoding.Flush();
+				this.transferEncoding.FlushAsync();
 		}
 
 		/// <summary>
@@ -439,7 +424,7 @@ namespace Waher.Networking.HTTP
 		public override Task FlushAsync()
 		{
 			if (this.transferEncoding != null)
-				this.transferEncoding.Flush();
+				this.transferEncoding.FlushAsync();
 
 			return base.FlushAsync();
 		}
@@ -484,7 +469,7 @@ namespace Waher.Networking.HTTP
 				if (this.transferEncoding is null)
 					this.StartSendResponse(false);
 				else
-					this.transferEncoding.ContentSent();
+					this.transferEncoding.ContentSentAsync();
 
 				EventHandler h = this.OnResponseSent;
 				if (!(h is null))
@@ -667,19 +652,19 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nContent-Length: ");
 						Output.Append(this.contentLength.Value.ToString());
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value, this.clientConnection);
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, this.contentLength.Value, this.clientConnection);
 					}
 					else if (ExpectContent)
 					{
 						Output.Append("\r\nTransfer-Encoding: chunked");
-						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? Stream.Null : this.responseStream, DefaultChunkSize, this.clientConnection);
+						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream, DefaultChunkSize, this.clientConnection);
 					}
 					else
 					{
 						if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
 							Output.Append("\r\nContent-Length: 0");
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, 0, this.clientConnection);
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0, this.clientConnection);
 					}
 
 					if (this.customHeaders != null)
@@ -710,14 +695,14 @@ namespace Waher.Networking.HTTP
 					if (this.responseStream is null || this.clientConnection.Disposed)
 						return;
 
-					this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
+					this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
 					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 					this.clientConnection.TransmitText(Header);
 				}
 				else
 				{
 					this.transferEncoding = this.desiredTransferEncoding;
-					this.transferEncoding.BeforeContent(this, ExpectContent);
+					this.transferEncoding.BeforeContentAsync(this, ExpectContent);
 				}
 			}
 		}
@@ -830,7 +815,7 @@ namespace Waher.Networking.HTTP
 			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
-			this.transferEncoding.Encode(Data, 0, Data.Length);
+			this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
 			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
@@ -841,7 +826,19 @@ namespace Waher.Networking.HTTP
 
 		internal Task WriteRawAsync(byte[] Data)
 		{
-			return this.responseStream.WriteAsync(Data, 0, Data.Length);
+			if (this.responseStream is null)
+				return Task.CompletedTask;
+			else
+			{
+				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+				
+				this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
+				{
+					Result.TrySetResult(true);
+				});
+
+				return Result.Task;
+			}
 		}
 
 		/// <summary>
@@ -857,7 +854,7 @@ namespace Waher.Networking.HTTP
 			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
-			this.transferEncoding.Encode(Data, Offset, Count);
+			this.transferEncoding.EncodeAsync(Data, Offset, Count);
 
 			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
@@ -953,13 +950,8 @@ namespace Waher.Networking.HTTP
 			if (this.responseStream != null)
 				throw new Exception("Response stream already set.");
 
-			this.responseStream = ResponseStream;
+			this.responseStream = new BinaryOutputStream(ResponseStream);
 		}
-
-		/// <summary>
-		/// Underlying stream, if any.
-		/// </summary>
-		public Stream Stream => this.clientConnection?.Stream;
 
 		/// <summary>
 		/// Event raised when the response has been sent.

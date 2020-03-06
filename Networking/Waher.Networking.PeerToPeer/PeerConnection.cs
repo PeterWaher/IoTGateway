@@ -12,9 +12,6 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	public class PeerConnection : IDisposable
 	{
-		private const int BufferSize = 65536;
-
-		private readonly byte[] incomingBuffer = new byte[BufferSize];
 		private byte[] packetBuffer = null;
 		private readonly PeerToPeerNetwork network;
 		private IPEndPoint remoteEndpoint;
@@ -44,30 +41,26 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpConnection.OnSent += TcpConnection_OnSent;
 		}
 
-		private async Task<bool> TcpConnection_OnSent(object Sender, byte[] Packet)
+		private async Task TcpConnection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			this.lastTcpPacket = DateTime.Now;
 
-			BinaryEventHandler h = this.OnSent;
-			if (h != null)
+			BinaryDataWrittenEventHandler h = this.OnSent;
+			if (!(h is null))
 			{
 				try
 				{
-					return await h(this, Packet);
+					await h(this, Buffer, Offset, Count);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
 			}
-
-			return true;
 		}
 
-		private async Task<bool> TcpConnection_OnReceived(object Sender, byte[] Packet)
+		private async Task<bool> TcpConnection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			BinaryEventHandler h;
-			int NrRead = Packet.Length;
 			bool Continue = true;
 
 			this.lastTcpPacket = DateTime.Now;
@@ -75,16 +68,15 @@ namespace Waher.Networking.PeerToPeer
 
 			if (this.encapsulatePackets)
 			{
-				int Pos = 0;
 				int NrLeft;
 				byte b;
 				
-				while (Pos < NrRead && Continue && !this.disposed)
+				while (Count-- > 0 && Continue && !this.disposed)
 				{
 					switch (this.readState)
 					{
 						case 0:
-							b = this.incomingBuffer[Pos++];
+							b = Buffer[Offset++];
 							this.packetSize |= (b & 127) << this.offset;
 							this.offset += 7;
 							if ((b & 128) == 0)
@@ -96,28 +88,14 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 						case 1:
-							NrLeft = NrRead - Pos;
-							if (NrLeft > this.packetSize - this.packetPos)
-								NrLeft = this.packetSize - this.packetPos;
-
-							Array.Copy(this.incomingBuffer, Pos, this.packetBuffer, this.packetPos, NrLeft);
-							Pos += NrLeft;
+							NrLeft = Math.Min(Count, this.packetSize - this.packetPos);
+							Array.Copy(Buffer, Offset, this.packetBuffer, this.packetPos, NrLeft);
+							Offset += NrLeft;
 							this.packetPos += NrLeft;
 
 							if (this.packetPos >= this.packetSize)
 							{
-								h = this.OnReceived;
-								if (h != null)
-								{
-									try
-									{
-										Continue = await h(this, this.packetBuffer);
-									}
-									catch (Exception ex)
-									{
-										Log.Critical(ex);
-									}
-								}
+								Continue = await this.OnPacketReceived();
 
 								this.readState = 0;
 								this.packetSize = 0;
@@ -127,33 +105,38 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 						default:
-							Pos = NrRead;
+							Count = 0;
 							break;
 					}
 				}
 			}
 			else
 			{
-				this.packetSize = NrRead;
-				this.packetBuffer = new byte[this.packetSize];
-
-				Array.Copy(this.incomingBuffer, 0, this.packetBuffer, 0, NrRead);
-
-				h = this.OnReceived;
-				if (h != null)
-				{
-					try
-					{
-						Continue = await h(this, this.packetBuffer);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+				this.packetSize = Count;
+				this.packetBuffer = new byte[Count];
+				Array.Copy(Buffer, Offset, this.packetBuffer, 0, Count);
+				Continue = await this.OnPacketReceived();
 			}
 
 			return Continue;
+		}
+
+		private async Task<bool> OnPacketReceived()
+		{
+			BinaryDataReadEventHandler h = this.OnReceived;
+			if (!(h is null))
+			{
+				try
+				{
+					return await h(this, this.packetBuffer, 0, this.packetSize);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		
+			return true;
 		}
 
 		private void TcpConnection_OnError(object Sender, Exception Exception)
@@ -251,7 +234,7 @@ namespace Waher.Networking.PeerToPeer
 				return;
 
 			byte[] EncodedPacket = this.EncodePacket(Packet, false);
-			this.tcpConnection.Send(EncodedPacket, Callback);
+			this.tcpConnection.SendAsync(EncodedPacket, Callback);
 		}
 
 		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber)
@@ -365,7 +348,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
-		public event BinaryEventHandler OnSent = null;
+		public event BinaryDataWrittenEventHandler OnSent = null;
 
 		/// <summary>
 		/// If reading has been paused.
@@ -383,7 +366,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Event received when binary data has been received.
 		/// </summary>
-		public event BinaryEventHandler OnReceived = null;
+		public event BinaryDataReadEventHandler OnReceived = null;
 
 		private void Closed()
 		{
@@ -505,7 +488,7 @@ namespace Waher.Networking.PeerToPeer
 						this.lastReceivedPacket = FirstPacketNr;
 				}
 
-				BinaryEventHandler h = this.OnReceived;
+				BinaryDataReadEventHandler h = this.OnReceived;
 				if (h != null)
 				{
 					if (LostPackets != null)
@@ -514,7 +497,7 @@ namespace Waher.Networking.PeerToPeer
 						{
 							try
 							{
-								h(this, P.Value);
+								h(this, P.Value, 0, P.Value.Length);
 							}
 							catch (Exception ex)
 							{
@@ -527,7 +510,7 @@ namespace Waher.Networking.PeerToPeer
 					{
 						try
 						{
-							h(this, FirstPacket);
+							h(this, FirstPacket, 0, FirstPacket.Length);
 						}
 						catch (Exception ex)
 						{
@@ -544,12 +527,12 @@ namespace Waher.Networking.PeerToPeer
 
 				Array.Copy(Data, 0, Packet, 0, Len);
 
-				BinaryEventHandler h = this.OnReceived;
+				BinaryDataReadEventHandler h = this.OnReceived;
 				if (h != null)
 				{
 					try
 					{
-						h(this, Packet);
+						h(this, Packet, 0, Packet.Length);
 					}
 					catch (Exception ex)
 					{

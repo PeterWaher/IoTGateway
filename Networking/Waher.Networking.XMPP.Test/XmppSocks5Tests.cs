@@ -159,7 +159,7 @@ namespace Waher.Networking.XMPP.Test
 
 			Client1.OnDataReceived += (sender, e) =>
 			{
-				if (Encoding.UTF8.GetString(e.Data) == "Hello2")
+				if (Encoding.UTF8.GetString(e.Buffer, e.Offset, e.Count) == "Hello2")
 					Done1.Set();
 				else
 					Error1.Set();
@@ -167,7 +167,7 @@ namespace Waher.Networking.XMPP.Test
 
 			Client2.OnDataReceived += (sender, e) =>
 			{
-				if (Encoding.UTF8.GetString(e.Data) == "Hello1")
+				if (Encoding.UTF8.GetString(e.Buffer, e.Offset, e.Count) == "Hello1")
 					Done2.Set();
 				else
 					Error2.Set();
@@ -239,7 +239,7 @@ namespace Waher.Networking.XMPP.Test
 			{
 				e.AcceptStream((sender2, e2) =>
 				{
-					if (Encoding.ASCII.GetString(e2.Data) == "Hello1")
+					if (Encoding.ASCII.GetString(e2.Buffer, e2.Offset, e2.Count) == "Hello1")
 					{
 						Done2.Set();
 						e2.Stream.Send(Encoding.ASCII.GetBytes("Hello2"));
@@ -259,7 +259,7 @@ namespace Waher.Networking.XMPP.Test
 				{
 					e.Stream.OnDataReceived += (sender2, e2) =>
 					{
-						if (Encoding.ASCII.GetString(e2.Data) == "Hello2")
+						if (Encoding.ASCII.GetString(e2.Buffer, e2.Offset, e2.Count) == "Hello2")
 							Done1.Set();
 						else
 							Error1.Set();

@@ -2267,7 +2267,7 @@ namespace Waher.Persistence.Serialization
 				}
 				catch (FileLoadException ex)
 				{
-					Log.Notice(ex.Message, Type.FullName);
+					Log.Warning(ex.Message, Type.FullName);
 					this.customSerializer = new ObjectSerializer(Type, Context, false);
 				}
 			}

@@ -449,6 +449,16 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets the object serializer corresponding to a specific type, if one exists.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer if exists, or null if not.</returns>
+		public IObjectSerializer GetObjectSerializerNoCreate(Type Type)
+		{
+			return this.serializers.GetObjectSerializerNoCreate(Type);
+		}
+
+		/// <summary>
 		/// Gets the object serializer corresponding to a specific object.
 		/// </summary>
 		/// <param name="Object">Object to serialize</param>

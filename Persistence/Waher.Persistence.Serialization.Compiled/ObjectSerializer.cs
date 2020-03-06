@@ -2267,8 +2267,12 @@ namespace Waher.Persistence.Serialization
 				}
 				catch (FileLoadException ex)
 				{
-					Log.Warning(ex.Message, Type.FullName);
-					this.customSerializer = new ObjectSerializer(Type, Context, false);
+					this.customSerializer = this.context.GetObjectSerializer(Type); // Created in other thread?
+					if (this.customSerializer is null)
+					{
+						Log.Warning(ex.Message, Type.FullName);
+						this.customSerializer = new ObjectSerializer(Type, Context, false);
+					}
 				}
 			}
 			else

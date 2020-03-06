@@ -1752,7 +1752,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async Task<bool> ProcessFragment(string Xml)
+		private Task<bool> ProcessFragment(string Xml)
 		{
 			XmlDocument Doc;
 			XmlElement E;
@@ -1906,12 +1906,12 @@ namespace Waher.Networking.XMPP
 								if (StartTls && this.allowEncryption)
 								{
 									this.BeginWrite("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>", null);
-									return true;
+									return Task.FromResult<bool>(true);
 								}
 								else if (Auth)
 								{
 									this.StartAuthentication();
-									return true;
+									return Task.FromResult<bool>(true);
 								}
 								else if (Bind)
 								{
@@ -1923,28 +1923,28 @@ namespace Waher.Networking.XMPP
 										this.SendIqSet(string.Empty, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
 											XML.Encode(this.resource) + "</resource></bind>", this.BindResult, null);
 									}
-									return true;
+									return Task.FromResult<bool>(true);
 								}
 								else if (this.createSession)
 								{
 									this.createSession = false;
 									this.State = XmppState.RequestingSession;
 									this.SendIqSet(string.Empty, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
-									return true;
+									return Task.FromResult<bool>(true);
 								}
 								else if (this.authenticationMechanisms.Count > 0 &&
 									(this.state == XmppState.Connecting || this.state == XmppState.StreamNegotiation ||
 									this.state == XmppState.StreamOpened || this.state == XmppState.StartingEncryption))
 								{
 									this.StartAuthentication();
-									return true;
+									return Task.FromResult<bool>(true);
 								}
 							}
 							break;
 
 						case "proceed":
-							this.upgradeToTls = false;
-							return false;
+							this.upgradeToTls = true;
+							return Task.FromResult<bool>(false);
 
 						case "failure":
 							if (this.authenticationMethod != null)
@@ -1996,7 +1996,7 @@ namespace Waher.Networking.XMPP
 								this.Information("Reconnecting to " + this.host);
 
 								this.Connect(this.domain);
-								return false;
+								return Task.FromResult<bool>(false);
 							}
 							else
 								throw StreamException;
@@ -2026,10 +2026,10 @@ namespace Waher.Networking.XMPP
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
-				return false;
+				return Task.FromResult<bool>(false);
 			}
 
-			return true;
+			return Task.FromResult<bool>(true);
 		}
 
 		private bool ValidateSender(XmlElement Stanza, string From, string FromBareJid)

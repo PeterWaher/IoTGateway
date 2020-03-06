@@ -120,6 +120,22 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Gets the object serializer corresponding to a specific type, if one exists.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer if exists, or null if not.</returns>
+		public IObjectSerializer GetObjectSerializerNoCreate(Type Type)
+		{
+			lock (this.synchObj)
+			{
+				if (this.serializers.TryGetValue(Type, out IObjectSerializer Result))
+					return Result;
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Gets the object serializer corresponding to a specific type.
 		/// </summary>
 		/// <param name="Type">Type of object to serialize.</param>

@@ -497,8 +497,13 @@ namespace Waher.Networking
 #else
 					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.cancelReading.Token);
 #endif
-					if (this.disposing || this.disposed || NrRead <= 0)
+					if (this.disposing || this.disposed)
 						break;
+					else if (NrRead <= 0)
+					{
+						this.Disconnected();
+						break;
+					}
 
 					try
 					{
@@ -520,21 +525,16 @@ namespace Waher.Networking
 			}
 			finally
 			{
-				bool DoDispose;
-
 				lock (this.synchObj)
 				{
 					this.reading = false;
 
-					if (DoDispose = this.disposing && !this.sending)
+					if (this.disposing && !this.sending)
 						this.DoDisposeLocked();
 				}
-
-				if (!DoDispose)
-					this.Disconnected();
 			}
 
-			if (!Continue)
+			if (!Continue && !this.disposed && !this.disposing)
 			{
 				AsyncEventHandler h = this.OnPaused;
 				if (!(h is null))

@@ -72,6 +72,13 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Type">Type of object to serialize.</param>
 		/// <returns>Object Serializer</returns>
 		IObjectSerializer GetObjectSerializer(Type Type);
+		
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific type, if one exists.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer if exists, or null if not.</returns>
+		IObjectSerializer GetObjectSerializerNoCreate(Type Type);
 
 		/// <summary>
 		/// Creates a new GUID.

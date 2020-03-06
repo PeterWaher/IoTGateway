@@ -188,8 +188,8 @@ namespace Waher.Client.WPF.Dialogs
 				this.client.OnRegistrationForm += Client_OnRegistrationForm;
 			}
 
-			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
-			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnStateChanged += this.Client_OnStateChanged;
+			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.Connect();
 		}
 

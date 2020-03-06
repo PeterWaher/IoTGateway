@@ -168,7 +168,7 @@ namespace Waher.Networking.XMPP.Chat
             this.provisioningClient = ProvisioningClient;
             this.concentratorServer = null;
 
-            this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
+            this.client.OnChatMessage += this.Client_OnChatMessage;
 
             this.client.RegisterFeature("urn:xmpp:iot:chat");
             this.client.SetPresence(Availability.Chat);
@@ -197,7 +197,7 @@ namespace Waher.Networking.XMPP.Chat
             this.provisioningClient = ProvisioningClient;
             this.concentratorServer = ConcentratorServer;
 
-            this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
+            this.client.OnChatMessage += this.Client_OnChatMessage;
 
             this.client.RegisterFeature("urn:xmpp:iot:chat");
             this.client.SetPresence(Availability.Chat);
@@ -379,7 +379,6 @@ namespace Waher.Networking.XMPP.Chat
             try
             {
                 Variables Variables = this.GetVariables(e.From);
-                SortedDictionary<int, KeyValuePair<string, object>> Menu = null;
                 IDataSource SelectedSource = null;
                 INode SelectedNode = null;
                 int i;
@@ -390,8 +389,11 @@ namespace Waher.Networking.XMPP.Chat
                     this.httpUpload.Discover(null);
                 }
 
-                if (!Variables.TryGetVariable(" Menu ", out Variable v) || (Menu = v.ValueObject as SortedDictionary<int, KeyValuePair<string, object>>) is null)
+                if (!Variables.TryGetVariable(" Menu ", out Variable v) ||
+                    !(v.ValueObject is SortedDictionary<int, KeyValuePair<string, object>> Menu))
+                {
                     Menu = null;
+                }
 
                 if (this.concentratorServer != null)
                 {
@@ -1565,10 +1567,8 @@ namespace Waher.Networking.XMPP.Chat
             {
                 s = this.bobClient.StoreData(Bin, "image/png");
 
-                Dictionary<string, bool> ContentIDs;
-
                 if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
-                    (ContentIDs = v.ValueObject as Dictionary<string, bool>) is null)
+                    !(v.ValueObject is Dictionary<string, bool> ContentIDs))
                 {
                     ContentIDs = new Dictionary<string, bool>();
                     Variables[" ContentIDs "] = ContentIDs;
@@ -1623,7 +1623,7 @@ namespace Waher.Networking.XMPP.Chat
             }
         }
 
-        private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string From, string Field)
+        private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)
         {
             Variables Variables = this.GetVariables(Address);
             List<KeyValuePair<string, string>> Exp = null;
@@ -1937,9 +1937,9 @@ namespace Waher.Networking.XMPP.Chat
             string Field = (string)P[2];
             RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
             string OrgSubject = (string)P[4];
-            int RowNr = (int)P[5];
+            //int RowNr = (int)P[5];
             int NrRows = (int)P[6];
-            bool Last = RowNr == NrRows;
+            //bool Last = RowNr == NrRows;
             StringBuilder sb = new StringBuilder();
             QuantityField QF;
 
@@ -2008,7 +2008,7 @@ namespace Waher.Networking.XMPP.Chat
             }
         }
 
-        private void CheckMomentaryValuesHeader(object[] P, StringBuilder sb, RemoteXmppSupport Support)
+        private void CheckMomentaryValuesHeader(object[] P, StringBuilder sb, RemoteXmppSupport _)
         {
             if ((bool)P[1])
             {
@@ -2023,12 +2023,12 @@ namespace Waher.Networking.XMPP.Chat
         {
             object[] P = (object[])e.State;
             string From = (string)P[0];
-            string Field = (string)P[2];
+            //string Field = (string)P[2];
             RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
             string OrgSubject = (string)P[4];
-            int RowNr = (int)P[5];
+            //int RowNr = (int)P[5];
             int NrRows = (int)P[6];
-            bool Last = RowNr == NrRows;
+            //bool Last = RowNr == NrRows;
             StringBuilder sb = new StringBuilder();
 
             foreach (ThingError Error in e.Errors)
@@ -2059,9 +2059,9 @@ namespace Waher.Networking.XMPP.Chat
             string Field = (string)P[2];
             RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
             string OrgSubject = (string)P[4];
-            int RowNr = (int)P[5];
+            //int RowNr = (int)P[5];
             int NrRows = (int)P[6];
-            bool Last = RowNr == NrRows;
+            //bool Last = RowNr == NrRows;
             StringBuilder sb = new StringBuilder();
             QuantityField QF;
             DateTime TP;
@@ -2135,7 +2135,7 @@ namespace Waher.Networking.XMPP.Chat
             // TODO: Localization
         }
 
-        private void CheckAllFieldsHeader(object[] P, StringBuilder sb, RemoteXmppSupport Support)
+        private void CheckAllFieldsHeader(object[] P, StringBuilder sb, RemoteXmppSupport _)
         {
             if ((bool)P[1])
             {
@@ -2150,12 +2150,12 @@ namespace Waher.Networking.XMPP.Chat
         {
             object[] P = (object[])e.State;
             string From = (string)P[0];
-            string Field = (string)P[2];
+            //string Field = (string)P[2];
             RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
             string OrgSubject = (string)P[4];
-            int RowNr = (int)P[5];
+            //int RowNr = (int)P[5];
             int NrRows = (int)P[6];
-            bool Last = RowNr == NrRows;
+            //bool Last = RowNr == NrRows;
             StringBuilder sb = new StringBuilder();
 
             foreach (ThingError Error in e.Errors)

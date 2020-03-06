@@ -24,7 +24,7 @@ namespace Waher.Client.WPF.Dialogs
 	/// </summary>
 	public partial class ParameterDialog : Window
 	{
-		private DataForm form;
+		private readonly DataForm form;
 		private FrameworkElement makeVisible = null;
 
 		/// <summary>
@@ -169,7 +169,7 @@ namespace Waher.Client.WPF.Dialogs
 			return First;
 		}
 
-		private void Layout(Panel Container, Networking.XMPP.DataForms.Layout.TextElement TextElement, DataForm Form)
+		private void Layout(Panel Container, Networking.XMPP.DataForms.Layout.TextElement TextElement, DataForm _)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -195,28 +195,26 @@ namespace Waher.Client.WPF.Dialogs
 			else
 				Field.Validate(Field.ValueStrings);
 
-			if (Field is TextSingleField)
-				Result = this.Layout(Container, (TextSingleField)Field, Form);
-			else if (Field is TextMultiField)
-				Result = this.Layout(Container, (TextMultiField)Field, Form);
-			else if (Field is TextPrivateField)
-				Result = this.Layout(Container, (TextPrivateField)Field, Form);
-			else if (Field is BooleanField)
-				Result = this.Layout(Container, (BooleanField)Field, Form);
-			else if (Field is ListSingleField)
-				Result = this.Layout(Container, (ListSingleField)Field, Form);
-			else if (Field is ListMultiField)
-				Result = this.Layout(Container, (ListMultiField)Field, Form);
-			else if (Field is FixedField)
-				this.Layout(Container, (FixedField)Field, Form);
-			else if (Field is HiddenField)
-				this.Layout(Container, (HiddenField)Field, Form);
-			else if (Field is JidMultiField)
-				Result = this.Layout(Container, (JidMultiField)Field, Form);
-			else if (Field is JidSingleField)
-				Result = this.Layout(Container, (JidSingleField)Field, Form);
-			else if (Field is MediaField)
-				this.Layout(Container, (MediaField)Field, Form);
+			if (Field is TextSingleField TextSingleField)
+				Result = this.Layout(Container, TextSingleField, Form);
+			else if (Field is TextMultiField TextMultiField)
+				Result = this.Layout(Container, TextMultiField, Form);
+			else if (Field is TextPrivateField TextPrivateField)
+				Result = this.Layout(Container, TextPrivateField, Form);
+			else if (Field is BooleanField BooleanField)
+				Result = this.Layout(Container, BooleanField, Form);
+			else if (Field is ListSingleField ListSingleField)
+				Result = this.Layout(Container, ListSingleField, Form);
+			else if (Field is ListMultiField ListMultiField)
+				Result = this.Layout(Container, ListMultiField, Form);
+			else if (Field is FixedField FixedField)
+				this.Layout(Container, FixedField, Form);
+			else if (Field is JidMultiField JidMultiField)
+				Result = this.Layout(Container, JidMultiField, Form);
+			else if (Field is JidSingleField JidSingleField)
+				Result = this.Layout(Container, JidSingleField, Form);
+			else if (Field is MediaField MediaField)
+				this.Layout(Container, MediaField, Form);
 
 			if (MakeVisible && this.makeVisible is null)
 				this.makeVisible = Result;
@@ -224,7 +222,7 @@ namespace Waher.Client.WPF.Dialogs
 			return Result;
 		}
 
-		private Control Layout(Panel Container, BooleanField Field, DataForm Form)
+		private Control Layout(Panel Container, BooleanField Field, DataForm _)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -260,7 +258,7 @@ namespace Waher.Client.WPF.Dialogs
 			else if (Field.NotSame)
 				CheckBox.Background = new SolidColorBrush(Colors.LightGray);
 
-			CheckBox.Click += new RoutedEventHandler(CheckBox_Click);
+			CheckBox.Click += this.CheckBox_Click;
 
 			Container.Children.Add(CheckBox);
 
@@ -310,7 +308,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.OkButton.IsEnabled = true;
 		}
 
-		private void Layout(Panel Container, FixedField Field, DataForm Form)
+		private void Layout(Panel Container, FixedField Field, DataForm _)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -322,15 +320,10 @@ namespace Waher.Client.WPF.Dialogs
 			Container.Children.Add(TextBlock);
 		}
 
-		private void Layout(Panel Container, HiddenField Field, DataForm Form)
-		{
-			// Do nothing
-		}
-
-		private Control Layout(Panel Container, JidMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, JidMultiField Field, DataForm _)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
-			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.TextChanged += this.TextBox_TextChanged;
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -338,15 +331,15 @@ namespace Waher.Client.WPF.Dialogs
 			return TextBox;
 		}
 
-		private Control Layout(Panel Container, JidSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, JidSingleField Field, DataForm _)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
-			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.TextChanged += this.TextBox_TextChanged;
 
 			return TextBox;
 		}
 
-		private Control Layout(Panel Container, ListMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, ListMultiField Field, DataForm _)
 		{
 			TextBlock TextBlock = new TextBlock()
 			{
@@ -391,7 +384,7 @@ namespace Waher.Client.WPF.Dialogs
 				else if (Field.NotSame)
 					CheckBox.Background = new SolidColorBrush(Colors.LightGray);
 
-				CheckBox.Click += new RoutedEventHandler(MultiListCheckBox_Click);
+				CheckBox.Click += this.MultiListCheckBox_Click;
 
 				StackPanel.Children.Add(CheckBox);
 			}
@@ -458,7 +451,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private Control Layout(Panel Container, ListSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, ListSingleField Field, DataForm _)
 		{
 			this.LayoutControlLabel(Container, Field);
 
@@ -501,7 +494,7 @@ namespace Waher.Client.WPF.Dialogs
 
 				ComboBox.IsEditable = false;
 				ComboBox.SelectedIndex = Array.FindIndex<KeyValuePair<string, string>>(Field.Options, (P) => P.Value.Equals(s));
-				ComboBox.SelectionChanged += new SelectionChangedEventHandler(ComboBox_SelectionChanged);
+				ComboBox.SelectionChanged += this.ComboBox_SelectionChanged;
 			}
 
 			Container.Children.Add(ComboBox);
@@ -579,7 +572,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Layout(Panel Container, MediaField Field, DataForm Form)
+		private void Layout(Panel Container, MediaField Field, DataForm _)
 		{
 			MediaElement MediaElement;
 			Uri Uri = null;
@@ -750,7 +743,7 @@ namespace Waher.Client.WPF.Dialogs
 				};
 
 				ControlPanel.Children.Add(Button);
-				Button.Click += new RoutedEventHandler(Rewind_Click);
+				Button.Click += this.Rewind_Click;
 
 				Button = new Button()
 				{
@@ -762,7 +755,7 @@ namespace Waher.Client.WPF.Dialogs
 				};
 
 				ControlPanel.Children.Add(Button);
-				Button.Click += new RoutedEventHandler(Play_Click);
+				Button.Click += this.Play_Click;
 
 				Button = new Button()
 				{
@@ -774,7 +767,7 @@ namespace Waher.Client.WPF.Dialogs
 				};
 
 				ControlPanel.Children.Add(Button);
-				Button.Click += new RoutedEventHandler(Pause_Click);
+				Button.Click += this.Pause_Click;
 
 				Button = new Button()
 				{
@@ -786,7 +779,7 @@ namespace Waher.Client.WPF.Dialogs
 				};
 
 				ControlPanel.Children.Add(Button);
-				Button.Click += new RoutedEventHandler(Stop_Click);
+				Button.Click += this.Stop_Click;
 
 				Button = new Button()
 				{
@@ -798,7 +791,7 @@ namespace Waher.Client.WPF.Dialogs
 				};
 
 				ControlPanel.Children.Add(Button);
-				Button.Click += new RoutedEventHandler(Forward_Click);
+				Button.Click += this.Forward_Click;
 
 				MediaElement.Play();
 			}
@@ -854,10 +847,10 @@ namespace Waher.Client.WPF.Dialogs
 				MediaElement.SpeedRatio *= 2;
 		}
 
-		private Control Layout(Panel Container, TextMultiField Field, DataForm Form)
+		private Control Layout(Panel Container, TextMultiField Field, DataForm _)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
-			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.TextChanged += this.TextBox_TextChanged;
 			TextBox.AcceptsReturn = true;
 			TextBox.AcceptsTab = true;
 			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -866,7 +859,7 @@ namespace Waher.Client.WPF.Dialogs
 			return TextBox;
 		}
 
-		private Control Layout(Panel Container, TextPrivateField Field, DataForm Form)
+		private Control Layout(Panel Container, TextPrivateField Field, DataForm _)
 		{
 			this.LayoutControlLabel(Container, Field);
 
@@ -884,7 +877,7 @@ namespace Waher.Client.WPF.Dialogs
 			else if (Field.NotSame)
 				PasswordBox.Background = new SolidColorBrush(Colors.LightGray);
 
-			PasswordBox.PasswordChanged += new RoutedEventHandler(PasswordBox_PasswordChanged);
+			PasswordBox.PasswordChanged += this.PasswordBox_PasswordChanged;
 
 			Container.Children.Add(PasswordBox);
 			PasswordBox.Tag = this.LayoutErrorLabel(Container, Field);
@@ -921,10 +914,10 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private Control Layout(Panel Container, TextSingleField Field, DataForm Form)
+		private Control Layout(Panel Container, TextSingleField Field, DataForm _)
 		{
 			TextBox TextBox = this.LayoutTextBox(Container, Field);
-			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.TextChanged += this.TextBox_TextChanged;
 
 			return TextBox;
 		}
@@ -1025,7 +1018,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Layout(Panel Container, ReportedReference ReportedReference, DataForm Form)
+		private void Layout(Panel Container, ReportedReference _, DataForm Form)
 		{
 			if (Form.Records.Length == 0 || Form.Header.Length == 0)
 				return;

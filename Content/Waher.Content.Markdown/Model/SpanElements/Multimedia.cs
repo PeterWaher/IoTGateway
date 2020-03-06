@@ -15,8 +15,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	public class Multimedia : MarkdownElementChildren
 	{
 		private IMultimediaContent handler = null;
-		private MultimediaItem[] items;
-		private bool aloneInParagraph;
+		private readonly MultimediaItem[] items;
+		private readonly bool aloneInParagraph;
 
 		/// <summary>
 		/// Multimedia
@@ -105,7 +105,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			IMultimediaContent Best = null;
 			Grade BestGrade = Grade.NotAtAll;
-			Grade CurrentGrade = Grade.NotAtAll;
+			Grade CurrentGrade;
 
 			foreach (MultimediaItem Item in Items)
 			{
@@ -161,7 +161,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						}
 
 						handlers = Handlers.ToArray();
-						Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
+						Types.OnInvalidated += Types_OnInvalidated;
 					}
 				}
 				return handlers;
@@ -177,7 +177,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		private static IMultimediaContent[] handlers = null;
-		private static object synchObject = new object();
+		private readonly static object synchObject = new object();
 
 		/// <summary>
 		/// Generates XAML for the markdown element.

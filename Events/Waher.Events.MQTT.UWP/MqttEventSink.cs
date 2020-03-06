@@ -22,12 +22,12 @@ namespace Waher.Events.MQTT
 		/// </summary>
 		internal const string NamespaceEventLogging = "urn:xmpp:eventlog";
 
-		private MqttClient client;
-		private string topic;
+		private readonly MqttClient client;
+		private readonly string topic;
 		private bool connected;
 		private uint eventsLost = 0;
-		private object synchObj = new object();
-		private Timer timer = null;
+		private readonly object synchObj = new object();
+		private readonly Timer timer = null;
 
 		/// <summary>
 		/// Event sink sending events to a topic on an MQTT server. Events are sent as XML fragments.
@@ -46,7 +46,7 @@ namespace Waher.Events.MQTT
 			this.client = Client;
 			this.topic = Topic;
 
-			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+			this.client.OnStateChanged += this.Client_OnStateChanged;
 			this.connected = this.client.State == MqttState.Connected;
 
 			if (MaintainConnected)
@@ -149,31 +149,31 @@ namespace Waher.Events.MQTT
 			if (!string.IsNullOrEmpty(s = Event.EventId))
 			{
 				Xml.Append("' id='");
-				Xml.Append(XML.Encode(Event.EventId));
+				Xml.Append(XML.Encode(s));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Object))
 			{
 				Xml.Append("' object='");
-				Xml.Append(XML.Encode(Event.Object));
+				Xml.Append(XML.Encode(s));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Actor))
 			{
 				Xml.Append("' subject='");
-				Xml.Append(XML.Encode(Event.Actor));
+				Xml.Append(XML.Encode(s));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Facility))
 			{
 				Xml.Append("' facility='");
-				Xml.Append(XML.Encode(Event.Facility));
+				Xml.Append(XML.Encode(s));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Module))
 			{
 				Xml.Append("' module='");
-				Xml.Append(XML.Encode(Event.Module));
+				Xml.Append(XML.Encode(s));
 			}
 
 			Xml.Append("'><message>");
@@ -299,7 +299,7 @@ namespace Waher.Events.MQTT
 			if (!string.IsNullOrEmpty(s = Event.StackTrace))
 			{
 				Xml.Append("<stackTrace>");
-				Xml.Append(XML.Encode(Event.StackTrace));
+				Xml.Append(XML.Encode(s));
 				Xml.Append("</stackTrace>");
 			}
 

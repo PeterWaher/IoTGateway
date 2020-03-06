@@ -138,7 +138,7 @@ namespace Waher.Networking.PeerToPeer
 				if (this.upnpClient is null)
 				{
 					this.upnpClient = new UPnPClient(this.sniffers);
-					this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(UpnpClient_OnDeviceFound);
+					this.upnpClient.OnDeviceFound += this.UpnpClient_OnDeviceFound;
 				}
 
 				lock (this.ipAddressesFound)

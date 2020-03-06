@@ -183,14 +183,14 @@ namespace Waher.Client.WPF.Model
 			if (Sniffers != null)
 				this.client.AddRange(Sniffers);
 
-			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
-			this.client.OnError += new ExceptionEventHandler(Client_OnError);
-			this.client.OnPresence += new PresenceEventHandler(Client_OnPresence);
-			this.client.OnPresenceSubscribe += new PresenceEventHandler(Client_OnPresenceSubscribe);
-			this.client.OnPresenceUnsubscribe += new PresenceEventHandler(Client_OnPresenceUnsubscribe);
-			this.client.OnRosterItemAdded += new RosterItemEventHandler(Client_OnRosterItemUpdated);
-			this.client.OnRosterItemRemoved += new RosterItemEventHandler(Client_OnRosterItemRemoved);
-			this.client.OnRosterItemUpdated += new RosterItemEventHandler(Client_OnRosterItemUpdated);
+			this.client.OnStateChanged += this.Client_OnStateChanged;
+			this.client.OnError += this.Client_OnError;
+			this.client.OnPresence += this.Client_OnPresence;
+			this.client.OnPresenceSubscribe += this.Client_OnPresenceSubscribe;
+			this.client.OnPresenceUnsubscribe += this.Client_OnPresenceUnsubscribe;
+			this.client.OnRosterItemAdded += this.Client_OnRosterItemUpdated;
+			this.client.OnRosterItemRemoved += this.Client_OnRosterItemRemoved;
+			this.client.OnRosterItemUpdated += this.Client_OnRosterItemUpdated;
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
 			this.client.OnNormalMessage += Client_OnNormalMessage;
 

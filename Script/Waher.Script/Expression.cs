@@ -69,7 +69,7 @@ namespace Waher.Script
 
 		static Expression()
 		{
-			Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
+			Types.OnInvalidated += Types_OnInvalidated;
 		}
 
 		private static void Types_OnInvalidated(object sender, EventArgs e)

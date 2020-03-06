@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static void ClassInitialize(TestContext _)
 		{
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
@@ -62,9 +62,9 @@ namespace Waher.Networking.XMPP.Test
 
 			this.client.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 
-			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
-			this.client.OnError += new ExceptionEventHandler(Client_OnError);
-			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+			this.client.OnConnectionError += this.Client_OnConnectionError;
+			this.client.OnError += this.Client_OnError;
+			this.client.OnStateChanged += this.Client_OnStateChanged;
 			this.client.Connect();
 		}
 
@@ -216,9 +216,9 @@ namespace Waher.Networking.XMPP.Test
 			this.Connection_Test_03_Disconnect();
 
 			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
-			this.client.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError);
-			this.client.OnError += new ExceptionEventHandler(Client_OnError);
-			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+			this.client.OnConnectionError += this.Client_OnConnectionError;
+			this.client.OnError += this.Client_OnError;
+			this.client.OnStateChanged += this.Client_OnStateChanged;
 			this.client.Connect();
 
 			this.WaitError(10000);

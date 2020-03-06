@@ -34,10 +34,10 @@ namespace Waher.Client.WPF.Controls
 	public partial class SensorDataView : UserControl, ITabView
 	{
 		private SensorDataClientRequest request;
-		private TreeNode node;
-		private Dictionary<string, bool> nodes = new Dictionary<string, bool>();
-		private Dictionary<string, bool> failed = new Dictionary<string, bool>();
-		private bool subscription;
+		private readonly TreeNode node;
+		private readonly Dictionary<string, bool> nodes = new Dictionary<string, bool>();
+		private readonly Dictionary<string, bool> failed = new Dictionary<string, bool>();
+		private readonly bool subscription;
 
 		public SensorDataView(SensorDataClientRequest Request, TreeNode Node, bool Subscription)
 		{
@@ -50,13 +50,13 @@ namespace Waher.Client.WPF.Controls
 			if (this.request != null)
 			{
 				this.Request_OnErrorsReceived(this, Request.Errors);
-				this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+				this.request.OnErrorsReceived += this.Request_OnErrorsReceived;
 
 				this.Request_OnFieldsReceived(this, Request.ReadFields);
-				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
+				this.request.OnFieldsReceived += this.Request_OnFieldsReceived;
 
 				this.Request_OnStateChanged(this, Request.State);
-				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
+				this.request.OnStateChanged += this.Request_OnStateChanged;
 			}
 		}
 
@@ -67,9 +67,9 @@ namespace Waher.Client.WPF.Controls
 				if (this.request is SensorDataSubscriptionRequest Subscription)
 					Subscription.Unsubscribe();
 
-				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
-				this.request.OnFieldsReceived -= new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
-				this.request.OnErrorsReceived -= new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+				this.request.OnStateChanged -= this.Request_OnStateChanged;
+				this.request.OnFieldsReceived -= this.Request_OnFieldsReceived;
+				this.request.OnErrorsReceived -= this.Request_OnErrorsReceived;
 			}
 
 			if (this.SensorDataListView.View is GridView GridView)
@@ -235,16 +235,16 @@ namespace Waher.Client.WPF.Controls
 						Rules.Add(new FieldSubscriptionRule(Field.Name, string.Empty, 1));
 				}
 
-				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
-				this.request.OnFieldsReceived -= new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
-				this.request.OnErrorsReceived -= new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+				this.request.OnStateChanged -= this.Request_OnStateChanged;
+				this.request.OnFieldsReceived -= this.Request_OnFieldsReceived;
+				this.request.OnErrorsReceived -= this.Request_OnErrorsReceived;
 				this.request = null;
 
 				this.request = this.node.SubscribeSensorDataMomentaryReadout(Rules.ToArray());
 
-				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
-				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
-				this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+				this.request.OnStateChanged += this.Request_OnStateChanged;
+				this.request.OnFieldsReceived += this.Request_OnFieldsReceived;
+				this.request.OnErrorsReceived += this.Request_OnErrorsReceived;
 			}
 		}
 
@@ -392,7 +392,7 @@ namespace Waher.Client.WPF.Controls
 				switch (E.LocalName)
 				{
 					case "resp":
-						Tuple<List<Field>, List<ThingError>> Response = SensorClient.ParseFields(E, out bool Done);
+						Tuple<List<Field>, List<ThingError>> Response = SensorClient.ParseFields(E, out bool _);
 
 						if (Response.Item1 != null)
 						{

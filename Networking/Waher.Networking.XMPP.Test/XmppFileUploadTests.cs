@@ -40,9 +40,9 @@ namespace Waher.Networking.XMPP.Test
 			};
 
 			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
-			this.client1.OnConnectionError += new ExceptionEventHandler(Client_OnConnectionError1);
-			this.client1.OnError += new ExceptionEventHandler(Client_OnError1);
-			this.client1.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged1);
+			this.client1.OnConnectionError += this.Client_OnConnectionError1;
+			this.client1.OnError += this.Client_OnError1;
+			this.client1.OnStateChanged += this.Client_OnStateChanged1;
 			this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 

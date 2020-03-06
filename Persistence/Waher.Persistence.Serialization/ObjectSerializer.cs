@@ -2226,7 +2226,7 @@ namespace Waher.Persistence.Serialization
 						References.Add(MetadataReference.CreateFromFile(Location));
 				}
 
-				CSharpCompilation Compilation = CSharpCompilation.Create("WPSA." + this.type.FullName,
+				CSharpCompilation Compilation = CSharpCompilation.Create("WPSA." + this.type.FullName + this.context.Id,
 					new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode) },
 					References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

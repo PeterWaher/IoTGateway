@@ -225,6 +225,13 @@
             <param name="Type">Type of object to serialize.</param>
             <returns>Object Serializer</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetObjectSerializerNoCreate(System.Type)">
+            <summary>
+            Gets the object serializer corresponding to a specific type, if one exists.
+            </summary>
+            <param name="Type">Type of object to serialize.</param>
+            <returns>Object Serializer if exists, or null if not.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetObjectSerializerEx(System.Object)">
             <summary>
             Gets the object serializer corresponding to a specific object.

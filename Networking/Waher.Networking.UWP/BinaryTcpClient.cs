@@ -165,6 +165,11 @@ namespace Waher.Networking
 		/// Underlying <see cref="TcpClient"/> object.
 		/// </summary>
 		public TcpClient Client => this.tcpClient;
+
+		/// <summary>
+		/// Stream object currently being used.
+		/// </summary>
+		public Stream Stream => this.stream;
 #endif
 
 		/// <summary>

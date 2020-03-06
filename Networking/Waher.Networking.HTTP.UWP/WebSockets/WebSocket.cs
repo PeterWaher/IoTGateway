@@ -152,6 +152,14 @@ namespace Waher.Networking.HTTP.WebSockets
 		}
 #endif
 		/// <summary>
+		/// Current client connection
+		/// </summary>
+		public BinaryTcpClient ClientConnection
+		{
+			get { return this.connection?.Client; }
+		}
+
+		/// <summary>
 		/// Disposes the object.
 		/// </summary>
 		public void Dispose()
@@ -788,8 +796,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 
 			byte[] Packet = new byte[c];
-			int i = 0;
-			int j;
+			int i, j;
 			bool ControlFrame = (int)OpCode >= 8;
 
 			if (this.writingFragments && !ControlFrame)

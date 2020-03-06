@@ -118,6 +118,11 @@ namespace Waher.Networking.HTTP
 			get { return this.disposed; }
 		}
 
+		internal BinaryTcpClient Client
+		{
+			get { return this.client; }
+		}
+
 #if !WINDOWS_UWP
 		internal bool Encrypted
 		{

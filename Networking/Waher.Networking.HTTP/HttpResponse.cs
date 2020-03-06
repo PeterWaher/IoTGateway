@@ -411,8 +411,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		public override void Flush()
 		{
-			if (this.transferEncoding != null)
-				this.transferEncoding.FlushAsync();
+			this.transferEncoding?.FlushAsync();
+			base.Flush();
 		}
 
 		/// <summary>
@@ -421,12 +421,10 @@ namespace Waher.Networking.HTTP
 		/// <returns>A task that represents the asynchronous flush operation.</returns>
 		/// <exception cref="System.ObjectDisposedException">The text writer is disposed.</exception>
 		/// <exception cref="System.InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
-		public override Task FlushAsync()
+		public override async Task FlushAsync()
 		{
-			if (this.transferEncoding != null)
-				this.transferEncoding.FlushAsync();
-
-			return base.FlushAsync();
+			await this.transferEncoding?.FlushAsync();
+			await base.FlushAsync();
 		}
 
 		/// <summary>
@@ -451,6 +449,14 @@ namespace Waher.Networking.HTTP
 		public bool Disposed
 		{
 			get { return this.disposed; }
+		}
+
+		/// <summary>
+		/// Current client connection
+		/// </summary>
+		public BinaryTcpClient ClientConnection
+		{
+			get { return this.clientConnection?.Client; }
 		}
 
 		/// <summary>

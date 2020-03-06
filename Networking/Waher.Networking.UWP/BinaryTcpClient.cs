@@ -687,12 +687,12 @@ namespace Waher.Networking
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
 
+			if (Count == 0)
+				return;
+
 			int c = Buffer.Length;
 			if (Offset < 0 || Offset >= c)
 				throw new ArgumentOutOfRangeException("Invalid offset.", nameof(Offset));
-
-			if (Count == 0)
-				return;
 
 			if (Count < 0 || Offset + Count > c)
 				throw new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count));

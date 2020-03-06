@@ -1853,12 +1853,25 @@
             <param name="Callback">Callback method</param>
             <param name="State">State object</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Peer_OnReceived(System.Object,System.Byte[])">
+        <member name="P:Waher.Networking.XMPP.P2P.PeerState.Paused">
+            <summary>
+            If reading has been paused.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Continue">
+            <summary>
+            Continues a paused connection.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.PeerState.Peer_OnReceived(System.Object,System.Byte[],System.Int32,System.Int32)">
             <summary>
             Data received from a peer.
             </summary>
-            <param name="Sender">Sender</param>
-            <param name="Packet">Binary data.</param>
+            <param name="Sender">Sender of event</param>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+            <returns>If the process should be continued.</returns>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.PeerState.State">
             <summary>
@@ -1996,17 +2009,29 @@
             Event arguments for data reception events.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.#ctor(System.Byte[],Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client,System.Object)">
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.#ctor(System.Byte[],System.Int32,System.Int32,Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client,System.Object)">
             <summary>
             Event arguments for data reception events.
             </summary>
-            <param name="Data">Data received.</param>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte received.</param>
+            <param name="Count">Number of bytes received.</param>
             <param name="Stream">SOCKS5 client stream.</param>
             <param name="State">State</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Data">
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Buffer">
             <summary>
-            Data received.
+            Buffer holding received data.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Offset">
+            <summary>
+            Start index of first byte received.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Count">
+            <summary>
+            Number of bytes received.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventArgs.Stream">

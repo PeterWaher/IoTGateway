@@ -49,7 +49,7 @@ namespace Waher.Networking
 		private readonly byte[] buffer = new byte[BufferSize];
 		private readonly TcpClient tcpClient;
 		private Stream stream = null;
-		private readonly CancellationTokenSource source;
+		private readonly CancellationTokenSource cancelReading;
 #endif
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
@@ -97,7 +97,7 @@ namespace Waher.Networking
 			this.client = new StreamSocket();
 #else
 			this.tcpClient = new TcpClient();
-			this.source = new CancellationTokenSource();
+			this.cancelReading = new CancellationTokenSource();
 #endif
 		}
 
@@ -151,7 +151,7 @@ namespace Waher.Networking
 		{
 			this.sniffBinary = SniffBinary;
 			this.tcpClient = Client;
-			this.source = new CancellationTokenSource();
+			this.cancelReading = new CancellationTokenSource();
 		}
 #endif
 
@@ -196,7 +196,7 @@ namespace Waher.Networking
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);
-			return await this.PostConnect(Paused);
+			return this.PostConnect(Paused);
 #else
 			await this.tcpClient.ConnectAsync(Host, Port);
 			return this.PostConnect(Paused);
@@ -227,7 +227,7 @@ namespace Waher.Networking
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
-			return await this.PostConnect(Paused);
+			return this.PostConnect(Paused);
 #else
 			await this.tcpClient.ConnectAsync(Address, Port);
 			return this.PostConnect(Paused);
@@ -262,27 +262,6 @@ namespace Waher.Networking
 		}
 #endif
 
-#if WINDOWS_UWP
-		/// <summary>
-		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
-		/// </summary>
-		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
-		public Task<bool> Bind()
-		{
-			return this.Bind(false);
-		}
-
-		/// <summary>
-		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
-		/// </summary>
-		/// <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
-		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
-		public Task<bool> Bind(bool Paused)
-		{
-			this.PreConnect();
-			return this.PostConnect(Paused);
-		}
-#else
 		/// <summary>
 		/// Binds to a <see cref="TcpClient"/> that was already connected when provided to the constructor.
 		/// </summary>
@@ -300,7 +279,7 @@ namespace Waher.Networking
 			this.PreConnect();
 			this.PostConnect(Paused);
 		}
-#endif
+
 		/// <summary>
 		/// If the connection is open.
 		/// </summary>
@@ -326,16 +305,8 @@ namespace Waher.Networking
 			this.remoteCertificateValid = false;
 		}
 
-#if WINDOWS_UWP
-		private async Task<bool> PostConnect(bool Paused)
-#else
 		private bool PostConnect(bool Paused)
-#endif
 		{
-#if WINDOWS_UWP
-			bool DoDispose = false;
-#endif
-
 			lock (this.synchObj)
 			{
 				this.connecting = false;
@@ -344,25 +315,15 @@ namespace Waher.Networking
 					return false;
 
 				if (this.disposing)
-#if WINDOWS_UWP
-					DoDispose = true;
-#else
 				{
 					this.DoDisposeLocked();
 					return false;
 				}
-#endif
 				else
 					this.connected = true;
 			}
 
 #if WINDOWS_UWP
-			if (DoDispose)
-			{
-				await this.DoDispose();
-				return false;
-			}
-
 			this.dataWriter = new DataWriter(this.client.OutputStream);
 #else
 			this.stream = this.tcpClient.GetStream();
@@ -396,32 +357,43 @@ namespace Waher.Networking
 		/// </summary>
 		public void Dispose()
 		{
+#if WINDOWS_UWP
+			bool Cancel;
+
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
 					throw new ObjectDisposedException("Object already disposed.");
 
-				if (this.connecting)
+				if (Cancel = this.connecting || this.reading || this.sending)
+					this.disposing = true;
+				else
+					this.DoDisposeLocked();
+			}
+
+			if (Cancel)
+			{
+				IAsyncAction _ = this.client.CancelIOAsync();
+			}
+#else
+			lock (this.synchObj)
+			{
+				if (this.disposed || this.disposing)
+					throw new ObjectDisposedException("Object already disposed.");
+
+				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
+					this.cancelReading.Cancel();
 					return;
 				}
 
-#if !WINDOWS_UWP
 				this.DoDisposeLocked();
-#endif
 			}
-
-#if WINDOWS_UWP
-			Task _ = this.DoDispose();
 #endif
 		}
 
-#if WINDOWS_UWP
-		private async Task DoDispose()
-#else
 		private void DoDisposeLocked()
-#endif
 		{
 			this.disposed = true;
 			this.connecting = false;
@@ -437,22 +409,14 @@ namespace Waher.Networking
 
 			this.queue.Clear();
 
-			if (!(this.idleQueue is null))
-			{
-				foreach (TaskCompletionSource<bool> T in this.idleQueue)
-					T.TrySetResult(false);
-
-				this.idleQueue = null;
-			}
+			this.EmptyIdleLocked();
 
 #if WINDOWS_UWP
-			await this.client.CancelIOAsync();
 			this.client.Dispose();
 			this.memoryBuffer.Dispose();
 			this.dataWriter.Dispose();
 #else
 			this.stream = null;
-			this.source.Cancel();
 			this.tcpClient.Dispose();
 #endif
 		}
@@ -462,34 +426,46 @@ namespace Waher.Networking
 		/// </summary>
 		public void Continue()
 		{
-			lock (this.synchObj)
-			{
-				if (this.reading)
-					throw new InvalidOperationException("Already in a reading state.");
-
-				this.reading = true;
-			}
-
 			this.BeginRead();
 		}
 
 		/// <summary>
 		/// If the reading is paused.
 		/// </summary>
-		public bool Paused => this.connected && !this.reading;
+		public bool Paused
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.connected && !this.reading;
+				}
+			}
+		}
 
 		private async void BeginRead()
 		{
-			try
+			lock (this.synchObj)
 			{
+				if (this.disposing || this.disposed)
+					return;
+
+				if (this.reading)
+					throw new InvalidOperationException("Already in a reading state.");
+
+				this.reading = true;
+			}
+
 #if WINDOWS_UWP
 				IInputStream InputStream;
 #else
-				Stream Stream;
+			Stream Stream;
 #endif
-				int NrRead;
-				bool Continue = true;
+			int NrRead;
+			bool Continue = true;
 
+			try
+			{
 				while (Continue)
 				{
 					lock (this.synchObj)
@@ -519,13 +495,10 @@ namespace Waher.Networking
 
 					NrRead = Packet.Length;
 #else
-					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.source.Token);
+					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.cancelReading.Token);
 #endif
-					if (this.disposed || NrRead <= 0)
-					{
-						this.Disconnected();
+					if (this.disposing || this.disposed || NrRead <= 0)
 						break;
-					}
 
 					try
 					{
@@ -547,9 +520,41 @@ namespace Waher.Networking
 			}
 			finally
 			{
-				this.reading = false;
+				bool DoDispose;
+
+				lock (this.synchObj)
+				{
+					this.reading = false;
+
+					if (DoDispose = this.disposing && !this.sending)
+						this.DoDisposeLocked();
+				}
+
+				if (!DoDispose)
+					this.Disconnected();
+			}
+
+			if (!Continue)
+			{
+				AsyncEventHandler h = this.OnPaused;
+				if (!(h is null))
+				{
+					try
+					{
+						await h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
 			}
 		}
+
+		/// <summary>
+		/// Event raised when reading on the socked has been paused. Call <see cref="Continue"/> to resume reading.
+		/// </summary>
+		public event AsyncEventHandler OnPaused;
 
 		/// <summary>
 		/// Method called when the connection has been disconnected.
@@ -741,14 +746,11 @@ namespace Waher.Networking
 							if (this.queue.First is null)
 							{
 								this.sending = false;
+								this.EmptyIdleLocked();
 
-								if (!(this.idleQueue is null))
-								{
-									foreach (TaskCompletionSource<bool> T in this.idleQueue)
-										T.TrySetResult(true);
+								if (this.disposing && !this.reading)
+									this.DoDisposeLocked();
 
-									this.idleQueue = null;
-								}
 								break;
 							}
 							else
@@ -788,7 +790,7 @@ namespace Waher.Networking
 					DataWriter.WriteBytes(Buffer);
 					await this.dataWriter.StoreAsync();
 #else
-					await Stream.WriteAsync(Buffer, Offset, Count, this.source.Token);
+					await Stream.WriteAsync(Buffer, Offset, Count);
 #endif
 
 					try
@@ -844,18 +846,32 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				this.sending = false;
-				Task?.TrySetResult(false);
+				bool DoDispose;
 
-				if (!(this.idleQueue is null))
+				lock (this.synchObj)
 				{
-					foreach (TaskCompletionSource<bool> T in this.idleQueue)
-						T.TrySetResult(false);
+					this.sending = false;
+					Task?.TrySetResult(false);
 
-					this.idleQueue = null;
+					this.EmptyIdleLocked();
+
+					if (DoDispose = this.disposing && !this.reading)
+						this.DoDisposeLocked();
 				}
 
-				this.Error(ex);
+				if (!DoDispose)
+					this.Error(ex);
+			}
+		}
+
+		private void EmptyIdleLocked()
+		{
+			if (!(this.idleQueue is null))
+			{
+				foreach (TaskCompletionSource<bool> T in this.idleQueue)
+					T.TrySetResult(true);
+
+				this.idleQueue = null;
 			}
 		}
 

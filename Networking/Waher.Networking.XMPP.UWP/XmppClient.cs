@@ -314,6 +314,7 @@ namespace Waher.Networking.XMPP
 		private bool checkConnection = false;
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
+		private bool upgradeToTls = false;
 
 #if WINDOWS_UWP
 		/// <summary>
@@ -658,12 +659,12 @@ namespace Waher.Networking.XMPP
 			else
 				this.ReceiveText(Packet);
 
-			return Task.FromResult<bool>(this.ProcessFragment(Packet));
+			return this.ProcessFragment(Packet);
 		}
 
 		private Task<bool> TextTransportLayer_OnReceived_NoSniff(object _, string Packet)
 		{
-			return Task.FromResult<bool>(this.ProcessFragment(Packet));
+			return this.ProcessFragment(Packet);
 		}
 
 		/// <summary>
@@ -696,6 +697,7 @@ namespace Waher.Networking.XMPP
 				this.serverFeatures = null;
 				this.serverComponents = null;
 				this.fragmentLength = 0;
+				this.upgradeToTls = false;
 
 				if (this.textTransportLayer is null)
 				{
@@ -704,6 +706,7 @@ namespace Waher.Networking.XMPP
 					this.client.OnSent += this.OnSent;
 					this.client.OnError += this.Error;
 					this.client.OnDisconnected += this.Client_OnDisconnected;
+					this.client.OnPaused += this.Client_OnPaused;
 
 					if (await this.client.ConnectAsync(this.host, this.port))
 					{
@@ -758,7 +761,7 @@ namespace Waher.Networking.XMPP
 			else
 				this.ReceiveText(Text);
 
-			return Task.FromResult<bool>(this.ParseIncoming(Text));
+			return this.ParseIncoming(Text);
 		}
 
 		/// <summary>
@@ -1229,7 +1232,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private bool ParseIncoming(string s)
+		private async Task<bool> ParseIncoming(string s)
 		{
 			bool Result = true;
 
@@ -1381,7 +1384,7 @@ namespace Waher.Networking.XMPP
 							{
 								if (this.inputDepth == 1)
 								{
-									if (!this.ProcessFragment(this.fragment.ToString()))
+									if (!await this.ProcessFragment(this.fragment.ToString()))
 										Result = false;
 
 									this.fragment.Clear();
@@ -1423,7 +1426,7 @@ namespace Waher.Networking.XMPP
 						{
 							if (this.inputDepth == 1)
 							{
-								if (!this.ProcessFragment(this.fragment.ToString()))
+								if (!await this.ProcessFragment(this.fragment.ToString()))
 									Result = false;
 
 								this.fragment.Clear();
@@ -1749,7 +1752,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private bool ProcessFragment(string Xml)
+		private async Task<bool> ProcessFragment(string Xml)
 		{
 			XmlDocument Doc;
 			XmlElement E;
@@ -1940,7 +1943,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "proceed":
-							this.UpgradeToTls();
+							this.upgradeToTls = false;
 							return false;
 
 						case "failure":
@@ -2965,26 +2968,31 @@ namespace Waher.Networking.XMPP
 			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
 		}
 
-		private async void UpgradeToTls()
+		private async Task Client_OnPaused(object sender, EventArgs e)
 		{
-			try
+			if (this.upgradeToTls)
 			{
-				this.State = XmppState.StartingEncryption;
-#if WINDOWS_UWP
-				await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
-#else
-				await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
-#endif
-				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
-					NamespaceStream + "'>", null);
+				this.upgradeToTls = false;
 
-				this.ResetState(false);
-				this.client.Continue();
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
+				try
+				{
+					this.State = XmppState.StartingEncryption;
+#if WINDOWS_UWP
+					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
+#else
+					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
+#endif
+					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+						"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+						NamespaceStream + "'>", null);
+
+					this.ResetState(false);
+					this.client.Continue();
+				}
+				catch (Exception ex)
+				{
+					this.ConnectionError(ex);
+				}
 			}
 		}
 

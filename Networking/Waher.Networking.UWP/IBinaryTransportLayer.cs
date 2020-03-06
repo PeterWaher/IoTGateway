@@ -27,6 +27,14 @@ namespace Waher.Networking
 	public delegate Task<bool> BinaryDataReadEventHandler(object Sender, byte[] Buffer, int Offset, int Count);
 
 	/// <summary>
+	/// Asynchronous Event Handler.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	/// <returns>If the process should be continued.</returns>
+	public delegate Task AsyncEventHandler(object Sender, EventArgs e);
+
+	/// <summary>
 	/// Interface for binary transport layers.
 	/// </summary>
 	public interface IBinaryTransportLayer : IBinaryTransmission

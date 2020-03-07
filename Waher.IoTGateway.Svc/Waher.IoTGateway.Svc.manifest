@@ -93,6 +93,7 @@
   <Assembly fileName='System.Linq.Expressions.dll'/>
   <Assembly fileName='System.Linq.Parallel.dll'/>
   <Assembly fileName='System.Linq.Queryable.dll'/>
+  <Assembly fileName='System.Memory.dll'/>
   <Assembly fileName='System.Net.dll'/>
   <Assembly fileName='System.Net.Http.dll'/>
   <Assembly fileName='System.Net.HttpListener.dll'/>
@@ -130,6 +131,7 @@
   <Assembly fileName='System.Resources.Reader.dll'/>
   <Assembly fileName='System.Resources.ResourceManager.dll'/>
   <Assembly fileName='System.Resources.Writer.dll'/>
+  <Assembly fileName='System.Runtime.CompilerServices.Unsafe.dll'/>
   <Assembly fileName='System.Runtime.CompilerServices.VisualC.dll'/>
   <Assembly fileName='System.Runtime.dll'/>
   <Assembly fileName='System.Runtime.Extensions.dll'/>

@@ -560,8 +560,9 @@
 							<File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.ServiceRegistration.dll' Name='Waher.Runtime.ServiceRegistration.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.ServiceRegistration.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Settings.dll' Vital='yes'/>
-							<File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.dll' Vital='yes'/>
-							<File Id='Waher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Timing.dll' Vital='yes'/>
+              <File Id='Waher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.dll' Vital='yes'/>
+              <File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.dll' Vital='yes'/>
+              <File Id='Waher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Timing.dll' Vital='yes'/>
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Content.dll' Name='Waher.Script.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Content.dll' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Fractals.dll' Vital='yes'/>
@@ -646,8 +647,9 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.ServiceRegistration.dll' Name='Waher.Runtime.ServiceRegistration.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.dll' Name='Waher.Script.Content.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' On='uninstall'/>

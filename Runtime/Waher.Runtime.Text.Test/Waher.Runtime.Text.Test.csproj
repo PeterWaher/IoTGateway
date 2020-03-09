@@ -7,10 +7,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Test_09_Diff.txt" />
+    <None Remove="Data\Test_09_New.txt" />
+    <None Remove="Data\Test_09_Org.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\Test_09_New.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_09_Diff.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_09_Org.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
     <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />
   </ItemGroup>
 
 </Project>

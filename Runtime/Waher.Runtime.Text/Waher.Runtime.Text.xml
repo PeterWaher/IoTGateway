@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Text</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Text.Difference">
+            <summary>
+            Computes the difference between two sequences of symbols.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Text.Difference.Analyze``1(``0[],``0[])">
+            <summary>
+            Analyzes two sequences of symbols to estimate the difference between them.
+            </summary>
+            <remarks>http://xmailserver.org/diff2.pdf</remarks>
+            <typeparam name="T">Type of symbols to compare.</typeparam>
+            <param name="S1">First sequence.</param>
+            <param name="S2">Second sequence.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.Difference.AnalyzeStrings(System.String,System.String)">
+            <summary>
+            Analyzes two text strings, estimating the difference between them.
+            </summary>
+            <param name="s1">First string.</param>
+            <param name="s2">Second string.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.Difference.AnalyzeRows(System.String,System.String)">
+            <summary>
+            Analyzes two texts, estimating the difference between them, as a sequence of rows.
+            </summary>
+            <param name="Text1">First text.</param>
+            <param name="Text2">Second text.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Runtime.Text.Difference.ExtractRows(System.String)">
+            <summary>
+            Extracts the rows from a text.
+            </summary>
+            <param name="Text">Text.</param>
+            <returns>Sequence of rows.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Text.EditOperation">
+            <summary>
+            Type of edit-operation
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Text.EditOperation.Keep">
+            <summary>
+            Symbol is kept.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Text.EditOperation.Insert">
+            <summary>
+            Symbol is inserted.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Text.EditOperation.Delete">
+            <summary>
+            Symbol is deleted.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Text.EditScript`1">
+            <summary>
+            Represents an Edit-script, converting one sequence of symbols to another.
+            </summary>
+            <typeparam name="T">Type of symbols used.</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Text.EditScript`1.#ctor(`0[],`0[],Waher.Runtime.Text.Step{`0}[])">
+            <summary>
+            Represents an Edit-script, converting one sequence of symbols to another.
+            </summary>
+            <param name="S1">First sequence of symbols.</param>
+            <param name="S2">Second sequence of symbols.</param>
+            <param name="Steps">Steps making up how to transform <paramref name="S1"/> to <paramref name="S2"/>.</param>
+        </member>
+        <member name="P:Waher.Runtime.Text.EditScript`1.Steps">
+            <summary>
+            Steps making up how to transform <see cref="P:Waher.Runtime.Text.EditScript`1.S1"/> to <see cref="P:Waher.Runtime.Text.EditScript`1.S2"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Text.EditScript`1.S1">
+            <summary>
+            First sequence of symbols.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Text.EditScript`1.S2">
+            <summary>
+            Second sequence of symbols.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Text.Step`1">
+            <summary>
+            Represents a sub-sequence of symbols.
+            </summary>
+            <typeparam name="T">Type of symbols being compared.</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Text.Step`1.#ctor(`0[],System.Int32,System.Int32,Waher.Runtime.Text.EditOperation)">
+            <summary>
+            Represents a sub-sequence of symbols.
+            </summary>
+            <param name="Symbols">Sequence of symbols.</param>
+            <param name="Index1">Index into the first sequence of symbols.</param>
+            <param name="Index2">Index into the second sequence of symbols.</param>
+            <param name="Operation">Edit operation being performed.</param>
+        </member>
+        <member name="P:Waher.Runtime.Text.Step`1.Symbols">
+            <summary>
+            Sequence of symbols.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Text.Step`1.Index1">
+            <summary>
+            Index into the first sequence of symbols.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Text.Step`1.Index2">
+            <summary>
+            Index into the second sequence of symbols.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Text.Step`1.Operation">
+            <summary>
+            Edit operation being performed.
+            </summary>
+        </member>
+    </members>
+</doc>

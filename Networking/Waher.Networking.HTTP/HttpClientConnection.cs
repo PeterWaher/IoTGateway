@@ -55,8 +55,6 @@ namespace Waher.Networking.HTTP
 			this.client.OnDisconnected += Client_OnDisconnected;
 			this.client.OnError += Client_OnError;
 			this.client.OnReceived += Client_OnReceived;
-
-			this.client.Bind();
 		}
 
 		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)

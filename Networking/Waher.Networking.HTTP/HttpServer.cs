@@ -814,7 +814,9 @@ namespace Waher.Networking.HTTP
 				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+				BinaryTcpClient.Bind(true);
 				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+				BinaryTcpClient.Continue();
 			}
 			catch (SocketException)
 			{
@@ -848,6 +850,7 @@ namespace Waher.Networking.HTTP
 							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+							BinaryTcpClient.Bind(true);
 
 							if (Tls)
 							{
@@ -856,6 +859,7 @@ namespace Waher.Networking.HTTP
 							else
 							{
 								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+								BinaryTcpClient.Continue();
 							}
 						}
 					}

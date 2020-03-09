@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
@@ -1072,7 +1073,7 @@ namespace Waher.Networking
 					};
 				}
 
-				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
+				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
 				await SslStream.AuthenticateAsClientAsync(this.hostName ?? ((IPEndPoint)this.Client.Client.LocalEndPoint).Address.ToString(),
@@ -1089,32 +1090,93 @@ namespace Waher.Networking
 		private RemoteCertificateValidationCallback certValidation = null;
 		private X509Certificate remoteCertificate = null;
 
-		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		private bool ValidateCertificateRequired(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
 		{
+			return this.ValidateCertificate(sender, certificate, chain, sslPolicyErrors, true);
+		}
+
+		private bool ValidateCertificateOptional(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		{
+			return this.ValidateCertificate(sender, certificate, chain, sslPolicyErrors, false);
+		}
+
+		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors, 
+			bool RequireCertificate)
+		{
+			bool Result;
+
 			this.remoteCertificate = certificate;
 
 			if (sslPolicyErrors == SslPolicyErrors.None)
-				this.remoteCertificateValid = true;
-			else
+				this.remoteCertificateValid = Result = true;
+			else if (certificate is null && !RequireCertificate)
 			{
 				this.remoteCertificateValid = false;
-				return this.trustRemoteEndpoint;
+				Result = true;
 			}
-
-			if (this.certValidation is null)
-				return true;
 			else
+				this.remoteCertificateValid = Result = false;
+
+			if (!(this.certValidation is null))
 			{
 				try
 				{
-					return this.certValidation(sender, certificate, chain, sslPolicyErrors);
+					Result = this.certValidation(sender, certificate, chain, sslPolicyErrors);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
-					return false;
+					Result = false;
 				}
 			}
+
+			if (!Result)
+			{
+				byte[] Cert = certificate?.Export(X509ContentType.Cert) ?? new byte[0];
+				string Base64 = Convert.ToBase64String(Cert);
+				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("sslPolicyErrors", sslPolicyErrors),
+					new KeyValuePair<string, object>("Subject", certificate?.Subject),
+					new KeyValuePair<string, object>("Issuer", certificate?.Issuer),
+					new KeyValuePair<string, object>("Cert", Base64)
+				};
+
+				if (this.trustRemoteEndpoint)
+				{
+					Result = true;
+					Log.Notice("Invalid certificate received. But server is trusted.", certificate?.Subject, certificate?.Issuer, Tags);
+				}
+				else
+					Log.Warning("Invalid certificate received (and rejected)", certificate?.Subject, certificate?.Issuer, Tags);
+
+				if (this.HasSniffers)
+				{
+					StringBuilder SniffMsg = new StringBuilder();
+
+					if (this.trustRemoteEndpoint)
+						SniffMsg.AppendLine("Invalid certificate received. But server is trusted.");
+					else
+						SniffMsg.AppendLine("Invalid certificate received (and rejected).");
+
+					SniffMsg.AppendLine();
+					SniffMsg.Append("sslPolicyErrors: ");
+					SniffMsg.AppendLine(sslPolicyErrors.ToString());
+					SniffMsg.Append("Subject: ");
+					SniffMsg.AppendLine(certificate?.Subject);
+					SniffMsg.Append("Issuer: ");
+					SniffMsg.AppendLine(certificate?.Issuer);
+					SniffMsg.Append("BASE64(Cert): ");
+					SniffMsg.Append(Base64);
+
+					if (this.trustRemoteEndpoint)
+						this.Information(SniffMsg.ToString());
+					else
+						this.Warning(SniffMsg.ToString());
+				}
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1201,7 +1263,7 @@ namespace Waher.Networking
 
 			try
 			{
-				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
+				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateOptional);
 				this.stream = SslStream;
 
 				await SslStream.AuthenticateAsServerAsync(ServerCertificate, ClientCertificateRequired, Protocols, true);

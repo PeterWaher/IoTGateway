@@ -918,6 +918,8 @@ namespace Waher.Networking.HTTP
 					foreach (ISniffer Sniffer in this.Sniffers)
 						Connection.Add(Sniffer);
 				}
+
+				Client.Continue();
 			}
 			catch (SocketException)
 			{

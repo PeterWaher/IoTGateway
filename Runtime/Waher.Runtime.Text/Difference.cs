@@ -13,11 +13,17 @@ namespace Waher.Runtime.Text
 		/// <summary>
 		/// Analyzes two sequences of symbols to estimate the difference between them.
 		/// </summary>
-		/// <remarks>http://xmailserver.org/diff2.pdf</remarks>
+		/// <remarks>
+		/// Method searches for the shortest path in changing <paramref name="S1"/> to
+		/// <paramref name="S2"/>. Costs are 0, if keeping a symbol: Cost of inserting
+		/// or deleting a symbol is 1, if first symbol, or same operation as previous
+		/// symbol, or 2, if chaning operation. The reason for this is to avoid altering
+		/// inserts and deletions when blocks are changed.
+		/// </remarks>
 		/// <typeparam name="T">Type of symbols to compare.</typeparam>
 		/// <param name="S1">First sequence.</param>
 		/// <param name="S2">Second sequence.</param>
-		/// <returns></returns>
+		/// <returns>Edit script</returns>
 		public static EditScript<T> Analyze<T>(T[] S1, T[] S2)
 		{
 			int c1 = S1.Length;

@@ -45,7 +45,7 @@ namespace Waher.Networking
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected RowTcpClient(Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
+		public RowTcpClient(Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
 			: base(Encoding, SniffText, Sniffers)
 		{
 			this.maxLen = MaxLength;
@@ -77,7 +77,7 @@ namespace Waher.Networking
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
+		public RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
 			: base(Client, Encoding, SniffText, Sniffers)
 		{
 			this.maxLen = MaxLength;
@@ -108,7 +108,7 @@ namespace Waher.Networking
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
+		public RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
 			: base(Client, Encoding, SniffText, Sniffers)
 		{
 			this.maxLen = MaxLength;

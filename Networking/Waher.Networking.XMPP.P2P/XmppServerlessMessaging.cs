@@ -97,7 +97,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private void P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
-			PeerState State = new PeerState(Peer, this);
+			PeerState _ = new PeerState(Peer, this);
 			this.Information("Peer connected from " + Peer.RemoteEndpoint.ToString());
 		}
 
@@ -539,7 +539,7 @@ namespace Waher.Networking.XMPP.P2P
 											Result.Peer = Connection;
 											Connection.Start();
 											Result.HeaderSent = true;
-											Result.Send(Header);
+											await Result.Send(Header);
 											this.TransmitText(Header);
 										}
 										else
@@ -561,7 +561,7 @@ namespace Waher.Networking.XMPP.P2P
 							Result.CallCallbacks();
 					});
 					Result.HeaderSent = true;
-					Result.Send(Header);
+					await Result.Send(Header);
 					this.TransmitText(Header);
 				}
 			});

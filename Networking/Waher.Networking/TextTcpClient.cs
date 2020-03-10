@@ -34,7 +34,7 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected TextTcpClient(Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
+		public TextTcpClient(Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
 			: base(false, Sniffers)
 		{
 			this.encoding = Encoding;
@@ -60,7 +60,7 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected TextTcpClient(StreamSocket Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
+		public TextTcpClient(StreamSocket Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
 			: base(Client, false, Sniffers)
 		{
 			this.encoding = Encoding;
@@ -85,7 +85,7 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected TextTcpClient(TcpClient Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
+		public TextTcpClient(TcpClient Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
 			: base(Client, false, Sniffers)
 		{
 			this.encoding = Encoding;

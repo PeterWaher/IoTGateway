@@ -89,7 +89,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected BinaryTcpClient(bool SniffBinary, params ISniffer[] Sniffers)
+		public BinaryTcpClient(bool SniffBinary, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
@@ -121,7 +121,7 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected BinaryTcpClient(StreamSocket Client, bool SniffBinary, params ISniffer[] Sniffers)
+		public BinaryTcpClient(StreamSocket Client, bool SniffBinary, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
@@ -147,7 +147,7 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		protected BinaryTcpClient(TcpClient Client, bool SniffBinary, params ISniffer[] Sniffers)
+		public BinaryTcpClient(TcpClient Client, bool SniffBinary, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
@@ -693,8 +693,26 @@ namespace Waher.Networking
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
 
+			if (Count < 0)
+				throw new ArgumentException("Count cannot be negative.", nameof(Count));
+
+
 			if (Count == 0)
+			{
+				if (!(Callback is null))
+				{
+					try
+					{
+						Callback(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
 				return;
+			}
 
 			int c = Buffer.Length;
 			if (Offset < 0 || Offset >= c)
@@ -1109,7 +1127,7 @@ namespace Waher.Networking
 			return this.ValidateCertificate(sender, certificate, chain, sslPolicyErrors, false);
 		}
 
-		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors, 
+		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors,
 			bool RequireCertificate)
 		{
 			bool Result;

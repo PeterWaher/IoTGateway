@@ -829,7 +829,7 @@ namespace Waher.Persistence.Files
 			lock (this.synchObj)
 			{
 				if (this.bulkCount <= 0)
-					throw new InvalidOperationException("Not in bulk mode.");
+					return Task.CompletedTask;
 
 				this.bulkCount--;
 				if (this.bulkCount > 0)

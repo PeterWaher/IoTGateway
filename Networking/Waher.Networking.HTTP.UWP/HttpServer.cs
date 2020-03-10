@@ -841,9 +841,31 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						TcpClient Client = await Listener.AcceptTcpClientAsync();
-						if (this.closed)
+						TcpClient Client;
+
+						try
+						{
+							Client = await Listener.AcceptTcpClientAsync();
+							if (this.closed)
+								return;
+						}
+						catch (InvalidOperationException)
+						{
+							LinkedListNode<KeyValuePair<TcpListener, bool>> Node = this.listeners.First;
+
+							while (!(Node is null))
+							{
+								if (Node.Value.Key == Listener)
+								{
+									this.listeners.Remove(Node);
+									break;
+								}
+
+								Node = Node.Next;
+							}
+
 							return;
+						}
 
 						if (!(Client is null))
 						{

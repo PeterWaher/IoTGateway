@@ -937,9 +937,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// Sends a packet.
 		/// </summary>
 		/// <param name="Packet"></param>
-		public void Send(string Packet)
+		public Task<bool> Send(string Packet)
 		{
-			this.Send(Packet, null);
+			return this.Send(Packet, null);
 		}
 
 		/// <summary>
@@ -947,7 +947,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Packet"></param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public void Send(string Packet, EventHandler Callback)
+		public Task<bool> Send(string Packet, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 
@@ -956,6 +956,8 @@ namespace Waher.Networking.XMPP.P2P
 				this.peer.SendTcp(Data, Callback);
 				this.lastActivity = DateTime.Now;
 			}
+
+			return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>

@@ -32,7 +32,7 @@ namespace Waher.Networking
 
 	/// <summary>
 	/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
+	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
 	/// permitted pace.
 	/// </summary>
 	public class BinaryTcpClient : Sniffable, IDisposable, IBinaryTransportLayer
@@ -993,6 +993,15 @@ namespace Waher.Networking
 		public Certificate RemoteCertificate => this.remoteCertificate;
 
 #else
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, null, false);
+		}
+
 		/// <summary>
 		/// Upgrades a client connection to TLS.
 		/// </summary>

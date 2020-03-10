@@ -10,9 +10,9 @@ namespace Waher.Networking
 	/// Event handler for text packet events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Packet">Text packet.</param>
+	/// <param name="Text">Text packet.</param>
 	/// <returns>If the process should be continued.</returns>
-	public delegate Task<bool> TextEventHandler(object Sender, string Packet);
+	public delegate Task<bool> TextEventHandler(object Sender, string Text);
 
 	/// <summary>
 	/// Interface for text transport layers.
@@ -22,15 +22,17 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
-		/// <param name="Packet">Text packet.</param>
-		void Send(string Packet);
+		/// <param name="Text">Text packet.</param>
+		/// <returns>If data was sent.</returns>
+		Task<bool> Send(string Text);
 
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
-		/// <param name="Packet">Text packet.</param>
+		/// <param name="Text">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		void Send(string Packet, EventHandler DeliveryCallback);
+		/// <returns>If data was sent.</returns>
+		Task<bool> Send(string Text, EventHandler DeliveryCallback);
 
 		/// <summary>
 		/// Event raised when a packet has been sent.

@@ -11,9 +11,7 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking
 {
 	/// <summary>
-	/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-	/// permitted pace.
+	/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 	/// </summary>
 	public class TextTcpClient : BinaryTcpClient, ITextTransportLayer
 	{
@@ -21,9 +19,7 @@ namespace Waher.Networking
 		private readonly bool sniffText;
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="Sniffers">Sniffers.</param>
@@ -33,9 +29,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
@@ -49,9 +43,7 @@ namespace Waher.Networking
 
 #if WINDOWS_UWP
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
@@ -62,9 +54,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
@@ -78,9 +68,7 @@ namespace Waher.Networking
 		}
 #else
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
@@ -91,9 +79,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and tramitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
@@ -149,34 +135,37 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
-		/// <param name="Packet">Text packet.</param>
-		public void Send(string Packet)
+		/// <param name="Text">Text packet.</param>
+		/// <returns>If data was sent.</returns>
+		public virtual Task<bool> Send(string Text)
 		{
-			this.Send(Packet, null);
+			return this.Send(Text, null);
 		}
 
 		/// <summary>
-		/// Sends a binary packet.
+		/// Sends a text packet.
 		/// </summary>
-		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Text">Text packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
-		public void Send(string Packet, EventHandler Callback)
+		/// <returns>If data was sent.</returns>
+		public async virtual Task<bool> Send(string Text, EventHandler Callback)
 		{
-			byte[] Data = this.encoding.GetBytes(Packet);
-			base.SendAsync(Data, Callback);
-			this.TextDataSent(Packet);
+			byte[] Data = this.encoding.GetBytes(Text);
+			bool Result = await base.SendAsync(Data, Callback);
+			await this.TextDataSent(Text);
+			return Result;
 		}
 
 		/// <summary>
-		/// Method called when binary data has been sent.
+		/// Method called when text data has been sent.
 		/// </summary>
-		/// <param name="Data">Text data sent.</param>
-		protected virtual Task TextDataSent(string Data)
+		/// <param name="Text">Text data sent.</param>
+		protected virtual Task TextDataSent(string Text)
 		{
 			if (this.sniffText && this.HasSniffers)
-				this.TransmitText(Data);
+				this.TransmitText(Text);
 
-			return this.OnSent?.Invoke(this, Data) ?? Task.CompletedTask;
+			return this.OnSent?.Invoke(this, Text) ?? Task.CompletedTask;
 		}
 
 		/// <summary>

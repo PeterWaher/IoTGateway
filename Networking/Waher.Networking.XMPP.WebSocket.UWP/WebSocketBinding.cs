@@ -182,7 +182,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				if (this.xmppClient.HasSniffers)
 					this.xmppClient.Information("Initiating session.");
 
-				this.Send("<?");
+				await this.Send("<?");
 
 				string XmlResponse = await this.ReadText();
 
@@ -364,7 +364,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					{
 						this.closeSent = true;
 
-						this.Send("<close xmlns=\"urn:ietf:params:xml:ns:xmpp-framing\"/>", async (sender, e) =>
+						Task _ = this.Send("<close xmlns=\"urn:ietf:params:xml:ns:xmpp-framing\"/>", async (sender, e) =>
 						{
 							this.terminated = true;
 

@@ -41,6 +41,7 @@ namespace Waher.Networking
 
 		private readonly LinkedList<Rec> queue = new LinkedList<Rec>();
 		private LinkedList<TaskCompletionSource<bool>> idleQueue = null;
+		private LinkedList<TaskCompletionSource<bool>> cancelledQueue = null;
 #if WINDOWS_UWP
 		private readonly MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private readonly StreamSocket client;
@@ -50,7 +51,7 @@ namespace Waher.Networking
 		private readonly byte[] buffer = new byte[BufferSize];
 		private readonly TcpClient tcpClient;
 		private Stream stream = null;
-		private readonly CancellationTokenSource cancelReading;
+		private CancellationTokenSource cancelReading;
 #endif
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
@@ -65,6 +66,7 @@ namespace Waher.Networking
 		private bool trustRemoteEndpoint = false;
 		private bool remoteCertificateValid = false;
 		private bool disposeWhenDone = false;
+		private bool cancelRead = false;
 
 		private class Rec
 		{
@@ -410,7 +412,8 @@ namespace Waher.Networking
 
 			this.queue.Clear();
 
-			this.EmptyIdleLocked();
+			this.EmptyIdleQueueLocked();
+			this.EmptyCancelQueueLocked();
 
 #if WINDOWS_UWP
 			this.client.Dispose();
@@ -471,7 +474,7 @@ namespace Waher.Networking
 				{
 					lock (this.synchObj)
 					{
-						if (this.disposing || this.disposed)
+						if (this.disposing || this.disposed || this.cancelRead)
 							break;
 
 #if WINDOWS_UWP
@@ -500,8 +503,15 @@ namespace Waher.Networking
 #endif
 					if (this.disposing || this.disposed)
 						break;
-					else if (NrRead <= 0)
+
+					if (NrRead <= 0)
 					{
+						lock (this.synchObj)
+						{
+							if (this.cancelRead)
+								break;
+						}
+
 						this.Disconnected();
 						break;
 					}
@@ -529,6 +539,16 @@ namespace Waher.Networking
 				lock (this.synchObj)
 				{
 					this.reading = false;
+					
+					if (this.cancelRead)
+					{
+						this.cancelRead = false;
+#if !WINDOWS_UWP
+						this.cancelReading.Dispose();
+						this.cancelReading = new CancellationTokenSource();
+#endif
+						this.EmptyCancelQueueLocked();
+					}
 
 					if (this.disposing && !this.sending)
 						this.DoDisposeLocked();
@@ -765,7 +785,7 @@ namespace Waher.Networking
 							if (this.queue.First is null)
 							{
 								this.sending = false;
-								this.EmptyIdleLocked();
+								this.EmptyIdleQueueLocked();
 
 								if (this.disposing && !this.reading)
 									this.DoDisposeLocked();
@@ -872,7 +892,7 @@ namespace Waher.Networking
 					this.sending = false;
 					Task?.TrySetResult(false);
 
-					this.EmptyIdleLocked();
+					this.EmptyIdleQueueLocked();
 
 					if (DoDispose = this.disposing && !this.reading)
 						this.DoDisposeLocked();
@@ -883,7 +903,7 @@ namespace Waher.Networking
 			}
 		}
 
-		private void EmptyIdleLocked()
+		private void EmptyIdleQueueLocked()
 		{
 			if (!(this.idleQueue is null))
 			{
@@ -891,6 +911,17 @@ namespace Waher.Networking
 					T.TrySetResult(true);
 
 				this.idleQueue = null;
+			}
+		}
+
+		private void EmptyCancelQueueLocked()
+		{
+			if (!(this.cancelledQueue is null))
+			{
+				foreach (TaskCompletionSource<bool> T in this.cancelledQueue)
+					T.TrySetResult(true);
+
+				this.cancelledQueue = null;
 			}
 		}
 
@@ -1313,6 +1344,41 @@ namespace Waher.Networking
 #else
 			get => this.stream is SslStream SslStream && SslStream.IsEncrypted;
 #endif
+		}
+
+		/// <summary>
+		/// Allows the caller to pause reading.
+		/// </summary>
+		public async Task<bool> PauseReading()
+		{
+			TaskCompletionSource<bool> Task = new TaskCompletionSource<bool>();
+
+			lock (this.synchObj)
+			{
+				if (this.disposed || this.disposing)
+					throw new ObjectDisposedException("Object already disposed.");
+
+				if (this.reading)
+				{
+					this.cancelRead = true;
+
+					if (this.cancelledQueue is null)
+						this.cancelledQueue = new LinkedList<TaskCompletionSource<bool>>();
+
+					this.cancelledQueue.AddLast(Task);
+#if WINDOWS_UWP
+					IAsyncAction _ = this.client.CancelIOAsync();
+#else
+					this.cancelReading.Cancel();
+#endif
+				}
+				else
+					return false;
+			}
+
+			await Task.Task;
+
+			return Task.Task.Result;
 		}
 
 	}

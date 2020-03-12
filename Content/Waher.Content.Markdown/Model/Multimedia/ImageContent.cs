@@ -251,7 +251,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		private static Dictionary<string, bool> temporaryFiles = null;
-		private static object synchObject = new object();
+		private readonly static object synchObject = new object();
 
 		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{

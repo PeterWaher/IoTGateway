@@ -117,7 +117,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		internal override void GetMargins(XamlSettings Settings, out int TopMargin, out int BottomMargin)
 		{
 			bool First = true;
-			int i;
 
 			TopMargin = BottomMargin = 0;
 
@@ -129,7 +128,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					E.GetMargins(Settings, out TopMargin, out BottomMargin);
 				}
 				else
-					E.GetMargins(Settings, out i, out BottomMargin);
+					E.GetMargins(Settings, out int _, out BottomMargin);
 			}
 		}
 

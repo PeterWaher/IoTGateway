@@ -6,16 +6,16 @@ namespace Waher.Content.Markdown.Model
 {
 	internal class BlockParseState
 	{
-		private string[] rows;
-		private int[] positions;
+		private readonly string[] rows;
+		private readonly int[] positions;
 		private string currentRow;
 		private int current;
-		private int start;
-		private int end;
+		private readonly int start;
+		private readonly int end;
 		private int pos;
 		private int len;
 		private bool lineBreakAfter;
-		private bool preserveCrLf;
+		private readonly bool preserveCrLf;
 		private char lastChar = (char)0;
 
 		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf)

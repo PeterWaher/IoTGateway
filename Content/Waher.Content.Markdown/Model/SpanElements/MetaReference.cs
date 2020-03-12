@@ -11,7 +11,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class MetaReference : MarkdownElement
 	{
-		private string key;
+		private readonly string key;
 
 		/// <summary>
 		/// Meta-data reference

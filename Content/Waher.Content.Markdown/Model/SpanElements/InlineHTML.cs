@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class InlineHTML : MarkdownElement
 	{
-		private string html;
+		private readonly string html;
 
 		/// <summary>
 		/// Inline HTML.

@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Sections : MarkdownElementChildren
 	{
-		private int nrColumns;
+		private readonly int nrColumns;
 
 		/// <summary>
 		/// Represents a sequence of sections.

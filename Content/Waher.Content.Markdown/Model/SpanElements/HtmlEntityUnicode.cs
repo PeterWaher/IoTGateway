@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class HtmlEntityUnicode : MarkdownElement
 	{
-		private int code;
+		private readonly int code;
 
 		/// <summary>
 		/// Represents an HTML entity in Unicode format.

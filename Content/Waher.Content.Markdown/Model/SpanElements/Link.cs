@@ -11,8 +11,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class Link : MarkdownElementChildren
 	{
-		private string url;
-		private string title;
+		private readonly string url;
+		private readonly string title;
 
 		/// <summary>
 		/// Link

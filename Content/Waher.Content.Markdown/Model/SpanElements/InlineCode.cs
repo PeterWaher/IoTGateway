@@ -11,7 +11,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class InlineCode : MarkdownElement
 	{
-		private string code;
+		private readonly string code;
 
 		/// <summary>
 		/// Inline source code.

@@ -20,8 +20,8 @@ namespace Waher.Content.Markdown
 		private int blockQuoteMargin = 20;
 		private int blockQuotePadding = 10;
 
-		private int[] headerFontSize = new int[] { 28, 24, 22, 20, 18, 16, 15, 14, 13, 12 };
-		private string[] headerForegroundColor = new string[] { "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy" };
+		private readonly int[] headerFontSize = new int[] { 28, 24, 22, 20, 18, 16, 15, 14, 13, 12 };
+		private readonly string[] headerForegroundColor = new string[] { "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy" };
 
 		private int listContentMargin = 5;
 

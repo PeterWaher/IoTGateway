@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class HtmlEntity : MarkdownElement
 	{
-		private string entity;
+		private readonly string entity;
 
 		/// <summary>
 		/// Represents an HTML entity.

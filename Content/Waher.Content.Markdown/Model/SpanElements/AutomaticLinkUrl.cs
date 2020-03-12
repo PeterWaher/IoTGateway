@@ -11,7 +11,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class AutomaticLinkUrl : MarkdownElement
 	{
-		private string url;
+		private readonly string url;
 
 		/// <summary>
 		/// Inline HTML.

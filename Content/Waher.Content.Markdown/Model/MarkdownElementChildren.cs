@@ -49,12 +49,13 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="NewChildren">New children to add.</param>
 		public virtual void AddChildren(IEnumerable<MarkdownElement> NewChildren)
 		{
-			LinkedList<MarkdownElement> Children = this.children as LinkedList<MarkdownElement>;
-			if (Children is null)
+			if (!(this.children is LinkedList<MarkdownElement> Children))
 			{
 				Children = new LinkedList<MarkdownElement>();
+			
 				foreach (MarkdownElement E in this.children)
 					Children.AddLast(E);
+				
 				this.children = Children;
 			}
 

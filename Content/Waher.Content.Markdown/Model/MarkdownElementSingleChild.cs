@@ -11,7 +11,7 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public abstract class MarkdownElementSingleChild : MarkdownElement
 	{
-		private MarkdownElement child;
+		private readonly MarkdownElement child;
 
 		/// <summary>
 		/// Abstract base class for all markdown elements with one child element.

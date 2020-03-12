@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Footnote : MarkdownElementChildren
 	{
-		private string key;
+		private readonly string key;
 
 		/// <summary>
 		/// Footnote reference

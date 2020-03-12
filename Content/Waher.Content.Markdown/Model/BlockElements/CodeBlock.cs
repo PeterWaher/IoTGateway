@@ -14,11 +14,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class CodeBlock : MarkdownElement
 	{
-		private ICodeContent handler;
-		private string[] rows;
-		private string indentString;
-		private string language;
-		private int start, end, indent;
+		private readonly ICodeContent handler;
+		private readonly string[] rows;
+		private readonly string indentString;
+		private readonly string language;
+		private readonly int start, end, indent;
 
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			return Best;
 		}
 
-		private static Dictionary<string, ICodeContent[]> handlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, ICodeContent[]> handlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
@@ -217,7 +217,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					if (ex is AggregateException ex2)
 					{
 						foreach (Exception ex3 in ex2.InnerExceptions)
-							Output.AppendLine(ex2.Message);
+							Output.AppendLine(ex3.Message);
 					}
 					else
 						Output.AppendLine(ex.Message);
@@ -266,7 +266,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 								Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
 							Output.WriteAttributeString("Foreground", "Red");
-							Output.WriteValue(ex.Message);
+							Output.WriteValue(ex3.Message);
 							Output.WriteEndElement();
 						}
 					}

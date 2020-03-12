@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public abstract class MarkdownElement
 	{
-		private MarkdownDocument document;
+		private readonly MarkdownDocument document;
 
 		/// <summary>
 		/// Abstract base class for all markdown elements.

@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class MultimediaReference : LinkReference
 	{
-		private bool aloneInParagraph;
+		private readonly bool aloneInParagraph;
 
 		/// <summary>
 		/// Multimedia reference.

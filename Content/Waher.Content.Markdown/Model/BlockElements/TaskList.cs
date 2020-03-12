@@ -99,7 +99,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteEndElement();
 			Output.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement E in this.Children)
+			foreach (MarkdownElement _ in this.Children)
 			{
 				Output.WriteStartElement("RowDefinition");
 				Output.WriteAttributeString("Height", "Auto");

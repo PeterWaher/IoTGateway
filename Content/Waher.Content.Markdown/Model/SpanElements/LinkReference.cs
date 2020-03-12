@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class LinkReference : MarkdownElementChildren
 	{
-		private string label;
+		private readonly string label;
 
 		/// <summary>
 		/// Link reference

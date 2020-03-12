@@ -281,7 +281,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result is null)
 				return;
 
-			SKImage Img;
 			string s;
 
 			if (Result is Graph G)
@@ -304,7 +303,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Data.Dispose();
 				}
 			}
-			else if ((Img = Result as SKImage) != null)
+			else if (Result is SKImage Img)
 			{
 				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
 				{
@@ -337,7 +336,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
 						Output.WriteAttributeString("Foreground", "Red");
-						Output.WriteValue(ex.Message);
+						Output.WriteValue(ex3.Message);
 						Output.WriteEndElement();
 					}
 				}

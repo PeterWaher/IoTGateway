@@ -104,8 +104,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			NumberedItem Item;
 			int Expected = 0;
 			int Row = 0;
-			int TopMargin;
-			int BottomMargin;
 			bool ParagraphBullet;
 
 			Output.WriteStartElement("Grid");
@@ -123,7 +121,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteEndElement();
 			Output.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement E in this.Children)
+			foreach (MarkdownElement _ in this.Children)
 			{
 				Output.WriteStartElement("RowDefinition");
 				Output.WriteAttributeString("Height", "Auto");
@@ -138,7 +136,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Item = E as NumberedItem;
 
 				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				E.GetMargins(Settings, out TopMargin, out BottomMargin);
+				E.GetMargins(Settings, out int TopMargin, out int BottomMargin);
 
 				Output.WriteStartElement("TextBlock");
 				Output.WriteAttributeString("TextWrapping", "Wrap");

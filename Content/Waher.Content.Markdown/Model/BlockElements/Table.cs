@@ -11,12 +11,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Table : MarkdownElement
 	{
-		private MarkdownElement[][] headers;
-		private MarkdownElement[][] rows;
-		private TextAlignment[] alignments;
-		private string caption;
-		private string id;
-		private int columns;
+		private readonly MarkdownElement[][] headers;
+		private readonly MarkdownElement[][] rows;
+		private readonly TextAlignment[] alignments;
+		private readonly string caption;
+		private readonly string id;
+		private readonly int columns;
 
 		/// <summary>
 		/// Represents a table in a markdown document.

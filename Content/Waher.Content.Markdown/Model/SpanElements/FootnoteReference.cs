@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class FootnoteReference : MarkdownElement
 	{
-		private string key;
+		private readonly string key;
 
 		/// <summary>
 		/// Footnote reference

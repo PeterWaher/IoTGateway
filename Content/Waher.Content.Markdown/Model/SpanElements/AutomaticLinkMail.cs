@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class AutomaticLinkMail : MarkdownElement
 	{
-		private string eMail;
+		private readonly string eMail;
 
 		/// <summary>
 		/// Inline HTML.

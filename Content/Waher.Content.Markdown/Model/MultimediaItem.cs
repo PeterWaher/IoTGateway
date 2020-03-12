@@ -10,13 +10,13 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public class MultimediaItem
 	{
-		private MarkdownDocument doc;
-		private string url;
-		private string title;
+		private readonly MarkdownDocument doc;
+		private readonly string url;
+		private readonly string title;
 		private string extension;
 		private string contentType;
-		private int? width;
-		private int? height;
+		private readonly int? width;
+		private readonly int? height;
 
 		/// <summary>
 		/// Multimedia item.

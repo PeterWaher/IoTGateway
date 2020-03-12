@@ -13,7 +13,7 @@ namespace Waher.Content.Markdown.Test
 	{
 		private void DoTest(string MarkdownFileName, string HtmlFileName)
 		{
-			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
+			string Markdown = File.ReadAllText("Markdown/Syntax/" + MarkdownFileName);
 			string ExpectedHtml = File.ReadAllText("HTML/" + HtmlFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 

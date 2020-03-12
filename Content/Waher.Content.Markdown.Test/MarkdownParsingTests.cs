@@ -15,7 +15,7 @@ namespace Waher.Content.Markdown.Test
 	{
 		private void DoTest(string MarkdownFileName, string XamlFileName)
 		{
-			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
+			string Markdown = File.ReadAllText("Markdown/Syntax/" + MarkdownFileName);
 			string ExpectedText = File.ReadAllText("XML/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");

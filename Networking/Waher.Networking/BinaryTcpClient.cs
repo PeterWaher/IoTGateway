@@ -458,7 +458,7 @@ namespace Waher.Networking
 			}
 
 #if WINDOWS_UWP
-				IInputStream InputStream;
+			IInputStream InputStream;
 #else
 			Stream Stream;
 #endif
@@ -1303,5 +1303,17 @@ namespace Waher.Networking
 			}
 		}
 #endif
+		/// <summary>
+		/// If connection is encrypted or not.
+		/// </summary>
+		public bool IsEncrypted
+		{
+#if WINDOWS_UWP
+			get => this.client.Information.ProtectionLevel != SocketProtectionLevel.PlainSocket;
+#else
+			get => this.stream is SslStream SslStream && SslStream.IsEncrypted;
+#endif
+		}
+
 	}
 }

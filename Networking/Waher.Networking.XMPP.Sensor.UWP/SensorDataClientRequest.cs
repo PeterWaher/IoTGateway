@@ -256,7 +256,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");
 
-			this.sensorClient?.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
+			this.sensorClient?.Client?.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
 		}
 
 		private void CancelResponse(object Sender, IqResultEventArgs e)

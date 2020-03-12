@@ -377,7 +377,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				this.client.Send(Xml, Callback);
+				this.client.SendAsync(Xml, Callback);
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 		}

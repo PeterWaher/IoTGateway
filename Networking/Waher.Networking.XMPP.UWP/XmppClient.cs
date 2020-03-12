@@ -1224,9 +1224,9 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				if (this.textTransportLayer is null)
-					this.client.Send(Xml, Callback);
+					this.client.SendAsync(Xml, Callback);
 				else
-					this.textTransportLayer.Send(Xml, Callback);
+					this.textTransportLayer.SendAsync(Xml, Callback);
 
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}

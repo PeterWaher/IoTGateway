@@ -479,9 +479,9 @@ namespace Waher.Networking.XMPP.BOSH
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
-		public override Task<bool> Send(string Packet)
+		public override Task<bool> SendAsync(string Packet)
 		{
-			return this.Send(Packet, null);
+			return this.SendAsync(Packet, null);
 		}
 
 		/// <summary>
@@ -489,7 +489,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public override async Task<bool> Send(string Packet, EventHandler DeliveryCallback)
+		public override async Task<bool> SendAsync(string Packet, EventHandler DeliveryCallback)
 		{
 			if (this.terminated)
 				return false;

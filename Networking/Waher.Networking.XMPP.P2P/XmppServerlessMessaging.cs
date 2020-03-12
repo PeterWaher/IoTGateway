@@ -539,7 +539,7 @@ namespace Waher.Networking.XMPP.P2P
 											Result.Peer = Connection;
 											Connection.Start();
 											Result.HeaderSent = true;
-											await Result.Send(Header);
+											await Result.SendAsync(Header);
 											this.TransmitText(Header);
 										}
 										else
@@ -561,7 +561,7 @@ namespace Waher.Networking.XMPP.P2P
 							Result.CallCallbacks();
 					});
 					Result.HeaderSent = true;
-					await Result.Send(Header);
+					await Result.SendAsync(Header);
 					this.TransmitText(Header);
 				}
 			});

@@ -29,14 +29,14 @@ namespace Waher.Networking.XMPP
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
-		public abstract Task<bool> Send(string Packet);
+		public abstract Task<bool> SendAsync(string Packet);
 
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public abstract Task<bool> Send(string Packet, EventHandler DeliveryCallback);
+		public abstract Task<bool> SendAsync(string Packet, EventHandler DeliveryCallback);
 
 		/// <summary>
 		/// If the reading is paused.

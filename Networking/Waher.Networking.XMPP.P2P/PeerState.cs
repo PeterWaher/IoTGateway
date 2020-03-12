@@ -680,7 +680,7 @@ namespace Waher.Networking.XMPP.P2P
 						"</text></stream:error></stream:stream>";
 
 					this.headerSent = true;
-					this.Send(Header, (sender, e) =>
+					this.SendAsync(Header, (sender, e) =>
 					{
 						this.ToError();
 					});
@@ -691,7 +691,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (!this.headerSent)
 				{
 					this.headerSent = true;
-					this.Send(Header);
+					this.SendAsync(Header);
 				}
 
 				this.state = XmppState.Connected;
@@ -937,9 +937,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// Sends a packet.
 		/// </summary>
 		/// <param name="Packet"></param>
-		public Task<bool> Send(string Packet)
+		public Task<bool> SendAsync(string Packet)
 		{
-			return this.Send(Packet, null);
+			return this.SendAsync(Packet, null);
 		}
 
 		/// <summary>
@@ -947,7 +947,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Packet"></param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public Task<bool> Send(string Packet, EventHandler Callback)
+		public Task<bool> SendAsync(string Packet, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 

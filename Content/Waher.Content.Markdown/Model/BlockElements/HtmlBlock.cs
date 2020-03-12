@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a block of HTML in a markdown document.
 	/// </summary>
-	public class HtmlBlock : MarkdownElementChildren
+	public class HtmlBlock : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a block of HTML in a markdown document.

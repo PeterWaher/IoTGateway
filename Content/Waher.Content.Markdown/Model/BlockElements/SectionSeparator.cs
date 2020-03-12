@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Section Separator
 	/// </summary>
-	public class SectionSeparator : MarkdownElement
+	public class SectionSeparator : BlockElement
 	{
 		private readonly int sectionNr;
 		private readonly int nrColumns;

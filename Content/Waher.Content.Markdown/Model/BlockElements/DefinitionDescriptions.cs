@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Definition descriptions
 	/// </summary>
-	public class DefinitionDescriptions : MarkdownElementChildren
+	public class DefinitionDescriptions : BlockElementChildren
 	{
 		/// <summary>
 		/// Definition descriptions

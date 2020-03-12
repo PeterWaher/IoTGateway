@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a task list in a markdown document.
 	/// </summary>
-	public class TaskList : MarkdownElementChildren
+	public class TaskList : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a task list in a markdown document.

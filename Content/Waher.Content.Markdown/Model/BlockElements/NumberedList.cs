@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a numbered list in a markdown document.
 	/// </summary>
-	public class NumberedList : MarkdownElementChildren
+	public class NumberedList : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a numbered list in a markdown document.

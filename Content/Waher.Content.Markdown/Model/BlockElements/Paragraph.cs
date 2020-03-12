@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a paragraph in a markdown document.
 	/// </summary>
-	public class Paragraph : MarkdownElementChildren
+	public class Paragraph : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a paragraph in a markdown document.

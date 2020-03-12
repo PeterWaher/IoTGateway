@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents an unnumbered item in an ordered list.
 	/// </summary>
-	public class UnnumberedItem : MarkdownElementSingleChild
+	public class UnnumberedItem : BlockElementSingleChild
 	{
 		private readonly string prefix;
 

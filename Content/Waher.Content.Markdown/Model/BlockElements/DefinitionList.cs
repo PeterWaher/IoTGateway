@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a definition list in a markdown document.
 	/// </summary>
-	public class DefinitionList : MarkdownElementChildren
+	public class DefinitionList : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a definition list in a markdown document.

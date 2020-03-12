@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a table in a markdown document.
 	/// </summary>
-	public class Table : MarkdownElement
+	public class Table : BlockElement
 	{
 		private readonly MarkdownElement[][] headers;
 		private readonly MarkdownElement[][] rows;

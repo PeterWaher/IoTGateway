@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a task item in a task list.
 	/// </summary>
-	public class TaskItem : MarkdownElementSingleChild
+	public class TaskItem : BlockElementSingleChild
 	{
 		private readonly int checkPosition;
 		private readonly bool isChecked;

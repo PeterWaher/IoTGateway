@@ -30,6 +30,14 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// If the element is a block element.
+		/// </summary>
+		public virtual bool IsBlockElement
+		{
+			get { return false; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>

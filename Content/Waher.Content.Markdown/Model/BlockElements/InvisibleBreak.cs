@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Invisible break
 	/// </summary>
-	public class InvisibleBreak : MarkdownElement
+	public class InvisibleBreak : BlockElement
 	{
 		/// <summary>
 		/// Invisible break

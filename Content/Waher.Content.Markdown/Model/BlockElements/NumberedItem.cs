@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a numbered item in an ordered list.
 	/// </summary>
-	public class NumberedItem : MarkdownElementSingleChild
+	public class NumberedItem : BlockElementSingleChild
 	{
 		private readonly int number;
 

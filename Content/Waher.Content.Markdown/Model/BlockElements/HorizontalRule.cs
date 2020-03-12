@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Horizontal rule
 	/// </summary>
-	public class HorizontalRule : MarkdownElement
+	public class HorizontalRule : BlockElement
 	{
 		/// <summary>
 		/// Horizontal rule

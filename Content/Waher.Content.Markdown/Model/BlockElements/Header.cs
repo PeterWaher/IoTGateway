@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a header in a markdown document.
 	/// </summary>
-	public class Header : MarkdownElementChildren
+	public class Header : BlockElementChildren
 	{
 		private readonly string id;
 		private readonly int level;

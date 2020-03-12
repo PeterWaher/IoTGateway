@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a nested block with no special formatting rules in a markdown document.
 	/// </summary>
-	public class NestedBlock : MarkdownElementChildren
+	public class NestedBlock : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a nested block with no special formatting rules in a markdown document.

@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a block quote in a markdown document.
 	/// </summary>
-	public class BlockQuote : MarkdownElementChildren
+	public class BlockQuote : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a block quote in a markdown document.

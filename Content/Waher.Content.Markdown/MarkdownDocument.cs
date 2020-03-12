@@ -10,9 +10,9 @@ using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
-using Waher.Script;
-using Waher.Script.Exceptions;
 using Waher.Events;
+using Waher.Script;
+using Waher.Runtime.Text;
 using System.Collections;
 
 namespace Waher.Content.Markdown
@@ -32,7 +32,7 @@ namespace Waher.Content.Markdown
 	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
 	{
 		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
-		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
+		private readonly Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumbers = null;
 		private Dictionary<string, Footnote> footnotes = null;
 		private SortedDictionary<int, string> toInsert = null;
@@ -204,7 +204,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Preprocessed markdown.</returns>
 		public static string Preprocess(string Markdown, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
 		{
-			return Preprocess(Markdown, Settings, string.Empty, out bool IsDynamic, TransparentExceptionTypes);
+			return Preprocess(Markdown, Settings, string.Empty, out bool _, TransparentExceptionTypes);
 		}
 
 		/// <summary>
@@ -218,7 +218,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Preprocessed markdown.</returns>
 		public static string Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
 		{
-			return Preprocess(Markdown, Settings, FileName, out bool IsDynamic, TransparentExceptionTypes);
+			return Preprocess(Markdown, Settings, FileName, out bool _, TransparentExceptionTypes);
 		}
 
 		/// <summary>
@@ -1622,7 +1622,6 @@ namespace Waher.Content.Markdown
 											while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
 												Text.Append(ch3);
 
-											ch2 = ch3;
 											Title = Text.ToString();
 											Text.Clear();
 										}
@@ -2035,7 +2034,7 @@ namespace Waher.Content.Markdown
 						{
 							Expression Exp = new Expression(Text.ToString());
 							State.DiscardBackup();
-							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, 
+							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables,
 								Elements.First is null && State.PeekNextChar() == 0, StartPosition, EndPosition));
 							Text.Clear();
 							this.isDynamic = true;
@@ -2288,10 +2287,10 @@ namespace Waher.Content.Markdown
 
 								while (!State.EOF)
 								{
-									if ((ch2 = State.PeekNextCharSameRow()) == '#')
+									if (State.PeekNextCharSameRow() == '#')
 									{
 										State.NextCharSameRow();
-										if ((ch3 = State.PeekNextCharSameRow()) == '.')
+										if (State.PeekNextCharSameRow() == '.')
 										{
 											Item = new UnnumberedItem(this, "#. ", new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
@@ -3245,7 +3244,7 @@ namespace Waher.Content.Markdown
 
 								while (!State.EOF)
 								{
-									if ((ch2 = State.PeekNextCharSameRow()) == ':')
+									if (State.PeekNextCharSameRow() == ':')
 									{
 										DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
 
@@ -4362,8 +4361,8 @@ namespace Waher.Content.Markdown
 			if (!Inclusion)
 			{
 				StringBuilder sb = null;
-				string Description = string.Empty;
-				string Title = string.Empty;
+				string Title;
+				string Description;
 				string s2;
 				bool First;
 
@@ -5650,13 +5649,22 @@ namespace Waher.Content.Markdown
 			this.ForEach((E, Obj) =>
 			{
 				if (E is AutomaticLinkUrl AutomaticLinkUrl)
-					Links[AutomaticLinkUrl.URL] = true;
-				else if (E is Link Link)
-					Links[Link.Url] = true;
-				else if (IncludeMultimedia && E is Multimedia Multimedia)
 				{
-					foreach (MultimediaItem Item in Multimedia.Items)
-						Links[Item.Url] = true;
+					if (IncludeAutomaticLinks)
+						Links[AutomaticLinkUrl.URL] = true;
+				}
+				else if (E is Link Link)
+				{
+					if (IncludeLinks)
+						Links[Link.Url] = true;
+				}
+				else if (E is Multimedia Multimedia)
+				{
+					if (IncludeMultimedia)
+					{
+						foreach (MultimediaItem Item in Multimedia.Items)
+							Links[Item.Url] = true;
+					}
 				}
 
 				return true;
@@ -5688,7 +5696,100 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		// TODO: Graphs.
+		/// <summary>
+		/// Calculates the difference of two Markdown documents.
+		/// </summary>
+		/// <param name="Old">Old version of the document.</param>
+		/// <param name="New">New version of the document.</param>
+		/// <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
+		/// <returns>Difference document</returns>
+		public static MarkdownDocument Compare(MarkdownDocument Old, MarkdownDocument New, bool KeepUnchanged)
+		{
+			return New.Compare(Old, KeepUnchanged);
+		}
+
+		/// <summary>
+		/// Calculates the difference of two Markdown documents.
+		/// </summary>
+		/// <param name="Old">Old version of the document.</param>
+		/// <param name="New">New version of the document.</param>
+		/// <param name="Settings">Markdown settings.</param>
+		/// <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
+		/// <returns>Difference document</returns>
+		public static string Compare(string Old, string New, MarkdownSettings Settings, bool KeepUnchanged,
+			params Type[] TransparentExceptionTypes)
+		{
+			MarkdownDocument OldDoc = new MarkdownDocument(Old, Settings, TransparentExceptionTypes);
+			MarkdownDocument NewDoc = new MarkdownDocument(New, Settings, TransparentExceptionTypes);
+			MarkdownDocument DiffDoc = Compare(OldDoc, NewDoc, KeepUnchanged);
+
+			return DiffDoc.markdownText;
+		}
+
+		/// <summary>
+		/// Calculates the difference of the current Markdown document, and a previous version of the Markdown document.
+		/// </summary>
+		/// <param name="Previous">Previous version</param>
+		/// <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
+		/// <returns>Difference document</returns>
+		public MarkdownDocument Compare(MarkdownDocument Previous, bool KeepUnchanged)
+		{
+			// TODO: Meta-data
+
+			MarkdownDocument Result = new MarkdownDocument(string.Empty, this.settings, this.transparentExceptionTypes);
+			IEnumerable<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
+			
+			foreach (MarkdownElement E in Edit)
+				Result.elements.AddLast(E);
+
+			// TODO: Export markdown text
+
+			return Result;
+		}
+
+		private static IEnumerable<MarkdownElement> Compare(ICollection<MarkdownElement> E1, ICollection<MarkdownElement> E2, 
+			bool KeepUnchanged, MarkdownDocument Document)
+		{
+			if (!(E1 is MarkdownElement[] S1))
+			{
+				S1 = new MarkdownElement[E1.Count];
+				E1.CopyTo(S1, 0);
+			}
+
+			if (!(E2 is MarkdownElement[] S2))
+			{
+				S2 = new MarkdownElement[E2.Count];
+				E2.CopyTo(S2, 0);
+			}
+
+			EditScript<MarkdownElement> Script = Difference.Analyze<MarkdownElement>(S1, S2);
+
+			foreach (Step<MarkdownElement> Step in Script.Steps)
+			{
+				switch (Step.Operation)
+				{
+					case EditOperation.Keep:
+						if (!KeepUnchanged)
+							break;
+
+						foreach (MarkdownElement E in Step.Symbols)
+							yield return E;
+
+						break;
+
+					case EditOperation.Insert:
+						yield return new Insert(Document, Step.Symbols);	// TODO: inserted blocks.
+						break;
+
+					case EditOperation.Delete:
+						yield return new Delete(Document, Step.Symbols);    // TODO: deleted blocks.
+						break;
+				}
+			}
+		}
+
 		// TODO: Footnotes in included markdown files.
 	}
 }

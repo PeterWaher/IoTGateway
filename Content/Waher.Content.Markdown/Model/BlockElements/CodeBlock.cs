@@ -12,7 +12,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a code block in a markdown document.
 	/// </summary>
-	public class CodeBlock : MarkdownElement
+	public class CodeBlock : BlockElement
 	{
 		private readonly ICodeContent handler;
 		private readonly string[] rows;

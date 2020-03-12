@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// <summary>
 	/// Represents a bullet list in a markdown document.
 	/// </summary>
-	public class BulletList : MarkdownElementChildren
+	public class BulletList : BlockElementChildren
 	{
 		/// <summary>
 		/// Represents a bullet list in a markdown document.

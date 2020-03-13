@@ -206,5 +206,54 @@ namespace Waher.Content.Markdown.Model
 					E.Export(Output);
 			}
 		}
+
+		/// <summary>
+		/// Determines whether the specified object is equal to the current object.
+		/// </summary>
+		/// <param name="obj">The object to compare with the current object.</param>
+		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+		public override bool Equals(object obj)
+		{
+			if (!(obj is MarkdownElementChildren x) || !base.Equals(obj))
+				return false;
+
+			IEnumerator<MarkdownElement> e1 = this.children.GetEnumerator();
+			IEnumerator<MarkdownElement> e2 = x.children.GetEnumerator();
+			bool b1, b2;
+
+			while (true)
+			{
+				b1 = e1.MoveNext();
+				b2 = e2.MoveNext();
+
+				if (b1 ^ b2)
+					return false;
+
+				if (!b1)
+					return true;
+
+				if (!e1.Current.Equals(e2.Current))
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// Serves as the default hash function.
+		/// </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode()
+		{
+			int h1 = base.GetHashCode();
+			int h2;
+
+			foreach (MarkdownElement E in this.children)
+			{
+				h2 = E.GetHashCode();
+				h1 = ((h1 << 5) + h1) ^ h2;
+			}
+
+			return h1;
+		}
+
 	}
 }

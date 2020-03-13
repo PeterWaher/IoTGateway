@@ -132,5 +132,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				base.SameMetaData(E);
 		}
 
+		/// <summary>
+		/// Determines whether the specified object is equal to the current object.
+		/// </summary>
+		/// <param name="obj">The object to compare with the current object.</param>
+		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+		public override bool Equals(object obj)
+		{
+			return obj is Sections x &&
+				this.initialNrColumns == x.initialNrColumns &&
+				this.initialRow == x.initialRow &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// Serves as the default hash function.
+		/// </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode()
+		{
+			int h1 = base.GetHashCode();
+			int h2 = this.initialNrColumns.GetHashCode();
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = this.initialRow?.GetHashCode() ?? 0;
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+
+			return h1;
+		}
+
 	}
 }

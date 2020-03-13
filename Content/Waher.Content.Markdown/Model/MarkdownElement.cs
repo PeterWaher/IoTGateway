@@ -49,6 +49,25 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Determines whether the specified object is equal to the current object.
+		/// </summary>
+		/// <param name="obj">The object to compare with the current object.</param>
+		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+		public override bool Equals(object obj)
+		{
+			return this.GetType().Equals(obj.GetType());
+		}
+
+		/// <summary>
+		/// Serves as the default hash function.
+		/// </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode()
+		{
+			return this.GetType().GetHashCode();
+		}
+
+		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>

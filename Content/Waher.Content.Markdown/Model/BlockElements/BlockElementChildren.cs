@@ -33,5 +33,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// If the element is a block element.
 		/// </summary>
 		public override bool IsBlockElement => true;
+
 	}
 }

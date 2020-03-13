@@ -25,7 +25,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Items">Multimedia items.</param>
-		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, bool AloneInParagraph, params MultimediaItem[] Items)
+		public Multimedia(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, bool AloneInParagraph, params MultimediaItem[] Items)
 			: base(Document, ChildElements)
 		{
 			this.items = Items;
@@ -46,6 +46,55 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public bool AloneInParagraph
 		{
 			get { return this.aloneInParagraph; }
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			bool First = true;
+
+			Output.Append("![");
+			base.GenerateMarkdown(Output);
+			Output.Append(']');
+
+			foreach (MultimediaItem Item in this.items)
+			{
+				if (First)
+					First = false;
+				else if (this.aloneInParagraph)
+				{
+					Output.AppendLine();
+					Output.Append('\t');
+				}
+
+				Output.Append('(');
+				Output.Append(Item.Url);
+
+				if (!string.IsNullOrEmpty(Item.Title))
+				{
+					Output.Append(" \"");
+					Output.Append(Item.Title.Replace("\"", "\\\""));
+					Output.Append('"');
+				}
+
+				if (Item.Width.HasValue)
+				{
+					Output.Append(' ');
+					Output.Append(Item.Width.Value.ToString());
+
+					if (Item.Height.HasValue)
+					{
+						Output.Append(' ');
+						Output.Append(Item.Height.Value.ToString());
+					}
+				}
+
+				Output.Append(')');
+			}
+
 		}
 
 		/// <summary>
@@ -123,7 +172,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					break;
 			}
 
-			return Best;	// Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
+			return Best;    // Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
 		}
 
 		/// <summary>
@@ -221,5 +270,47 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			Output.WriteEndElement();
 		}
+
+		/// <summary>
+		/// Creates an object of the same type, and meta-data, as the current object,
+		/// but with content defined by <paramref name="Children"/>.
+		/// </summary>
+		/// <param name="Children">New content.</param>
+		/// <param name="Document">Document that will contain the element.</param>
+		/// <returns>Object of same type and meta-data, but with new content.</returns>
+		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		{
+			return new Multimedia(Document, Children, this.aloneInParagraph, this.items);
+		}
+
+		/// <summary>
+		/// If the current object has same meta-data as <paramref name="E"/>
+		/// (but not necessarily same content).
+		/// </summary>
+		/// <param name="E">Element to compare to.</param>
+		/// <returns>If same meta-data as <paramref name="E"/>.</returns>
+		public override bool SameMetaData(MarkdownElement E)
+		{
+			return E is Multimedia x &&
+				x.aloneInParagraph == this.aloneInParagraph &&
+				AreEqual(x.items, this.items) &&
+				base.SameMetaData(E);
+		}
+
+		private static bool AreEqual(MultimediaItem[] Items1, MultimediaItem[] Items2)
+		{
+			int i, c = Items1.Length;
+			if (Items2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!Items1[i].Equals(Items2[i]))
+					return false;
+			}
+
+			return true;
+		}
+
 	}
 }

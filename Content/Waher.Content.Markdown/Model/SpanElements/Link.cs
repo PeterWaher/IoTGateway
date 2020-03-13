@@ -21,7 +21,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Url">URL</param>
 		/// <param name="Title">Optional title.</param>
-		public Link(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title)
+		public Link(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, string Url, string Title)
 			: base(Document, ChildElements)
 		{
 			this.url = Url;
@@ -42,6 +42,27 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Title
 		{
 			get { return this.title; }
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.Append('[');
+			base.GenerateMarkdown(Output);
+			Output.Append("](");
+			Output.Append(this.url);
+
+			if (!string.IsNullOrEmpty(this.title))
+			{
+				Output.Append(" \"");
+				Output.Append(this.title.Replace("\"", "\\\""));
+				Output.Append('"');
+			}
+
+			Output.Append(')');
 		}
 
 		/// <summary>
@@ -149,6 +170,32 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.WriteAttributeString("title", this.title);
 			this.ExportChildren(Output);
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Creates an object of the same type, and meta-data, as the current object,
+		/// but with content defined by <paramref name="Children"/>.
+		/// </summary>
+		/// <param name="Children">New content.</param>
+		/// <param name="Document">Document that will contain the element.</param>
+		/// <returns>Object of same type and meta-data, but with new content.</returns>
+		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		{
+			return new Link(Document, Children, this.url, this.title);
+		}
+
+		/// <summary>
+		/// If the current object has same meta-data as <paramref name="E"/>
+		/// (but not necessarily same content).
+		/// </summary>
+		/// <param name="E">Element to compare to.</param>
+		/// <returns>If same meta-data as <paramref name="E"/>.</returns>
+		public override bool SameMetaData(MarkdownElement E)
+		{
+			return E is Link x &&
+				x.url == this.url &&
+				x.title == this.title &&
+				base.SameMetaData(E);
 		}
 
 	}

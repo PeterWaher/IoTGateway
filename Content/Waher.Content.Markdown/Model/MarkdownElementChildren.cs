@@ -123,6 +123,25 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Creates an object of the same type, and meta-data, as the current object,
+		/// but with content defined by <paramref name="Children"/>.
+		/// </summary>
+		/// <param name="Children">New content.</param>
+		/// <param name="Document">Document that will contain the element.</param>
+		/// <returns>Object of same type and meta-data, but with new content.</returns>
+		public abstract MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document);
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateMarkdown(Output);
+		}
+
+		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>

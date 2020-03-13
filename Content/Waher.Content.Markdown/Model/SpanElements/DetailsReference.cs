@@ -33,6 +33,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.Append("[%Details]");
+		}
+
+		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>

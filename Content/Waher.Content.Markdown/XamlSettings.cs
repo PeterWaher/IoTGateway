@@ -20,6 +20,9 @@ namespace Waher.Content.Markdown
 		private int blockQuoteMargin = 20;
 		private int blockQuotePadding = 10;
 
+		private string insertedBlockQuoteBorderColor = "Green";
+		private string deletedBlockQuoteBorderColor = "Red";
+
 		private readonly int[] headerFontSize = new int[] { 28, 24, 22, 20, 18, 16, 15, 14, 13, 12 };
 		private readonly string[] headerForegroundColor = new string[] { "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy" };
 
@@ -186,6 +189,28 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.blockQuotePadding; }
 			set { this.blockQuotePadding = value; }
+		}
+
+		/// <summary>
+		/// Inserted Block Quote border color.
+		/// 
+		/// NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+		/// </summary>
+		public string InsertedBlockQuoteBorderColor
+		{
+			get { return this.insertedBlockQuoteBorderColor; }
+			set { this.insertedBlockQuoteBorderColor = value; }
+		}
+
+		/// <summary>
+		/// Deleted Block Quote border color.
+		/// 
+		/// NOTE: Property is a string, to allow generation of XAML where access to WPF libraries is not available.
+		/// </summary>
+		public string DeletedBlockQuoteBorderColor
+		{
+			get { return this.deletedBlockQuoteBorderColor; }
+			set { this.deletedBlockQuoteBorderColor = value; }
 		}
 
 		/// <summary>

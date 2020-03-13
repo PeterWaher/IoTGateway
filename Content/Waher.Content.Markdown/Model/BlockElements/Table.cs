@@ -14,6 +14,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private readonly MarkdownElement[][] headers;
 		private readonly MarkdownElement[][] rows;
 		private readonly TextAlignment[] alignments;
+		private readonly string[] alignmentDefinitions;
 		private readonly string caption;
 		private readonly string id;
 		private readonly int columns;
@@ -26,16 +27,18 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Headers">Header rows.</param>
 		/// <param name="Rows">Data rows.</param>
 		/// <param name="Alignments">Column alignments.</param>
+		/// <param name="AlignmentDefinitions">How the alignments where defined.</param>
 		/// <param name="Caption">Table caption.</param>
 		/// <param name="Id">Table ID.</param>
-		public Table(MarkdownDocument Document, int Columns, MarkdownElement[][] Headers, MarkdownElement[][] Rows, TextAlignment[] Alignments,
-			string Caption, string Id)
+		public Table(MarkdownDocument Document, int Columns, MarkdownElement[][] Headers, MarkdownElement[][] Rows,
+			TextAlignment[] Alignments, string[] AlignmentDefinitions, string Caption, string Id)
 			: base(Document)
 		{
 			this.columns = Columns;
 			this.headers = Headers;
 			this.rows = Rows;
 			this.alignments = Alignments;
+			this.alignmentDefinitions = AlignmentDefinitions;
 			this.caption = Caption;
 			this.id = Id;
 		}
@@ -78,6 +81,142 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public string Id
 		{
 			get { return this.id; }
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			int[] Widths = new int[this.columns];
+			int i, c, d;
+
+			string[][] Headers = new string[c = this.headers.Length][];
+			for (i = 0; i < c; i++)
+				Headers[i] = this.GenerateMarkdown(this.headers[i], Widths);
+
+			string[][] Rows = new string[d = this.rows.Length][];
+			for (i = 0; i < d; i++)
+				Rows[i] = this.GenerateMarkdown(this.rows[i], Widths);
+
+			for (i = 0; i < c; i++)
+				this.GenerateMarkdown(Headers[i], Widths, Output);
+
+			foreach (string Headline in this.alignmentDefinitions)
+			{
+				Output.Append('|');
+				Output.Append(Headline);
+			}
+
+			Output.AppendLine("|");
+
+			for (i = 0; i < d; i++)
+				this.GenerateMarkdown(Rows[i], Widths, Output);
+
+			bool NewLine = false;
+
+			if (!string.IsNullOrEmpty(this.caption))
+			{
+				Output.Append('[');
+				Output.Append(this.caption);
+				Output.Append(']');
+				NewLine = true;
+			}
+
+			if (!string.IsNullOrEmpty(this.id))
+			{
+				Output.Append('[');
+				Output.Append(this.id);
+				Output.Append(']');
+				NewLine = true;
+			}
+
+			if (NewLine)
+				Output.AppendLine();
+
+			Output.AppendLine();
+		}
+
+		private void GenerateMarkdown(string[] Elements, int[] Widths, StringBuilder Output)
+		{
+			string s;
+			int i, j, k;
+
+			Output.Append('|');
+
+			for (i = 0; i < this.columns;)
+			{
+				s = Elements[i];
+				if (s is null)
+					continue;
+
+				Output.Append(' ');
+				Output.Append(s);
+				j = Widths[i] - s.Length;
+				k = 1;
+
+				i++;
+				while (i < this.columns && Elements[i] is null)
+				{
+					j += Widths[i++];
+					k++;
+				}
+
+				while (j-- > 0)
+					Output.Append(' ');
+
+				while (k-- > 0)
+					Output.Append('|');
+			}
+
+			Output.AppendLine();
+		}
+
+		private string[] GenerateMarkdown(MarkdownElement[] Elements, int[] Widths)
+		{
+			string[] Result = new string[this.columns];
+			StringBuilder sb = new StringBuilder();
+			MarkdownElement E;
+			int Len, LastLen;
+			int i, j;
+
+			for (i = 0; i < this.columns; i++)
+			{
+				E = Elements[i];
+				if (E == null)
+					continue;
+
+				E.GenerateMarkdown(sb);
+				Result[i] = sb.ToString();
+				sb.Clear();
+
+				LastLen = sb.Length + 2;    // One space on each side of content.
+				j = i + 1;
+				while (j < this.columns && Elements[j] is null)
+				{
+					Result[j++] = null;
+					LastLen++;              // One additional pipe character
+				}
+
+				j -= i;
+
+				Len = LastLen / j;
+				LastLen -= (j - 1) * Len;
+
+				while (j-- > 1)
+				{
+					if (Widths[i] < Len)
+						Widths[i] = Len;
+
+					i++;
+				}
+
+				if (Widths[i] < LastLen)
+					Widths[i] = LastLen;
+			}
+
+			return Result;
 		}
 
 		/// <summary>

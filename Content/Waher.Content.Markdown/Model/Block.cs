@@ -218,6 +218,7 @@ namespace Waher.Content.Markdown.Model
 			int[] PartPositions = new int[Columns];
 
 			TextAlignment[] Alignments = new TextAlignment[Columns];
+			string[] AlignmentDefinitions = new string[Columns];
 			bool Left;
 			bool Right;
 			int Diff;
@@ -237,6 +238,7 @@ namespace Waher.Content.Markdown.Model
 
 				Left = s.StartsWith(":");
 				Right = s.EndsWith(":");
+				AlignmentDefinitions[j] = s;
 
 				if (Left && Right)
 					Alignments[j] = TextAlignment.Center;
@@ -261,6 +263,7 @@ namespace Waher.Content.Markdown.Model
 			TableInformation = new TableInformation
 			{
 				Alignments = Alignments,
+				AlignmentDefinitions = AlignmentDefinitions,
 				Caption = Caption,
 				Columns = Columns,
 				Id = Id,

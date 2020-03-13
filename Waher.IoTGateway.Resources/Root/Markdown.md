@@ -397,6 +397,23 @@ This is transformed into:
 >
 > etc.
 
+The `>` sign can be optionally prefixed by a `+` or a `-` sign to show the block has been
+inserted (`+`) or deleted(`-`). Example:
+
+	+> This paragraph has been added.
+
+	This paragraph is unchanged.
+
+	-> This paragraph has been deleted.
+
+This is transformed to:
+
++> This paragraph has been added.
+
+This paragraph is unchanged.
+
+-> This paragraph has been deleted.
+
 ### Bullet Lists
 
 Bullet lists are created by simply writing the items prefixed by either asterisks `*`, plus signs `+` or minus signs (hyphens) `-`, followed by one to three

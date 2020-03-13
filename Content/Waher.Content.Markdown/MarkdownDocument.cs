@@ -41,7 +41,7 @@ namespace Waher.Content.Markdown
 		private readonly LinkedList<MarkdownElement> elements;
 		private readonly List<Header> headers = new List<Header>();
 		private readonly IEmojiSource emojiSource;
-		private readonly string markdownText;
+		private string markdownText;
 		private string fileName = string.Empty;
 		private string resourceName = string.Empty;
 		private string url = string.Empty;
@@ -188,7 +188,24 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string MarkdownText
 		{
-			get { return this.markdownText; }
+			get
+			{
+				if (this.markdownText is null)
+				{
+					StringBuilder Output = new StringBuilder();
+
+					// TODO: Meta-data
+
+					foreach (MarkdownElement E in this.elements)
+						E.GenerateMarkdown(Output);
+
+					// TODO: Footnotes
+
+					this.markdownText = Output.ToString();
+				}
+
+				return this.markdownText;
+			}
 		}
 
 		internal static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
@@ -390,6 +407,7 @@ namespace Waher.Content.Markdown
 			Block Block;
 			string[] Rows;
 			string s, s2;
+			string InitialSectionSeparator = null;
 			int BlockIndex;
 			int i, j, c, d;
 			int Index;
@@ -499,9 +517,31 @@ namespace Waher.Content.Markdown
 
 					continue;
 				}
+				else if (Block.IsPrefixedBy("+>", false))
+				{
+					Content = this.ParseBlocks(Block.RemovePrefix("+>", 3));
+
+					if (Elements.Last != null && Elements.Last.Value is InsertBlocks InsertBlocks)
+						InsertBlocks.AddChildren(Content);
+					else
+						Elements.AddLast(new InsertBlocks(this, Content));
+
+					continue;
+				}
+				else if (Block.IsPrefixedBy("->", false))
+				{
+					Content = this.ParseBlocks(Block.RemovePrefix("->", 3));
+
+					if (Elements.Last != null && Elements.Last.Value is DeleteBlocks DeleteBlocks)
+						DeleteBlocks.AddChildren(Content);
+					else
+						Elements.AddLast(new DeleteBlocks(this, Content));
+
+					continue;
+				}
 				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true, true) || this.IsUnderline(Block.Rows[0], '*', true, true)))
 				{
-					Elements.AddLast(new HorizontalRule(this));
+					Elements.AddLast(new HorizontalRule(this, Block.Rows[0]));
 					continue;
 				}
 				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '=', true, false)))
@@ -510,14 +550,17 @@ namespace Waher.Content.Markdown
 					HasSections = true;
 
 					if (Elements.First is null)
+					{
 						InitialNrColumns = NrColumns;
+						InitialSectionSeparator = Block.Rows[0];
+					}
 					else
-						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns));
+						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns, Block.Rows[0]));
 					continue;
 				}
 				else if (Block.End == Block.Start && this.IsUnderline(Block.Rows[0], '~', false, false))
 				{
-					Elements.AddLast(new InvisibleBreak(this));
+					Elements.AddLast(new InvisibleBreak(this, Block.Rows[0]));
 					continue;
 				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
@@ -853,7 +896,9 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					Elements.AddLast(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.Caption, TableInformation.Id));
+					Elements.AddLast(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.AlignmentDefinitions,
+						TableInformation.Caption, TableInformation.Id));
+
 					continue;
 				}
 				else if (Block.IsPrefixedBy(":", true) && Elements.Last != null)
@@ -954,14 +999,14 @@ namespace Waher.Content.Markdown
 
 					if (this.IsUnderline(s, '=', false, false))
 					{
-						Header Header = new Header(this, 1, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
+						Header Header = new Header(this, 1, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
 					}
 					else if (this.IsUnderline(s, '-', false, false))
 					{
-						Header Header = new Header(this, 2, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
+						Header Header = new Header(this, 2, false, s, this.ParseBlock(Rows, Block.Positions, 0, c - 1));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
@@ -971,7 +1016,8 @@ namespace Waher.Content.Markdown
 				s = Rows[Block.Start];
 				if (this.IsPrefixedBy(s, '#', out d) && d < s.Length)
 				{
-					Rows[Block.Start] = Rows[Block.Start].Substring(d).Trim();
+					string Prefix = s.Substring(0, d);
+					Rows[Block.Start] = s.Substring(d).Trim();
 
 					s = Rows[c];
 					i = s.Length - 1;
@@ -981,7 +1027,7 @@ namespace Waher.Content.Markdown
 					if (++i < s.Length)
 						Rows[c] = s.Substring(0, i).TrimEnd();
 
-					Header Header = new Header(this, d, this.ParseBlock(Rows, Block.Positions, Block.Start, c));
+					Header Header = new Header(this, d, true, Prefix, this.ParseBlock(Rows, Block.Positions, Block.Start, c));
 					Elements.AddLast(Header);
 					this.headers.Add(Header);
 					continue;
@@ -1011,7 +1057,7 @@ namespace Waher.Content.Markdown
 			if (HasSections)
 			{
 				LinkedList<MarkdownElement> Sections = new LinkedList<MarkdownElement>();
-				Sections.AddLast(new Sections(this, InitialNrColumns, Elements));
+				Sections.AddLast(new Sections(this, InitialNrColumns, InitialSectionSeparator, Elements));
 				return Sections;
 			}
 			else
@@ -1374,7 +1420,7 @@ namespace Waher.Content.Markdown
 									try
 									{
 										Title = Url.ToLower();
-										Elements.AddLast(new FootnoteReference(this, System.Xml.XmlConvert.VerifyNCName(Title)));
+										Elements.AddLast(new FootnoteReference(this, XmlConvert.VerifyNCName(Title)));
 										if (!this.footnoteNumbers.ContainsKey(Title))
 										{
 											this.footnoteNumbers[Title] = ++this.lastFootnote;
@@ -5725,7 +5771,7 @@ namespace Waher.Content.Markdown
 			MarkdownDocument NewDoc = new MarkdownDocument(New, Settings, TransparentExceptionTypes);
 			MarkdownDocument DiffDoc = Compare(OldDoc, NewDoc, KeepUnchanged);
 
-			return DiffDoc.markdownText;
+			return DiffDoc.MarkdownText;
 		}
 
 		/// <summary>
@@ -5740,54 +5786,154 @@ namespace Waher.Content.Markdown
 
 			MarkdownDocument Result = new MarkdownDocument(string.Empty, this.settings, this.transparentExceptionTypes);
 			IEnumerable<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
-			
+
 			foreach (MarkdownElement E in Edit)
 				Result.elements.AddLast(E);
 
-			// TODO: Export markdown text
+			// TODO: Footnotes
 
+			Result.markdownText = null; // Triggers export, if needed.
 			return Result;
 		}
 
-		private static IEnumerable<MarkdownElement> Compare(ICollection<MarkdownElement> E1, ICollection<MarkdownElement> E2, 
-			bool KeepUnchanged, MarkdownDocument Document)
+		private static MarkdownElement[] ToArray(IEnumerable<MarkdownElement> Elements)
 		{
-			if (!(E1 is MarkdownElement[] S1))
+			if (Elements is MarkdownElement[] Array)
+				return Array;
+
+			if (Elements is ICollection<MarkdownElement> Collection)
 			{
-				S1 = new MarkdownElement[E1.Count];
-				E1.CopyTo(S1, 0);
+				Array = new MarkdownElement[Collection.Count];
+				Collection.CopyTo(Array, 0);
+				return Array;
 			}
 
-			if (!(E2 is MarkdownElement[] S2))
-			{
-				S2 = new MarkdownElement[E2.Count];
-				E2.CopyTo(S2, 0);
-			}
+			int c = 0;
 
+			foreach (MarkdownElement E in Elements)
+				c++;
+
+			Array = new MarkdownElement[c];
+
+			c = 0;
+
+			foreach (MarkdownElement E in Elements)
+				Array[c++] = E;
+
+			return Array;
+		}
+
+		private static IEnumerable<MarkdownElement> Compare(IEnumerable<MarkdownElement> Elements1,
+			IEnumerable<MarkdownElement> Elements2, bool KeepUnchanged, MarkdownDocument Document)
+		{
+			MarkdownElement[] S1 = ToArray(Elements1);
+			MarkdownElement[] S2 = ToArray(Elements2);
 			EditScript<MarkdownElement> Script = Difference.Analyze<MarkdownElement>(S1, S2);
+			Step<MarkdownElement> Step, Step2;
+			int i, c = Script.Steps.Length;
 
-			foreach (Step<MarkdownElement> Step in Script.Steps)
+			for (i = 0; i < c; i++)
 			{
-				switch (Step.Operation)
+				Step = Script.Steps[i];
+
+				if (Step.Operation == EditOperation.Keep)
 				{
-					case EditOperation.Keep:
-						if (!KeepUnchanged)
-							break;
+					if (!KeepUnchanged)
+						continue;
 
-						foreach (MarkdownElement E in Step.Symbols)
-							yield return E;
+					foreach (MarkdownElement E in Step.Symbols)
+						yield return E;
+				}
+				else
+				{
+					if (i + 1 < c &&
+						(Step2 = Script.Steps[i + 1]).Operation != Step.Operation &&
+						SameBlockTypes(Step.Symbols, Step2.Symbols))
+					{
+						MarkdownElement E1, E2;
+						int j, d = Step.Symbols.Length;
 
-						break;
+						for (j = 0; j < d; j++)
+						{
+							E1 = Step.Symbols[j];
+							E2 = Step2.Symbols[j];
 
-					case EditOperation.Insert:
-						yield return new Insert(Document, Step.Symbols);	// TODO: inserted blocks.
-						break;
+							if (E1 is MarkdownElementChildren Children1 &&
+								E2 is MarkdownElementChildren Children2)
+							{
+								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children, true, Document);
+								yield return Children1.Create(Diff, Document);
+							}
+							else if (E1 is MarkdownElementSingleChild Child1 &&
+								E2 is MarkdownElementSingleChild Child2 &&
+								Child1.Child.SameMetaData(Child2.Child) &&
+								Child1.Child is MarkdownElementChildren GrandChildren1 &&
+								Child2.Child is MarkdownElementChildren GrandChildren2)
+							{
+								IEnumerable<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children, true, Document);
+								yield return Child1.Create(GrandChildren1.Create(Diff, Document), Document);
+							}
+							else
+							{
+								yield return GetElement(Step.Operation, Document, E1);
+								yield return GetElement(Step2.Operation, Document, E2);
+							}
+						}
 
-					case EditOperation.Delete:
-						yield return new Delete(Document, Step.Symbols);    // TODO: deleted blocks.
-						break;
+						i++;
+					}
+					else
+						yield return GetElement(Step.Operation, Document, Step.Symbols);
 				}
 			}
+		}
+
+		private static MarkdownElement GetElement(EditOperation Operation, MarkdownDocument Document, params MarkdownElement[] Symbols)
+		{
+			if (Symbols[0].IsBlockElement)
+			{
+				switch (Operation)
+				{
+					case EditOperation.Insert:
+						return new InsertBlocks(Document, Symbols);
+
+					case EditOperation.Delete:
+						return new DeleteBlocks(Document, Symbols);
+				}
+			}
+			else
+			{
+				switch (Operation)
+				{
+					case EditOperation.Insert:
+						return new Insert(Document, Symbols);
+
+					case EditOperation.Delete:
+						return new Delete(Document, Symbols);
+				}
+			}
+
+			return new InvisibleBreak(Document, string.Empty);
+		}
+
+		private static bool SameBlockTypes(MarkdownElement[] E1, MarkdownElement[] E2)
+		{
+			int i, c = E1.Length;
+			if (E2.Length != c)
+				return false;
+
+			MarkdownElement e;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!(e = E1[i]).IsBlockElement)
+					return false;
+
+				if (!e.SameMetaData(E2[i]))
+					return false;
+			}
+
+			return true;
 		}
 
 		// TODO: Footnotes in included markdown files.

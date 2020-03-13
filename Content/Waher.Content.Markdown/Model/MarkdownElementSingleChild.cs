@@ -36,6 +36,15 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Creates an object of the same type, and meta-data, as the current object,
+		/// but with content defined by <paramref name="Child"/>.
+		/// </summary>
+		/// <param name="Child">New content.</param>
+		/// <param name="Document">Document that will contain the element.</param>
+		/// <returns>Object of same type and meta-data, but with new content.</returns>
+		public abstract MarkdownElementSingleChild Create(MarkdownElement Child, MarkdownDocument Document);
+
+		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>

@@ -10,6 +10,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class SectionSeparator : BlockElement
 	{
+		private readonly string row;
 		private readonly int sectionNr;
 		private readonly int nrColumns;
 
@@ -19,11 +20,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="SectionNr">Section number</param>
 		/// <param name="NrColumns">Number of columns in following section.</param>
-		public SectionSeparator(MarkdownDocument Document, int SectionNr, int NrColumns)
+		/// <param name="Row">Markdown definition.</param>
+		public SectionSeparator(MarkdownDocument Document, int SectionNr, int NrColumns, string Row)
 			: base(Document)
 		{
 			this.sectionNr = SectionNr;
 			this.nrColumns = NrColumns;
+			this.row = Row;
 		}
 
 		/// <summary>
@@ -40,6 +43,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public int NrColumns
 		{
 			get { return this.nrColumns; }
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.AppendLine(this.row);
+			Output.AppendLine();
 		}
 
 		/// <summary>

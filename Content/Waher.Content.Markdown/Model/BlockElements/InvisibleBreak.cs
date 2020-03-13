@@ -10,13 +10,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class InvisibleBreak : BlockElement
 	{
+		private readonly string row;
+
 		/// <summary>
 		/// Invisible break
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		public InvisibleBreak(MarkdownDocument Document)
+		/// <param name="Row">Markdown definition.</param>
+		public InvisibleBreak(MarkdownDocument Document, string Row)
 			: base(Document)
 		{
+			this.row = Row;
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.AppendLine(this.row);
+			Output.AppendLine();
 		}
 
 		/// <summary>

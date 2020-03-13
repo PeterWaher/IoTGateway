@@ -143,6 +143,22 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private readonly static Dictionary<string, ICodeContent[]> handlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.Append("```");
+			Output.AppendLine(this.language);
+
+			foreach (string Row in this.rows)
+				Output.AppendLine(Row);
+
+			Output.AppendLine("```");
+			Output.AppendLine();
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>

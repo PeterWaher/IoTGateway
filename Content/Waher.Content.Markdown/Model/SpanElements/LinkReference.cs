@@ -18,7 +18,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Label">Link label.</param>
-		public LinkReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label)
+		public LinkReference(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, string Label)
 			: base(Document, ChildElements)
 		{
 			this.label = Label;
@@ -30,6 +30,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string Label
 		{
 			get { return this.label; }
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			Output.Append('[');
+			base.GenerateMarkdown(Output);
+			Output.Append("][");
+			Output.Append(this.label);
+			Output.Append(']');
 		}
 
 		/// <summary>
@@ -98,5 +111,31 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			this.ExportChildren(Output);
 			Output.WriteEndElement();
 		}
+
+		/// <summary>
+		/// Creates an object of the same type, and meta-data, as the current object,
+		/// but with content defined by <paramref name="Children"/>.
+		/// </summary>
+		/// <param name="Children">New content.</param>
+		/// <param name="Document">Document that will contain the element.</param>
+		/// <returns>Object of same type and meta-data, but with new content.</returns>
+		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		{
+			return new LinkReference(Document, Children, this.label);
+		}
+
+		/// <summary>
+		/// If the current object has same meta-data as <paramref name="E"/>
+		/// (but not necessarily same content).
+		/// </summary>
+		/// <param name="E">Element to compare to.</param>
+		/// <returns>If same meta-data as <paramref name="E"/>.</returns>
+		public override bool SameMetaData(MarkdownElement E)
+		{
+			return E is LinkReference x &&
+				x.label == this.label &&
+				base.SameMetaData(E);
+		}
+
 	}
 }

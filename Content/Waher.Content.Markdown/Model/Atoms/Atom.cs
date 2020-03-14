@@ -1,36 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace Waher.Content.Markdown.Model.BlockElements
+namespace Waher.Content.Markdown.Model.Atoms
 {
 	/// <summary>
-	/// Invisible break
+	/// Represents an atom of editable text (i.e. typed character).
 	/// </summary>
-	public class InvisibleBreak : BlockElement
+	public abstract class Atom : MarkdownElement
 	{
-		private readonly string row;
+		private readonly IEditableText source;
+		private readonly char character;
 
 		/// <summary>
-		/// Invisible break
+		/// Represents an atom of editable text (i.e. typed character).
 		/// </summary>
-		/// <param name="Document">Markdown document.</param>
-		/// <param name="Row">Markdown definition.</param>
-		public InvisibleBreak(MarkdownDocument Document, string Row)
+		public Atom(MarkdownDocument Document, IEditableText Source, char Character)
 			: base(Document)
 		{
-			this.row = Row;
+			this.source = Source;
+			this.character = Character;
 		}
 
 		/// <summary>
-		/// Generates Markdown for the markdown element.
+		/// Character
 		/// </summary>
-		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public char Charater => this.character;
+
+		/// <summary>
+		/// Source
+		/// </summary>
+		public IEditableText Source => this.source;
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement => true;
+
+		/// <summary>
+		/// Exports the element to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public override void Export(XmlWriter Output)
 		{
-			Output.AppendLine(this.row);
-			Output.AppendLine();
+			MustBeReassembled();
 		}
 
 		/// <summary>
@@ -39,6 +52,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
+			MustBeReassembled();
+		}
+
+		/// <summary>
+		/// Generates Markdown for the markdown element.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public override void GenerateMarkdown(StringBuilder Output)
+		{
+			MustBeReassembled();
 		}
 
 		/// <summary>
@@ -47,6 +70,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
+			MustBeReassembled();
 		}
 
 		/// <summary>
@@ -57,36 +81,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
+			MustBeReassembled();
 		}
 
-		/// <summary>
-		/// If the element is an inline span element.
-		/// </summary>
-		internal override bool InlineSpanElement
+		private static void MustBeReassembled()
 		{
-			get { return false; }
-		}
-
-		/// <summary>
-		/// Exports the element to XML.
-		/// </summary>
-		/// <param name="Output">XML Output.</param>
-		public override void Export(XmlWriter Output)
-		{
-			Output.WriteElementString("InvisibleBreak", string.Empty);
-		}
-
-		/// <summary>
-		/// If the current object has same meta-data as <paramref name="E"/>
-		/// (but not necessarily same content).
-		/// </summary>
-		/// <param name="E">Element to compare to.</param>
-		/// <returns>If same meta-data as <paramref name="E"/>.</returns>
-		public override bool SameMetaData(MarkdownElement E)
-		{
-			return E is InvisibleBreak x &&
-				x.row == this.row &&
-				base.SameMetaData(E);
+			throw new NotSupportedException("Atomic elements must be reassembled before being exported or used for output.");
 		}
 
 		/// <summary>
@@ -96,8 +96,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
-			return obj is InvisibleBreak x &&
-				this.row == x.row &&
+			return obj is Atom x &&
+				this.character == x.character &&
 				base.Equals(obj);
 		}
 
@@ -107,8 +107,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <returns>A hash code for the current object.</returns>
 		public override int GetHashCode()
 		{
-			int h1 = base.GetHashCode();
-			int h2 = this.row?.GetHashCode() ?? 0;
+			int h1 = this.character.GetHashCode();
+			int h2 = base.GetHashCode();
 
 			h1 = ((h1 << 5) + h1) ^ h2;
 

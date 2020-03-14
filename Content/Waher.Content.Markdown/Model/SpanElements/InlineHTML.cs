@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Markdown.Model.Atoms;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
 	/// Inline HTML.
 	/// </summary>
-	public class InlineHTML : MarkdownElement
+	public class InlineHTML : MarkdownElement, IEditableText
 	{
 		private readonly string html;
 
@@ -119,6 +120,27 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
+		}
+
+		/// <summary>
+		/// Return an enumeration of the editable HTML as atoms.
+		/// </summary>
+		/// <returns>Atoms.</returns>
+		public IEnumerable<Atom> Atomize()
+		{
+			foreach (char ch in this.html)
+				yield return new InlineHtmlCharacter(this.Document, this, ch);
+		}
+
+		/// <summary>
+		/// Assembles a markdown element from a sequence of atoms.
+		/// </summary>
+		/// <param name="Document">Document that will contain the new element.</param>
+		/// <param name="Text">Assembled text.</param>
+		/// <returns>Assembled markdown element.</returns>
+		public MarkdownElement Assemble(MarkdownDocument Document, string Text)
+		{
+			return new InlineHTML(Document, Text);
 		}
 
 	}

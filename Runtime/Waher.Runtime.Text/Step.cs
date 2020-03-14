@@ -10,7 +10,7 @@ namespace Waher.Runtime.Text
 	/// <typeparam name="T">Type of symbols being compared.</typeparam>
 	public class Step<T>
 	{
-		private readonly T[] symbols;
+		private T[] symbols;
 		private readonly int index1;
 		private readonly int index2;
 		private readonly EditOperation operation;
@@ -33,7 +33,11 @@ namespace Waher.Runtime.Text
 		/// <summary>
 		/// Sequence of symbols.
 		/// </summary>
-		public T[] Symbols => this.symbols;
+		public T[] Symbols
+		{
+			get => this.symbols;
+			set => this.symbols = value;
+		}
 
 		/// <summary>
 		/// Index into the first sequence of symbols.

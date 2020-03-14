@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
+using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
@@ -5796,6 +5797,45 @@ namespace Waher.Content.Markdown
 			return Result;
 		}
 
+		private static IEnumerable<MarkdownElement> Atomize(IEnumerable<MarkdownElement> Elements, out bool Reassemble)
+		{
+			if (ContainsEditableText(Elements))
+			{
+				Reassemble = true;
+				return Atomize(Elements);
+			}
+			else
+			{
+				Reassemble = false;
+				return Elements;
+			}
+		}
+
+		private static IEnumerable<MarkdownElement> Atomize(IEnumerable<MarkdownElement> Elements)
+		{
+			foreach (MarkdownElement E in Elements)
+			{
+				if (E is IEditableText EditableText)
+				{
+					foreach (MarkdownElement E2 in EditableText.Atomize())
+						yield return E2;
+				}
+				else
+					yield return E;
+			}
+		}
+
+		private static bool ContainsEditableText(IEnumerable<MarkdownElement> Elements)
+		{
+			foreach (MarkdownElement E in Elements)
+			{
+				if (E is IEditableText)
+					return true;
+			}
+
+			return false;
+		}
+
 		private static MarkdownElement[] ToArray(IEnumerable<MarkdownElement> Elements)
 		{
 			if (Elements is MarkdownElement[] Array)
@@ -5826,11 +5866,81 @@ namespace Waher.Content.Markdown
 		private static IEnumerable<MarkdownElement> Compare(IEnumerable<MarkdownElement> Elements1,
 			IEnumerable<MarkdownElement> Elements2, bool KeepUnchanged, MarkdownDocument Document)
 		{
-			MarkdownElement[] S1 = ToArray(Elements1);
-			MarkdownElement[] S2 = ToArray(Elements2);
+			MarkdownElement[] S1 = ToArray(Atomize(Elements1, out bool Reassemble1));
+			MarkdownElement[] S2 = ToArray(Atomize(Elements2, out bool Reassemble2));
 			EditScript<MarkdownElement> Script = Difference.Analyze<MarkdownElement>(S1, S2);
 			Step<MarkdownElement> Step, Step2;
 			int i, c = Script.Steps.Length;
+
+			if (Reassemble1 || Reassemble2)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				for (i = 0; i < c; i++)
+				{
+					Step = Script.Steps[i];
+
+					switch (Step.Operation)
+					{
+						case EditOperation.Keep:
+						case EditOperation.Delete:
+							if (!Reassemble1)
+								continue;
+							break;
+
+						case EditOperation.Insert:
+							if (!Reassemble2)
+								continue;
+							break;
+
+						default:
+							continue;
+					}
+
+					List<MarkdownElement> Reassembled = new List<MarkdownElement>();
+					Type LastAtomType = null;
+					Atom LastAtom = null;
+					Type AtomType;
+
+					foreach (MarkdownElement E in Step.Symbols)
+					{
+						if (E is Atom Atom)
+						{
+							AtomType = Atom.GetType();
+							if (AtomType != LastAtomType)
+							{
+								if (!(LastAtom is null))
+								{
+									Reassembled.Add(LastAtom.Source.Assemble(Document, sb.ToString()));
+									sb.Clear();
+								}
+
+								LastAtom = Atom;
+								LastAtomType = AtomType;
+							}
+
+							sb.Append(Atom.Charater);
+						}
+						else
+						{
+							if (!(LastAtom is null))
+							{
+								Reassembled.Add(LastAtom.Source.Assemble(Document, sb.ToString()));
+								sb.Clear();
+								LastAtom = null;
+								LastAtomType = null;
+							}
+
+							Reassembled.Add(E);
+						}
+					}
+
+					if (!(LastAtom is null))
+						Reassembled.Add(LastAtom.Source.Assemble(Document, sb.ToString()));
+
+					Step.Symbols = Reassembled.ToArray();
+				}
+			}
 
 			for (i = 0; i < c; i++)
 			{
@@ -5847,7 +5957,8 @@ namespace Waher.Content.Markdown
 				else
 				{
 					if (i + 1 < c &&
-						(Step2 = Script.Steps[i + 1]).Operation != Step.Operation &&
+						(Step2 = Script.Steps[i + 1]).Operation != EditOperation.Keep &&
+						Step2.Operation != Step.Operation &&
 						SameBlockTypes(Step.Symbols, Step2.Symbols))
 					{
 						MarkdownElement E1, E2;

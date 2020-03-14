@@ -5752,7 +5752,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Difference document</returns>
 		public static MarkdownDocument Compare(MarkdownDocument Old, MarkdownDocument New, bool KeepUnchanged)
 		{
-			return New.Compare(Old, KeepUnchanged);
+			return Old.Compare(New, KeepUnchanged);
 		}
 
 		/// <summary>
@@ -5941,7 +5941,10 @@ namespace Waher.Content.Markdown
 					}
 
 					if (!(LastAtom is null))
+					{
 						Reassembled.Add(LastAtom.Source.Assemble(Document, sb.ToString()));
+						sb.Clear();
+					}
 
 					Step.Symbols = Reassembled.ToArray();
 					Reassembled.Clear();

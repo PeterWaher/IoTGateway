@@ -132,5 +132,10 @@
             Edit operation being performed.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Text.Step`1.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
     </members>
 </doc>

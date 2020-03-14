@@ -53,5 +53,21 @@ namespace Waher.Runtime.Text
 		/// Edit operation being performed.
 		/// </summary>
 		public EditOperation Operation => this.operation;
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Result = new StringBuilder();
+
+			Result.Append(this.operation.ToString());
+			Result.Append(": ");
+
+			foreach (T Symbol in this.symbols)
+				Result.Append(Symbol.ToString());
+
+			return Result.ToString();
+		}
 	}
 }

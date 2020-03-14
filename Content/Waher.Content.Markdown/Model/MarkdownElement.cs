@@ -253,5 +253,15 @@ namespace Waher.Content.Markdown.Model
 			return h1;
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Result = new StringBuilder();
+			this.GenerateMarkdown(Result);
+			return Result.ToString();
+		}
+
 	}
 }

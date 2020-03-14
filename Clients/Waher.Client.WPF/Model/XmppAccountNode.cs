@@ -248,6 +248,7 @@ namespace Waher.Client.WPF.Model
 
 		public IEnumerable<MessageEventArgs> GetUnhandledMessages(string LocalName, string Namespace)
 		{
+			LinkedList<MessageEventArgs> Result = new LinkedList<MessageEventArgs>();
 			LinkedListNode<KeyValuePair<DateTime, MessageEventArgs>> Loop, Next;
 			bool Found;
 
@@ -272,13 +273,15 @@ namespace Waher.Client.WPF.Model
 
 					if (Found)
 					{
-						yield return Loop.Value.Value;
+						Result.AddLast(Loop.Value.Value);
 						this.unhandledMessages.Remove(Loop);
 					}
 
 					Loop = Next;
 				}
 			}
+
+			return Result;
 		}
 
 		private void Client_OnError(object Sender, Exception Exception)

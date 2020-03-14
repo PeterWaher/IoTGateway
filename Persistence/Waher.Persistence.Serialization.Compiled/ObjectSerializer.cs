@@ -3722,16 +3722,20 @@ namespace Waher.Persistence.Serialization
 		/// <returns>Enumerated set of members.</returns>
 		public static IEnumerable<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
 		{
+			LinkedList<MemberInfo> Result = new LinkedList<MemberInfo>();
+
 			while (!(T is null))
 			{
 				foreach (MemberInfo MI in T.DeclaredMembers)
-					yield return MI;
+					Result.AddLast(MI);
 
 				if (!(T.BaseType is null))
 					T = T.BaseType.GetTypeInfo();
 				else
 					T = null;
 			}
+
+			return Result;
 		}
 
 		private void AppendType(Type T, StringBuilder sb)

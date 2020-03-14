@@ -256,8 +256,12 @@ namespace Waher.Networking.Cluster
 		{
 			get
 			{
+				LinkedList<IPEndPoint> Result = new LinkedList<IPEndPoint>();
+
 				foreach (ClusterUdpClient Client in this.incoming)
-					yield return Client.EndPoint;
+					Result.AddLast(Client.EndPoint);
+
+				return Result;
 			}
 		}
 

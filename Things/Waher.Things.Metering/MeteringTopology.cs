@@ -190,7 +190,7 @@ namespace Waher.Things.Metering
 				if (root is null)
 					LoadRoot().Wait();
 
-				yield return root;
+				return new INode[] { root };
 			}
 		}
 

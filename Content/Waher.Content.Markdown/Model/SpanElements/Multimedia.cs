@@ -304,23 +304,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
-			int i, c;
-
-			if (!(obj is Multimedia x) ||
-				this.aloneInParagraph != x.aloneInParagraph ||
-				(c = this.items.Length) != x.items.Length ||
-				!base.Equals(obj))
-			{
-				return false;
-			}
-
-			for (i = 0; i < c; i++)
-			{
-				if (!this.items[i].Equals(x.items[i]))
-					return false;
-			}
-
-			return true;
+			return obj is Multimedia x &&
+				this.aloneInParagraph == x.aloneInParagraph &&
+				AreEqual(x.items, this.items) &&
+				base.Equals(obj);
 		}
 
 		/// <summary>
@@ -333,29 +320,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			int h2 = this.aloneInParagraph.GetHashCode();
 
 			h1 = ((h1 << 5) + h1) ^ h2;
-
-			foreach (MultimediaItem Item in this.items)
-			{
-				h2 = Item.GetHashCode();
-				h1 = ((h1 << 5) + h1) ^ h2;
-			}
+			h2 = GetHashCode(this.items);
+			
+			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
-		}
-
-		private static bool AreEqual(MultimediaItem[] Items1, MultimediaItem[] Items2)
-		{
-			int i, c = Items1.Length;
-			if (Items2.Length != c)
-				return false;
-
-			for (i = 0; i < c; i++)
-			{
-				if (!Items1[i].Equals(Items2[i]))
-					return false;
-			}
-
-			return true;
 		}
 
 	}

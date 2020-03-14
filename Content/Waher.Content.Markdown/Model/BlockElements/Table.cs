@@ -586,5 +586,85 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.WriteEndElement();
 		}
+
+		/// <summary>
+		/// Determines whether the specified object is equal to the current object.
+		/// </summary>
+		/// <param name="obj">The object to compare with the current object.</param>
+		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+		public override bool Equals(object obj)
+		{
+			return obj is Table x &&
+				this.caption == x.caption &&
+				this.id == x.id &&
+				this.columns == x.columns &&
+				AreEqual(this.alignments, x.alignments) &&
+				AreEqual(this.alignmentDefinitions, x.alignmentDefinitions) &&
+				AreEqual(this.headers, x.headers) &&
+				AreEqual(this.rows, x.rows) &&
+				base.Equals(obj);
+		}
+
+		/// <summary>
+		/// Serves as the default hash function.
+		/// </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode()
+		{
+			int h1 = base.GetHashCode();
+			int h2 = this.caption?.GetHashCode() ?? 0;
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = this.id?.GetHashCode() ?? 0;
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = this.columns.GetHashCode();
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.alignments);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.alignmentDefinitions);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.headers);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+			h2 = GetHashCode(this.rows);
+
+			h1 = ((h1 << 5) + h1) ^ h2;
+
+			return h1;
+		}
+
+		private static bool AreEqual(MarkdownElement[][] Items1, MarkdownElement[][] Items2)
+		{
+			int i, c = Items1.Length;
+			if (Items2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!AreEqual(Items1[i], Items2[i]))
+					return false;
+			}
+
+			return true;
+		}
+
+		private static int GetHashCode(MarkdownElement[][] Items)
+		{
+			int h1 = 0;
+			int h2;
+
+			foreach (MarkdownElement[] Item in Items)
+			{
+				h2 = GetHashCode(Item);
+				h1 = ((h1 << 5) + h1) ^ h2;
+			}
+
+			return h1;
+		}
+
 	}
 }

@@ -213,5 +213,45 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
+		/// <summary>
+		/// Checks if two typed arrays are equal
+		/// </summary>
+		/// <param name="Items1">First array</param>
+		/// <param name="Items2">Second array</param>
+		/// <returns>If arrays are equal</returns>
+		protected static bool AreEqual(Array Items1, Array Items2)
+		{
+			int i, c = Items1.Length;
+			if (Items2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!Items1.GetValue(i)?.Equals(Items2.GetValue(i)) ?? Items2.GetValue(i) is null)
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Calculates a hash value on an array.
+		/// </summary>
+		/// <param name="Items">Array</param>
+		/// <returns>Hash Code</returns>
+		protected static int GetHashCode(Array Items)
+		{
+			int h1 = 0;
+			int h2;
+
+			foreach (object Item in Items)
+			{
+				h2 = Item?.GetHashCode() ?? 0;
+				h1 = ((h1 << 5) + h1) ^ h2;
+			}
+
+			return h1;
+		}
+
 	}
 }

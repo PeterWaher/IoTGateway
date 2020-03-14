@@ -5752,7 +5752,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Difference document</returns>
 		public static MarkdownDocument Compare(MarkdownDocument Old, MarkdownDocument New, bool KeepUnchanged)
 		{
-			return Old.Compare(New, KeepUnchanged);
+			return New.Compare(Old, KeepUnchanged);
 		}
 
 		/// <summary>
@@ -5975,8 +5975,16 @@ namespace Waher.Content.Markdown
 
 						for (j = 0; j < d; j++)
 						{
-							E1 = Step.Symbols[j];
-							E2 = Step2.Symbols[j];
+							if (Step.Operation == EditOperation.Insert)
+							{
+								E2 = Step.Symbols[j];
+								E1 = Step2.Symbols[j];
+							}
+							else
+							{
+								E1 = Step.Symbols[j];
+								E2 = Step2.Symbols[j];
+							}
 
 							if (E1 is MarkdownElementChildren Children1 &&
 								E2 is MarkdownElementChildren Children2)

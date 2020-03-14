@@ -28,6 +28,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			base.GenerateMarkdown(Output);
 			Output.AppendLine();
+			Output.AppendLine();
 		}
 
 		/// <summary>

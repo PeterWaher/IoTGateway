@@ -203,12 +203,17 @@ namespace Waher.Content.Markdown.Model
 			foreach (MarkdownElement E in Children)
 				E.GenerateMarkdown(Temp);
 
-			string s = Temp.ToString();
+			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
+			string[] Rows = s.Split('\n');
+			int i, c = Rows.Length;
 
-			foreach (string Row in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+			if (c > 0 && string.IsNullOrEmpty(Rows[c - 1]))
+				c--;
+
+			for (i = 0; i < c; i++)
 			{
 				Output.Append(PrefixFirstRow);
-				Output.AppendLine(Row);
+				Output.AppendLine(Rows[i]);
 				PrefixFirstRow = PrefixNextRows;
 			}
 		}

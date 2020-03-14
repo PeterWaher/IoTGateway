@@ -90,7 +90,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			base.GenerateMarkdown(Output);
-
 			Output.AppendLine();
 
 			if (!this.prefix)

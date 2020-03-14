@@ -5813,16 +5813,20 @@ namespace Waher.Content.Markdown
 
 		private static IEnumerable<MarkdownElement> Atomize(IEnumerable<MarkdownElement> Elements)
 		{
+			LinkedList<MarkdownElement> Result = new LinkedList<MarkdownElement>();
+
 			foreach (MarkdownElement E in Elements)
 			{
 				if (E is IEditableText EditableText)
 				{
 					foreach (MarkdownElement E2 in EditableText.Atomize())
-						yield return E2;
+						Result.AddLast(E2);
 				}
 				else
-					yield return E;
+					Result.AddLast(E);
 			}
+
+			return Result;
 		}
 
 		private static bool ContainsEditableText(IEnumerable<MarkdownElement> Elements)
@@ -5866,6 +5870,7 @@ namespace Waher.Content.Markdown
 		private static IEnumerable<MarkdownElement> Compare(IEnumerable<MarkdownElement> Elements1,
 			IEnumerable<MarkdownElement> Elements2, bool KeepUnchanged, MarkdownDocument Document)
 		{
+			LinkedList<MarkdownElement> Result = new LinkedList<MarkdownElement>();
 			MarkdownElement[] S1 = ToArray(Atomize(Elements1, out bool Reassemble1));
 			MarkdownElement[] S2 = ToArray(Atomize(Elements2, out bool Reassemble2));
 			EditScript<MarkdownElement> Script = Difference.Analyze<MarkdownElement>(S1, S2);
@@ -5874,6 +5879,7 @@ namespace Waher.Content.Markdown
 
 			if (Reassemble1 || Reassemble2)
 			{
+				List<MarkdownElement> Reassembled = new List<MarkdownElement>();
 				StringBuilder sb = new StringBuilder();
 
 				for (i = 0; i < c; i++)
@@ -5897,7 +5903,6 @@ namespace Waher.Content.Markdown
 							continue;
 					}
 
-					List<MarkdownElement> Reassembled = new List<MarkdownElement>();
 					Type LastAtomType = null;
 					Atom LastAtom = null;
 					Type AtomType;
@@ -5939,6 +5944,7 @@ namespace Waher.Content.Markdown
 						Reassembled.Add(LastAtom.Source.Assemble(Document, sb.ToString()));
 
 					Step.Symbols = Reassembled.ToArray();
+					Reassembled.Clear();
 				}
 			}
 
@@ -5952,7 +5958,7 @@ namespace Waher.Content.Markdown
 						continue;
 
 					foreach (MarkdownElement E in Step.Symbols)
-						yield return E;
+						Result.AddLast(E);
 				}
 				else
 				{
@@ -5973,7 +5979,7 @@ namespace Waher.Content.Markdown
 								E2 is MarkdownElementChildren Children2)
 							{
 								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children, true, Document);
-								yield return Children1.Create(Diff, Document);
+								Result.AddLast(Children1.Create(Diff, Document));
 							}
 							else if (E1 is MarkdownElementSingleChild Child1 &&
 								E2 is MarkdownElementSingleChild Child2 &&
@@ -5982,21 +5988,23 @@ namespace Waher.Content.Markdown
 								Child2.Child is MarkdownElementChildren GrandChildren2)
 							{
 								IEnumerable<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children, true, Document);
-								yield return Child1.Create(GrandChildren1.Create(Diff, Document), Document);
+								Result.AddLast(Child1.Create(GrandChildren1.Create(Diff, Document), Document));
 							}
 							else
 							{
-								yield return GetElement(Step.Operation, Document, E1);
-								yield return GetElement(Step2.Operation, Document, E2);
+								Result.AddLast(GetElement(Step.Operation, Document, E1));
+								Result.AddLast(GetElement(Step2.Operation, Document, E2));
 							}
 						}
 
 						i++;
 					}
 					else
-						yield return GetElement(Step.Operation, Document, Step.Symbols);
+						Result.AddLast(GetElement(Step.Operation, Document, Step.Symbols));
 				}
 			}
+
+			return Result;
 		}
 
 		private static MarkdownElement GetElement(EditOperation Operation, MarkdownDocument Document, params MarkdownElement[] Symbols)

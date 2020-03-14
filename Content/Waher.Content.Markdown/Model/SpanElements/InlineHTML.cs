@@ -128,8 +128,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <returns>Atoms.</returns>
 		public IEnumerable<Atom> Atomize()
 		{
+			LinkedList<Atom> Result = new LinkedList<Atom>();
+
 			foreach (char ch in this.html)
-				yield return new InlineHtmlCharacter(this.Document, this, ch);
+				Result.AddLast(new InlineHtmlCharacter(this.Document, this, ch));
+
+			return Result;
 		}
 
 		/// <summary>

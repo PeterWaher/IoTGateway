@@ -75,12 +75,17 @@
 									<xs:documentation>Text color for links in the menu.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name="EditColor" type="Color">
+							<xs:element name="InsertColor" type="Color">
 								<xs:annotation>
-									<xs:documentation>Backgound color for edited text.</xs:documentation>
+									<xs:documentation>Backgound color for inserted text.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name="LinkColorUnvisited" type="Color">
+              <xs:element name="DeleteColor" type="Color">
+                <xs:annotation>
+                  <xs:documentation>Backgound color for deleted text.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="LinkColorUnvisited" type="Color">
 								<xs:annotation>
 									<xs:documentation>Color of unvisited links.</xs:documentation>
 								</xs:annotation>

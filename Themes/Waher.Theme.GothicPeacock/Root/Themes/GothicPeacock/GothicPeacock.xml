@@ -13,7 +13,8 @@
 		<ButtonColor>#663300</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
 		<MenuTextColor>#FFFFFF</MenuTextColor>
-		<EditColor>#FFFF00</EditColor>
+    <InsertColor>#00A00040</InsertColor>
+    <DeleteColor>#A0000040</DeleteColor>
 		<LinkColorUnvisited>#993300</LinkColorUnvisited>
 		<LinkColorVisited>#732600</LinkColorVisited>
 		<LinkColorHot>#663300</LinkColorHot>

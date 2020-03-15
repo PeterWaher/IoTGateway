@@ -28,7 +28,8 @@ namespace Waher.IoTGateway.Setup
 		private SKColor buttonColor;
 		private SKColor buttonTextColor;
 		private SKColor menuTextColor;
-		private SKColor editColor;
+		private SKColor insertColor;
+		private SKColor deleteColor;
 		private SKColor linkColorUnvisited;
 		private SKColor linkColorVisited;
 		private SKColor linkColorHot;
@@ -112,9 +113,14 @@ namespace Waher.IoTGateway.Setup
 												this.menuTextColor = cl;
 											break;
 
-										case "EditColor":
+										case "InsertColor":
 											if (Color.TryParse(E2.InnerText, out cl))
-												this.editColor = cl;
+												this.insertColor = cl;
+											break;
+
+										case "DeleteColor":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.deleteColor = cl;
 											break;
 
 										case "LinkColorUnvisited":
@@ -258,9 +264,14 @@ namespace Waher.IoTGateway.Setup
 		public SKColor MenuTextColor => this.menuTextColor;
 
 		/// <summary>
-		/// Backgound color for edited text.
+		/// Backgound color for inserted text.
 		/// </summary>
-		public SKColor EditColor => this.editColor;
+		public SKColor InsertColor => this.insertColor;
+
+		/// <summary>
+		/// Backgound color for deleted text.
+		/// </summary>
+		public SKColor DeleteColor => this.deleteColor;
 
 		/// <summary>
 		/// Color of unvisited links.

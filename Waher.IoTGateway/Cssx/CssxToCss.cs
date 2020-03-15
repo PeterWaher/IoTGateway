@@ -94,7 +94,8 @@ namespace Waher.IoTGateway.Cssx
 					Session["ButtonColor"] = Def.ButtonColor;
 					Session["ButtonTextColor"] = Def.ButtonTextColor;
 					Session["MenuTextColor"] = Def.MenuTextColor;
-					Session["EditColor"] = Def.EditColor;
+					Session["InsertColor"] = Def.InsertColor;
+					Session["DeleteColor"] = Def.DeleteColor;
 					Session["LinkColorUnvisited"] = Def.LinkColorUnvisited;
 					Session["LinkColorVisited"] = Def.LinkColorVisited;
 					Session["LinkColorHot"] = Def.LinkColorHot;

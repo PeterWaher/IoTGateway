@@ -13,8 +13,9 @@
 		<ButtonColor>#4CAF50</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
 		<MenuTextColor>#FFFFFF</MenuTextColor>
-		<EditColor>#FFFF00</EditColor>
-		<LinkColorUnvisited>#3187B9</LinkColorUnvisited>
+    <InsertColor>#00A00040</InsertColor>
+    <DeleteColor>#A0000040</DeleteColor>
+    <LinkColorUnvisited>#3187B9</LinkColorUnvisited>
 		<LinkColorVisited>#25658B</LinkColorVisited>
 		<LinkColorHot>#4CAF50</LinkColorHot>
 		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>

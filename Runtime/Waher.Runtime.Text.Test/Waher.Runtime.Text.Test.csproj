@@ -12,10 +12,13 @@
     <None Remove="Data\Test_09_Org.txt" />
     <None Remove="Markdown\Diff\Diff\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Diff\Test_02_Paragraphs.md" />
+    <None Remove="Markdown\Diff\Diff\Test_03_Bullets.md" />
     <None Remove="Markdown\Diff\New\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\New\Test_02_Paragraphs.md" />
+    <None Remove="Markdown\Diff\New\Test_03_Bullets.md" />
     <None Remove="Markdown\Diff\Old\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Old\Test_02_Paragraphs.md" />
+    <None Remove="Markdown\Diff\Old\Test_03_Bullets.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,10 +37,19 @@
     <Content Include="Markdown\Diff\Diff\Test_02_Paragraphs.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Markdown\Diff\Diff\Test_03_Bullets.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Markdown\Diff\New\Test_01_Simple.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Diff\New\Test_02_Paragraphs.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Markdown\Diff\New\Test_03_Bullets.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Markdown\Diff\Old\Test_03_Bullets.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Markdown\Diff\Old\Test_02_Paragraphs.md">

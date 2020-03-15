@@ -32,5 +32,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.Test("Test_02_Paragraphs.md");
 		}
+
+		[TestMethod]
+		public void Test_03_Bullets()
+		{
+			this.Test("Test_03_Bullets.md");
+		}
 	}
 }

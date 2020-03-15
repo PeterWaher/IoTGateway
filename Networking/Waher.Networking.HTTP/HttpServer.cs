@@ -851,7 +851,7 @@ namespace Waher.Networking.HTTP
 						}
 						catch (InvalidOperationException)
 						{
-							LinkedListNode<KeyValuePair<TcpListener, bool>> Node = this.listeners.First;
+							LinkedListNode<KeyValuePair<TcpListener, bool>> Node = this.listeners?.First;
 
 							while (!(Node is null))
 							{

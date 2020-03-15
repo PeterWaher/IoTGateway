@@ -51,4 +51,15 @@
 			<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">return shell_exec("echo $input | $markdown_script");</TextBlock>
 		</StackPanel>
 	</Border>
+  <TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Blockquites can also be used do illustrate editing:</TextBlock>
+  <Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="#4000A000">
+    <StackPanel>
+      <TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This paragraph has been inserted</TextBlock>
+    </StackPanel>
+  </Border>
+  <Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="#40A00000">
+    <StackPanel>
+      <TextBlock TextWrapping="Wrap" Margin="0,5,0,5">While this paragraph has been deleted</TextBlock>
+    </StackPanel>
+  </Border>
 </StackPanel>

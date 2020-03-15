@@ -67,6 +67,19 @@
 				<Row>return shell_exec("echo $input | $markdown_script");</Row>
 			</CodeBlock>
 		</BlockQuote>
-	</elements>
+    <Paragraph>
+      <InlineText>Blockquites can also be used do illustrate editing:</InlineText>
+    </Paragraph>
+    <InsertBlocks>
+      <Paragraph>
+        <InlineText>This paragraph has been inserted</InlineText>
+      </Paragraph>
+    </InsertBlocks>
+    <DeleteBlocks>
+      <Paragraph>
+        <InlineText>While this paragraph has been deleted</InlineText>
+      </Paragraph>
+    </DeleteBlocks>
+  </elements>
 	<references />
 </parsedMakdown>

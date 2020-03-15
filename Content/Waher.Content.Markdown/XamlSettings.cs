@@ -20,8 +20,8 @@ namespace Waher.Content.Markdown
 		private int blockQuoteMargin = 20;
 		private int blockQuotePadding = 10;
 
-		private string insertedBlockQuoteBorderColor = "Green";
-		private string deletedBlockQuoteBorderColor = "Red";
+		private string insertedBlockQuoteBorderColor = "#4000A000";
+		private string deletedBlockQuoteBorderColor = "#40A00000";
 
 		private readonly int[] headerFontSize = new int[] { 28, 24, 22, 20, 18, 16, 15, 14, 13, 12 };
 		private readonly string[] headerForegroundColor = new string[] { "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy", "Navy" };

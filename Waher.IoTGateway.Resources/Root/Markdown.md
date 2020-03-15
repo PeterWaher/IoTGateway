@@ -1096,8 +1096,8 @@ In your browser, this is displayed as:
 
 ![Cactus Rose][]
 	
-[Cactus Rose]: /Themes/WaherDataAB/CactusRose1600x1600.png 1600 1600
-	/Themes/WaherDataAB/CactusRose800x800.png 800 800
+[Cactus Rose]: /Themes/CactusRose/CactusRose1600x1600.png 1600 1600
+	/Themes/CactusRose/CactusRose800x800.png 800 800
 
 A short summary:
 

@@ -268,12 +268,13 @@ namespace Waher.Content.Markdown.Model
 				Columns = Columns,
 				Id = Id,
 				NrHeaderRows = (UnderlineRow - this.start),
-				NrDataRows = End - UnderlineRow,
-				Headers = new string[TableInformation.NrHeaderRows][],
-				HeaderPositions = new int[TableInformation.NrHeaderRows][],
-				Rows = new string[TableInformation.NrDataRows][],
-				RowPositions = new int[TableInformation.NrDataRows][]
+				NrDataRows = End - UnderlineRow
 			};
+
+			TableInformation.Headers = new string[TableInformation.NrHeaderRows][];
+			TableInformation.HeaderPositions = new int[TableInformation.NrHeaderRows][];
+			TableInformation.Rows = new string[TableInformation.NrDataRows][];
+			TableInformation.RowPositions = new int[TableInformation.NrDataRows][];
 
 			for (i = 0; i < TableInformation.NrHeaderRows; i++)
 			{

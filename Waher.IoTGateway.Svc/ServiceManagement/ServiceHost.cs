@@ -76,7 +76,9 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		{
 			Log.Informational("Entering service main function.");
 
-			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName, (ServiceControlHandler)this.HandleServiceControlCommand, IntPtr.Zero);
+			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName, 
+				(ServiceControlHandler)this.HandleServiceControlCommand, IntPtr.Zero);
+
 			if (serviceStatusHandle.IsInvalid)
 			{
 				stopTaskCompletionSource.TrySetException(new Win32Exception(Marshal.GetLastWin32Error()));

@@ -79,7 +79,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName, (ServiceControlHandler)this.HandleServiceControlCommand, IntPtr.Zero);
 			if (serviceStatusHandle.IsInvalid)
 			{
-				stopTaskCompletionSource.SetException(new Win32Exception(Marshal.GetLastWin32Error()));
+				stopTaskCompletionSource.TrySetException(new Win32Exception(Marshal.GetLastWin32Error()));
 				return;
 			}
 
@@ -165,10 +165,14 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						this.StopService(false);
 						break;
 
+					case ServiceControlCommand.Interrogate:
+						ReportServiceStatus(serviceStatus.State, serviceStatus.AcceptedControlCommands, 
+							serviceStatus.Win32ExitCode, serviceStatus.WaitHint);
+						break;
+
 					case ServiceControlCommand.Continue:
 					case ServiceControlCommand.DeviceEvent:
 					case ServiceControlCommand.HardwareProfileChange:
-					case ServiceControlCommand.Interrogate:
 					case ServiceControlCommand.NetBindAdd:
 					case ServiceControlCommand.NetBindDisable:
 					case ServiceControlCommand.NetBindEnable:

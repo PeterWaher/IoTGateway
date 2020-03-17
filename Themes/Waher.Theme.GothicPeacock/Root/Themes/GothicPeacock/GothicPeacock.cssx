@@ -530,6 +530,7 @@ blockquote.deleted
 {
     border-color:¤DeleteColor¤ !important;
     background-color: ¤Alpha(DeleteColor,19)¤ !important;
+    text-decoration: line-through;
 }
 
 ul

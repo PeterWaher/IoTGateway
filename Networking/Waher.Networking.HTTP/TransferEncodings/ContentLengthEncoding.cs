@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
 			ulong NrAccepted;
-			if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
+			if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, NrRead))
 				this.transferError = true;
 
 			if (NrRead >= this.bytesLeft)

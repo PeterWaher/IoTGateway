@@ -476,127 +476,149 @@ namespace Waher.Runtime.Inventory
 			string LastNamespace = string.Empty;
 			int i;
 
-			if (isInitialized)
-				throw new Exception("Script engine is already initialized.");
-
-			CheckIncluded(ref Assemblies, typeof(Types).GetTypeInfo().Assembly);
-			CheckIncluded(ref Assemblies, typeof(int).GetTypeInfo().Assembly);
-
-			if (Array.IndexOf<Assembly>(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
+			lock (synchObject)
 			{
-				int c = Assemblies.Length;
-				Array.Resize<Assembly>(ref Assemblies, c + 1);
-				Assemblies[c] = A;
-			}
-
-			assemblies = Assemblies;
-
-			foreach (Assembly Assembly in Assemblies)
-			{
-				try
+				if (isInitialized)
 				{
-					AssemblyTypes = Assembly.ExportedTypes;
+					List<Assembly> NewAssemblies = new List<Assembly>();
+					List<Assembly> AllAssemblies = new List<Assembly>();
+
+					AllAssemblies.AddRange(assemblies);
+
+					foreach (Assembly Assembly in Assemblies)
+					{
+						if (!AllAssemblies.Contains(Assembly))
+						{
+							NewAssemblies.Add(Assembly);
+							AllAssemblies.Add(Assembly);
+						}
+					}
+
+					assemblies = AllAssemblies.ToArray();
+					Assemblies = NewAssemblies.ToArray();
 				}
-				catch (ReflectionTypeLoadException ex)
+				else
 				{
-					foreach (Exception ex2 in ex.LoaderExceptions)
-						Log.Critical(ex2);
+					CheckIncluded(ref Assemblies, typeof(Types).GetTypeInfo().Assembly);
+					CheckIncluded(ref Assemblies, typeof(int).GetTypeInfo().Assembly);
 
-					continue;
+					if (Array.IndexOf<Assembly>(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
+					{
+						int c = Assemblies.Length;
+						Array.Resize<Assembly>(ref Assemblies, c + 1);
+						Assemblies[c] = A;
+					}
+
+					assemblies = Assemblies;
 				}
-				catch (Exception ex)
+
+				foreach (Assembly Assembly in Assemblies)
 				{
-					Log.Critical(ex, Assembly.FullName);
-					continue;
-				}
-
-				foreach (Type Type in AssemblyTypes)
-				{
-					TypeName = Type.FullName;
-					i = TypeName.LastIndexOf('`');
-					if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out int j))
-						TypeName = TypeName.Substring(0, i);
-
-					types[TypeName] = Type;
-
-
-					i = TypeName.LastIndexOf('.');
-					if (i >= 0)
-						RegisterQualifiedName(TypeName.Substring(i + 1), TypeName);
-
 					try
 					{
-						foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
-						{
-							InterfaceName = Interface.FullName;
-							if (InterfaceName is null)
-								continue;   // Generic interface.
+						AssemblyTypes = Assembly.ExportedTypes;
+					}
+					catch (ReflectionTypeLoadException ex)
+					{
+						foreach (Exception ex2 in ex.LoaderExceptions)
+							Log.Critical(ex2);
 
-							if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+						continue;
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, Assembly.FullName);
+						continue;
+					}
+
+					foreach (Type Type in AssemblyTypes)
+					{
+						TypeName = Type.FullName;
+						i = TypeName.LastIndexOf('`');
+						if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out int j))
+							TypeName = TypeName.Substring(0, i);
+
+						types[TypeName] = Type;
+
+
+						i = TypeName.LastIndexOf('.');
+						if (i >= 0)
+							RegisterQualifiedName(TypeName.Substring(i + 1), TypeName);
+
+						try
+						{
+							foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
 							{
-								Types = new SortedDictionary<string, Type>();
-								typesPerInterface[InterfaceName] = Types;
+								InterfaceName = Interface.FullName;
+								if (InterfaceName is null)
+									continue;   // Generic interface.
+
+								if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+								{
+									Types = new SortedDictionary<string, Type>();
+									typesPerInterface[InterfaceName] = Types;
+								}
+
+								Types[TypeName] = Type;
+							}
+						}
+						catch (Exception)
+						{
+							// Implemented interfaces might not be accessible.
+						}
+
+						Namespace = Type.Namespace;
+						if (Namespace != null)
+						{
+							if (Namespace == LastNamespace)
+								Types = LastTypes;
+							else
+							{
+								if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+								{
+									Types = new SortedDictionary<string, Type>();
+									typesPerNamespace[Namespace] = Types;
+
+									i = Namespace.LastIndexOf('.');
+									while (i >= 0)
+									{
+										RegisterQualifiedName(Namespace.Substring(i + 1), Namespace);
+										ParentNamespace = Namespace.Substring(0, i);
+
+										if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
+										{
+											Namespaces = new SortedDictionary<string, bool>();
+											namespacesPerNamespace[ParentNamespace] = Namespaces;
+										}
+										else
+										{
+											if (Namespaces.ContainsKey(Namespace))
+												break;
+										}
+
+										Namespaces[Namespace] = true;
+										Namespace = ParentNamespace;
+										i = Namespace.LastIndexOf('.');
+									}
+
+									if (i < 0)
+									{
+										rootNamespaces[Namespace] = true;
+										RegisterQualifiedName(Namespace, Namespace);
+									}
+								}
+
+								LastNamespace = Namespace;
+								LastTypes = Types;
 							}
 
 							Types[TypeName] = Type;
 						}
 					}
-					catch (Exception)
-					{
-						// Implemented interfaces might not be accessible.
-					}
-
-					Namespace = Type.Namespace;
-					if (Namespace != null)
-					{
-						if (Namespace == LastNamespace)
-							Types = LastTypes;
-						else
-						{
-							if (!typesPerNamespace.TryGetValue(Namespace, out Types))
-							{
-								Types = new SortedDictionary<string, Type>();
-								typesPerNamespace[Namespace] = Types;
-
-								i = Namespace.LastIndexOf('.');
-								while (i >= 0)
-								{
-									RegisterQualifiedName(Namespace.Substring(i + 1), Namespace);
-									ParentNamespace = Namespace.Substring(0, i);
-
-									if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
-									{
-										Namespaces = new SortedDictionary<string, bool>();
-										namespacesPerNamespace[ParentNamespace] = Namespaces;
-									}
-									else
-									{
-										if (Namespaces.ContainsKey(Namespace))
-											break;
-									}
-
-									Namespaces[Namespace] = true;
-									Namespace = ParentNamespace;
-									i = Namespace.LastIndexOf('.');
-								}
-
-								if (i < 0)
-								{
-									rootNamespaces[Namespace] = true;
-									RegisterQualifiedName(Namespace, Namespace);
-								}
-							}
-
-							LastNamespace = Namespace;
-							LastTypes = Types;
-						}
-
-						Types[TypeName] = Type;
-					}
 				}
-			}
 
-			isInitialized = true;
+				isInitialized = true;
+			}
 		}
 
 		private static void RegisterQualifiedName(string UnqualifiedName, string QualifiedName)

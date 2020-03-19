@@ -719,6 +719,8 @@ namespace Waher.Networking
 
 			if (Count == 0)
 			{
+				Task.TrySetResult(true);
+
 				if (!(Callback is null))
 				{
 					try
@@ -755,6 +757,7 @@ namespace Waher.Networking
 					{
 						if (this.disposing || this.disposed)
 						{
+							Task.TrySetResult(false);
 							this.sending = false;
 							break;
 						}

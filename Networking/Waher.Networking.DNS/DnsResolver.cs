@@ -166,25 +166,25 @@ namespace Waher.Networking.DNS
 					{
 						LastName = Name;
 
-                        try
-                        {
-                            Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
-                                new FilterFieldEqualTo("Name", Name),
-                                new FilterFieldEqualTo("Type", TYPE),
-                                new FilterFieldEqualTo("Class", CLASS)));
+						try
+						{
+							Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
+								new FilterFieldEqualTo("Name", Name),
+								new FilterFieldEqualTo("Type", TYPE),
+								new FilterFieldEqualTo("Class", CLASS)));
 
-                            if (!(Response is null) && Response.Expires <= DateTime.Now)
-                            {
-                                await Database.Delete(Response);
-                                Response = null;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            // Some inconsistency in database. Clear collection to get fresh set of DNS entries.
-                            await Database.Clear("DnsCache");
-                            Response = null;
-                        }
+							if (!(Response is null) && Response.Expires <= DateTime.Now)
+							{
+								await Database.Delete(Response);
+								Response = null;
+							}
+						}
+						catch (Exception)
+						{
+							// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
+							await Database.Clear("DnsCache");
+							Response = null;
+						}
 					}
 
 					if (Response is null)
@@ -710,6 +710,19 @@ namespace Waher.Networking.DNS
 							i -= SRV.Weight;
 					}
 				}
+				else
+				{
+					foreach (SRV SRV in SamePriority)
+					{
+						Selected = SRV;
+						SamePriority.Remove(SRV);
+						if (SamePriority.Count == 0)
+							ServicesByPriority.Remove(FirstKey.Value);
+						break;
+					}
+				}
+
+				// TODO: Check host availability on the given port... If not available, continue with next.
 
 				if (Selected is null)
 					ServicesByPriority.Remove(FirstKey.Value);

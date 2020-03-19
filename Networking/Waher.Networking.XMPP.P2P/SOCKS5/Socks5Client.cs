@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.Information("Connected to " + this.host + ":" + this.port.ToString());
 
 				this.state = Socks5State.Initializing;
-				this.SendPacket(new byte[] { 5, 1, 0 });
+				await this.SendPacket(new byte[] { 5, 1, 0 });
 			}
 			catch (Exception ex)
 			{
@@ -260,34 +260,37 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public void Dispose()
 		{
-			this.disposed = true;
-			this.State = Socks5State.Offline;
+			if (!this.disposed)
+			{
+				this.disposed = true;
+				this.State = Socks5State.Offline;
 
-			this.client?.Dispose();
-			this.client = null;
+				this.client?.Dispose();
+				this.client = null;
+			}
 		}
 
 		/// <summary>
 		/// Send binary data.
 		/// </summary>
 		/// <param name="Data">Data</param>
-		public void Send(byte[] Data)
+		/// <returns>If data was sent.</returns>
+		public Task<bool> Send(byte[] Data)
 		{
 			if (this.state != Socks5State.Connected)
 				throw new IOException("SOCKS5 connection not open.");
 
-			this.SendPacket(Data);
+			return this.SendPacket(Data);
 		}
 
-		private void SendPacket(byte[] Data)
+		private Task<bool> SendPacket(byte[] Data)
 		{
 			lock (this.synchObj)
 			{
 				this.isWriting = true;
 			}
 
-			Data = (byte[])Data.Clone();
-			this.client.SendAsync(Data);
+			return this.client.SendAsync(Data);
 		}
 
 		/// <summary>

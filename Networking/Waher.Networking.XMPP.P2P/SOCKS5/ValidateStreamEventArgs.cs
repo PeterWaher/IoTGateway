@@ -38,6 +38,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			get { return this.streamId; }
 		}
 
+		/// <summary>
+		/// XMPP Client.
+		/// </summary>
+		public XmppClient Client
+		{
+			get { return this.client; }
+		}
+
 		internal DataReceivedEventHandler DataCallback
 		{
 			get { return this.dataCallback; }

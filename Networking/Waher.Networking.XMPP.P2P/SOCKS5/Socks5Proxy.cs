@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		public const string Namespace = "http://jabber.org/protocol/bytestreams";
 
 		private readonly Dictionary<string, Socks5Client> streams = new Dictionary<string, Socks5Client>();
-		private IEndToEndEncryption e2e;
+		private readonly IEndToEndEncryption e2e;
 		private bool hasProxy = false;
 		private string jid = null;
 		private string host = null;
@@ -342,8 +342,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					case Socks5State.Error:
 					case Socks5State.Offline:
-						if (this.stream != null)
-							this.stream.Dispose();
+						this.stream?.Dispose();
 						this.proxy.Callback(this.callback, this.state, false, null, this.streamId);
 						this.callback = null;
 						break;

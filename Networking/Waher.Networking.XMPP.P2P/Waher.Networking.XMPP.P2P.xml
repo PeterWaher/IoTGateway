@@ -2282,6 +2282,7 @@
             Send binary data.
             </summary>
             <param name="Data">Data</param>
+            <returns>If data was sent.</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client.OnWriteQueueEmpty">
             <summary>
@@ -2501,6 +2502,11 @@
         <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs.StreamId">
             <summary>
             Stream ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs.Client">
+            <summary>
+            XMPP Client.
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.ValidateStreamEventArgs.AcceptStream(Waher.Networking.XMPP.P2P.SOCKS5.DataReceivedEventHandler,Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler,System.Object)">

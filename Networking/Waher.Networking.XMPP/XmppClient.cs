@@ -699,7 +699,7 @@ namespace Waher.Networking.XMPP
 
 				this.State = XmppState.Connecting;
 				this.pingResponse = true;
-				this.nextPing = DateTime.MinValue;
+				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 				this.serverFeatures = null;
 				this.serverComponents = null;
 				this.fragmentLength = 0;

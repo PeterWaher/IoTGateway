@@ -664,7 +664,13 @@ namespace Waher.Networking.XMPP
 
 		private Task<bool> TextTransportLayer_OnReceived_NoSniff(object _, string Packet)
 		{
-			return this.ProcessFragment(Packet);
+			if (Packet.StartsWith("</"))
+			{
+				this.ToError();
+				return Task.FromResult<bool>(false);
+			}
+			else
+				return this.ProcessFragment(Packet);
 		}
 
 		/// <summary>

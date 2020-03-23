@@ -217,7 +217,6 @@
   <Assembly fileName='mscorrc.dll' />
   <Assembly fileName='netstandard.dll' />
   <Assembly fileName='SharpCompress.dll'/>
-  <Assembly fileName='SharpSnmpLib.dll'/>
   <Assembly fileName='SkiaSharp.dll'/>
   <Assembly fileName='sos.dll' />
   <Assembly fileName='SOS.NETCore.dll' />

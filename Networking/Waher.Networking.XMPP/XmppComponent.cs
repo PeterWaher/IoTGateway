@@ -190,6 +190,8 @@ namespace Waher.Networking.XMPP
 
 		private void Error(object _, Exception ex)
 		{
+			this.State = XmppState.Error;
+
 			this.Error(ex.Message);
 
 			ExceptionEventHandler h = this.OnError;

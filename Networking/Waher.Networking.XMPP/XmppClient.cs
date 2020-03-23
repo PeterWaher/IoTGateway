@@ -845,6 +845,8 @@ namespace Waher.Networking.XMPP
 
 		private void Error(object Sender, Exception Exception)
 		{
+			this.State = XmppState.Error;
+
 			Exception = Log.UnnestException(Exception);
 
 			if (Exception is AggregateException ex)

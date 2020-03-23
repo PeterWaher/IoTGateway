@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
@@ -199,7 +200,7 @@ namespace Waher.Networking.DNS
 							switch (Message.RCode)
 							{
 								case RCode.NXDomain:
-									throw new ArgumentException("Domain name does not exist.", nameof(Name));
+									throw new GenericException("Domain name not found.", Object: Name);
 							}
 						}
 						catch (TimeoutException)

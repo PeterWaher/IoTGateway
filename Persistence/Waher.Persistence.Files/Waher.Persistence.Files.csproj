@@ -14,9 +14,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database enryption file storage encryption</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.66</AssemblyVersion>
-    <FileVersion>1.0.66</FileVersion>
-    <Version>1.0.66</Version>
+    <AssemblyVersion>1.0.67</AssemblyVersion>
+    <FileVersion>1.0.67</FileVersion>
+    <Version>1.0.67</Version>
     <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence.Files\</UpgradeBackupLocation>

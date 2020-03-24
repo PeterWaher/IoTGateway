@@ -3,12 +3,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
-using Waher.Events.WindowsEventLog;
-using Waher.Persistence.Files;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
@@ -29,19 +26,24 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 	{
 		private ServiceStatus serviceStatus;
 		private ServiceStatusHandle serviceStatusHandle;
-		private readonly TaskCompletionSource<int> stopTaskCompletionSource;
 		private readonly string serviceName;
-		private uint checkpointCounter = 1;
+		private uint checkpointCounter = 0;
+		private int win32ExitCode = 0;
+		private Exception exception = null;
+		private ManualResetEvent terminating = null;
+		private Timer pendingTimer = null;
 
 		internal ServiceHost(string ServiceName)
 		{
 			this.serviceName = ServiceName;
 			this.serviceStatus = new ServiceStatus(ServiceType.Win32OwnProcess, ServiceState.StartPending,
 				ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, serviceSpecificExitCode: 0, checkPoint: 0, waitHint: 0);
-			this.stopTaskCompletionSource = new TaskCompletionSource<int>();
 		}
 
-		internal Task<int> RunAsync()
+		/// <summary>
+		/// Runs the service
+		/// </summary>
+		public int Run()
 		{
 			ServiceTableEntry[] serviceTable = new ServiceTableEntry[2]; // second one is null/null to indicate termination
 			serviceTable[0].serviceName = this.serviceName;
@@ -61,98 +63,100 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				throw new PlatformNotSupportedException("Unable to call windows service management API.", dllException);
 			}
 
-			return stopTaskCompletionSource.Task;
-		}
-
-		/// <summary>
-		/// Runs the service
-		/// </summary>
-		public int Run()
-		{
-			return RunAsync().Result;
+			if (this.exception is null)
+				return this.win32ExitCode;
+			else
+				throw this.exception;
 		}
 
 		private void ServiceMainFunction(int numArgs, IntPtr argPtrPtr)
 		{
 			Log.Informational("Entering service main function.");
 
-			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName, 
+			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName,
 				(ServiceControlHandler)this.HandleServiceControlCommand, IntPtr.Zero);
 
 			if (serviceStatusHandle.IsInvalid)
 			{
-				stopTaskCompletionSource.TrySetException(new Win32Exception(Marshal.GetLastWin32Error()));
+				this.exception = new Win32Exception(Marshal.GetLastWin32Error());
 				return;
 			}
 
-			ReportServiceStatus(ServiceState.StartPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
-
+			this.terminating = new ManualResetEvent(false);
 			try
 			{
+				ReportServiceStatus(ServiceState.StartPending, ServiceAcceptedControlCommandsFlags.None);
+
 				Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 				Gateway.GetDatabaseProvider += Program.GetDatabase;
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
-				Gateway.OnTerminate += (sender, e) => this.StopService(true);
+				Gateway.OnTerminate += (sender, e) => this.terminating?.Set();
 
 				if (!Gateway.Start(true, true, Program.InstanceName).Result)
 					throw new Exception("Gateway being started in another process.");
 
-				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop, win32ExitCode: 0, waitHint: 0);
+				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop);
+
+				while (!this.terminating.WaitOne(60000, false))
+					;
+
+				ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None);
+
+				Gateway.Stop();
+				Log.Terminate();
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-
-				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 1, waitHint: 0);
-			}
-		}
-
-		private void ReportServiceStatus(ServiceState state, ServiceAcceptedControlCommandsFlags acceptedControlCommands, int win32ExitCode, uint waitHint)
-		{
-			if (serviceStatus.State == ServiceState.Stopped)
-			{
-				// we refuse to leave or alter the final state
-				return;
-			}
-
-			serviceStatus.State = state;
-			serviceStatus.Win32ExitCode = win32ExitCode;
-			serviceStatus.WaitHint = waitHint;
-
-			serviceStatus.AcceptedControlCommands = (state == ServiceState.Stopped)
-				? ServiceAcceptedControlCommandsFlags.None // since we enforce "Stopped" as final state, no longer accept control messages
-				: acceptedControlCommands;
-
-			serviceStatus.CheckPoint = (state == ServiceState.Running) || (state == ServiceState.Stopped) || (state == ServiceState.Paused)
-				? 0 // MSDN: This value is not valid and should be zero when the service does not have a start, stop, pause, or continue operation pending.
-				: checkpointCounter++;
-
-			Win32.SetServiceStatus(serviceStatusHandle, ref serviceStatus);
-
-			if (state == ServiceState.Stopped)
-				stopTaskCompletionSource.TrySetResult(win32ExitCode);
-		}
-
-		private void StopService(bool NeedsRestart)
-		{
-			ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
-
-			int win32ExitCode = NeedsRestart ? 1 : 0;
-
-			try
-			{
-				Gateway.Terminate();
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				win32ExitCode = 1;
 			}
 			finally
 			{
-				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode, waitHint: 0);
+				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None);
+
+				this.terminating?.Dispose();
+				this.terminating = null;
 			}
+		}
+
+		private void ReportServiceStatus(ServiceState state, ServiceAcceptedControlCommandsFlags acceptedControlCommands)
+		{
+			if (serviceStatus.State == ServiceState.Stopped)
+				return;
+
+			serviceStatus.State = state;
+			serviceStatus.AcceptedControlCommands = acceptedControlCommands;
+			serviceStatus.Win32ExitCode = state == ServiceState.Stopped ? this.win32ExitCode : 0;
+
+			switch (state)
+			{
+				case ServiceState.ContinuePending:
+				case ServiceState.PausePending:
+				case ServiceState.StartPending:
+				case ServiceState.StopPending:
+					serviceStatus.WaitHint = 2000;
+					serviceStatus.CheckPoint = ++this.checkpointCounter;
+
+					if (this.pendingTimer is null)
+						this.pendingTimer = new Timer(this.ResetPendingStatus, null, 1000, 1000);
+
+					break;
+
+				default:
+					serviceStatus.WaitHint = 0;
+					serviceStatus.CheckPoint = this.checkpointCounter = 0;
+
+					this.pendingTimer?.Dispose();
+					this.pendingTimer = null;
+					break;
+			}
+
+			Win32.SetServiceStatus(serviceStatusHandle, ref serviceStatus);
+		}
+
+		private void ResetPendingStatus(object State)
+		{
+			ReportServiceStatus(serviceStatus.State, serviceStatus.AcceptedControlCommands);
 		}
 
 		private void HandleServiceControlCommand(ServiceControlCommand command, uint eventType, IntPtr eventData, IntPtr eventContext)
@@ -164,12 +168,12 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				switch (command)
 				{
 					case ServiceControlCommand.Stop:
-						this.StopService(false);
+						this.win32ExitCode = 0;
+						this.terminating?.Set();
 						break;
 
 					case ServiceControlCommand.Interrogate:
-						ReportServiceStatus(serviceStatus.State, serviceStatus.AcceptedControlCommands, 
-							serviceStatus.Win32ExitCode, serviceStatus.WaitHint);
+						this.ResetPendingStatus(null);
 						break;
 
 					case ServiceControlCommand.Continue:
@@ -189,24 +193,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 					default:
 						if ((int)command >= 128)
-						{
-							try
-							{
-								Gateway.ExecuteServiceCommand((int)command);
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-							}
-						}
+							Gateway.ExecuteServiceCommand((int)command);
 						break;
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-
-				ReportServiceStatus(ServiceState.Stopped, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 1, waitHint: 0);
 			}
 		}
 

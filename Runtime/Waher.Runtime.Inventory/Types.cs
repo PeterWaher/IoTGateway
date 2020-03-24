@@ -314,12 +314,27 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		public static void StopAllModules()
 		{
+			StopAllModules(null);
+		}
+
+		/// <summary>
+		/// Stops all modules.
+		/// </summary>
+		/// <param name="Order">Order in which modules should be stopped.
+		/// Default order is the reverse starting order, if no other order is provided.</param>
+		public static void StopAllModules(IComparer<IModule> Order)
+		{
 			if (isInitialized)
 			{
-				IModule[] Modules = Types.Modules;
+				IModule[] Modules = (IModule[])Types.Modules?.Clone();
 
-				if (Modules != null)
+				if (!(Modules is null))
 				{
+					if (Order is null)
+						Array.Reverse(Modules);
+					else
+						Array.Sort<IModule>(Modules, Order);
+
 					foreach (IModule Module in Modules)
 					{
 						try
@@ -362,6 +377,18 @@ namespace Waher.Runtime.Inventory
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
 		public static bool StartAllModules(int Timeout)
 		{
+			return StartAllModules(Timeout, null);
+		}
+
+		/// <summary>
+		/// Starts all loaded modules.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="Order">Order in which modules should be started.</param>
+		/// <returns>If all modules have been successfully started (true), or if at least one has not been
+		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
+		public static bool StartAllModules(int Timeout, IComparer<IModule> Order)
+		{
 			if (modules is null || modules.Length == 0)
 			{
 				List<WaitHandle> Handles = new List<WaitHandle>();
@@ -381,15 +408,28 @@ namespace Waher.Runtime.Inventory
 						Log.Informational("Starting module.", T.FullName);
 
 						Module = (IModule)Activator.CreateInstance(T);
-						Handle = Module.Start();
-						if (Handle != null)
-							Handles.Add(Handle);
-
 						Modules.Add(Module);
 					}
 					catch (Exception ex)
 					{
 						Log.Error("Unable to start module: " + ex.Message, T.FullName);
+					}
+				}
+
+				if (!(Order is null))
+					Modules.Sort(Order);
+
+				foreach (IModule Module2 in Modules)
+				{
+					try
+					{
+						Handle = Module2.Start();
+						if (Handle != null)
+							Handles.Add(Handle);
+					}
+					catch (Exception ex)
+					{
+						Log.Error("Unable to start module: " + ex.Message, Module2.GetType().FullName);
 					}
 				}
 

@@ -881,14 +881,11 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (this.xmppClient != null)
 			{
-				IDisposable Disposable;
-
 				foreach (ISniffer Sniffer in this.xmppClient.Sniffers)
 				{
 					this.xmppClient.Remove(Sniffer);
 
-					Disposable = Sniffer as IDisposable;
-					if (Disposable != null)
+					if (Sniffer is IDisposable Disposable)
 					{
 						try
 						{

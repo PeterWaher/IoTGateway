@@ -82,14 +82,11 @@ namespace Waher.Events
 		/// </summary>
 		public static void Terminate()
 		{
-			IDisposable Disposable;
-
 			foreach (IEventSink Sink in Sinks)
 			{
 				Unregister(Sink);
 
-				Disposable = Sink as IDisposable;
-				if (Disposable != null)
+				if (Sink is IDisposable Disposable)
 				{
 					try
 					{

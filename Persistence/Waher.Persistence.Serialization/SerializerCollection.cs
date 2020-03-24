@@ -93,12 +93,9 @@ namespace Waher.Persistence.Serialization
 		{
 			if (!(this.serializers is null))
 			{
-				IDisposable d;
-
 				foreach (IObjectSerializer Serializer in this.serializers.Values)
 				{
-					d = Serializer as IDisposable;
-					if (!(d is null))
+					if (Serializer is IDisposable d)
 					{
 						try
 						{

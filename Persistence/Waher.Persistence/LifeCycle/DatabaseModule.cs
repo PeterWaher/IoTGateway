@@ -24,12 +24,7 @@ namespace Waher.Persistence.LifeCycle
 		/// <returns>If an asynchronous start operation has been started, a wait handle is returned. This
 		/// wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
 		/// operation has been started, null can be returned.</returns>
-		public WaitHandle Start()
-		{
-			return ToWaitHandle(DoStart());
-		}
-
-		private async Task DoStart()
+		public async Task Start()
 		{
 			if (Database.HasProvider)
 				await Database.Provider.Start();
@@ -38,38 +33,10 @@ namespace Waher.Persistence.LifeCycle
 				await Ledger.Provider.Start();
 		}
 
-		private static WaitHandle ToWaitHandle(Task T)
-		{
-			if (T is null)
-				return null;
-
-			ManualResetEvent Done = new ManualResetEvent(false);
-			Task _ = Wait(T, Done);
-
-			return Done;
-		}
-
-		private static async Task Wait(Task T, ManualResetEvent Done)
-		{
-			try
-			{
-				await T;
-			}
-			finally
-			{
-				Done.Set();
-			}
-		}
-
 		/// <summary>
 		/// Stops the module.
 		/// </summary>
-		public void Stop()
-		{
-			DoStop()?.Wait();
-		}
-
-		private async Task DoStop()
+		public async Task Stop()
 		{
 			if (Database.HasProvider)
 				await Database.Provider.Stop();

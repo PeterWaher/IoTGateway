@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 
@@ -26,18 +26,18 @@ namespace Waher.WebService.Script
 		/// <returns>If an asynchronous start operation has been started, a wait handle is returned. This
 		/// wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
 		/// operation has been started, null can be returned.</returns>
-		public WaitHandle Start()
+		public Task Start()
 		{
 			if (Types.TryGetModuleParameter("HTTP", out object Obj) && (this.webServer = Obj as HttpServer) != null)
 				this.webServer.Register(this.instance = new ScriptService("/Evaluate"));
 
-			return null;
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Stops the module.
 		/// </summary>
-		public void Stop()
+		public Task Stop()
 		{
 			if (this.webServer != null)
 			{
@@ -46,6 +46,8 @@ namespace Waher.WebService.Script
 				this.webServer = null;
 				this.instance = null;
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

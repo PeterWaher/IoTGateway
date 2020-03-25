@@ -20,7 +20,7 @@ namespace Waher.IoTGateway.App
 		{
 		}
 
-		public WaitHandle Start()
+		public Task Start()
 		{
 			ConcentratorServer ConcentratorServer = null;
 			ProvisioningClient ProvisioningClient = null;
@@ -34,16 +34,18 @@ namespace Waher.IoTGateway.App
 			this.bobClient = new BobClient(Gateway.XmppClient, Path.Combine(Gateway.AppDataFolder, "BoB"));
 			this.chatServer = new ChatServer(Gateway.XmppClient, this.bobClient, ConcentratorServer, ProvisioningClient);
 
-			return null;
+			return Task.CompletedTask;
 		}
 
-		public void Stop()
+		public Task Stop()
 		{
 			this.chatServer?.Dispose();
 			this.chatServer = null;
 
 			this.bobClient?.Dispose();
 			this.bobClient = null;
+
+			return Task.CompletedTask;
 		}
 	}
 }

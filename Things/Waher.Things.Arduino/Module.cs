@@ -23,14 +23,7 @@ namespace Waher.Things.Arduino
 		{
 		}
 
-		public WaitHandle Start()
-		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			this.Init(Done);
-			return Done;
-		}
-
-		private async void Init(ManualResetEvent Done)
+		public async Task Start()
 		{
 			try
 			{
@@ -70,10 +63,6 @@ namespace Waher.Things.Arduino
 			{
 				Log.Critical(ex);
 			}
-			finally
-			{
-				Done.Set();
-			}
 		}
 
 		public static DeviceInformation GetDeviceInformation(string Name)
@@ -97,7 +86,7 @@ namespace Waher.Things.Arduino
 			}
 		}
 
-		public void Stop()
+		public Task Stop()
 		{
 			UsbState[] States;
 
@@ -110,6 +99,8 @@ namespace Waher.Things.Arduino
 
 			foreach (UsbState State in States)
 				State.Dispose();
+
+			return Task.CompletedTask;
 		}
 	}
 }

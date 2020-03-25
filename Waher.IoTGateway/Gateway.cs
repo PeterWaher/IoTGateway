@@ -850,7 +850,7 @@ namespace Waher.IoTGateway
 						}
 					}
 
-					if (Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
+					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
 						Log.Informational("Server started.");
 					else
 						Log.Critical("Unable to start all modules.");
@@ -1472,7 +1472,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Stops the gateway.
 		/// </summary>
-		public static void Stop()
+		public static async Task Stop()
 		{
 			if (stopped)
 			{
@@ -1485,10 +1485,10 @@ namespace Waher.IoTGateway
 			stopped = true;
 			try
 			{
-				Types.StopAllModules();
+				await Types.StopAllModules();
 
 				if (!(internalProvider is null) && Database.Provider != internalProvider)
-					internalProvider.Stop();
+					await internalProvider.Stop();
 
 				scheduler?.Dispose();
 				scheduler = null;

@@ -1,8 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Inventory
@@ -21,7 +21,6 @@ namespace Waher.Runtime.Inventory
 		private static readonly Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
-		private static WaitHandle[] startWaitHandles = null;
 		private static readonly Type[] noTypes = new Type[0];
 		private static readonly object[] noParameters = new object[0];
 		private static readonly object synchObject = new object();
@@ -312,9 +311,9 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Stops all modules.
 		/// </summary>
-		public static void StopAllModules()
+		public static Task StopAllModules()
 		{
-			StopAllModules(null);
+			return StopAllModules(null);
 		}
 
 		/// <summary>
@@ -322,7 +321,7 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		/// <param name="Order">Order in which modules should be stopped.
 		/// Default order is the reverse starting order, if no other order is provided.</param>
-		public static void StopAllModules(IComparer<IModule> Order)
+		public static async Task StopAllModules(IComparer<IModule> Order)
 		{
 			if (isInitialized)
 			{
@@ -339,7 +338,7 @@ namespace Waher.Runtime.Inventory
 					{
 						try
 						{
-							Module.Stop();
+							await Module.Stop();
 						}
 						catch (Exception ex)
 						{
@@ -380,7 +379,7 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static bool StartAllModules(int Timeout)
+		public static Task<bool> StartAllModules(int Timeout)
 		{
 			return StartAllModules(Timeout, null);
 		}
@@ -392,14 +391,13 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Order">Order in which modules should be started.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static bool StartAllModules(int Timeout, IComparer<IModule> Order)
+		public static async Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order)
 		{
 			if (modules is null || modules.Length == 0)
 			{
-				List<WaitHandle> Handles = new List<WaitHandle>();
+				List<Task> Tasks = new List<Task>();
 				List<IModule> Modules = new List<IModule>();
 				IModule Module;
-				WaitHandle Handle;
 				TypeInfo TI;
 
 				foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
@@ -428,9 +426,7 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						Handle = Module2.Start();
-						if (Handle != null)
-							Handles.Add(Handle);
+						Tasks.Add(Module2.Start());
 					}
 					catch (Exception ex)
 					{
@@ -438,13 +434,16 @@ namespace Waher.Runtime.Inventory
 					}
 				}
 
-				startWaitHandles = Handles.ToArray();
 				modules = Modules.ToArray();
 
-				if (startWaitHandles.Length == 0)
+				if (Tasks.Count > 0)
+				{
+					Task TimeoutTask = Task.Delay(Timeout);
+					Task Result = await Task.WhenAny(Task.WhenAll(Tasks.ToArray()), TimeoutTask);
+					return Result != TimeoutTask;
+				}
+				else
 					return true;
-
-				return WaitHandle.WaitAll(startWaitHandles, Timeout);
 			}
 			else
 				return true;

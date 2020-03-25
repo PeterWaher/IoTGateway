@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Waher.Runtime.Inventory
 {
@@ -16,11 +14,11 @@ namespace Waher.Runtime.Inventory
 		/// <returns>If an asynchronous start operation has been started, a wait handle is returned. This
 		/// wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
 		/// operation has been started, null can be returned.</returns>
-		WaitHandle Start();
+		Task Start();
 
 		/// <summary>
 		/// Stops the module.
 		/// </summary>
-		void Stop();
+		Task Stop();
 	}
 }

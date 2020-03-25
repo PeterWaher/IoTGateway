@@ -10,14 +10,7 @@ namespace Waher.Things.Mqtt
 {
 	public class MqttModule : IModule
 	{
-		public WaitHandle Start()
-		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			this.InitBrokers(Done);
-			return Done;
-		}
-
-		private async void InitBrokers(ManualResetEvent Done)
+		public async Task Start()
 		{
 			try
 			{
@@ -27,15 +20,11 @@ namespace Waher.Things.Mqtt
 			{
 				Log.Critical(ex);
 			}
-			finally
-			{
-				Done.Set();
-			}
 		}
 
 		private async Task CheckNode(INode Node)
 		{
-			foreach (INode Child in await MeteringTopology.Root.ChildNodes)
+			foreach (INode Child in await Node.ChildNodes)
 			{
 				if (Child is MqttBrokerNode BrokerNode)
 					BrokerNode.GetBroker(); // Makes sure it is initialized.
@@ -44,8 +33,9 @@ namespace Waher.Things.Mqtt
 			}
 		}
 
-		public void Stop()
+		public Task Stop()
 		{
+			return Task.CompletedTask;
 		}
 	}
 }

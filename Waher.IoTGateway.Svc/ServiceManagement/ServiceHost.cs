@@ -4,11 +4,11 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
+using Waher.Persistence;
 
 namespace Waher.IoTGateway.Svc.ServiceManagement
 {
@@ -98,6 +98,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 				ReportServiceStatus(ServiceState.Running,
 					ServiceAcceptedControlCommandsFlags.Stop |
+					ServiceAcceptedControlCommandsFlags.Shutdown |
+					ServiceAcceptedControlCommandsFlags.PreShutdown |
 					ServiceAcceptedControlCommandsFlags.PauseContinue);
 
 				while (!this.terminating.WaitOne(60000, false))
@@ -169,7 +171,20 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 				switch (command)
 				{
+					case ServiceControlCommand.PreShutdown:
+					case ServiceControlCommand.Shutdown:
 					case ServiceControlCommand.Stop:
+						if (command == ServiceControlCommand.Stop)
+							Log.Notice("Service is being stopped.");
+						else
+							Log.Notice("System is shutting down.");
+
+						if (Database.HasProvider)
+							Database.Provider.Flush().Wait();
+
+						if (Ledger.HasProvider)
+							Ledger.Provider.Flush().Wait();
+
 						this.win32ExitCode = 0;
 						this.terminating?.Set();
 						break;
@@ -180,13 +195,19 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 					case ServiceControlCommand.Pause:
 						ReportServiceStatus(ServiceState.PausePending, ServiceAcceptedControlCommandsFlags.None);
-
-						Gateway.Stop();
-						Log.Terminate();
-
-						ReportServiceStatus(ServiceState.Paused,
-							ServiceAcceptedControlCommandsFlags.Stop |
-							ServiceAcceptedControlCommandsFlags.PauseContinue);
+						try
+						{
+							Gateway.Stop();
+							Log.Terminate();
+						}
+						finally
+						{
+							ReportServiceStatus(ServiceState.Paused,
+								ServiceAcceptedControlCommandsFlags.Stop |
+								ServiceAcceptedControlCommandsFlags.Shutdown |
+								ServiceAcceptedControlCommandsFlags.PreShutdown |
+								ServiceAcceptedControlCommandsFlags.PauseContinue);
+						}
 						break;
 
 					case ServiceControlCommand.Continue:
@@ -196,6 +217,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						{
 							ReportServiceStatus(ServiceState.Running,
 								ServiceAcceptedControlCommandsFlags.Stop |
+								ServiceAcceptedControlCommandsFlags.Shutdown |
+								ServiceAcceptedControlCommandsFlags.PreShutdown |
 								ServiceAcceptedControlCommandsFlags.PauseContinue);
 						}
 						else
@@ -204,6 +227,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 							
 							ReportServiceStatus(ServiceState.Paused,
 								ServiceAcceptedControlCommandsFlags.Stop |
+								ServiceAcceptedControlCommandsFlags.Shutdown |
+								ServiceAcceptedControlCommandsFlags.PreShutdown |
 								ServiceAcceptedControlCommandsFlags.PauseContinue);
 						}
 						break;
@@ -217,12 +242,10 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 					case ServiceControlCommand.Paramchange:
 					case ServiceControlCommand.PowerEvent:
 					case ServiceControlCommand.SessionChange:
-					case ServiceControlCommand.PreShutdown:
-					case ServiceControlCommand.Shutdown:
 					case ServiceControlCommand.TimeChange:
 					case ServiceControlCommand.TriggerEvent:
 					case ServiceControlCommand.UserModeReboot:
-						// TODO: Implement
+						// TODO: Implement?
 						break;
 
 					default:

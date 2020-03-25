@@ -3,11 +3,16 @@
 		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" 
-					UpgradeCode="01a50176-5f9c-4eba-888c-7812302375c1">
+	<Bundle Name="IoT Gateway Setup" 
+          Version="1.0" 
+          Manufacturer="Waher Data AB"
+          UpgradeCode="01a50176-5f9c-4eba-888c-7812302375c1"
+          DisableModify="yes"
+          DisableRepair="yes">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
 			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
-																							SuppressOptionsUI="yes"/>
+																							SuppressOptionsUI="yes" 
+                                              SuppressRepair="yes"/>
 		</BootstrapperApplicationRef>
 		<Chain>
 			<PackageGroupRef Id="NetFx462Web"/>

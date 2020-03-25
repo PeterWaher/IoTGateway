@@ -46,7 +46,7 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// <param name="Settings">Settings object.</param>
 		public Task ConfigureSettings(object Settings)
 		{
-			if (Settings is MongoDBSettings MongoDBSettings)
+			if (Settings is MongoDBSettings MongoDBSettings && !Database.Locked)
 			{
 				object MongoClientSettings = Types.CreateObject("MongoDB.Driver.MongoClientSettings");
 				Types.SetProperty(MongoClientSettings, "ApplicationName", Gateway.ApplicationName);

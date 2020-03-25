@@ -43,7 +43,9 @@ namespace Waher.IoTGateway.Setup.Databases
 		/// <param name="Settings">Settings object.</param>
 		public Task ConfigureSettings(object Settings)
 		{
-			Database.Register(Database.Provider, true);
+			if (!Database.Locked)
+				Database.Register(Database.Provider, true);
+
 			return Task.CompletedTask;
 		}
 

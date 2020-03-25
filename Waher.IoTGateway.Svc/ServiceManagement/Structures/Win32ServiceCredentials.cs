@@ -29,11 +29,10 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(objA: null, objB: obj))
-            {
+            if (obj is null)
                 return false;
-            }
-            return obj is Win32ServiceCredentials && Equals((Win32ServiceCredentials) obj);
+            else
+                return obj is Win32ServiceCredentials Win32ServiceCredentials && Equals(Win32ServiceCredentials);
         }
 
         public override int GetHashCode()

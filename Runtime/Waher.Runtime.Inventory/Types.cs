@@ -349,6 +349,11 @@ namespace Waher.Runtime.Inventory
 
 					modules = new IModule[0];
 				}
+
+				lock (moduleParameters)
+				{
+					moduleParameters.Clear();
+				}
 			}
 		}
 

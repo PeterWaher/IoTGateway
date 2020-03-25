@@ -19,6 +19,10 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Enumerations
 		DeviceEvent = 0x0000000B,
 		HardwareProfileChange = 0x0000000C,
 		PowerEvent = 0x0000000D,
-		SessionChange = 0x0000000E
+		SessionChange = 0x0000000E,
+		PreShutdown = 0x0000000F,
+		TimeChange = 0x00000010,
+		TriggerEvent = 0x00000020,
+		UserModeReboot = 0x00000040
 	}
 }

@@ -162,6 +162,7 @@ namespace Waher.IoTGateway
 		private static string exceptionFileName = null;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
+		private static bool firstStart = true;
 		private static bool registered = false;
 		private static bool connected = false;
 		private static bool immediateReconnect;
@@ -203,6 +204,9 @@ namespace Waher.IoTGateway
 		/// <returns>If the gateway was successfully started.</returns>
 		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
 		{
+			bool FirstStart = firstStart;
+
+			firstStart = false;
 			instance = InstanceName;
 
 			string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
@@ -245,35 +249,39 @@ namespace Waher.IoTGateway
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
 
-				Assert.UnauthorizedAccess += Assert_UnauthorizedAccess;
+				if (FirstStart)
+					Assert.UnauthorizedAccess += Assert_UnauthorizedAccess;
 
 				Log.Informational("Server starting up.");
 
-				Initialize();
-
-				beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
-
-				if (!Directory.Exists(rootFolder))
+				if (FirstStart)
 				{
-					string s = Path.Combine(runtimeFolder, "Root");
-					if (Directory.Exists(s))
+					Initialize();
+
+					beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
+
+					if (!Directory.Exists(rootFolder))
 					{
-						CopyFolder(runtimeFolder, appDataFolder, "*.config", true);
-						CopyFolders(s, rootFolder, true);
-						CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
-						CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);
+						string s = Path.Combine(runtimeFolder, "Root");
+						if (Directory.Exists(s))
+						{
+							CopyFolder(runtimeFolder, appDataFolder, "*.config", true);
+							CopyFolders(s, rootFolder, true);
+							CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
+							CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);
+						}
 					}
-				}
 
-				string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
-				Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
+					string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
+					Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
 
-				foreach (string ManifestFile in ManifestFiles)
-				{
-					CheckContentFiles(ManifestFile, ContentOptions);
+					foreach (string ManifestFile in ManifestFiles)
+					{
+						CheckContentFiles(ManifestFile, ContentOptions);
 
-					if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
-						CheckInstallUtilityFiles(ManifestFile);
+						if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
+							CheckInstallUtilityFiles(ManifestFile);
+					}
 				}
 
 				Types.SetModuleParameter("AppData", appDataFolder);
@@ -281,11 +289,14 @@ namespace Waher.IoTGateway
 
 				scheduler = new Scheduler();
 
-				Task T = Task.Run(() =>
+				if (FirstStart)
 				{
-					CodeContent.GraphViz.Init();
-					CodeContent.PlantUml.Init();
-				});
+					Task T = Task.Run(() =>
+					{
+						CodeContent.GraphViz.Init();
+						CodeContent.PlantUml.Init();
+					});
+				}
 
 				XmlDocument Config = new XmlDocument();
 
@@ -352,70 +363,87 @@ namespace Waher.IoTGateway
 								exceptionFile.Write("Start of export: ");
 								exceptionFile.WriteLine(DateTime.Now.ToString());
 
-								AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+								if (FirstStart)
 								{
-									lock (exceptionFile)
+									AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
 									{
-										if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+										if (exceptionFile is null)
 											return;
 
-										exceptionFile.WriteLine(new string('-', 80));
-										exceptionFile.Write("Type: ");
-
-										if (e.Exception != null)
-											exceptionFile.WriteLine(e.Exception.GetType().FullName);
-										else
-											exceptionFile.WriteLine("null");
-
-										exceptionFile.Write("Time: ");
-										exceptionFile.WriteLine(DateTime.Now.ToString());
-
-										if (e.Exception != null)
+										lock (exceptionFile)
 										{
-											LinkedList<Exception> Exceptions = new LinkedList<Exception>();
-											Exceptions.AddLast(e.Exception);
+											if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+												return;
 
-											while (Exceptions.First != null)
+											exceptionFile.WriteLine(new string('-', 80));
+											exceptionFile.Write("Type: ");
+
+											if (e.Exception != null)
+												exceptionFile.WriteLine(e.Exception.GetType().FullName);
+											else
+												exceptionFile.WriteLine("null");
+
+											exceptionFile.Write("Time: ");
+											exceptionFile.WriteLine(DateTime.Now.ToString());
+
+											if (e.Exception != null)
 											{
-												Exception ex = Exceptions.First.Value;
-												Exceptions.RemoveFirst();
+												LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+												Exceptions.AddLast(e.Exception);
 
-												exceptionFile.WriteLine();
-
-												exceptionFile.WriteLine(ex.Message);
-												exceptionFile.WriteLine();
-												exceptionFile.WriteLine(ex.StackTrace);
-												exceptionFile.WriteLine();
-
-												if (ex is AggregateException ex2)
+												while (Exceptions.First != null)
 												{
-													foreach (Exception ex3 in ex2.InnerExceptions)
-														Exceptions.AddLast(ex3);
-												}
-												else if (ex.InnerException != null)
-													Exceptions.AddLast(ex.InnerException);
-											}
-										}
+													Exception ex = Exceptions.First.Value;
+													Exceptions.RemoveFirst();
 
-										exceptionFile.Flush();
-									}
-								};
+													exceptionFile.WriteLine();
+
+													exceptionFile.WriteLine(ex.Message);
+													exceptionFile.WriteLine();
+													exceptionFile.WriteLine(ex.StackTrace);
+													exceptionFile.WriteLine();
+
+													if (ex is AggregateException ex2)
+													{
+														foreach (Exception ex3 in ex2.InnerExceptions)
+															Exceptions.AddLast(ex3);
+													}
+													else if (ex.InnerException != null)
+														Exceptions.AddLast(ex.InnerException);
+												}
+											}
+
+											exceptionFile.Flush();
+										}
+									};
+								}
 								break;
 
 							case "Database":
-								if (!(DatabaseProvider is null))
-									throw new Exception("Database provider already initiated.");
+								if (FirstStart)
+								{
+									if (!(DatabaseProvider is null))
+										throw new Exception("Database provider already initiated.");
 
-								if (GetDatabaseProvider != null)
-									DatabaseProvider = await GetDatabaseProvider(E);
+									if (GetDatabaseProvider != null)
+										DatabaseProvider = await GetDatabaseProvider(E);
+									else
+										DatabaseProvider = null;
+
+									if (DatabaseProvider is null)
+										throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
+
+									internalProvider = DatabaseProvider;
+									Database.Register(DatabaseProvider, false);
+								}
 								else
-									DatabaseProvider = null;
+								{
+									DatabaseProvider = Database.Provider;
+									await DatabaseProvider.Start();
 
-								if (DatabaseProvider is null)
-									throw new Exception("Database provider not defined. Make sure the GetDatabaseProvider event has an appropriate event handler.");
-
-								internalProvider = DatabaseProvider;
-								Database.Register(DatabaseProvider, false);
+									if (Ledger.HasProvider)
+										await Ledger.Provider.Start();
+								}
 								break;
 
 							case "Ports":
@@ -446,7 +474,7 @@ namespace Waher.IoTGateway
 
 				if (!(MI is null))
 				{
-					T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
+					Task T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
 					if (T is Task<string[]> StringArrayTask)
 						DatabaseConfiguration.RepairedCollections = await StringArrayTask;
 					else if (!(T is null))
@@ -771,27 +799,11 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Avatar", avatarClient);
 				Types.SetModuleParameter("Scheduler", scheduler);
 
-				MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
+				if (FirstStart)
+					MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
 
 				DeleteOldDataSourceEvents(null);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
 
-				startingServer?.Release();
-				startingServer?.Dispose();
-				startingServer = null;
-
-				gatewayRunning?.Release();
-				gatewayRunning?.Dispose();
-				gatewayRunning = null;
-
-				ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-
-			Task T2 = Task.Run(async () =>
-			{
 				try
 				{
 					string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -838,7 +850,7 @@ namespace Waher.IoTGateway
 						}
 					}
 
-					if (Types.StartAllModules(int.MaxValue))
+					if (Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
 						Log.Informational("Server started.");
 					else
 						Log.Critical("Unable to start all modules.");
@@ -856,9 +868,41 @@ namespace Waher.IoTGateway
 					if (xmppClient.State != XmppState.Connected)
 						xmppClient.Connect();
 				}
-			});
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+
+				startingServer?.Release();
+				startingServer?.Dispose();
+				startingServer = null;
+
+				gatewayRunning?.Release();
+				gatewayRunning?.Dispose();
+				gatewayRunning = null;
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
 
 			return true;
+		}
+
+		private class ModuleStartOrder : IComparer<IModule>
+		{
+			public int Compare(IModule x, IModule y)
+			{
+				bool dm1 = x is Persistence.LifeCycle.DatabaseModule;
+				bool dm2 = y is Persistence.LifeCycle.DatabaseModule;
+
+				if (dm1 && dm2)
+					return 0;
+				else if (dm1)
+					return -1;
+				else if (dm2)
+					return 1;
+				else
+					return string.Compare(x.GetType().FullName, y.GetType().FullName);
+			}
 		}
 
 		private static void Assert_UnauthorizedAccess(object Sender, UnauthorizedAccessEventArgs e)
@@ -1430,7 +1474,11 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static void Stop()
 		{
-			IDisposable Disposable;
+			if (stopped)
+			{
+				Log.Notice("Request to stop Gateway, but Gateway already stopped.");
+				return;
+			}
 
 			Log.Informational("Server shutting down.");
 
@@ -1503,7 +1551,7 @@ namespace Waher.IoTGateway
 				mailClient?.Dispose();
 				mailClient = null;
 
-				if (xmppClient != null)
+				if (!(xmppClient is null))
 				{
 					using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
 					{
@@ -1515,8 +1563,7 @@ namespace Waher.IoTGateway
 					{
 						XmppClient.Remove(Sniffer);
 
-						Disposable = Sniffer as IDisposable;
-						if (Disposable != null)
+						if (Sniffer is IDisposable Disposable)
 							Disposable.Dispose();
 					}
 
@@ -1533,8 +1580,7 @@ namespace Waher.IoTGateway
 					{
 						webServer.Remove(Sniffer);
 
-						Disposable = Sniffer as IDisposable;
-						if (Disposable != null)
+						if (Sniffer is IDisposable Disposable)
 							Disposable.Dispose();
 					}
 
@@ -1555,6 +1601,8 @@ namespace Waher.IoTGateway
 						exceptionFile.Flush();
 						exceptionFile.Close();
 					}
+
+					exceptionFile = null;
 				}
 			}
 			finally

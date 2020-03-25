@@ -93,10 +93,12 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
 				Gateway.OnTerminate += (sender, e) => this.terminating?.Set();
 
-				if (!Gateway.Start(true, true, Program.InstanceName).Result)
+				if (!Gateway.Start(false, true, Program.InstanceName).Result)
 					throw new Exception("Gateway being started in another process.");
 
-				ReportServiceStatus(ServiceState.Running, ServiceAcceptedControlCommandsFlags.Stop);
+				ReportServiceStatus(ServiceState.Running,
+					ServiceAcceptedControlCommandsFlags.Stop |
+					ServiceAcceptedControlCommandsFlags.PauseContinue);
 
 				while (!this.terminating.WaitOne(60000, false))
 					;
@@ -176,7 +178,36 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						this.ResetPendingStatus(null);
 						break;
 
+					case ServiceControlCommand.Pause:
+						ReportServiceStatus(ServiceState.PausePending, ServiceAcceptedControlCommandsFlags.None);
+
+						Gateway.Stop();
+						Log.Terminate();
+
+						ReportServiceStatus(ServiceState.Paused,
+							ServiceAcceptedControlCommandsFlags.Stop |
+							ServiceAcceptedControlCommandsFlags.PauseContinue);
+						break;
+
 					case ServiceControlCommand.Continue:
+						ReportServiceStatus(ServiceState.ContinuePending, ServiceAcceptedControlCommandsFlags.None);
+
+						if (Gateway.Start(false, true, Program.InstanceName).Result)
+						{
+							ReportServiceStatus(ServiceState.Running,
+								ServiceAcceptedControlCommandsFlags.Stop |
+								ServiceAcceptedControlCommandsFlags.PauseContinue);
+						}
+						else
+						{
+							Log.Error("Unable to resume from paused state.");
+							
+							ReportServiceStatus(ServiceState.Paused,
+								ServiceAcceptedControlCommandsFlags.Stop |
+								ServiceAcceptedControlCommandsFlags.PauseContinue);
+						}
+						break;
+
 					case ServiceControlCommand.DeviceEvent:
 					case ServiceControlCommand.HardwareProfileChange:
 					case ServiceControlCommand.NetBindAdd:
@@ -184,10 +215,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 					case ServiceControlCommand.NetBindEnable:
 					case ServiceControlCommand.NetBindRemoved:
 					case ServiceControlCommand.Paramchange:
-					case ServiceControlCommand.Pause:
 					case ServiceControlCommand.PowerEvent:
 					case ServiceControlCommand.SessionChange:
+					case ServiceControlCommand.PreShutdown:
 					case ServiceControlCommand.Shutdown:
+					case ServiceControlCommand.TimeChange:
+					case ServiceControlCommand.TriggerEvent:
+					case ServiceControlCommand.UserModeReboot:
 						// TODO: Implement
 						break;
 

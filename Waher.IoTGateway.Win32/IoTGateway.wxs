@@ -1218,12 +1218,18 @@
       <Directory Id='CommonAppDataFolder' Name='CommonAppData'>
         <Directory Id="APPDATADIR" Name="IoT Gateway">
           <Component Id="AppDataFolder" Guid="6F766315-8929-4754-81E0-3B16FA851887">
+            <CreateFolder>
+              <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+            </CreateFolder>
             <RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
               <RegistryValue Type='string' Name='AppDataDir' Value='[APPDATADIR]' Action='write' KeyPath='yes'/>
             </RegistryKey>
           </Component>
           <Directory Id='ROOTDIR' Name='Root'>
             <Component Id='RootFiles' Guid='FAAC1B8A-39C9-4ABE-996D-0B7688990DC3'>
+              <CreateFolder>
+                <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+              </CreateFolder>
               <RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
                 <RegistryValue Type='string' Name='RootDir' Value='[ROOTDIR]' Action='write'/>
               </RegistryKey>
@@ -1259,6 +1265,9 @@
             </Component>
             <Directory Id='Audio' Name='Audio'>
               <Component Id='AudioFiles' Guid='315A0BCE-D9DB-4BF9-B9CE-8E0D400D5A06'>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
                 <RemoveFolder Id='RemoveAudio' On='uninstall' />
                 <File Id='glass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Audio\glass_ping-Go445-1207030150.mp3' KeyPath='yes'/>
                 <File Id='glass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Audio\glass_ping-Go445-1207030150.wav'/>
@@ -1269,7 +1278,10 @@
             <Directory Id='Images' Name='Images'>
               <Component Id='ImageFiles' Guid='66D950BA-6795-45CA-9943-38F483CA658B'>
                 <RemoveFolder Id='RemoveImages' On='uninstall' />
-								<File Id='logo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-200x39.png' KeyPath='yes'/>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
+                <File Id='logo_WaherDataAB_200x39.png' Name='logo-WaherDataAB-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-200x39.png' KeyPath='yes'/>
 								<File Id='logo_WaherDataAB_300x58.png' Name='logo-WaherDataAB-300x58.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-300x58.png'/>
 								<File Id='logo_WaherDataAB_400x77.png' Name='logo-WaherDataAB-400x77.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-400x77.png'/>
 								<File Id='logo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Images\logo-WaherDataAB-500x97.png'/>
@@ -1281,7 +1293,10 @@
             </Directory>
 						<Directory Id='Settings' Name='Settings'>
 							<Component Id='SettingsFiles' Guid='13A2665D-91CB-45D3-9739-0236C82065FD'>
-								<RemoveFolder Id='SettingsFiles' On='uninstall' />
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
+                <RemoveFolder Id='SettingsFiles' On='uninstall' />
 								<File Id='Backup.js' Name='Backup.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.js' KeyPath='yes'/>
 								<File Id='Backup.md' Name='Backup.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.md'/>
 								<File Id='Config.cssx' Name='Config.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Config.cssx'/>
@@ -1331,14 +1346,20 @@
 							</Component>
 							<Directory Id='Database' Name='Database'>
 								<Component Id='DatabaseFiles' Guid='1F5D29D1-7E5F-425E-BD02-151A6B117F3D'>
-									<RemoveFolder Id='RemoveDatabase' On='uninstall' />
+                  <CreateFolder>
+                    <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                  </CreateFolder>
+                  <RemoveFolder Id='RemoveDatabase' On='uninstall' />
 									<File Id='MongoDB.md' Name='MongoDB.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database\MongoDB.md' Vital='yes' KeyPath='yes'/>
 									<RemoveFile Id='RemoveMongoDB.md' Name='MongoDB.md' On='uninstall'/>
 								</Component>
 							</Directory>
 							<Directory Id='PersonalData' Name='PersonalData'>
 								<Component Id='PersonalDataFiles' Guid='4C73E63A-EA2B-4BE9-9DFA-228538513FA2'>
-									<RemoveFolder Id='RemovePersonalData' On='uninstall' />
+                  <CreateFolder>
+                    <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                  </CreateFolder>
+                  <RemoveFolder Id='RemovePersonalData' On='uninstall' />
 									<File Id='PiiBackups.md' Name='Backups.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\Backups.md' Vital='yes' KeyPath='yes'/>
 									<File Id='PiiLocalDatabase.md' Name='LocalDatabase.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalDatabase.md'/>
 									<File Id='PiiLocalSensorsAndDevices.md' Name='LocalSensorsAndDevices.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData\LocalSensorsAndDevices.md'/>
@@ -1354,6 +1375,9 @@
 						</Directory>
 						<Directory Id='Templates' Name='Templates'>
               <Component Id='TemplateFiles' Guid='627A90AF-D6C1-41B1-814A-043B7B626E98'>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
                 <RemoveFolder Id='RemoveTemplates' On='uninstall' />
                 <File Id='Repeat.md' Name='Repeat.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Templates\Repeat.md' KeyPath='yes'/>
                 <RemoveFile Id='RemoveRepeat.md' Name='Repeat.md' On='uninstall'/>
@@ -1362,7 +1386,10 @@
 						<Directory Id='Themes' Name='Themes'>
 							<Directory Id='CactusRose' Name='CactusRose'>
 								<Component Id='CactusRoseFiles' Guid='3FA99AE1-D6B0-486E-B5E6-8CFC05ECA306'>
-									<RemoveFolder Id='RemoveCactusRose' On='uninstall' />
+                  <CreateFolder>
+                    <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                  </CreateFolder>
+                  <RemoveFolder Id='RemoveCactusRose' On='uninstall' />
 									<File Id='CactusRose.cssx' Name='CactusRose.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.cssx'/>
 									<File Id='CactusRose.xml' Name='CactusRose.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.xml'/>
 									<File Id='CactusRose.png' Name='CactusRose.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\CactusRose\CactusRose.png'/>
@@ -1387,7 +1414,10 @@
 							</Directory>
 							<Directory Id='GothicPeacock' Name='GothicPeacock'>
 								<Component Id='GothicPeacockFiles' Guid='C00E2CC5-8FBC-4390-B77D-7428A499557A'>
-									<RemoveFolder Id='RemoveGothicPeacock' On='uninstall' />
+                  <CreateFolder>
+                    <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                  </CreateFolder>
+                  <RemoveFolder Id='RemoveGothicPeacock' On='uninstall' />
 									<File Id='GothicPeacock.cssx' Name='GothicPeacock.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.cssx'/>
 									<File Id='GothicPeacock.xml' Name='GothicPeacock.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.xml'/>
 									<File Id='GothicPeacock.png' Name='GothicPeacock.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\GothicPeacock\GothicPeacock.png'/>
@@ -1413,6 +1443,9 @@
 						</Directory>
             <Directory Id='Video' Name='Video'>
               <Component Id='VideoFiles' Guid='B9D37E9B-7288-43E3-87A1-E04E3EEA9BFB'>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
                 <RemoveFolder Id='RemoveVideo' On='uninstall' />
                 <File Id='small.3gp' Name='small.3gp' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Video\small.3gp' KeyPath='yes'/>
                 <File Id='small.flv' Name='small.flv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Video\small.flv'/>
@@ -1429,6 +1462,9 @@
           </Directory>
           <Directory Id='Transforms' Name='Transforms'>
             <Component Id='TransformFiles' Guid='14F7FAEC-E30A-457A-86A3-B107D7810E19'>
+              <CreateFolder>
+                <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+              </CreateFolder>
               <RemoveFolder Id='RemoveTransforms' On='uninstall' />
 							<File Id='ClockStatXmlToCsv.xslt' Name='ClockStatXmlToCsv.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToCsv.xslt' KeyPath='yes'/>
 							<File Id='ClockStatXmlToHtml.xslt' Name='ClockStatXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Transforms\ClockStatXmlToHtml.xslt'/>
@@ -1448,6 +1484,9 @@
           </Directory>
           <Directory Id='Language' Name='Language'>
             <Component Id='English' Guid='531257BB-A840-4D96-85CA-F7A5C77AD546'>
+              <CreateFolder>
+                <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+              </CreateFolder>
               <RemoveFolder Id='RemoveEnglish' On='uninstall' />
               <File Id='Waher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng'/>

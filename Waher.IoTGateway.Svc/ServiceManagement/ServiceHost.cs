@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -32,6 +33,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		private Exception exception = null;
 		private ManualResetEvent terminating = null;
 		private Timer pendingTimer = null;
+		private bool autoPaused = false;
 
 		internal ServiceHost(string ServiceName)
 		{
@@ -100,6 +102,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 					ServiceAcceptedControlCommandsFlags.Stop |
 					ServiceAcceptedControlCommandsFlags.Shutdown |
 					ServiceAcceptedControlCommandsFlags.PreShutdown |
+					ServiceAcceptedControlCommandsFlags.PowerEvent |
 					ServiceAcceptedControlCommandsFlags.PauseContinue);
 
 				while (!this.terminating.WaitOne(60000, false))
@@ -107,7 +110,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 				ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None);
 
-				Gateway.Stop();
+				Gateway.Stop().Wait();
 				Log.Terminate();
 			}
 			catch (Exception ex)
@@ -163,7 +166,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			ReportServiceStatus(serviceStatus.State, serviceStatus.AcceptedControlCommands);
 		}
 
-		private void HandleServiceControlCommand(ServiceControlCommand command, uint eventType, IntPtr eventData, IntPtr eventContext)
+		private async void HandleServiceControlCommand(ServiceControlCommand command, uint eventType, IntPtr eventData, IntPtr eventContext)
 		{
 			try
 			{
@@ -173,20 +176,13 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 				{
 					case ServiceControlCommand.PreShutdown:
 					case ServiceControlCommand.Shutdown:
+						Log.Notice("System is shutting down.");
+						await this.Stop();
+						break;
+
 					case ServiceControlCommand.Stop:
-						if (command == ServiceControlCommand.Stop)
-							Log.Notice("Service is being stopped.");
-						else
-							Log.Notice("System is shutting down.");
-
-						if (Database.HasProvider)
-							Database.Provider.Flush().Wait();
-
-						if (Ledger.HasProvider)
-							Ledger.Provider.Flush().Wait();
-
-						this.win32ExitCode = 0;
-						this.terminating?.Set();
+						Log.Notice("Service is being stopped.");
+						await this.Stop();
 						break;
 
 					case ServiceControlCommand.Interrogate:
@@ -194,42 +190,44 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						break;
 
 					case ServiceControlCommand.Pause:
-						ReportServiceStatus(ServiceState.PausePending, ServiceAcceptedControlCommandsFlags.None);
-						try
-						{
-							Gateway.Stop();
-							Log.Terminate();
-						}
-						finally
-						{
-							ReportServiceStatus(ServiceState.Paused,
-								ServiceAcceptedControlCommandsFlags.Stop |
-								ServiceAcceptedControlCommandsFlags.Shutdown |
-								ServiceAcceptedControlCommandsFlags.PreShutdown |
-								ServiceAcceptedControlCommandsFlags.PauseContinue);
-						}
+						this.autoPaused = false;
+						await this.Pause();
 						break;
 
 					case ServiceControlCommand.Continue:
-						ReportServiceStatus(ServiceState.ContinuePending, ServiceAcceptedControlCommandsFlags.None);
+						await this.Continue();
+						break;
 
-						if (Gateway.Start(false, true, Program.InstanceName).Result)
+					case ServiceControlCommand.PowerEvent:
+						// https://docs.microsoft.com/en-us/windows/win32/api/winsvc/nc-winsvc-lphandler_function_ex
+						// https://docs.microsoft.com/sv-se/windows/win32/power/wm-powerbroadcast
+
+						switch (eventType)
 						{
-							ReportServiceStatus(ServiceState.Running,
-								ServiceAcceptedControlCommandsFlags.Stop |
-								ServiceAcceptedControlCommandsFlags.Shutdown |
-								ServiceAcceptedControlCommandsFlags.PreShutdown |
-								ServiceAcceptedControlCommandsFlags.PauseContinue);
-						}
-						else
-						{
-							Log.Error("Unable to resume from paused state.");
-							
-							ReportServiceStatus(ServiceState.Paused,
-								ServiceAcceptedControlCommandsFlags.Stop |
-								ServiceAcceptedControlCommandsFlags.Shutdown |
-								ServiceAcceptedControlCommandsFlags.PreShutdown |
-								ServiceAcceptedControlCommandsFlags.PauseContinue);
+							case 0x0a:      // PBT_APMPOWERSTATUSCHANGE, Power status has changed.
+								await this.Flush();
+								break;
+
+							case 0x12:		// PBT_APMRESUMEAUTOMATIC, Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
+								if (this.autoPaused && serviceStatus.State == ServiceState.Paused)
+								{
+									Log.Notice("Resuming service.");
+									this.autoPaused = false;
+									await this.Continue();
+								}
+								break;
+
+							case 0x07:		// PBT_APMRESUMESUSPEND, Operation is resuming from a low-power state. This message is sent after PBT_APMRESUMEAUTOMATIC if the resume is triggered by user input, such as pressing a key.
+								break;
+
+							case 0x04:      // PBT_APMSUSPEND, System is suspending operation.
+								Log.Notice("Suspending service.");
+								this.autoPaused = true;
+								await this.Pause();
+								break;
+
+							case 0x8013:    // PBT_POWERSETTINGCHANGE, A power setting change event has been received.
+								break;
 						}
 						break;
 
@@ -240,7 +238,6 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 					case ServiceControlCommand.NetBindEnable:
 					case ServiceControlCommand.NetBindRemoved:
 					case ServiceControlCommand.Paramchange:
-					case ServiceControlCommand.PowerEvent:
 					case ServiceControlCommand.SessionChange:
 					case ServiceControlCommand.TimeChange:
 					case ServiceControlCommand.TriggerEvent:
@@ -258,6 +255,77 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Stops the service.
+		/// </summary>
+		public virtual async Task Stop()
+		{
+			await this.Flush();
+
+			this.win32ExitCode = 0;
+			this.terminating?.Set();
+		}
+
+		/// <summary>
+		/// Pauses the service
+		/// </summary>
+		public virtual async Task Pause()
+		{
+			ReportServiceStatus(ServiceState.PausePending, ServiceAcceptedControlCommandsFlags.None);
+			try
+			{
+				await Gateway.Stop();
+				Log.Terminate();
+			}
+			finally
+			{
+				ReportServiceStatus(ServiceState.Paused,
+					ServiceAcceptedControlCommandsFlags.Stop |
+					ServiceAcceptedControlCommandsFlags.Shutdown |
+					ServiceAcceptedControlCommandsFlags.PreShutdown |
+					ServiceAcceptedControlCommandsFlags.PowerEvent |
+					ServiceAcceptedControlCommandsFlags.PauseContinue);
+			}
+		}
+
+		/// <summary>
+		/// Continues the service.
+		/// </summary>
+		public virtual async Task Continue()
+		{
+			ReportServiceStatus(ServiceState.ContinuePending, ServiceAcceptedControlCommandsFlags.None);
+
+			if (await Gateway.Start(false, true, Program.InstanceName))
+			{
+				ReportServiceStatus(ServiceState.Running,
+					ServiceAcceptedControlCommandsFlags.Stop |
+					ServiceAcceptedControlCommandsFlags.Shutdown |
+					ServiceAcceptedControlCommandsFlags.PreShutdown |
+					ServiceAcceptedControlCommandsFlags.PowerEvent |
+					ServiceAcceptedControlCommandsFlags.PauseContinue);
+			}
+			else
+			{
+				Log.Error("Unable to resume from paused state.");
+
+				ReportServiceStatus(ServiceState.Paused,
+					ServiceAcceptedControlCommandsFlags.Stop |
+					ServiceAcceptedControlCommandsFlags.Shutdown |
+					ServiceAcceptedControlCommandsFlags.PreShutdown |
+					ServiceAcceptedControlCommandsFlags.PowerEvent |
+					ServiceAcceptedControlCommandsFlags.PauseContinue);
+			}
+		}
+
+		private async Task Flush()
+		{
+			if (Database.HasProvider)
+				await Database.Provider.Flush();
+
+			if (Ledger.HasProvider)
+				await Ledger.Provider.Flush();
 		}
 
 		/// <summary>

@@ -350,8 +350,8 @@ namespace Waher.IoTGateway.Svc
 
 				if (!Gateway.Start(true, true, instanceName).Result)
 				{
-					System.Console.Out.WriteLine();
-					System.Console.Out.WriteLine("Gateway being started in another process.");
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("Gateway being started in another process.");
 					return;
 				}
 

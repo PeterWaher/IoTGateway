@@ -189,7 +189,7 @@ namespace Waher.IoTGateway.Console
 			}
 			finally
 			{
-				Gateway.Stop();
+				Gateway.Stop().Wait();
 				Log.Terminate();
 			}
 		}

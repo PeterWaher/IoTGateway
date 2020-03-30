@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,12 +9,10 @@ using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Runtime.Inventory;
-using Waher.Runtime.Settings;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
@@ -315,8 +314,10 @@ namespace Waher.IoTGateway.Svc
 			{
 				Log.Informational("Starting service.");
 
-				ServiceHost host = new ServiceHost(ServiceName);
-				host.Run();
+				using (GatewayService Service = new GatewayService(ServiceName))
+				{
+					ServiceBase.Run(Service);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -393,7 +394,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			finally
 			{
-				Gateway.Stop();
+				Gateway.Stop().Wait();
 				Log.Terminate();
 			}
 		}
@@ -431,7 +432,7 @@ namespace Waher.IoTGateway.Svc
 		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, bool Immediate,
 			ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
-			ServiceHost host = new ServiceHost(ServiceName);
+			ServiceInstaller host = new ServiceInstaller(ServiceName);
 			int i;
 
 			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
@@ -459,7 +460,7 @@ namespace Waher.IoTGateway.Svc
 
 		private static void UninstallService(string ServiceName)
 		{
-			ServiceHost host = new ServiceHost(ServiceName);
+			ServiceInstaller host = new ServiceInstaller(ServiceName);
 
 			if (host.Uninstall())
 				Console.Out.WriteLine("Service successfully uninstalled.");

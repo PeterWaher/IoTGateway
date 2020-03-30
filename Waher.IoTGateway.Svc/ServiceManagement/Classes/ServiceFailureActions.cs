@@ -29,7 +29,9 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
+			if (obj is null)
+				return false;
+
 			return obj is ServiceFailureActions && Equals((ServiceFailureActions)obj);
 		}
 

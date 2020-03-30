@@ -841,8 +841,7 @@ namespace Waher.IoTGateway.Installers
 
             Session.Log("Parsing " + DepsJsonFileName);
 
-            Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-            if (Deps is null)
+            if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
                 throw new Exception("Invalid deps.json file. Unable to install.");
 
             Session.Log("Loading manifest file.");
@@ -1123,8 +1122,7 @@ namespace Waher.IoTGateway.Installers
 
             Session.Log("Parsing " + DepsJsonFileName);
 
-            Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
-            if (Deps is null)
+            if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
                 throw new Exception("Invalid deps.json file. Unable to install.");
 
             Session.Log("Loading manifest file.");

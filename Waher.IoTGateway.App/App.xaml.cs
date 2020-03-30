@@ -168,7 +168,7 @@ namespace Waher.IoTGateway.App
 
 		private void Gateway_OnTerminate(object sender, EventArgs e)
 		{
-			Gateway.Stop();
+			Gateway.Stop().Wait();
 			Log.Terminate();
 			Window.Current.Close();
 		}

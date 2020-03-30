@@ -5989,7 +5989,9 @@ namespace Waher.Content.Markdown
 							if (E1 is MarkdownElementChildren Children1 &&
 								E2 is MarkdownElementChildren Children2)
 							{
-								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children, true, Document);
+								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children, 
+									KeepUnchanged || d > 1, Document);
+
 								Result.AddLast(Children1.Create(Diff, Document));
 							}
 							else if (E1 is MarkdownElementSingleChild Child1 &&
@@ -5998,7 +6000,9 @@ namespace Waher.Content.Markdown
 								Child1.Child is MarkdownElementChildren GrandChildren1 &&
 								Child2.Child is MarkdownElementChildren GrandChildren2)
 							{
-								IEnumerable<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children, true, Document);
+								IEnumerable<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children,
+									KeepUnchanged || d > 1, Document);
+
 								Result.AddLast(Child1.Create(GrandChildren1.Create(Diff, Document), Document));
 							}
 							else

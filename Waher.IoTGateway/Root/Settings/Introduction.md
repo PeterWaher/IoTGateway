@@ -2,7 +2,6 @@
 Description: Provides the user with a short introduction.
 Date: 2018-05-16
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js

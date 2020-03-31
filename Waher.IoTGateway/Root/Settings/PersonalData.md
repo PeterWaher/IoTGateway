@@ -2,7 +2,6 @@
 Description: Information about personal data processing.
 Date: 2018-06-27
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js

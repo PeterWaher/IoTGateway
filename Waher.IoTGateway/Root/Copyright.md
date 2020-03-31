@@ -2,7 +2,6 @@
 Description: Copyright statement
 Date: 2016-02-09
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: /Master.md
 
 =======   ========  ==========

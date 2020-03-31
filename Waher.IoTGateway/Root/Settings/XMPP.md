@@ -2,7 +2,6 @@
 Description: Allows the user to configure XMPP settings.
 Date: 2018-05-10
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js

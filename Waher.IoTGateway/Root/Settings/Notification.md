@@ -2,7 +2,6 @@
 Description: Allows the user to configure notification settings.
 Date: 2019-01-12
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Notification.js

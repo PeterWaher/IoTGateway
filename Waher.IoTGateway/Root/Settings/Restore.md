@@ -2,7 +2,6 @@
 Description: Allows the user to restore the contents of a backup.
 Date: 2018-09-14
 Author: Peter Waher
-Copyright: /Copyright.md
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js

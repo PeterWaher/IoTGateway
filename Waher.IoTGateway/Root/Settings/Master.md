@@ -1,8 +1,8 @@
 Title: IoT Gateway Setup
-Description: Main menu durin setup
+Description: Main menu during setup
 Date: 2018-06-02
 Author: Peter Waher
-Copyright: ..\Copyright.md
+Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
 
 <header>

@@ -15,53 +15,6 @@
     font-weight: bold;
 }
 
-.error
-{
-    font-weight: bold;
-    color: red;
-}
-
-.posButton 
-{
-	background-color:#4CAF50;
-}
-
-.posButtonPressed
-{
-	background-color:rgb(160,200,160);
-	box-shadow: 0.1em 0.1em 0.1em #999;
-}
-
-.negButton 
-{
-	background-color:rgb(216,49,52);
-}
-
-.posButtonSm
-{
-	padding:0.75em 0.25em 0.75em 0.25em;
-	line-height:0.2em;
-	background-color:#4CAF50;
-	width:7em;
-}
-
-.posButtonSmPressed
-{
-	padding:0.75em 0.25em 0.75em 0.25em;
-	line-height:0.2em;
-	width:7em;
-	background-color:rgb(160,200,160);
-	box-shadow: 0.1em 0.1em 0.1em #999;
-}
-
-.negButtonSm
-{
-	padding:0.75em 0.25em 0.75em 0.25em;
-	line-height:0.2em;
-	background-color:rgb(216,49,52);
-	width:7em;
-}
-
 .themes
 {
 }

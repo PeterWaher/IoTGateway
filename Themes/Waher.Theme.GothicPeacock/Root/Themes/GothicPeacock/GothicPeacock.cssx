@@ -16,6 +16,7 @@ body
     width:100%;
     height:100%;
     position:relative;
+    margin:0;
     color:¤TextColor¤;
 }
 
@@ -55,6 +56,7 @@ nav > ul
     padding: 0;
     overflow: hidden;
     background-color: rgba(0,0,0,0.5);
+	display:flex;
 }
 
 nav > ul > li
@@ -62,16 +64,50 @@ nav > ul > li
     float: left;
     border-left: 1px solid rgba(255,255,255,0.7);
     background-clip: content-box;
+	white-space:nowrap;
+	transition: opacity 0.25s ease-out;
+	color:white;
+	opacity:0;
+}
+
+header:hover > nav > ul > li
+{
+	opacity:1;
 }
 
 nav > ul > li:nth-last-of-type(1)
 {
     float: right;
+	order:4;
 }
 
 nav > ul > li:nth-last-of-type(2)
 {
     float: right;
+	order:5;
+}
+
+nav > ul > li:nth-last-of-type(3)
+{
+    float: right;
+	order:6;
+}
+
+nav > ul > li:nth-last-of-type(4)
+{
+	text-align:center;
+    display: block;
+    padding: 0.9em 1em;
+	flex-basis:100%;
+	display:inline-block;
+	font-weight:bold;
+	opacity:1;
+	border-left:0;
+}
+
+nav > ul > li:nth-last-of-type(5)
+{
+    border-right: 1px solid rgba(255,255,255,0.7);
 }
 
 nav > ul > li:first-child
@@ -82,15 +118,20 @@ nav > ul > li:first-child
 nav > ul > li > a
 {
     display: block;
-    color: ¤MenuTextColor¤;
     text-align: center;
     padding: 0.9em 1em;
     text-decoration: none;
+    color: ¤MenuTextColor¤;
 }
 
 nav > ul > li > a:hover
 {
     background-color: rgba(0,0,0,0.5);
+}
+
+header:hover > nav > ul > li.active
+{
+    background-color: ¤ButtonColor¤;
 }
 
 nav > ul > li > ul
@@ -456,6 +497,12 @@ img.aloneUnsized
 	image-orientation:from-image;
 }
 
+figure
+{
+	display:inline-block;
+	text-align:center;
+}
+
 figure img
 {
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
@@ -565,11 +612,22 @@ li.taskListItem
     text-indent: -1.5em;
 }
 
-label.taskListItemLabel > input[type='checkbox']
+li.taskListItem > input[type='checkbox']
 {
     display:inline;
     width:1.5em;
     box-shadow:0px 0px 0px #000;
+}
+
+li.taskListItem > input[type='checkbox'][data-editable='1']
+{
+    cursor:pointer;
+}
+
+input[type='checkbox']:checked ~ label.taskListItemLabel
+{
+    color:¤Blend(BackgroundColor,TextColor,0.35)¤;
+    text-decoration:line-through;
 }
 
 dl
@@ -714,7 +772,7 @@ div.footnotes > hr
 .footnotes
 {
     margin: 2em -6% 0 -6%;
-    padding: 0.5em 0em 0.5em 0em;
+    padding: 0.5em 6% 0.5em 6%;       /* 0.5em 0em 0.5em 0em */
     background:#eee;
     background: -webkit-linear-gradient(#555, #eee 10%);
     background: -o-linear-gradient(#555, #eee 10%);
@@ -939,4 +997,54 @@ fieldset > legend
 	padding: 0.25em 1em 0.25em 1em;
 	border-radius:0.7em;
 	background-color:¤HeaderColor¤;
+}
+
+.posButton 
+{
+	background-color:¤PosColor¤;
+}
+
+.posButtonPressed
+{
+	background-color:¤PosSelectedColor¤;
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+}
+
+.negButton 
+{
+	background-color:¤NegColor¤;
+}
+
+.posButtonSm
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	background-color:¤PosColor¤;
+	width:7em;
+}
+
+.posButtonSmPressed
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	width:7em;
+	background-color:¤PosSelectedColor¤;
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+}
+
+.negButtonSm
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	background-color:¤NegColor¤;
+	width:7em;
+}
+
+.error 
+{
+	color:red;
+	font-weight:bold;
+	padding:1em;
+    border:0.1em solid ¤HeaderColor¤;
+	background-color: ¤Blend(BackgroundColor,"Red",0.075)¤;
 }

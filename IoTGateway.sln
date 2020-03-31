@@ -404,9 +404,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.UWP", "Net
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.DTLS.UWP", "Security\Waher.Security.DTLS.UWP\Waher.Security.DTLS.UWP.csproj", "{8B4C7493-0CC3-40C1-926B-00915DCD0BA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Text", "Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj", "{7289981D-1CFC-4428-80DB-64C098AD5D94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Text", "Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj", "{7289981D-1CFC-4428-80DB-64C098AD5D94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Text.Test", "Runtime\Waher.Runtime.Text.Test\Waher.Runtime.Text.Test.csproj", "{1195B262-BA07-48D6-AD47-A27A3284FA17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Text.Test", "Runtime\Waher.Runtime.Text.Test\Waher.Runtime.Text.Test.csproj", "{1195B262-BA07-48D6-AD47-A27A3284FA17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2653,7 +2653,6 @@ Global
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|x64.ActiveCfg = Debug|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|x86.ActiveCfg = Debug|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Debug|x86.Build.0 = Debug|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Any CPU.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM64.ActiveCfg = Release|x86
@@ -2667,7 +2666,6 @@ Global
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x64.ActiveCfg = Debug|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x86.ActiveCfg = Debug|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|x86.Build.0 = Debug|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Any CPU.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM64.ActiveCfg = Release|x86

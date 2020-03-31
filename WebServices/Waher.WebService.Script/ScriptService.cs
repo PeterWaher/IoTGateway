@@ -160,6 +160,9 @@ namespace Waher.WebService.Script
                         this.SendResponse(Variables, e.Preview, null, Response2, true);
                 };
 
+                Log.Notice("Script evaluated:\r\n\r\n" + s, this.ResourceName, User.UserName, "ScriptEval",
+                    new KeyValuePair<string, object>("RemoteEndPoint", Request.RemoteEndPoint));
+
                 Task.Run(() =>
                 {
                     try

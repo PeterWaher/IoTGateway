@@ -210,7 +210,7 @@ namespace Waher.Security.ACME
 				{
 					Uri Location = this.authorizationUris[i];
 					Result[i] = new AcmeAuthorization(this.Client, this.AccountLocation, Location, 
-						(await this.Client.GET(Location)).Payload);
+						(await this.Client.POST_as_GET(Location, this.AccountLocation)).Payload);
 				}
 
 				this.authorizations = Result;

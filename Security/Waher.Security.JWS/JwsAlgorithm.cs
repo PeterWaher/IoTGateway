@@ -83,7 +83,7 @@ namespace Waher.Security.JWS
 			byte[] HeaderBin = Encoding.UTF8.GetBytes(HeaderJson);
 			HeaderString = Base64Url.Encode(HeaderBin);
 
-			string PayloadJson = JSON.Encode(Payload, null);
+			string PayloadJson = Payload is null ? string.Empty : JSON.Encode(Payload, null);
 			byte[] PayloadBin = Encoding.UTF8.GetBytes(PayloadJson);
 			PayloadString = Base64Url.Encode(PayloadBin);
 

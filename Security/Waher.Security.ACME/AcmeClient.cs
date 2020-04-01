@@ -106,6 +106,11 @@ namespace Waher.Security.ACME
 			return this.directory;
 		}
 
+		internal Task<AcmeResponse> POST_as_GET(Uri URL, Uri AccountLocation)
+		{
+			return this.POST(URL, AccountLocation, null);
+		}
+
 		internal async Task<AcmeResponse> GET(Uri URL)
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
@@ -575,7 +580,7 @@ namespace Waher.Security.ACME
 		/// <returns>ACME order object.</returns>
 		public async Task<AcmeOrder> GetOrder(Uri AccountLocation, Uri OrderLocation)
 		{
-			AcmeResponse Response = await this.GET(OrderLocation);
+			AcmeResponse Response = await this.POST_as_GET(OrderLocation, AccountLocation);
 			return new AcmeOrder(this, AccountLocation, OrderLocation, Response.Payload, Response.ResponseMessage);
 		}
 
@@ -599,7 +604,7 @@ namespace Waher.Security.ACME
 		/// <returns>ACME authorization object.</returns>
 		public async Task<AcmeAuthorization> GetAuthorization(Uri AccountLocation, Uri AuthorizationLocation)
 		{
-			AcmeResponse Response = await this.GET(AuthorizationLocation);
+			AcmeResponse Response = await this.POST_as_GET(AuthorizationLocation, AccountLocation);
 			return new AcmeAuthorization(this, AccountLocation, AuthorizationLocation, Response.Payload);
 		}
 

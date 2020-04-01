@@ -246,7 +246,7 @@ namespace Waher.Security.ACME
 			if (this.certificate is null)
 				throw new Exception("No certificate URI available.");
 
-			return this.Client.DownloadCertificate(this.certificate);
+			return this.Client.DownloadCertificate(this.AccountLocation, this.certificate);
 		}
 	}
 }

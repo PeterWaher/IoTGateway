@@ -115,7 +115,6 @@ namespace Waher.Security.ACME
 		{
 			HttpResponseMessage Response = await this.httpClient.GetAsync(URL);
 
-			Stream Stream = await Response.Content.ReadAsStreamAsync();
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string CharSet = Response.Content.Headers.ContentType?.CharSet;
 			Encoding Encoding;
@@ -130,7 +129,7 @@ namespace Waher.Security.ACME
 			if (!(JSON.Parse(JsonResponse) is IEnumerable<KeyValuePair<string, object>> Obj))
 				throw new Exception("Unexpected response returned.");
 
-			if (Response.Content.Headers.TryGetValues("Retry-After", out IEnumerable<string> Values))
+			if (Response.Content.Headers.TryGetValues("Retry-After", out IEnumerable<string> _))
 			{
 				// TODO: Rate limit
 			}
@@ -196,7 +195,7 @@ namespace Waher.Security.ACME
 			public string Json;
 		}
 
-		internal async Task<AcmeResponse> POST(Uri URL, Uri KeyID, params KeyValuePair<string, object>[] Payload)
+		private async Task<HttpResponseMessage> HttpPost(Uri URL, Uri KeyID, string Accept, params KeyValuePair<string, object>[] Payload)
 		{
 			string HeaderString;
 			string PayloadString;
@@ -229,15 +228,24 @@ namespace Waher.Security.ACME
 
 			HttpContent Content = new ByteArrayContent(System.Text.Encoding.ASCII.GetBytes(Json));
 			Content.Headers.Add("Content-Type", JwsAlgorithm.JwsContentType);
+
+			if (!string.IsNullOrEmpty(Accept))
+				Content.Headers.TryAddWithoutValidation("Accept", Accept);
+
 			HttpResponseMessage Response = await this.httpClient.PostAsync(URL, Content);
 
 			this.GetNextNonce(Response);
 
-			Stream Stream = await Response.Content.ReadAsStreamAsync();
+			return Response;
+		}
+
+		internal async Task<AcmeResponse> POST(Uri URL, Uri KeyID, params KeyValuePair<string, object>[] Payload)
+		{
+			HttpResponseMessage Response = await this.HttpPost(URL, KeyID, null, Payload);
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string CharSet = Response.Content.Headers.ContentType?.CharSet;
 			Encoding Encoding;
-
+			
 			if (string.IsNullOrEmpty(CharSet))
 				Encoding = Encoding.UTF8;
 			else
@@ -592,8 +600,8 @@ namespace Waher.Security.ACME
 		/// <returns>ACME order object.</returns>
 		public async Task<AcmeOrder[]> GetOrders(Uri AccountLocation, Uri OrdersLocation)
 		{
-			AcmeResponse Response = await this.GET(OrdersLocation);
-			return null;
+			AcmeResponse _ = await this.GET(OrdersLocation);
+			throw new NotImplementedException("Method not implemented.");
 		}
 
 		/// <summary>
@@ -709,17 +717,15 @@ namespace Waher.Security.ACME
 		/// <summary>
 		/// Downloads a certificate.
 		/// </summary>
+		/// <param name="AccountLocation">Account location.</param>
 		/// <param name="CertificateLocation">URI of certificate.</param>
 		/// <returns>Certificate chain.</returns>
-		public async Task<X509Certificate2[]> DownloadCertificate(Uri CertificateLocation)
+		public async Task<X509Certificate2[]> DownloadCertificate(Uri AccountLocation, Uri CertificateLocation)
 		{
-			HttpRequestMessage Request = new HttpRequestMessage(HttpMethod.Get, CertificateLocation);
 			string ContentType = PemDecoder.ContentType;
-			Request.Headers.TryAddWithoutValidation("Accept", ContentType);
-			HttpResponseMessage Response = await this.httpClient.SendAsync(Request);
+			HttpResponseMessage Response = await this.HttpPost(CertificateLocation, AccountLocation, ContentType, null);
 			Response.EnsureSuccessStatusCode();
 
-			Stream Stream = await Response.Content.ReadAsStreamAsync();
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 
 			if (Response.Headers.TryGetValues("Content-Type", out IEnumerable<string> Values))

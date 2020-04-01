@@ -14,7 +14,7 @@ namespace Waher.Security.ACME.Test
 		private AcmeClient client;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize();
 		}
@@ -278,7 +278,7 @@ namespace Waher.Security.ACME.Test
 			{
 				foreach (AcmeChallenge Challenge in Authorization.Challenges)
 				{
-					if (Challenge is AcmeHttpChallenge HttpChallenge)
+					if (Challenge is AcmeHttpChallenge)
 					{
 						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
 
@@ -306,7 +306,7 @@ namespace Waher.Security.ACME.Test
 			{
 				foreach (AcmeChallenge Challenge in Authorization.Challenges)
 				{
-					if (Challenge is AcmeDnsChallenge DnsChallenge)
+					if (Challenge is AcmeDnsChallenge)
 					{
 						AcmeChallenge Challenge2 = await Challenge.AcknowledgeChallenge();
 
@@ -330,7 +330,7 @@ namespace Waher.Security.ACME.Test
 			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
 			{
 				AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
-				Order = await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
+				await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 				{
 					//Country = "SE",
 					//StateOrProvince = "Stockholm",
@@ -353,7 +353,7 @@ namespace Waher.Security.ACME.Test
 		public async Task ACME_Test_90_DeactivateAccount()
 		{
 			AcmeAccount Account = await this.client.GetAccount();
-			Account = await Account.Deactivate();
+			await Account.Deactivate();
 		}
 
 	}

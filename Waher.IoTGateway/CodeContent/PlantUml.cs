@@ -73,7 +73,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			jarPath = JarPath;
 			javaPath = JavaPath;
-			plantUmlFolder = System.IO.Path.Combine(Gateway.RootFolder, "PlantUML");
+			plantUmlFolder = Path.Combine(Gateway.RootFolder, "PlantUML");
 
 			if (!Directory.Exists(plantUmlFolder))
 				Directory.CreateDirectory(plantUmlFolder);
@@ -115,122 +115,14 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="JavaPath">Path to Java VM.</param>
 		public static void SearchForInstallationFolder(out string JarPath, out string JavaPath)
 		{
-			JarPath = string.Empty;
-			JavaPath = string.Empty;
-
-			SearchForInstallationFolder(Environment.SpecialFolder.ProgramFilesX86, ref JarPath, ref JavaPath);
-			if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
-			{
-				SearchForInstallationFolder(Environment.SpecialFolder.ProgramFiles, ref JarPath, ref JavaPath);
-				if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
+			string[] Folders = Gateway.GetFolders(new Environment.SpecialFolder[]
 				{
-					SearchForInstallationFolder(Environment.SpecialFolder.Programs, ref JarPath, ref JavaPath);
-					if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
-					{
-						SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFilesX86, ref JarPath, ref JavaPath);
-						if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
-						{
-							SearchForInstallationFolder(Environment.SpecialFolder.CommonProgramFiles, ref JarPath, ref JavaPath);
-							if (string.IsNullOrEmpty(JarPath) || string.IsNullOrEmpty(javaPath))
-								SearchForInstallationFolder(Environment.SpecialFolder.CommonPrograms, ref JarPath, ref JavaPath);
-						}
-					}
-				}
-			}
-		}
+					Environment.SpecialFolder.ProgramFiles,
+					Environment.SpecialFolder.ProgramFilesX86
+				});
 
-		private static void SearchForInstallationFolder(Environment.SpecialFolder SpecialFolder, ref string JarPath, ref string JavaPath)
-		{
-			string Folder;
-
-			try
-			{
-				Folder = Environment.GetFolderPath(SpecialFolder);
-			}
-			catch (Exception)
-			{
-				return;	// Folder not defined for the operating system.
-			}
-
-			if (String.IsNullOrEmpty(Folder))
-				return;
-
-			if (!Directory.Exists(Folder))
-				return;
-
-			DateTime JarTP;
-			DateTime JavaTP;
-			DateTime TP = DateTime.MinValue;
-			string FolderName;
-			string[] Files;
-			string[] SubFolders;
-
-			if (string.IsNullOrEmpty(JarPath))
-				JarTP = DateTime.MinValue;
-			else
-				JarTP = File.GetCreationTimeUtc(JarPath);
-
-			if (string.IsNullOrEmpty(JavaPath))
-				JavaTP = DateTime.MinValue;
-			else
-				JavaTP = File.GetCreationTimeUtc(JavaPath);
-
-			try
-			{
-				SubFolders = Directory.GetDirectories(Folder);
-			}
-			catch (UnauthorizedAccessException)
-			{
-				return;
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return;
-			}
-
-			foreach (string SubFolder in SubFolders)
-			{
-				try
-				{
-					FolderName = Path.GetFileName(SubFolder);
-					if (FolderName.ToLower() == "java")
-					{
-						Files = Directory.GetFiles(SubFolder, "java.exe", SearchOption.AllDirectories);
-
-						foreach (string FilePath in Files)
-						{
-							TP = File.GetCreationTimeUtc(FilePath);
-							if (TP > JavaTP)
-							{
-								JavaTP = TP;
-								JavaPath = FilePath;
-							}
-						}
-					}
-					else
-					{
-						Files = Directory.GetFiles(SubFolder, "plantuml.jar");
-						if (Files.Length == 1)
-						{
-							TP = File.GetCreationTimeUtc(Files[0]);
-							if (TP > JarTP)
-							{
-								JarTP = TP;
-								JarPath = Files[0];
-							}
-						}
-					}
-				}
-				catch (UnauthorizedAccessException)
-				{
-					continue;
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+			JarPath = Gateway.FindLatestFile(Folders, "plantuml.jar", 1);
+			JavaPath = Gateway.FindLatestFile(Folders, "java.exe", 3);
 		}
 
 		/// <summary>

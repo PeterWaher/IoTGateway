@@ -437,7 +437,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
+			this.GetFileName(Language, Rows, out string Title, out string _, out string _);
 			Output.AppendLine(Title);
 
 			return true;
@@ -456,7 +456,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
+			string FileName = this.GetFileName(Language, Rows, out string Title, out string _, out string _);
 			if (FileName is null)
 				return false;
 

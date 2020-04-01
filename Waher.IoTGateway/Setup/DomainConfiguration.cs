@@ -969,57 +969,15 @@ namespace Waher.IoTGateway.Setup
 
 							if (string.IsNullOrEmpty(this.openSslPath) || !File.Exists(this.openSslPath))
 							{
-								Files = GetFiles(new string(Path.DirectorySeparatorChar, 1), "openssl.exe");
-								if (Files is null)
-								{
-									List<string> Files2 = new List<string>();
-
-									Files = GetFiles(Environment.SpecialFolder.ProgramFiles, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.CommonProgramFilesX86, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.Programs, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.System, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.SystemX86, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.Windows, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.CommonProgramFiles, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.CommonProgramFilesX86, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Environment.SpecialFolder.CommonPrograms, "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Path.DirectorySeparatorChar + "OpenSSL-Win32", "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = GetFiles(Path.DirectorySeparatorChar + "OpenSSL-Win64", "openssl.exe");
-									if (Files != null)
-										Files2.AddRange(Files);
-
-									Files = Files2.ToArray();
-								}
+								string[] Folders = Gateway.GetFolders(new Environment.SpecialFolder[]
+									{
+										Environment.SpecialFolder.ProgramFiles,
+										Environment.SpecialFolder.ProgramFilesX86
+									},
+									Path.DirectorySeparatorChar + "OpenSSL-Win32",
+									Path.DirectorySeparatorChar + "OpenSSL-Win64");
+								
+								Files = Gateway.FindFiles(Folders, "openssl.exe", 2, int.MaxValue);
 							}
 							else
 								Files = new string[] { this.openSslPath };
@@ -1159,30 +1117,6 @@ namespace Waher.IoTGateway.Setup
 			finally
 			{
 				this.inProgress = false;
-			}
-		}
-
-		private static string[] GetFiles(Environment.SpecialFolder Path, string Pattern)
-		{
-			try
-			{
-				return GetFiles(Environment.GetFolderPath(Path), Pattern);
-			}
-			catch (Exception)
-			{
-				return null;
-			}
-		}
-
-		private static string[] GetFiles(string Path, string Pattern)
-		{
-			try
-			{
-				return Directory.GetFiles(Path, Pattern, SearchOption.AllDirectories);
-			}
-			catch (Exception)
-			{
-				return null;
 			}
 		}
 

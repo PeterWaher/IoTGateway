@@ -506,6 +506,8 @@ figure
 figure img
 {
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+    max-width:100%;
+    height:auto;
 }
 
 figure figcaption

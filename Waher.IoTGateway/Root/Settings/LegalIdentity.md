@@ -20,7 +20,7 @@ By assigning a legal identity to **{{Waher.IoTGateway.Gateway.ApplicationName}}*
 types of information. Third parties with access to such signatures have a secure manner to validate them, and the legal identities behind the 
 signatures.
 
-You can apply for a legal identity below. The informatiuon is sent to your broker operator (i.e. *Trust Provider*) for approval. Depending
+You can apply for a legal identity below. The information is sent to your broker operator (i.e. *Trust Provider*) for approval. Depending
 on which approval procedure used, you might have to take additional steps before the identity can be approved. Contact your Trust Provider for
 more information about their approval procedure.
 

@@ -462,6 +462,6 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Event raised when list of group suggestions is populated.
 		/// </summary>
-		public static SuggesstionsEventHandler OnGetGroupSuggestions = null;
+		public static event SuggesstionsEventHandler OnGetGroupSuggestions = null;
 	}
 }

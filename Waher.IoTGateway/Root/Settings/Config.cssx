@@ -57,3 +57,150 @@
     text-align: center;
     padding: 10px 20px;
 }
+
+div.addGroup
+{
+	margin-top:1em;
+}
+
+div.tags + div.addGroup
+{
+	margin-top:0;
+}
+
+div.addGroupForm 
+{
+	float:left;
+	margin-right:1em;
+}
+
+div.addGroupForm input
+{
+	width:20em;	
+}
+
+ul.GroupList 
+{
+	list-style-type:none;
+	display:inline;
+    padding:0;
+}
+
+div.GroupList > br
+{
+    line-height:1.5em;
+}
+
+ul.GroupList > li:last-child
+{
+	float:right;
+	border:none;
+	width:100%;
+	cursor:default;
+	height:0.2em;
+}
+
+li.Group
+{
+	display:block;
+    float: left;
+    border: 0px;
+	background-color: ¤RestrictionColor¤;
+    color: white;
+	padding:0.2em 0.5em;
+	border-radius: 5px;
+    margin: 0.2em 0.2em;
+	cursor: pointer;
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+}
+
+li.GroupLink
+{
+	display:block;
+    float: left;
+    border: 0px;
+	background-color: ¤RestrictionColor¤;
+    color: white;
+	padding:0.2em 0.5em;
+	border-radius: 5px;
+    margin: 0.2em 0.2em;
+	cursor: pointer;
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+}
+
+li.Group:not(:hover)::after
+{
+    content: "\2713";
+    padding-left: 0.5em;
+}
+
+li.Group:active
+{
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+	background-color:¤NegColor¤;
+}
+
+li.GroupLink:active
+{
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+}
+
+li.Group:hover::after
+{
+    content: "×";
+    padding-left: 0.5em;
+}
+
+li.Group:hover:not(:active)
+{
+    box-shadow: 0.5em 0.5em 0.5em rgba(0,0,0,0.5);
+	background-color:¤NegColor¤;
+}
+
+li.GroupLink:hover:not(:active)
+{
+    box-shadow: 0.5em 0.5em 0.5em rgba(0,0,0,0.5);
+}
+
+div.TagContainer
+{
+	vertical-align:middle;
+}
+
+div.EndOfTags
+{
+	clear:both;
+}
+
+ul.suggestionDropDownHidden
+{
+	display:none;
+}
+
+ul.suggestionDropDown
+{
+	display:block;
+    border: 2px solid ¤PosColor¤;
+    border-radius: 4px;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+	margin-top:0;
+	list-style-type:none;
+	list-style-position:outside;
+}
+
+ul.suggestionDropDown > li
+{
+	cursor:pointer;
+	padding:0.25em 0.25em 0.25em 1em;
+	display:block;
+	margin-left:-2.5em;
+}
+
+ul.suggestionDropDown > li:hover
+{
+    background-color: rgba(0,0,0,0.1);
+}

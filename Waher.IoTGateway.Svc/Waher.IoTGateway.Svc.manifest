@@ -478,6 +478,8 @@
       <Content fileName='PersonalData.md'/>
       <Content fileName='Restore.js'/>
       <Content fileName='Restore.md'/>
+      <Content fileName="Roster.js"/>
+      <Content fileName="Roster.md"/>
       <Content fileName='Theme.js'/>
       <Content fileName='Theme.md'/>
       <Content fileName='XMPP.js'/>

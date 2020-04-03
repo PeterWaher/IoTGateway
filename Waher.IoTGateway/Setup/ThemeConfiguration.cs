@@ -19,8 +19,8 @@ namespace Waher.IoTGateway.Setup
 	/// </summary>
 	public class ThemeConfiguration : SystemMultiStepConfiguration
 	{
+		private readonly static Dictionary<string, ThemeDefinition> themeDefinitions = new Dictionary<string, ThemeDefinition>();
 		private static ThemeConfiguration instance = null;
-		private static Dictionary<string, ThemeDefinition> themeDefinitions = new Dictionary<string, ThemeDefinition>();
 		private HttpResource setTheme = null;
 
 		private string themeId = string.Empty;

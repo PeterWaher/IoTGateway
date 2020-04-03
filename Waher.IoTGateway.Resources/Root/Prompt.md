@@ -8,12 +8,12 @@ Parameter: Expression
 UserVariable: User
 Login: /Login.md
 
-Script calculator
+Script prompt
 =============================
 
-Below, you can enter script and ask the server to evaluate it, to test script syntax. You can also review the [script reference page](Script.md)
-for more information about script syntax. Press `ENTER` evaluate the script you're writing. Press `SHIFT`+`ENTER` to add a newline to the script
-you're editing. The script editor accepts `TAB` characters.
+Below, you can enter script and ask the server to evaluate it. You can review the [script reference page](Script.md) for more information about 
+script syntax. Press `ENTER` evaluate the script you're writing. Press `SHIFT`+`ENTER` to add a newline to the script you're editing. The script 
+editor accepts `TAB` characters.
 
 Script:  
 <textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">{Expression}</textarea>

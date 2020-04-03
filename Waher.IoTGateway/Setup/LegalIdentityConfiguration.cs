@@ -295,9 +295,10 @@ namespace Waher.IoTGateway.Setup
 
 		private void AddHandlers()
 		{
-			if (!this.handlersAdded)
+			if (!this.handlersAdded || Gateway.ContractsClient != this.prevClient)
 			{
 				this.handlersAdded = true;
+				this.prevClient = Gateway.ContractsClient;
 
 				Gateway.XmppClient.OnStateChanged += XmppClient_OnStateChanged;
 
@@ -313,6 +314,7 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		private bool handlersAdded = false;
+		private ContractsClient prevClient = null;
 
 		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{

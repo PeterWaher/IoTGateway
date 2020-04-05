@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Runtime.Language;
+using Waher.Script;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -98,22 +102,65 @@ namespace Waher.IoTGateway.Setup
 
 		private void XmppClient_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			// TODO
+			RosterItem Item = Gateway.XmppClient[e.FromBareJID];
+			if (!(Item is null))
+				this.XmppClient_OnRosterItemUpdated(Sender, Item);
 		}
 
 		private void XmppClient_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
-			// TODO
+			string[] TabIDs = this.GetTabIDs();
+			if (TabIDs.Length > 0)
+			{
+				string Json = JSON.Encode(new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("bareJid", Item.BareJid),
+					new KeyValuePair<string, object>("html", this.RosterItemsHtml(Item))
+				}, false);
+
+				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
+			}
 		}
 
 		private void XmppClient_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
-			// TODO
+			string[] TabIDs = this.GetTabIDs();
+			if (TabIDs.Length > 0)
+			{
+				string Json = JSON.Encode(new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("bareJid", Item.BareJid)
+				}, false);
+
+				ClientEvents.PushEvent(TabIDs, "RemoveRosterItem", Json, true, "User");
+			}
 		}
 
 		private void XmppClient_OnRosterItemAdded(object Sender, RosterItem Item)
 		{
-			// TODO
+			this.XmppClient_OnRosterItemUpdated(Sender, Item);
+		}
+
+		private string[] GetTabIDs()
+		{
+			if (Gateway.Configuring)
+				return ClientEvents.GetTabIDs();
+			else
+				return ClientEvents.GetTabIDsForLocation("/Settings/Roster.md");
+		}
+
+		private string RosterItemsHtml(params RosterItem[] Contacts)
+		{
+			string FileName = Path.Combine(Gateway.RootFolder, "Settings", "RosterItems.md");
+			string Markdown = File.ReadAllText(FileName);
+			Variables v = new Variables(new Variable("Contacts", Contacts));
+			MarkdownSettings Settings = new MarkdownSettings(Gateway.Emoji1_24x24, true, v);
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FileName, string.Empty, string.Empty);
+			string Html= Doc.GenerateHTML();
+
+			Html = HtmlDocument.GetBody(Html);
+
+			return Html;
 		}
 
 		/// <summary>

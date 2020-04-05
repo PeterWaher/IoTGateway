@@ -1320,6 +1320,7 @@
 								<File Id='Restore.md' Name='Restore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.md'/>
                 <File Id='Roster.js' Name='Roster.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.js'/>
                 <File Id='Roster.md' Name='Roster.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.md'/>
+                <File Id='RosterItems.md' Name='RosterItems.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\RosterItems.md'/>
                 <File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
                 <File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
@@ -1345,6 +1346,7 @@
 								<RemoveFile Id='RemoveRestore.md' Name='Restore.md' On='uninstall'/>
                 <RemoveFile Id='RemoveRoster.js' Name='Roster.js' On='uninstall'/>
                 <RemoveFile Id='RemoveRoster.md' Name='Roster.md' On='uninstall'/>
+                <RemoveFile Id='RemoveRosterItems.md' Name='RosterItems.md' On='uninstall'/>
                 <RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
                 <RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>

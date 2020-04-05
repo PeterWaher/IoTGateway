@@ -633,3 +633,36 @@ function OpenGroup(Group)
 	var Window = window.open("/Settings/Roster.md?Group=" + encodeURI(Group), "_blank");
 	Window.focus();
 }
+
+function RemoveRosterItem(Data)
+{
+	var tr = FindContactRow(Data.bareJid);
+	if (tr)
+		tr.parentNode.removeChild(tr);
+}
+
+function UpdateRosterItem(Data)
+{
+	var Loop;
+	var Contacts = FindRosterTable();
+	var tr = FindBareJidRow(Contacts, Data.bareJid);
+
+	var Table = document.createElement("TABLE");
+	var TBody = document.createElement("TBODY");
+	Table.appendChild(TBody);
+
+	TBody.innerHTML = Data.html;
+
+	while ((Loop = TBody.firstChild) !== null)
+	{
+		TBody.removeChild(Loop);
+
+		if (tr)
+			Contacts.insertBefore(Loop, tr);
+		else
+			Contacts.appendChild(Loop);
+	}
+
+	if (tr)
+		Contacts.removeChild(tr);
+}

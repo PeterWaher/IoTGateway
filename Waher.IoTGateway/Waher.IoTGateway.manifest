@@ -29,6 +29,7 @@
       <Content fileName="Restore.md"/>
       <Content fileName="Roster.js"/>
       <Content fileName="Roster.md"/>
+      <Content fileName="RosterItems.md"/>
       <Content fileName="Theme.js"/>
       <Content fileName="Theme.md"/>
       <Content fileName="XMPP.js"/>

@@ -207,5 +207,11 @@ namespace Waher.Persistence
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
 		IPersistentDictionary GetDictionary(string Collection);
+
+		/// <summary>
+		/// Gets an array of available collection.s
+		/// </summary>
+		/// <returns>Array of collections.</returns>
+		Task<string[]> GetCollections();
 	}
 }

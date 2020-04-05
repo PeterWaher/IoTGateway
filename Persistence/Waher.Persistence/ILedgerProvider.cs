@@ -59,5 +59,11 @@ namespace Waher.Persistence
 		/// Persists any pending changes.
 		/// </summary>
 		Task Flush();
+
+		/// <summary>
+		/// Gets an array of available collection.s
+		/// </summary>
+		/// <returns>Array of collections.</returns>
+		Task<string[]> GetCollections();
 	}
 }

@@ -1254,6 +1254,23 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Gets an array of available collection.s
+		/// </summary>
+		/// <returns>Array of collections.</returns>
+		public Task<string[]> GetCollections()
+		{
+			string[] Result;
+
+			lock (this.files)
+			{
+				Result = new string[this.files.Count];
+				this.files.Keys.CopyTo(Result, 0);
+			}
+
+			return Task.FromResult<string[]>(Result);
+		}
+
 		#endregion
 
 		#region Objects

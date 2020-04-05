@@ -675,5 +675,14 @@ namespace Waher.Persistence
 			return Provider.GetDictionary(Collection);
 		}
 
+		/// <summary>
+		/// Gets an array of available collection.s
+		/// </summary>
+		/// <returns>Array of collections.</returns>
+		public static Task<string[]> GetCollections()
+		{
+			return Provider.GetCollections();
+		}
+
 	}
 }

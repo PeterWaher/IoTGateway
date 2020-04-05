@@ -1498,6 +1498,20 @@ namespace Waher.Persistence.MongoDB
 			return new StringDictionary(Collection, this);
 		}
 
+		/// <summary>
+		/// Gets an array of available collection.s
+		/// </summary>
+		/// <returns>Array of collections.</returns>
+		public async Task<string[]> GetCollections()
+		{
+			List<string> Collections = new List<string>();
+
+			foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
+				Collections.Add(CollectionName);
+
+			return Collections.ToArray();
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

@@ -78,8 +78,8 @@
 		</Folder>
 	</Folder>
 	<Folder name="Root">
+    <Content fileName="Admin.cssx"/>
     <Content fileName="Admin.md"/>
-    <Content fileName="Admin.js"/>
     <Content fileName="Emojis.md"/>
 		<Content fileName="Entities.md"/>
 		<Content fileName="Index.md"/>

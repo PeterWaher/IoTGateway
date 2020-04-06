@@ -434,8 +434,8 @@
     </Folder>
   </Folder>
   <Folder name="Root">
+    <Content fileName="Admin.cssx"/>
     <Content fileName="Admin.md"/>
-    <Content fileName="Admin.js"/>
     <Content fileName='Copyright.md'/>
     <Content fileName='Emojis.md'/>
     <Content fileName='Entities.md'/>

@@ -72,11 +72,11 @@ namespace Waher.Networking.XMPP
 	public class RosterItem
 	{
 		private readonly Dictionary<string, PresenceEventArgs> resources;
+		private readonly string bareJid;
 		private string[] groups;
 		private SubscriptionState state;
 		private PendingSubscription pendingSubscription;
 		private PresenceEventArgs lastPresence = null;
-		private string bareJid;
 		private string name;
 
 		/// <summary>
@@ -330,21 +330,29 @@ namespace Waher.Networking.XMPP
 			if (ToTest != null)
 			{
 				foreach (PresenceEventArgs e2 in ToTest)
-					Client.SendPing(e2.From, this.PingResult, new object[] { Client, e2 });
+				{
+					if (!e2.Testing)
+					{
+						e2.Testing = true;
+						Client.SendPing(e2.From, this.PingResult, new object[] { Client, e2 });
+					}
+				}
 			}
 		}
 
 		private void PingResult(object Sender, IqResultEventArgs e)
 		{
+			object[] P = (object[])e.State;
+			XmppClient Client = (XmppClient)P[0];
+			PresenceEventArgs e2 = (PresenceEventArgs)P[1];
+
+			e2.Testing = false;
+
 			if (e.Ok)
 				return;
 
 			if (e.ErrorElement != null && e.ErrorElement.LocalName == FeatureNotImplementedException.LocalName)
 				return;
-
-			object[] P = (object[])e.State;
-			XmppClient Client = (XmppClient)P[0];
-			PresenceEventArgs e2 = (PresenceEventArgs)P[1];
 
 			Client.Unavail(e2);
 		}

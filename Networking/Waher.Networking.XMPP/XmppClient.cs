@@ -241,6 +241,7 @@ namespace Waher.Networking.XMPP
 		private ServiceItemsDiscoveryEventArgs serverComponents = null;
 		private readonly SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
 		private readonly Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, PresenceEventArgs> subscriptionRequests = new Dictionary<string, PresenceEventArgs>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
 		private readonly List<IXmppExtension> extensions = new List<IXmppExtension>();
@@ -2283,6 +2284,11 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case PresenceType.Subscribe:
+					lock (this.subscriptionRequests)
+					{
+						this.subscriptionRequests[e.FromBareJID] = e;
+					}
+
 					this.Information("OnPresenceSubscribe()");
 					h = this.OnPresenceSubscribe;
 					break;
@@ -4133,6 +4139,41 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Received presence subscription requests.
+		/// </summary>
+		public PresenceEventArgs[] SubscriptionRequests
+		{
+			get
+			{
+				PresenceEventArgs[] Result;
+
+				lock (this.subscriptionRequests)
+				{
+					Result = new PresenceEventArgs[this.subscriptionRequests.Count];
+					this.subscriptionRequests.Values.CopyTo(Result, 0);
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Gets a presence subscription request
+		/// </summary>
+		/// <param name="BareJID">Bare JID of sender.</param>
+		/// <returns>Subscription request, if found, or null, if not available.</returns>
+		public PresenceEventArgs GetSubscriptionRequest(string BareJID)
+		{
+			lock (this.subscriptionRequests)
+			{
+				if (this.subscriptionRequests.TryGetValue(BareJID, out PresenceEventArgs SubscriptionRequest))
+					return SubscriptionRequest;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Event raised when presence is set. Allows custom presence XML to be inserted into presence stanza.
 		/// </summary>
 		public event CustomPresenceEventHandler CustomPresenceXml = null;
@@ -4297,10 +4338,27 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Generates custom XML for embedding a nickname, as defined in XEP-0172. Can be used with 
+		/// <see cref="RequestPresenceSubscription(string, string)"/> for instance, to inform the recipient of your
+		/// nickname, as well as your Bare JID.
+		/// </summary>
+		/// <param name="NickName">Nickname.</param>
+		/// <returns>Custom XML</returns>
+		public static string EmbedNickName(string NickName)
+		{
+			if (string.IsNullOrEmpty(NickName))
+				return string.Empty;
+			else
+				return "<nick xmlns='http://jabber.org/protocol/nick'>" + XML.Encode(NickName) + "</nick>";
+		}
+
+
+		/// <summary>
 		/// Requests subscription of presence information from a contact.
 		/// </summary>
 		/// <param name="BareJid">Bare JID of contact.</param>
-		/// <param name="CustomXml">Custom XML to include in the subscription request.</param>
+		/// <param name="CustomXml">Custom XML to include in the subscription request. Use with <see cref="EmbedNickName(string)"/> to
+		/// include a nickname in the presence subscription.</param>
 		public void RequestPresenceSubscription(string BareJid, string CustomXml)
 		{
 			RosterItem Item = this.GetRosterItem(BareJid);
@@ -4384,6 +4442,11 @@ namespace Waher.Networking.XMPP
 
 		internal void PresenceSubscriptionAccepted(string Id, string BareJid)
 		{
+			lock (this.subscriptionRequests)
+			{
+				this.subscriptionRequests.Remove(BareJid);
+			}
+
 			RosterItem Item = this.GetRosterItem(BareJid);
 			if (Item != null)
 			{
@@ -4417,6 +4480,11 @@ namespace Waher.Networking.XMPP
 
 		internal void PresenceSubscriptionDeclined(string Id, string BareJid)
 		{
+			lock (this.subscriptionRequests)
+			{
+				this.subscriptionRequests.Remove(BareJid);
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence to='");

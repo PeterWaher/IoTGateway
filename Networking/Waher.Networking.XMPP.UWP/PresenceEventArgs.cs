@@ -93,33 +93,34 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class PresenceEventArgs : EventArgs
 	{
-		private KeyValuePair<string, string>[] statuses;
-		private XmlElement presence;
+		private readonly KeyValuePair<string, string>[] statuses;
+		private readonly XmlElement presence;
 		private XmlElement content;
-		private XmlElement errorElement = null;
-		private ErrorType errorType = ErrorType.None;
-		private XmppException stanzaError = null;
-		private string errorText = string.Empty;
-		private XmppClient client;
-		private XmppComponent component;
-		private PresenceType type;
-		private Availability availability;
-		private DateTime received;
-		private string from;
-		private string fromBareJid;
-		private string to;
-		private string id;
-		private string status;
+		private readonly XmlElement errorElement = null;
+		private readonly ErrorType errorType = ErrorType.None;
+		private readonly XmppException stanzaError = null;
+		private readonly string errorText = string.Empty;
+		private readonly XmppClient client;
+		private readonly XmppComponent component;
+		private readonly PresenceType type;
+		private readonly Availability availability;
+		private readonly DateTime received;
+		private readonly string from;
+		private readonly string fromBareJid;
+		private readonly string to;
+		private readonly string id;
+		private readonly string status;
 		private readonly string entityCapabilityVersion = null;
 		private readonly string entityCapabilityNode = null;
 		private readonly string entityCapabilityHashFunction = null;
-		private int errorCode;
-		private sbyte priority;
-		private bool ok;
+		private readonly int errorCode;
+		private readonly sbyte priority;
+		private readonly bool ok;
 		private readonly bool hasEntityCapabilities = false;
-        private bool updateLastPresence = false;
+		private bool updateLastPresence = false;
+		private bool testing = false;
 
-        internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
+		internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
 			: this(Client, null, Presence)
 		{
 		}
@@ -357,19 +358,28 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmlElement Presence { get { return this.presence; } }
 
-        /// <summary>
-        /// If the <see cref="RosterItem.LastPresence"/> property should be updated with this presence, for the corresponding contact.
-        /// </summary>
-        public bool UpdateLastPresence
-        {
-            get { return this.updateLastPresence; }
-            set { this.updateLastPresence = value; }
-        }
+		/// <summary>
+		/// If the connection is being tested.
+		/// </summary>
+		internal bool Testing
+		{
+			get { return this.testing; }
+			set { this.testing = value; }
+		}
 
-        /// <summary>
-        /// If contact is online.
-        /// </summary>
-        public bool IsOnline
+		/// <summary>
+		/// If the <see cref="RosterItem.LastPresence"/> property should be updated with this presence, for the corresponding contact.
+		/// </summary>
+		public bool UpdateLastPresence
+		{
+			get { return this.updateLastPresence; }
+			set { this.updateLastPresence = value; }
+		}
+
+		/// <summary>
+		/// If contact is online.
+		/// </summary>
+		public bool IsOnline
 		{
 			get { return this.ok && this.availability != Availability.Offline; }
 		}
@@ -512,6 +522,29 @@ namespace Waher.Networking.XMPP
 			}
 			else
 				throw new Exception("Presence stanza is not a subscription or unsubscription.");
+		}
+
+		/// <summary>
+		/// NickName, if available, as defined in XEP-0172. Can be sent in presence subscription requests, as an informal way to
+		/// let the recipient know who the sender is. If not found, null is returned.
+		/// </summary>
+		public string NickName
+		{
+			get
+			{
+				string NickName = null;
+
+				foreach (XmlNode N in this.presence.ChildNodes)
+				{
+					if (N.LocalName == "nick" && N.NamespaceURI == "http://jabber.org/protocol/nick")   // XEP-0172
+					{
+						NickName = N.InnerText.Trim();
+						break;
+					}
+				}
+
+				return NickName;
+			}
 		}
 	}
 }

@@ -26,7 +26,7 @@ communicate directly with another. More detailed application-specific authorizat
 The *groups* are also implicitly managed by the broker, as they are part of the roster.
 
 Below, you can organize the roster, invite new contacts by sending presence subscriptions to them, revoke consents by removing their
-presence subscriptions, unsubscribe from contacts or remove them. You can also assign contacts to groups, Depending on available applications,
+presence subscriptions, unsubscribe from contacts or remove them. You can also assign contacts to groups, depending on available applications,
 these groups can provide a means for a more detailed authorization of access to available data.
 
 <form>

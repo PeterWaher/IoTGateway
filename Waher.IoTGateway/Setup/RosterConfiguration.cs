@@ -588,6 +588,13 @@ namespace Waher.IoTGateway.Setup
 				SubscriptionRequest.Accept();
 				Log.Informational("Accepting presence subscription request.", SubscriptionRequest.FromBareJID);
 				Response.Write("1");
+
+				if (Gateway.XmppClient.LastSetPresenceAvailability != Availability.Offline)
+				{
+					Gateway.XmppClient.SetPresence(
+						Gateway.XmppClient.LastSetPresenceAvailability, 
+						Gateway.XmppClient.LastSetPresenceCustomStatus);
+				}
 			}
 		}
 

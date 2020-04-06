@@ -997,6 +997,16 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Last availability set by the client when setting presence.
+		/// </summary>
+		public Availability LastSetPresenceAvailability => this.currentAvailability;
+
+		/// <summary>
+		/// Last custom status set by the client when setting presence.
+		/// </summary>
+		public KeyValuePair<string, string>[] LastSetPresenceCustomStatus => this.customPresenceStatus;
+
+		/// <summary>
 		/// Current state of connection.
 		/// </summary>
 		public XmppState State

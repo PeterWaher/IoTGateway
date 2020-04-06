@@ -457,6 +457,12 @@
             </summary>
             <returns>Task object</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetCollections">
+            <summary>
+            Gets an array of available collection.s
+            </summary>
+            <returns>Array of collections.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.

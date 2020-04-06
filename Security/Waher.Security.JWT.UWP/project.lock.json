@@ -2503,7 +2503,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5036,7 +5036,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7605,7 +7605,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10147,7 +10147,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12725,7 +12725,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15267,7 +15267,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17845,7 +17845,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.JWS/1.0.3": {
+      "Waher.Security.JWS/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27762,7 +27762,7 @@
       "path": "../Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Security.JWS/1.0.3": {
+    "Waher.Security.JWS/1.0.4": {
       "type": "project",
       "path": "../Waher.Security.JWS/Waher.Security.JWS.csproj",
       "msbuildProject": "../Waher.Security.JWS/Waher.Security.JWS.csproj"

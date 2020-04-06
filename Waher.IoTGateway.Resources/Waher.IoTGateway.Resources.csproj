@@ -97,6 +97,8 @@
     <None Remove="Highlight\styles\vs.css" />
     <None Remove="Highlight\styles\xcode.css" />
     <None Remove="Highlight\styles\zenburn.css" />
+    <None Remove="Root\Admin.cssx" />
+    <None Remove="Root\Admin.md" />
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.mp3" />
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.wav" />
     <None Remove="Root\Emojis.md" />
@@ -114,6 +116,7 @@
     <None Remove="Root\Prompt.md" />
     <None Remove="Root\Script.md" />
     <None Remove="Root\Smileys.md" />
+    <None Remove="Root\TargetBlank.js" />
     <None Remove="Root\Templates\Repeat.md" />
     <None Remove="Root\Video\small.3gp" />
     <None Remove="Root\Video\small.flv" />
@@ -356,6 +359,12 @@
     <Content Include="Highlight\styles\zenburn.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\Admin.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Admin.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Audio\glass_ping-Go445-1207030150.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -399,6 +408,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Smileys.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\TargetBlank.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Templates\Repeat.md">

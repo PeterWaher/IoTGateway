@@ -1238,8 +1238,8 @@
                 <RegistryValue Type='string' Name='RootDir' Value='[ROOTDIR]' Action='write'/>
               </RegistryKey>
               <RemoveFolder Id='RemoveRoot' On='uninstall' />
-							<File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js' KeyPath='yes'/>
-              <File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
+              <File Id='Admin.js' Name='Admin.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Admin.js' KeyPath='yes'/>
+              <File Id='Admin.md' Name='Admin.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Admin.md'/>
               <File Id='Copyright.md' Name='Copyright.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Copyright.md'/>
               <File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Emojis.md'/>
               <File Id='Entities.md' Name='Entities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Entities.md'/>
@@ -1248,12 +1248,15 @@
 							<File Id='Login.md' Name='Login.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md'/>
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
+							<File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
+              <File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
               <File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.js' />
               <File Id='SignatureRequest.md' Name='SignatureRequest.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.md' />
               <File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Smileys.md'/>
-							<RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
-              <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
+              <File Id='TargetBlank.md' Name='TargetBlank.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\TargetBlank.md'/>
+              <RemoveFile Id='RemoveAdmin.js' Name='Admin.js' On='uninstall'/>
+              <RemoveFile Id='RemoveAdmin.md' Name='Admin.md' On='uninstall'/>
               <RemoveFile Id='RemoveCopyright.md' Name='Copyright.md' On='uninstall'/>
               <RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
               <RemoveFile Id='RemoveEntities.md' Name='Entities.md' On='uninstall'/>
@@ -1262,10 +1265,13 @@
 							<RemoveFile Id='RemoveLogin.md' Name='Login.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
               <RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
+              <RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
+              <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
               <RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
               <RemoveFile Id='RemoveSignatureRequest.js' Name='SignatureRequest.js' On='uninstall'/>
               <RemoveFile Id='RemoveSignatureRequest.md' Name='SignatureRequest.md' On='uninstall'/>
               <RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
+              <RemoveFile Id='RemoveTargetBlank.md' Name='TargetBlank.md' On='uninstall'/>
             </Component>
             <Directory Id='Audio' Name='Audio'>
               <Component Id='AudioFiles' Guid='315A0BCE-D9DB-4BF9-B9CE-8E0D400D5A06'>

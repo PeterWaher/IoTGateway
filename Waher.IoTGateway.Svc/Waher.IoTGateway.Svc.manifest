@@ -434,6 +434,8 @@
     </Folder>
   </Folder>
   <Folder name="Root">
+    <Content fileName="Admin.md"/>
+    <Content fileName="Admin.js"/>
     <Content fileName='Copyright.md'/>
     <Content fileName='Emojis.md'/>
     <Content fileName='Entities.md'/>
@@ -448,6 +450,7 @@
     <Content fileName="SignatureRequest.js"/>
     <Content fileName="SignatureRequest.md"/>
     <Content fileName='Smileys.md'/>
+    <Content fileName="TargetBlank.js"/>
     <Folder name='Audio'>
       <Content fileName='glass_ping-Go445-1207030150.mp3'/>
       <Content fileName='glass_ping-Go445-1207030150.wav'/>

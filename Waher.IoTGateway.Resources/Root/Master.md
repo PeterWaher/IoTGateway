@@ -7,7 +7,7 @@ CSS: {{Theme.CSSX}}
 * [Home](/Index.md)
 * [Markdown](/Markdown.md)
 * [Script](/Script.md)
-* [Prompt](/Prompt.md)
+* [Admin](/Admin.md)
 * [%Title]
 * [License](/Copyright.md)
 * [IoT Gateway](https://github.com/PeterWaher/IoTGateway)

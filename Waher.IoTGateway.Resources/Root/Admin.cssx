@@ -1,0 +1,49 @@
+﻿.menuHeader
+{
+	display:block;
+}
+
+.menuItems
+{
+	display:flex;
+    flex-wrap: wrap;
+}
+
+.menuItem
+{
+    width: 10em;
+    min-width: 10em;
+    height: 3em;
+    min-height: 3em;
+    background-color: ¤ButtonColor¤;
+    margin: 0.3em 0.6em 0.3em 0;
+    padding: 0.3em;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+    border-radius: 4px;
+    display:table;
+}
+
+.menuItem:hover
+{
+    box-shadow: 0.5em 0.5em 0.5em rgba(0,0,0,0.5);
+}
+
+.menuItem:active
+{
+    box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5) !important;
+}
+
+.menuItemContent
+{
+    display:table-cell;
+    font-size: 16px;
+    vertical-align: middle;
+	text-decoration:none;
+	color:¤ButtonTextColor¤;
+    line-height:1em;
+}

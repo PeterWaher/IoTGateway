@@ -78,16 +78,19 @@
 		</Folder>
 	</Folder>
 	<Folder name="Root">
-		<Content fileName="Smileys.md"/>
-		<Content fileName="Prompt.js"/>
-		<Content fileName="Prompt.md"/>
-		<Content fileName="Emojis.md"/>
+    <Content fileName="Admin.md"/>
+    <Content fileName="Admin.js"/>
+    <Content fileName="Emojis.md"/>
 		<Content fileName="Entities.md"/>
 		<Content fileName="Index.md"/>
 		<Content fileName="Markdown.md"/>
 		<Content fileName="Master.md"/>
-		<Content fileName="Script.md"/>
-		<Folder name="Audio">
+    <Content fileName="Prompt.js"/>
+    <Content fileName="Prompt.md"/>
+    <Content fileName="Script.md"/>
+    <Content fileName="Smileys.md"/>
+    <Content fileName="TargetBlank.js"/>
+    <Folder name="Audio">
 			<Content fileName="glass_ping-Go445-1207030150.wav"/>
 			<Content fileName="glass_ping-Go445-1207030150.mp3"/>
 		</Folder>

@@ -1134,16 +1134,11 @@ namespace Waher.IoTGateway
 			if (!string.IsNullOrEmpty(xmppCredentials.Provisioning))
 				provisioningClient = new ProvisioningClient(xmppClient, xmppCredentials.Provisioning);
 			else
-			{
 				provisioningClient = null;
-				xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
-				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
-			}
 
 			scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
 			xmppClient.OnStateChanged += XmppClient_OnStateChanged;
-			xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
 			ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
 			Types.SetModuleParameter("IBB", ibbClient);
@@ -1869,28 +1864,6 @@ namespace Waher.IoTGateway
 						xmppClient.Reconnect();
 					break;
 			}
-		}
-
-		private static void XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
-		{
-			e.Accept();
-
-			RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
-			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-				xmppClient.RequestPresenceSubscription(e.FromBareJID);
-
-			xmppClient.SetPresence(Availability.Chat);
-		}
-
-		private static void XmppClient_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
-		{
-			e.Accept();
-		}
-
-		private static void XmppClient_OnRosterItemUpdated(object Sender, RosterItem Item)
-		{
-			//if (Item.State == SubscriptionState.None && Item.PendingSubscription != PendingSubscription.Subscribe)
-			//	xmppClient.RemoveRosterItem(Item.BareJid);
 		}
 
 		/// <summary>

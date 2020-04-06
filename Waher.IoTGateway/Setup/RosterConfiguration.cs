@@ -28,6 +28,8 @@ namespace Waher.IoTGateway.Setup
 		private HttpResource renameContact;
 		private HttpResource updateContactGroups;
 		private HttpResource getGroups;
+		private HttpResource acceptRequest;
+		private HttpResource declineRequest;
 
 		/// <summary>
 		/// Allows the user to configure the XMPP Roster of the gateway.
@@ -92,12 +94,42 @@ namespace Waher.IoTGateway.Setup
 
 		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{
-			// TODO
+			if (NewState == XmppState.Offline || NewState == XmppState.Error || NewState == XmppState.Connected)
+			{
+				string[] TabIDs = this.GetTabIDs();
+				if (TabIDs.Length > 0 && !(Gateway.XmppClient is null))
+				{
+					string Json = JSON.Encode(new KeyValuePair<string, object>[]
+					{
+						new KeyValuePair<string, object>("html", this.RosterItemsHtml(Gateway.XmppClient.Roster, Gateway.XmppClient.SubscriptionRequests))
+					}, false);
+
+					ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
+				}
+			}
 		}
 
 		private void XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			// TODO
+			StringBuilder Markdown = new StringBuilder();
+
+			Markdown.Append("Presence subscription request received from **");
+			Markdown.Append(MarkdownDocument.Encode(e.FromBareJID));
+			Markdown.Append("**. You can accept or decline the request from the roster configuration in the Administration portal.");
+
+			Gateway.SendNotification(Markdown.ToString());
+
+			string[] TabIDs = this.GetTabIDs();
+			if (TabIDs.Length > 0)
+			{
+				string Json = JSON.Encode(new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("bareJid", e.FromBareJID),
+					new KeyValuePair<string, object>("html", this.RosterItemsHtml(new RosterItem[0], new PresenceEventArgs[] { e }))
+				}, false);
+
+				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
+			}
 		}
 
 		private void XmppClient_OnPresence(object Sender, PresenceEventArgs e)
@@ -115,7 +147,7 @@ namespace Waher.IoTGateway.Setup
 				string Json = JSON.Encode(new KeyValuePair<string, object>[]
 				{
 					new KeyValuePair<string, object>("bareJid", Item.BareJid),
-					new KeyValuePair<string, object>("html", this.RosterItemsHtml(Item))
+					new KeyValuePair<string, object>("html", this.RosterItemsHtml(new RosterItem[]{ Item }, new PresenceEventArgs[0]))
 				}, false);
 
 				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
@@ -124,12 +156,17 @@ namespace Waher.IoTGateway.Setup
 
 		private void XmppClient_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
+			this.RosterItemRemoved(Item.BareJid);
+		}
+
+		private void RosterItemRemoved(string BareJid)
+		{
 			string[] TabIDs = this.GetTabIDs();
 			if (TabIDs.Length > 0)
 			{
 				string Json = JSON.Encode(new KeyValuePair<string, object>[]
 				{
-					new KeyValuePair<string, object>("bareJid", Item.BareJid)
+					new KeyValuePair<string, object>("bareJid", BareJid)
 				}, false);
 
 				ClientEvents.PushEvent(TabIDs, "RemoveRosterItem", Json, true, "User");
@@ -149,14 +186,16 @@ namespace Waher.IoTGateway.Setup
 				return ClientEvents.GetTabIDsForLocation("/Settings/Roster.md");
 		}
 
-		private string RosterItemsHtml(params RosterItem[] Contacts)
+		private string RosterItemsHtml(RosterItem[] Contacts, PresenceEventArgs[] SubscriptionRequests)
 		{
 			string FileName = Path.Combine(Gateway.RootFolder, "Settings", "RosterItems.md");
 			string Markdown = File.ReadAllText(FileName);
-			Variables v = new Variables(new Variable("Contacts", Contacts));
+			Variables v = new Variables(
+				new Variable("Contacts", Contacts),
+				new Variable("Requests", SubscriptionRequests));
 			MarkdownSettings Settings = new MarkdownSettings(Gateway.Emoji1_24x24, true, v);
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FileName, string.Empty, string.Empty);
-			string Html= Doc.GenerateHTML();
+			string Html = Doc.GenerateHTML();
 
 			Html = HtmlDocument.GetBody(Html);
 
@@ -185,6 +224,8 @@ namespace Waher.IoTGateway.Setup
 			this.renameContact = WebServer.Register("/Settings/RenameContact", null, this.RenameContact, true, false, true, Gateway.LoggedIn);
 			this.updateContactGroups = WebServer.Register("/Settings/UpdateContactGroups", null, this.UpdateContactGroups, true, false, true, Gateway.LoggedIn);
 			this.getGroups = WebServer.Register("/Settings/GetGroups", null, this.GetGroups, true, false, true, Gateway.LoggedIn);
+			this.acceptRequest = WebServer.Register("/Settings/AcceptRequest", null, this.AcceptRequest, true, false, true, Gateway.LoggedIn);
+			this.declineRequest = WebServer.Register("/Settings/DeclineRequest", null, this.DeclineRequest, true, false, true, Gateway.LoggedIn);
 
 			return base.InitSetup(WebServer);
 		}
@@ -202,6 +243,8 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.renameContact);
 			WebServer.Unregister(this.updateContactGroups);
 			WebServer.Unregister(this.getGroups);
+			WebServer.Unregister(this.acceptRequest);
+			WebServer.Unregister(this.declineRequest);
 
 			return base.UnregisterSetup(WebServer);
 		}
@@ -258,10 +301,20 @@ namespace Waher.IoTGateway.Setup
 
 		private string NickName()
 		{
-			if (string.IsNullOrEmpty(Gateway.Domain))
-				return string.Empty;
-			else
-				return "<nick xmlns='http://jabber.org/protocol/nick'>" + Gateway.Domain + "</nick>";    // Nick name: XEP-0172.
+			SuggestionEventArgs e = new SuggestionEventArgs(string.Empty);
+			try
+			{
+				OnGetNickNameSuggestions?.Invoke(this, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			string[] Suggestions = e.ToArray();
+			string NickName = Suggestions.Length > 0 ? Suggestions[0] : (string)Gateway.Domain;
+
+			return XmppClient.EmbedNickName(NickName);
 		}
 
 		private void RemoveContact(HttpRequest Request, HttpResponse Response)
@@ -454,17 +507,13 @@ namespace Waher.IoTGateway.Setup
 						e.AddSuggestion(Group);
 				}
 
-				SuggesstionsEventHandler h = OnGetGroupSuggestions;
-				if (!(h is null))
+				try
 				{
-					try
-					{
-						h(this, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
+					OnGetGroupSuggestions?.Invoke(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 				}
 
 				StringBuilder sb = new StringBuilder();
@@ -510,5 +559,64 @@ namespace Waher.IoTGateway.Setup
 		/// Event raised when list of group suggestions is populated.
 		/// </summary>
 		public static event SuggesstionsEventHandler OnGetGroupSuggestions = null;
+
+		/// <summary>
+		/// Event raised when list of nickname suggestions is populated.
+		/// </summary>
+		public static event SuggesstionsEventHandler OnGetNickNameSuggestions = null;
+
+		private void AcceptRequest(HttpRequest Request, HttpResponse Response)
+		{
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = Request.DecodeData();
+			if (!(Obj is string JID))
+				throw new BadRequestException();
+
+			Response.ContentType = "text/plain";
+
+			XmppClient Client = Gateway.XmppClient;
+
+			PresenceEventArgs SubscriptionRequest = Client.GetSubscriptionRequest(JID);
+			if (SubscriptionRequest is null)
+				Response.Write("0");
+			else
+			{
+				SubscriptionRequest.Accept();
+				Log.Informational("Accepting presence subscription request.", SubscriptionRequest.FromBareJID);
+				Response.Write("1");
+			}
+		}
+
+		private void DeclineRequest(HttpRequest Request, HttpResponse Response)
+		{
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = Request.DecodeData();
+			if (!(Obj is string JID))
+				throw new BadRequestException();
+
+			Response.ContentType = "text/plain";
+
+			XmppClient Client = Gateway.XmppClient;
+
+			PresenceEventArgs SubscriptionRequest = Client.GetSubscriptionRequest(JID);
+			if (SubscriptionRequest is null)
+				Response.Write("0");
+			else
+			{
+				SubscriptionRequest.Decline();
+				Log.Informational("Declining presence subscription request.", SubscriptionRequest.FromBareJID);
+				Response.Write("1");
+
+				this.RosterItemRemoved(JID);
+			}
+		}
 	}
 }

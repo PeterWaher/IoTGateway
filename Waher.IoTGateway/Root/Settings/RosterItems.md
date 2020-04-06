@@ -26,7 +26,7 @@ SubscriptionIcon(Item):=
 	else if State=Remove then
 		":x:"
 	else
-		":question:";
+		":grey_question:";
 );
 
 SubscriptionLabel(Item):=
@@ -70,7 +70,7 @@ PresenceIcon(Presence):=
 		else if State=ExtendedAway then
 			":dizzy_face:"
 		else
-			":question:";
+			":grey_question:";
 	)
 	else
 		"";
@@ -101,6 +101,18 @@ PresenceLabel(Presence):=
 		"";
 );
 
+foreach Request in Requests do
+(
+	]]<tr data-bare-jid='((Jid:=Request.FromBareJID))'>
+<td>((MarkdownEncode(Jid) ))</td>
+<td>:question:</td>
+<td>Request subscription</td>
+<td colspan="3"></td>
+<td><button type='button' class='posButtonSm' onclick='AcceptRequest("((Jid))");'>Accept</button> <button type='button' class='negButtonSm' onclick='DeclineRequest("((Jid))");'>Decline</button>
+</tr>
+[[
+);
+
 foreach RosterItem in Contacts do
 (
 	if empty(Group) or Group in RosterItem.Groups then
@@ -109,7 +121,7 @@ foreach RosterItem in Contacts do
 		Resources:=RosterItem.Resources;
 		n:=Resources.Length;
 		RowSpan:=n>1 ? " rowspan='"+n+"'" : "";
-		FirstResource:=n>0?Resources[0];null;
+		FirstResource:=n>0?Resources[0]:null;
 		]]<tr data-bare-jid='((Jid))' data-full-jid='((exists(FirstResource)?FirstResource?.From))'>
 <td((RowSpan))>((empty(RosterItem.Name) ? MarkdownEncode(RosterItem.BareJid) : "<span title=\""+HtmlAttributeEncode(RosterItem.BareJid)+"\">"+MarkdownEncode(RosterItem.Name)+"</span>"))</td>
 <td((RowSpan))>((SubscriptionIcon(RosterItem) ))</td>

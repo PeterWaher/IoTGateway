@@ -82,13 +82,10 @@ function UnsubscribeContact(Name, BareJid)
 
 	s += "?\n\nSince connections are bidirectional, your contact may still be connected to you. You can remove the contact to remove its connection to you.";
 
-	if (window.confirm(s))
-	{
-		var xhttp = new XMLHttpRequest();
-		xhttp.open("POST", "/Settings/UnsubscribeContact", true);
-		xhttp.setRequestHeader("Content-Type", "text/plain");
-		xhttp.send(BareJid);
-	}
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/Settings/UnsubscribeContact", true);
+	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.send(BareJid);
 }
 
 function SubscribeContact(Name, BareJid)
@@ -99,13 +96,10 @@ function SubscribeContact(Name, BareJid)
 
 	s += "?";
 
-	if (window.confirm(s))
-	{
-		var xhttp = new XMLHttpRequest();
-		xhttp.open("POST", "/Settings/SubscribeToContact", true);
-		xhttp.setRequestHeader("Content-Type", "text/plain");
-		xhttp.send(BareJid);
-	}
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/Settings/SubscribeToContact", true);
+	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.send(BareJid);
 }
 
 function RenameContact(Name, BareJid)
@@ -374,7 +368,7 @@ function FindBareJidRow(Table, BareJID)
 
 	if (Table !== null)
 	{
-		var Loop = Table.firstChild;
+		var Loop = Table.firstElementChild;
 		while (Loop !== null)
 		{
 			if (Loop.tagName === "TR")
@@ -384,7 +378,7 @@ function FindBareJidRow(Table, BareJID)
 					return Loop;
 			}
 
-			Loop = Loop.nextSibling;
+			Loop = Loop.nextElementSibling;
 		}
 	}
 
@@ -396,15 +390,15 @@ function FindRosterTable()
 	var Result = document.getElementById("Roster");
 	if (Result !== null)
 	{
-		var Loop = Result.firstChild;
+		var Loop = Result.firstElementChild;
 		while (Loop !== null && Loop.tagName !== "TABLE")
-			Loop = Loop.nextSibling;
+			Loop = Loop.nextElementSibling;
 
 		if (Loop !== null)
 		{
-			Loop = Loop.firstChild;
+			Loop = Loop.firstElementChild;
 			while (Loop !== null && Loop.tagName !== "TBODY")
-				Loop = Loop.nextSibling;
+				Loop = Loop.nextElementSibling;
 
 			return Loop;
 		}
@@ -644,16 +638,15 @@ function RemoveRosterItem(Data)
 function UpdateRosterItem(Data)
 {
 	var Loop;
+	var BareJid = Data.bareJid.toUpperCase();
 	var Contacts = FindRosterTable();
-	var tr = FindBareJidRow(Contacts, Data.bareJid);
+	var tr = FindBareJidRow(Contacts, BareJid);
+	var s;
 
-	var Table = document.createElement("TABLE");
 	var TBody = document.createElement("TBODY");
-	Table.appendChild(TBody);
-
 	TBody.innerHTML = Data.html;
 
-	while ((Loop = TBody.firstChild) !== null)
+	while ((Loop = TBody.firstElementChild) !== null)
 	{
 		TBody.removeChild(Loop);
 
@@ -663,6 +656,38 @@ function UpdateRosterItem(Data)
 			Contacts.appendChild(Loop);
 	}
 
-	if (tr)
-		Contacts.removeChild(tr);
+	while (tr)
+	{
+		Loop = tr.nextElementSibling;
+
+		s = tr.getAttribute("data-bare-jid").toUpperCase();
+		if (s === BareJid)
+			Contacts.removeChild(tr);
+		else
+			break;
+
+		tr = Loop;
+	}
+}
+
+function UpdateRoster(Data)
+{
+	var Contacts = FindRosterTable();
+	Contacts.innerHTML = Data.html;
+}
+
+function AcceptRequest(Jid)
+{
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/Settings/AcceptRequest", true);
+	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.send(Jid);
+}
+
+function DeclineRequest(Jid)
+{
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/Settings/DeclineRequest", true);
+	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.send(Jid);
 }

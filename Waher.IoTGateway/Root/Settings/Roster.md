@@ -46,6 +46,7 @@ these groups can provide a means for a more detailed authorization of access to 
 {{
 Client:=Waher.IoTGateway.Gateway.XmppClient;
 Contacts:=Client.Roster;
+Requests:=Client.SubscriptionRequests;
 Root:=Waher.IoTGateway.Gateway.RootFolder;
 FileName:=System.IO.Path.Combine(Root,"Settings","RosterItems.md");
 LoadMarkdown(FileName)

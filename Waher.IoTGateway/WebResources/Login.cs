@@ -80,24 +80,15 @@ namespace Waher.IoTGateway.WebResources
 				else
 					From = "/Index.md";
 
-				LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint);
+				LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint, "Web");
 				if (LoginResult == LoginResult.Successful)
-				{
-					Log.Informational("User logged in.", UserName, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor);
 					DoLogin(Request, From, false);
-				}
 				else
 				{
 					if (LoginResult == LoginResult.InvalidLogin)
-					{
-						Log.Warning("Invalid login attempt.", UserName, Request.RemoteEndPoint, "LoginFailure", EventLevel.Minor);
 						Request.Session["LoginError"] = "Invalid login credentials provided.";
-					}
 					else
-					{
-						Log.Error("Unable to connect to XMPP server to validate login credentials.");
 						Request.Session["LoginError"] = "Unable to connect to XMPP server.";
-					}
 
 					throw new SeeOtherException(Request.Header.Referer.Value);
 				}

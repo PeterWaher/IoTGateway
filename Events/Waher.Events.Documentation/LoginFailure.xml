@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  eventId="LoginFailure" 
+                  minor="true" medium="false" major="false"
+                  debug="false" informational="false" notice="true" warning="false" error="false" critical="false" alert="false" emergency="false">
+  <Description>Event raised when a user has attempted to login, and failed.</Description>
+	<Object>User Name</Object>
+	<Actor>Remote Endpoint</Actor>
+  <Tag key="Protocol" valueType="xs:string">
+    <Description>Protocol used to log in.</Description>
+  </Tag>
+</EventDescription>

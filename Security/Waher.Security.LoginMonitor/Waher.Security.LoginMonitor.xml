@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Security.LoginMonitor</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Security.LoginMonitor.LoginAuditor">
+            <summary>
+            Class that monitors login events, and help applications determine malicious intent. 
+            Register instance of class with <see cref="M:Waher.Events.Log.Register(Waher.Events.IEventSink)"/> to activate it.
+            Call its static methods to get information about remote endpoints.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.#ctor">
+            <summary>
+            Class that monitors login events, and help applications determine malicious intent. 
+            Register instance of class with <see cref="M:Waher.Events.Log.Register(Waher.Events.IEventSink)"/> to activate it.
+            Call its static methods to get information about remote endpoints.
+            </summary>
+        </member>
+    </members>
+</doc>

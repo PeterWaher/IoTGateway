@@ -299,6 +299,7 @@
   <Assembly fileName='Waher.Security.EllipticCurves.dll'/>
   <Assembly fileName='Waher.Security.JWS.dll'/>
   <Assembly fileName='Waher.Security.JWT.dll'/>
+  <Assembly fileName='Waher.Security.LoginMonitor.dll'/>
   <Assembly fileName='Waher.Security.PKCS.dll'/>
   <Assembly fileName='Waher.Security.SHA3.dll'/>
   <Assembly fileName='Waher.Security.SPF.dll'/>

@@ -266,6 +266,7 @@
     <ProjectReference Include="..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.PKCS\Waher.Security.PKCS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />

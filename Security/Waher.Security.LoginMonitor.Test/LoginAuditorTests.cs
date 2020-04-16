@@ -22,7 +22,7 @@ namespace Waher.Security.LoginMonitor.Test
 		private static LoginAuditor auditor = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(Database).Assembly,

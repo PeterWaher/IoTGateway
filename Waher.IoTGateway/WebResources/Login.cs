@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Waher.Events;
+using System.Text;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
@@ -79,6 +79,47 @@ namespace Waher.IoTGateway.WebResources
 				}
 				else
 					From = "/Index.md";
+
+				DateTime? Next = await Gateway.LoginAuditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "Web");
+				if (Next.HasValue)
+				{
+					StringBuilder sb = new StringBuilder();
+					DateTime TP = Next.Value;
+					DateTime Today = DateTime.Today;
+
+					if (Next.Value == DateTime.MaxValue)
+					{
+						sb.Append("This endpoint (");
+						sb.Append(Request.RemoteEndPoint);
+						sb.Append(") has been blocked from the system.");
+					}
+					else
+					{
+						sb.Append("Too many failed login attempts in a row registered. Try again after ");
+						sb.Append(TP.ToLongTimeString());
+
+						if (TP.Date != Today)
+						{
+							if (TP.Date == Today.AddDays(1))
+							{
+								sb.Append(TP.ToLongTimeString());
+								sb.Append(" tomorrow");
+							}
+							else
+							{
+								sb.Append(TP.ToLongTimeString());
+								sb.Append(", ");
+								sb.Append(TP.ToShortDateString());
+							}
+						}
+
+						sb.Append('.');
+					}
+
+					Request.Session["LoginError"] = sb.ToString();
+
+					throw new SeeOtherException(Request.Header.Referer.Value);
+				}
 
 				LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint, "Web");
 				if (LoginResult == LoginResult.Successful)

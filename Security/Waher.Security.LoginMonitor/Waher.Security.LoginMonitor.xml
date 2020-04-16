@@ -8,14 +8,129 @@
             <summary>
             Class that monitors login events, and help applications determine malicious intent. 
             Register instance of class with <see cref="M:Waher.Events.Log.Register(Waher.Events.IEventSink)"/> to activate it.
-            Call its static methods to get information about remote endpoints.
+            Call its <see cref="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)"/> method to get information about 
+            when a remote endpoint can login.
+            
+            Stream of events are analyzed, to detect events with Event ID "LoginSuccessful" and "LoginFailure". Individual state objects 
+            are maintained for each remote endpoint, allowing services to query the LoginAuditor class (using its 
+            <see cref="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)"/> method) about the current state of each remote endpoint trying to login.
             </summary>
         </member>
-        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.#ctor">
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.#ctor(System.String,Waher.Security.LoginMonitor.LoginInterval[])">
             <summary>
             Class that monitors login events, and help applications determine malicious intent. 
             Register instance of class with <see cref="M:Waher.Events.Log.Register(Waher.Events.IEventSink)"/> to activate it.
-            Call its static methods to get information about remote endpoints.
+            Call its <see cref="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)"/> method to get information about 
+            when a remote endpoint can login.
+            
+            Stream of events are analyzed, to detect events with Event ID "LoginSuccessful" and "LoginFailure". Individual state objects 
+            are maintained for each remote endpoint, allowing services to query the LoginAuditor class (using its 
+            <see cref="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)"/> method) about the current state of each remote endpoint trying to login.
+            </summary>
+            <param name="ObjectID">Log Object ID</param>
+            <param name="LoginIntervals">Number of login attempts possible during given time period. Numbers must be positive, and
+            interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.Queue(Waher.Events.Event)">
+            <summary>
+            Queues an event to be output.
+            </summary>
+            <param name="Event">Event to queue.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginSuccessful(System.String,System.String)">
+            <summary>
+            Processes a successful login attempt.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+            <param name="Protocol">Protocol used to log in.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginFailure(System.String,System.String,System.DateTime)">
+            <summary>
+            Processes a failed login attempt.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+            <param name="Protocol">Protocol used to log in.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)">
+            <summary>
+            Checks when a remote endpoint can login.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+            <param name="Protocol">Protocol used to log in.</param>
+            <returns>When the remote endpoint is allowed to login:
+            
+            null = Remote endpoint can login now.
+            <see cref="F:System.DateTime.MaxValue"/> = Remote endpoint has been blocked and cannot login.
+            Other <see cref="T:System.DateTime"/> values indicate when, at the earliest, the remote endpoint
+            is allowed to login again.
+            </returns>
+        </member>
+        <member name="T:Waher.Security.LoginMonitor.LoginInterval">
+            <summary>
+            Number of failing login attempts possible during given time period.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginInterval.#ctor(System.Int32,System.TimeSpan)">
+            <summary>
+            Number of failing login attempts possible during given time period.
+            </summary>
+            <param name="NrAttempts">Number of allowed login attempts.</param>
+            <param name="Interval">Time period during which failing attempts can be made.</param>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.LoginInterval.Interval">
+            <summary>
+            Number of allowed login attempts.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.LoginInterval.NrAttempts">
+            <summary>
+            Time period during which failing attempts can be made.
+            </summary>
+        </member>
+        <member name="T:Waher.Security.LoginMonitor.RemoteEndpoint">
+            <summary>
+            Login state information relating to a remote endpoint
+            </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.RemoteEndpoint.#ctor">
+            <summary>
+            Login state information relating to a remote endpoint
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Endpoint">
+            <summary>
+            String-representation of remote endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Creted">
+            <summary>
+            When record was created.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.LastProtocol">
+            <summary>
+            Last protocol used.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Blocked">
+            <summary>
+            If endpoint is blocked or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.State">
+            <summary>
+            Current login state. Null represents no login attempts have been made, or last one successfull.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Timestamps">
+            <summary>
+            Timestamps of first attempt in each interval. Null represents no login attempts have been made, or last one successfull.
             </summary>
         </member>
     </members>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence;
@@ -76,9 +77,25 @@ namespace Waher.Security.LoginMonitor
 			return string.Empty;
 		}
 
+		private string RemovePort(string s)
+		{
+			int i = s.LastIndexOf(':');
+			if (i < 0)
+				return s;
+
+			string s2 = s.Substring(0, i);
+
+			if (int.TryParse(s.Substring(i + 1), out int _) && IPAddress.TryParse(s2, out IPAddress _))
+				return s2;
+			else
+				return s;
+		}
+
 		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol)
 		{
 			RemoteEndpoint EP;
+
+			RemoteEndpoint = this.RemovePort(RemoteEndpoint);
 
 			lock (this.states)
 			{

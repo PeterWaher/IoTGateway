@@ -79,13 +79,15 @@ namespace Waher.Security.LoginMonitor
 		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol)
 		{
 			RemoteEndpoint EP;
-			bool Created;
 
 			lock (this.states)
 			{
 				if (this.states.TryGetValue(RemoteEndpoint, out EP))
 					return EP;
 			}
+
+			bool Created = false;
+			bool Updated = false;
 
 			EP = await Database.FindFirstIgnoreRest<RemoteEndpoint>(new FilterFieldEqualTo("Endpoint", RemoteEndpoint), "Created");
 
@@ -97,14 +99,24 @@ namespace Waher.Security.LoginMonitor
 					LastProtocol = Protocol,
 					Creted = DateTime.Now,
 					Blocked = false,
-					State = null,
-					Timestamps = null
+					State = new int[this.nrIntervals],
+					Timestamps = new DateTime[this.nrIntervals]
 				};
 
+				EP.Reset(false);
 				Created = true;
 			}
 			else
-				Created = false;
+			{
+				if (EP.State is null || EP.State.Length != this.nrIntervals)
+				{
+					EP.State = new int[this.nrIntervals];
+					EP.Timestamps = new DateTime[this.nrIntervals];
+
+					EP.Reset(false);
+					Updated = true;
+				}
+			}
 
 			lock (this.states)
 			{
@@ -116,6 +128,8 @@ namespace Waher.Security.LoginMonitor
 
 			if (Created)
 				await Database.Insert(EP);
+			else if (Updated)
+				await Database.Update(EP);
 
 			return EP;
 		}
@@ -128,12 +142,11 @@ namespace Waher.Security.LoginMonitor
 		public async Task ProcessLoginSuccessful(string RemoteEndpoint, string Protocol)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
-			if (EP.LastProtocol == Protocol && EP.State is null && EP.Timestamps is null)
+			if (EP.LastProtocol == Protocol && !EP.LastFailed)
 				return;
 
 			EP.LastProtocol = Protocol;
-			EP.State = null;
-			EP.Timestamps = null;
+			EP.Reset(false);
 
 			await Database.Update(EP);
 		}
@@ -147,31 +160,15 @@ namespace Waher.Security.LoginMonitor
 		public async Task ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
-			TimeSpan Span;
 			int i;
 
-			if (EP.State is null || EP.State.Length != this.nrIntervals)   // First failure (since change of configuration)
-			{
-				EP.State = new int[this.nrIntervals];
-				EP.Timestamps = new DateTime[this.nrIntervals];
-
-				EP.State[0] = 1;
-				EP.Timestamps[0] = Timestamp;
-
-				for (i = 1; i < this.nrIntervals; i++)
-				{
-					EP.State[i] = 0;
-					EP.Timestamps[i] = DateTime.MinValue;
-				}
-			}
-			else
+			if (EP.LastFailed)
 			{
 				i = 0;
 
 				while (i < this.nrIntervals)
 				{
-					Span = Timestamp - EP.Timestamps[i];
-					if (Span < this.intervals[i].Interval)
+					if (EP.State[i] < this.intervals[i].NrAttempts)
 					{
 						EP.State[i]++;
 						break;
@@ -187,12 +184,17 @@ namespace Waher.Security.LoginMonitor
 							await this.Block(EP);
 							return;
 						}
-						else if (EP.Timestamps[i] == DateTime.MinValue)
-							EP.Timestamps[i] = Timestamp;
 					}
 				}
 			}
-
+			else
+			{
+				for (i = 0; i < this.nrIntervals; i++)
+				{
+					EP.State[i] = 1;
+					EP.Timestamps[i] = Timestamp;
+				}
+			}
 
 			await Database.Update(EP);
 		}
@@ -216,13 +218,15 @@ namespace Waher.Security.LoginMonitor
 			if (EP.Blocked)
 				return DateTime.MaxValue;
 
-			if (EP.State is null || EP.State[0] < this.intervals[0].NrAttempts)
+			if (!EP.LastFailed)
 				return null;
 
-			int i = 1;
-
+			int i = 0;
 			while (i < this.nrIntervals && EP.State[i] >= this.intervals[i].NrAttempts)
 				i++;
+
+			if (i == 0)
+				return null;
 
 			if (i >= this.nrIntervals)
 			{
@@ -230,7 +234,7 @@ namespace Waher.Security.LoginMonitor
 				return DateTime.MaxValue;
 			}
 
-			return EP.Timestamps[i].Add(this.intervals[i].Interval);
+			return EP.Timestamps[i - 1].Add(this.intervals[i - 1].Interval);
 		}
 
 		private async Task Block(RemoteEndpoint EP)
@@ -238,6 +242,21 @@ namespace Waher.Security.LoginMonitor
 			EP.Blocked = true;
 			Log.Warning("Remote endpoint blocked due to excessive number of failed login attempts.", 
 				EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major);
+
+			await Database.Update(EP);
+		}
+
+		/// <summary>
+		/// Unblocks a remote endpoint and resets counters for it.
+		/// </summary>
+		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="Protocol">Protocol used to log in.</param>
+		public async Task UnblockAndReset(string RemoteEndpoint, string Protocol)
+		{
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
+
+			EP.LastProtocol = Protocol;
+			EP.Reset(true);
 
 			await Database.Update(EP);
 		}

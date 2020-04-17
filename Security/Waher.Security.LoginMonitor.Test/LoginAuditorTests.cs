@@ -17,7 +17,7 @@ namespace Waher.Security.LoginMonitor.Test
 		private static readonly TimeSpan Zero = TimeSpan.Zero;
 		private static readonly TimeSpan OneH = TimeSpan.FromHours(1);
 		private static readonly TimeSpan _23H = TimeSpan.FromHours(23);
-		private static readonly TimeSpan _6D23H = new TimeSpan(6, 23, 0, 0, 0);
+		private static readonly TimeSpan _5D23H = new TimeSpan(5, 23, 0, 0, 0);
 		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 
@@ -37,7 +37,7 @@ namespace Waher.Security.LoginMonitor.Test
 				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
 				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
 				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
-				new LoginInterval(2, TimeSpan.MaxValue));		// Maximum 2x2x2x5 failed login attempts in total, then blocked.
+				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
 		}
 
 		[AssemblyCleanup]
@@ -50,7 +50,7 @@ namespace Waher.Security.LoginMonitor.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			await auditor.ProcessLoginSuccessful(remoteEndpoint, protocol);
+			await auditor.UnblockAndReset(remoteEndpoint, protocol);
 			DateTime? TP = await auditor.GetEarliestLoginOpportunity(remoteEndpoint, protocol);
 			Assert.IsNull(TP);
 		}
@@ -162,7 +162,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H);
+				_5D23H);
 		}
 
 		[TestMethod]
@@ -173,7 +173,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero);
+				_5D23H, Zero);
 		}
 
 		[TestMethod]
@@ -184,7 +184,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero);
+				_5D23H, Zero, Zero, Zero, Zero);
 		}
 
 		[TestMethod]
@@ -195,7 +195,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH);
 		}
 
@@ -207,7 +207,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero);
 		}
 
@@ -219,7 +219,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero);
 		}
 
@@ -231,7 +231,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H);
 		}
@@ -244,7 +244,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero);
 		}
@@ -257,7 +257,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero);
 		}
@@ -270,7 +270,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH);
@@ -284,7 +284,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero);
@@ -298,7 +298,7 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero);
@@ -313,11 +313,11 @@ namespace Waher.Security.LoginMonitor.Test
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H, Zero, Zero, Zero, Zero,
+				_5D23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
 				_23H, Zero, Zero, Zero, Zero,
 				OneH, Zero, Zero, Zero, Zero,
-				_6D23H);
+				_5D23H);
 		}
 
 		private async Task TestFails(params TimeSpan[] Spans)
@@ -341,6 +341,7 @@ namespace Waher.Security.LoginMonitor.Test
 					TP2 = TP;
 
 				Assert.AreEqual(Spans[i], TP2 - TP);
+				TP = TP2;
 
 				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);
 			}
@@ -358,7 +359,12 @@ namespace Waher.Security.LoginMonitor.Test
 				if (Next.HasValue)
 				{
 					if (Next.Value == DateTime.MaxValue)
-						return;	// Success in blocking sparse login attempts
+					{
+						Assert.AreEqual(40, i);
+						return;
+					}
+					else
+						TP = Next.Value;
 				}
 
 				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);

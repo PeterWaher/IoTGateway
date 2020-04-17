@@ -29,6 +29,10 @@ namespace Waher.Security.LoginMonitor
 		{
 		}
 
+		/* NOTE: No default values are reported in attributes. This is to assure serialized object size do not vary when changed.
+		 * These objects might change a lot. By maintaining a constant object size over its lifetime, minimizes the risk of blocks 
+		 * being split or joined in the object database during operation. */
+
 		/// <summary>
 		/// Object ID
 		/// </summary>
@@ -60,7 +64,6 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Last protocol used.
 		/// </summary>
-		[DefaultValueStringEmpty]
 		public string LastProtocol
 		{
 			get => this.lastProtocol;
@@ -70,7 +73,6 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// If endpoint is blocked or not.
 		/// </summary>
-		[DefaultValue(false)]
 		public bool Blocked
 		{
 			get => this.blocked;
@@ -80,7 +82,6 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Current login state. Null represents no login attempts have been made, or last one successfull.
 		/// </summary>
-		[DefaultValueNull]
 		public int[] State
 		{
 			get => this.state;
@@ -90,11 +91,44 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Timestamps of first attempt in each interval. Null represents no login attempts have been made, or last one successfull.
 		/// </summary>
-		[DefaultValueNull]
 		public DateTime[] Timestamps
 		{
 			get => this.timestamps;
 			set => this.timestamps = value;
 		}
+
+		/// <summary>
+		/// Checks if last login attempt was a failed login attempt.
+		/// </summary>
+		public bool LastFailed
+		{
+			get
+			{
+				int i, c = this.state?.Length ?? 0;
+
+				for (i = 0; i < c; i++)
+				{
+					if (this.state[i] > 0)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		internal void Reset(bool Unblock)
+		{
+			int i, c;
+
+			for (i = 0, c = this.state?.Length ?? 0; i < c; i++)
+				this.state[i] = 0;
+
+			for (i = 0, c = this.timestamps?.Length ?? 0; i < c; i++)
+				this.timestamps[i] = DateTime.MinValue;
+
+			if (Unblock)
+				this.blocked = false;
+		}
+
 	}
 }

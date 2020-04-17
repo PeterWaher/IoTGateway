@@ -345,5 +345,28 @@ namespace Waher.Security.LoginMonitor.Test
 				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);
 			}
 		}
+
+		[TestMethod]
+		public async Task Test_26_SparseFails()
+		{
+			DateTime TP = new DateTime(2020, 1, 1, 0, 0, 0);
+			int i;
+
+			for (i = 0; i < 41; i++)
+			{
+				DateTime? Next = await auditor.GetEarliestLoginOpportunity(remoteEndpoint, protocol);
+				if (Next.HasValue)
+				{
+					if (Next.Value == DateTime.MaxValue)
+						return;	// Success in blocking sparse login attempts
+				}
+
+				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);
+				TP = TP.AddDays(1);
+			}
+
+			Assert.Fail("Sparse login attempts not detected.");
+		}
+
 	}
 }

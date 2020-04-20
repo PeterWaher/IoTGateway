@@ -40,7 +40,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public bool MoveNext()
 		{
-			while (e.MoveNext())
+			while (this.e.MoveNext())
 			{
 				try
 				{

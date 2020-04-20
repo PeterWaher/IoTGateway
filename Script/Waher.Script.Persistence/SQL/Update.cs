@@ -66,7 +66,7 @@ namespace Waher.Script.Persistence.SQL
 				Count++;
 			}
 
-			Database.Update(ToUpdate);
+			Task _ = Database.Update(ToUpdate);
 
 			return new DoubleNumber(Count);
 		}

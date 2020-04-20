@@ -100,8 +100,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			Type T = Arguments[0].AssociatedObjectValue as Type;
-			if (T is null)
+			if (!(Arguments[0].AssociatedObjectValue is Type T))
 				throw new ScriptRuntimeException("First parameter must be a type.", this);
 
 			int Offset = (int)Expression.ToDouble(Arguments[1].AssociatedObjectValue);

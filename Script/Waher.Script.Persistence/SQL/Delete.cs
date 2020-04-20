@@ -57,7 +57,7 @@ namespace Waher.Script.Persistence.SQL
 				Count++;
 			}
 
-			Database.Delete(ToDelete);
+			Task _ = Database.Delete(ToDelete);
 
 			return new DoubleNumber(Count);
 		}

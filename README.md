@@ -123,10 +123,10 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
-| **Waher.Content.Asn1.Test**        | .NET Core 2.0 | The [Waher.Content.Asn1.Test](Content/Waher.Content.Asn1.Test) project contains unit tests for the **Waher.Content.Asn1** project. |
+| **Waher.Content.Asn1.Test**        | .NET Core 2.2 | The [Waher.Content.Asn1.Test](Content/Waher.Content.Asn1.Test) project contains unit tests for the **Waher.Content.Asn1** project. |
 | **Waher.Content.Html.Test**        | .NET 4.6.2    | The [Waher.Content.Html.Test](Content/Waher.Content.Html.Test) project contains unit tests for the **Waher.Content.Html** project. |
-| **Waher.Content.Markdown.Test**    | .NET Core 2.0 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
-| **Waher.Content.Test**             | .NET Core 2.0 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
+| **Waher.Content.Markdown.Test**    | .NET Core 2.2 | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.Test**             | .NET Core 2.2 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 
 
 Events
@@ -220,12 +220,12 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
-| **Waher.Networking.Cluster.Test**  | .NET Core 2.0 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
+| **Waher.Networking.Cluster.Test**  | .NET Core 2.2 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
 | **Waher.Networking.CoAP.Test**     | .NET 4.6.2    | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
-| **Waher.Networking.DNS.Test**      | .NET Core 2.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
+| **Waher.Networking.DNS.Test**      | .NET Core 2.2 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
 | **Waher.Networking.HTTP.Test**     | .NET 4.6.2    | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
 | **Waher.Networking.MQTT.Test**     | .NET 4.6.2    | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
-| **Waher.Networking.XMPP.Test**     | .NET Core 2.0 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
+| **Waher.Networking.XMPP.Test**     | .NET Core 2.2 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 Persistence
 ----------------------
@@ -247,9 +247,9 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
-| **Waher.Persistence.Files.Test**   | .NET Core 2.0 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
-| **Waher.Persistence.FilesLW.Test** | .NET Core 2.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
-| **Waher.Persistence.MongoDB.Test** | .NET Core 2.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| **Waher.Persistence.Files.Test**   | .NET Core 2.2 | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
+| **Waher.Persistence.FilesLW.Test** | .NET Core 2.2 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
+| **Waher.Persistence.MongoDB.Test** | .NET Core 2.2 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 
 Runtime
 ----------------------
@@ -273,9 +273,9 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
-| **Waher.Runtime.Language.Test**    | .NET Core 2.0 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
-| **Waher.Runtime.Text.Test**        | .NET Core 2.0 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
-| **Waher.Runtime.Threading.Test**   | .NET Core 2.0 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
+| **Waher.Runtime.Language.Test**    | .NET Core 2.2 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
+| **Waher.Runtime.Text.Test**        | .NET Core 2.2 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
+| **Waher.Runtime.Threading.Test**   | .NET Core 2.2 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
 
 Script
 ----------------------
@@ -330,14 +330,14 @@ The folder also contains the following unit test projects:
 | Project                                | Type          | Project description |
 |----------------------------------------|---------------|---------------------|
 | **Waher.Security.ACME.Test**           | .NET 4.6.2    | The [Waher.Security.ACME.Test](Security/Waher.Security.ACME.Test) project contains unit tests for the  [Waher.Security.ACME](Security/Waher.Security.ACME) project.                                         |
-| **Waher.Security.ChaChaPoly.Test**     | .NET Core 2.0 | The [Waher.Security.ChaChaPoly.Test](Security/Waher.Security.ChaChaPoly.Test) project contains unit tests for the  [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project. |
+| **Waher.Security.ChaChaPoly.Test**     | .NET Core 2.2 | The [Waher.Security.ChaChaPoly.Test](Security/Waher.Security.ChaChaPoly.Test) project contains unit tests for the  [Waher.Security.ChaChaPoly](Security/Waher.Security.ChaChaPoly) project. |
 | **Waher.Security.DTLS.Test**           | .NET 4.6.2    | The [Waher.Security.DTLS.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project.                                         |
-| **Waher.Security.EllipticCurves.Test** | .NET Core 2.0 | The [Waher.Security.EllipticCurves.Test](Security/Waher.Security.EllipticCurves.Test) project contains unit tests for the  [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project. |
+| **Waher.Security.EllipticCurves.Test** | .NET Core 2.2 | The [Waher.Security.EllipticCurves.Test](Security/Waher.Security.EllipticCurves.Test) project contains unit tests for the  [Waher.Security.EllipticCurves](Security/Waher.Security.EllipticCurves) project. |
 | **Waher.Security.JWT.Test**            | .NET 4.6.2    | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project.                                             |
-| **Waher.Security.LoginMonitor.Test**   | .NET Core 2.0 | The [Waher.Security.LoginMonitor.Test](Security/Waher.Security.LoginMonitor.Test) project contains unit tests for the  [Waher.Security.LoginMonitor](Security/Waher.Security.LoginMonitor) project. |
+| **Waher.Security.LoginMonitor.Test**   | .NET Core 2.2 | The [Waher.Security.LoginMonitor.Test](Security/Waher.Security.LoginMonitor.Test) project contains unit tests for the  [Waher.Security.LoginMonitor](Security/Waher.Security.LoginMonitor) project. |
 | **Waher.Security.PKCS.Test**           | .NET 4.6.2    | The [Waher.Security.PKCS.Test](Security/Waher.Security.PKCS.Test) project contains unit tests for the  [Waher.Security.PKCS](Security/Waher.Security.PKCS) project.                                         |
-| **Waher.Security.SHA3.Test**           | .NET Core 2.0 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
-| **Waher.Security.SPF.Test**            | .NET Core 2.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
+| **Waher.Security.SHA3.Test**           | .NET Core 2.2 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
+| **Waher.Security.SPF.Test**            | .NET Core 2.2 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
 
 Services
 ----------------------

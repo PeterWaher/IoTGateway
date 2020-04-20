@@ -388,12 +388,21 @@ namespace Waher.Networking
 				{
 					this.disposing = true;
 					this.cancelReading.Cancel();
+					Task.Delay(1000).ContinueWith(this.AbortRead);	// Double-check socket gets cancelled. If not, forcefully close.
 					return;
 				}
 
 				this.DoDisposeLocked();
 			}
 #endif
+		}
+
+		private Task AbortRead(object P)
+		{
+			if (!this.disposed)
+				this.DoDisposeLocked();
+
+			return Task.CompletedTask;
 		}
 
 		private void DoDisposeLocked()
@@ -539,7 +548,7 @@ namespace Waher.Networking
 				lock (this.synchObj)
 				{
 					this.reading = false;
-					
+
 					if (this.cancelRead)
 					{
 						this.cancelRead = false;

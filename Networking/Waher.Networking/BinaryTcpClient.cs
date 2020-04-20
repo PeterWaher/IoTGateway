@@ -1146,7 +1146,7 @@ namespace Waher.Networking
 				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsClientAsync(this.hostName ?? ((IPEndPoint)this.Client.Client.LocalEndPoint).Address.ToString(),
+				await SslStream.AuthenticateAsClientAsync(this.hostName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString(),
 					ClientCertificates, Protocols, true);
 			}
 			finally
@@ -1206,9 +1206,10 @@ namespace Waher.Networking
 				string Base64 = Convert.ToBase64String(Cert);
 				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 				{
-					new KeyValuePair<string, object>("sslPolicyErrors", sslPolicyErrors),
+					new KeyValuePair<string, object>("sslPolicyErrors", sslPolicyErrors.ToString()),
 					new KeyValuePair<string, object>("Subject", certificate?.Subject),
 					new KeyValuePair<string, object>("Issuer", certificate?.Issuer),
+					new KeyValuePair<string, object>("HostName", this.hostName),
 					new KeyValuePair<string, object>("Cert", Base64)
 				};
 

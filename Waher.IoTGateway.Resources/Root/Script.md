@@ -1520,7 +1520,7 @@ the name of the corresponding column.
 Syntax:
 
 ```
-SELECT [TOP maxcount]
+SELECT [TOP maxcount] [DISTINCT]
 	* |
 	column1 [name1][, column2 [name2][, ...]]
 FROM

@@ -28,6 +28,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupByNames;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
+		private readonly bool distinct;
 		private ScriptNode top;
 		private ScriptNode where;
 		private ScriptNode having;
@@ -47,12 +48,13 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="OrderBy">Optional ordering</param>
 		/// <param name="Top">Optional limit on number of records to return</param>
 		/// <param name="Offset">Optional offset into result set where reporting begins</param>
+		/// <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, ScriptNode[] Sources, ScriptNode[] SourceNames, ScriptNode Where,
 			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top,
-			ScriptNode Offset, int Start, int Length, Expression Expression)
+			ScriptNode Offset, bool Distinct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.columns = Columns;
@@ -66,6 +68,7 @@ namespace Waher.Script.Persistence.SQL
 			this.having = Having;
 			this.orderBy = OrderBy;
 			this.offset = Offset;
+			this.distinct = Distinct;
 
 			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("Columns and ColumnNames must both be null or not null.", nameof(ColumnNames));
@@ -156,14 +159,10 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			bool ManualPaging = this.groupBy != null || this.where != null;
-			bool ManualTop = Top != int.MaxValue && ManualPaging;
-			bool ManualOffset = Offset != 0 && ManualPaging;
-
-			IEnumerator e = Find(T, ManualOffset ? 0 : Offset, ManualTop ? int.MaxValue : Top, this.where, Variables, OrderBy.ToArray(), this);
 			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
 			Dictionary<string, int> Columns = new Dictionary<string, int>();
-			IElement[] Rec;
+			IEnumerator e;
+			RecordEnumerator e2;
 			int NrRecords = 0;
 
 			if (this.columns != null)
@@ -177,6 +176,15 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 				c = 0;
+
+			if (this.groupBy is null)
+			{
+				e = Find(T, Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
+				Offset = 0;
+				Top = int.MaxValue;
+			}
+			else
+				e = Find(T, 0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 
 			if (this.where != null)
 				e = new ConditionalEnumerator(e, Variables, this.where);
@@ -208,42 +216,21 @@ namespace Waher.Script.Persistence.SQL
 				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
 			}
 
-			while (e.MoveNext())
+			if (Offset > 0)
+				e = new OffsetEnumerator(e, Offset);
+
+			if (Top != int.MaxValue)
+				e = new MaxCountEnumerator(e, Top);
+
+			if (this.distinct)
+				e2 = new DistinctEnumerator(e, this.columns, Variables);
+			else
+				e2 = new RecordEnumerator(e, this.columns, Variables);
+
+			while (e2.MoveNext())
 			{
-				if (ManualOffset && Offset > 0)
-				{
-					Offset--;
-					continue;
-				}
-
-				object Item = e.Current;
-				ObjectProperties Properties = new ObjectProperties(Item, Variables);
-
-				if (this.columns is null)
-					Rec = new IElement[1] { Expression.Encapsulate(Item) };
-				else
-				{
-					Rec = new IElement[c];
-
-					for (i = 0; i < c; i++)
-					{
-						try
-						{
-							Rec[i] = this.columns[i].Evaluate(Properties);
-						}
-						catch (Exception ex)
-						{
-							ex = Log.UnnestException(ex);
-							Rec[i] = Expression.Encapsulate(ex);
-						}
-					}
-				}
-
-				Items.AddLast(Rec);
+				Items.AddLast(e2.CurrentRecord);
 				NrRecords++;
-
-				if (ManualTop && NrRecords >= Top)
-					break;
 			}
 
 			IElement[] Elements = new IElement[this.columns is null ? NrRecords : NrRecords * c];
@@ -656,6 +643,7 @@ namespace Waher.Script.Persistence.SQL
 				AreEqual(this.where, O.where) &&
 				AreEqual(this.having, O.having) &&
 				AreEqual(this.offset, O.offset) &&
+				this.distinct == O.distinct &&
 				base.Equals(obj)))
 			{
 				return false;
@@ -685,7 +673,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// <see cref="Object.GetHashCode()"/>
 		/// </summary>
@@ -702,6 +690,7 @@ namespace Waher.Script.Persistence.SQL
 			Result ^= Result << 5 ^ GetHashCode(this.where);
 			Result ^= Result << 5 ^ GetHashCode(this.having);
 			Result ^= Result << 5 ^ GetHashCode(this.offset);
+			Result ^= Result << 5 ^ this.distinct.GetHashCode();
 
 			foreach (KeyValuePair<ScriptNode, bool> P in this.orderBy)
 			{

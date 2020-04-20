@@ -66,6 +66,13 @@
             is allowed to login again.
             </returns>
         </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.UnblockAndReset(System.String,System.String)">
+            <summary>
+            Unblocks a remote endpoint and resets counters for it.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+            <param name="Protocol">Protocol used to log in.</param>
+        </member>
         <member name="T:Waher.Security.LoginMonitor.LoginInterval">
             <summary>
             Number of failing login attempts possible during given time period.
@@ -131,6 +138,11 @@
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Timestamps">
             <summary>
             Timestamps of first attempt in each interval. Null represents no login attempts have been made, or last one successfull.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.LastFailed">
+            <summary>
+            Checks if last login attempt was a failed login attempt.
             </summary>
         </member>
     </members>

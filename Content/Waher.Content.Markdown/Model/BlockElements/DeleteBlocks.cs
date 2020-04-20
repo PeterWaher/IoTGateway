@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (string Row in s.Split('\n'))
 			{
-				Output.Append("- ");
+				Output.Append("-> ");
 				Output.AppendLine(Row);
 			}
 

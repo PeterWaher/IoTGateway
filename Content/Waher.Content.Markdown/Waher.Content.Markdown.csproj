@@ -15,12 +15,12 @@ https://waher.se/Markdown.md</Description>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Markdown Parser Text HTML XAML Difference History</PackageTags>
+    <PackageTags>Markdown Parser Text HTML XAML XML Difference History</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.39</AssemblyVersion>
-    <FileVersion>1.0.39</FileVersion>
+    <AssemblyVersion>1.0.40</AssemblyVersion>
+    <FileVersion>1.0.40</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.39</Version>
+    <Version>1.0.40</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

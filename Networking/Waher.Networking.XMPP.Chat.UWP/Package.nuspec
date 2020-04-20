@@ -18,7 +18,7 @@
       <dependency id="Waher.Content" version="1.0.24"/>
 			<dependency id="Waher.Content.Emoji" version="1.0.2"/>
 			<dependency id="Waher.Content.Html" version="1.0.11"/>
-			<dependency id="Waher.Content.Markdown" version="1.0.39"/>
+			<dependency id="Waher.Content.Markdown" version="1.0.40"/>
       <dependency id="Waher.Content.Xml" version="1.0.7"/>
       <dependency id="Waher.Networking.UWP" version="1.0.15"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.46"/>

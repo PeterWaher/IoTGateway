@@ -18,7 +18,7 @@
       <group targetFramework="UAP10.0">
         <dependency id="Waher.Content" version="1.0.24"/>
         <dependency id="Waher.Content.Emoji" version="1.0.2"/>
-        <dependency id="Waher.Content.Markdown" version="1.0.39"/>
+        <dependency id="Waher.Content.Markdown" version="1.0.40"/>
         <dependency id="Waher.Networking.HTTP.UWP" version="1.0.41"/>
         <dependency id="Waher.Runtime.Inventory" version="1.0.12"/>
         <dependency id="Waher.Script" version="1.0.35"/>

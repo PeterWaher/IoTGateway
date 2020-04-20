@@ -10,7 +10,8 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="Description" type="xs:string"/>
-				<xs:element name="Object" type="xs:string" minOccurs="0"/>
+        <xs:element name="Source" type="xs:string" minOccurs="0"/>
+        <xs:element name="Object" type="xs:string" minOccurs="0"/>
 				<xs:element name="Actor" type="xs:string" minOccurs="0"/>
 				<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
 					<xs:complexType>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="DBOpt" minor="true" medium="false" major="false"
+				  debug="false" informational="false" notice="true" warning="false" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when a database operation has been encountered that can be optimized. Message text includes information of the operation. Tags may vary, and can include additional information of the operation.</Description>
+  <Source>Waher.Persistence.Files[.LW]</Source>
+	<Object>Database File</Object>
+</EventDescription>

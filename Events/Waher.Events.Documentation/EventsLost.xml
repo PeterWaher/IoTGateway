@@ -3,7 +3,7 @@
 				  eventId="EventsLost" minor="true" medium="true" major="true"
 				  debug="true" informational="false" notice="true" warning="true" 
 				  error="true" critical="false" alert="false" emergency="false">
-	<Description>Event raised to inform the recipient that a certain number of events have been lost.</Description>
+	<Description>Event raised to inform the recipient that a certain number of events have been lost in an event sink.</Description>
 	<Object>Object where the events where lost.</Object>
 	<Tag key="Nr" valueType="xs:unsignedInt">
 		<Description>Number of events lost.</Description>

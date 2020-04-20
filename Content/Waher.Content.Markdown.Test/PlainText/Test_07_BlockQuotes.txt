@@ -30,7 +30,7 @@ Blockquotes can contain other Markdown elements, including headers, lists, and c
 > 
 > return shell_exec("echo $input | $markdown_script");
 
-Blockquites can also be used do illustrate editing:
+Blockquotes can also be used do illustrate editing:
 
 +> This paragraph has been inserted
 

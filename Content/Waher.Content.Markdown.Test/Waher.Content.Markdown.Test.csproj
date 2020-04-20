@@ -553,6 +553,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />
     <ProjectReference Include="..\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />

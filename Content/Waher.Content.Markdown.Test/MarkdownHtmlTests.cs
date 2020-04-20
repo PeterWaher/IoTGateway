@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Runtime.Text;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -37,24 +38,38 @@ namespace Waher.Content.Markdown.Test
 
 		public static void AssertEqual(string Expected, string Generated, string Message)
 		{
-			int i, c = Expected.Length;
-			int d = Generated.Length;
-
-			if (d < c)
-				c = d;
-
-			for (i = 0; i < c; i++)
+			if (Generated != Expected)
 			{
-				if (Expected[i] != Generated[i])
-				{
-					throw new Exception(Message + "\r\n\r\nMismatch at position " + i.ToString() +
-						"\r\n\r\nGenerated: " + Generated.Substring(i, Math.Min(100, Generated.Length - i)) +
-						"\r\n\r\nExpected: " + Expected.Substring(i, Math.Min(100, Expected.Length - i)));
-				}
-			}
+				StringBuilder sb = new StringBuilder();
 
-			if (Expected.Length != Generated.Length)
-				throw new Exception(Message + "\r\n\r\nUnexpected end: " + Generated.Substring(c));
+				sb.AppendLine(Message);
+				sb.AppendLine();
+				sb.AppendLine("Changes required:");
+				sb.AppendLine();
+
+				EditScript<string> Script = Difference.AnalyzeRows(Generated, Expected);
+
+				foreach (Step<string> Op in Script.Steps)
+				{
+					foreach (string Row in Op.Symbols)
+					{
+						switch (Op.Operation)
+						{
+							case EditOperation.Delete:
+								sb.Append("- ");
+								sb.AppendLine(Row);
+								break;
+
+							case EditOperation.Insert:
+								sb.Append("+ ");
+								sb.AppendLine(Row);
+								break;
+						}
+					}
+				}
+			
+				throw new Exception(sb.ToString());
+			}
 		}
 
 		[TestMethod]

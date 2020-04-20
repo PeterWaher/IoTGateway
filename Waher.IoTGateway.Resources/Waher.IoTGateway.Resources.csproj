@@ -103,6 +103,7 @@
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.wav" />
     <None Remove="Root\Emojis.md" />
     <None Remove="Root\Entities.md" />
+    <None Remove="Root\favicon.ico" />
     <None Remove="Root\Images\Banner1 - 1400x425.png" />
     <None Remove="Root\Images\Banner1 - 1900x500.png" />
     <None Remove="Root\Images\Banner1 - 2000x600.png" />
@@ -114,6 +115,7 @@
     <None Remove="Root\Master.md" />
     <None Remove="Root\Prompt.js" />
     <None Remove="Root\Prompt.md" />
+    <None Remove="Root\robots.txt" />
     <None Remove="Root\Script.md" />
     <None Remove="Root\Smileys.md" />
     <None Remove="Root\TargetBlank.js" />
@@ -377,6 +379,9 @@
     <Content Include="Root\Entities.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Images\logo-WaherDataAB-200x39.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -396,6 +401,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Master.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\robots.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Prompt.js">

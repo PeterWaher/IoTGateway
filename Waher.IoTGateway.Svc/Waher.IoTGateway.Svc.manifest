@@ -441,12 +441,14 @@
     <Content fileName='Emojis.md'/>
     <Content fileName='Entities.md'/>
     <Content fileName='Events.js'/>
+    <Content fileName="favicon.ico"/>
     <Content fileName='Index.md'/>
     <Content fileName='Login.md'/>
     <Content fileName='Markdown.md'/>
     <Content fileName='Master.md'/>
     <Content fileName='Prompt.js'/>
     <Content fileName='Prompt.md'/>
+    <Content fileName="robots.txt"/>
     <Content fileName='Script.md'/>
     <Content fileName="SignatureRequest.js"/>
     <Content fileName="SignatureRequest.md"/>

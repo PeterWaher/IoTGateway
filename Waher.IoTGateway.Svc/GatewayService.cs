@@ -160,9 +160,48 @@ namespace Waher.IoTGateway.Svc
 
 		protected override void OnSessionChange(SessionChangeDescription changeDescription)
 		{
-			Log.Notice("Session changed.",
-				new KeyValuePair<string, object>("SessionId", changeDescription.SessionId),
-				new KeyValuePair<string, object>("Reason", changeDescription.Reason.ToString()));
+			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("SessionId", changeDescription.SessionId)
+			};
+
+			switch (changeDescription.Reason)
+			{
+				case SessionChangeReason.ConsoleConnect:
+					Log.Notice("User connected to machine via console interface.", Tags);
+					break;
+
+				case SessionChangeReason.ConsoleDisconnect:
+					Log.Notice("User disconnected console interface.", Tags);
+					break;
+				case SessionChangeReason.RemoteConnect:
+					Log.Notice("User connected remotely to machine.", Tags);
+					break;
+				case SessionChangeReason.RemoteDisconnect:
+					Log.Notice("User disconnected remote interface.", Tags);
+					break;
+				case SessionChangeReason.SessionLock:
+					Log.Notice("User session locked.", Tags);
+					break;
+				case SessionChangeReason.SessionLogoff:
+					Log.Notice("User logged off.", Tags);
+					break;
+				case SessionChangeReason.SessionLogon:
+					Log.Notice("User logged on.", Tags);
+					break;
+				case SessionChangeReason.SessionRemoteControl:
+					Log.Notice("User remote control status of session has changed.", Tags);
+					break;
+				case SessionChangeReason.SessionUnlock:
+					Log.Notice("User session unlocked.", Tags);
+					break;
+
+				default:
+					Log.Notice("Session changed.",
+						new KeyValuePair<string, object>("SessionId", changeDescription.SessionId),
+						new KeyValuePair<string, object>("Reason", changeDescription.Reason.ToString()));
+					break;
+			}
 		}
 
 		protected override void OnShutdown()

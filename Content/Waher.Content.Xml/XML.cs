@@ -47,7 +47,10 @@ namespace Waher.Content.Xml
 				Replace("&", "&amp;").
 				Replace("<", "&lt;").
 				Replace(">", "&gt;").
-				Replace("\"", "&quot;");
+				Replace("\"", "&quot;").
+				Replace("\t", "&#09;").
+				Replace("\n", "&#10;").
+				Replace("\r", "&#13;");
 		}
 
 		/// <summary>
@@ -66,7 +69,7 @@ namespace Waher.Content.Xml
 				Replace(">", "&gt;");
 		}
 
-		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
+		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"', '\t', '\r', '\n' };
 		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
 		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"', '\'' };
 
@@ -193,19 +196,17 @@ namespace Waher.Content.Xml
 
 				if (i == 10)
 				{
-					TimeSpan Offset;
 					char ch;
 
 					s = s.Substring(11);
 					i = s.IndexOfAny(plusMinusZ);
 
 					if (i < 0)
-					{
 						Value = new DateTime(Year, Month, Day);
-						Offset = TimeSpan.Zero;
-					}
 					else
 					{
+						TimeSpan Offset;
+
 						ch = s[i];
 						if (ch == 'z' || ch == 'Z')
 							Offset = TimeSpan.Zero;

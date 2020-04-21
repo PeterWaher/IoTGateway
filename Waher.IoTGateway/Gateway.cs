@@ -275,13 +275,23 @@ namespace Waher.IoTGateway
 
 					string[] ManifestFiles = Directory.GetFiles(runtimeFolder, "*.manifest", SearchOption.TopDirectoryOnly);
 					Dictionary<string, CopyOptions> ContentOptions = new Dictionary<string, CopyOptions>();
+					int i;
 
-					foreach (string ManifestFile in ManifestFiles)
+					for (i = 0; i < 2; i++)
 					{
-						CheckContentFiles(ManifestFile, ContentOptions);
+						foreach (string ManifestFile in ManifestFiles)
+						{
+							string FileName = Path.GetFileName(ManifestFile);
+							bool GatewayFile = FileName.StartsWith("Waher.IoTGateway", StringComparison.CurrentCultureIgnoreCase);
 
-						if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
-							CheckInstallUtilityFiles(ManifestFile);
+							if ((i == 0 && GatewayFile) || (i == 1 && !GatewayFile))
+							{
+								CheckContentFiles(ManifestFile, ContentOptions);
+
+								if (ManifestFile.EndsWith("Waher.Utility.Install.manifest"))
+									CheckInstallUtilityFiles(ManifestFile);
+							}
+						}
 					}
 				}
 

@@ -410,7 +410,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Text.Test", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.LoginMonitor", "Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj", "{04EE401F-7038-4689-8FAC-55E215D34755}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.LoginMonitor.Test", "Security\Waher.Security.LoginMonitor.Test\Waher.Security.LoginMonitor.Test.csproj", "{201186E7-243C-4329-A8A8-3FB80A2A62FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.LoginMonitor.Test", "Security\Waher.Security.LoginMonitor.Test\Waher.Security.LoginMonitor.Test.csproj", "{201186E7-243C-4329-A8A8-3FB80A2A62FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2715,8 +2715,6 @@ Global
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x64.Build.0 = Debug|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x64.Deploy.0 = Debug|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.ActiveCfg = Debug|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Build.0 = Debug|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Debug|x86.Deploy.0 = Debug|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Any CPU.ActiveCfg = Release|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.ActiveCfg = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Build.0 = Release|ARM
@@ -2729,8 +2727,6 @@ Global
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x64.Build.0 = Release|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x64.Deploy.0 = Release|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x86.ActiveCfg = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x86.Build.0 = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x86.Deploy.0 = Release|x86
 		{F074513C-4099-4438-956E-A2C9952757B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F074513C-4099-4438-956E-A2C9952757B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F074513C-4099-4438-956E-A2C9952757B5}.Debug|ARM.ActiveCfg = Debug|ARM

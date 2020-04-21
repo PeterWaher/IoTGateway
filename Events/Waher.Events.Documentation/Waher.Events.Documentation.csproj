@@ -94,6 +94,15 @@
   <ItemGroup>
     <None Include="FileNotFound.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ScriptEval.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ScriptLong.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ScriptAbort.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

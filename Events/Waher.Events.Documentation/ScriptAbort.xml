@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="ScriptAbort" minor="true" medium="false" major="false"
+				  debug="false" informational="false" notice="false" warning="true" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when user script evaluation has been aborted because of time restrictions.</Description>
+	<Object>Resource evaluating the script</Object>
+	<Actor>Name of user evaluating the script.</Actor>
+  <Tag key="RemoteEndPoint" valueType="xs:string">
+    <Description>Remote endpoint of user.</Description>
+  </Tag>
+  <Tag key="Script" valueType="xs:string">
+    <Description>Script evaluated.</Description>
+  </Tag>
+  <Tag key="Milliseconds" valueType="xs:double">
+    <Description>Number of milliseconds spent evaluating the script before it was aborted.</Description>
+  </Tag>
+</EventDescription>

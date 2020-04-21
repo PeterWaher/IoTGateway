@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="FileNotFound" minor="true" medium="false" major="false"
+				  debug="false" informational="false" notice="false" warning="true" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when a file that was not found on the system was requested.</Description>
+	<Object>Filename</Object>
+	<Actor>Remote endpoint of client requesting the file.</Actor>
+</EventDescription>

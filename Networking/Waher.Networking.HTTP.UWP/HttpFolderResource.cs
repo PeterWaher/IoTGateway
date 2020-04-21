@@ -186,7 +186,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
 			{
-				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 			}
 
@@ -663,7 +663,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
 			{
-				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint);
+				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 			}
 

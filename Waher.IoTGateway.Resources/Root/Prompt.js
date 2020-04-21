@@ -8,21 +8,22 @@
 	var Tag = Segment() + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + Segment() + Segment();
 
 	var Script = document.getElementById("script");
-	if (Script.value == "")
+	var Expression = Script.value;
+	if (Expression === "")
 		return;
+
+	Expressions[Tag] = Expression;
 
 	var Div = document.getElementById("Results");
 	var Code = document.createElement("code");
-	var TextNode = document.createTextNode(Script.value);
-	var s = TextNode.nodeValue;
-    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;&nbsp;');
-	Code.innerHTML = s;
+	Code.innerHTML = Expression.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;&nbsp;');
 	var P = document.createElement('p');
 	P.appendChild(Code);
 	var Div2 = document.createElement('div');
 	Div2.appendChild(P);
 	Div2.setAttribute("class", "clickable");
-    Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, '\\\'').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t') + "\");");
+	Div2.setAttribute("data-tag", Tag);
+	Div2.setAttribute("onclick", "SetScript(this);");
 
 	Div.insertBefore(Div2, Div.firstChild);
 
@@ -32,35 +33,53 @@
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4 && xhttp.status == 200)
+		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
-			var Response = JSON.parse(xhttp.responseText);
-			ResultDiv.innerHTML = Response.html;
+			ResultDiv.innerHTML = xhttp.responseText;
 
-			if (Response.more)
+			if (xhttp.getResponseHeader("X-More") === "1")
 			{
 				xhttp.open("POST", "/Evaluate", true);
 				xhttp.setRequestHeader("Content-Type", "text/plain");
 				xhttp.setRequestHeader("X-TAG", Tag);
 				xhttp.send("");
 			}
-			else
-				delete xhttp;
 		};
 	}
 
 	xhttp.open("POST", "/Evaluate", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.setRequestHeader("X-TAG", Tag);
-	xhttp.send(Script.value);
+	xhttp.send(Expression);
+
 	Script.value = "";
 	Script.focus();
 }
 
-function SetScript(Text)
+function SetScript(Div)
 {
 	var Script = document.getElementById("script");
-	Script.value = Text;
+	var Loop = Div.firstElementChild;
+	var Expression = "";
+
+	while (Loop !== null)
+	{
+		if (Loop.tagName === "CODE")
+		{
+			Expression = Loop.innerText;
+			break;
+		}
+		else
+			Loop = Loop.nextElementSibling;
+	}
+
+	if (Expression === "")
+	{
+		var Tag = Div.getAttribute("data-tag");
+		Expression = Expressions[Tag];
+	}
+
+	Script.value = Expression;
 	Script.select();
 	Script.focus();
 	document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -94,7 +113,7 @@ function ScriptKeyDown(Control,Event)
 		Control.selectionStart = Control.selectionEnd = Start + 1;
 		return false;
 	}
-	else if (Event.keyCode == 13 && !Event.shiftKey)
+	else if (Event.keyCode === 13 && !Event.shiftKey)
 	{
 		EvaluateExpression();
 		return false;
@@ -119,14 +138,12 @@ function GraphClicked(Image, Event, Tag)
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4 && xhttp.status == 200)
+		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
 			var Script = document.getElementById("script");
 
 			Script.value = xhttp.responseText;
 			EvaluateExpression();
-
-			delete xhttp;
 		};
 	}
 
@@ -137,3 +154,5 @@ function GraphClicked(Image, Event, Tag)
 	xhttp.setRequestHeader("X-Y", y);
 	xhttp.send("");
 }
+
+var Expressions = {};

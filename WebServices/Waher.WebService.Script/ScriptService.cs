@@ -245,10 +245,9 @@ namespace Waher.WebService.Script
 
 					if (Exp.Tag is State State && !State.Response.HeaderSent && !State.Previewing)
 					{
-						State.Response.ContentType = "application/json";
-						State.Response.Write("{\"more\":true,\"html\":\"" + 
-							JSON.Encode("<p><font style=\"color:green\"><code>" + new string('.', Counter) + "</code></font></p>") + 
-							"\"}");
+						State.Response.SetHeader("X-More", "1");
+						State.Response.ContentType = "text/html";
+						State.Response.Write("<p><font style=\"color:green\"><code>" + new string('.', Counter) + "</code></font></p>");
 						State.Response.SendResponse();
 						State.Response.Dispose();
 					}
@@ -397,9 +396,9 @@ namespace Waher.WebService.Script
 
 				s = Result.ToString();
 
-				Html.Append("<div class='clickable' onclick='SetScript(\"");
-				Html.Append(s.ToString().Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'"));
-				Html.Append("\");'><table><thead><tr>");
+				Html.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
+				Html.Append(XML.Encode(s));
+				Html.Append("</code><table><thead><tr>");
 
 				foreach (string s2 in M.ColumnNames)
 				{
@@ -441,8 +440,8 @@ namespace Waher.WebService.Script
 			else
 			{
 				s = Result.ToString();
-				s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
-					"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+				s = "<div class='clickable' onclick='SetScript(this);'><code style='display:none'>"+ XML.Encode(s) +
+					"</code><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
 			}
 
 			if (sb != null)
@@ -452,8 +451,8 @@ namespace Waher.WebService.Script
 					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
 			}
 
-			s = "{\"more\":" + CommonTypes.Encode(More) + ",\"html\":\"" + JSON.Encode(s) + "\"}";
-			Response.ContentType = "application/json";
+			Response.SetHeader("X-More", More ? "1" : "0");
+			Response.ContentType = "text/html";
 			Response.Write(s);
 			Response.SendResponse();
 			Response.Dispose();

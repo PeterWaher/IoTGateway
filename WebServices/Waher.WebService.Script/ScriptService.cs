@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using SkiaSharp;
-using Waher.Content;
-using Waher.Content.Xml;
-using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Script;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
 using Waher.Security;
 
 namespace Waher.WebService.Script
@@ -27,7 +15,6 @@ namespace Waher.WebService.Script
 	public class ScriptService : HttpAsynchronousResource, IHttpPostMethod
 	{
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
-		private readonly Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
 
 		/// <summary>
 		/// Web service that can be used to execute script on the server.
@@ -88,25 +75,18 @@ namespace Waher.WebService.Script
 			if (string.IsNullOrEmpty(Tag))
 				throw new BadRequestException();
 
-			Variables Variables = new Variables();
-			Request.Session.CopyTo(Variables);
-
-			Variables["Request"] = Request;
-			Variables["Response"] = Response;
-
-			StringBuilder sb = new StringBuilder();
-			Variables.ConsoleOut = new StringWriter(sb);
-
-			Expression Exp = null;
-			IElement Result;
+			State State;
 
 			if (string.IsNullOrEmpty(s))
 			{
 				if (!string.IsNullOrEmpty(s = Request.Header["X-X"]) && int.TryParse(s, out int x) &&
 					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out int y))
 				{
-					if (!(Variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
+					if (!Request.Session.TryGetVariable("Graphs", out v) ||
+						!(v.ValueObject is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
+					{
 						throw new NotFoundException("Graphs not found.");
+					}
 
 					KeyValuePair<Graph, object[]> Rec;
 
@@ -124,157 +104,41 @@ namespace Waher.WebService.Script
 				}
 				else
 				{
-					lock (this.expressions)
-					{
-						if (!this.expressions.TryGetValue(Tag, out Exp))
-							throw new NotFoundException("Expression not found.");
-					}
+					if (!State.TryGetState(Tag, out State))
+						throw new NotFoundException("Expression not found.");
 
-					Exp.Tag = new State(Response, Tag);
+					State.SetRequestResponse(Request, Response, User);
 				}
 			}
 			else
 			{
+				if (!Request.Session.TryGetVariable("Timeout", out v) ||
+					!(v.ValueObject is double Timeout) || Timeout <= 0)
+				{
+					Timeout = 5 * 60 * 1000;    // 5 minutes
+				}
+
+				State = new State(Request, Response, Tag, (int)(Timeout + 0.5), User);
+
 				try
 				{
-					Exp = new Expression(s);
+					Expression Exp = new Expression(s);
 
 					if (!Exp.ForAll(this.IsAuthorized, User, false))
-						throw new ForbiddenException("Unauthorized to execute expression.");
+					{
+						State.SendResponse(new ObjectValue(new ForbiddenException("Unauthorized to execute expression.")), false);
+						return;
+					}
+
+					State.SetExpression(Exp);
 				}
 				catch (Exception ex)
 				{
-					this.SendResponse(Variables, new ObjectValue(ex), null, Response, false);
+					State.SendResponse(new ObjectValue(ex), false);
 					return;
 				}
 
-				Exp.Tag = new State(Response, Tag);
-
-				lock (this.expressions)
-				{
-					this.expressions[Tag] = Exp;
-				}
-
-				Exp.OnPreview += (sender, e) =>
-				{
-					if (Exp.Tag is State State && !State.Response.HeaderSent)
-					{
-						State.Previewing = true;
-						this.SendResponse(Variables, e.Preview, null, State.Response, true);
-					}
-				};
-
-				Stopwatch Watch = new Stopwatch();
-				Timer Watchdog = null;
-				Thread T = new Thread(P =>
-				{
-					try
-					{
-						try
-						{
-							Watch.Start();
-							Result = Exp.Root.Evaluate(Variables);
-						}
-						catch (ScriptReturnValueException ex)
-						{
-							Result = ex.ReturnValue;
-						}
-						catch (Exception ex)
-						{
-							Result = new ObjectValue(ex);
-						}
-						finally
-						{
-							Watch.Stop();
-							Watchdog?.Dispose();
-
-							double ms = (Watch.ElapsedTicks * 1000.0) / Stopwatch.Frequency;
-
-							Log.Notice("Script evaluated.", this.ResourceName, User.UserName, "ScriptEval",
-								new KeyValuePair<string, object>("RemoteEndPoint", Request.RemoteEndPoint),
-								new KeyValuePair<string, object>("Script", s),
-								new KeyValuePair<string, object>("Milliseconds", ms));
-						}
-
-						if (Exp.Tag is State State && !State.Response.HeaderSent)
-						{
-							lock (this.expressions)
-							{
-								this.expressions.Remove(State.Tag);
-							}
-
-							this.SendResponse(Variables, Result, sb, State.Response, false);
-						}
-
-						Variables.CopyTo(Request.Session);
-					}
-					catch (ThreadAbortException)
-					{
-						if (Exp.Tag is State State && !State.Response.HeaderSent)
-						{
-							lock (this.expressions)
-							{
-								this.expressions.Remove(State.Tag);
-							}
-
-							this.SendResponse(Variables, new ObjectValue(new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use.")),
-								sb, State.Response, false);
-						}
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-					finally
-					{
-						Timer Temp = Watchdog;
-						Watchdog = null;
-						Temp?.Dispose();
-					}
-				});
-
-				if (!Variables.TryGetVariable("Timeout", out v) || !(v.ValueObject is double Timeout))
-					Timeout = 5 * 60 * 1000;	// 5 minutes
-
-				int Counter = 0;
-				Watchdog = new Timer(P =>
-				{
-					double ms = (Watch.ElapsedTicks * 1000.0) / Stopwatch.Frequency;
-
-					Counter++;
-
-					if (Exp.Tag is State State && !State.Response.HeaderSent && !State.Previewing)
-					{
-						State.Response.SetHeader("X-More", "1");
-						State.Response.ContentType = "text/html";
-						State.Response.Write("<p><font style=\"color:green\"><code>" + new string('.', Counter) + "</code></font></p>");
-						State.Response.SendResponse();
-						State.Response.Dispose();
-					}
-
-					if (ms >= Timeout)
-					{
-						T?.Abort();
-						Timer Temp = Watchdog;
-						Watchdog = null;
-						Temp?.Dispose();
-
-						Log.Warning("Long-running script forcefully terminated.", this.ResourceName, User.UserName, "ScriptAbort",
-							new KeyValuePair<string, object>("RemoteEndPoint", Request.RemoteEndPoint),
-							new KeyValuePair<string, object>("Script", s),
-							new KeyValuePair<string, object>("Milliseconds", ms));
-					}
-					else if (Counter == 5)     // 5 sceonds
-					{
-						Log.Notice("Long-running script.", this.ResourceName, User.UserName, "ScriptLong",
-							new KeyValuePair<string, object>("RemoteEndPoint", Request.RemoteEndPoint),
-							new KeyValuePair<string, object>("Script", s),
-							new KeyValuePair<string, object>("Milliseconds", ms));
-					}
-
-				}, null, 1000, 1000);
-
-				T.Start(null);
+				State.Start();
 			}
 		}
 
@@ -286,182 +150,6 @@ namespace Waher.WebService.Script
 				return User.HasPrivilege(Node.GetType().FullName);
 			else
 				return false;
-		}
-
-		private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response,
-			bool More)
-		{
-			Variables["Ans"] = Result;
-
-			object Obj;
-			string s;
-
-			if (Result is Graph G)
-			{
-				GraphSettings Settings = new GraphSettings();
-				Tuple<int, int> Size;
-				double d;
-
-				if ((Size = G.RecommendedBitmapSize) != null)
-				{
-					Settings.Width = Size.Item1;
-					Settings.Height = Size.Item2;
-
-					Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-					Settings.MarginRight = Settings.MarginLeft;
-
-					Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-					Settings.MarginBottom = Settings.MarginTop;
-					Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-				}
-				else
-				{
-					if (Variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-					{
-						Settings.Width = (int)Math.Round(d);
-						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
-						Settings.MarginRight = Settings.MarginLeft;
-					}
-					else if (!Variables.ContainsVariable("GraphWidth"))
-						Variables["GraphWidth"] = (double)Settings.Width;
-
-					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-					{
-						Settings.Height = (int)Math.Round(d);
-						Settings.MarginTop = (int)Math.Round(15 * d / 480);
-						Settings.MarginBottom = Settings.MarginTop;
-						Settings.LabelFontSize = 12 * d / 480;
-					}
-					else if (!Variables.ContainsVariable("GraphHeight"))
-						Variables["GraphHeight"] = (double)Settings.Height;
-				}
-
-				using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
-				{
-					string Tag = Guid.NewGuid().ToString();
-					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-					byte[] Bin = Data.ToArray();
-					s = Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
-
-					Data.Dispose();
-
-					if (!(Variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
-					{
-						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
-						Variables["Graphs"] = Graphs;
-					}
-
-					lock (Graphs)
-					{
-						Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
-					}
-				}
-			}
-			else if (Result.AssociatedObjectValue is SKImage Img)
-			{
-				SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
-				byte[] Bin = Data.ToArray();
-
-				s = Convert.ToBase64String(Bin, 0, Bin.Length);
-				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-					"\" src=\"data:image/png;base64," + s + "\" /></figure>";
-
-				Data.Dispose();
-			}
-			else if (Result.AssociatedObjectValue is Exception ex)
-			{
-				ex = Log.UnnestException(ex);
-
-				if (ex is AggregateException ex2)
-				{
-					StringBuilder sb2 = new StringBuilder();
-
-					foreach (Exception ex3 in ex2.InnerExceptions)
-					{
-						sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
-						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex3.Message)));
-						sb2.Append("</code></font></p>");
-					}
-
-					s = sb2.ToString();
-				}
-				else
-					s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
-			}
-			else if (Result is ObjectMatrix M && M.ColumnNames != null)
-			{
-				StringBuilder Html = new StringBuilder();
-
-				s = Result.ToString();
-
-				Html.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
-				Html.Append(XML.Encode(s));
-				Html.Append("</code><table><thead><tr>");
-
-				foreach (string s2 in M.ColumnNames)
-				{
-					Html.Append("<th>");
-					Html.Append(this.FormatText(XML.HtmlValueEncode(s2)));
-					Html.Append("</th>");
-				}
-
-				Html.Append("</tr></thead><tbody>");
-
-				int x, y;
-
-				for (y = 0; y < M.Rows; y++)
-				{
-					Html.Append("<tr>");
-
-					for (x = 0; x < M.Columns; x++)
-					{
-						Html.Append("<td>");
-
-						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (Item != null)
-						{
-							if (Item is string s2)
-								Html.Append(this.FormatText(XML.HtmlValueEncode(s2)));
-							else
-								Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
-						}
-
-						Html.Append("</td>");
-					}
-
-					Html.Append("</tr>");
-				}
-
-				Html.Append("</tbody></table></div>");
-				s = Html.ToString();
-			}
-			else
-			{
-				s = Result.ToString();
-				s = "<div class='clickable' onclick='SetScript(this);'><code style='display:none'>"+ XML.Encode(s) +
-					"</code><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
-			}
-
-			if (sb != null)
-			{
-				string s2 = sb.ToString();
-				if (!string.IsNullOrEmpty(s2))
-					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
-			}
-
-			Response.SetHeader("X-More", More ? "1" : "0");
-			Response.ContentType = "text/html";
-			Response.Write(s);
-			Response.SendResponse();
-			Response.Dispose();
-		}
-
-		private string FormatText(string s)
-		{
-			return s.Replace("\r\n", "\n").Replace("\n", "<br/>").Replace("\r", "<br/>").
-				Replace("\t", "&nbsp;&nbsp;&nbsp;").Replace(" ", "&nbsp;");
 		}
 
 		/// <summary>

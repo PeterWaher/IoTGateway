@@ -583,8 +583,11 @@ namespace Waher.IoTGateway
 
 					webServer = new HttpServer(new int[] { HttpServer.DefaultHttpPort, 8080, 8081, 8082 }, null, null)
 					{
-						ResourceOverrideFilter = "(?<!Login)[.]md(\\?[.]*)?$"
+						ResourceOverrideFilter = "(?<!Login)[.]md(\\?[.]*)?$",
+						LoginAuditor = loginAuditor
 					};
+
+					webServer.CustomError += WebServer_CustomError;
 
 					loggedIn = new LoggedIn(webServer);
 
@@ -714,6 +717,9 @@ namespace Waher.IoTGateway
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
 
+					webServer.CustomError += WebServer_CustomError;
+
+					webServer.LoginAuditor = loginAuditor;
 					loggedIn = new LoggedIn(webServer);
 
 					foreach (SystemConfiguration Configuration in configurations)
@@ -1896,7 +1902,7 @@ namespace Waher.IoTGateway
 		{
 			if (xmppClient is null || xmppClient.UserName != UserName)
 			{
-				Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor, 
+				Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor,
 					new KeyValuePair<string, object>("Protocol", Protocol));
 
 				return LoginResult.InvalidLogin;
@@ -1966,8 +1972,8 @@ namespace Waher.IoTGateway
 							UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
 							string.IsNullOrEmpty(xmppCredentials.PasswordType))
 						{
-							Log.Informational("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", 
-								UserName, RemoteEndPoint, "LoginSuccessful", EventLevel.Minor, new KeyValuePair<string,object>("Protocol", Protocol));
+							Log.Informational("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.",
+								UserName, RemoteEndPoint, "LoginSuccessful", EventLevel.Minor, new KeyValuePair<string, object>("Protocol", Protocol));
 
 							return LoginResult.Successful;
 						}
@@ -2037,8 +2043,8 @@ namespace Waher.IoTGateway
 
 			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 			{
-				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.", 
-					string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor, 
+				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.",
+					string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor,
 					new KeyValuePair<string, object>("Protocol", "Web"));
 
 				Login.DoLogin(Request, From, true);
@@ -2145,7 +2151,7 @@ namespace Waher.IoTGateway
 
 						if (P.SessionId == CurrentSession)
 						{
-							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", 
+							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful",
 								EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "Web"));
 
 							Login.DoLogin(Request, From, true);
@@ -3387,7 +3393,7 @@ namespace Waher.IoTGateway
 				{
 					// In 64-bit operating systems, the 32-bit folder can be returned anyway, if the process is running in 32 bit.
 
-					if (Environment.Is64BitOperatingSystem && !Environment.Is64BitProcess)		
+					if (Environment.Is64BitOperatingSystem && !Environment.Is64BitProcess)
 					{
 						switch (Folder)
 						{
@@ -3473,5 +3479,118 @@ namespace Waher.IoTGateway
 
 		#endregion
 
+		#region Custom Errors
+
+		private static readonly Dictionary<int, KeyValuePair<DateTime, MarkdownDocument>> defaultDocuments = new Dictionary<int, KeyValuePair<DateTime, MarkdownDocument>>();
+
+		private static void WebServer_CustomError(object Sender, CustomErrorEventArgs e)
+		{
+			string ContentType = e.ContentType;
+			bool IsText = ContentType.StartsWith("text/plain");
+			bool IsMarkdown = ContentType.StartsWith("text/markdown");
+			bool IsEmpty = string.IsNullOrEmpty(ContentType);
+
+			if (IsEmpty || IsText || IsMarkdown)
+			{
+				MarkdownDocument Doc;
+				DateTime TP;
+
+				lock (defaultDocuments)
+				{
+					if (defaultDocuments.TryGetValue(e.StatusCode, out KeyValuePair<DateTime, MarkdownDocument> P))
+					{
+						TP = P.Key;
+						Doc = P.Value;
+					}
+					else
+					{
+						TP = DateTime.MinValue;
+						Doc = null;
+					}
+				}
+
+				string FileName = Path.Combine(appDataFolder, "Default", e.StatusCode.ToString() + ".md");
+
+				if (File.Exists(FileName))
+				{
+					DateTime TP2 = File.GetLastWriteTime(FileName);
+					MarkdownSettings Settings;
+					MarkdownDocument Detail;
+					string Markdown;
+					string Html;
+
+					if (Doc is null || TP2 > TP)
+					{
+						//string LocalResourceName = "/" + e.StatusCode.ToString() + ".md";
+						//string Url = GetUrl(LocalResourceName);
+
+						Markdown = File.ReadAllText(FileName);
+						Settings = new MarkdownSettings(emoji1_24x24, true)
+						{
+							RootFolder = rootFolder,
+							Variables = e.Request.Session ?? new Variables()
+						};
+
+						Doc = new MarkdownDocument(Markdown, Settings, RootFolder, string.Empty, string.Empty/* LocalResourceName, Url*/);
+
+						lock (defaultDocuments)
+						{
+							defaultDocuments[e.StatusCode] = new KeyValuePair<DateTime, MarkdownDocument>(TP2, Doc);
+						}
+					}
+
+					if (IsEmpty || e.Content is null)
+						Detail = null;
+					else
+					{
+						Encoding Encoding = null;
+						int i = ContentType.IndexOf(';');
+
+						if (i > 0)
+						{
+							KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).TrimStart());
+
+							foreach (KeyValuePair<string, string> Field in Fields)
+							{
+								if (Field.Key.ToUpper() == "CHARSET")
+									Encoding = InternetContent.GetEncoding(Field.Value);
+							}
+						}
+
+						if (Encoding is null)
+							Encoding = System.Text.Encoding.UTF8;
+
+						Markdown = Encoding.GetString(e.Content);
+						if (IsText)
+						{
+							MarkdownSettings Settings2 = new MarkdownSettings(null, false);
+							Detail = new MarkdownDocument("```\r\n" + Markdown + "\r\n```", Settings2);
+						}
+						else
+							Detail = new MarkdownDocument(Markdown, Doc.Settings);
+					}
+
+					lock (Doc)
+					{
+						Doc.Detail = Detail;
+						Html = Doc.GenerateHTML();
+					}
+
+					e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
+				}
+				else
+				{
+					if (!(Doc is null))
+					{
+						lock (defaultDocuments)
+						{
+							defaultDocuments.Remove(e.StatusCode);
+						}
+					}
+				}
+			}
+		}
+
+		#endregion
 	}
 }

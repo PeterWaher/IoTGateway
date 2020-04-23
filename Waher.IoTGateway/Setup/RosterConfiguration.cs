@@ -134,7 +134,7 @@ namespace Waher.IoTGateway.Setup
 
 		private void XmppClient_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			RosterItem Item = Gateway.XmppClient[e.FromBareJID];
+			RosterItem Item = Gateway.XmppClient?.GetRosterItem(e.FromBareJID);
 			if (!(Item is null))
 				this.XmppClient_OnRosterItemUpdated(Sender, Item);
 		}

@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldUpgradeInsecureRequests : HttpField
 	{
-		private bool upgrade;
+		private readonly bool upgrade;
 
 		/// <summary>
 		/// Upgrade-Insecure-Requests HTTP Field header.

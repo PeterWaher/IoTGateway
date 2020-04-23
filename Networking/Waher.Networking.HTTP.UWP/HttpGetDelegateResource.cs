@@ -9,11 +9,11 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpGetDelegateResource : HttpResource, IHttpGetMethod
 	{
-		private HttpAuthenticationScheme[] authenticationSchemes;
-		private HttpMethodHandler get;
-		private bool synchronous;
-		private bool handlesSubPaths;
-		private bool userSessions;
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly HttpMethodHandler get;
+		private readonly bool synchronous;
+		private readonly bool handlesSubPaths;
+		private readonly bool userSessions;
 
 		/// <summary>
 		/// HTTP resource defined by a GET delegate method.

@@ -9,8 +9,8 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpField
 	{
-		private string key;
-		private string value;
+		private readonly string key;
+		private readonly string value;
 
 		/// <summary>
 		/// Base class for all HTTP fields.

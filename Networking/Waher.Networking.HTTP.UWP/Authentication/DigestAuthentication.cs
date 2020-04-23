@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP.Authentication
 	{
 		private readonly Dictionary<string, DateTime> expirationByNonce = new Dictionary<string, DateTime>();
 		private readonly SortedDictionary<DateTime, string> nonceByExpiration = new SortedDictionary<DateTime, string>();
-		private Random rnd = new Random();
+		private readonly Random rnd = new Random();
 		private readonly string opaque = Guid.NewGuid().ToString().Replace("-", string.Empty);
 		private readonly IUserSource users;
 		private readonly string realm;
@@ -54,7 +54,7 @@ namespace Waher.Networking.HTTP.Authentication
 				string Nc = null;
 				string Uri = null;
 				string Qop = null;
-				string[] QopItems = null;
+				string[] QopItems;
 				string Response = null;
 				bool Auth = false;
 				bool AuthInt = false;

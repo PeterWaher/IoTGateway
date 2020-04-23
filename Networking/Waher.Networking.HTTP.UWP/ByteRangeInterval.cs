@@ -9,8 +9,8 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class ByteRangeInterval
 	{
-		private long? first;
-		private long? last;
+		private readonly long? first;
+		private readonly long? last;
 		private ByteRangeInterval next;
 
 		/// <summary>

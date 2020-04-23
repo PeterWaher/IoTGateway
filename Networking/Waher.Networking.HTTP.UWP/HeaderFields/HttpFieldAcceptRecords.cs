@@ -125,7 +125,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string Alternative)
 		{
-			return this.IsAcceptable(Alternative, out double Quality, out AcceptanceLevel Acceptance);
+			return this.IsAcceptable(Alternative, out double _, out AcceptanceLevel _);
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <returns>If content of the given type is acceptable to the client.</returns>
 		public bool IsAcceptable(string Alternative, out double Quality)
 		{
-			return this.IsAcceptable(Alternative, out Quality, out AcceptanceLevel Acceptance);
+			return this.IsAcceptable(Alternative, out Quality, out AcceptanceLevel _);
 		}
 
 		/// <summary>

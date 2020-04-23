@@ -9,7 +9,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpGetPostDelegateResource : HttpGetDelegateResource, IHttpPostMethod
 	{
-		private HttpMethodHandler post;
+		private readonly HttpMethodHandler post;
 
         /// <summary>
         /// HTTP resource defined by GET and POST delegate methods.

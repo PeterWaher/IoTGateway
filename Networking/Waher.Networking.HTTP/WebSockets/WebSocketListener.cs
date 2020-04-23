@@ -102,9 +102,9 @@ namespace Waher.Networking.HTTP.WebSockets
 				throw new UpgradeRequiredException("websocket");
 			}
 
-			string Challenge = null;
+			string Challenge;
 			string WebSocketProtocol = null;
-			int? WebSocketVersion = null;
+			int? WebSocketVersion;
 			int i;
 
 			if (Request.Header.TryGetHeaderField("Sec-WebSocket-Key", out HttpField Field))

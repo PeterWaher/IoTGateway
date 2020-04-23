@@ -9,9 +9,9 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class ContentByteRangeInterval
 	{
-		private long first;
-		private long last;
-		private long total;
+		private readonly long first;
+		private readonly long last;
+		private readonly long total;
 
 		/// <summary>
 		/// Represents a content range interval in a ranged HTTP request or response.

@@ -11,14 +11,14 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class Cookie
 	{
-		private string name;
-		private string value;
-		private string domain = null;
-		private string path = null;
 		private DateTimeOffset? expires = null;
-		private int? maxAgeSeconds = null;
-		private bool secure = false;
-		private bool httpOnly = false;
+		private readonly string name;
+		private readonly string value;
+		private readonly string domain = null;
+		private readonly string path = null;
+		private readonly int? maxAgeSeconds = null;
+		private readonly bool secure = false;
+		private readonly bool httpOnly = false;
 
 		/// <summary>
 		/// Contains information about a cookie, as defined in RFC 6265.

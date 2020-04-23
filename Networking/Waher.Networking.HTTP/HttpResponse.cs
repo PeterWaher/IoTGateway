@@ -591,7 +591,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					this.SetHeader("Content-Type", string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType);
-					this.SetHeader("Connection", "close");
+					//this.SetHeader("Connection", "close");
 
 					if (!(Content is null))
 						this.Write(Content);

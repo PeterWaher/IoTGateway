@@ -139,6 +139,7 @@ namespace Waher.IoTGateway
 		private static DateTime checkCertificate = DateTime.MinValue;
 		private static DateTime checkIp = DateTime.MinValue;
 		private static HttpServer webServer = null;
+		private static HttpFolderResource root = null;
 		private static HttpxProxy httpxProxy = null;
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
@@ -567,7 +568,6 @@ namespace Waher.IoTGateway
 				SystemConfigurations.Values.CopyTo(configurations, 0);
 				Array.Sort<SystemConfiguration>(configurations, (c1, c2) => c1.Priority - c2.Priority);
 
-				HttpFolderResource HttpFolderResource;
 				ISystemConfiguration CurrentConfiguration = null;
 				LinkedList<HttpResource> SetupResources = null;
 				StringBuilder sb;
@@ -596,7 +596,7 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
 					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
 					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false)));   // Syntax highlighting library, provided by http://highlightjs.org
-					SetupResources.AddLast(webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
 					SetupResources.AddLast(webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage)));
 					SetupResources.AddLast(webServer.Register(new ClientEvents()));
 					SetupResources.AddLast(webServer.Register(new ClientEventsWebSocket()));
@@ -606,7 +606,8 @@ namespace Waher.IoTGateway
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
 
-					HttpFolderResource.AllowTypeConversion();
+					root.AllowTypeConversion();
+
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
@@ -747,7 +748,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
 				webServer.Register(new ClientEvents());
@@ -764,7 +765,7 @@ namespace Waher.IoTGateway
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
 
-				HttpFolderResource.AllowTypeConversion();
+				root.AllowTypeConversion();
 
 				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
 				if (FileFolders != null)
@@ -1607,6 +1608,8 @@ namespace Waher.IoTGateway
 					webServer = null;
 				}
 
+				root = null;
+
 				if (exportExceptions)
 				{
 					lock (exceptionFile)
@@ -1679,6 +1682,14 @@ namespace Waher.IoTGateway
 		public static string RootFolder
 		{
 			get { return rootFolder; }
+		}
+
+		/// <summary>
+		/// Root folder resource.
+		/// </summary>
+		public static HttpFolderResource Root
+		{
+			get { return root; }
 		}
 
 		/// <summary>
@@ -3481,11 +3492,26 @@ namespace Waher.IoTGateway
 
 		#region Custom Errors
 
-		private static readonly Dictionary<int, KeyValuePair<DateTime, MarkdownDocument>> defaultDocuments = new Dictionary<int, KeyValuePair<DateTime, MarkdownDocument>>();
+		private static readonly Dictionary<string, KeyValuePair<DateTime, MarkdownDocument>> defaultDocuments = new Dictionary<string, KeyValuePair<DateTime, MarkdownDocument>>();
 
 		private static void WebServer_CustomError(object Sender, CustomErrorEventArgs e)
 		{
-			string ContentType = e.ContentType;
+			string Html = GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
+
+			if (!string.IsNullOrEmpty(Html))
+				e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
+		}
+
+		/// <summary>
+		/// Gets a custom error HTML document.
+		/// </summary>
+		/// <param name="Request">Request for which the error document is to be prepared.</param>
+		/// <param name="LocalFileName">Local file name of the custom error markdown document.</param>
+		/// <param name="ContentType">Content-Type of embedded content.</param>
+		/// <param name="Content">Binary encoding of embedded content.</param>
+		/// <returns>HTML document, if it could be found and generated, or null otherwise.</returns>
+		public static string GetCustomErrorHtml(HttpRequest Request, string LocalFileName, string ContentType, byte[] Content)
+		{
 			bool IsText = ContentType.StartsWith("text/plain");
 			bool IsMarkdown = ContentType.StartsWith("text/markdown");
 			bool IsEmpty = string.IsNullOrEmpty(ContentType);
@@ -3497,7 +3523,7 @@ namespace Waher.IoTGateway
 
 				lock (defaultDocuments)
 				{
-					if (defaultDocuments.TryGetValue(e.StatusCode, out KeyValuePair<DateTime, MarkdownDocument> P))
+					if (defaultDocuments.TryGetValue(LocalFileName, out KeyValuePair<DateTime, MarkdownDocument> P))
 					{
 						TP = P.Key;
 						Doc = P.Value;
@@ -3509,37 +3535,36 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				string FileName = Path.Combine(appDataFolder, "Default", e.StatusCode.ToString() + ".md");
+				string FullFileName = Path.Combine(appDataFolder, "Default", LocalFileName);
 
-				if (File.Exists(FileName))
+				if (File.Exists(FullFileName))
 				{
-					DateTime TP2 = File.GetLastWriteTime(FileName);
+					DateTime TP2 = File.GetLastWriteTime(FullFileName);
 					MarkdownSettings Settings;
 					MarkdownDocument Detail;
 					string Markdown;
-					string Html;
 
 					if (Doc is null || TP2 > TP)
 					{
-						//string LocalResourceName = "/" + e.StatusCode.ToString() + ".md";
-						//string Url = GetUrl(LocalResourceName);
-
-						Markdown = File.ReadAllText(FileName);
+						Markdown = File.ReadAllText(FullFileName);
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
-							Variables = e.Request.Session ?? new Variables()
+							Variables = Request.Session ?? new Variables()
 						};
 
-						Doc = new MarkdownDocument(Markdown, Settings, RootFolder, string.Empty, string.Empty/* LocalResourceName, Url*/);
+						if (!Settings.Variables.ContainsVariable("Request"))
+							Settings.Variables["Request"] = Request;
+
+						Doc = new MarkdownDocument(Markdown, Settings, RootFolder, string.Empty, string.Empty);
 
 						lock (defaultDocuments)
 						{
-							defaultDocuments[e.StatusCode] = new KeyValuePair<DateTime, MarkdownDocument>(TP2, Doc);
+							defaultDocuments[LocalFileName] = new KeyValuePair<DateTime, MarkdownDocument>(TP2, Doc);
 						}
 					}
 
-					if (IsEmpty || e.Content is null)
+					if (IsEmpty || Content is null)
 						Detail = null;
 					else
 					{
@@ -3560,7 +3585,7 @@ namespace Waher.IoTGateway
 						if (Encoding is null)
 							Encoding = System.Text.Encoding.UTF8;
 
-						Markdown = Encoding.GetString(e.Content);
+						Markdown = Encoding.GetString(Content);
 						if (IsText)
 						{
 							MarkdownSettings Settings2 = new MarkdownSettings(null, false);
@@ -3573,10 +3598,8 @@ namespace Waher.IoTGateway
 					lock (Doc)
 					{
 						Doc.Detail = Detail;
-						Html = Doc.GenerateHTML();
+						return Doc.GenerateHTML();
 					}
-
-					e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
 				}
 				else
 				{
@@ -3584,11 +3607,13 @@ namespace Waher.IoTGateway
 					{
 						lock (defaultDocuments)
 						{
-							defaultDocuments.Remove(e.StatusCode);
+							defaultDocuments.Remove(LocalFileName);
 						}
 					}
 				}
 			}
+
+			return null;
 		}
 
 		#endregion

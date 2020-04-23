@@ -532,7 +532,6 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				Response = new HttpResponse(this.client, this, this.server, Request);
 #if !WINDOWS_UWP
 				HttpRequestHeader Header = Request.Header;
 				int? UpgradePort = null;
@@ -582,7 +581,10 @@ namespace Waher.Networking.HTTP
 				}
 				else
 #endif
+				{
+					Response = new HttpResponse(this.client, this, this.server, Request);
 					Resource.Execute(this.server, Request, Response);
+				}
 			}
 			catch (HttpException ex)
 			{

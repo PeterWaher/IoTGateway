@@ -184,26 +184,59 @@ namespace Waher.Networking.HTTP
 		public void GET(HttpRequest Request, HttpResponse Response)
 		{
 			string FullPath = this.GetFullPath(Request);
-			if (!File.Exists(FullPath))
+			if (File.Exists(FullPath))
 			{
-				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
-				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+				CacheRec Rec;
+
+				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+
+				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+				Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
+				Rec.IsDynamic = Dynamic;
+
+				if (Response.ResponseSent)
+					return;
+
+				SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
+			}
+			else
+				this.RaiseFileNotFound(FullPath, Request, Response);
+		}
+
+		private void RaiseFileNotFound(string FullPath, HttpRequest Request, HttpResponse Response)
+		{
+			NotFoundException ex = new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+			FileNotFoundEventHandler h = this.FileNotFound;
+
+			if (!(h is null))
+			{
+				FileNotFoundEventArgs e = new FileNotFoundEventArgs(ex, FullPath, Request, Response);
+
+				try
+				{
+					h(this, e);
+				}
+				catch (Exception ex2)
+				{
+					Log.Critical(ex2);
+				}
+
+				ex = e.Exception;
+				if (ex is null)
+					return;		// Sent asynchronously from event handler.
 			}
 
-			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
-			CacheRec Rec;
+			Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 
-			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
-
-			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
-			Rec.IsDynamic = Dynamic;
-
-			if (Response.ResponseSent)
-				return;
-
-			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
+			Response.SendResponse(ex);
+			Response.Dispose();
 		}
+
+		/// <summary>
+		/// Event raised when a file was requested that could not be found. 
+		/// </summary>
+		public event FileNotFoundEventHandler FileNotFound = null;
 
 		/// <summary>
 		/// Sends a file-based response back to the client.
@@ -646,6 +679,7 @@ namespace Waher.Networking.HTTP
 				if (this.Response != null)
 				{
 					this.Response.SendResponse();
+					this.Response.Dispose();
 					this.Response = null;
 				}
 			}
@@ -661,111 +695,110 @@ namespace Waher.Networking.HTTP
 		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
 			string FullPath = this.GetFullPath(Request);
-			if (!File.Exists(FullPath))
+			if (File.Exists(FullPath))
 			{
-				Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
-				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
-			}
+				HttpRequestHeader Header = Request.Header;
+				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+				DateTimeOffset? Limit;
+				CacheRec Rec;
 
-			HttpRequestHeader Header = Request.Header;
-			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
-			DateTimeOffset? Limit;
-			CacheRec Rec;
-
-			if (Header.IfRange != null && (Limit = Header.IfRange.Timestamp).HasValue &&
-				!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
-			{
-				Response.StatusCode = 200;
-				this.GET(Request, Response);    // No ranged request.
-				return;
-			}
-
-			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
-
-			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
-			Rec.IsDynamic = Dynamic;
-
-			if (Response.ResponseSent)
-				return;
-
-			ReadProgress Progress = new ReadProgress()
-			{
-				Response = Response,
-				Request = Request,
-				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-			};
-
-			ByteRangeInterval Interval = FirstInterval;
-			Progress.TotalLength = Progress.f.Length;
-
-			long i = 0;
-			long j;
-			long First;
-
-			if (FirstInterval.First.HasValue)
-				First = FirstInterval.First.Value;
-			else
-				First = Progress.TotalLength - FirstInterval.Last.Value;
-
-			Progress.f.Position = First;
-			Progress.BytesLeft = Interval.GetIntervalLength(Progress.TotalLength);
-			Progress.Next = Interval.Next;
-
-			while (Interval != null)
-			{
-				j = Interval.GetIntervalLength(Progress.TotalLength);
-				if (j > i)
-					i = j;
-
-				Interval = Interval.Next;
-			}
-
-			Progress.BlockSize = (int)Math.Min(BufferSize, i);
-			Progress.Buffer = new byte[Progress.BlockSize];
-
-			if (FirstInterval.Next is null)
-			{
-				Progress.Boundary = null;
-				Progress.ContentType = null;
-
-				Response.ContentType = ContentType;
-				Response.ContentLength = FirstInterval.GetIntervalLength(Progress.f.Length);
-				Response.SetHeader("Content-Range", ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
-			}
-			else
-			{
-				Progress.Boundary = Guid.NewGuid().ToString().Replace("-", string.Empty);
-				Progress.ContentType = ContentType;
-
-				Response.ContentType = "multipart/byteranges; boundary=" + Progress.Boundary;
-				// chunked transfer encoding will be used
-			}
-
-			if (!Rec.IsDynamic)
-			{
-				Response.SetHeader("ETag", Rec.ETag);
-				Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
-			}
-
-			if (Response.OnlyHeader || Progress.BytesLeft == 0)
-			{
-				Response.SendResponse();
-				Progress.Dispose();
-			}
-			else
-			{
-				if (FirstInterval.Next != null)
+				if (Header.IfRange != null && (Limit = Header.IfRange.Timestamp).HasValue &&
+					!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 				{
-					Response.WriteLine();
-					Response.WriteLine("--" + Progress.Boundary);
-					Response.WriteLine("Content-Type: " + Progress.ContentType);
-					Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
-					Response.WriteLine();
+					Response.StatusCode = 200;
+					this.GET(Request, Response);    // No ranged request.
+					return;
 				}
 
-				Task _ = Progress.BeginRead();
+				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+
+				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+				Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
+				Rec.IsDynamic = Dynamic;
+
+				if (Response.ResponseSent)
+					return;
+
+				ReadProgress Progress = new ReadProgress()
+				{
+					Response = Response,
+					Request = Request,
+					f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+				};
+
+				ByteRangeInterval Interval = FirstInterval;
+				Progress.TotalLength = Progress.f.Length;
+
+				long i = 0;
+				long j;
+				long First;
+
+				if (FirstInterval.First.HasValue)
+					First = FirstInterval.First.Value;
+				else
+					First = Progress.TotalLength - FirstInterval.Last.Value;
+
+				Progress.f.Position = First;
+				Progress.BytesLeft = Interval.GetIntervalLength(Progress.TotalLength);
+				Progress.Next = Interval.Next;
+
+				while (Interval != null)
+				{
+					j = Interval.GetIntervalLength(Progress.TotalLength);
+					if (j > i)
+						i = j;
+
+					Interval = Interval.Next;
+				}
+
+				Progress.BlockSize = (int)Math.Min(BufferSize, i);
+				Progress.Buffer = new byte[Progress.BlockSize];
+
+				if (FirstInterval.Next is null)
+				{
+					Progress.Boundary = null;
+					Progress.ContentType = null;
+
+					Response.ContentType = ContentType;
+					Response.ContentLength = FirstInterval.GetIntervalLength(Progress.f.Length);
+					Response.SetHeader("Content-Range", ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
+				}
+				else
+				{
+					Progress.Boundary = Guid.NewGuid().ToString().Replace("-", string.Empty);
+					Progress.ContentType = ContentType;
+
+					Response.ContentType = "multipart/byteranges; boundary=" + Progress.Boundary;
+					// chunked transfer encoding will be used
+				}
+
+				if (!Rec.IsDynamic)
+				{
+					Response.SetHeader("ETag", Rec.ETag);
+					Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+				}
+
+				if (Response.OnlyHeader || Progress.BytesLeft == 0)
+				{
+					Response.SendResponse();
+					Progress.Dispose();
+				}
+				else
+				{
+					if (FirstInterval.Next != null)
+					{
+						Response.WriteLine();
+						Response.WriteLine("--" + Progress.Boundary);
+						Response.WriteLine("Content-Type: " + Progress.ContentType);
+						Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
+						Response.WriteLine();
+					}
+
+					Task _ = Progress.BeginRead();
+				}
 			}
+			else
+				this.RaiseFileNotFound(FullPath, Request, Response);
 		}
 
 		/// <summary>
@@ -792,6 +825,7 @@ namespace Waher.Networking.HTTP
 
 			Response.StatusCode = 201;
 			Response.SendResponse();
+			Response.Dispose();
 		}
 
 		/// <summary>
@@ -839,6 +873,7 @@ namespace Waher.Networking.HTTP
 
 			Response.StatusCode = 201;
 			Response.SendResponse();
+			Response.Dispose();
 		}
 
 		/// <summary>
@@ -859,6 +894,7 @@ namespace Waher.Networking.HTTP
 				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 
 			Response.SendResponse();
+			Response.Dispose();
 		}
 
 		/// <summary>
@@ -934,6 +970,7 @@ namespace Waher.Networking.HTTP
 				throw new SeeOtherException(Referer);  // PRG pattern.
 
 			Response.SendResponse();
+			Response.Dispose();
 		}
 	}
 }

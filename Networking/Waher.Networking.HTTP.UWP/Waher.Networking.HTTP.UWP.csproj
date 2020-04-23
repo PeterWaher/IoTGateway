@@ -156,6 +156,7 @@
     <Compile Include="Exceptions\ServerErrors\NotImplementedException.cs" />
     <Compile Include="Exceptions\ServerErrors\ServiceUnavailableException.cs" />
     <Compile Include="Exceptions\ServerErrors\VariantAlsoNegotiatesException.cs" />
+    <Compile Include="FileNotFoundEventArgs.cs" />
     <Compile Include="HeaderFields\AcceptRecord.cs" />
     <Compile Include="HeaderFields\HttpFieldAccept.cs" />
     <Compile Include="HeaderFields\HttpFieldAcceptCharset.cs" />

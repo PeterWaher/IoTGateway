@@ -621,6 +621,6 @@
     </Content>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" />
+    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y&#xD;&#xA;xcopy &quot;$(OutDir)Default\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Default&quot; /S /Y" />
   </Target>
 </Project>

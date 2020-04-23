@@ -6,4 +6,7 @@
   <Description>Event raised when a remote endpoint has been blocked due to excessing number of failed login attempts.</Description>
   <Object>Remote Endpoint</Object>
 	<Actor>Module blocking the remote endpoint.</Actor>
+  <Tag key="Reason" valueType="xs:string">
+    <Description>The reason the endpoint got blocked.</Description>
+  </Tag>
 </EventDescription>

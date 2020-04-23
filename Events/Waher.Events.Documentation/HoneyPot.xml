@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="HoneyPot" minor="true" medium="false" major="false"
+				  debug="false" informational="false" notice="false" warning="true" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when a resource flagged as a vulnerable resource on the Internet was requested.</Description>
+	<Object>Resource</Object>
+	<Actor>Remote endpoint of client requesting the file.</Actor>
+  <Tag key="Blocked" valueType="xs:boolean">
+    <Description>If the remote endpoint has been blocked (by this request, or earlier requests).</Description>
+  </Tag>
+</EventDescription>

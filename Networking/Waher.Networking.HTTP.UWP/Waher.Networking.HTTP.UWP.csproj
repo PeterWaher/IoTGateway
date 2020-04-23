@@ -120,6 +120,7 @@
     <Compile Include="CommunicationStatistics.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
     <Compile Include="Exceptions\ClientErrors\ConflictException.cs" />
     <Compile Include="Exceptions\ClientErrors\FailedDependencyException.cs" />

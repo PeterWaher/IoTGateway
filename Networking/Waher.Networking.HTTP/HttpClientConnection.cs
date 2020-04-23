@@ -176,12 +176,12 @@ namespace Waher.Networking.HTTP
 
 				if (this.header.HttpVersion < 1)
 				{
-					this.SendResponse(null, new HttpException(505, "HTTP Version Not Supported", "At least HTTP Version 1.0 is required."), true);
+					this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported", "At least HTTP Version 1.0 is required."), true);
 					return Task.FromResult<bool>(false);
 				}
 				else if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
-					this.SendResponse(null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
+					this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 					return Task.FromResult<bool>(false);
 				}
 				else if (i + 1 < NrRead)
@@ -210,7 +210,7 @@ namespace Waher.Networking.HTTP
 					this.ReceiveBinary(Data2);
 				}
 
-				this.SendResponse(null, new HttpException(431, "Request Header Fields Too Large", "Max Header Size: " + MaxHeaderSize.ToString()), true);
+				this.SendResponse(null, null, new HttpException(431, "Request Header Fields Too Large", "Max Header Size: " + MaxHeaderSize.ToString()), true);
 				return Task.FromResult<bool>(false);
 			}
 		}
@@ -229,7 +229,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						this.SendResponse(null, new HttpException(501, "Not Implemented", "Transfer encoding not implemented."), false);
+						this.SendResponse(null, null, new HttpException(501, "Not Implemented", "Transfer encoding not implemented."), false);
 						return true;
 					}
 				}
@@ -241,7 +241,7 @@ namespace Waher.Networking.HTTP
 						long l = ContentLength.ContentLength;
 						if (l < 0)
 						{
-							this.SendResponse(null, new HttpException(400, "Bad Request", "Negative content lengths invalid."), false);
+							this.SendResponse(null, null, new HttpException(400, "Bad Request", "Negative content lengths invalid."), false);
 							return true;
 						}
 
@@ -254,7 +254,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						this.SendResponse(null, new HttpException(411, "Length Required", "Content Length required."), true);
+						this.SendResponse(null, null, new HttpException(411, "Length Required", "Content Length required."), true);
 						return false;
 					}
 				}
@@ -280,12 +280,12 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.transferEncoding.InvalidEncoding)
 				{
-					this.SendResponse(null, new HttpException(400, "Bad Request", "Invalid transfer encoding."), false);
+					this.SendResponse(null, null, new HttpException(400, "Bad Request", "Invalid transfer encoding."), false);
 					return true;
 				}
 				else if (this.transferEncoding.TransferError)
 				{
-					this.SendResponse(null, new HttpException(500, "Internal Server Error", "Unable to transfer content to resource."), false);
+					this.SendResponse(null, null, new HttpException(500, "Internal Server Error", "Unable to transfer content to resource."), false);
 					return true;
 				}
 				else
@@ -307,7 +307,7 @@ namespace Waher.Networking.HTTP
 				this.dataStream.Dispose();
 				this.dataStream = null;
 
-				this.SendResponse(null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
+				this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 				return false;
 			}
 			else
@@ -377,7 +377,7 @@ namespace Waher.Networking.HTTP
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
 
-							this.SendResponse(Request, new HttpException(401, "Unauthorized", "Unauthorized access prohibited."), false, Challenges.ToArray());
+							this.SendResponse(Request, null, new HttpException(401, "Unauthorized", "Unauthorized access prohibited."), false, Challenges.ToArray());
 							Request.Dispose();
 							return true;
 						}
@@ -392,13 +392,13 @@ namespace Waher.Networking.HTTP
 						{
 							if (!Request.HasData)
 							{
-								this.SendResponse(Request, new HttpException(100, "Continue", null), false);
+								this.SendResponse(Request, null, new HttpException(100, "Continue", null), false);
 								return null;
 							}
 						}
 						else
 						{
-							this.SendResponse(Request, new HttpException(417, "Expectation Failed", "Unable to parse Expect header."), true);
+							this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", "Unable to parse Expect header."), true);
 							Request.Dispose();
 							return false;
 						}
@@ -409,14 +409,14 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					this.SendResponse(Request, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
+					this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
 					Result = true;
 				}
 			}
 			catch (HttpException ex)
 			{
 				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
-				this.SendResponse(Request, ex, !Result, ex.HeaderFields);
+				this.SendResponse(Request, null, ex, !Result, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
@@ -424,7 +424,7 @@ namespace Waher.Networking.HTTP
 
 				Log.Critical(ex);
 
-				this.SendResponse(Request, new NotImplementedException(ex.Message), !Result);
+				this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result);
 			}
 			catch (IOException ex)
 			{
@@ -432,9 +432,9 @@ namespace Waher.Networking.HTTP
 
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
-					this.SendResponse(Request, new HttpException(507, "Insufficient Storage", "Insufficient space."), true);
+					this.SendResponse(Request, null, new HttpException(507, "Insufficient Storage", "Insufficient space."), true);
 				else
-					this.SendResponse(Request, new InternalServerErrorException(ex.Message), true);
+					this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
 
 				Result = false;
 			}
@@ -444,7 +444,7 @@ namespace Waher.Networking.HTTP
 
 				Log.Critical(ex);
 
-				this.SendResponse(Request, new InternalServerErrorException(ex.Message), !Result);
+				this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
 
 			Request.Dispose();
@@ -515,7 +515,7 @@ namespace Waher.Networking.HTTP
 						Location.Append(Header.Fragment);
 					}
 
-					this.SendResponse(Request, new HttpException(307, "Moved Temporarily",
+					this.SendResponse(Request, Response, new HttpException(307, "Moved Temporarily",
 						new KeyValuePair<string, string>("Location", Location.ToString()),
 						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests")), false);
 				}
@@ -529,7 +529,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(Request, ex, false, this.Merge(ex.HeaderFields, Response.Cookies));
+						this.SendResponse(Request, Response, ex, false, this.Merge(ex.HeaderFields, Response.Cookies));
 					}
 					catch (Exception)
 					{
@@ -547,7 +547,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(Request, new InternalServerErrorException(ex.Message), true);
+						this.SendResponse(Request, Response, new InternalServerErrorException(ex.Message), true);
 					}
 					catch (Exception)
 					{
@@ -569,17 +569,36 @@ namespace Waher.Networking.HTTP
 			this.client = null;
 		}
 
-		private void SendResponse(HttpRequest Request, HttpException ex, bool CloseAfterTransmission,
+		private void SendResponse(HttpRequest Request, HttpResponse Response, HttpException ex, bool CloseAfterTransmission,
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			using (HttpResponse Response = new HttpResponse(this.client, this, this.server, Request)
+			bool DisposeResponse;
+
+			if (Response is null)
 			{
-				StatusCode = ex.StatusCode,
-				StatusMessage = ex.Message,
-				ContentLength = null,
-				ContentType = null,
-				ContentLanguage = null
-			})
+				Response = new HttpResponse(this.client, this, this.server, Request)
+				{
+					StatusCode = ex.StatusCode,
+					StatusMessage = ex.Message,
+					ContentLength = null,
+					ContentType = null,
+					ContentLanguage = null
+				};
+
+				DisposeResponse = true;
+			}
+			else
+			{
+				Response.StatusCode = ex.StatusCode;
+				Response.StatusMessage = ex.Message;
+				Response.ContentLength = null;
+				Response.ContentType = null;
+				Response.ContentLanguage = null;
+
+				DisposeResponse = false;
+			}
+
+			try
 			{
 				foreach (KeyValuePair<string, string> P in HeaderFields)
 					Response.SetHeader(P.Key, P.Value);
@@ -594,6 +613,11 @@ namespace Waher.Networking.HTTP
 					Response.SendResponse();
 				else
 					Response.SendResponse(ex);
+			}
+			finally
+			{
+				if (DisposeResponse)
+					Response.Dispose();
 			}
 		}
 

@@ -508,12 +508,24 @@ namespace Waher.Networking.HTTP
 					this.ContentType = null;
 					this.ContentLanguage = null;
 
+					byte[] Content = null;
+					string ContentType = null;
+
 					if (ex is HttpException ex2)
 					{
 						this.StatusCode = ex2.StatusCode;
 						this.StatusMessage = ex2.Message;
 
-						string ContentType = ex2.ContentType;
+						if (!(ex2.Content is null))
+						{
+							ContentType = ex2.ContentType;
+							Content = ex2.Content;
+						}
+						else if (!(ex2.ContentObject is null) && this.TryEncode(ex2.ContentObject, out byte[] Content2, out string ContentType2))
+						{
+							Content = Content2;
+							ContentType = ContentType2;
+						}
 
 						if (!(ex2.HeaderFields is null))
 						{
@@ -530,25 +542,6 @@ namespace Waher.Networking.HTTP
 								this.SetHeader(P.Key, P.Value);
 							}
 						}
-
-						this.SetHeader("Connection", "close");
-
-						if (ex2.Content != null)
-						{
-							this.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/octet-stream";
-							this.Write(ex2.Content);
-						}
-						else if (ex2.ContentObject != null)
-						{
-							if (this.TryEncode(ex2.ContentObject, out byte[] Data, out ContentType))
-							{
-								this.ContentType = ContentType;
-								this.Write(Data);
-							}
-						}
-
-						this.SendResponse();
-						return;
 					}
 					else if (ex is System.NotImplementedException)
 					{
@@ -581,9 +574,26 @@ namespace Waher.Networking.HTTP
 						this.StatusMessage = "Internal Server Error";
 					}
 
+					if (Content is null)
+					{
+						Content = Encoding.UTF8.GetBytes(ex.Message);
+						ContentType = "text/plain; charset=utf-8";
+					}
+
+					if (this.httpServer.HasCustomErrors)
+					{
+						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content);
+						this.httpServer.CustomizeError(e);
+						Content = e.Content;
+						ContentType = e.ContentType;
+					}
+
+					this.SetHeader("Content-Type", string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType);
 					this.SetHeader("Connection", "close");
-					this.SetHeader("Content-Type", "text/plain");
-					this.Write(ex.Message);
+
+					if (!(Content is null))
+						this.Write(Content);
+
 					this.SendResponse();
 				}
 				catch (Exception)
@@ -837,7 +847,7 @@ namespace Waher.Networking.HTTP
 			else
 			{
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-				
+
 				this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
 				{
 					Result.TrySetResult(true);

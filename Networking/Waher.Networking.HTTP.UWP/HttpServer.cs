@@ -1301,6 +1301,25 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
+		/// <summary>
+		/// Event raised before sending an error back to a client. Allows the server to prepare custom error pages.
+		/// </summary>
+		public event CustomErrorEventHandler CustomError = null;
+
+		internal bool HasCustomErrors => !(this.CustomError is null);
+
+		internal void CustomizeError(CustomErrorEventArgs e)
+		{
+			try
+			{
+				this.CustomError?.Invoke(this, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
 		#endregion
 
 		#region Statistics

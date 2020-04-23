@@ -580,9 +580,11 @@ namespace Waher.Networking.HTTP
 						ContentType = "text/plain; charset=utf-8";
 					}
 
-					if (this.httpServer.HasCustomErrors)
+					if (this.statusCode >= 400 && this.httpServer.HasCustomErrors)
 					{
-						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content);
+						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content,
+							this.httpRequest, this);
+
 						this.httpServer.CustomizeError(e);
 						Content = e.Content;
 						ContentType = e.ContentType;

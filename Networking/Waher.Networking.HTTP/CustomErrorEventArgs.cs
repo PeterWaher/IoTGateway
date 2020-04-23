@@ -16,6 +16,8 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class CustomErrorEventArgs : EventArgs
 	{
+		private readonly HttpRequest request;
+		private readonly HttpResponse response;
 		private readonly int statusCode;
 		private readonly string statusMessage;
 		private string contentType;
@@ -28,13 +30,28 @@ namespace Waher.Networking.HTTP
 		/// <param name="StatusMessage">Status message of error</param>
 		/// <param name="ContentType">Content-Type of any content.</param>
 		/// <param name="Content">Any content.</param>
-		public CustomErrorEventArgs(int StatusCode, string StatusMessage, string ContentType, byte[] Content)
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		public CustomErrorEventArgs(int StatusCode, string StatusMessage, string ContentType, byte[] Content, 
+			HttpRequest Request, HttpResponse Response)
 		{
 			this.statusCode = StatusCode;
 			this.statusMessage = StatusMessage;
 			this.contentType = ContentType;
 			this.content = Content;
+			this.request = Request;
+			this.response = Response;
 		}
+
+		/// <summary>
+		/// Current request object.
+		/// </summary>
+		public HttpRequest Request => this.request;
+
+		/// <summary>
+		/// Current response object.
+		/// </summary>
+		public HttpResponse Response => this.response;
 
 		/// <summary>
 		/// Status code of error

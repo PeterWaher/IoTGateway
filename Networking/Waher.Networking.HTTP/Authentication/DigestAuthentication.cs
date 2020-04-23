@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Security.Cryptography;
 using Waher.Content;
+using Waher.Events;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -193,9 +193,19 @@ namespace Waher.Networking.HTTP.Authentication
 				Digest = ToHex(H(Digest));
 
 				if (Digest == Response)
-					return true;
+				{
+					Log.Informational("Login successful.", UserName, Request.RemoteEndPoint, "LoginSuccessful",
+						EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
 
-				User = null;
+					return true;
+				}
+				else
+				{
+					Log.Notice("Login attempt failed.", UserName, Request.RemoteEndPoint, "LoginFailure",
+						EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
+
+					User = null;
+				}
 			}
 
 			return false;

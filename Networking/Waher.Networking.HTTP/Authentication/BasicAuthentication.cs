@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Content;
+using Waher.Events;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -39,7 +39,7 @@ namespace Waher.Networking.HTTP.Authentication
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
 			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.CurrentCultureIgnoreCase))
 			{
-				byte[] Data = System.Convert.FromBase64String(Authorization.Value.Substring(6).Trim());
+				byte[] Data = Convert.FromBase64String(Authorization.Value.Substring(6).Trim());
 				string s = InternetContent.ISO_8859_1.GetString(Data);
 				int i = s.IndexOf(':');
 				if (i > 0)
@@ -48,7 +48,12 @@ namespace Waher.Networking.HTTP.Authentication
 					string Password = s.Substring(i + 1);
 
 					if (!this.users.TryGetUser(UserName, out User))
+					{
+						Log.Notice("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "LoginFailure",
+							EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
+
 						return false;
+					}
 
 					switch (User.PasswordHashType)
 					{
@@ -65,7 +70,20 @@ namespace Waher.Networking.HTTP.Authentication
 					}
 
 					if (Password == User.PasswordHash)
+					{
+						Log.Informational("Login successful.", UserName, Request.RemoteEndPoint, "LoginSuccessful",
+							EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
+
 						return true;
+					}
+					else
+					{
+						Log.Notice("Login attempt failed.", UserName, Request.RemoteEndPoint, "LoginFailure",
+							EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
+
+						User = null;
+						return false;
+					}
 				}
 			}
 

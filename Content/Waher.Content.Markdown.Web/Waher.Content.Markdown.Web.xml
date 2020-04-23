@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Web</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToHtmlConverter">
+            <summary>
+            Converts Markdown documents to HTML documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.#ctor">
+            <summary>
+            Converts Markdown documents to HTML documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.FromContentTypes">
+            <summary>
+            Converts content from these content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.BareJID">
+            <summary>
+            Bare JID used, if the HTTPX URI scheme is supported.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.RootFolder">
+            <summary>
+            Root folder used for web content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.EmojiSource">
+            <summary>
+            Emoji source to use when converting Markdown documents to HTML.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Script.Variables)">
+            <summary>
+            Performs the actual conversion.
+            </summary>
+            <param name="FromContentType">Content type of the content to convert from.</param>
+            <param name="From">Stream pointing to binary representation of content.</param>
+            <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
+            Otherwise, the parameter is the empty string.</param>
+            <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
+            <param name="URL">URL of resource, if accessed from a web server.</param>
+            <param name="ToContentType">Content type of the content to convert to.</param>
+            <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
+            <param name="Session">Session states.</param>
+            <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
+        </member>
+        <member name="T:Waher.Networking.HTTP.ScriptExtensions.Page">
+            <summary>
+            Page-local variables.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.#ctor">
+            <summary>
+            Page-local variables.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.HTTP.ScriptExtensions.Page.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.HTTP.ScriptExtensions.Page.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
+    </members>
+</doc>

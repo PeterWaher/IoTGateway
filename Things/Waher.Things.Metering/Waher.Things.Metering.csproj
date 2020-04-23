@@ -25,7 +25,7 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.3\.xml</DocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Things\Waher.Things.Metering\Waher.Things.Metering.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C:\My Projects\IoTGateway\Things\Waher.Things.Metering\Waher.Things.Metering.xml</DocumentationFile>

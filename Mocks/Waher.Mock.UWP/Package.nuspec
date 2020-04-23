@@ -16,7 +16,7 @@
     <tags>mock networking iot app uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.24"/>
-      <dependency id="Waher.Content.Xml" version="1.0.7"/>
+      <dependency id="Waher.Content.Xml" version="1.0.8"/>
       <dependency id="Waher.Events" version="1.0.11"/>
       <dependency id="Waher.Networking.UWP" version="1.0.15"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.46"/>

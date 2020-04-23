@@ -17,12 +17,12 @@
     <dependencies>
 			<dependency id="System.Net.WebSockets.Client" version="4.3.2"/>
 			<dependency id="Waher.Content" version="1.0.24"/>
-			<dependency id="Waher.Content.Xml" version="1.0.7"/>
+			<dependency id="Waher.Content.Xml" version="1.0.8"/>
 			<dependency id="Waher.Events" version="1.0.11"/>
 			<dependency id="Waher.Networking.UWP" version="1.0.15"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="1.0.46"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.0.12"/>
-      <dependency id="Waher.Security" version="1.0.4"/>
+      <dependency id="Waher.Security" version="1.0.5"/>
     </dependencies>
   </metadata>
   <files>

@@ -2537,7 +2537,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -2548,14 +2548,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2646,7 +2646,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5158,7 +5158,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -5169,14 +5169,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5267,7 +5267,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7815,7 +7815,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -7826,14 +7826,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7924,7 +7924,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10445,7 +10445,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -10456,14 +10456,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10554,7 +10554,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13111,7 +13111,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -13122,14 +13122,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13220,7 +13220,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15741,7 +15741,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -15752,14 +15752,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15850,7 +15850,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18407,7 +18407,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "1.0.24",
-          "Waher.Content.Xml": "1.0.7"
+          "Waher.Content.Xml": "1.0.8"
         }
       },
       "Waher.Content.Markdown/1.0.40": {
@@ -18418,14 +18418,14 @@
           "SkiaSharp": "1.68.1.1",
           "Waher.Content.Emoji": "1.0.2",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.7",
+          "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.35",
           "Waher.Script.Graphs": "1.0.13"
         }
       },
-      "Waher.Content.Xml/1.0.7": {
+      "Waher.Content.Xml/1.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18516,7 +18516,7 @@
           "Waher.Script": "1.0.35"
         }
       },
-      "Waher.Security/1.0.4": {
+      "Waher.Security/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28513,7 +28513,7 @@
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
     },
-    "Waher.Content.Xml/1.0.7": {
+    "Waher.Content.Xml/1.0.8": {
       "type": "project",
       "path": "../Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../Waher.Content.Xml/Waher.Content.Xml.csproj"
@@ -28563,7 +28563,7 @@
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
-    "Waher.Security/1.0.4": {
+    "Waher.Security/1.0.5": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"

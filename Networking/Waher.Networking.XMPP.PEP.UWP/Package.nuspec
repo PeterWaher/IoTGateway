@@ -22,12 +22,12 @@ XEP-0118: User Tune</description>
     <tags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.24"/>
-      <dependency id="Waher.Content.Xml" version="1.0.7"/>
+      <dependency id="Waher.Content.Xml" version="1.0.8"/>
       <dependency id="Waher.Events" version="1.0.11"/>
       <dependency id="Waher.Networking.UWP" version="1.0.15"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="1.0.46"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="1.0.8"/>
-			<dependency id="Waher.Security" version="1.0.4"/>
+			<dependency id="Waher.Security" version="1.0.5"/>
 		</dependencies>
   </metadata>
   <files>

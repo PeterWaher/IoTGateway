@@ -353,6 +353,47 @@
   <Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
+  <Folder name="Default">
+    <Content fileName="400.md"/>
+    <Content fileName="401.md"/>
+    <Content fileName="403.md"/>
+    <Content fileName="411.md"/>
+    <Content fileName="410.md"/>
+    <Content fileName="409.md"/>
+    <Content fileName="408.md"/>
+    <Content fileName="407.md"/>
+    <Content fileName="406.md"/>
+    <Content fileName="405.md"/>
+    <Content fileName="404.md"/>
+    <Content fileName="402.md"/>
+    <Content fileName="417.md"/>
+    <Content fileName="416.md"/>
+    <Content fileName="415.md"/>
+    <Content fileName="414.md"/>
+    <Content fileName="413.md"/>
+    <Content fileName="412.md"/>
+    <Content fileName="422.md"/>
+    <Content fileName="429.md"/>
+    <Content fileName="428.md"/>
+    <Content fileName="426.md"/>
+    <Content fileName="425.md"/>
+    <Content fileName="424.md"/>
+    <Content fileName="423.md"/>
+    <Content fileName="421.md"/>
+    <Content fileName="431.md"/>
+    <Content fileName="451.md"/>
+    <Content fileName="500.md"/>
+    <Content fileName="501.md"/>
+    <Content fileName="508.md"/>
+    <Content fileName="507.md"/>
+    <Content fileName="506.md"/>
+    <Content fileName="505.md"/>
+    <Content fileName="504.md"/>
+    <Content fileName="502.md"/>
+    <Content fileName="503.md"/>
+    <Content fileName="511.md"/>
+    <Content fileName="510.md"/>
+  </Folder>
   <Folder name="Graphics">
     <Content fileName='Emoji1.zip'/>
   </Folder>

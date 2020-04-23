@@ -18,7 +18,7 @@ namespace Waher.Security.LoginMonitor
 	/// are maintained for each remote endpoint, allowing services to query the LoginAuditor class (using its 
 	/// <see cref="GetEarliestLoginOpportunity(string, string)"/> method) about the current state of each remote endpoint trying to login.
 	/// </summary>
-	public class LoginAuditor : EventSink
+	public class LoginAuditor : EventSink, ILoginAuditor
 	{
 		private readonly Dictionary<string, RemoteEndpoint> states = new Dictionary<string, RemoteEndpoint>();
 		private readonly LoginInterval[] intervals;
@@ -153,6 +153,9 @@ namespace Waher.Security.LoginMonitor
 
 		/// <summary>
 		/// Processes a successful login attempt.
+		/// 
+		/// NOTE: Typically, logins are audited by listening on logged events.
+		/// This method should only be called directly when such events are not logged.
 		/// </summary>
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
@@ -170,6 +173,9 @@ namespace Waher.Security.LoginMonitor
 
 		/// <summary>
 		/// Processes a failed login attempt.
+		/// 
+		/// NOTE: Typically, logins are audited by listening on logged events.
+		/// This method should only be called directly when such events are not logged.
 		/// </summary>
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>

@@ -314,7 +314,7 @@ namespace Waher.Networking.HTTP
 				return true;
 		}
 
-		private Task<bool> RequestReceived()
+		private async Task<bool> RequestReceived()
 		{
 #if WINDOWS_UWP
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, 
@@ -324,7 +324,7 @@ namespace Waher.Networking.HTTP
 #endif
 			Request.clientConnection = this;
 
-			bool? Queued = this.QueueRequest(Request);
+			bool? Queued = await this.QueueRequest(Request);
 
 			if (Queued.HasValue)
 			{
@@ -335,13 +335,13 @@ namespace Waher.Networking.HTTP
 				this.dataStream = null;
 				this.transferEncoding = null;
 
-				return Task.FromResult<bool>(Queued.Value);
+				return Queued.Value;
 			}
 			else
-				return Task.FromResult<bool>(true);
+				return true;
 		}
 
-		private bool? QueueRequest(HttpRequest Request)
+		private async Task<bool?> QueueRequest(HttpRequest Request)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
 			bool Result;
@@ -361,6 +361,67 @@ namespace Waher.Networking.HTTP
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
 					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
 					{
+						ILoginAuditor Auditor = this.server.LoginAuditor;
+
+						if (!(Auditor is null))
+						{
+							DateTime? Next = await Auditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "HTTP");
+
+							if (Next.HasValue)
+							{
+								StringBuilder sb = new StringBuilder();
+								DateTime TP = Next.Value;
+								DateTime Today = DateTime.Today;
+								HttpException Error;
+
+								if (Next.Value == DateTime.MaxValue)
+								{
+									sb.Append("This endpoint (");
+									sb.Append(Request.RemoteEndPoint);
+									sb.Append(") has been blocked from the system.");
+
+									Error = new ForbiddenException(sb.ToString());
+								}
+								else
+								{
+									sb.Append("Too many failed login attempts in a row registered. Try again in ");
+
+									TimeSpan Span = DateTime.Now - TP;
+									double d;
+
+									if ((d = Span.TotalDays) >= 1)
+									{
+										d = Math.Ceiling(d);
+										sb.Append(d.ToString());
+										sb.Append(" day");
+									}
+									else if ((d = Span.TotalHours) >= 1)
+									{
+										d = Math.Ceiling(d);
+										sb.Append(d.ToString());
+										sb.Append(" hour");
+									}
+									else
+									{
+										d = Math.Ceiling(Span.TotalMinutes);
+										sb.Append(d.ToString());
+										sb.Append(" minute");
+									}
+
+									if (d > 1)
+										sb.Append('s');
+
+									sb.Append('.');
+
+									Error = new TooManyRequestsException(sb.ToString());
+								}
+
+								this.SendResponse(Request, null, Error, true);
+								Request.Dispose();
+								return true;
+							}
+						}
+
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
 							if (Scheme.IsAuthenticated(Request, out IUser User))
@@ -404,7 +465,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					Task.Run(() => this.ProcessRequest(Request, Resource));
+					Task _ = Task.Run(() => this.ProcessRequest(Request, Resource));
 					return true;
 				}
 				else

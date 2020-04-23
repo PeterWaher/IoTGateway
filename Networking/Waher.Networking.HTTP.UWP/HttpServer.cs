@@ -21,6 +21,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Cache;
 using Waher.Script;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
@@ -72,6 +73,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
+		private ILoginAuditor loginAuditor = null;
 		private DateTime lastStat = DateTime.MinValue;
 		private string eTagSalt = string.Empty;
 		private string name = typeof(HttpServer).Namespace;
@@ -991,6 +993,21 @@ namespace Waher.Networking.HTTP
 					this.resourceOverrideFilter = null;
 				else
 					this.resourceOverrideFilter = new Regex(value, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+			}
+		}
+
+		/// <summary>
+		/// Reference to login-auditor to help remove malicious users from the server.
+		/// </summary>
+		public ILoginAuditor LoginAuditor
+		{
+			get => this.loginAuditor;
+			set
+			{
+				if (this.loginAuditor is null || this.loginAuditor == value)
+					this.loginAuditor = value;
+				else
+					throw new InvalidOperationException("Login Auditor already set.");
 			}
 		}
 

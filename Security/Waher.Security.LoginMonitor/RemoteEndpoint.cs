@@ -17,6 +17,7 @@ namespace Waher.Security.LoginMonitor
 		private string objectId = null;
 		private string endpoint = null;
 		private string lastProtocol = string.Empty;
+		private string reason = string.Empty;
 		private bool blocked = false;
 		private int[] state = null;
 		private DateTime[] timestamps = null;
@@ -98,6 +99,16 @@ namespace Waher.Security.LoginMonitor
 		}
 
 		/// <summary>
+		/// Reason for blocking the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Reason
+		{
+			get => this.reason;
+			set => this.reason = value;
+		}
+
+		/// <summary>
 		/// Checks if last login attempt was a failed login attempt.
 		/// </summary>
 		public bool LastFailed
@@ -127,7 +138,10 @@ namespace Waher.Security.LoginMonitor
 				this.timestamps[i] = DateTime.MinValue;
 
 			if (Unblock)
+			{
 				this.blocked = false;
+				this.reason = string.Empty;
+			}
 		}
 
 	}

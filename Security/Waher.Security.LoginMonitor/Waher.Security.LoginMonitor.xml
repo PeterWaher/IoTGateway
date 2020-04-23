@@ -40,6 +40,9 @@
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginSuccessful(System.String,System.String)">
             <summary>
             Processes a successful login attempt.
+            
+            NOTE: Typically, logins are audited by listening on logged events.
+            This method should only be called directly when such events are not logged.
             </summary>
             <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
             <param name="Protocol">Protocol used to log in.</param>
@@ -47,6 +50,9 @@
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginFailure(System.String,System.String,System.DateTime)">
             <summary>
             Processes a failed login attempt.
+            
+            NOTE: Typically, logins are audited by listening on logged events.
+            This method should only be called directly when such events are not logged.
             </summary>
             <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
             <param name="Protocol">Protocol used to log in.</param>

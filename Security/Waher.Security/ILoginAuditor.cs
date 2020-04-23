@@ -29,7 +29,10 @@ namespace Waher.Security
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
 		/// <param name="Timestamp">Timestamp of event.</param>
-		Task ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp);
+		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
+		/// gets blocked.</param>
+		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
+		Task<bool> ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp, string Reason);
 
 		/// <summary>
 		/// Checks when a remote endpoint can login.

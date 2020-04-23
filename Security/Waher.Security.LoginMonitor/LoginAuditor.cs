@@ -53,7 +53,8 @@ namespace Waher.Security.LoginMonitor
 			switch (Event.EventId)
 			{
 				case "LoginFailure":
-					return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp);
+					return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp, 
+						"Repeatedly failing login attempts.");
 
 				case "LoginSuccessful":
 					return this.ProcessLoginSuccessful(Event.Actor, this.FindProtocol(Event));
@@ -180,10 +181,16 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
 		/// <param name="Timestamp">Timestamp of event.</param>
-		public async Task ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp)
+		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
+		/// gets blocked.</param>
+		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
+		public async Task<bool> ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp, string Reason)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
 			int i;
+
+			if (EP.Blocked)
+				return true;
 
 			if (EP.LastFailed)
 			{
@@ -204,8 +211,8 @@ namespace Waher.Security.LoginMonitor
 						i++;
 						if (i >= this.nrIntervals)
 						{
-							await this.Block(EP);
-							return;
+							await this.Block(EP, Reason);
+							return true;
 						}
 					}
 				}
@@ -220,6 +227,8 @@ namespace Waher.Security.LoginMonitor
 			}
 
 			await Database.Update(EP);
+
+			return EP.Blocked;
 		}
 
 		/// <summary>
@@ -253,20 +262,25 @@ namespace Waher.Security.LoginMonitor
 
 			if (i >= this.nrIntervals)
 			{
-				await this.Block(EP);
+				await this.Block(EP, "No more allowed login attempts.");
 				return DateTime.MaxValue;
 			}
 
 			return EP.Timestamps[i - 1].Add(this.intervals[i - 1].Interval);
 		}
 
-		private async Task Block(RemoteEndpoint EP)
+		private async Task Block(RemoteEndpoint EP, string Reason)
 		{
-			EP.Blocked = true;
-			Log.Warning("Remote endpoint blocked due to excessive number of failed login attempts.", 
-				EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major);
+			if (!EP.Blocked)
+			{
+				EP.Blocked = true;
+				EP.Reason = Reason;
 
-			await Database.Update(EP);
+				Log.Warning("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major,
+					new KeyValuePair<string, object>("Reason", Reason));
+
+				await Database.Update(EP);
+			}
 		}
 
 		/// <summary>

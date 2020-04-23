@@ -343,7 +343,7 @@ namespace Waher.Security.LoginMonitor.Test
 				Assert.AreEqual(Spans[i], TP2 - TP);
 				TP = TP2;
 
-				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);
+				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP, string.Empty);
 			}
 		}
 
@@ -367,7 +367,7 @@ namespace Waher.Security.LoginMonitor.Test
 						TP = Next.Value;
 				}
 
-				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP);
+				await auditor.ProcessLoginFailure(remoteEndpoint, protocol, TP, string.Empty);
 				TP = TP.AddDays(1);
 			}
 

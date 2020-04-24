@@ -574,7 +574,8 @@ namespace Waher.Networking.HTTP
 						this.StatusMessage = "Internal Server Error";
 					}
 
-					if (Content is null)
+					if (Content is null && !string.IsNullOrEmpty(ex.Message) &&
+						((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304))
 					{
 						Content = Encoding.UTF8.GetBytes(ex.Message);
 						ContentType = "text/plain; charset=utf-8";

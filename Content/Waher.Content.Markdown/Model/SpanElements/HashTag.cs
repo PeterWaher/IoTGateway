@@ -64,7 +64,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (!string.IsNullOrEmpty(s))
 			{
-				Output.Append(" click=\"");
+				Output.Append(" onclick=\"");
 				Output.Append(XML.HtmlAttributeEncode(s));
 				Output.Append('"');
 			}

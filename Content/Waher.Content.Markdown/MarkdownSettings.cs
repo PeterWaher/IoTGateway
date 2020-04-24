@@ -10,8 +10,10 @@ namespace Waher.Content.Markdown
     /// </summary>
     public class MarkdownSettings
     {
+		private XamlSettings xamlSettings = null;
+		private HtmlSettings htmlSettings = null;
         private IEmojiSource emojiSource;
-        private Variables variables;
+		private Variables variables;
         private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
@@ -193,6 +195,24 @@ namespace Waher.Content.Markdown
 			}
 			else
 				return Path.Combine(Path.GetDirectoryName(DocumentFileName), FileNameReference);
+		}
+
+		/// <summary>
+		/// XAML Settings used for XAML rendering.
+		/// </summary>
+		public XamlSettings XamlSettings
+		{
+			get => this.xamlSettings;
+			set => this.xamlSettings = value;
+		}
+
+		/// <summary>
+		/// HTML Settings used for HTML rendering.
+		/// </summary>
+		public HtmlSettings HtmlSettings
+		{
+			get => this.htmlSettings;
+			set => this.htmlSettings = value;
 		}
 
 	}

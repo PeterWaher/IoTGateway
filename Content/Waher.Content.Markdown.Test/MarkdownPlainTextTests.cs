@@ -20,7 +20,7 @@ namespace Waher.Content.Markdown.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Waher.Runtime.Inventory.Types.Initialize(
 				typeof(MarkdownPlainTextTests).Assembly,
@@ -213,6 +213,12 @@ namespace Waher.Content.Markdown.Test
 		public void Test_24_Subscript()
 		{
 			this.DoTest("Test_24_Subscript.md", "Test_24_Subscript.txt");
+		}
+
+		[TestMethod]
+		public void Test_25_HashTags()
+		{
+			this.DoTest("Test_25_HashTags.md", "Test_25_HashTags.txt");
 		}
 	}
 }

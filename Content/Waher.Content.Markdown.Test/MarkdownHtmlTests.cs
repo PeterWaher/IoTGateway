@@ -215,5 +215,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_24_Subscript.md", "Test_24_Subscript.html");
 		}
+
+		[TestMethod]
+		public void Test_25_HashTags()
+		{
+			this.DoTest("Test_25_HashTags.md", "Test_25_HashTags.html");
+		}
 	}
 }

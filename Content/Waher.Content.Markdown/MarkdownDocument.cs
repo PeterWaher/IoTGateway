@@ -1015,7 +1015,7 @@ namespace Waher.Content.Markdown
 				}
 
 				s = Rows[Block.Start];
-				if (this.IsPrefixedBy(s, '#', out d) && d < s.Length)
+				if (this.IsPrefixedBy(s, '#', out d, true) && d < s.Length)
 				{
 					string Prefix = s.Substring(0, d);
 					Rows[Block.Start] = s.Substring(d).Trim();
@@ -2312,7 +2312,24 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '#':
-						if (State.IsFirstCharOnLine && State.PeekNextCharSameRow() == '.')
+						ch2 = State.PeekNextCharSameRow();
+						if (char.IsLetterOrDigit(ch2))
+						{
+							this.AppendAnyText(Elements, Text);
+
+							Text.Append(ch2);
+							State.NextCharSameRow();
+
+							while (char.IsLetterOrDigit(ch2 = State.PeekNextCharSameRow()))
+							{
+								Text.Append(ch2);
+								State.NextCharSameRow();
+							}
+
+							Elements.AddLast(new HashTag(this, Text.ToString()));
+							Text.Clear();
+						}
+						else if (State.IsFirstCharOnLine && ch2 == '.')
 						{
 							State.NextCharSameRow();
 
@@ -4187,7 +4204,7 @@ namespace Waher.Content.Markdown
 				return true;
 		}
 
-		private bool IsPrefixedBy(string s, char ch, out int Count)
+		private bool IsPrefixedBy(string s, char ch, out int Count, bool MustHaveWhiteSpaceAfter)
 		{
 			int c = s.Length;
 
@@ -4195,7 +4212,18 @@ namespace Waher.Content.Markdown
 			while (Count < c && s[Count] == ch)
 				Count++;
 
-			return Count > 0;
+			if (Count == 0)
+				return false;
+
+			if (MustHaveWhiteSpaceAfter)
+			{
+				if (s.Length == Count)
+					return false;
+
+				return (ch = s[Count]) <= ' ' || ch == 160;
+			}
+			else
+				return true;
 		}
 
 		private bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
@@ -4405,6 +4433,9 @@ namespace Waher.Content.Markdown
 		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal void GenerateHTML(StringBuilder Output, bool Inclusion)
 		{
+			if (this.settings.HtmlSettings is null)
+				this.settings.HtmlSettings = new HtmlSettings();
+
 			if (!Inclusion)
 			{
 				StringBuilder sb = null;
@@ -4882,17 +4913,7 @@ namespace Waher.Content.Markdown
 		/// <returns>XAML</returns>
 		public string GenerateXAML()
 		{
-			return this.GenerateXAML(XML.WriterSettings(false, true), new XamlSettings());
-		}
-
-		/// <summary>
-		/// Generates XAML from the markdown text.
-		/// </summary>
-		/// <param name="XamlSettings">XAML settings.</param>
-		/// <returns>XAML</returns>
-		public string GenerateXAML(XamlSettings XamlSettings)
-		{
-			return this.GenerateXAML(XML.WriterSettings(false, true), XamlSettings);
+			return this.GenerateXAML(XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
@@ -4902,19 +4923,8 @@ namespace Waher.Content.Markdown
 		/// <returns>XAML</returns>
 		public string GenerateXAML(XmlWriterSettings XmlSettings)
 		{
-			return this.GenerateXAML(XmlSettings, new XamlSettings());
-		}
-
-		/// <summary>
-		/// Generates XAML from the markdown text.
-		/// </summary>
-		/// <param name="XmlSettings">XML settings.</param>
-		/// <param name="XamlSettings">XAML settings.</param>
-		/// <returns>XAML</returns>
-		public string GenerateXAML(XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
-		{
 			StringBuilder Output = new StringBuilder();
-			this.GenerateXAML(Output, XmlSettings, XamlSettings);
+			this.GenerateXAML(Output, XmlSettings);
 			return Output.ToString();
 		}
 
@@ -4924,17 +4934,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">XAML will be output here.</param>
 		public void GenerateXAML(StringBuilder Output)
 		{
-			this.GenerateXAML(Output, XML.WriterSettings(false, true), new XamlSettings());
-		}
-
-		/// <summary>
-		/// Generates XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="XamlSettings">XAML settings.</param>
-		public void GenerateXAML(StringBuilder Output, XamlSettings XamlSettings)
-		{
-			this.GenerateXAML(Output, XML.WriterSettings(false, true), XamlSettings);
+			this.GenerateXAML(Output, XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
@@ -4944,20 +4944,9 @@ namespace Waher.Content.Markdown
 		/// <param name="XmlSettings">XML settings.</param>
 		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
 		{
-			this.GenerateXAML(Output, XmlSettings, new XamlSettings());
-		}
-
-		/// <summary>
-		/// Generates XAML from the markdown text.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="XmlSettings">XML settings.</param>
-		/// <param name="XamlSettings">XAML settings.</param>
-		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
-		{
 			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
 			{
-				this.GenerateXAML(w, XamlSettings, false);
+				this.GenerateXAML(w, false);
 			}
 		}
 
@@ -4965,20 +4954,21 @@ namespace Waher.Content.Markdown
 		/// Generates XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
-		public void GenerateXAML(XmlWriter Output, XamlSettings Settings)
+		public void GenerateXAML(XmlWriter Output)
 		{
-			this.GenerateXAML(Output, Settings, false);
+			this.GenerateXAML(Output, false);
 		}
 
 		/// <summary>
 		/// Generates XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal void GenerateXAML(XmlWriter Output, XamlSettings Settings, bool Inclusion)
+		internal void GenerateXAML(XmlWriter Output, bool Inclusion)
 		{
+			if (this.settings.XamlSettings is null)
+				this.settings.XamlSettings = new XamlSettings();
+
 			if (!Inclusion)
 			{
 				Output.WriteStartElement("StackPanel", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
@@ -4986,15 +4976,15 @@ namespace Waher.Content.Markdown
 			}
 
 			foreach (MarkdownElement E in this.elements)
-				E.GenerateXAML(Output, Settings, TextAlignment.Left);
+				E.GenerateXAML(Output, TextAlignment.Left);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
 				Footnote Footnote;
-				string FootnoteMargin = "0," + Settings.ParagraphMarginTop.ToString() + "," +
-					Settings.FootnoteSeparator.ToString() + "," + Settings.ParagraphMarginBottom.ToString();
-				string Scale = CommonTypes.Encode(Settings.SuperscriptScale);
-				string Offset = Settings.SuperscriptOffset.ToString();
+				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
+					settings.XamlSettings.FootnoteSeparator.ToString() + "," + settings.XamlSettings.ParagraphMarginBottom.ToString();
+				string Scale = CommonTypes.Encode(settings.XamlSettings.SuperscriptScale);
+				string Offset = settings.XamlSettings.SuperscriptOffset.ToString();
 				int Nr;
 				int Row = 0;
 
@@ -5063,7 +5053,7 @@ namespace Waher.Content.Markdown
 						Output.WriteAttributeString("Grid.Column", "1");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
 
-						Footnote.GenerateXAML(Output, Settings, TextAlignment.Left);
+						Footnote.GenerateXAML(Output, TextAlignment.Left);
 						Output.WriteEndElement();
 
 						Row++;
@@ -5723,6 +5713,27 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Finds hashtags in the document.
+		/// </summary>
+		/// <returns>Array of hashtags found in the document.</returns>
+		public string[] FindHashTags()
+		{
+			SortedDictionary<string, bool> Tags = new SortedDictionary<string, bool>();
+
+			this.ForEach((E, Obj) =>
+			{
+				if (E is HashTag Tag)
+					Tags[Tag.Tag] = true;
+
+				return true;
+			}, null);
+
+			string[] Result = new string[Tags.Count];
+			Tags.Keys.CopyTo(Result, 0);
+			return Result;
+		}
+
+		/// <summary>
 		/// Gets an enumerator of root markdown elements in the document.
 		/// </summary>
 		public IEnumerator<MarkdownElement> GetEnumerator()
@@ -5989,7 +6000,7 @@ namespace Waher.Content.Markdown
 							if (E1 is MarkdownElementChildren Children1 &&
 								E2 is MarkdownElementChildren Children2)
 							{
-								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children, 
+								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children,
 									KeepUnchanged || d > 1, Document);
 
 								Result.AddLast(Children1.Create(Diff, Document));

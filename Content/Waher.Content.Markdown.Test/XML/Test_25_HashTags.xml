@@ -1,0 +1,26 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_25_HashTags.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Header id="header" level="1">
+			<InlineText>Header</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>This </InlineText>
+			<Hashtag>paragraph</Hashtag>
+			<InlineText> contains </InlineText>
+			<Hashtag>3</Hashtag>
+			<InlineText> </InlineText>
+			<Hashtag>hashtags</Hashtag>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<Hashtag>Hashtags</Hashtag>
+			<InlineText> at the beginning of a row works, as headers require space after # and the tag.</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

@@ -1,0 +1,5 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">Header</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This paragraph contains 3 hashtags.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Hashtags at the beginning of a row works, as headers require space after # and the tag.</TextBlock>
+</StackPanel>

@@ -166,6 +166,14 @@ http://waher.se/
 **Note**: Some of the multi-media interfaces supported, can also manage automatic links. If you include a web link that such a multimedia interface
 recognizes, the corresponding presentation will be used.
 
+#### Hashtags
+
+You can create #hashtags in markdown by adding a hash character (`#`) followed by a sequence of letters and/or numbers. No space characters
+or punctuation marks are allowed. The main function of hashtags is to highlight keywords in a text. Applications can also use them to create 
+spceial types of links. How such a link would work, is application-specific however, if it exists.
+
+Example: `#hashtag` becomes #hashtag.
+
 ### Inline HTML
 
 Inline HTML elements can be inserted anywhere in markdown text, by just writing it. It can be freely combined with 
@@ -308,6 +316,8 @@ the header:
 	#### Fourth level header
 	
 	...
+
+**Note**: If you omit the space character after the hash signs, you create a [hashtag](#hashtags) instead.
 
 If using hash signs to define headers, you can suffix any number of hash signs at the end of the row for clarity in the markown. These will not be
 displayed in the generated output.

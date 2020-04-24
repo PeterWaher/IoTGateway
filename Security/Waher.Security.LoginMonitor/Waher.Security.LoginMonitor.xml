@@ -47,7 +47,7 @@
             <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
             <param name="Protocol">Protocol used to log in.</param>
         </member>
-        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginFailure(System.String,System.String,System.DateTime)">
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginFailure(System.String,System.String,System.DateTime,System.String)">
             <summary>
             Processes a failed login attempt.
             
@@ -57,6 +57,9 @@
             <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
             <param name="Protocol">Protocol used to log in.</param>
             <param name="Timestamp">Timestamp of event.</param>
+            <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
+            gets blocked.</param>
+            <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
         </member>
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.GetEarliestLoginOpportunity(System.String,System.String)">
             <summary>
@@ -144,6 +147,11 @@
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Timestamps">
             <summary>
             Timestamps of first attempt in each interval. Null represents no login attempts have been made, or last one successfull.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Reason">
+            <summary>
+            Reason for blocking the endpoint.
             </summary>
         </member>
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.LastFailed">

@@ -90,7 +90,16 @@ namespace Waher.IoTGateway.Svc
 			private void MoreTime(object State)
 			{
 				if (!this.disposed)
-					this.service.RequestAdditionalTime(2000);
+				{
+					try
+					{
+						this.service.RequestAdditionalTime(2000);
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
 			}
 		}
 

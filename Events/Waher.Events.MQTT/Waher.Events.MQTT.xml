@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Events.MQTT</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Events.MQTT.EventEventHandler">
+            <summary>
+            Delegate for <see cref="E:Waher.Events.MQTT.MqttEventReceptor.OnEvent"/> events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Events.MQTT.EventEventArgs">
+            <summary>
+            Event arguments for <see cref="E:Waher.Events.MQTT.MqttEventReceptor.OnEvent"/> events.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.MQTT.EventEventArgs.Event">
+            <summary>
+            Event.
+            </summary>
+        </member>
+        <member name="T:Waher.Events.MQTT.MqttEventReceptor">
+            <summary>
+            This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="T:Waher.Events.Log"/>. 
+            This behaviour can be overridden by provding an event handler for the <see cref="E:Waher.Events.MQTT.MqttEventReceptor.OnEvent"/> event.
+            
+            The format of XML fragments understood is specified in XEP-0337:
+            http://xmpp.org/extensions/xep-0337.html
+            </summary>
+        </member>
+        <member name="M:Waher.Events.MQTT.MqttEventReceptor.#ctor(Waher.Networking.MQTT.MqttClient)">
+            <summary>
+            This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="T:Waher.Events.Log"/>. 
+            This behaviour can be overridden by provding an event handler for the <see cref="E:Waher.Events.MQTT.MqttEventReceptor.OnEvent"/> event.
+            
+            The format of XML fragments understood is specified in XEP-0337:
+            http://xmpp.org/extensions/xep-0337.html
+            </summary>
+            <param name="Client">Client on which to receive events from.</param>
+        </member>
+        <member name="M:Waher.Events.MQTT.MqttEventReceptor.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="E:Waher.Events.MQTT.MqttEventReceptor.OnEvent">
+            <summary>
+            Event raised whenever an event has been received. If no event handler is defined, the default action is to log the event
+            to <see cref="T:Waher.Events.Log"/>.
+            </summary>
+        </member>
+        <member name="T:Waher.Events.MQTT.MqttEventSink">
+            <summary>
+            Event sink sending events to a topic on an MQTT server. Events are sent as XML fragments.
+            
+            The XML format is specified in XEP-0337:
+            http://xmpp.org/extensions/xep-0337.html
+            </summary>
+        </member>
+        <member name="F:Waher.Events.MQTT.MqttEventSink.NamespaceEventLogging">
+            <summary>
+            urn:xmpp:eventlog
+            </summary>
+        </member>
+        <member name="M:Waher.Events.MQTT.MqttEventSink.#ctor(System.String,Waher.Networking.MQTT.MqttClient,System.String,System.Boolean)">
+            <summary>
+            Event sink sending events to a topic on an MQTT server. Events are sent as XML fragments.
+            
+            The XML format is specified in XEP-0337:
+            http://xmpp.org/extensions/xep-0337.html
+            </summary>
+            <param name="ObjectID">Object ID of event sink.</param>
+            <param name="Client">MQTT Client.</param>
+            <param name="Topic">Destination topic.</param>
+            <param name="MaintainConnected">If the client should be maintained connected by the event sink (true), or if the caller
+            is responsible for maintaining the client connected (false).</param>
+        </member>
+        <member name="P:Waher.Events.MQTT.MqttEventSink.Client">
+            <summary>
+            MQTT Client
+            </summary>
+        </member>
+        <member name="P:Waher.Events.MQTT.MqttEventSink.Topic">
+            <summary>
+            Destination topic of event messages.
+            </summary>
+        </member>
+        <member name="M:Waher.Events.MQTT.MqttEventSink.Queue(Waher.Events.Event)">
+            <summary>
+            <see cref="M:Waher.Events.EventSink.Queue(Waher.Events.Event)"/>
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Xml</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Xml.Text.XmlCodec">
+            <summary>
+            XML encoder/decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.#ctor">
+            <summary>
+            XML encoder/decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Xml.Text.XmlCodec.XmlContentTypes">
+            <summary>
+            XML content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Xml.Text.XmlCodec.XmlFileExtensions">
+            <summary>
+            XML file extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Xml.Text.XmlCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Xml.Text.XmlCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Xml.XML">
+            <summary>
+            Helps with common XML-related tasks.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(System.String)">
+            <summary>
+            Encodes a string for use in XML.
+            </summary>
+            <param name="s">String</param>
+            <returns>XML-encoded string.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.HtmlAttributeEncode(System.String)">
+            <summary>
+            Differs from <see cref="M:Waher.Content.Xml.XML.Encode(System.String)"/>, in that it does not encode the aposotrophe.
+            </summary>
+            <param name="s">String to encode.</param>
+            <returns>Encoded string</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.HtmlValueEncode(System.String)">
+            <summary>
+            Differs from <see cref="M:Waher.Content.Xml.XML.Encode(System.String)"/>, in that it does not encode the aposotrophe or the quote.
+            </summary>
+            <param name="s">String to encode.</param>
+            <returns>Encoded string</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(System.DateTime)">
+            <summary>
+            Encodes a <see cref="T:System.DateTime"/> for use in XML.
+            </summary>
+            <param name="DT">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(System.DateTime,System.Boolean)">
+            <summary>
+            Encodes a <see cref="T:System.DateTime"/> for use in XML.
+            </summary>
+            <param name="DT">Value to encode.</param>
+            <param name="DateOnly">If only the date should be encoded (true), or both date and time (false).</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(System.DateTimeOffset)">
+            <summary>
+            Encodes a <see cref="T:System.DateTimeOffset"/> for use in XML.
+            </summary>
+            <param name="DTO">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.DecodeString(System.String)">
+            <summary>
+            Decodes a string used in XML.
+            </summary>
+            <param name="s">String</param>
+            <returns>XML-decoded string.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.TryParse(System.String,System.DateTime@)">
+            <summary>
+            Tries to decode a string encoded DateTime.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.TryParse(System.String,System.DateTimeOffset@)">
+            <summary>
+            Tries to decode a string encoded DateTimeOffset.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <returns>Value of attribute, if found, or the empty string, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.String)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Boolean)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Int32)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Int64)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Double)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Decimal)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.DateTime)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.DateTimeOffset)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.Enum)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,Waher.Content.Duration)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,System.TimeSpan)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.WriterSettings(System.Boolean,System.Boolean)">
+            <summary>
+            Gets an XML writer settings object.
+            </summary>
+            <param name="Indent">If output should be indented.</param>
+            <param name="OmitXmlDeclaration">If the XML declaration should be omitted.</param>
+            <returns>Settings object.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <param name="CDATA">If CDATA sections are allowed. (Default=true)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <param name="CDATA">If CDATA sections are allowed. (Default=true)</param>
+            <param name="Empty">If empty XML (or an empty string) is acceptable. (Default=false)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <param name="CDATA">If CDATA sections are allowed. (Default=true)</param>
+            <param name="Empty">If empty XML (or an empty string) is acceptable. (Default=false)</param>
+            <param name="Fragment">If XML fragments are allowed. (Default=false)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <param name="CDATA">If CDATA sections are allowed. (Default=true)</param>
+            <param name="Empty">If empty XML (or an empty string) is acceptable. (Default=false)</param>
+            <param name="Fragment">If XML fragments are allowed. (Default=false)</param>
+            <param name="ProcessingInstructions">If processing instructions are allowed. (Default=false)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.IsValidXml(System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Checks if a string is valid XML
+            </summary>
+            <param name="Xml">String with possible XML.</param>
+            <param name="Comments">If comments are allowed. (Default=true)</param>
+            <param name="CDATA">If CDATA sections are allowed. (Default=true)</param>
+            <param name="Empty">If empty XML (or an empty string) is acceptable. (Default=false)</param>
+            <param name="Fragment">If XML fragments are allowed. (Default=false)</param>
+            <param name="ProcessingInstructions">If processing instructions are allowed. (Default=false)</param>
+            <param name="DTD">If DTD processing is allowed. (Default=false)</param>
+            <returns>If <paramref name="Xml"/> is valid XML.</returns>
+        </member>
+    </members>
+</doc>

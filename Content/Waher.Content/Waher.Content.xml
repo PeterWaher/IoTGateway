@@ -1,0 +1,2037 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Audio.AudioDecoder">
+            <summary>
+            Binary audio decoder. Is used to identify audio content, but does not have actual decoding of corresponding audio formats.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Audio.AudioDecoder.#ctor">
+            <summary>
+            Binary audio decoder. Is used to identify audio content, but does not have actual decoding of corresponding audio formats.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Audio.AudioDecoder.AudioContentTypes">
+            <summary>
+            Audio content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Audio.AudioDecoder.AudioFileExtensions">
+            <summary>
+            Audio content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Audio.AudioDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Audio.AudioDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Audio.AudioDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Audio.AudioDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Audio.AudioDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.Base64Url">
+            <summary>
+            Static class that does BASE64URL encoding (using URL and filename safe alphabet), 
+            as defined in RFC4648:
+            https://tools.ietf.org/html/rfc4648#section-5
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Base64Url.Decode(System.String)">
+            <summary>
+            Converts a Base64URL-encoded string to its binary representation.
+            </summary>
+            <param name="Base64Url">Base64URL-encoded string.</param>
+            <returns>Binary representation.</returns>
+        </member>
+        <member name="M:Waher.Content.Base64Url.Encode(System.Byte[])">
+            <summary>
+            Converts a binary block of data to a Base64URL-encoded string.
+            </summary>
+            <param name="Data">Data to encode.</param>
+            <returns>Base64URL-encoded string.</returns>
+        </member>
+        <member name="T:Waher.Content.Binary.BinaryDecoder">
+            <summary>
+            Binary decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryDecoder.#ctor">
+            <summary>
+            Binary decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Binary.BinaryDecoder.BinaryContentTypes">
+            <summary>
+            Binary content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Binary.BinaryDecoder.BinaryFileExtensions">
+            <summary>
+            Binary content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Binary.BinaryDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Binary.BinaryDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.ColorReference">
+            <summary>
+            Color reference. Separate class to avoid reference to Windows Forms or WPF libraries.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.ColorReference.#ctor(System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Color reference. Separate class to avoid reference to Windows Forms or WPF libraries.
+            </summary>
+            <param name="Red">Red component.</param>
+            <param name="Green">Green component.</param>
+            <param name="Blue">Blue component.</param>
+        </member>
+        <member name="M:Waher.Content.ColorReference.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Color reference. Separate class to avoid reference to Windows Forms or WPF libraries.
+            </summary>
+            <param name="Red">Red component.</param>
+            <param name="Green">Green component.</param>
+            <param name="Blue">Blue component.</param>
+            <param name="Alpha">Alpha component.</param>
+        </member>
+        <member name="P:Waher.Content.ColorReference.Red">
+            <summary>
+            Red component.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.ColorReference.Green">
+            <summary>
+            Green component.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.ColorReference.Blue">
+            <summary>
+            Blue component.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.ColorReference.Alpha">
+            <summary>
+            Alpha component.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.ColorReference.HasAlpha">
+            <summary>
+            If the <see cref="P:Waher.Content.ColorReference.Alpha"/> component was explicitly specified.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.ColorReference.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Content.CommonTypes">
+            <summary>
+            Helps with parsing of commong data types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.CommonTypes.CRLF">
+            <summary>
+            Contains the CR LF character sequence.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Double@)">
+            <summary>
+            Tries to decode a string encoded double.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Single@)">
+            <summary>
+            Tries to decode a string encoded float.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Decimal@)">
+            <summary>
+            Tries to decode a string encoded decimal.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Double@,System.Byte@)">
+            <summary>
+            Tries to decode a string encoded double.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <param name="NrDecimals">Number of decimals found.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Single@,System.Byte@)">
+            <summary>
+            Tries to decode a string encoded float.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <param name="NrDecimals">Number of decimals found.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Decimal@,System.Byte@)">
+            <summary>
+            Tries to decode a string encoded decimal.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <param name="NrDecimals">Number of decimals found.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Boolean@)">
+            <summary>
+            Tries to decode a string encoded boolean.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParseRfc822(System.String,System.DateTimeOffset@)">
+            <summary>
+            Parses a date and time value encoded according to RFC 822, §5.
+            </summary>
+            <param name="s">Encoded value.</param>
+            <param name="Value">Decoded value.</param>
+            <returns>If the value could be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.TryParseTimeZone(System.String,System.TimeSpan@)">
+            <summary>
+            Parses a timezone string, according to RFC 822.
+            </summary>
+            <param name="s">String</param>
+            <param name="Value">Timezone</param>
+            <returns>If the string could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.ParseFieldValues(System.String)">
+            <summary>
+            Parses a set of comma or semicolon-separated field values, optionaly delimited by ' or " characters.
+            </summary>
+            <param name="Value">Field Value</param>
+            <returns>Parsed set of field values.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Boolean)">
+            <summary>
+            Encodes a <see cref="T:System.Boolean"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Double)">
+            <summary>
+            Encodes a <see cref="T:System.Double"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Single)">
+            <summary>
+            Encodes a <see cref="T:System.Single"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Decimal)">
+            <summary>
+            Encodes a <see cref="T:System.Decimal"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Double,System.Byte)">
+            <summary>
+            Encodes a <see cref="T:System.Double"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <param name="NrDecimals">Number of decimals.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Single,System.Byte)">
+            <summary>
+            Encodes a <see cref="T:System.Single"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <param name="NrDecimals">Number of decimals.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Encode(System.Decimal,System.Byte)">
+            <summary>
+            Encodes a <see cref="T:System.Decimal"/> for use in XML and other formats.
+            </summary>
+            <param name="x">Value to encode.</param>
+            <param name="NrDecimals">Number of decimals.</param>
+            <returns>XML-encoded value.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.EncodeRfc822(System.DateTime)">
+            <summary>
+            Encodes a date and time, according to RFC 822 §5.
+            </summary>
+            <param name="Timestamp">Timestamp to encode.</param>
+            <returns>Encoded date and time.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.EncodeRfc822(System.DateTimeOffset)">
+            <summary>
+            Encodes a date and time, according to RFC 822 §5.
+            </summary>
+            <param name="Timestamp">Timestamp to encode.</param>
+            <returns>Encoded date and time.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.JsonStringEncode(System.String)">
+            <summary>
+            Encodes a string for inclusion in JSON.
+            </summary>
+            <param name="s">String to encode.</param>
+            <returns>Encoded string.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.RegexStringEncode(System.String)">
+            <summary>
+            Encodes a string for inclusion in a regular expression.
+            </summary>
+            <param name="s">String to encode.</param>
+            <returns>Encoded string.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Escape(System.String,System.Char[],System.String)">
+            <summary>
+            Escapes a set of characters in a string.
+            </summary>
+            <param name="s">String to escape.</param>
+            <param name="CharactersToEscape">Characters that needs to be escaped.</param>
+            <param name="EscapeSequence">Escape sequence.</param>
+            <returns>Escaped string.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.Escape(System.String,System.Char[],System.String[])">
+            <summary>
+            Escapes a set of characters in a string.
+            </summary>
+            <param name="s">String to escape.</param>
+            <param name="CharactersToEscape">Characters that needs to be escaped.</param>
+            <param name="EscapeSequences">Individual escape sequences.</param>
+            <returns>Escaped string.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.GetNrDecimals(System.Double)">
+            <summary>
+            Calculates the number of decimals of a floating-point number.
+            </summary>
+            <param name="x">Value</param>
+            <returns>Number of decimals.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.GetNrDecimals(System.Single)">
+            <summary>
+            Calculates the number of decimals of a floating-point number.
+            </summary>
+            <param name="x">Value</param>
+            <returns>Number of decimals.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.GetNrDecimals(System.Decimal)">
+            <summary>
+            Calculates the number of decimals of a floating-point number.
+            </summary>
+            <param name="x">Value</param>
+            <returns>Number of decimals.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.GetNrDecimals(System.String)">
+            <summary>
+            Calculates the number of decimals of a floating-point number.
+            </summary>
+            <param name="s">Value</param>
+            <returns>Number of decimals.</returns>
+        </member>
+        <member name="M:Waher.Content.CommonTypes.GetString(System.Byte[],System.Text.Encoding)">
+            <summary>
+            Gets a string from its binary representation, taking
+            any Byte Order Mark (BOM) into account.
+            
+            If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
+            is used, if defined. If not, ISO-8859-1 is used
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="DefaultEncoding">Default encoding to use, in case
+            a Byte Order Mark (BOM) is not found in the binary representation.</param>
+            <returns></returns>
+        </member>
+        <member name="P:Waher.Content.CommonTypes.ISO_8859_1">
+            <summary>
+            ISO-8859-1 encoding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.CommonTypes.BigEndianUnicode32">
+            <summary>
+            ISO-8859-1 encoding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.CommonTypes.GB18030">
+            <summary>
+            GB18030 encoding (simplified Chinese).
+            </summary>
+        </member>
+        <member name="T:Waher.Content.ConversionSequence">
+            <summary>
+            Internal class that performs content conversion by joining a sequence of conversions into one larger.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.CSV">
+            <summary>
+            Helps with common CSV-related tasks.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.CSV.Parse(System.String)">
+            <summary>
+            Parses a CSV string.
+            </summary>
+            <param name="Csv">CSV</param>
+            <returns>Parsed content.</returns>
+        </member>
+        <member name="T:Waher.Content.Duration">
+            <summary>
+            Represents a duration value, as defined by the xsd:duration data type:
+            http://www.w3.org/TR/xmlschema-2/#duration
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Duration.#ctor">
+            <summary>
+            Represents a duration value, as defined by the xsd:duration data type:
+            http://www.w3.org/TR/xmlschema-2/#duration
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Duration.#ctor(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Double)">
+            <summary>
+            Represents a duration value, as defined by the xsd:duration data type:
+            http://www.w3.org/TR/xmlschema-2/#duration
+            </summary>
+            <param name="Negation">If the duration is negative (true) or positive (false).</param>
+            <param name="Years">Number of years.</param>
+            <param name="Months">Number of months.</param>
+            <param name="Days">Number of days.</param>
+            <param name="Hours">Number of hours.</param>
+            <param name="Minutes">Number of minutes.</param>
+            <param name="Seconds">Number of seconds.</param>
+        </member>
+        <member name="M:Waher.Content.Duration.Parse(System.String)">
+            <summary>
+            Parses a duration from its string representation.
+            </summary>
+            <param name="s">String representation of duration.</param>
+            <returns>Duration</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="s"/> does not represent a valid duration.</exception>
+        </member>
+        <member name="M:Waher.Content.Duration.TryParse(System.String,Waher.Content.Duration@)">
+            <summary>
+            Tries to parse a duration value.
+            </summary>
+            <param name="s">String</param>
+            <param name="Result">Duration, if successful.</param>
+            <returns>If the string could be parsed.</returns>
+        </member>
+        <member name="P:Waher.Content.Duration.Years">
+            <summary>
+            Number of years.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Months">
+            <summary>
+            Number of months.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Days">
+            <summary>
+            Number of days.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Hours">
+            <summary>
+            Number of hours.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Minutes">
+            <summary>
+            Number of minutes.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Seconds">
+            <summary>
+            Number of seconds.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Duration.Negation">
+            <summary>
+            If the duration is negative (true) or positive (false).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Duration.op_Addition(System.DateTime,Waher.Content.Duration)">
+            <summary>
+            Adds a duration to a <see cref="T:System.DateTime"/> value.
+            </summary>
+            <param name="Timepoint">DateTime value.</param>
+            <param name="Offset">Offset.</param>
+            <returns><paramref name="Timepoint"/>+<paramref name="Offset"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_Subtraction(System.DateTime,Waher.Content.Duration)">
+            <summary>
+            Subtracts a duration from a <see cref="T:System.DateTime"/> value.
+            </summary>
+            <param name="Timepoint">DateTime value.</param>
+            <param name="Offset">Offset.</param>
+            <returns><paramref name="Timepoint"/>-<paramref name="Offset"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_LessThan(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is less than duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>&lt;<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_LessThanOrEqual(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is less than or equal to duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>&lt;=<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_GreaterThan(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is greater than duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>&gt;<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_GreaterThanOrEqual(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is greater than or equal to duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>&gt;=<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_Equality(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is equal to duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>==<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_Inequality(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Checks if duration <paramref name="D1"/> is not equal to duration <paramref name="D2"/>.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.Equals(System.Object)">
+            <summary>
+            Checks if the duration is equal to another object.
+            </summary>
+            <param name="obj">Object to compare against.</param>
+            <returns>If they are equal.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Duration.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Duration.Zero">
+            <summary>
+            Zero value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Duration.FromYears(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of years.
+            </summary>
+            <param name="Years">Number of years.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.FromMonths(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of months.
+            </summary>
+            <param name="Months">Number of months.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.FromDays(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of days.
+            </summary>
+            <param name="Days">Number of days.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.FromHours(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of hours.
+            </summary>
+            <param name="Hours">Number of hours.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.FromMinutes(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of minutes.
+            </summary>
+            <param name="Minutes">Number of minutes.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.FromSeconds(System.Int32)">
+            <summary>
+            Creates a <see cref="T:Waher.Content.Duration"/> object from a given number of seconds.
+            </summary>
+            <param name="Seconds">Number of seconds.</param>
+            <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
+        </member>
+        <member name="T:Waher.Content.Getters.WebGetter">
+            <summary>
+            Gets resources from the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.#ctor">
+            <summary>
+            Gets resources from the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Getters.WebGetter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.CanGet(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
+            <returns>If the getter can get a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.GetAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="T:Waher.Content.IContentConverter">
+            <summary>
+            Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
+            to partake in object encodings through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentConverter.FromContentTypes">
+            <summary>
+            Converts content from these content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentConverter.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Script.Variables)">
+            <summary>
+            Performs the actual conversion.
+            </summary>
+            <param name="FromContentType">Content type of the content to convert from.</param>
+            <param name="From">Stream pointing to binary representation of content.</param>
+            <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
+            Otherwise, the parameter is the empty string.</param>
+            <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
+            <param name="URL">URL of resource, if accessed from a web server.</param>
+            <param name="ToContentType">Content type of the content to convert to.</param>
+            <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
+            <param name="Session">Session states.</param>
+            <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
+        </member>
+        <member name="T:Waher.Content.IContentDecoder">
+            <summary>
+            Basic interface for Internet Content decoders. A class implementing this interface and having a default constructor, will be able
+            to partake in object decodings through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.IContentDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.IContentEncoder">
+            <summary>
+            Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
+            to partake in object encodings through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentEncoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentEncoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentEncoder.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentEncoder.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="M:Waher.Content.IContentEncoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.IContentGetter">
+            <summary>
+            Basic interface for Internet Content getters. A class implementing this interface and having a default constructor, will be able
+            to partake in retrieving content through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentGetter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentGetter.CanGet(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
+            <returns>If the getter can get a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentGetter.GetAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentGetter.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="T:Waher.Content.IFileNameResource">
+            <summary>
+            Basic interface for resources having a FileName property.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IFileNameResource.FileName">
+            <summary>
+            Filename of resource.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.InternetContent">
+            <summary>
+            Static class managing encoding and decoding of internet content.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.InternetContent.ISO_8859_1">
+            <summary>
+            ISO-8859-1 character encoding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanEncodeContentTypes">
+            <summary>
+            Internet content types that can be encoded.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanEncodeFileExtensions">
+            <summary>
+            File extensions that can be encoded.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Encoders">
+            <summary>
+            Available Internet Content Encoders.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentEncoder@,System.String[])">
+            <summary>
+            If a given object can be encoded.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the object can be encoded.</param>
+            <param name="Encoder">Best encoder for the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the object can be encoded.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="M:Waher.Content.InternetContent.IsAccepted(System.String,System.String[])">
+            <summary>
+            Checks if a given content type is acceptable.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+        </member>
+        <member name="M:Waher.Content.InternetContent.IsAccepted(System.String[],System.String[])">
+            <summary>
+            Checks if at least one content type in a set of content types is acceptable.
+            </summary>
+            <param name="ContentTypes">Content types.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+        </member>
+        <member name="M:Waher.Content.InternetContent.IsAccepted(System.String[],System.String@,System.String[])">
+            <summary>
+            Checks if at least one content type in a set of content types is acceptable.
+            </summary>
+            <param name="ContentTypes">Content types.</param>
+            <param name="ContentType">Content type selected as the first acceptable content type.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanDecodeContentTypes">
+            <summary>
+            Internet content types that can be decoded.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanDecodeFileExtensions">
+            <summary>
+            File extensions that can be decoded.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Decoders">
+            <summary>
+            Available Internet Content Decoders.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.Decodes(System.String,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentDecoder@)">
+            <summary>
+            If an object with a given content type can be decoded.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <param name="Decoder">Best decoder for the object.</param>
+            <returns>If an object with the given type can be decoded.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.InternetContent.Decode(System.String,System.Byte[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetEncoding(System.String)">
+            <summary>
+            Gets a character encoding from its name.
+            </summary>
+            <param name="CharacterSet">Name of character set.</param>
+            <returns>Encoding.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetContentType(System.String)">
+            <summary>
+            Gets the content type of an item, given its file extension. It uses the <see cref="M:Waher.Content.InternetContent.TryGetContentType(System.String,System.String@)"/> to see if any of the
+            content encoders/decoders support content with the corresponding file type. If no such encoder/decoder is found, the generic
+            application/octet-stream type is returned.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <returns>Content type.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Converters">
+            <summary>
+            Available Internet Content Converters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanConvert(System.String,System.String,Waher.Content.IContentConverter@)">
+            <summary>
+            Checks if it is possible to convert content from one type to another.
+            
+            A shortest path algorithm maximizing conversion quality and shortening conversion distance is used to find sequences of converters, 
+            if a direct conversion is not possible.
+            </summary>
+            <param name="FromContentType">Existing content type.</param>
+            <param name="ToContentType">Desired content type.</param>
+            <param name="Converter">Converter that transforms content from type <paramref name="FromContentType"/> to type
+            <paramref name="ToContentType"/>.</param>
+            <returns>If a converter was found.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetConverters(System.String)">
+            <summary>
+            Gets available converters that can convert content from a given type.
+            </summary>
+            <param name="FromContentType">From which content type converters have to convert.</param>
+            <returns>Available converters, or null if there are none.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanGetUriSchemes">
+            <summary>
+            Internet URI Schemes that can be gotten.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Getters">
+            <summary>
+            Available Internet Content Getters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanGet(System.Uri,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentGetter@)">
+            <summary>
+            If a resource can be gotten, given its URI.
+            </summary>
+            <param name="Uri">URI of resource.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <param name="Getter">Best getter for the URI.</param>
+            <returns>If a resource with the given URI can be gotten.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="T:Waher.Content.JSON">
+            <summary>
+            Helps with common JSON-related tasks.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.JSON.UnixEpoch">
+            <summary>
+            Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
+            </summary>
+        </member>
+        <member name="M:Waher.Content.JSON.Parse(System.String)">
+            <summary>
+            Parses a JSON string.
+            </summary>
+            <param name="Json">JSON</param>
+            <returns>Parsed content.</returns>
+        </member>
+        <member name="M:Waher.Content.JSON.Encode(System.String)">
+            <summary>
+            Encodes a string for inclusion in JSON.
+            </summary>
+            <param name="s">String to encode.</param>
+            <returns>Encoded string.</returns>
+        </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Object,System.Boolean)">
+            <summary>
+            Encodes an object as JSON.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Indent">If JSON should be indented.</param>
+            <returns>JSON string.</returns>
+        </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Object,System.Boolean,System.Text.StringBuilder)">
+            <summary>
+            Encodes an object as JSON.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Json">JSON Output.</param>
+            <param name="Indent">If JSON should be indented.</param>
+        </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}},System.Nullable{System.Int32},System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Encodes an object as JSON.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Indent">If JSON should be indented.</param>
+            <param name="AdditionalProperties">Optional additional properties.</param>
+            <returns>Encoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}},System.Nullable{System.Int32},System.Text.StringBuilder,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Encodes an object as JSON.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Json">JSON Output.</param>
+            <param name="Indent">If JSON should be indented.</param>
+            <param name="AdditionalProperties">Optional additional properties.</param>
+        </member>
+        <member name="T:Waher.Content.Multipart.AlternativeCodec">
+            <summary>
+            Decoder of alternative data.
+            
+            http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.AlternativeCodec.ContentType">
+            <summary>
+            multipart/alternative
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.#ctor">
+            <summary>
+            Decoder of alternative data.
+            
+            http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.AlternativeCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.AlternativeCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Multipart.ContentAlternatives">
+            <summary>
+            Represents alternative versions of the same content, encoded with 
+            multipart/alternative
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.ContentAlternatives.#ctor(Waher.Content.Multipart.EmbeddedContent[])">
+            <summary>
+            Represents mixed content, encoded with multipart/mixed
+            </summary>
+            <param name="Content">Embedded content.</param>
+        </member>
+        <member name="T:Waher.Content.Multipart.ContentDisposition">
+            <summary>
+            Content disposition
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.ContentDisposition.Inline">
+            <summary>
+            Content appears inline
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.ContentDisposition.Attachment">
+            <summary>
+            Content is available as an attachment
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.ContentDisposition.Unknown">
+            <summary>
+            Unknown or unspecified disposition
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Multipart.EmbeddedContent">
+            <summary>
+            Represents content embedded in other content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.ContentType">
+            <summary>
+            Content-Type of embedded object.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Disposition">
+            <summary>
+            Disposition of embedded object.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Name">
+            <summary>
+            Name of embedded object.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.FileName">
+            <summary>
+            Filename of embedded object.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.TransferEncoding">
+            <summary>
+            Content Transfer Encoding of embedded object, if defined.
+            Affects how <see cref="P:Waher.Content.Multipart.EmbeddedContent.Raw"/> is transformed
+            into <see cref="P:Waher.Content.Multipart.EmbeddedContent.TransferDecoded"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Raw">
+            <summary>
+            Raw, untrasnformed body of embedded object.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.TransferDecoded">
+            <summary>
+            Transformed body of embedded object . <see cref="P:Waher.Content.Multipart.EmbeddedContent.TransferEncoding"/> 
+            defines how <see cref="P:Waher.Content.Multipart.EmbeddedContent.Raw"/> is transformed into
+            <see cref="P:Waher.Content.Multipart.EmbeddedContent.TransferDecoded"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Decoded">
+            <summary>
+            Decoded body of embedded object. <see cref="P:Waher.Content.Multipart.EmbeddedContent.ContentType"/> defines
+            how <see cref="P:Waher.Content.Multipart.EmbeddedContent.TransferDecoded"/> is transformed into
+            <see cref="P:Waher.Content.Multipart.EmbeddedContent.Decoded"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.ID">
+            <summary>
+            Content-ID of embedded object, if defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Description">
+            <summary>
+            Content-Description of embedded object, if defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.Size">
+            <summary>
+            Size of content, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.CreationDate">
+            <summary>
+            Creation-Date of content, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.EmbeddedContent.ModificationDate">
+            <summary>
+            Modification-Date of content, if available.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.EmbeddedContent.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Multipart.FormDataDecoder">
+            <summary>
+            Decoder of form data.
+            
+            https://tools.ietf.org/html/rfc7578
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.FormDataDecoder.ContentType">
+            <summary>
+            multipart/form-data
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.#ctor">
+            <summary>
+            Decoder of form data.
+            
+            https://tools.ietf.org/html/rfc7578
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.FormDataDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.FormDataDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.Decode(System.Byte[],System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Collections.Generic.Dictionary{System.String,System.Object},System.Collections.Generic.List{Waher.Content.Multipart.EmbeddedContent},System.Uri)">
+            <summary>
+            Decodes a multipart object
+            </summary>
+            <param name="Data">Binary representation</param>
+            <param name="Fields">Content-Type fields</param>
+            <param name="Form">Resulting Form, or null if not of interest.</param>
+            <param name="List">Decoded embedded objects will be added to this list.</param>
+            <param name="BaseUri">Bare URI</param>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.TryTransferDecode(System.Byte[],System.String,System.Byte[]@)">
+            <summary>
+            Tries to decode transfer-encoded binary data.
+            </summary>
+            <param name="Encoded">Transfer-encoded binary data.</param>
+            <param name="TransferEncoding">Transfer-encoding used.</param>
+            <param name="Decoded">Decoded binary data.</param>
+            <returns>If decoding was successful.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.Encode(System.Collections.Generic.IEnumerable{Waher.Content.Multipart.EmbeddedContent},System.String)">
+            <summary>
+            Encodes multi-part content
+            </summary>
+            <param name="Content">Multi-part content.</param>
+            <param name="Boundary">Boundary to use.</param>
+            <returns>Encoded multi-part content.</returns>
+        </member>
+        <member name="T:Waher.Content.Multipart.MixedCodec">
+            <summary>
+            Decoder of mixed data.
+            
+            http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.MixedCodec.ContentType">
+            <summary>
+            multipart/mixed
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.#ctor">
+            <summary>
+            Decoder of mixed data.
+            
+            http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.MixedCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.MixedCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Multipart.MixedContent">
+            <summary>
+            Represents mixed content, encoded with multipart/mixed
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedContent.#ctor(Waher.Content.Multipart.EmbeddedContent[])">
+            <summary>
+            Represents mixed content, encoded with multipart/mixed
+            </summary>
+            <param name="Content">Embedded content.</param>
+        </member>
+        <member name="T:Waher.Content.Multipart.MultipartContent">
+            <summary>
+            Abstract base class for multipart content
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.MultipartContent.#ctor(Waher.Content.Multipart.EmbeddedContent[])">
+            <summary>
+            Abstract base class for multipart content
+            </summary>
+            <param name="Content">Embedded content.</param>
+        </member>
+        <member name="P:Waher.Content.Multipart.MultipartContent.Content">
+            <summary>
+            Embedded content.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Multipart.RelatedCodec">
+            <summary>
+            Decoder of related data.
+            
+            https://tools.ietf.org/html/rfc2387
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.RelatedCodec.ContentType">
+            <summary>
+            multipart/related
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.#ctor">
+            <summary>
+            Decoder of related data.
+            
+            https://tools.ietf.org/html/rfc2387
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.RelatedCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.RelatedCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Multipart.RelatedContent">
+            <summary>
+            Represents related content, encoded with multipart/related
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.RelatedContent.#ctor(Waher.Content.Multipart.EmbeddedContent[],System.String)">
+            <summary>
+            Represents related content, encoded with multipart/related
+            </summary>
+            <param name="Content">Embedded content.</param>
+            <param name="Type">Principle content type of related content.</param>
+        </member>
+        <member name="P:Waher.Content.Multipart.RelatedContent.Type">
+            <summary>
+            Principle content type of related content, if specified.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Multipart.WwwFormDecoder">
+            <summary>
+            Decoder of URL encoded web forms.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Multipart.WwwFormDecoder.ContentType">
+            <summary>
+            application/x-www-form-urlencoded
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.WwwFormDecoder.#ctor">
+            <summary>
+            Decoder of URL encoded web forms.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.WwwFormDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Multipart.WwwFormDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Multipart.WwwFormDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.WwwFormDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Multipart.WwwFormDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.Resources">
+            <summary>
+            Static class managing loading of resources stored as embedded resources or in content files.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Resources.GetAssembly(System.String)">
+            <summary>
+            Gets the assembly corresponding to a given resource name.
+            </summary>
+            <param name="ResourceName">Resource name.</param>
+            <returns>Assembly.</returns>
+            <exception cref="T:System.ArgumentException">If no assembly could be found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadResource(System.String)">
+            <summary>
+            Loads a resource from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <returns>Binary content.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadResource(System.String,System.Reflection.Assembly)">
+            <summary>
+            Loads a resource from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <param name="Assembly">Assembly containing the resource.</param>
+            <returns>Binary content.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadCertificate(System.String)">
+            <summary>
+            Loads a certificate from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <returns>Certificate.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadCertificate(System.String,System.Reflection.Assembly)">
+            <summary>
+            Loads a certificate from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <param name="Assembly">Assembly containing the resource.</param>
+            <returns>Certificate.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadCertificate(System.String,System.String)">
+            <summary>
+            Loads a certificate from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <param name="Password">Optional password.</param>
+            <returns>Certificate.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadCertificate(System.String,System.String,System.Reflection.Assembly)">
+            <summary>
+            Loads a certificate from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <param name="Password">Optional password.</param>
+            <param name="Assembly">Assembly containing the resource.</param>
+            <returns>Certificate.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="T:Waher.Content.TemporaryFile">
+            <summary>
+            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.TemporaryFile.DefaultBufferSize">
+            <summary>
+            Default buffer size, in bytes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.TemporaryFile.#ctor">
+            <summary>
+            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.TemporaryFile.#ctor(System.String)">
+            <summary>
+            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+            </summary>
+            <param name="FileName">Name of temporary file. Call <see cref="M:System.IO.Path.GetTempFileName"/> to get a new temporary file name.</param>
+        </member>
+        <member name="M:Waher.Content.TemporaryFile.#ctor(System.String,System.Int32)">
+            <summary>
+            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+            </summary>
+            <param name="FileName">Name of temporary file. Call <see cref="M:System.IO.Path.GetTempFileName"/> to get a new temporary file name.</param>
+            <param name="BufferSize">Buffer size.</param>
+        </member>
+        <member name="P:Waher.Content.TemporaryFile.FileName">
+            <summary>
+            File Name.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.TemporaryFile.DeleteWhenDisposed">
+            <summary>
+            Delete file when object is disposed.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.TemporaryFile.Dispose(System.Boolean)">
+            <summary>
+            Disposes of the object, and deletes the temporary file.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Text.CsvDecoder">
+            <summary>
+            CSV decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.CsvDecoder.#ctor">
+            <summary>
+            CSV decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.CsvDecoder.CsvContentTypes">
+            <summary>
+            CSV content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.CsvDecoder.CsvFileExtensions">
+            <summary>
+            CSV content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.CsvDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.CsvDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.CsvDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.CsvDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Text.CsvDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.Text.JsonDecoder">
+            <summary>
+            JSON decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.#ctor">
+            <summary>
+            JSON decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.JsonDecoder.JsonContentTypes">
+            <summary>
+            JSON content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.JsonDecoder.JsonFileExtensions">
+            <summary>
+            JSON file extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.JsonDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.JsonDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Text.PlainTextCodec">
+            <summary>
+            Plain text encoder/decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.#ctor">
+            <summary>
+            Plain text encoder/decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.PlainTextCodec.PlainTextContentTypes">
+            <summary>
+            Plain text content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Text.PlainTextCodec.PlainTextFileExtensions">
+            <summary>
+            Plain text file extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.PlainTextCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.PlainTextCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Video.VideoDecoder">
+            <summary>
+            Binary video decoder. Is used to identify video content, but does not have actual decoding of corresponding video formats.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Video.VideoDecoder.#ctor">
+            <summary>
+            Binary video decoder. Is used to identify video content, but does not have actual decoding of corresponding video formats.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Video.VideoDecoder.VideoContentTypes">
+            <summary>
+            Video content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Video.VideoDecoder.VideoFileExtensions">
+            <summary>
+            Video content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Video.VideoDecoder.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Video.VideoDecoder.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Video.VideoDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Video.VideoDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Video.VideoDecoder.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+    </members>
+</doc>

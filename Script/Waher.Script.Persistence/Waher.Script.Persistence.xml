@@ -1,0 +1,775 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Persistence</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Persistence.Functions.DeleteObject">
+            <summary>
+            Deletes an object from the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.DeleteObject.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Deletes an object from the object database.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.DeleteObject.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.DeleteObject.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.DeleteObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.Functions.FindObjects">
+            <summary>
+            Finds objects in the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.FindObjects.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Finds object in the object database.
+            </summary>
+            <param name="Type">Type</param>
+            <param name="Offset">Offset</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Search filter.</param>
+            <param name="SortOrder">Sort order.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.FindObjects.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.FindObjects.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.FindObjects.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.Functions.SaveNewObject">
+            <summary>
+            Saves an object to the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SaveNewObject.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Saves an object to the object database.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.SaveNewObject.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.SaveNewObject.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SaveNewObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.Functions.UpdateObject">
+            <summary>
+            Updates an object in the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.UpdateObject.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Updates an object in the object database.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.UpdateObject.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.UpdateObject.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.UpdateObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
+            <summary>
+            Enumerator that only returns elements matching a set of conditions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Enumerator that only returns elements matching a set of conditions.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Conditions">Set of conditions that must be fulfilled.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.ConditionalEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.CustomOrderEnumerator">
+            <summary>
+            Enumerator that reorders a sequence of items.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[])">
+            <summary>
+            Enumerator that reorders a sequence of items.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Custom order.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.CustomOrderEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Delete">
+            <summary>
+            Executes a DELETE statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes a DELETE statement against the object database.
+            </summary>
+            <param name="Source">Source to delete from.</param>
+            <param name="Where">Optional where clause</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.DistinctEnumerator">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
+            <param name="Variables">Current set of variables.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.GroupEnumerator">
+            <summary>
+            Enumerator that groups items into groups, and returns aggregated elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
+            <summary>
+            Enumerator that groups items into groups, and returns aggregated elements.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Variables">Current set of variables</param>
+            <param name="GroupBy">Group on these fields</param>
+            <param name="GroupNames">Names given to grouped fields</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.GroupEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.MaxCountEnumerator">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.#ctor(System.Collections.IEnumerator,System.Int32)">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Count">Maximum number of records to enumerate.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.MaxCountEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.ObjectProperties">
+            <summary>
+            Object properties.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.#ctor(System.Object,Waher.Script.Variables)">
+            <summary>
+            Object properties.
+            </summary>
+            <param name="Object">Object</param>
+            <param name="Variables">Variables</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.#ctor(System.Object,Waher.Script.Variables,System.Boolean)">
+            <summary>
+            Object properties.
+            </summary>
+            <param name="Object">Object</param>
+            <param name="Variables">Variables</param>
+            <param name="ReadOnly">If access to object properties is read-only (default=true).</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.ObjectProperties.Object">
+            <summary>
+            Current object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.ContainsVariable(System.String)">
+            <summary>
+            If the collection contains a variable with a given name.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <returns>If a variable with that name exists.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.TryGetVariable(System.String,Waher.Script.Variable@)">
+            <summary>
+            Tries to get a variable object, given its name.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <param name="Variable">Variable, if found, or null otherwise.</param>
+            <returns>If a variable with the corresponding name was found.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.Add(System.String,System.Object)">
+            <summary>
+            Adds a variable to the collection.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <param name="Value">Associated variable object value.</param>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.OffsetEnumerator">
+            <summary>
+            Enumerator that skips a given number of result records.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.#ctor(System.Collections.IEnumerator,System.Int32)">
+            <summary>
+            Enumerator that skips a given number of result records.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Offset">Number of records to skip.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.OffsetEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.DeleteParser">
+            <summary>
+            Parses a DELETE statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.DeleteParser.#ctor">
+            <summary>
+            Parses a DELETE statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DeleteParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DeleteParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DeleteParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.DeleteParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.ParserExtensions">
+            <summary>
+            Script Parser extensions
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.ParserExtensions.ParseNoWhiteSpace(Waher.Script.Model.ScriptParser)">
+            <summary>
+            Parses script until first whitespace character is found.
+            </summary>
+            <param name="Parser">Parser</param>
+            <returns>Script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.SelectParser">
+            <summary>
+            Parses a SELECT statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.SelectParser.#ctor">
+            <summary>
+            Parses a SELECT statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.SelectParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.SelectParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.SelectParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.SelectParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.UpdateParser">
+            <summary>
+            Parses a UPDATE statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.UpdateParser.#ctor">
+            <summary>
+            Parses a UPDATE statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.UpdateParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.UpdateParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.UpdateParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.UpdateParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.WildcardParser">
+            <summary>
+            Parses the Wildcard symbol *
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.WildcardParser.#ctor">
+            <summary>
+            Parses the Wildcard symbol *
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.WildcardParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.WildcardParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.WildcardParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.WildcardParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Record">
+            <summary>
+            Represents one record.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Record.#ctor(Waher.Script.Abstraction.Elements.IElement[])">
+            <summary>
+            Represents one record.
+            </summary>
+            <param name="Elements">Elements in the record.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Record.Elements">
+            <summary>
+            Elements in the record.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Record.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Record.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.RecordEnumerator">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+            <summary>
+            Enumerator that limits the return set to a maximum number of records.
+            </summary>
+            <param name="ItemEnumerator">Item enumerator</param>
+            <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
+            <param name="Variables">Current set of variables.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.RecordEnumerator.Current">
+            <summary>
+            <see cref="P:System.Collections.IEnumerator.Current"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.RecordEnumerator.CurrentRecord">
+            <summary>
+            Current record
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.Reset">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.Reset"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Select">
+            <summary>
+            Executes a SELECT statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.#ctor(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes a SELECT statement against the object database.
+            </summary>
+            <param name="Columns">Columns to select. If null, all columns are selected.</param>
+            <param name="ColumnNames">Optional renaming of columns.</param>
+            <param name="Sources">Sources to select from.</param>
+            <param name="SourceNames">Optional renaming of sources.</param>
+            <param name="Where">Optional where clause</param>
+            <param name="GroupBy">Optional grouping</param>
+            <param name="GroupByNames">Optional renaming of groups</param>
+            <param name="Having">Optional Having clause</param>
+            <param name="OrderBy">Optional ordering</param>
+            <param name="Top">Optional limit on number of records to return</param>
+            <param name="Offset">Optional offset into result set where reporting begins</param>
+            <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Select.FindMethod">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.WildcardToRegex(System.String,System.String)">
+            <summary>
+            Converts a wildcard string to a regular expression string.
+            </summary>
+            <param name="s">String</param>
+            <param name="Wildcard">Wildcardd</param>
+            <returns>Regular expression</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Update">
+            <summary>
+            Executes an UPDATE statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Operators.Assignments.Assignment[],Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes an UPDATE statement against the object database.
+            </summary>
+            <param name="Source">Source to update objects from.</param>
+            <param name="SetOperations">Set operations to perform.</param>
+            <param name="Where">Optional where clause</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Wildcard">
+            <summary>
+            Represents the Wildcard symbol *
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Wildcard.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Represents the Wildcard symbol *
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Wildcard.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Wildcard.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Wildcard.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.TypeConversion.CiStringToString">
+            <summary>
+            Converts case-insensitive strings to normal strings.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.TypeConversion.CiStringToString.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.TypeConversion.CiStringToString.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.TypeConversion.CiStringToString.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.Persistence.TypeConversion.CiStringToString.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.Persistence.TypeConversion.CiStringToString.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.Persistence.TypeConversion.CiStringToString.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.Persistence.TypeConversion.StringToCiString">
+            <summary>
+            Converts normal strings to case-insensitive strings.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.TypeConversion.StringToCiString.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.TypeConversion.StringToCiString.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.TypeConversion.StringToCiString.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.Persistence.TypeConversion.StringToCiString.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.Persistence.TypeConversion.StringToCiString.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.Persistence.TypeConversion.StringToCiString.From"/>.</exception>
+        </member>
+    </members>
+</doc>

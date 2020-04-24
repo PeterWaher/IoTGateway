@@ -59,6 +59,11 @@
             <param name="Session">Session states.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.HtmlSettings">
+            <summary>
+            HTML settings for automatically converted content.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.HTTP.ScriptExtensions.Page">
             <summary>
             Page-local variables.

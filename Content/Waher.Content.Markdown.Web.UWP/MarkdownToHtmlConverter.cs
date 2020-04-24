@@ -20,6 +20,7 @@ namespace Waher.Content.Markdown.Web
 		private static IEmojiSource emojiSource = null;
 		private static string bareJid = string.Empty;
 		private static string rootFolder = string.Empty;
+		private static HtmlSettings htmlSettings = new HtmlSettings();
 
 		/// <summary>
 		/// Converts Markdown documents to HTML documents.
@@ -173,7 +174,8 @@ namespace Waher.Content.Markdown.Web
 
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, Session)
 			{
-				RootFolder = rootFolder
+				RootFolder = rootFolder,
+				HtmlSettings = htmlSettings
 			};
 
 			if (!string.IsNullOrEmpty(bareJid))
@@ -378,5 +380,14 @@ namespace Waher.Content.Markdown.Web
 		}
 
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
+
+		/// <summary>
+		/// HTML settings for automatically converted content.
+		/// </summary>
+		public static HtmlSettings HtmlSettings
+		{
+			get => htmlSettings;
+			set => htmlSettings = value;
+		}
 	}
 }

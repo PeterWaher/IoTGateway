@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Content.Markdown.Web.UWP</id>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <title>Waher.Content.Markdown.Web.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -21,7 +21,7 @@
         <dependency id="Waher.Content.Markdown" version="1.0.40"/>
         <dependency id="Waher.Networking.HTTP.UWP" version="1.0.42"/>
         <dependency id="Waher.Runtime.Inventory" version="1.0.12"/>
-        <dependency id="Waher.Script" version="1.0.35"/>
+        <dependency id="Waher.Script" version="1.0.36"/>
         <dependency id="Waher.Security" version="1.0.5"/>
       </group>
     </dependencies>

@@ -198,9 +198,26 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						TcpClient TcpClient = await this.tcpListener.AcceptTcpClientAsync();
-						if (this.disposed)
+						TcpClient TcpClient;
+
+						try
+						{
+							TcpClient = await this.tcpListener.AcceptTcpClientAsync();
+							if (this.disposed)
+								return;
+						}
+						catch (InvalidOperationException)
+						{
+							this.State = PeerToPeerNetworkState.Error;
+
+							this.tcpListener?.Stop();
+							this.tcpListener = null;
+
+							this.udpClient?.Dispose();
+							this.udpClient = null;
+
 							return;
+						}
 
 						if (!(TcpClient is null))
 						{
@@ -351,7 +368,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 				}
 				while (this.tcpListener is null);
-			
+
 				this.localEndpoint = new IPEndPoint(this.localAddress, Registration.LocalPort);
 				this.externalEndpoint = new IPEndPoint(this.externalAddress, Registration.ExternalPort);
 

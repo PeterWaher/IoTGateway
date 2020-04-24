@@ -27,12 +27,12 @@ namespace Waher.Client.WPF.Controls.Chat
 	/// </summary>
 	public class ChatItem : ColorableItem
 	{
-		private ChatItemType type;
-		private DateTime timestamp;
+		private readonly ChatItemType type;
+		private readonly DateTime timestamp;
+		private readonly bool lastIsTable;
 		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
-		private bool lastIsTable;
 		private StringBuilder building = null;
 		private Timer timer = null;
 
@@ -55,7 +55,8 @@ namespace Waher.Client.WPF.Controls.Chat
 
 			if (Markdown is null)
 			{
-				XamlSettings Settings = new XamlSettings();
+				XamlSettings Settings = Markdown.Settings.XamlSettings;
+
 				this.formattedMessage = new TextBlock()
 				{
 					TextWrapping = TextWrapping.Wrap,
@@ -112,7 +113,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				string s = this.building.ToString();
 				this.building = null;
 
-				MarkdownDocument Markdown = new MarkdownDocument(s, new MarkdownSettings(ChatView.Emoji1_24x24, false));
+				MarkdownDocument Markdown = new MarkdownDocument(s, ChatView.GetMarkdownSettings());
 
 				MainWindow.Dispatcher.BeginInvoke(new ThreadStart(() => this.Refresh2(ChatListView, s, Markdown)));
 			}
@@ -143,13 +144,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			{
 				if (Markdown != null)
 				{
-					XamlSettings Settings = new XamlSettings()
-					{
-						TableCellRowBackgroundColor1 = "#20404040",
-						TableCellRowBackgroundColor2 = "#10808080"
-					};
-
-					string XAML = Markdown.GenerateXAML(Settings);
+					string XAML = Markdown.GenerateXAML();
 					this.formattedMessage = XamlReader.Parse(XAML);
 
 					if (this.formattedMessage is DependencyObject Root)
@@ -168,13 +163,12 @@ namespace Waher.Client.WPF.Controls.Chat
 		{
 			int i, c = VisualTreeHelper.GetChildrenCount(Element);
 			DependencyObject Child;
-			Hyperlink Hyperlink;
 
 			if (Element is TextBlock TextBlock)
 			{
 				foreach (Inline Inline in TextBlock.Inlines)
 				{
-					if ((Hyperlink = Inline as Hyperlink) != null)
+					if (Inline is Hyperlink Hyperlink)
 						Hyperlink.Click += Hyperlink_Click;
 				}
 			}
@@ -188,8 +182,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)
 		{
-			Hyperlink Link = e.Source as Hyperlink;
-			if (Link is null)
+			if (!(e.Source is Hyperlink Link))
 				return;
 
 			string Uri = Link.NavigateUri.ToString();

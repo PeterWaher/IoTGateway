@@ -170,6 +170,10 @@
     <Resource Include="pi.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
+      <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj">
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>

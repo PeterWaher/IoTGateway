@@ -37,7 +37,7 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class ScriptView : UserControl, ITabView
 	{
-		private Variables variables;
+		private readonly Variables variables;
 
 		public ScriptView()
 		{
@@ -120,8 +120,6 @@ namespace Waher.Client.WPF.Controls
 					{
 						try
 						{
-							SKImage Img;
-
 							if (Ans is Graph G)
 							{
 								using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
@@ -129,7 +127,7 @@ namespace Waher.Client.WPF.Controls
 									this.AddImageBlock(ScriptBlock, Bmp, G, States);
 								}
 							}
-							else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
+							else if (Ans.AssociatedObjectValue is SKImage Img)
 								this.AddImageBlock(ScriptBlock, Img, null, null);
 							else if (Ans.AssociatedObjectValue is Exception ex)
 							{
@@ -182,14 +180,8 @@ namespace Waher.Client.WPF.Controls
 									Markdown.AppendLine(" |");
 								}
 
-								MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString());
-								XamlSettings Settings = new XamlSettings()
-								{
-									TableCellRowBackgroundColor1 = "#20404040",
-									TableCellRowBackgroundColor2 = "#10808080"
-								};
-
-								string XAML = Doc.GenerateXAML(Settings);
+								MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), ChatView.GetMarkdownSettings());
+								string XAML = Doc.GenerateXAML();
 
 								if (XamlReader.Parse(XAML) is UIElement Parsed)
 									this.AddBlock(ScriptBlock, Parsed);
@@ -229,7 +221,7 @@ namespace Waher.Client.WPF.Controls
 				FontFamily = new FontFamily("Courier New"),
 				Foreground = new SolidColorBrush(cl),
 				TextWrapping = TextWrapping.Wrap,
-				FontWeight = FontWeight,
+				FontWeight = Weight,
 				Tag = Tag
 			};
 

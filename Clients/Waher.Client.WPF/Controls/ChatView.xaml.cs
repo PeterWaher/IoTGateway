@@ -33,7 +33,7 @@ namespace Waher.Client.WPF.Controls
 	public partial class ChatView : UserControl, ITabView
 	{
 		private static Emoji1LocalFiles emoji1_24x24 = null;
-		private TreeNode node;
+		private readonly TreeNode node;
 
 		public ChatView(TreeNode Node)
 		{
@@ -82,6 +82,18 @@ namespace Waher.Client.WPF.Controls
 			this.Input.Width = Math.Max(this.ActualWidth - this.SendButton.ActualWidth - 16, 10);
 		}
 
+		public static MarkdownSettings GetMarkdownSettings()
+		{
+			return new MarkdownSettings(Emoji1_24x24, false)
+			{
+				XamlSettings = new XamlSettings()
+				{
+					TableCellRowBackgroundColor1 = "#20404040",
+					TableCellRowBackgroundColor2 = "#10808080"
+				}
+			};
+		}
+
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
 			MarkdownDocument Markdown;
@@ -107,7 +119,7 @@ namespace Waher.Client.WPF.Controls
 							s += Environment.NewLine;
 
 						s += Msg;
-						Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
+						Markdown = new MarkdownDocument(s, GetMarkdownSettings());
 						Item.Update(s, Markdown);
 						this.ChatListView.Items.Refresh();
 						this.ChatListView.ScrollIntoView(Item);
@@ -122,7 +134,7 @@ namespace Waher.Client.WPF.Controls
 
 			try
 			{
-				Markdown = new MarkdownDocument(Msg, new MarkdownSettings(Emoji1_24x24, false));
+				Markdown = new MarkdownDocument(Msg, GetMarkdownSettings());
 			}
 			catch (Exception)
 			{
@@ -167,7 +179,7 @@ namespace Waher.Client.WPF.Controls
 
 				try
 				{
-					Markdown = new MarkdownDocument(Message, new MarkdownSettings(Emoji1_24x24, false));
+					Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
 				}
 				catch (Exception)
 				{
@@ -347,7 +359,7 @@ namespace Waher.Client.WPF.Controls
 
 				try
 				{
-					Markdown = new MarkdownDocument(E.InnerText, new MarkdownSettings(Emoji1_24x24, false));
+					Markdown = new MarkdownDocument(E.InnerText, GetMarkdownSettings());
 				}
 				catch (Exception)
 				{

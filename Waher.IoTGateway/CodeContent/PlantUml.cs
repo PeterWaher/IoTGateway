@@ -300,14 +300,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		/// <param name="Rows">Code rows.</param>
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string FileName = this.GetFileName(Language, Rows, out string Title);
 			if (FileName is null)

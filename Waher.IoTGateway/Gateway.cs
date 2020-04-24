@@ -3114,6 +3114,9 @@ namespace Waher.IoTGateway
 		{
 			List<WebMenuItem> Result = new List<WebMenuItem>();
 			Variables Session = Request.Session;
+			if (Session is null)
+				return new WebMenuItem[0];
+
 			Language Language = ScriptExtensions.Language.GetLanguageAsync(Session).Result;
 
 			if (Session is null ||

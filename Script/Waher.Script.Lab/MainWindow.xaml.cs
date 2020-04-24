@@ -30,7 +30,7 @@ namespace Waher.Script.Lab
 	{
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Script.Lab";
 
-		private Variables variables;
+		private readonly Variables variables;
 
 		public MainWindow()
 		{
@@ -179,8 +179,6 @@ namespace Waher.Script.Lab
 
 					this.Dispatcher.Invoke(() =>
 					{
-						SKImage Img;
-
 						if (Ans is Graph G)
 						{
 							using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
@@ -188,7 +186,7 @@ namespace Waher.Script.Lab
 								this.AddImageBlock(ScriptBlock, Bmp, G, States);
 							}
 						}
-						else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
+						else if (Ans.AssociatedObjectValue is SKImage Img)
 							this.AddImageBlock(ScriptBlock, Img, null, null);
 						else if (Ans.AssociatedObjectValue is Exception ex)
 						{
@@ -241,14 +239,8 @@ namespace Waher.Script.Lab
 								Markdown.AppendLine(" |");
 							}
 
-							MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString());
-							XamlSettings Settings = new XamlSettings()
-							{
-								TableCellRowBackgroundColor1 = "#20404040",
-								TableCellRowBackgroundColor2 = "#10808080"
-							};
-
-							string XAML = Doc.GenerateXAML(Settings);
+							MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), GetMarkdownSettings());
+							string XAML = Doc.GenerateXAML();
 
 							if (XamlReader.Parse(XAML) is UIElement Parsed)
 								this.AddBlock(ScriptBlock, Parsed);
@@ -266,6 +258,17 @@ namespace Waher.Script.Lab
 					});
 				}
 			});
+		}
+		public static MarkdownSettings GetMarkdownSettings()
+		{
+			return new MarkdownSettings(null, false)
+			{
+				XamlSettings = new XamlSettings()
+				{
+					TableCellRowBackgroundColor1 = "#20404040",
+					TableCellRowBackgroundColor2 = "#10808080"
+				}
+			};
 		}
 
 		private TextBlock AddTextBlock(TextBlock ScriptBlock, string s, Color cl, FontWeight FontWeight)

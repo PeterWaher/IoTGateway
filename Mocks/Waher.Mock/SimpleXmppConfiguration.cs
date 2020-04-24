@@ -233,7 +233,11 @@ namespace Waher.Mock
 			{
 				return Load(FileName);
 			}
-			catch (Exception ex)
+			catch (Exception
+#if WINDOWS_UWP
+			ex
+#endif
+			)
 			{
 				XmppCredentials Credentials = new XmppCredentials();
 				bool Ok;

@@ -179,7 +179,7 @@ namespace Waher.Mock
 			{
 				return new SimpleComponentConfiguration(FileName);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				SimpleComponentConfiguration Config = new SimpleComponentConfiguration();
 				bool Ok;

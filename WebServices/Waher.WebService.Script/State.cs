@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using SkiaSharp;
@@ -153,6 +154,11 @@ namespace Waher.WebService.Script
 				{
 					Result = ex.ReturnValue;
 				}
+				catch (ScriptAbortedException)
+				{
+					this.variables.CancelAbort();
+					Result = new ObjectValue(new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use."));
+				}
 				catch (Exception ex)
 				{
 					Result = new ObjectValue(ex);
@@ -222,7 +228,31 @@ namespace Waher.WebService.Script
 
 			if (ms >= this.timeout)
 			{
-				this.thread?.Abort();
+				MethodInfo AbortInternal = null;
+
+				foreach (MethodInfo MI in this.thread.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+				{
+					if (MI.Name == "AbortInternal" && MI.GetParameters().Length == 0)
+					{
+						AbortInternal = MI;
+						break;
+					}
+				}
+
+				if (AbortInternal is null)
+					this.variables?.Abort();
+				else
+				{
+					try
+					{
+						AbortInternal.Invoke(this.thread, new object[0]);
+					}
+					catch (Exception)
+					{
+						this.variables?.Abort();
+					}
+				}
+
 				Timer Temp = this.watchdog;
 				this.watchdog = null;
 				Temp?.Dispose();

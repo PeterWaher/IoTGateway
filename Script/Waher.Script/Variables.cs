@@ -21,6 +21,7 @@ namespace Waher.Script
 		private TextWriter consoleOut = null;
 		private IContextVariables contextVariables = null;
 		private readonly Mutex mutex = new Mutex();
+		private volatile bool active = true;
 
 		/// <summary>
 		/// Collection of variables.
@@ -39,16 +40,21 @@ namespace Waher.Script
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public virtual bool TryGetVariable(string Name, out Variable Variable)
 		{
-			lock (this.variables)
+			if (this.active)
 			{
-				if (this.variables.TryGetValue(Name, out Variable))
-					return true;
+				lock (this.variables)
+				{
+					if (this.variables.TryGetValue(Name, out Variable))
+						return true;
+				}
+
+				if (!(this.contextVariables is null))
+					return this.contextVariables.TryGetVariable(Name, out Variable);
+
+				return false;
 			}
-
-			if (!(this.contextVariables is null))
-				return this.contextVariables.TryGetVariable(Name, out Variable);
-
-			return false;
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -58,16 +64,21 @@ namespace Waher.Script
 		/// <returns>If a variable with that name exists.</returns>
 		public virtual bool ContainsVariable(string Name)
 		{
-			lock (this.variables)
+			if (this.active)
 			{
-				if (this.variables.ContainsKey(Name))
-					return true;
+				lock (this.variables)
+				{
+					if (this.variables.ContainsKey(Name))
+						return true;
+				}
+
+				if (!(this.contextVariables is null))
+					return this.contextVariables.ContainsVariable(Name);
+
+				return false;
 			}
-
-			if (!(this.contextVariables is null))
-				return this.contextVariables.ContainsVariable(Name);
-
-			return false;
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -98,13 +109,18 @@ namespace Waher.Script
 		/// <param name="Value">Associated variable object value.</param>
 		public virtual void Add(string Name, object Value)
 		{
-			lock (this.variables)
+			if (this.active)
 			{
-				if (this.variables.TryGetValue(Name, out Variable v))
-					v.SetValue(Value);
-				else
-					this.variables[Name] = new Variable(Name, Value);
+				lock (this.variables)
+				{
+					if (this.variables.TryGetValue(Name, out Variable v))
+						v.SetValue(Value);
+					else
+						this.variables[Name] = new Variable(Name, Value);
+				}
 			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -114,10 +130,15 @@ namespace Waher.Script
 		/// <returns>If the variable was found and removed.</returns>
 		public virtual bool Remove(string VariableName)
 		{
-			lock (this.variables)
+			if (this.active)
 			{
-				return this.variables.Remove(VariableName);
+				lock (this.variables)
+				{
+					return this.variables.Remove(VariableName);
+				}
 			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -125,10 +146,15 @@ namespace Waher.Script
 		/// </summary>
 		public virtual void Clear()
 		{
-			lock (this.variables)
+			if (this.active)
 			{
-				this.variables.Clear();
+				lock (this.variables)
+				{
+					this.variables.Clear();
+				}
 			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -137,16 +163,21 @@ namespace Waher.Script
 		/// </summary>
 		public virtual void Push()
 		{
-			if (this.stack is null)
-				this.stack = new Stack<Dictionary<string, Variable>>();
+			if (this.active)
+			{
+				if (this.stack is null)
+					this.stack = new Stack<Dictionary<string, Variable>>();
 
-			this.stack.Push(this.variables);
+				this.stack.Push(this.variables);
 
-			Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
-			foreach (KeyValuePair<string, Variable> P in this.variables)
-				Clone[P.Key] = new Variable(P.Key, P.Value.ValueElement);
+				Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
+				foreach (KeyValuePair<string, Variable> P in this.variables)
+					Clone[P.Key] = new Variable(P.Key, P.Value.ValueElement);
 
-			this.variables = Clone;
+				this.variables = Clone;
+			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -154,10 +185,15 @@ namespace Waher.Script
 		/// </summary>
 		public virtual void Pop()
 		{
-			if (this.stack is null)
-				throw new ScriptException("Stack is empty.");
+			if (this.active)
+			{
+				if (this.stack is null)
+					throw new ScriptException("Stack is empty.");
 
-			this.variables = this.stack.Pop();
+				this.variables = this.stack.Pop();
+			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -202,8 +238,13 @@ namespace Waher.Script
 		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
 		public void Lock(int Timeout)
 		{
-			if (!this.mutex.WaitOne(Timeout))
-				throw new TimeoutException("Unique access to variables connection was not granted.");
+			if (this.active)
+			{
+				if (!this.mutex.WaitOne(Timeout))
+					throw new TimeoutException("Unique access to variables connection was not granted.");
+			}
+			else
+				throw new ScriptAbortedException();
 		}
 
 		/// <summary>
@@ -221,15 +262,20 @@ namespace Waher.Script
 		{
 			get
 			{
-				Variable[] Variables;
-
-				lock (this.variables)
+				if (this.active)
 				{
-					Variables = new Variable[this.variables.Count];
-					this.variables.Values.CopyTo(Variables, 0);
-				}
+					Variable[] Variables;
 
-				return Variables;
+					lock (this.variables)
+					{
+						Variables = new Variable[this.variables.Count];
+						this.variables.Values.CopyTo(Variables, 0);
+					}
+
+					return Variables;
+				}
+				else
+					throw new ScriptAbortedException();
 			}
 		}
 
@@ -306,6 +352,22 @@ namespace Waher.Script
 				foreach (Variable Variable in VariablesToCopy)
 					Recipient[Variable.Name] = Variable;
 			}
+		}
+
+		/// <summary>
+		/// Aborts the execution of script using this collection of variables.
+		/// </summary>
+		public void Abort()
+		{
+			this.active = false;
+		}
+
+		/// <summary>
+		/// Allows new script to be evaluated using this collection of variables.
+		/// </summary>
+		public void CancelAbort()
+		{
+			this.active = true;
 		}
 	}
 }

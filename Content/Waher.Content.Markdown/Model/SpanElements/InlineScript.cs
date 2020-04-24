@@ -284,9 +284,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			object Result = this.EvaluateExpression();
 			if (Result is null)
@@ -337,6 +336,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				if (ex is AggregateException ex2)
 				{
+					XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
 						Output.WriteStartElement("TextBlock");
@@ -355,6 +356,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				{
 					if (this.aloneInParagraph)
 					{
+						XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 						Output.WriteStartElement("TextBlock");
 						Output.WriteAttributeString("TextWrapping", "Wrap");
 						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
@@ -373,6 +376,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				if (this.aloneInParagraph)
 				{
+					XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 					Output.WriteStartElement("TextBlock");
 					Output.WriteAttributeString("TextWrapping", "Wrap");
 					Output.WriteAttributeString("Margin", Settings.ParagraphMargins);

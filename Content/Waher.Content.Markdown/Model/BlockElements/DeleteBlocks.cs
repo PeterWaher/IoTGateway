@@ -71,10 +71,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 			Output.WriteStartElement("Border");
 			Output.WriteAttributeString("BorderThickness", Settings.BlockQuoteBorderThickness.ToString() + ",0,0,0");
 			Output.WriteAttributeString("Margin", Settings.BlockQuoteMargin.ToString() + "," + Settings.ParagraphMarginTop.ToString() + ",0," +
@@ -84,7 +85,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteStartElement("StackPanel");
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, Settings, TextAlignment);
+				E.GenerateXAML(Output, TextAlignment);
 
 			Output.WriteEndElement();
 			Output.WriteEndElement();

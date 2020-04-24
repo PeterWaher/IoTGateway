@@ -90,14 +90,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			string s;
-
 			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
 			{
+				XamlSettings Settings = this.Document.Settings.XamlSettings;
+				string s;
+
 				Output.WriteStartElement("TextBlock");
 				Output.WriteAttributeString("Text", Nr.ToString());
 

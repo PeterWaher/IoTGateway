@@ -87,10 +87,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Row = 0;
 			bool ParagraphBullet;
 
@@ -121,7 +121,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 			{
 				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				E.GetMargins(Settings, out int TopMargin, out int BottomMargin);
+				E.GetMargins(out int TopMargin, out int BottomMargin);
 
 				if (E is TaskItem TaskItem && TaskItem.IsChecked)
 				{
@@ -144,7 +144,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteAttributeString("Grid.Row", Row.ToString());
 
 				if (ParagraphBullet)
-					E.GenerateXAML(Output, Settings, TextAlignment);
+					E.GenerateXAML(Output, TextAlignment);
 				else
 				{
 					Output.WriteStartElement("TextBlock");
@@ -152,7 +152,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					if (TextAlignment != TextAlignment.Left)
 						Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
-					E.GenerateXAML(Output, Settings, TextAlignment);
+					E.GenerateXAML(Output, TextAlignment);
 
 					Output.WriteEndElement();
 				}

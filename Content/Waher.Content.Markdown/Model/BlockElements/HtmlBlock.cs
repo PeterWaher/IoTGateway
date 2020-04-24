@@ -80,10 +80,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 			Output.WriteStartElement("TextBlock");
 			Output.WriteAttributeString("TextWrapping", "Wrap");
 			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
@@ -91,7 +92,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, Settings, TextAlignment);
+				E.GenerateXAML(Output, TextAlignment);
 
 			Output.WriteEndElement();
 		}

@@ -119,24 +119,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			GenerateXAML(Output, Settings, TextAlignment, this.url, this.title, this.Children, this.Document);
+			GenerateXAML(Output, TextAlignment, this.url, this.title, this.Children, this.Document);
 		}
 
 		/// <summary>
 		/// Generates XAML for a link.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		/// <param name="Url">URL</param>
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public static void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, 
+		public static void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title, 
 			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			Output.WriteStartElement("Hyperlink");
@@ -146,7 +144,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.WriteAttributeString("ToolTip", Title);
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateXAML(Output, Settings, TextAlignment);
+				E.GenerateXAML(Output, TextAlignment);
 
 			Output.WriteEndElement();
 		}

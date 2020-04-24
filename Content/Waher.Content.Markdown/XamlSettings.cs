@@ -418,5 +418,6 @@ namespace Waher.Content.Markdown
 			get { return this.defaultGraphHeight; }
 			set { this.defaultGraphHeight = value; }
 		}
+
 	}
 }

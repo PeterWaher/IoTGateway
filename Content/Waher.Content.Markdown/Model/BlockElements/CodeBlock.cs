@@ -255,15 +255,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 			if (this.handler != null && this.handler.HandlesXAML)
 			{
 				try
 				{
-					if (this.handler.GenerateXAML(Output, Settings, TextAlignment, this.rows, this.language, this.indent, this.Document))
+					if (this.handler.GenerateXAML(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)

@@ -89,9 +89,8 @@ namespace Waher.Content.Markdown.Model
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public abstract void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment);
+		public abstract void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment);
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
@@ -120,10 +119,9 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Gets margins for content.
 		/// </summary>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TopMargin">Top margin.</param>
 		/// <param name="BottomMargin">Bottom margin.</param>
-		internal virtual void GetMargins(XamlSettings Settings, out int TopMargin, out int BottomMargin)
+		internal virtual void GetMargins(out int TopMargin, out int BottomMargin)
 		{
 			if (this.InlineSpanElement && !this.OutsideParagraph)
 			{
@@ -132,6 +130,8 @@ namespace Waher.Content.Markdown.Model
 			}
 			else
 			{
+				XamlSettings Settings = this.Document.Settings.XamlSettings;
+
 				TopMargin = Settings.ParagraphMarginTop;
 				BottomMargin = Settings.ParagraphMarginBottom;
 			}

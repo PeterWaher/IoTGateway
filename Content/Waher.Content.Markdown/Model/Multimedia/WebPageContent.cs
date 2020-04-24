@@ -89,13 +89,12 @@ namespace Waher.Content.Markdown.Model.Multimedia
         /// Generates XAML for the markdown element.
         /// </summary>
         /// <param name="Output">XAML will be output here.</param>
-        /// <param name="Settings">XAML settings.</param>
         /// <param name="TextAlignment">Alignment of text in element.</param>
         /// <param name="Items">Multimedia items.</param>
         /// <param name="ChildNodes">Child nodes.</param>
         /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
         /// <param name="Document">Markdown document containing element.</param>
-        public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
+        public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             foreach (MultimediaItem Item in Items)

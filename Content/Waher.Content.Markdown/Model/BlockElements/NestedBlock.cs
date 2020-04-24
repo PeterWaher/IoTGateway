@@ -63,12 +63,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			if (this.HasOneChild)
-				this.FirstChild.GenerateXAML(Output, Settings, TextAlignment);
+				this.FirstChild.GenerateXAML(Output, TextAlignment);
 			else
 			{
 				bool SpanOpen = false;
@@ -95,7 +94,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						}
 					}
 
-					E.GenerateXAML(Output, Settings, TextAlignment);
+					E.GenerateXAML(Output, TextAlignment);
 				}
 
 				if (SpanOpen)
@@ -120,10 +119,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Gets margins for content.
 		/// </summary>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TopMargin">Top margin.</param>
 		/// <param name="BottomMargin">Bottom margin.</param>
-		internal override void GetMargins(XamlSettings Settings, out int TopMargin, out int BottomMargin)
+		internal override void GetMargins(out int TopMargin, out int BottomMargin)
 		{
 			bool First = true;
 
@@ -134,10 +132,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				if (First)
 				{
 					First = false;
-					E.GetMargins(Settings, out TopMargin, out BottomMargin);
+					E.GetMargins(out TopMargin, out BottomMargin);
 				}
 				else
-					E.GetMargins(Settings, out int _, out BottomMargin);
+					E.GetMargins(out int _, out BottomMargin);
 			}
 		}
 

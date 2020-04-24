@@ -57,14 +57,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateXAML(Output, Settings, false);
+				this.Document.Detail.GenerateXAML(Output, false);
 			else
-				base.GenerateXAML(Output, Settings, TextAlignment);
+				base.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>

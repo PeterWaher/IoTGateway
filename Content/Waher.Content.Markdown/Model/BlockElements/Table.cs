@@ -379,10 +379,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Column;
 			int Row, NrRows;
 			int RowNr = 0;
@@ -414,16 +414,17 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteEndElement();
 
 			for (Row = 0, NrRows = this.headers.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXAML(Output, Settings, this.headers[Row], RowNr, true);
+				this.GenerateXAML(Output, this.headers[Row], RowNr, true);
 
 			for (Row = 0, NrRows = this.rows.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXAML(Output, Settings, this.rows[Row], RowNr, false);
+				this.GenerateXAML(Output, this.rows[Row], RowNr, false);
 
 			Output.WriteEndElement();
 		}
 
-		private void GenerateXAML(XmlWriter Output, XamlSettings Settings, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
+		private void GenerateXAML(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
 		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement E;
 			TextAlignment TextAlignment;
 			int Column;
@@ -482,7 +483,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Margin", Settings.TableCellPadding);
 				}
 
-				E.GenerateXAML(Output, Settings, TextAlignment);
+				E.GenerateXAML(Output, TextAlignment);
 				Output.WriteEndElement();
 				Output.WriteEndElement();
 			}

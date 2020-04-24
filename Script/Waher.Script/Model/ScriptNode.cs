@@ -169,7 +169,7 @@ namespace Waher.Script.Model
 		public abstract bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst);
 
 		/// <summary>
-		/// Calls the <see cref="ForAll(ScriptNodeEventHandler, ScriptNode[], object, bool)"/> method for all nodes in an array.
+		/// Calls the <see cref="ScriptNode.ForAllChildNodes(ScriptNodeEventHandler, object, bool)"/> method for all nodes in an array.
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="Nodes">Script node array</param>
@@ -198,9 +198,8 @@ namespace Waher.Script.Model
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="Nodes">Script node array</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
 		/// <returns>If the process was completed.</returns>
-		protected static bool ForAll(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
+		protected static bool ForAll(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State)
 		{
 			if (!(Nodes is null))
 			{

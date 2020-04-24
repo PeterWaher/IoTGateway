@@ -11,7 +11,7 @@ using Waher.Script.Operators;
 
 namespace Waher.Script.Fractals.IFS.Variations
 {
-    public abstract class FlameVariationZeroParameters : Function, IFlameVariation
+    public abstract class FlameVariationZeroParameters : FunctionZeroVariables, IFlameVariation
     {
         protected double[] homogeneousTransform = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
         protected double variationWeight = 1;
@@ -20,14 +20,6 @@ namespace Waher.Script.Fractals.IFS.Variations
             : base(Start, Length, Expression)
         {
         }
-
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[0];
-			}
-		}
 
 		public override IElement Evaluate(Variables Variables)
         {
@@ -38,18 +30,6 @@ namespace Waher.Script.Fractals.IFS.Variations
         {
             return LambdaDefinition.ToString(this);
         }
-
-		/// <summary>
-		/// Calls the callback method for all child nodes.
-		/// </summary>
-		/// <param name="Callback">Callback method to call.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
-		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
-		{
-			return true;
-		}
 
 		#region IFlameVariation Members
 

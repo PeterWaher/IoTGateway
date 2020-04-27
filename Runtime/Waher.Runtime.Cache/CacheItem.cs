@@ -6,9 +6,9 @@ namespace Waher.Runtime.Cache
 {
     internal class CacheItem<KeyType, ValueType>
     {
-        private KeyType key;
-        private ValueType value;
-        private DateTime created;
+        private readonly KeyType key;
+        private readonly ValueType value;
+        private readonly DateTime created;
         private DateTime lastUsed;
 
         internal CacheItem(KeyType Key, ValueType Value, DateTime Created)

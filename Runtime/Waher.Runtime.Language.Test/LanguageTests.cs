@@ -18,7 +18,7 @@ namespace Waher.Runtime.Language.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(FilesProvider).Assembly, 
@@ -78,7 +78,7 @@ namespace Waher.Runtime.Language.Test
 			Language Language = await Translator.GetLanguageAsync("en");
 			Namespace Namespace = await Language.GetNamespaceAsync("Test");
 			if (Namespace is null)
-				Namespace = await Language.CreateNamespaceAsync("Test");
+				await Language.CreateNamespaceAsync("Test");
 		}
 
 		[TestMethod]

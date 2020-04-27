@@ -29,9 +29,9 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public const string SchemaRoot = "Translation";
 
-		private static SortedDictionary<string, Language> languagesByCode = new SortedDictionary<string, Language>(StringComparer.CurrentCultureIgnoreCase);
-		private static SortedDictionary<string, Language> languagesByName = new SortedDictionary<string, Language>(StringComparer.CurrentCultureIgnoreCase);
-		private static object synchObject = new object();
+		private readonly static SortedDictionary<string, Language> languagesByCode = new SortedDictionary<string, Language>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static SortedDictionary<string, Language> languagesByName = new SortedDictionary<string, Language>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static object synchObject = new object();
 		private static bool langaugesLoaded = false;
 
 		/// <summary>
@@ -203,12 +203,12 @@ namespace Waher.Runtime.Language
 		{
 			Language Language = null;
 			Namespace Namespace = null;
-			string Code = null;
-			string Name = null;
+			string Code;
+			string Name;
 			string Value = null;
-			byte[] Flag = null;
-			int? FlagWidth = null;
-			int? FlagHeight = null;
+			byte[] Flag;
+			int? FlagWidth;
+			int? FlagHeight;
 			int? Id = null;
 			bool Untranslated = false;
 			bool InString = false;

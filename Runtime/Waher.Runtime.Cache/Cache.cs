@@ -15,7 +15,7 @@ namespace Waher.Runtime.Cache
 		private readonly Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
-		private Random rnd = new Random();
+		private readonly Random rnd = new Random();
 		private readonly object synchObject = new object();
 		private readonly int maxItems;
 		private TimeSpan maxTimeUsed;
@@ -181,7 +181,7 @@ namespace Waher.Runtime.Cache
 				}
 				else
 				{
-					Value = default(ValueType);
+					Value = default;
 					return false;
 				}
 			}
@@ -224,7 +224,7 @@ namespace Waher.Runtime.Cache
 		/// <returns>If the key is available.</returns>
 		public bool ContainsKey(KeyType Key)
 		{
-			return (this.TryGetValue(Key, out ValueType Value));
+			return (this.TryGetValue(Key, out ValueType _));
 		}
 
 		private DateTime GetLastUsageTimeLocked()
@@ -285,7 +285,7 @@ namespace Waher.Runtime.Cache
 
 					if (this.valuesByKey.Count >= this.maxItems)
 					{
-						KeyType OldKey = default(KeyType);
+						KeyType OldKey = default;
 						bool Found = false;
 
 						foreach (KeyType Key2 in this.keysByLastUsage.Values)

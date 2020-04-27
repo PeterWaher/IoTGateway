@@ -16,8 +16,8 @@ namespace Waher.Runtime.Language
 	[TypeName(TypeNameSerialization.None)]
 	public class Language
 	{
-		private SortedDictionary<string, Namespace> namespacesByName = new SortedDictionary<string, Namespace>(StringComparer.CurrentCultureIgnoreCase);
-		private object synchObject = new object();
+		private readonly SortedDictionary<string, Namespace> namespacesByName = new SortedDictionary<string, Namespace>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly object synchObject = new object();
 		private Guid objectId = Guid.Empty;
 		private string code = string.Empty;
 		private string name = string.Empty;

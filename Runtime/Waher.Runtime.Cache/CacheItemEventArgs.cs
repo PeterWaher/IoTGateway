@@ -49,9 +49,9 @@ namespace Waher.Runtime.Cache
     /// <typeparam name="ValueType">Cache value type.</typeparam>
     public class CacheItemEventArgs<KeyType, ValueType> : EventArgs
     {
-        private KeyType key;
-        private ValueType value;
-        private RemovedReason reason;
+        private readonly KeyType key;
+        private readonly ValueType value;
+        private readonly RemovedReason reason;
 
         internal CacheItemEventArgs(KeyType Key, ValueType Value, RemovedReason Reason)
         {

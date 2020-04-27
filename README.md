@@ -67,6 +67,21 @@ The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2020. All r
  
 [![](/Images/logo-WaherDataAB-300x58.png)](http://waher.se/)
 
+Mastering Internet of Things
+-----------------------------------
+
+Many of the libraries available in this repository contains are described and explained
+in the book *Mastering Internet of Things* by Peter Waher. You can find the book
+on [Packt](https://www.packtpub.com/networking-and-servers/mastering-internet-things),
+[Amazon](https://www.amazon.com/Mastering-Internet-Things-Peter-Waher/dp/1788397487/),
+[Bokus](https://www.bokus.com/bok/9781788397483/mastering-internet-of-things/)
+and other stores.
+
+![Mastering Internet of Things Book Cover](/Images/Cover.png)
+
+The examples described in this book are available in a separate repository:
+[MIoT](https://github.com/PeterWaher/MIoT)
+
 IoT Gateway
 ----------------------
 

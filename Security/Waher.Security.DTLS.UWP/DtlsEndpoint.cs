@@ -24,11 +24,11 @@ namespace Waher.Security.DTLS
 
 		private Cache<object, EndpointState> states;
 		private Scheduler timeouts;
-		private DtlsMode mode;
+		private readonly DtlsMode mode;
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer communicationLayer;
-		private IUserSource users;
-		private string requiredPrivilege;
+		private readonly IUserSource users;
+		private readonly string requiredPrivilege;
 		private double probabilityPacketLoss = 0;
 
 		static DtlsEndpoint()
@@ -406,7 +406,7 @@ namespace Waher.Security.DTLS
 			return Version.ToString();
 		}
 
-		private void SniffMsg(byte[] Data, int Offset, bool Rx, EndpointState State)
+		private void SniffMsg(byte[] Data, int Offset, bool Rx)
 		{
 			StringBuilder Msg = new StringBuilder();
 
@@ -480,7 +480,7 @@ namespace Waher.Security.DTLS
 			try
 			{
 				if (this.HasSniffers)
-					this.SniffMsg(Record.datagram, Record.recordOffset, true, State);
+					this.SniffMsg(Record.datagram, Record.recordOffset, true);
 
 				switch (Record.type)
 				{
@@ -1178,7 +1178,7 @@ namespace Waher.Security.DTLS
 				Array.Copy(Record, 0, Readable, 0, 13);
 				Array.Copy(Fragment, 0, Readable, 13, Fragment.Length);
 
-				this.SniffMsg(Readable, 0, false, State);
+				this.SniffMsg(Readable, 0, false);
 			}
 
 			if (More && State.buffer is null)

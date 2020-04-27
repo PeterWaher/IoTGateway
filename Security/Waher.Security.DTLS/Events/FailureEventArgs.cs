@@ -16,8 +16,8 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class FailureEventArgs : RemoteEndpointEventArgs
 	{
-		private string reason;
-		private AlertDescription descripton;
+		private readonly string reason;
+		private readonly AlertDescription descripton;
 
 		/// <summary>
 		/// Event arguments for handshake failure events.

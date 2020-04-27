@@ -103,7 +103,6 @@ namespace Waher.Security.DTLS.Ciphers
 
 			State.server_write_IV = new byte[this.fixedIvLength];
 			Array.Copy(KeyBlock, Pos, State.server_write_IV, 0, this.fixedIvLength);
-			Pos += this.fixedIvLength;
 		}
 
 		/// <summary>

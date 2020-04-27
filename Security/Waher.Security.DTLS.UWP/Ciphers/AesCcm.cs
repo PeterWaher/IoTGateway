@@ -11,11 +11,11 @@ namespace Waher.Security.DTLS.Ciphers
 	/// </summary>
 	public class AesCcm : IDisposable
 	{
-		private byte[] iv = new byte[16];   // zeroes.
+		private readonly byte[] iv = new byte[16];   // zeroes.
+		private readonly int t;
+		private readonly int n;
+		private readonly int q;
 		private Aes aes;
-		private int t;
-		private int n;
-		private int q;
 
 		/// <summary>
 		/// AES CCM encryptor/decryptor:

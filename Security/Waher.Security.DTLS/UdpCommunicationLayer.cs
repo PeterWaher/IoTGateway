@@ -13,7 +13,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class UdpCommunicationLayer : Sniffable, IDisposable, ICommunicationLayer
 	{
-		private LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
+		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
 		private UdpClient client;
 		private bool disposed = false;
 		private bool isWriting = false;
@@ -130,7 +130,7 @@ namespace Waher.Security.DTLS
 		public void SendPacket(byte[] Packet, object RemoteEndpoint)
 		{
 			IPEndPoint EP = (IPEndPoint)RemoteEndpoint;
-			Task T = this.BeginTransmit(Packet, EP);
+			Task _ = this.BeginTransmit(Packet, EP);
 		}
 
 		/// <summary>

@@ -16,7 +16,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class ApplicationDataEventArgs : RemoteEndpointEventArgs
 	{
-		private byte[] applicationData;
+		private readonly byte[] applicationData;
 
 		/// <summary>
 		/// Event arguments for application data events.

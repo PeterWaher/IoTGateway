@@ -9,8 +9,8 @@ namespace Waher.Security.DTLS
 	/// </summary>
     public class PresharedKey : IDtlsCredentials
     {
-		private byte[] identity;
-		private byte[] key;
+		private readonly byte[] identity;
+		private readonly byte[] key;
 
 		/// <summary>
 		/// Pre-shared key.

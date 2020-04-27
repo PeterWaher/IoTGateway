@@ -11,8 +11,8 @@ namespace Waher.Security.DTLS.Ciphers
 	/// </summary>
 	public abstract class AesCcmCipher : PskCipher
 	{
+		private readonly int t;
 		private AesCcm aesCcm;
-		private int t;
 
 		/// <summary>
 		/// AES CCM cipher:

@@ -10,8 +10,8 @@ namespace Waher.Security.DTLS.Events
 	/// </summary>
     public abstract class UdpEventArgs : EventArgs
     {
-		private IPEndPoint remoteEndpoint;
-		private DtlsOverUdp dtlsOverUdp;
+		private readonly IPEndPoint remoteEndpoint;
+		private readonly DtlsOverUdp dtlsOverUdp;
 
 		/// <summary>
 		/// Event arguments for UDP datagram events.

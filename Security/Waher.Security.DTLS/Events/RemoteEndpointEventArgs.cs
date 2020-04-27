@@ -16,7 +16,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class RemoteEndpointEventArgs : EventArgs
 	{
-		private object remoteEndpoint;
+		private readonly object remoteEndpoint;
 
 		/// <summary>
 		/// Event arguments for state change events.

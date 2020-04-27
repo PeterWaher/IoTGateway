@@ -15,7 +15,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class DtlsOverUdp : IDisposable
 	{
-		private Cache<IPEndPoint, DtlsOverUdpState> dtlsStates;
+		private readonly Cache<IPEndPoint, DtlsOverUdpState> dtlsStates;
 		private UdpCommunicationLayer udp;
 		private DtlsEndpoint dtls;
 		private object tag = null;
@@ -98,9 +98,9 @@ namespace Waher.Security.DTLS
 		{
 			IPEndPoint EP = (IPEndPoint)e.RemoteEndpoint;
 
-			if (!this.dtlsStates.TryGetValue(EP, out DtlsOverUdpState State))
+			if (!this.dtlsStates.ContainsKey(EP))
 			{
-				State = new DtlsOverUdpState()
+				DtlsOverUdpState State = new DtlsOverUdpState()
 				{
 					RemoteEndpoint = EP,
 					Queue = new LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>>(),

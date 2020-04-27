@@ -17,8 +17,8 @@ namespace Waher.Security.DTLS.Events
 	/// </summary>
 	public class UdpTransmissionEventArgs : UdpEventArgs
     {
-		private bool successful;
-		private object state;
+		private readonly bool successful;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for UDP datagram events.

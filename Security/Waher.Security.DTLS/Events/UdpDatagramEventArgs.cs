@@ -17,7 +17,7 @@ namespace Waher.Security.DTLS.Events
 	/// </summary>
     public class UdpDatagramEventArgs : UdpEventArgs
     {
-		private byte[] datagram;
+		private readonly byte[] datagram;
 
 		/// <summary>
 		/// Event arguments for UDP datagram events.

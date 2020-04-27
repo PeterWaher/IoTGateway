@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Security.DTLS.UWP</id>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <title>Waher.Security.DTLS.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -2065,31 +2066,27 @@ namespace Waher.IoTGateway
 			if (DoLog)
 				Log.Debug("Checking for local login from: " + RemoteEndpoint);
 
-			if (RemoteEndpoint.StartsWith("[::1]:"))
-			{
-				if (!int.TryParse(RemoteEndpoint.Substring(6), out Port))
-				{
-					if (DoLog)
-						Log.Debug("Invalid port number: " + RemoteEndpoint);
-
-					return;
-				}
-			}
-			else if (RemoteEndpoint.StartsWith("127."))
-			{
-				i = RemoteEndpoint.IndexOf(':');
-				if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out Port))
-				{
-					if (DoLog)
-						Log.Debug("Invalid port number: " + RemoteEndpoint);
-
-					return;
-				}
-			}
-			else
+			i = RemoteEndpoint.LastIndexOf(':');
+			if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out Port))
 			{
 				if (DoLog)
-					Log.Debug("Request not received on loopback interface: " + RemoteEndpoint);
+					Log.Debug("Invalid port number: " + RemoteEndpoint);
+
+				return;
+			}
+
+			if (!IPAddress.TryParse(RemoteEndpoint.Substring(0, i), out IPAddress Address))
+			{
+				if (DoLog)
+					Log.Debug("Invalid IP Address: " + RemoteEndpoint);
+
+				return;
+			}
+
+			if (!IsLocalCall(Address, Request, DoLog))
+			{
+				if (DoLog)
+					Log.Debug("Request not local: " + RemoteEndpoint);
 
 				return;
 			}
@@ -2186,6 +2183,60 @@ namespace Waher.IoTGateway
 				return;
 			}
 #endif
+		}
+
+		private static readonly IPAddress ipv6Local = IPAddress.Parse("[::1]");
+		private static readonly IPAddress ipv4Local = IPAddress.Parse("127.0.0.1");
+
+		private static bool IsLocalCall(IPAddress Address, HttpRequest Request, bool DoLog)
+		{
+			if (Address.Equals(ipv4Local) || Address.Equals(ipv6Local))
+				return true;
+
+			string s = Request.Header.Host.Value;
+			int i = s.IndexOf(':');
+			if (i > 0)
+				s = s.Substring(0, i);
+
+			if (string.Compare(s, "localhost", true) != 0)
+			{
+				if (!IPAddress.TryParse(s, out IPAddress IP) || !Address.Equals(IP))
+				{
+					if (DoLog)
+						Log.Debug("Host not localhost or IP Address: " + Request.Header.Host.Value);
+
+					return false;
+				}
+			}
+
+			try
+			{
+				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+				{
+					if (Interface.OperationalStatus != OperationalStatus.Up)
+						continue;
+
+					IPInterfaceProperties Properties = Interface.GetIPProperties();
+
+					foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+					{
+						if (Address.Equals(UnicastAddress.Address))
+							return true;
+					}
+				}
+
+				if (DoLog)
+					Log.Debug("IP Address not found among network adapters: " + Address.ToString());
+
+				return false;
+			}
+			catch (Exception ex)
+			{
+				if (DoLog)
+					Log.Debug(ex.Message);
+
+				return false;
+			}
 		}
 
 #if !MONO

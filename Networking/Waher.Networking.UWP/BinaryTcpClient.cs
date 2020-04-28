@@ -56,6 +56,7 @@ namespace Waher.Networking
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
 		private string hostName;
+		private string domainName;
 		private bool connecting = false;
 		private bool connected = false;
 		private bool disposing = false;
@@ -195,7 +196,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(string Host, int Port, bool Paused)
 		{
-			this.hostName = Host;
+			this.hostName = this.domainName = Host;
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);
@@ -226,7 +227,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(IPAddress Address, int Port, bool Paused)
 		{
-			this.hostName = Address.ToString();
+			this.hostName = this.domainName = Address.ToString();
 			this.PreConnect();
 #if WINDOWS_UWP
 			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
@@ -258,7 +259,7 @@ namespace Waher.Networking
 		/// <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
 		public async Task<bool> ConnectAsync(IPAddress[] Addresses, int Port, bool Paused)
 		{
-			this.hostName = null;
+			this.hostName = this.domainName = null;
 			this.PreConnect();
 			await this.tcpClient.ConnectAsync(Addresses, Port);
 			return this.PostConnect(Paused);
@@ -991,7 +992,7 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols)
 		{
-			return this.UpgradeToTlsAsClient(Protocols, false);
+			return this.UpgradeToTlsAsClient(Protocols, false, this.hostName);
 		}
 
 		/// <summary>
@@ -999,7 +1000,17 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
-		public async Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols, bool TrustRemoteEndpoint)
+		public Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols, bool TrustRemoteEndpoint)
+		{
+			return this.UpgradeToTlsAsClient(Protocols, TrustRemoteEndpoint, this.hostName);
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		public async Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols, bool TrustRemoteEndpoint, string DomainName)
 		{
 			lock (this.synchObj)
 			{
@@ -1012,6 +1023,7 @@ namespace Waher.Networking
 				if (this.upgraded)
 					throw new InvalidOperationException("Connection already upgraded.");
 
+				this.domainName = DomainName;
 				this.upgrading = true;
 				this.trustRemoteEndpoint = TrustRemoteEndpoint;
 			}
@@ -1031,7 +1043,7 @@ namespace Waher.Networking
 					this.client.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.RevocationFailure);
 				}
 
-				await this.client.UpgradeToSslAsync(Protocols, new HostName(this.hostName));
+				await this.client.UpgradeToSslAsync(Protocols, new HostName(this.domainName));
 				this.remoteCertificate = this.client.Information.ServerCertificate;
 				this.remoteCertificateValid = true;
 
@@ -1052,15 +1064,15 @@ namespace Waher.Networking
 		/// Certificate used by the remote endpoint.
 		/// </summary>
 		public Certificate RemoteCertificate => this.remoteCertificate;
-
 #else
+		
 		/// <summary>
 		/// Upgrades a client connection to TLS.
 		/// </summary>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, null, false);
+			return this.UpgradeToTlsAsClient(null, Protocols, null, false, this.hostName);
 		}
 
 		/// <summary>
@@ -1070,7 +1082,7 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false);
+			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false, this.hostName);
 		}
 
 		/// <summary>
@@ -1080,7 +1092,7 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false, this.hostName);
 		}
 
 		/// <summary>
@@ -1092,7 +1104,7 @@ namespace Waher.Networking
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false, this.hostName);
 		}
 
 		/// <summary>
@@ -1103,7 +1115,20 @@ namespace Waher.Networking
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustRemoteEndpoint)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint, this.hostName);
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, this.hostName);
 		}
 
 		/// <summary>
@@ -1114,7 +1139,7 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
-			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName)
 		{
 			lock (this.synchObj)
 			{
@@ -1128,6 +1153,7 @@ namespace Waher.Networking
 					throw new InvalidOperationException("Connection already upgraded.");
 
 				this.upgrading = true;
+				this.domainName = DomainName;
 				this.certValidation = CertificateValidationCheck;
 				this.trustRemoteEndpoint = TrustRemoteEndpoint;
 			}
@@ -1146,7 +1172,7 @@ namespace Waher.Networking
 				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsClientAsync(this.hostName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString(),
+				await SslStream.AuthenticateAsClientAsync(this.domainName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString(),
 					ClientCertificates, Protocols, true);
 			}
 			finally
@@ -1210,6 +1236,7 @@ namespace Waher.Networking
 					new KeyValuePair<string, object>("Subject", certificate?.Subject),
 					new KeyValuePair<string, object>("Issuer", certificate?.Issuer),
 					new KeyValuePair<string, object>("HostName", this.hostName),
+					new KeyValuePair<string, object>("DomainName", this.domainName),
 					new KeyValuePair<string, object>("Cert", Base64)
 				};
 

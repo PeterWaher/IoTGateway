@@ -1229,15 +1229,32 @@ namespace Waher.Networking
 			if (!Result)
 			{
 				byte[] Cert = certificate?.Export(X509ContentType.Cert) ?? new byte[0];
-				string Base64 = Convert.ToBase64String(Cert);
+				StringBuilder Base64 = new StringBuilder();
+				string s;
+				int c = Cert.Length;
+				int i = 0;
+				int j;
+
+				while (i < c)
+				{
+					j = Math.Min(57, c - i);
+					s = Convert.ToBase64String(Cert, i, j);
+					i += j;
+
+					Base64.Append(s);
+
+					if (i < c)
+						Base64.AppendLine();
+				}
+
 				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 				{
-					new KeyValuePair<string, object>("sslPolicyErrors", sslPolicyErrors.ToString()),
+					new KeyValuePair<string, object>("SslPolicyErrors", sslPolicyErrors.ToString()),
 					new KeyValuePair<string, object>("Subject", certificate?.Subject),
 					new KeyValuePair<string, object>("Issuer", certificate?.Issuer),
 					new KeyValuePair<string, object>("HostName", this.hostName),
 					new KeyValuePair<string, object>("DomainName", this.domainName),
-					new KeyValuePair<string, object>("Cert", Base64)
+					new KeyValuePair<string, object>("Cert", Base64.ToString())
 				};
 
 				if (this.trustRemoteEndpoint)
@@ -1246,7 +1263,7 @@ namespace Waher.Networking
 					Log.Notice("Invalid certificate received. But server is trusted.", certificate?.Subject, certificate?.Issuer, Tags);
 				}
 				else
-					Log.Warning("Invalid certificate received (and rejected)", certificate?.Subject, certificate?.Issuer, Tags);
+					Log.Warning("Invalid certificate received (and rejected)", certificate?.Subject, certificate?.Issuer, "CertError", Tags);
 
 				if (this.HasSniffers)
 				{

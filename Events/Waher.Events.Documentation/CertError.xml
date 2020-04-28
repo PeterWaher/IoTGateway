@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="CertError" minor="true" medium="false" major="false"
+				  debug="false" informational="false" notice="false" warning="true" 
+				  error="false" critical="false" alert="false" emergency="false">
+	<Description>Event raised when validating a certificate, and errors where found that could not be accepted.</Description>
+	<Object>Subject</Object>
+	<Actor>Issuer</Actor>
+  <Tag key="SslPolicyErrors" valueType="xs:string">
+    <Description>What type of errors where found.</Description>
+  </Tag>
+  <Tag key="Subject" valueType="xs:string">
+    <Description>Subject field of certificate.</Description>
+  </Tag>
+  <Tag key="Issuer" valueType="xs:string">
+    <Description>Issuer of certificate.</Description>
+  </Tag>
+  <Tag key="HostName" valueType="xs:string">
+    <Description>Host name of connection.</Description>
+  </Tag>
+  <Tag key="DomainName" valueType="xs:string">
+    <Description>Domain name being validated.</Description>
+  </Tag>
+  <Tag key="Cert" valueType="xs:string">
+    <Description>Base64-encoding of certificate.</Description>
+  </Tag>
+</EventDescription>

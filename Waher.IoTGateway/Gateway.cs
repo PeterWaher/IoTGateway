@@ -2035,7 +2035,6 @@ namespace Waher.IoTGateway
 		{
 			string RemoteEndpoint = Request.RemoteEndPoint;
 			string From;
-			int Port;
 			int i;
 			bool DoLog = false;
 
@@ -2067,7 +2066,7 @@ namespace Waher.IoTGateway
 				Log.Debug("Checking for local login from: " + RemoteEndpoint);
 
 			i = RemoteEndpoint.LastIndexOf(':');
-			if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out Port))
+			if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out int Port))
 			{
 				if (DoLog)
 					Log.Debug("Invalid port number: " + RemoteEndpoint);

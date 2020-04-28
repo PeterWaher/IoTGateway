@@ -276,7 +276,7 @@ namespace Waher.Security.LoginMonitor
 				EP.Blocked = true;
 				EP.Reason = Reason;
 
-				Log.Warning("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major,
+				Log.Alert("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major,
 					new KeyValuePair<string, object>("Reason", Reason));
 
 				await Database.Update(EP);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Events;
 
@@ -40,6 +41,10 @@ namespace Waher.IoTGateway.Events
 
 					Markdown.AppendLine("===============");
 					Markdown.AppendLine();
+					Markdown.AppendLine(MarkdownDocument.Encode(Event.Message));
+					Markdown.AppendLine();
+					Markdown.AppendLine("| Information ||");
+					Markdown.AppendLine("|:======|:=====|");
 
 					this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
 					this.AppendLabel("Event ID", Event.EventId, Markdown);
@@ -54,9 +59,6 @@ namespace Waher.IoTGateway.Events
 							this.AppendLabel(P.Key, P.Value?.ToString(), Markdown);
 					}
 
-					Markdown.AppendLine();
-					Markdown.Append(MarkdownDocument.Encode(Event.Message));
-
 					Gateway.SendNotification(Markdown.ToString());
 					break;
 			}
@@ -66,12 +68,23 @@ namespace Waher.IoTGateway.Events
 
 		private void AppendLabel(string Label, string Value, StringBuilder Markdown)
 		{
-			if (!string.IsNullOrEmpty(Value))
+			bool First = true;
+
+			Markdown.Append("| ");
+			Markdown.Append(MarkdownDocument.Encode(Label));
+			Markdown.Append(" | ");
+
+			foreach (string Row in Value.Trim().Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
 			{
-				Markdown.Append(Label);
-				Markdown.Append(": ");
-				Markdown.AppendLine(MarkdownDocument.Encode(Value));
+				if (First)
+					First = false;
+				else
+					Markdown.Append("<br/>");
+
+				Markdown.Append(MarkdownDocument.Encode(Row));
 			}
+
+			Markdown.AppendLine(" |");
 		}
 	}
 }

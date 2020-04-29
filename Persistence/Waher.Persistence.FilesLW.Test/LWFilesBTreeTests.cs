@@ -451,7 +451,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(IOException))]
+		[ExpectedException(typeof(FileException))]
 		public async Task DBFiles_BTree_Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -966,7 +966,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception))]
+		[ExpectedException(typeof(SerializationException))]
 		public async Task DBFiles_BTree_Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);

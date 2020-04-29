@@ -12,7 +12,7 @@ namespace Waher.Persistence.Attributes
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public class ShortNameAttribute : Attribute
 	{
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// This attribute defines a short name for a member (field or property). Short names are preferred for serialization.

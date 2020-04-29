@@ -11,7 +11,7 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Type of object being sorted.</typeparam>
 	internal class SortedReference<T> : IComparable
 	{
-		private byte[] key;
+		private readonly byte[] key;
 		private readonly IComparer<byte[]> comparer;
 		private readonly T value;
 		private readonly IObjectSerializer serializer;

@@ -11,7 +11,7 @@ namespace Waher.Persistence.Filters
 	/// </summary>
 	public class FilterFieldLikeRegEx : FilterField
 	{
-		private string regularExpression;
+		private readonly string regularExpression;
 
 		/// <summary>
 		/// This filter selects objects that have a named field matching a given regular expression.

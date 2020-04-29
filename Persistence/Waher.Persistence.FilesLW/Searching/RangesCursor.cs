@@ -27,7 +27,6 @@ namespace Waher.Persistence.Files.Searching
 		private readonly bool locked;
 		private readonly bool firstAscending;
 		private readonly bool[] ascending;
-		private readonly string[] fieldNames;
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
@@ -47,7 +46,6 @@ namespace Waher.Persistence.Files.Searching
 			this.locked = Locked;
 			this.currentRange = null;
 			this.ascending = Index.Ascending;
-			this.fieldNames = Index.FieldNames;
 			this.firstAscending = this.ascending[0];
 			this.nrRanges = this.ranges.Length;
 			this.provider = Provider;

@@ -13,7 +13,7 @@ namespace Waher.Persistence.Attributes
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public class DefaultValueAttribute : Attribute
 	{
-		private object value;
+		private readonly object value;
 
 		/// <summary>
 		/// This attribute informs the persistence layer about the default value of a member (field or property).

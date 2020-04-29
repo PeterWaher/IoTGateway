@@ -12,7 +12,7 @@ namespace Waher.Persistence.Attributes
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 	public class CollectionNameAttribute : Attribute
 	{
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// This attribute defines the name of the collection that will house objects of this type.

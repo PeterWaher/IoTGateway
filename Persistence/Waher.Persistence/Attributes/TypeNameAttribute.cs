@@ -33,8 +33,8 @@ namespace Waher.Persistence.Attributes
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 	public class TypeNameAttribute : Attribute
 	{
-		private TypeNameSerialization typeNameSerialization;
-		private string fieldName;
+		private readonly TypeNameSerialization typeNameSerialization;
+		private readonly string fieldName;
 
 		/// <summary>
 		/// This attribute defines the name of the collection that will house objects of this type.

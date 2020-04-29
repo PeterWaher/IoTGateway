@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// Provides a cursor into an empty set.
 		/// </summary>
-		internal EmptyCursor(ObjectSerializer Serializer)
+		internal EmptyCursor()
 		{
 		}
 

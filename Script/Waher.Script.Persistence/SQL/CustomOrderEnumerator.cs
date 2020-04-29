@@ -15,7 +15,6 @@ namespace Waher.Script.Persistence.SQL
 	public class CustomOrderEnumerator : IEnumerator
 	{
 		private readonly KeyValuePair<ScriptNode, bool>[] order;
-		private readonly Variables variables;
 		private readonly IEnumerator e;
 
 		/// <summary>
@@ -26,7 +25,6 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Order">Custom order.</param>
 		public CustomOrderEnumerator(IEnumerator ItemEnumerator, Variables Variables, KeyValuePair<ScriptNode, bool>[] Order)
 		{
-			this.variables = Variables;
 			this.order = Order;
 
 			List<object> Items = new List<object>();

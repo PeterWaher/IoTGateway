@@ -11,7 +11,7 @@ namespace Waher.Persistence.Filters
 	/// </summary>
 	public abstract class FilterChild : Filter
 	{
-		private Filter filter;
+		private readonly Filter filter;
 
 		/// <summary>
 		/// Abstract base class for filters having a single child-filters.

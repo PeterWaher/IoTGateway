@@ -12,7 +12,7 @@ namespace Waher.Persistence.Attributes
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true, Inherited = true)]
 	public class IndexAttribute : Attribute
 	{
-		private string[] fieldNames;
+		private readonly string[] fieldNames;
 
 		/// <summary>
 		/// This attribute defines a compound index for the collection holding objects of the corresponding class.

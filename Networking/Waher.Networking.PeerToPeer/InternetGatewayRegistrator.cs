@@ -423,13 +423,13 @@ namespace Waher.Networking.PeerToPeer
 						case PeerToPeerNetworkState.Ready:
 							this.searchTimer?.Dispose();
 							this.searchTimer = null;
-							this.ready.Set();
+							this.ready?.Set();
 							break;
 
 						case PeerToPeerNetworkState.Error:
 							this.searchTimer?.Dispose();
 							this.searchTimer = null;
-							this.error.Set();
+							this.error?.Set();
 
 							this.searchTimer = new Timer(this.Reinitialize, null, 60000, Timeout.Infinite);
 							break;

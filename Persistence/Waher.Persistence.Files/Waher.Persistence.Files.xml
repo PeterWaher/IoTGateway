@@ -2242,7 +2242,7 @@
             </summary>
             <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
         </member>
-        <member name="M:Waher.Persistence.Files.Searching.EmptyCursor`1.#ctor(Waher.Persistence.Serialization.ObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.Searching.EmptyCursor`1.#ctor">
             <summary>
             Provides a cursor into an empty set.
             </summary>

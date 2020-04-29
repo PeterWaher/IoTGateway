@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	public class DataFormEventArgs : IqResultEventArgs
 	{
-		private DataForm form;
+		private readonly DataForm form;
 
 		/// <summary>
 		/// Event arguments for data form results.

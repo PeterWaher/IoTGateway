@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public class TextElement : LayoutElement
 	{
-		private string text;
+		private readonly string text;
 
 		/// <summary>
 		/// Class managing a text element.

@@ -9,9 +9,9 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	public class DynamicDataFormEventArgs : MessageEventArgs
 	{
-		private DataForm form;
-		private string sessionVariable;
-		private string language;
+		private readonly DataForm form;
+		private readonly string sessionVariable;
+		private readonly string language;
 
 		internal DynamicDataFormEventArgs(DataForm Form, string SessionVariable, string Language, MessageEventArgs e)
 			: base(e)

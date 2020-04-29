@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public class Section : LayoutElement
 	{
-		private string label;
+		private readonly string label;
 		private LayoutElement[] staticElements;
 		private List<LayoutElement> dynamicElements = null;
 		private int priority = 0;

@@ -11,10 +11,10 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 	/// </summary>
 	public class ResultPage
 	{
-		private string first = null;
-		private string last = null;
-		private int? count = null;
-		private int? firstIndex = null;
+		private readonly string first = null;
+		private readonly string last = null;
+		private readonly int? count = null;
+		private readonly int? firstIndex = null;
 
 		/// <summary>
 		/// Contains information about a restricted query, as deinfed in XEP-0059: Result Set Management

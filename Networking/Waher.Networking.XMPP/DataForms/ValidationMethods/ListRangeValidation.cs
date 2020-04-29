@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 	/// </summary>
 	public class ListRangeValidation : ValidationMethod
 	{
-		private ValidationMethod additional;
+		private readonly ValidationMethod additional;
 		private int min;
 		private int max;
 
@@ -110,8 +110,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <returns>If merger was possible.</returns>
 		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
 		{
-			ListRangeValidation V2 = SecondaryValidationMethod as ListRangeValidation;
-			if (V2 is null)
+			if (!(SecondaryValidationMethod is ListRangeValidation V2))
 				return false;
 
 			if ((this.additional is null) ^ (V2.additional is null))

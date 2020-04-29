@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class OpenStreamEventArgs : IqResultEventArgs
 	{
-		private OutgoingStream output;
+		private readonly OutgoingStream output;
 
 		internal OpenStreamEventArgs(IqResultEventArgs e, OutgoingStream Output)
 			: base(e)

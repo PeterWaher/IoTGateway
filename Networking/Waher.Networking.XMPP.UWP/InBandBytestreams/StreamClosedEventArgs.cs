@@ -18,8 +18,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class StreamClosedEventArgs : EventArgs
 	{
-		private CloseReason reason;
-		private object state;
+		private readonly CloseReason reason;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for stream close callbacks.

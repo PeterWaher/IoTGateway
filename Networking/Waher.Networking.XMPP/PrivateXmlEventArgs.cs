@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class PrivateXmlEventArgs : IqResultEventArgs
 	{
-		private XmlElement element;
+		private readonly XmlElement element;
 
 		/// <summary>
 		/// Event arguments for Private XML Storage callback methods.

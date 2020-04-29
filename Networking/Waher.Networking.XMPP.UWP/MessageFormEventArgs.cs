@@ -11,8 +11,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class MessageFormEventArgs : MessageEventArgs
 	{
-		private DataForm form;
-		private string formType;
+		private readonly DataForm form;
+		private readonly string formType;
 
 		/// <summary>
 		/// Event arguments for message events.

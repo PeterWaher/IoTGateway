@@ -15,9 +15,9 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	public class Media
 	{
-		private KeyValuePair<string, Uri>[] uris;
-		private int? width;
-		private int? height;
+		private readonly KeyValuePair<string, Uri>[] uris;
+		private readonly int? width;
+		private readonly int? height;
 		private byte[] bin = null;
 		private string url = null;
 
@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.DataForms
 		}
 
 		/// <summary>
-		/// An array of (Content Type,URI) pairs pointing to media content.
+		/// An array of (Content-Type, URI) pairs pointing to media content.
 		/// </summary>
 		public KeyValuePair<string, Uri>[] URIs { get { return this.uris; } }
 

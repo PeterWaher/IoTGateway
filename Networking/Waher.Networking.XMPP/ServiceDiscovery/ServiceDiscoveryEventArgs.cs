@@ -17,9 +17,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	public class ServiceDiscoveryEventArgs : IqResultEventArgs
 	{
-		private Dictionary<string, DataForm> extendedInformation;
-		private Dictionary<string, bool> features;
-		private Identity[] identities;
+		private readonly Dictionary<string, DataForm> extendedInformation;
+		private readonly Dictionary<string, bool> features;
+		private readonly Identity[] identities;
 
 		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Identity[] Identities, 
 			Dictionary<string, bool> Features, Dictionary<string, DataForm> ExtendedInformation)

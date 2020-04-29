@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public abstract class LayoutElement
 	{
-		private DataForm form;
+		private readonly DataForm form;
 
 		internal LayoutElement(DataForm Form)
 		{

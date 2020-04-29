@@ -16,9 +16,9 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 	/// </summary>
 	public class HttpFileUploadEventArgs : IqResultEventArgs
 	{
-		private KeyValuePair<string, string>[] putHeaders = null;
-		private string putUrl = null;
-		private string getUrl = null;
+		private readonly KeyValuePair<string, string>[] putHeaders = null;
+		private readonly string putUrl = null;
+		private readonly string getUrl = null;
 
 		/// <summary>
 		/// Event arguments for HTTP File Upload callback methods.

@@ -19,10 +19,10 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	{
 		private DataReceivedEventHandler dataCallback = null;
 		private StreamClosedEventHandler closeCallback = null;
-		private XmppClient client;
+		private readonly XmppClient client;
 		private object state = null;
-		private string streamId;
-		private int blockSize;
+		private readonly string streamId;
+		private readonly int blockSize;
 
 		internal ValidateStreamEventArgs(XmppClient Client, IqEventArgs e, string StreamId, int BlockSize)
 			: base(e)
@@ -30,6 +30,14 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			this.client = Client;
 			this.streamId = StreamId;
 			this.blockSize = BlockSize;
+		}
+
+		/// <summary>
+		/// XMPP Client
+		/// </summary>
+		public XmppClient Client
+		{
+			get { return this.client; }
 		}
 
 		/// <summary>

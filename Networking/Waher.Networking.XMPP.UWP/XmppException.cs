@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class XmppException : Exception
 	{
-		private XmlElement stanza;
+		private readonly XmlElement stanza;
 
 		/// <summary>
 		/// Base class of XMPP exceptions

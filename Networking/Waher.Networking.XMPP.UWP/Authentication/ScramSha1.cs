@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Authentication
 	public class ScramSha1 : SHA1AuthenticationMethod
 	{
 		private byte[] salt;
-		private string nonce;
+		private readonly string nonce;
 		private string serverNonce;
 		private string saltString;
 		private string serverSignature;

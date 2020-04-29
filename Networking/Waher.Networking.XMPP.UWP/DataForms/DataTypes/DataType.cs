@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	/// </summary>
 	public abstract class DataType
 	{
-		private string typeName;
+		private readonly string typeName;
 
 		/// <summary>
 		/// Abstract base class for all data types used in forms.

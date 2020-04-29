@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 	/// </summary>
 	public class MediaField : Field
 	{
-		private Media media;
+		private readonly Media media;
 
 		/// <summary>
 		/// Media form field.

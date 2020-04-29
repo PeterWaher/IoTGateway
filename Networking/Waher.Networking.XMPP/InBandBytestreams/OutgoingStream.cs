@@ -11,14 +11,14 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class OutgoingStream : IDisposable
 	{
-		private XmppClient client;
+		private readonly XmppClient client;
 		private TemporaryFile tempFile;
-		private IEndToEndEncryption e2e;
-		private string to;
-		private string streamId;
+		private readonly IEndToEndEncryption e2e;
+		private readonly string to;
+		private readonly string streamId;
 		private object state = null;
 		private long pos = 0;
-		private int blockSize;
+		private readonly int blockSize;
 		private ushort seq;
 		private int seqAcknowledged = -1;
 		private bool isWriting;

@@ -33,11 +33,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		private DataReceivedEventHandler dataCallback;
 		private StreamClosedEventHandler closeCallback;
 		private TemporaryFile tempFile = null;
-		private object synchObj = new object();
-		private object state;
+		private readonly object synchObj = new object();
+		private readonly object state;
 		private int expectedSeq = 0;
 		private int baseSeq = 0;
-		private int blockSize;
+		private readonly int blockSize;
 		private bool upperEnd = false;
 
 		/// <summary>

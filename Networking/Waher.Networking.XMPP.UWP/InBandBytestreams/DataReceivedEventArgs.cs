@@ -18,8 +18,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class DataReceivedEventArgs : EventArgs
 	{
-		private byte[] data;
-		private object state;
+		private readonly byte[] data;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments containing received binary data.

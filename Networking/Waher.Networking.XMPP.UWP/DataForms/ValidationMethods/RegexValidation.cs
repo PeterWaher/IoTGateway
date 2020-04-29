@@ -15,8 +15,8 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 	/// </summary>
 	public class RegexValidation : BasicValidation
 	{
-		private string expression;
-		private Regex regex;
+		private readonly string expression;
+		private readonly Regex regex;
 
 		/// <summary>
 		/// Performs regex validation.
@@ -75,8 +75,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <returns>If merger was possible.</returns>
 		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
 		{
-			RegexValidation V2 = SecondaryValidationMethod as RegexValidation;
-			if (V2 is null)
+			if (!(SecondaryValidationMethod is RegexValidation V2))
 				return false;
 
 			return this.regex == V2.regex;

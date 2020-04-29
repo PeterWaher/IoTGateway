@@ -17,10 +17,10 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 	/// </summary>
 	public class BitsOfBinaryEventArgs : IqResultEventArgs
 	{
-		private string contentId;
-		private string contentType;
-		private byte[] data;
-		private DateTime? expires;
+		private readonly string contentId;
+		private readonly string contentType;
+		private readonly byte[] data;
+		private readonly DateTime? expires;
 
 		/// <summary>
 		/// Event argument for a bits-of-byte data request.

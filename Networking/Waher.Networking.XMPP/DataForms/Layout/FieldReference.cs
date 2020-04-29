@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public class FieldReference : LayoutElement
 	{
-		private string var;
+		private readonly string var;
 
 		/// <summary>
 		/// Class managing a field reference.

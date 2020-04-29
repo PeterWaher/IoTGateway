@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         public const string NamespaceAbuseReason = "urn:xmpp:reporting:reason:abuse:0";
 
-        private SortedDictionary<string, bool> blockList = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
+        private readonly SortedDictionary<string, bool> blockList = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
         private bool supportsBlocking = false;
         private bool supportsReporting = false;
         private bool supportsSpamReason = false;
@@ -379,6 +379,7 @@ namespace Waher.Networking.XMPP.Abuse
             {
                 try
                 {
+                    e.State = State;
                     Callback(this, e);
                 }
                 catch (Exception ex)

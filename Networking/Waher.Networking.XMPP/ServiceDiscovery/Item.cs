@@ -11,9 +11,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	public class Item
 	{
-		private string jid;
-		private string node;
-		private string name;
+		private readonly string jid;
+		private readonly string node;
+		private readonly string name;
 
 		internal Item(XmlElement E)
 		{

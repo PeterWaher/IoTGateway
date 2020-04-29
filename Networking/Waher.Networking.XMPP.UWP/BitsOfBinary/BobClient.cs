@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// </summary>
 		public const string Namespace = "urn:xmpp:bob";
 
-		private string folder;
+		private readonly string folder;
 
 		/// <summary>
 		/// Client managing bits of binary (XEP-0231):

@@ -17,8 +17,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class ValidateSenderEventArgs : EventArgs
 	{
-		private XmppClient client;
-		private XmlElement stanza;
+		private readonly XmppClient client;
+		private readonly XmlElement stanza;
 		private string from;
 		private string fromBareJid;
 		private bool accepted = false;

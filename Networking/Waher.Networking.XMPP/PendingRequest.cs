@@ -9,17 +9,17 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	internal class PendingRequest
 	{
-		private IqResultEventHandler iqCallback;
-		private PresenceEventHandler presenceCallback;
+		private readonly IqResultEventHandler iqCallback;
+		private readonly PresenceEventHandler presenceCallback;
 		private DateTime timeout;
-		private string to;
+		private readonly string to;
 		private string xml;
-		private object state;
+		private readonly object state;
 		private int retryTimeout;
 		private int nrRetries;
-		private int maxRetryTimeout;
-		private uint seqNr;
-		private bool dropOff;
+		private readonly int maxRetryTimeout;
+		private readonly uint seqNr;
+		private readonly bool dropOff;
 
 		internal PendingRequest(uint SeqNr, IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, 
 			string To)

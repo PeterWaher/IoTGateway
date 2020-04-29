@@ -14,18 +14,18 @@ namespace Waher.Networking.XMPP.DataForms
 	public abstract class Field
 	{
 		private DataForm form;
-		private string var;
-		private string label;
-		private bool required;
+		private readonly string var;
+		private readonly string label;
+		private readonly bool required;
 		private string[] valueStrings;
 		private KeyValuePair<string, string>[] options;
-		private string description;
-		private DataType dataType;
-		private ValidationMethod validationMethod;
+		private readonly string description;
+		private readonly DataType dataType;
+		private readonly ValidationMethod validationMethod;
 		private string error;
 		private int priority = 0;
 		private int ordinal = 0;
-		private bool postBack;
+		private readonly bool postBack;
 		private bool readOnly;
 		private bool notSame;
 		private bool edited = false;

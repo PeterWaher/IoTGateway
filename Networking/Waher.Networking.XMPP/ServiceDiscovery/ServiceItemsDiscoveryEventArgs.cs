@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	public class ServiceItemsDiscoveryEventArgs : IqResultEventArgs
 	{
-		private Item[] items;
+		private readonly Item[] items;
 
 		internal ServiceItemsDiscoveryEventArgs(IqResultEventArgs e, Item[] Items)
 			: base(e)

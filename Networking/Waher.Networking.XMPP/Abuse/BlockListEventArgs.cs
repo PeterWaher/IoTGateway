@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Abuse
     /// </summary>
     public class BlockListEventArgs : IqResultEventArgs
     {
-        private string[] jids;
+        private readonly string[] jids;
 
         /// <summary>
         /// Event arguments for block-list response callbacks.

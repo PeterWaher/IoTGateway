@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// </summary>
 	public class SeeOtherHostException : StreamException
 	{
-		private string newHost;
+		private readonly string newHost;
 
 		/// <summary>
 		/// The server will not provide service to the initiating entity but is redirecting traffic to another host under the administrative control

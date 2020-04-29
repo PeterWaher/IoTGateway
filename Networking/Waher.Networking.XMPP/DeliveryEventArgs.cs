@@ -16,8 +16,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class DeliveryEventArgs : EventArgs
 	{
-		private object state;
-		private bool ok;
+		private readonly object state;
+		private readonly bool ok;
 
 		internal DeliveryEventArgs(object State, bool Ok)
 		{

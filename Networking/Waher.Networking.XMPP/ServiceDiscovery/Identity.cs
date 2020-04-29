@@ -11,10 +11,10 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	public class Identity
 	{
-		private string category;
-		private string type;
-		private string name;
-		private string language;
+		private readonly string category;
+		private readonly string type;
+		private readonly string name;
+		private readonly string language;
 
 		internal Identity(XmlElement E)
 		{

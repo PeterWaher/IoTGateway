@@ -24,14 +24,14 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	public class SearchFormEventArgs : IqResultEventArgs
 	{
-		private XmppClient client;
-		private DataForm searchForm;
-		private string instructions;
+		private readonly XmppClient client;
+		private readonly DataForm searchForm;
+		private readonly string instructions;
 		private string first;
 		private string last;
 		private string nick;
 		private string email;
-		private bool supportsForms;
+		private readonly bool supportsForms;
 
 		internal SearchFormEventArgs(XmppClient Client, IqResultEventArgs e, string Instructions, string First, string Last, string Nick, string EMail,
 			DataForm SearchForm, bool SupportsForms)

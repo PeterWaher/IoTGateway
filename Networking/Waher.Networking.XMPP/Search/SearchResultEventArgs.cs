@@ -18,8 +18,8 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	public class SearchResultEventArgs : IqResultEventArgs
 	{
-		private Dictionary<string, string>[] records;
-		private Field[] headers;
+		private readonly Dictionary<string, string>[] records;
+		private readonly Field[] headers;
 
 		internal SearchResultEventArgs(Dictionary<string, string>[] Records, Field[] Headers, IqResultEventArgs e)
 			: base(e)

@@ -16,9 +16,9 @@ namespace Waher.Networking.XMPP.SoftwareVersion
 	/// </summary>
 	public class SoftwareVersionEventArgs : IqResultEventArgs
 	{
-		private string name;
-		private string version;
-		private string os;
+		private readonly string name;
+		private readonly string version;
+		private readonly string os;
 
 		internal SoftwareVersionEventArgs(IqResultEventArgs e, string Name, string Version, string OS)
 			: base(e)

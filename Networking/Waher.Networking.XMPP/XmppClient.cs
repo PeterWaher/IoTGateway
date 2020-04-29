@@ -3011,7 +3011,7 @@ namespace Waher.Networking.XMPP
 						NamespaceStream + "'>", null);
 
 					this.ResetState(false);
-					this.client.Continue();
+					this.client?.Continue();
 				}
 				catch (Exception ex)
 				{

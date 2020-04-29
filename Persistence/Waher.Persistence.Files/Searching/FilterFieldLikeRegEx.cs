@@ -14,7 +14,6 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private Regex regexCs = null;
 		private Regex regexCi = null;
-		private readonly string expression;
 
 		/// <summary>
 		/// This filter selects objects that have a named field matching a given regular expression.
@@ -24,7 +23,6 @@ namespace Waher.Persistence.Files.Searching
 		public FilterFieldLikeRegEx(string FieldName, string RegularExpression)
 			: base(FieldName, RegularExpression)
 		{
-			this.expression = RegularExpression;
 		}
 
 		/// <summary>
@@ -64,14 +62,14 @@ namespace Waher.Persistence.Files.Searching
 			if (Value is string s)
 			{
 				if (this.regexCs is null)
-					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+					this.regexCs = new Regex(this.RegularExpression, RegexOptions.Singleline);
 
 				M = this.regexCs.Match(s);
 			}
 			else if (Value is CaseInsensitiveString cis)
 			{
 				if (this.regexCi is null)
-					this.regexCi = new Regex(RegularExpression, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+					this.regexCi = new Regex(this.RegularExpression, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
 				M = this.regexCi.Match(s = cis.Value);
 			}
@@ -85,7 +83,7 @@ namespace Waher.Persistence.Files.Searching
 					M = this.regexCi.Match(s);
 				else
 				{
-					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+					this.regexCs = new Regex(this.RegularExpression, RegexOptions.Singleline);
 					M = this.regexCs.Match(s);
 				}
 			}
@@ -109,7 +107,7 @@ namespace Waher.Persistence.Files.Searching
 					return this.regexCi;
 				else
 				{
-					this.regexCs = new Regex(RegularExpression, RegexOptions.Singleline);
+					this.regexCs = new Regex(this.RegularExpression, RegexOptions.Singleline);
 					return this.regexCs;
 				}
 			}

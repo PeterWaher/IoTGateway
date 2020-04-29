@@ -5085,25 +5085,15 @@ namespace Waher.Persistence.Files
         {
             if (Result.SameSortOrder(ConstantFields, SortOrder))
                 return Result;
-            else if (CanReverse && Result.ReverseSortOrder(ConstantFields, SortOrder))
+
+            if (CanReverse && Result.ReverseSortOrder(ConstantFields, SortOrder))
                 return new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
 
-            StringBuilder sb = new StringBuilder();
-            bool First = true;
-
-            foreach (string s in SortOrder)
-            {
-                if (First)
-                    First = false;
-                else
-                    sb.Append(", ");
-
-                sb.Append(s);
-            }
-
-            Log.Notice("Sort order in search result did not match index.", this.fileName, string.Empty, "DBOpt",
+            Log.Notice("Sort order in search result did not match index.", 
+                this.fileName, string.Empty, "DBOpt",
                 new KeyValuePair<string, object>("Collection", this.collectionName),
-                new KeyValuePair<string, object>("SortOrder", sb.ToString()));
+                new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
+                new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
             SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
             IndexRecords Records;
@@ -5129,6 +5119,29 @@ namespace Waher.Persistence.Files
             }
 
             return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);
+        }
+
+        private string ToString(string[] SortOrder)
+        {
+            if (SortOrder is null)
+                return string.Empty;
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                bool First = true;
+
+                foreach (string s in SortOrder)
+                {
+                    if (First)
+                        First = false;
+                    else
+                        sb.Append(", ");
+
+                    sb.Append(s);
+                }
+
+                return sb.ToString();
+            }
         }
 
         internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, bool Locked, string[] SortOrder)
@@ -5198,7 +5211,12 @@ namespace Waher.Persistence.Files
                     if (Index is null)
                     {
                         this.nrFullFileScans++;
-                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                            this.fileName, string.Empty, "DBOpt",
+                            new KeyValuePair<string, object>("Collection", this.collectionName),
+                            new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                            new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+                        
                         return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
                             this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
@@ -5333,7 +5351,12 @@ namespace Waher.Persistence.Files
                     if (DoFullScan)
                     {
                         this.nrFullFileScans++;
-                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                            this.fileName, string.Empty, "DBOpt",
+                            new KeyValuePair<string, object>("Collection", this.collectionName),
+                            new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                            new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
                         return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
                             this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
@@ -5352,7 +5375,12 @@ namespace Waher.Persistence.Files
                     if (NegatedFilter is FilterNot)
                     {
                         this.nrFullFileScans++;
-                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                            this.fileName, string.Empty, "DBOpt",
+                            new KeyValuePair<string, object>("Collection", this.collectionName),
+                            new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                            new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
                         return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
                             this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                     }
@@ -5387,20 +5415,25 @@ namespace Waher.Persistence.Files
                                 else if (Value is byte[])
                                     ObjectId = new Guid((byte[])Value);
                                 else
-                                    return new Searching.EmptyCursor<T>(Serializer);
+                                    return new Searching.EmptyCursor<T>();
 
                                 T Obj = await this.LoadObject<T>(ObjectId);
                                 return new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId);
                             }
                             catch (Exception)
                             {
-                                return new Searching.EmptyCursor<T>(Serializer);
+                                return new Searching.EmptyCursor<T>();
                             }
                         }
                     }
 
                     this.nrFullFileScans++;
-                    Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                    Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                        this.fileName, string.Empty, "DBOpt",
+                        new KeyValuePair<string, object>("Collection", this.collectionName),
+                        new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                        new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
                     return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
                         this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
@@ -5411,7 +5444,7 @@ namespace Waher.Persistence.Files
                     Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
                     bool UntilFirstFail;
 
-                    if (!(SortOrder is null) && SortOrder.Length > 0 && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+                    if (Index.ReverseSortOrder(null, Filter2.ConstantFields))
                     {
                         UntilFirstFail = true;
                         Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(Locked,
@@ -5420,10 +5453,16 @@ namespace Waher.Persistence.Files
                     else
                     {
                         Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
-                        UntilFirstFail = Index.SameSortOrder(Filter2.ConstantFields, SortOrder);
+                        UntilFirstFail = Index.SameSortOrder(null, Filter2.ConstantFields);
 
                         if (!UntilFirstFail)
-                            Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                        {
+                            Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+                                this.fileName, string.Empty, "DBOpt",
+                                new KeyValuePair<string, object>("Collection", this.collectionName),
+                                new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                                new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+                        }
                     }
 
                     return new Searching.FilteredCursor<T>(Cursor, Filter2, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);
@@ -5431,7 +5470,12 @@ namespace Waher.Persistence.Files
                 else if (Filter is FilterFieldNotEqualTo)
                 {
                     this.nrFullFileScans++;
-                    Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                    Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                        this.fileName, string.Empty, "DBOpt",
+                        new KeyValuePair<string, object>("Collection", this.collectionName),
+                        new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                        new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
                     return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
                         this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
                 }
@@ -5516,7 +5560,12 @@ namespace Waher.Persistence.Files
                     if (string.IsNullOrEmpty(ConstantPrefix))
                     {
                         this.nrFullFileScans++;
-                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName, string.Empty, "DBOpt");
+                        Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", 
+                            this.fileName, string.Empty, "DBOpt",
+                            new KeyValuePair<string, object>("Collection", this.collectionName),
+                            new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+                            new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
                         return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), FilterFieldLikeRegEx2,
                             false, true, this.timeoutMilliseconds, this.provider);
                     }

@@ -42,6 +42,7 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private IndexBTreeFile index;
 		private readonly string[] fieldNames;
+		private readonly int fieldCount;
 		private readonly bool[] ascending;
 		private readonly string collectionName;
 		private Guid objectId = Guid.Empty;
@@ -61,13 +62,14 @@ namespace Waher.Persistence.Files.Storage
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.fieldNames = FieldNames;
+			this.fieldCount = FieldNames.Length;
 			this.keySizeLimit = KeySizeLimit;
 
-			int i, c = this.fieldNames.Length;
+			int i;
 
-			this.ascending = new bool[c];
+			this.ascending = new bool[this.fieldCount];
 
-			for (i = 0; i < c; i++)
+			for (i = 0; i < this.fieldCount; i++)
 			{
 				if (this.fieldNames[i].StartsWith("-"))
 				{
@@ -120,11 +122,11 @@ namespace Waher.Persistence.Files.Storage
 		public byte[] Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer, MissingFieldAction MissingFields)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-			int i, c = this.fieldNames.Length;
+			int i;
 
 			Writer.WriteBit(true);
 
-			for (i = 0; i < c; i++)
+			for (i = 0; i < this.fieldCount; i++)
 			{
 				if (!Serializer.TryGetFieldValue(this.fieldNames[i], Object, out object Value))
 				{
@@ -321,7 +323,7 @@ namespace Waher.Persistence.Files.Storage
 				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x, BlockLimit);
 				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y, BlockLimit);
 				uint xType, yType;
-				int i, j, c;
+				int i, j;
 				long l;
 				bool xExists = xReader.ReadBit();
 				bool yExists = yReader.ReadBit();
@@ -337,7 +339,7 @@ namespace Waher.Persistence.Files.Storage
 				else if (!xExists)
 					return 0;
 
-				for (i = 0, c = this.fieldNames.Length; i < c; i++)
+				for (i = 0; i < this.fieldCount; i++)
 				{
 					Ascending = this.ascending[i];
 					xType = xReader.ReadBits(6);
@@ -2082,9 +2084,9 @@ namespace Waher.Persistence.Files.Storage
 				return false;
 			}
 
-			int i, c;
+			int i;
 
-			for (i = 0, c = this.fieldNames.Length; i < c; i++)
+			for (i = 0; i < this.fieldCount; i++)
 			{
 				switch ((uint)Reader.ReadBits(6))
 				{
@@ -2202,9 +2204,9 @@ namespace Waher.Persistence.Files.Storage
 			if (Reader.BytesLeft > 0 && Reader.ReadBit())
 			{
 				string Value;
-				int i, c;
+				int i;
 
-				for (i = 0, c = this.fieldNames.Length; i < c; i++)
+				for (i = 0; i < this.fieldCount; i++)
 				{
 					switch ((uint)Reader.ReadBits(6))
 					{
@@ -2323,20 +2325,22 @@ namespace Waher.Persistence.Files.Storage
 			if (SortOrder is null)
 				return true;
 
-			int c = SortOrder.Length;
-			int d = this.fieldNames.Length;
-			if (d < c)
+			int SortLen = SortOrder.Length;
+			if (SortLen == 0)
+				return true;
+
+			if (this.fieldCount < SortLen)
 				return false;
 
 			string s, s2;
-			int i = 0;
-			int j;
+			int FieldIndex = 0;
+			int SortIndex;
 			int NrConstantsFound = 0;
 			bool Ascending;
 
-			for (j = 0; j < c; j++)
+			for (SortIndex = 0; SortIndex < SortLen; SortIndex++)
 			{
-				s = SortOrder[j];
+				s = SortOrder[SortIndex];
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
@@ -2350,9 +2354,9 @@ namespace Waher.Persistence.Files.Storage
 						s = s.Substring(1);
 				}
 
-				while (i < d)
+				while (FieldIndex < this.fieldCount)
 				{
-					s2 = this.fieldNames[i];
+					s2 = this.fieldNames[FieldIndex];
 
 					if (s == s2)
 						break;
@@ -2361,40 +2365,20 @@ namespace Waher.Persistence.Files.Storage
 					else
 					{
 						NrConstantsFound++;
-						i++;
+						FieldIndex++;
 					}
 				}
 
-				if (i >= d)
+				if (FieldIndex >= this.fieldCount)
 					return false;
 
-				if (Ascending != this.ascending[i])
+				if (Ascending != this.ascending[FieldIndex])
 					return false;
 
-				i++;
+				FieldIndex++;
 			}
 
-			if (!(ConstantFields is null))
-			{
-				int e = ConstantFields.Length;
-
-				while (i < d && NrConstantsFound < e)
-				{
-					s2 = this.fieldNames[i];
-
-					if (Array.IndexOf<string>(ConstantFields, s2) < 0)
-						return false;
-					else
-					{
-						NrConstantsFound++;
-						i++;
-					}
-				}
-
-				return NrConstantsFound == e;
-			}
-			else
-				return true;
+			return true;
 		}
 
 		/// <summary>
@@ -2409,20 +2393,22 @@ namespace Waher.Persistence.Files.Storage
 			if (SortOrder is null)
 				return false;
 
-			int c = SortOrder.Length;
-			int d = this.fieldNames.Length;
-			if (d < c)
+			int SortLen = SortOrder.Length;
+			if (SortLen == 0)
+				return true;
+
+			if (this.fieldCount < SortLen)
 				return false;
 
 			string s, s2;
-			int i = 0;
-			int j;
+			int FieldIndex = 0;
+			int SortIndex;
 			int NrConstantsFound = 0;
 			bool Ascending;
 
-			for (j = 0; j < c; j++)
+			for (SortIndex = 0; SortIndex < SortLen; SortIndex++)
 			{
-				s = SortOrder[j];
+				s = SortOrder[SortIndex];
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
@@ -2436,9 +2422,9 @@ namespace Waher.Persistence.Files.Storage
 						s = s.Substring(1);
 				}
 
-				while (i < d)
+				while (FieldIndex < this.fieldCount)
 				{
-					s2 = this.fieldNames[i];
+					s2 = this.fieldNames[FieldIndex];
 
 					if (s == s2)
 						break;
@@ -2447,40 +2433,20 @@ namespace Waher.Persistence.Files.Storage
 					else
 					{
 						NrConstantsFound++;
-						i++;
+						FieldIndex++;
 					}
 				}
 
-				if (i >= d)
+				if (FieldIndex >= this.fieldCount)
 					return false;
 
-				if (Ascending == this.ascending[i])
+				if (Ascending == this.ascending[FieldIndex])
 					return false;
 
-				i++;
+				FieldIndex++;
 			}
 
-			if (!(ConstantFields is null))
-			{
-				int e = ConstantFields.Length;
-
-				while (i < d && NrConstantsFound < e)
-				{
-					s2 = this.fieldNames[i];
-
-					if (Array.IndexOf<string>(ConstantFields, s2) < 0)
-						return false;
-					else
-					{
-						NrConstantsFound++;
-						i++;
-					}
-				}
-
-				return NrConstantsFound == e;
-			}
-			else
-				return true;
+			return true;
 		}
 
 		internal static int BinaryCompare(byte[] b1, byte[] b2)

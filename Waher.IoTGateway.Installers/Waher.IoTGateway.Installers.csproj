@@ -86,6 +86,7 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Q.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Z.cs" />
+    <Compile Include=".bak\Waher.Script\Exceptions\ScriptAbortedException.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Fields.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
@@ -116,6 +117,11 @@
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />
+    <Compile Include=".bak\Waher.Script\Order\CompoundOrder.cs" />
+    <Compile Include=".bak\Waher.Script\Order\ElementOrder.cs" />
+    <Compile Include=".bak\Waher.Script\Order\IndexOrder.cs" />
+    <Compile Include=".bak\Waher.Script\Order\LambdaOrder.cs" />
+    <Compile Include=".bak\Waher.Script\Order\PropertyOrder.cs" />
     <Compile Include=".bak\Waher.Script\Output\BigIntegerOutput.cs" />
     <Compile Include=".bak\Waher.Script\Output\BooleanOutput.cs" />
     <Compile Include=".bak\Waher.Script\Output\ComplexArrayOutput.cs" />

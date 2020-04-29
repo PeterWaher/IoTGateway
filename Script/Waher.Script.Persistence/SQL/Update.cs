@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
-using Waher.Persistence.Filters;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Assignments;
+using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -51,7 +49,8 @@ namespace Waher.Script.Persistence.SQL
 			if (!(E.AssociatedObjectValue is Type T))
 				throw new ScriptRuntimeException("Type expected.", this.source);
 
-			IEnumerator e = Select.Find(T, 0, int.MaxValue, this.where, Variables, new string[0], this);
+			IEnumerator e = TypeSource.Find(T, 0, int.MaxValue, this.where, Variables,
+				new KeyValuePair<VariableReference, bool>[0], this);
 			LinkedList<object> ToUpdate = new LinkedList<object>();
 			int Count = 0;
 

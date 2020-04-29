@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -122,11 +121,20 @@ namespace Waher.Script.Persistence.SQL
 			if (c != 1)
 				throw new ScriptRuntimeException("Joinds between multiple sources not supported.", this);
 
-			E = this.sources[0].Evaluate(Variables);
-			if (!(E.AssociatedObjectValue is Type T))
-				throw new ScriptRuntimeException("Type expected.", this.sources[0]);
+			IDataSource[] Sources = new IDataSource[c];
+			for (i = 0; i < c; i++)
+			{
+				E = this.sources[i].Evaluate(Variables);
 
-			List<string> OrderBy = new List<string>();
+				if (E.AssociatedObjectValue is Type T)
+					Sources[i] = new TypeSource(T);
+				else if (E is IVector V)
+					Sources[i] = new VectorSource(V);
+				else
+					throw new ScriptRuntimeException("Data source type not supported.", this.sources[i]);
+			}
+
+			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
 			if (this.orderBy != null)
@@ -134,28 +142,40 @@ namespace Waher.Script.Persistence.SQL
 				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
 				{
 					if (Node.Key is VariableReference Ref)
-					{
-						if (Node.Value)
-							OrderBy.Add(Ref.VariableName);
-						else
-							OrderBy.Add("-" + Ref.VariableName);
-					}
+						OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, Node.Value));
 					else
+					{
 						CalculatedOrder = true;
+						break;
+					}
 				}
 			}
 
-			if (this.groupBy != null)
+			if (this.groupBy != null && !CalculatedOrder)
 			{
 				foreach (ScriptNode Node in this.groupBy)
 				{
 					if (Node is VariableReference Ref)
 					{
-						if (!OrderBy.Contains(Ref.VariableName))
-							OrderBy.Add(Ref.VariableName);
+						bool Found = false;
+
+						foreach (KeyValuePair<VariableReference, bool> P in OrderBy)
+						{
+							if (P.Key.VariableName == Ref.VariableName)
+							{
+								Found = true;
+								break;
+							}
+						}
+
+						if (!Found)
+							OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, true));
 					}
 					else
+					{
 						CalculatedOrder = true;
+						break;
+					}
 				}
 			}
 
@@ -179,15 +199,12 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.groupBy is null)
 			{
-				e = Find(T, Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
+				e = Sources[0].Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
 				Offset = 0;
 				Top = int.MaxValue;
 			}
 			else
-				e = Find(T, 0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
-
-			if (this.where != null)
-				e = new ConditionalEnumerator(e, Variables, this.where);
+				e = Sources[0].Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 
 			if (this.groupBy != null)
 			{
@@ -299,224 +316,6 @@ namespace Waher.Script.Persistence.SQL
 			// TODO: Joins
 			// TODO: Source names
 		}
-
-		internal static IEnumerator Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables, string[] Order, ScriptNode Node)
-		{
-			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables), Order };
-			object Obj = FindMethod.MakeGenericMethod(T).Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI is null)
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			Obj = PI.GetValue(Task);
-			if (!(Obj is IEnumerable Enumerable))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			return Enumerable.GetEnumerator();
-		}
-
-		private static MethodInfo findMethod = null;
-
-		/// <summary>
-		/// Generic object database Find method: <see cref="Database.Find{T}(int, int, Filter, string[])"/>
-		/// </summary>
-		public static MethodInfo FindMethod
-		{
-			get
-			{
-				if (findMethod is null)
-				{
-					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
-					{
-						if (!MI.ContainsGenericParameters)
-							continue;
-
-						ParameterInfo[] Parameters = MI.GetParameters();
-						if (Parameters.Length != 4 ||
-							Parameters[0].ParameterType != typeof(int) ||
-							Parameters[1].ParameterType != typeof(int) ||
-							Parameters[2].ParameterType != typeof(Filter) ||
-							Parameters[3].ParameterType != typeof(string[]))
-						{
-							continue;
-						}
-
-						findMethod = MI;
-					}
-
-					if (findMethod is null)
-						throw new InvalidOperationException("Appropriate Database.Find method not found.");
-				}
-
-				return findMethod;
-			}
-		}
-
-		internal static Filter Convert(ScriptNode Conditions, Variables Variables)
-		{
-			if (Conditions is null)
-				return null;
-
-			Operators.Logical.And And = Conditions as Operators.Logical.And;
-			Operators.Dual.And And2 = And is null ? Conditions as Operators.Dual.And : null;
-
-			if (And != null || And2 != null)
-			{
-				Filter L = Convert(And != null ? And.LeftOperand : And2.LeftOperand, Variables);
-				Filter R = Convert(And != null ? And.RightOperand : And2.RightOperand, Variables);
-
-				if (L is null && R is null)
-					return null;
-				else if (L is null)
-					return R;
-				else if (R is null)
-					return L;
-				else
-				{
-					List<Filter> Filters = new List<Filter>();
-
-					if (L is FilterAnd L2)
-						Filters.AddRange(L2.ChildFilters);
-					else
-						Filters.Add(L);
-
-					if (R is FilterAnd R2)
-						Filters.AddRange(R2.ChildFilters);
-					else
-						Filters.Add(R);
-
-					return new FilterAnd(Filters.ToArray());
-				}
-			}
-
-			Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
-			Operators.Dual.Or Or2 = Or is null ? Conditions as Operators.Dual.Or : null;
-
-			if (Or != null || Or2 != null)
-			{
-				Filter L = Convert(Or != null ? Or.LeftOperand : Or2.LeftOperand, Variables);
-				Filter R = Convert(Or != null ? Or.RightOperand : Or2.RightOperand, Variables);
-
-				if (L is null || R is null)
-					return null;
-				else
-				{
-					List<Filter> Filters = new List<Filter>();
-
-					if (L is FilterOr L2)
-						Filters.AddRange(L2.ChildFilters);
-					else
-						Filters.Add(L);
-
-					if (R is FilterOr R2)
-						Filters.AddRange(R2.ChildFilters);
-					else
-						Filters.Add(R);
-
-					return new FilterOr(Filters.ToArray());
-				}
-			}
-
-			if (Conditions is Operators.Logical.Not Not)
-			{
-				Filter F = Convert(Not.Operand, Variables);
-				if (F is null)
-					return null;
-				else
-					return new FilterNot(F);
-			}
-			else if (Conditions is BinaryOperator Bin && Bin.LeftOperand is VariableReference Var)
-			{
-				string FieldName = Var.VariableName;
-				object Value = Bin.RightOperand.Evaluate(Variables)?.AssociatedObjectValue ?? null;
-
-				if (Conditions is Operators.Comparisons.EqualTo ||
-					Conditions is Operators.Comparisons.EqualToElementWise ||
-					Conditions is Operators.Comparisons.IdenticalTo ||
-					Conditions is Operators.Comparisons.IdenticalToElementWise)
-				{
-					return new FilterFieldEqualTo(FieldName, Value);
-				}
-				else if (Conditions is Operators.Comparisons.NotEqualTo ||
-					Conditions is Operators.Comparisons.NotEqualToElementWise)
-				{
-					return new FilterFieldNotEqualTo(FieldName, Value);
-				}
-				else if (Conditions is Operators.Comparisons.GreaterThan)
-					return new FilterFieldGreaterThan(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
-					return new FilterFieldGreaterOrEqualTo(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.LesserThan)
-					return new FilterFieldLesserThan(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
-					return new FilterFieldLesserOrEqualTo(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.Like Like)
-				{
-					string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-					Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
-					return new FilterFieldLikeRegEx(FieldName, RegEx);
-				}
-				else if (Conditions is Operators.Comparisons.NotLike NotLike)
-				{
-					string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-					NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
-					return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Converts a wildcard string to a regular expression string.
-		/// </summary>
-		/// <param name="s">String</param>
-		/// <param name="Wildcard">Wildcardd</param>
-		/// <returns>Regular expression</returns>
-		public static string WildcardToRegex(string s, string Wildcard)
-		{
-			string[] Parts = s.Split(new string[] { Wildcard }, StringSplitOptions.None);
-			StringBuilder RegEx = new StringBuilder();
-			bool First = true;
-			int i, j, c;
-
-			foreach (string Part in Parts)
-			{
-				if (First)
-					First = false;
-				else
-					RegEx.Append(".*");
-
-				i = 0;
-				c = Part.Length;
-				while (i < c)
-				{
-					j = Part.IndexOfAny(regexSpecialCharaters, i);
-					if (j < i)
-					{
-						RegEx.Append(Part.Substring(i));
-						i = c;
-					}
-					else
-					{
-						if (j > i)
-							RegEx.Append(Part.Substring(i, j - i));
-
-						RegEx.Append('\\');
-						RegEx.Append(Part[j]);
-
-						i = j + 1;
-					}
-				}
-			}
-
-			return RegEx.ToString();
-		}
-
-		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.

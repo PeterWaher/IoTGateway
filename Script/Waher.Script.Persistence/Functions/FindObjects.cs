@@ -6,14 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Script;
-using Waher.Script.Abstraction;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Logical;
+using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.Functions
 {
@@ -191,13 +190,13 @@ namespace Waher.Script.Persistence.Functions
 			else if (Node is Like)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx= SQL.Select.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx= TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterFieldLikeRegEx(FieldName, RegEx);
 			}
 			else if (Node is NotLike)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx= SQL.Select.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx= TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 			}
 			else

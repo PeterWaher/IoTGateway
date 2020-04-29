@@ -285,6 +285,23 @@
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.IDataSource">
+            <summary>
+            Interface for data sources that can be used in SQL statements.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.MaxCountEnumerator">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
@@ -621,19 +638,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="P:Waher.Script.Persistence.SQL.Select.FindMethod">
-            <summary>
-            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.Select.WildcardToRegex(System.String,System.String)">
-            <summary>
-            Converts a wildcard string to a regular expression string.
-            </summary>
-            <param name="s">String</param>
-            <param name="Wildcard">Wildcardd</param>
-            <returns>Regular expression</returns>
-        </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -652,6 +656,75 @@
             <summary>
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.TypeSource">
+            <summary>
+            Data Source defined by a type definition
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.#ctor(System.Type)">
+            <summary>
+            Data Source defined by a type definition
+            </summary>
+            <param name="Type">Type definition</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.Type">
+            <summary>
+            Type definition
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.FindMethod">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.WildcardToRegex(System.String,System.String)">
+            <summary>
+            Converts a wildcard string to a regular expression string.
+            </summary>
+            <param name="s">String</param>
+            <param name="Wildcard">Wildcardd</param>
+            <returns>Regular expression</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.VectorSource">
+            <summary>
+            Data Source defined by a vector.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.#ctor(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Data Source defined by a vector.
+            </summary>
+            <param name="Vector">Vector</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.Vector">
+            <summary>
+            Vector
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Update">
             <summary>

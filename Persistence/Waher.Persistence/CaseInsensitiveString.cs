@@ -865,7 +865,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Format(IFormatProvider provider, CaseInsensitiveString format, object arg0, object arg1, object arg2)
 		{
-			return new CaseInsensitiveString(string.Format(format.lowerCase, arg0, arg1, arg2));
+			return new CaseInsensitiveString(string.Format(provider, format.lowerCase, arg0, arg1, arg2));
 		}
 
 		/// <summary>

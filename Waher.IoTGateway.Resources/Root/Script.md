@@ -1611,7 +1611,10 @@ directly on these vectors, without going to the database.
 
 Example:
 
-
+```
+v:=[{a:1,b:2},{a:2,b:1}];
+select a, b from v
+```
 
 #### UPDATE
 

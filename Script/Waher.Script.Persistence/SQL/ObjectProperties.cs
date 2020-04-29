@@ -15,7 +15,7 @@ namespace Waher.Script.Persistence.SQL
 		private Type type;
 		private readonly Variables variables2;
 		private object obj;
-		private Dictionary<string, Tuple<PropertyInfo, FieldInfo>> properties = null;
+		private Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>> properties = null;
 		private readonly bool readOnly;
 
 		/// <summary>
@@ -74,22 +74,47 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo>>();
+					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
 
-				if (this.properties.TryGetValue(Name, out Tuple<PropertyInfo, FieldInfo> Rec))
-					return Rec != null;
+				if (this.properties.TryGetValue(Name, out Tuple<PropertyInfo, FieldInfo, bool> Rec))
+				{
+					if (Rec.Item3)
+					{
+						try
+						{
+							Rec.Item1.GetValue(this.obj, new object[] { Name });
+							return true;
+						}
+						catch (Exception)
+						{
+							return false;
+						}
+					}
+					else
+						return !(Rec is null);
+				}
 
 				PropertyInfo PI = this.type.GetRuntimeProperty(Name);
 				FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
 
 				if (PI is null && FI is null)
 				{
-					this.properties[Name] = null;
-					return false;
+					PI = this.type.GetRuntimeProperty("Item");
+
+					if (PI is null)
+					{
+						this.properties[Name] = null;
+						return false;
+					}
+					else
+					{
+						this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+						return true;
+					}
 				}
 				else
 				{
-					this.properties[Name] = new Tuple<PropertyInfo, FieldInfo>(PI, FI);
+					this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
 					return true;
 				}
 			}
@@ -103,7 +128,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
-			Tuple<PropertyInfo, FieldInfo> Rec;
+			Tuple<PropertyInfo, FieldInfo, bool> Rec;
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
@@ -120,7 +145,7 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo>>();
+					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
@@ -128,20 +153,29 @@ namespace Waher.Script.Persistence.SQL
 					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
 
 					if (PI is null && FI is null)
-						Rec = null;
+					{
+						PI = this.type.GetRuntimeProperty("Item");
+
+						if (PI is null)
+							Rec = null;
+						else
+							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+					}
 					else
-						Rec = new Tuple<PropertyInfo, FieldInfo>(PI, FI);
+						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
 
 					this.properties[Name] = Rec;
 				}
 			}
 
-			if (Rec != null)
+			if (!(Rec is null))
 			{
-				if (Rec.Item1 != null)
-					Value = Rec.Item1.GetValue(this.obj);
-				else
+				if (Rec.Item1 is null)
 					Value = Rec.Item2.GetValue(this.obj);
+				else if (Rec.Item3)
+					Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+				else
+					Value = Rec.Item1.GetValue(this.obj);
 
 				Variable = this.CreateVariable(Name, Value);
 
@@ -180,7 +214,7 @@ namespace Waher.Script.Persistence.SQL
 				return;
 			}
 
-			Tuple<PropertyInfo, FieldInfo> Rec;
+			Tuple<PropertyInfo, FieldInfo, bool> Rec;
 
 			if (this.dictionary != null)
 			{
@@ -191,7 +225,7 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo>>();
+					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
@@ -199,23 +233,32 @@ namespace Waher.Script.Persistence.SQL
 					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
 
 					if (PI is null && FI is null)
-						Rec = null;
+					{
+						PI = this.type.GetRuntimeProperty("Item");
+
+						if (PI is null)
+							Rec = null;
+						else
+							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+					}
 					else
-						Rec = new Tuple<PropertyInfo, FieldInfo>(PI, FI);
+						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
 
 					this.properties[Name] = Rec;
 				}
 			}
 
-			if (Rec != null)
+			if (!(Rec is null))
 			{
 				if (Value is IElement Element)
 					Value = Element.AssociatedObjectValue;
 
-				if (Rec.Item1 != null)
-					Rec.Item1.SetValue(this.obj, Value);
-				else
+				if (Rec.Item1 is null)
 					Rec.Item2.SetValue(this.obj, Value);
+				else if (Rec.Item3)
+					Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
+				else
+					Rec.Item1.SetValue(this.obj, Value);
 
 				return;
 			}

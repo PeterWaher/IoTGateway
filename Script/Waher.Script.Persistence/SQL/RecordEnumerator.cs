@@ -53,10 +53,12 @@ namespace Waher.Script.Persistence.SQL
 
 			int i;
 			object Item = e.Current;
-			ObjectProperties Properties = new ObjectProperties(Item, this.variables);
-			
+			IElement Element = Item as IElement;
+
+			ObjectProperties Properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, this.variables);
+
 			if (this.columns is null)
-				this.record = new IElement[1] { Expression.Encapsulate(Item) };
+				this.record = new IElement[1] { Element ?? Expression.Encapsulate(Item) };
 			else
 			{
 				this.record = new IElement[this.count];

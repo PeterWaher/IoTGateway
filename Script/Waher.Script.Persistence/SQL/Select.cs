@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -123,16 +118,7 @@ namespace Waher.Script.Persistence.SQL
 
 			IDataSource[] Sources = new IDataSource[c];
 			for (i = 0; i < c; i++)
-			{
-				E = this.sources[i].Evaluate(Variables);
-
-				if (E.AssociatedObjectValue is Type T)
-					Sources[i] = new TypeSource(T);
-				else if (E is IVector V)
-					Sources[i] = new VectorSource(V);
-				else
-					throw new ScriptRuntimeException("Data source type not supported.", this.sources[i]);
-			}
+				Sources[i] = GetDataSource(this.sources[i], Variables);
 
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
@@ -315,6 +301,24 @@ namespace Waher.Script.Persistence.SQL
 
 			// TODO: Joins
 			// TODO: Source names
+		}
+
+		/// <summary>
+		/// Evaluates a data source.
+		/// </summary>
+		/// <param name="Source">Data source definition.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Evaluated data source.</returns>
+		public static IDataSource GetDataSource(ScriptNode Source, Variables Variables)
+		{
+			IElement E = Source.Evaluate(Variables);
+
+			if (E.AssociatedObjectValue is Type T)
+				return new TypeSource(T);
+			else if (E is IVector V)
+				return new VectorSource(V, Source);
+			else
+				throw new ScriptRuntimeException("Data source type not supported.", Source);
 		}
 
 		/// <summary>

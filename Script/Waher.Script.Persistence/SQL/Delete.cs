@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -41,12 +37,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IElement E = this.source.Evaluate(Variables);
-			if (!(E.AssociatedObjectValue is Type T))
-				throw new ScriptRuntimeException("Type expected.", this.source);
-
-			IEnumerator e = TypeSource.Find(T, 0, int.MaxValue, this.where, Variables,
-				new	KeyValuePair<VariableReference, bool>[0], this);
+			IDataSource Source = Select.GetDataSource(this.source, Variables);
+			IEnumerator e = Source.Find(0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
 			LinkedList<object> ToDelete = new LinkedList<object>();
 			int Count = 0;
 
@@ -56,7 +48,7 @@ namespace Waher.Script.Persistence.SQL
 				Count++;
 			}
 
-			Task _ = Database.Delete(ToDelete);
+			Source.Delete(ToDelete);
 
 			return new DoubleNumber(Count);
 		}

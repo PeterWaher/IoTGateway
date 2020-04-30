@@ -1616,6 +1616,50 @@ v:=[{a:1,b:2},{a:2,b:1}];
 select a, b from v
 ```
 
+#### INSERT
+
+Simplified SQL `INSERT` statements can be executed against the object database. The inserted object is returned.
+
+Syntax:
+
+```
+INSERT
+INTO Source 
+(
+	Column1[, 
+	Column2[, 
+	...[, 
+	ColumnN]]]
+)
+VALUES
+(
+	Value1[, 
+	Value2[, 
+	...[, 
+	ValueN]]]
+)
+```
+
+Example:
+
+```
+insert
+into PersistedEvent 
+(
+	Timestamp, 
+	Message, 
+	Object, 
+	Actor
+)
+values
+(
+	Now, 
+	"Kilroy was here", 
+	"Here", 
+	"Kilroy"
+)
+```
+
 #### UPDATE
 
 Simplified SQL `UPDATE` statements can be executed against the object database. The number of objects updated is returned.
@@ -1624,7 +1668,7 @@ Syntax:
 
 ```
 UPDATE
-	type
+	source
 SET
 	property=value[,
 	property2=value2[,...]]
@@ -1652,7 +1696,7 @@ Syntax:
 ```
 DELETE
 FROM
-	type
+	source
 [WHERE
 	conditions]
 ```

@@ -8,12 +8,12 @@ using Waher.Script.Operators.Comparisons;
 namespace Waher.Script.Persistence.SQL.Parsers
 {
 	/// <summary>
-	/// Parses a UPDATE statement
+	/// Parses an UPDATE statement
 	/// </summary>
 	public class UpdateParser : IKeyWord
 	{
 		/// <summary>
-		/// Parses a UPDATE statement
+		/// Parses an UPDATE statement
 		/// </summary>
 		public UpdateParser()
 		{

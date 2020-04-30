@@ -302,6 +302,76 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.IDataSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.IDataSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Insert">
+            <summary>
+            Executes an INSERT statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Operators.ElementList,Waher.Script.Operators.ElementList,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes an INSERT statement against the object database.
+            </summary>
+            <param name="Source">Source to update objects from.</param>
+            <param name="Columns">Columns</param>
+            <param name="Values">Values</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.MaxCountEnumerator">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
@@ -436,6 +506,39 @@
             <param name="Result">Parsed Script Node.</param>
             <returns>If successful in parsing a script node.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.InsertParser">
+            <summary>
+            Parses an INSERT statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.InsertParser.#ctor">
+            <summary>
+            Parses an INSERT statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.InsertParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.InsertParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.InsertParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.InsertParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Parsers.ParserExtensions">
             <summary>
             Script Parser extensions
@@ -483,12 +586,12 @@
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Parsers.UpdateParser">
             <summary>
-            Parses a UPDATE statement
+            Parses an UPDATE statement
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Parsers.UpdateParser.#ctor">
             <summary>
-            Parses a UPDATE statement
+            Parses an UPDATE statement
             </summary>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Parsers.UpdateParser.KeyWord">
@@ -638,6 +741,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.GetDataSource(Waher.Script.Model.ScriptNode,Waher.Script.Variables)">
+            <summary>
+            Evaluates a data source.
+            </summary>
+            <param name="Source">Data source definition.</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Evaluated data source.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -698,16 +809,45 @@
             <param name="Wildcard">Wildcardd</param>
             <returns>Regular expression</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.VectorSource">
             <summary>
             Data Source defined by a vector.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.#ctor(Waher.Script.Abstraction.Elements.IVector)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.#ctor(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Model.ScriptNode)">
             <summary>
             Data Source defined by a vector.
             </summary>
             <param name="Vector">Vector</param>
+            <param name="Node">Node defining the vector.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.Vector">
             <summary>
@@ -725,6 +865,34 @@
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Update">
             <summary>

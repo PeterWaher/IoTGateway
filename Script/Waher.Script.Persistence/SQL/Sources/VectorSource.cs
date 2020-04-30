@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Order;
 
@@ -13,14 +14,17 @@ namespace Waher.Script.Persistence.SQL.Sources
 	public class VectorSource : IDataSource
 	{
 		private readonly IVector vector;
+		private readonly ScriptNode node;
 
 		/// <summary>
 		/// Data Source defined by a vector.
 		/// </summary>
 		/// <param name="Vector">Vector</param>
-		public VectorSource(IVector Vector)
+		/// <param name="Node">Node defining the vector.</param>
+		public VectorSource(IVector Vector, ScriptNode Node)
 		{
 			this.vector = Vector;
+			this.node = Node;
 		}
 
 		/// <summary>
@@ -92,6 +96,49 @@ namespace Waher.Script.Persistence.SQL.Sources
 		private static PropertyOrder ToPropertyOrder(ScriptNode Node, KeyValuePair<VariableReference, bool> Order)
 		{
 			return new PropertyOrder(Node, Order.Key.VariableName, Order.Value ? 1 : -1);
+		}
+
+		/// <summary>
+		/// Updates a set of objects.
+		/// </summary>
+		/// <param name="Objects">Objects to update</param>
+		public void Update(IEnumerable<object> Objects)
+		{
+			// Do nothing.
+		}
+
+		/// <summary>
+		/// Deletes a set of objects.
+		/// </summary>
+		/// <param name="Objects">Objects to delete</param>
+		public void Delete(IEnumerable<object> Objects)
+		{
+			throw new ScriptRuntimeException("Unable to delete object", this.node);
+		}
+
+		/// <summary>
+		/// Inserts an object.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public void Insert(object Object)
+		{
+			throw new ScriptRuntimeException("Unable to insert object", this.node);
+		}
+
+		/// <summary>
+		/// Name of corresponding collection.
+		/// </summary>
+		public string CollectionName
+		{
+			get { throw new ScriptRuntimeException("Collection not defined.", this.node); }
+		}
+
+		/// <summary>
+		/// Name of corresponding type.
+		/// </summary>
+		public string TypeName
+		{
+			get { throw new ScriptRuntimeException("Type not defined.", this.node); }
 		}
 
 	}

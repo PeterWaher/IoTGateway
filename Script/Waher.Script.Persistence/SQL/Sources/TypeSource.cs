@@ -286,5 +286,48 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
 
+		/// <summary>
+		/// Updates a set of objects.
+		/// </summary>
+		/// <param name="Objects">Objects to update</param>
+		public void Update(IEnumerable<object> Objects)
+		{
+			Task _ = Database.Update(Objects);
+		}
+
+		/// <summary>
+		/// Deletes a set of objects.
+		/// </summary>
+		/// <param name="Objects">Objects to delete</param>
+		public void Delete(IEnumerable<object> Objects)
+		{
+			Task _ = Database.Delete(Objects);
+		}
+
+		/// <summary>
+		/// Inserts an object.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public void Insert(object Object)
+		{
+			Task _ = Database.Insert(Object);
+		}
+
+		/// <summary>
+		/// Name of corresponding collection.
+		/// </summary>
+		public string CollectionName
+		{
+			get { return Database.GetCollection(this.type).Result; }
+		}
+
+		/// <summary>
+		/// Name of corresponding type.
+		/// </summary>
+		public string TypeName
+		{
+			get { return this.type.FullName; }
+		}
+
 	}
 }

@@ -768,6 +768,70 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.CollectionSource">
+            <summary>
+            Data Source defined by a collection name
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.#ctor(System.String)">
+            <summary>
+            Data Source defined by a collection name
+            </summary>
+            <param name="CollectionName">Collection Name</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindMethod">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.WildcardToRegex(System.String,System.String)">
+            <summary>
+            Converts a wildcard string to a regular expression string.
+            </summary>
+            <param name="s">String</param>
+            <param name="Wildcard">Wildcardd</param>
+            <returns>Regular expression</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.TypeSource">
             <summary>
             Data Source defined by a type definition

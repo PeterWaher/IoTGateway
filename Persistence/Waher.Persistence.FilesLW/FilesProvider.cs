@@ -1663,27 +1663,9 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
-			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, null, true, SortOrder))
-			{
-				return await this.LoadAll<T>(ResultSet);
-			}
-		}
-
-		private async Task<IEnumerable<T>> LoadAll<T>(ICursor<T> ResultSet)
-		{
-			LinkedList<T> Result = new LinkedList<T>();
-
-			while (await ResultSet.MoveNextAsync())
-			{
-				if (ResultSet.CurrentTypeCompatible)
-					Result.AddLast(ResultSet.Current);
-			}
-
-			return Result;
+			return this.Find<T>(Offset, MaxCount, null, SortOrder);
 		}
 
 		/// <summary>
@@ -1703,6 +1685,52 @@ namespace Waher.Persistence.Files
 			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder))
 			{
 				return await this.LoadAll<T>(ResultSet);
+			}
+		}
+
+		private async Task<IEnumerable<T>> LoadAll<T>(ICursor<T> ResultSet)
+		{
+			LinkedList<T> Result = new LinkedList<T>();
+
+			while (await ResultSet.MoveNextAsync())
+			{
+				if (ResultSet.CurrentTypeCompatible)
+					Result.AddLast(ResultSet.Current);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return this.Find(Collection, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection);
+			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, true, SortOrder))
+			{
+				return await this.LoadAll<object>(ResultSet);
 			}
 		}
 

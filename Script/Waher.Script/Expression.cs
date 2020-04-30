@@ -2945,7 +2945,14 @@ namespace Waher.Script
 			}
 		}
 
-		internal static bool TryGetConstant(string Name, Variables Variables, out IElement ValueElement)
+		/// <summary>
+		/// Tries to get a constant value, given its name.
+		/// </summary>
+		/// <param name="Name">Name</param>
+		/// <param name="Variables">Current set of cariables.</param>
+		/// <param name="ValueElement">If found, constant value will be placed here.</param>
+		/// <returns>If a constant with the given name was found.</returns>
+		public static bool TryGetConstant(string Name, Variables Variables, out IElement ValueElement)
 		{
 			Dictionary<string, IConstant> C = constants;
 			if (C is null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -311,14 +312,46 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Evaluated data source.</returns>
 		public static IDataSource GetDataSource(ScriptNode Source, Variables Variables)
 		{
-			IElement E = Source.Evaluate(Variables);
+			if (Source is VariableReference Ref)
+				return GetDataSource(Ref, Variables);
+			else
+				return GetDataSource(Source.Evaluate(Variables), Source);
+		}
 
+		private static IDataSource GetDataSource(IElement E, ScriptNode Source)
+		{
 			if (E.AssociatedObjectValue is Type T)
 				return new TypeSource(T);
+			else if (E is StringValue S)
+				return new CollectionSource(S.Value);
 			else if (E is IVector V)
 				return new VectorSource(V, Source);
 			else
 				throw new ScriptRuntimeException("Data source type not supported.", Source);
+		}
+
+		private static IDataSource GetDataSource(VariableReference Source, Variables Variables)
+		{
+			string Name = Source.VariableName;
+
+			if (Variables.TryGetVariable(Name, out Variable v))
+				return GetDataSource(v.ValueElement, Source);
+
+			if (Expression.TryGetConstant(Name, Variables, out IElement ValueElement))
+				return GetDataSource(ValueElement, Source);
+
+			if (Types.TryGetQualifiedNames(Name, out string[] QualifiedNames))
+			{
+				if (QualifiedNames.Length == 1)
+				{
+					Type T = Types.GetType(QualifiedNames[0]);
+
+					if (!(T is null))
+						return new TypeSource(T);
+				}
+			}
+
+			return new CollectionSource(Name);
 		}
 
 		/// <summary>

@@ -5015,16 +5015,13 @@ namespace Waher.Persistence.Files
                 ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
                 string CollectionName = Serializer.CollectionName(null);
                 ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
-                if (File != this)
+                if (File == this)
                 {
-                    throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + CollectionName +
-                        ",  not " + this.collectionName + ".", nameof(T));
+                    foreach (string[] Index in Serializer.Indices)
+                        await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);
+
+                    this.indicesCreated = true;
                 }
-
-                foreach (string[] Index in Serializer.Indices)
-                    await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);
-
-                this.indicesCreated = true;
             }
 
             ICursor<T> Result = null;

@@ -1524,7 +1524,7 @@ SELECT [TOP maxcount] [DISTINCT]
 	* |
 	column1 [name1][, column2 [name2][, ...]]
 FROM
-	type1[, type2[, ...]]
+	source1[, source2[, ...]]
 [WHERE
 	conditions]
 [GROUP BY
@@ -1601,13 +1601,23 @@ where
 	Type=EventType.Notice
 ```
 
-##### Vector Sources
+##### Type Sources
 
 The `SELECT` statement can search for information from different types of sources. These
 sources are defined in the `FROM` clause. If they point to Type Names, they refer to
-objects of the specified type that are stored in the object database. The sources can also
-be script that returns any type of vector. In such a case, the `SELECT` statement operates
-directly on these vectors, without going to the database.
+objects of the specified type that are stored in the object database.
+
+##### Collection Sources
+
+If the source returns a string value, or is a variable reference that does not point to a
+type or variable, it is interpreted to represent the name of a collection in the object
+database. Using such a source allows you to reference untyped objects in the corresponding
+collection.
+
+##### Vector Sources
+
+The sources can also be script that returns any type of vector. In such a case, the `SELECT` 
+statement operates directly on these vectors, without going to the database.
 
 Example:
 

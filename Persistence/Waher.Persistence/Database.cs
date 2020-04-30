@@ -676,12 +676,32 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		public static Task<string[]> GetCollections()
 		{
 			return Provider.GetCollections();
+		}
+
+		/// <summary>
+		/// Gets the collection corresponding to a given type.
+		/// </summary>
+		/// <param name="Type">Type</param>
+		/// <returns>Collection name.</returns>
+		public static Task<string> GetCollection(Type Type)
+		{
+			return Provider.GetCollection(Type);
+		}
+
+		/// <summary>
+		/// Gets the collection corresponding to a given object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Collection name.</returns>
+		public static Task<string> GetCollection(Object Object)
+		{
+			return Provider.GetCollection(Object);
 		}
 
 	}

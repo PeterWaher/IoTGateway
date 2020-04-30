@@ -1512,6 +1512,28 @@ namespace Waher.Persistence.MongoDB
 			return Collections.ToArray();
 		}
 
+		/// <summary>
+		/// Gets the collection corresponding to a given type.
+		/// </summary>
+		/// <param name="Type">Type</param>
+		/// <returns>Collection name.</returns>
+		public Task<string> GetCollection(Type Type)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Type);
+			return Task.FromResult<string>(Serializer.CollectionName(null));
+		}
+
+		/// <summary>
+		/// Gets the collection corresponding to a given object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Collection name.</returns>
+		public Task<string> GetCollection(Object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
+			return Task.FromResult<string>(Serializer.CollectionName(Object));
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

@@ -213,5 +213,19 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		Task<string[]> GetCollections();
+
+		/// <summary>
+		/// Gets the collection corresponding to a given type.
+		/// </summary>
+		/// <param name="Type">Type</param>
+		/// <returns>Collection name.</returns>
+		Task<string> GetCollection(Type Type);
+
+		/// <summary>
+		/// Gets the collection corresponding to a given object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Collection name.</returns>
+		Task<string> GetCollection(Object Object);
 	}
 }

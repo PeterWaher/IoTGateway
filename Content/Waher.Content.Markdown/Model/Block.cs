@@ -147,6 +147,8 @@ namespace Waher.Content.Markdown.Model
 
 		public bool IsTable(out TableInformation TableInformation)
 		{
+			string[] Rows = (string[])this.rows.Clone();
+			int[] Positions = (int[])this.positions.Clone();
 			string Caption = string.Empty;
 			string Id = string.Empty;
 			string s;
@@ -165,8 +167,8 @@ namespace Waher.Content.Markdown.Model
 				j = 0;
 				IsUnderline = true;
 
-				s = this.rows[i];
-				Pos = this.positions[i];
+				s = Rows[i];
+				Pos = Positions[i];
 
 				if (i == End && (M = caption.Match(s)).Success)
 				{
@@ -176,17 +178,22 @@ namespace Waher.Content.Markdown.Model
 				}
 				else
 				{
+					s = s.TrimEnd();
+
 					if (s.StartsWith("|"))
 					{
-						s = s.TrimEnd().Substring(1);
+						if (s.EndsWith("|"))
+							s = s.Substring(1, s.Length - 2);
+						else
+							s = s.Substring(1);
+					
 						Pos++;
 					}
-
-					if (s.EndsWith("|"))
+					else if (s.EndsWith("|"))
 						s = s.Substring(0, s.Length - 1);
 
-					this.rows[i] = s;
-					this.positions[i] = Pos;
+					Rows[i] = s;
+					Positions[i] = Pos;
 
 					foreach (char ch in s)
 					{
@@ -211,8 +218,8 @@ namespace Waher.Content.Markdown.Model
 			if (UnderlineRow < 0)
 				return false;
 
-			s = this.rows[UnderlineRow];
-			Pos = this.positions[UnderlineRow];
+			s = Rows[UnderlineRow];
+			Pos = Positions[UnderlineRow];
 
 			string[] Parts = s.Split('|');
 			int[] PartPositions = new int[Columns];
@@ -278,10 +285,10 @@ namespace Waher.Content.Markdown.Model
 
 			for (i = 0; i < TableInformation.NrHeaderRows; i++)
 			{
-				TableInformation.Headers[i] = this.rows[this.start + i].Split('|');
+				TableInformation.Headers[i] = Rows[this.start + i].Split('|');
 				TableInformation.HeaderPositions[i] = new int[Columns];
 
-				Pos = this.positions[this.start + i];
+				Pos = Positions[this.start + i];
 				for (j = 0; j < Columns; j++)
 				{
 					s = TableInformation.Headers[i][j];
@@ -305,10 +312,10 @@ namespace Waher.Content.Markdown.Model
 
 			for (i = 0; i < TableInformation.NrDataRows; i++)
 			{
-				TableInformation.Rows[i] = this.rows[UnderlineRow + i + 1].Split('|');
+				TableInformation.Rows[i] = Rows[UnderlineRow + i + 1].Split('|');
 				TableInformation.RowPositions[i] = new int[Columns];
 
-				Pos = this.positions[UnderlineRow + i + 1];
+				Pos = Positions[UnderlineRow + i + 1];
 				for (j = 0; j < Columns; j++)
 				{
 					s = TableInformation.Rows[i][j];

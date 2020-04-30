@@ -44,7 +44,7 @@ namespace Waher.IoTGateway.Events
 					Markdown.AppendLine(MarkdownDocument.Encode(Event.Message));
 					Markdown.AppendLine();
 					Markdown.AppendLine("| Information ||");
-					Markdown.AppendLine("|:======|:=====|");
+					Markdown.AppendLine("|:------|:-----|");
 
 					this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
 					this.AppendLabel("Event ID", Event.EventId, Markdown);

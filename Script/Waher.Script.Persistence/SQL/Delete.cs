@@ -12,7 +12,7 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class Delete : ScriptNode
 	{
-		private ScriptNode source;
+		private SourceDefinition source;
 		private ScriptNode where;
 
 		/// <summary>
@@ -23,7 +23,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Delete(ScriptNode Source, ScriptNode Where, int Start, int Length, Expression Expression)
+		public Delete(SourceDefinition Source, ScriptNode Where, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
@@ -37,7 +37,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IDataSource Source = Select.GetDataSource(this.source, Variables);
+			IDataSource Source = this.source.GetSource(Variables);
 			IEnumerator e = Source.Find(0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
 			LinkedList<object> ToDelete = new LinkedList<object>();
 			int Count = 0;
@@ -71,8 +71,17 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			if (!(this.source is null) && !Callback(ref this.source, State))
+			ScriptNode Node = this.source;
+			if (!(Node is null) && !Callback(ref Node, State))
 				return false;
+
+			if (Node != this.source)
+			{
+				if (Node is SourceDefinition Source2)
+					this.source = Source2;
+				else
+					return false;
+			}
 
 			if (!(this.where is null) && !Callback(ref this.where, State))
 				return false;

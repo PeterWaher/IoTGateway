@@ -14,7 +14,7 @@ namespace Waher.Script.Persistence.SQL
 	public class Update : ScriptNode
 	{
 		private readonly Assignment[] setOperations;
-		private ScriptNode source;
+		private SourceDefinition source;
 		private ScriptNode where;
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Update(ScriptNode Source, Assignment[] SetOperations, ScriptNode Where, int Start, int Length, Expression Expression)
+		public Update(SourceDefinition Source, Assignment[] SetOperations, ScriptNode Where, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
@@ -41,7 +41,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IDataSource Source = Select.GetDataSource(this.source, Variables);
+			IDataSource Source = this.source.GetSource(Variables);
 			IEnumerator e = Source.Find(0, int.MaxValue, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
 			LinkedList<object> ToUpdate = new LinkedList<object>();
 			int Count = 0;
@@ -86,8 +86,17 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			if (!(this.source is null) && !Callback(ref this.source, State))
+			ScriptNode Node = this.source;
+			if (!(Node is null) && !Callback(ref Node, State))
 				return false;
+
+			if (Node != this.source)
+			{
+				if (Node is SourceDefinition Source2)
+					this.source = Source2;
+				else
+					return false;
+			}
 
 			int i, c = this.setOperations.Length;
 			for (i = 0; i < c; i++)

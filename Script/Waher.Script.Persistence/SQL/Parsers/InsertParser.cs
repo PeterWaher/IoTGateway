@@ -50,7 +50,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s != "INTO")
 					return false;
 
-				ScriptNode Source = Parser.ParseNoWhiteSpace();
+				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+					return false;
 
 				if (Parser.NextToken() != "(")
 					return false;

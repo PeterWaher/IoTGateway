@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -18,12 +16,11 @@ namespace Waher.Script.Persistence.SQL
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
-		private readonly ScriptNode[] sources;
-		private readonly ScriptNode[] sourceNames;
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupByNames;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly bool distinct;
+		private SourceDefinition source;
 		private ScriptNode top;
 		private ScriptNode where;
 		private ScriptNode having;
@@ -34,8 +31,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Columns">Columns to select. If null, all columns are selected.</param>
 		/// <param name="ColumnNames">Optional renaming of columns.</param>
-		/// <param name="Sources">Sources to select from.</param>
-		/// <param name="SourceNames">Optional renaming of sources.</param>
+		/// <param name="Source">Source(s) to select from.</param>
 		/// <param name="Where">Optional where clause</param>
 		/// <param name="GroupBy">Optional grouping</param>
 		/// <param name="GroupByNames">Optional renaming of groups</param>
@@ -47,16 +43,15 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, ScriptNode[] Sources, ScriptNode[] SourceNames, ScriptNode Where,
-			ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top,
-			ScriptNode Offset, bool Distinct, int Start, int Length, Expression Expression)
+		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, ScriptNode Where, ScriptNode[] GroupBy, 
+			ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset, 
+			bool Distinct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.columns = Columns;
 			this.columnNames = ColumnNames;
 			this.top = Top;
-			this.sources = Sources;
-			this.sourceNames = SourceNames;
+			this.source = Source;
 			this.where = Where;
 			this.groupBy = GroupBy;
 			this.groupByNames = GroupByNames;
@@ -70,9 +65,6 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.columns != null && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("Columns and ColumnNames must be of equal length.", nameof(ColumnNames));
-
-			if (this.sources.Length != this.sourceNames.Length)
-				throw new ArgumentException("Sources and SourceNames must be of equal length.", nameof(SourceNames));
 
 			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("GroupBy and GroupByNames must both be null or not null.", nameof(GroupByNames));
@@ -113,14 +105,8 @@ namespace Waher.Script.Persistence.SQL
 			else
 				Offset = 0;
 
-			c = this.sources.Length;
-			if (c != 1)
-				throw new ScriptRuntimeException("Joinds between multiple sources not supported.", this);
-
-			IDataSource[] Sources = new IDataSource[c];
-			for (i = 0; i < c; i++)
-				Sources[i] = GetDataSource(this.sources[i], Variables);
-
+			IDataSource Source = this.source.GetSource(Variables);
+			
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
@@ -186,12 +172,12 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.groupBy is null)
 			{
-				e = Sources[0].Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
+				e = Source.Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
 				Offset = 0;
 				Top = int.MaxValue;
 			}
 			else
-				e = Sources[0].Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
+				e = Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 
 			if (this.groupBy != null)
 			{
@@ -299,59 +285,6 @@ namespace Waher.Script.Persistence.SQL
 			Result.ColumnNames = Names;
 
 			return Result;
-
-			// TODO: Joins
-			// TODO: Source names
-		}
-
-		/// <summary>
-		/// Evaluates a data source.
-		/// </summary>
-		/// <param name="Source">Data source definition.</param>
-		/// <param name="Variables">Current set of variables.</param>
-		/// <returns>Evaluated data source.</returns>
-		public static IDataSource GetDataSource(ScriptNode Source, Variables Variables)
-		{
-			if (Source is VariableReference Ref)
-				return GetDataSource(Ref, Variables);
-			else
-				return GetDataSource(Source.Evaluate(Variables), Source);
-		}
-
-		private static IDataSource GetDataSource(IElement E, ScriptNode Source)
-		{
-			if (E.AssociatedObjectValue is Type T)
-				return new TypeSource(T);
-			else if (E is StringValue S)
-				return new CollectionSource(S.Value);
-			else if (E is IVector V)
-				return new VectorSource(V, Source);
-			else
-				throw new ScriptRuntimeException("Data source type not supported.", Source);
-		}
-
-		private static IDataSource GetDataSource(VariableReference Source, Variables Variables)
-		{
-			string Name = Source.VariableName;
-
-			if (Variables.TryGetVariable(Name, out Variable v))
-				return GetDataSource(v.ValueElement, Source);
-
-			if (Expression.TryGetConstant(Name, Variables, out IElement ValueElement))
-				return GetDataSource(ValueElement, Source);
-
-			if (Types.TryGetQualifiedNames(Name, out string[] QualifiedNames))
-			{
-				if (QualifiedNames.Length == 1)
-				{
-					Type T = Types.GetType(QualifiedNames[0]);
-
-					if (!(T is null))
-						return new TypeSource(T);
-				}
-			}
-
-			return new CollectionSource(Name);
 		}
 
 		/// <summary>
@@ -369,10 +302,9 @@ namespace Waher.Script.Persistence.SQL
 			{
 				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
@@ -394,12 +326,22 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
 				!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-				!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
-				!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
 				!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
 				!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst))
 			{
 				return false;
+			}
+
+			ScriptNode Node = this.source;
+			if (!(this.source is null) && !Callback(ref Node, State))
+				return false;
+
+			if (Node != this.source)
+			{
+				if (Node is SourceDefinition SourceDef2)
+					this.source = SourceDef2;
+				else
+					return false;
 			}
 
 			if (!(this.top is null) && !Callback(ref this.top, State))
@@ -419,7 +361,7 @@ namespace Waher.Script.Persistence.SQL
 				c = this.orderBy.Length;
 				for (i = 0; i < c; i++)
 				{
-					ScriptNode Node = this.orderBy[i].Key;
+					Node = this.orderBy[i].Key;
 					if (!(Node is null))
 					{
 						ScriptNode Node0 = Node;
@@ -437,10 +379,9 @@ namespace Waher.Script.Persistence.SQL
 			{
 				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.sources, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.sourceNames, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
 					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
@@ -471,8 +412,7 @@ namespace Waher.Script.Persistence.SQL
 			if (!(obj is Select O &&
 				AreEqual(this.columns, O.columns) &&
 				AreEqual(this.columnNames, O.columnNames) &&
-				AreEqual(this.sources, O.sources) &&
-				AreEqual(this.sourceNames, O.sourceNames) &&
+				AreEqual(this.source, O.source) &&
 				AreEqual(this.groupBy, O.groupBy) &&
 				AreEqual(this.groupByNames, O.groupByNames) &&
 				AreEqual(this.top, O.top) &&
@@ -518,8 +458,7 @@ namespace Waher.Script.Persistence.SQL
 			int Result = base.GetHashCode();
 			Result ^= Result << 5 ^ GetHashCode(this.columns);
 			Result ^= Result << 5 ^ GetHashCode(this.columnNames);
-			Result ^= Result << 5 ^ GetHashCode(this.sources);
-			Result ^= Result << 5 ^ GetHashCode(this.sourceNames);
+			Result ^= Result << 5 ^ GetHashCode(this.source);
 			Result ^= Result << 5 ^ GetHashCode(this.groupBy);
 			Result ^= Result << 5 ^ GetHashCode(this.groupByNames);
 			Result ^= Result << 5 ^ GetHashCode(this.top);

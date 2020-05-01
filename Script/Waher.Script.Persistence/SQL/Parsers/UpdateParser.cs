@@ -46,7 +46,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 			try
 			{
-				ScriptNode Source = Parser.ParseNoWhiteSpace();
+				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+					return false;
 
 				string s = Parser.NextToken().ToUpper();
 				if (s != "SET")

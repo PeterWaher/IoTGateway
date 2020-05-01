@@ -16,7 +16,7 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class Insert : ScriptNode
 	{
-		private ScriptNode source;
+		private SourceDefinition source;
 		private ElementList columns;
 		private ElementList values;
 		private readonly int nrFields;
@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Insert(ScriptNode Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
+		public Insert(SourceDefinition Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			if ((this.nrFields = Columns.Elements.Length) != Values.Elements.Length)
@@ -48,7 +48,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IDataSource Source = Select.GetDataSource(this.source, Variables);
+			IDataSource Source = this.source.GetSource(Variables);
 			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
 			ScriptNode Node;
 			IElement E;
@@ -102,8 +102,17 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			if (!(this.source is null) && !Callback(ref this.source, State))
+			ScriptNode Node = this.source;
+			if (!(Node is null) && !Callback(ref Node, State))
 				return false;
+
+			if (Node != this.source)
+			{
+				if (Node is SourceDefinition Source2)
+					this.source = Source2;
+				else
+					return false;
+			}
 
 			ScriptNode Temp;
 

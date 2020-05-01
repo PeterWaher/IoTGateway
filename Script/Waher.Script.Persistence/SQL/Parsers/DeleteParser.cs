@@ -48,7 +48,9 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s != "FROM")
 					return false;
 
-				ScriptNode Source = Parser.ParseNoWhiteSpace();
+				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+					return false;
+
 				ScriptNode Where = null;
 
 				s = Parser.PeekNextToken().ToUpper();

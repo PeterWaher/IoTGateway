@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Functions.Vectors;
+using Waher.Script.Persistence.SQL.SourceDefinitions;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {
@@ -31,7 +32,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "FROM", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET", "ASC", "DESC", "DISTINCT" };
+		public string[] InternalKeywords => new string[] { "AS", "FROM", "INNER", "OUTER", "LEFT", "RIGHT", "JOIN", "FULL", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET", "ASC", "DESC", "DISTINCT" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -96,6 +97,9 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						s = Parser.PeekNextToken().ToUpper();
 						if (!string.IsNullOrEmpty(s) && s != "," && s != "FROM")
 						{
+							if (s == "AS")
+								Parser.NextToken();
+
 							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken();
 						}
@@ -116,33 +120,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s != "FROM")
 					return false;
 
-				List<ScriptNode> Sources = new List<ScriptNode>();
-				List<ScriptNode> SourceNames = new List<ScriptNode>();
-
-				while (true)
-				{
-					ScriptNode Node = Parser.ParseNoWhiteSpace();
-					ScriptNode Name = null;
-
-					Parser.SkipWhiteSpace();
-
-					s = Parser.PeekNextToken().ToUpper();
-					if (!string.IsNullOrEmpty(s) && s != "," && s != "WHERE" && s != "GROUP" && s != "ORDER" && s != "OFFSET")
-					{
-						Name = Parser.ParseNoWhiteSpace();
-						s = Parser.PeekNextToken().ToUpper();
-					}
-					else if (Node is VariableReference Ref)
-						Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
-
-					Sources.Add(Node);
-					SourceNames.Add(Name);
-
-					if (s != ",")
-						break;
-
-					Parser.NextToken();
-				}
+				if (!TryParseSources(Parser, out SourceDefinition Source))
+					return false;
 
 				ScriptNode Where = null;
 
@@ -263,8 +242,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Offset = Parser.ParseNoWhiteSpace();
 				}
 
-				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Sources.ToArray(), SourceNames.ToArray(),
-					Where, GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct,
+				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where, GroupBy?.ToArray(),
+					GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct,
 					Parser.Start, Parser.Length, Parser.Expression);
 
 				return true;
@@ -273,6 +252,181 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			{
 				return false;
 			}
+		}
+
+		internal static bool TryParseSources(ScriptParser Parser, out SourceDefinition Source)
+		{
+			if (!TryParseSource(Parser, out Source))
+				return false;
+
+			while (true)
+			{
+				string s = Parser.PeekNextToken().ToUpper();
+
+				switch (s)
+				{
+					case ",":
+						Parser.NextToken();
+						if (!TryParseSource(Parser, out SourceDefinition Source2))
+							return false;
+
+						Source = new CrossJoin(Source, Source2, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					case "INNER":
+					case "JOIN":
+						Parser.NextToken();
+
+						if (s == "INNER")
+						{
+							if (Parser.NextToken() != "JOIN")
+								return false;
+						}
+
+						if (!TryParseSource(Parser, out Source2))
+							return false;
+
+						ScriptNode Conditions = ParseJoinConditions(Parser);
+						Source = new InnerJoin(Source, Source2, Conditions, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					case "LEFT":
+						Parser.NextToken();
+
+						switch (Parser.NextToken().ToUpper())
+						{
+							case "JOIN":
+								break;
+
+							case "OUTER":
+								if (Parser.NextToken() != "JOIN")
+									return false;
+								break;
+
+							default:
+								return false;
+						}
+
+						if (!TryParseSource(Parser, out Source2))
+							return false;
+
+						Conditions = ParseJoinConditions(Parser);
+						Source = new LeftOuterJoin(Source, Source2, Conditions, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					case "RIGHT":
+						Parser.NextToken();
+
+						switch (Parser.NextToken().ToUpper())
+						{
+							case "JOIN":
+								break;
+
+							case "OUTER":
+								if (Parser.NextToken() != "JOIN")
+									return false;
+								break;
+
+							default:
+								return false;
+						}
+
+						if (!TryParseSource(Parser, out Source2))
+							return false;
+
+						Conditions = ParseJoinConditions(Parser);
+						Source = new RightOuterJoin(Source, Source2, Conditions, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					case "FULL":
+						Parser.NextToken();
+
+						switch (Parser.NextToken().ToUpper())
+						{
+							case "JOIN":
+								break;
+
+							case "OUTER":
+								if (Parser.NextToken() != "JOIN")
+									return false;
+								break;
+
+							default:
+								return false;
+						}
+
+						if (!TryParseSource(Parser, out Source2))
+							return false;
+
+						Conditions = ParseJoinConditions(Parser);
+						Source = new FullOuterJoin(Source, Source2, Conditions, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					case "OUTER":
+						Parser.NextToken();
+
+						if (Parser.NextToken() != "JOIN")
+							return false;
+
+						if (!TryParseSource(Parser, out Source2))
+							return false;
+
+						Conditions = ParseJoinConditions(Parser);
+						Source = new FullOuterJoin(Source, Source2, Conditions, Source.Start, Parser.Position - Source.Start, Parser.Expression);
+						break;
+
+					default:
+						return true;
+				}
+			}
+		}
+
+		private static ScriptNode ParseJoinConditions(ScriptParser Parser)
+		{
+			if (Parser.PeekNextToken().ToUpper() != "ON")
+				return null;
+
+			Parser.NextToken();
+
+			return Parser.ParseOrs();
+		}
+
+		internal static bool TryParseSource(ScriptParser Parser, out SourceDefinition Source)
+		{
+			Parser.SkipWhiteSpace();
+
+			int Start = Parser.Position;
+			ScriptNode Node = Parser.ParseNoWhiteSpace();
+			ScriptNode Name = null;
+			string s;
+
+			Parser.SkipWhiteSpace();
+
+			s = Parser.PeekNextToken().ToUpper();
+			if (!string.IsNullOrEmpty(s) &&
+				s != "," &&
+				s != "INNER" &&
+				s != "OUTER" &&
+				s != "LEFT" &&
+				s != "RIGHT" &&
+				s != "FULL" &&
+				s != "JOIN" &&
+				s != "WHERE" &&
+				s != "GROUP" &&
+				s != "ORDER" &&
+				s != "OFFSET")
+			{
+				if (s == "AS")
+					Parser.NextToken();
+
+				Name = Parser.ParseNoWhiteSpace();
+			}
+			else if (Node is VariableReference Ref)
+				Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
+
+			Source = new SourceReference(Node, Name, Start, Parser.Position - Start, Parser.Expression);
+
+			return true;
 		}
 
 		private bool ContainsVectorFunction(ScriptNode Node)

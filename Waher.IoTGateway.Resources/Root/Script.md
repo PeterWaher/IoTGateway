@@ -1522,9 +1522,11 @@ Syntax:
 ```
 SELECT [TOP maxcount] [DISTINCT]
 	* |
-	column1 [name1][, column2 [name2][, ...]]
+	column1 [[as ]name1][, column2 [[as ]name2][, ...]]
 FROM
-	source1[, source2[, ...]]
+	source1[ as sourcename1][, source2[ as sourcename2][, ...]]
+(([INNER ]JOIN|LEFT[ OUTER] JOIN|RIGHT[ OUTER] JOIN|FULL[ OUTER] JOIN|OUTER JOIN)
+	source[ as sourcename][ ON conditions])*
 [WHERE
 	conditions]
 [GROUP BY
@@ -1634,7 +1636,7 @@ Syntax:
 
 ```
 INSERT
-INTO Source 
+INTO Source
 (
 	Column1[, 
 	Column2[, 

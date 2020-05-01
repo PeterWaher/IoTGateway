@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Dsn;
 using Waher.Content.Html;
 using Waher.Content.Images;
 using Waher.Content.Multipart;
+using Waher.Content.Test.Encodings;
 using Waher.Content.Xml;
 
 namespace Waher.Content.Test
@@ -23,6 +25,8 @@ namespace Waher.Content.Test
 				typeof(ImageCodec).Assembly,
 				typeof(DeliveryStatus).Assembly,
 				typeof(XML).Assembly);
+
+			Encoding.RegisterProvider(new CodePages());
 		}
 
 		private object Decode(string FileName)
@@ -143,6 +147,26 @@ namespace Waher.Content.Test
 		public void Test_04_BoundaryAtEnd()
 		{
 			object Decoded = this.Decode("1773459c-3649-4bb4-a33c-a15651665e92");
+
+			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
+			Assert.IsNotNull(Alternatives);
+
+			Assert.AreEqual(2, Alternatives.Content.Length);
+			string PlainText = Alternatives.Content[0].Decoded as string;
+			Assert.IsNotNull(PlainText);
+			Console.Out.WriteLine(PlainText);
+			Console.Out.WriteLine();
+
+			HtmlDocument Html = Alternatives.Content[1].Decoded as HtmlDocument;
+			Assert.IsNotNull(Html);
+			Console.Out.WriteLine(Html.HtmlText);
+			Console.Out.WriteLine();
+		}
+
+		[TestMethod]
+		public void Test_05_Windows1252()
+		{
+			object Decoded = this.Decode("84784fa7-51a3-46e4-b8c8-38570416acab");
 
 			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
 			Assert.IsNotNull(Alternatives);

@@ -219,6 +219,18 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Find(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="CollectionName">Collection Name</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
             <summary>
             Finds objects in a given collection.
@@ -396,6 +408,20 @@
             Gets an array of available collection.s
             </summary>
             <returns>Array of collections.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetCollection(System.Type)">
+            <summary>
+            Gets the collection corresponding to a given type.
+            </summary>
+            <param name="Type">Type</param>
+            <returns>Collection name.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetCollection(System.Object)">
+            <summary>
+            Gets the collection corresponding to a given object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Collection name.</returns>
         </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase">
             <summary>

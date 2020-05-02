@@ -68,6 +68,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Customer.cs" />
+    <Compile Include="Data\Order.cs" />
+    <Compile Include="ScriptSqlTests.cs" />
     <Compile Include="ScriptXmlTests.cs" />
     <Compile Include="ScriptEvaluationTests.cs" />
     <Compile Include="Canvas3DTests.cs" />
@@ -77,6 +80,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
+      <Project>{8b1029cc-299f-4325-baf7-782b06f53c94}</Project>
+      <Name>Waher.Persistence.FilesLW</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
+      <Project>{d096df31-9837-4267-bd65-7c48f1d788d2}</Project>
+      <Name>Waher.Persistence.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
@@ -88,6 +103,10 @@
     <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
+      <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
+      <Name>Waher.Script.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Xml\Waher.Script.Xml.csproj">
       <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>

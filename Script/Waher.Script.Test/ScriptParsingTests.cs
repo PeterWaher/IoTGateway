@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Runtime.Inventory;
-using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
 	[TestClass]
 	public class ScriptParsingTests
 	{
-		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
-		{
-			Types.Initialize(typeof(Expression).Assembly,
-				typeof(Graphs.Graph).Assembly,
-				typeof(XmlParser).Assembly,
-				typeof(System.Text.RegularExpressions.Regex).Assembly);
-		}
-
 		private void Test(string Script)
 		{
 			Expression Exp1 = new Expression(Script);

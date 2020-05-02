@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Functions.Vectors;
+using Waher.Script.Operators.Membership;
 using Waher.Script.Persistence.SQL.SourceDefinitions;
 
 namespace Waher.Script.Persistence.SQL.Parsers
@@ -105,6 +106,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						}
 						else if (Node is VariableReference Ref)
 							Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
+						else if (Node is NamedMember NamedMember)
+							Name=new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
 
 						Columns.Add(Node);
 						ColumnNames.Add(Name);
@@ -125,6 +128,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 				ScriptNode Where = null;
 
+				s = Parser.PeekNextToken().ToUpper();
 				if (s == "WHERE")
 				{
 					Parser.NextToken();
@@ -279,7 +283,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 						if (s == "INNER")
 						{
-							if (Parser.NextToken() != "JOIN")
+							if (Parser.NextToken().ToUpper() != "JOIN")
 								return false;
 						}
 
@@ -299,7 +303,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 								break;
 
 							case "OUTER":
-								if (Parser.NextToken() != "JOIN")
+								if (Parser.NextToken().ToUpper() != "JOIN")
 									return false;
 								break;
 
@@ -323,7 +327,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 								break;
 
 							case "OUTER":
-								if (Parser.NextToken() != "JOIN")
+								if (Parser.NextToken().ToUpper() != "JOIN")
 									return false;
 								break;
 
@@ -347,7 +351,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 								break;
 
 							case "OUTER":
-								if (Parser.NextToken() != "JOIN")
+								if (Parser.NextToken().ToUpper() != "JOIN")
 									return false;
 								break;
 
@@ -365,7 +369,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					case "OUTER":
 						Parser.NextToken();
 
-						if (Parser.NextToken() != "JOIN")
+						if (Parser.NextToken().ToUpper() != "JOIN")
 							return false;
 
 						if (!TryParseSource(Parser, out Source2))
@@ -414,7 +418,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s != "WHERE" &&
 				s != "GROUP" &&
 				s != "ORDER" &&
-				s != "OFFSET")
+				s != "OFFSET" &&
+				s != "ON")
 			{
 				if (s == "AS")
 					Parser.NextToken();

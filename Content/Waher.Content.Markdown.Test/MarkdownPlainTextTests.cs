@@ -40,11 +40,8 @@ namespace Waher.Content.Markdown.Test
 		[AssemblyCleanup]
 		public static void AssemblyCleanup()
 		{
-			if (filesProvider != null)
-			{
-				filesProvider.Dispose();
-				filesProvider = null;
-			}
+			filesProvider?.Dispose();
+			filesProvider = null;
 		}
 
 		private void DoTest(string MarkdownFileName, string PlainTextFileName)
@@ -136,19 +133,19 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_11_OrderedLists.md", "Test_11_OrderedLists.txt");
 		}
-		
+
 		[TestMethod]
 		public void Test_12_Typography()
 		{
 			this.DoTest("Test_12_Typography.md", "Test_12_Typography.txt");
 		}
-		
+
 		[TestMethod]
 		public void Test_13_Tables()
 		{
 			this.DoTest("Test_13_Tables.md", "Test_13_Tables.txt");
 		}
-		
+
 		[TestMethod]
 		public void Test_14_HorizontalRules()
 		{
@@ -185,11 +182,11 @@ namespace Waher.Content.Markdown.Test
 			this.DoTest("Test_19_Sections.md", "Test_19_Sections.txt");
 		}
 
-        [TestMethod]
-        public void Test_20_Script()
-        {
-            this.DoTest("Test_20_Script.md", "Test_20_Script.txt");
-        }
+		[TestMethod]
+		public void Test_20_Script()
+		{
+			this.DoTest("Test_20_Script.md", "Test_20_Script.txt");
+		}
 
 		[TestMethod]
 		public void Test_21_Httpx()

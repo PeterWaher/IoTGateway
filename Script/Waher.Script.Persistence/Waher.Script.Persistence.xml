@@ -141,7 +141,7 @@
             Enumerator that only returns elements matching a set of conditions.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode)">
             <summary>
             Enumerator that only returns elements matching a set of conditions.
             </summary>
@@ -159,6 +159,11 @@
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.MoveNextAsync">
+            <summary>
+            <see cref="M:Waher.Persistence.IAsyncEnumerator.MoveNextAsync"/>
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.ConditionalEnumerator.Reset">
             <summary>
             <see cref="M:System.Collections.IEnumerator.Reset"/>
@@ -169,7 +174,7 @@
             Enumerator that reorders a sequence of items.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[])">
+        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[])">
             <summary>
             Enumerator that reorders a sequence of items.
             </summary>
@@ -183,6 +188,11 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.MoveNext">
+            <summary>
+            <see cref="M:System.Collections.IEnumerator.MoveNext"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CustomOrderEnumerator.MoveNextAsync">
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
@@ -214,6 +224,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Delete.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Delete.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -238,7 +256,7 @@
             Enumerator that limits the return set to a maximum number of records.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
             </summary>
@@ -261,7 +279,7 @@
             Enumerator that groups items into groups, and returns aggregated elements.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
+        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
             <summary>
             Enumerator that groups items into groups, and returns aggregated elements.
             </summary>
@@ -279,6 +297,14 @@
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.Reset">
             <summary>
@@ -353,6 +379,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Insert.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Insert.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -372,12 +406,17 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.IResultSetEnumerator">
+            <summary>
+            Interface for result-set enumerators.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.MaxCountEnumerator">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.#ctor(System.Collections.IEnumerator,System.Int32)">
+        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,System.Int32)">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
             </summary>
@@ -393,6 +432,14 @@
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.MaxCountEnumerator.Reset">
             <summary>
@@ -451,7 +498,7 @@
             Enumerator that skips a given number of result records.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.#ctor(System.Collections.IEnumerator,System.Int32)">
+        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,System.Int32)">
             <summary>
             Enumerator that skips a given number of result records.
             </summary>
@@ -467,6 +514,14 @@
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.OffsetEnumerator.Reset">
             <summary>
@@ -681,7 +736,7 @@
             Enumerator that limits the return set to a maximum number of records.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.#ctor(System.Collections.IEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
             <summary>
             Enumerator that limits the return set to a maximum number of records.
             </summary>
@@ -703,6 +758,14 @@
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.RecordEnumerator.Reset">
             <summary>
@@ -736,6 +799,14 @@
         <member name="M:Waher.Script.Persistence.SQL.Select.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Select.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
@@ -801,12 +872,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.CrossJoin.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.CrossJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Gets the actual data source, from its definition.
+            Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin">
             <summary>
@@ -824,12 +900,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Gets the actual data source, from its definition.
+            Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin">
             <summary>
@@ -847,12 +928,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Gets the actual data source, from its definition.
+            Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.Join">
             <summary>
@@ -869,6 +955,21 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Left">
+            <summary>
+            Left source
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Right">
+            <summary>
+            Right source
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Conditions">
+            <summary>
+            Conditions linking the two sources.
+            </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
@@ -889,6 +990,53 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.GetSource(Waher.Script.Variables)">
+            <summary>
+            Gets the actual data source, from its definition.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Data Source</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin">
             <summary>
             LEFT [OUTER] JOIN of two source definitions.
@@ -905,12 +1053,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Gets the actual data source, from its definition.
+            Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin">
             <summary>
@@ -928,12 +1081,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Gets the actual data source, from its definition.
+            Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference">
             <summary>
@@ -1194,6 +1352,14 @@
         <member name="M:Waher.Script.Persistence.SQL.Update.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Update.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -11,11 +11,11 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Enumerator that only returns elements matching a set of conditions.
 	/// </summary>
-	public class ConditionalEnumerator : IEnumerator
+	public class ConditionalEnumerator : IResultSetEnumerator
 	{
 		private readonly ScriptNode conditions;
 		private readonly Variables variables;
-		private readonly IEnumerator e;
+		private readonly IResultSetEnumerator e;
 
 		/// <summary>
 		/// Enumerator that only returns elements matching a set of conditions.
@@ -23,7 +23,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="ItemEnumerator">Item enumerator</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Conditions">Set of conditions that must be fulfilled.</param>
-		public ConditionalEnumerator(IEnumerator ItemEnumerator, Variables Variables, ScriptNode Conditions)
+		public ConditionalEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, ScriptNode Conditions)
 		{
 			this.e = ItemEnumerator;
 			this.variables = Variables;
@@ -42,23 +42,43 @@ namespace Waher.Script.Persistence.SQL
 		{
 			while (this.e.MoveNext())
 			{
-				try
-				{
-					ObjectProperties Properties = new ObjectProperties(e.Current, this.variables);
-
-					IElement E = this.conditions.Evaluate(Properties);
-					if (!(E is BooleanValue B) || !B.Value)
-						continue;
-
+				if (this.MatchesCondition())
 					return true;
-				}
-				catch (Exception)
-				{
-					continue;
-				}
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// <see cref="IAsyncEnumerator.MoveNextAsync"/>
+		/// </summary>
+		public async Task<bool> MoveNextAsync()
+		{
+			while (await this.e.MoveNextAsync())
+			{
+				if (this.MatchesCondition())
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool MatchesCondition()
+		{
+			try
+			{
+				ObjectProperties Properties = new ObjectProperties(this.e.Current, this.variables);
+
+				IElement E = this.conditions.Evaluate(Properties);
+				if (!(E is BooleanValue B) || !B.Value)
+					return false;
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		/// <summary>

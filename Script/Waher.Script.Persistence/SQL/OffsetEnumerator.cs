@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
-using Waher.Script.Objects;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Persistence.SQL
 {
 	/// <summary>
 	/// Enumerator that skips a given number of result records.
 	/// </summary>
-	public class OffsetEnumerator : IEnumerator
+	public class OffsetEnumerator : IResultSetEnumerator
 	{
-		private readonly IEnumerator e;
+		private readonly IResultSetEnumerator e;
 		private readonly int offset0;
 		private int offset;
 
@@ -22,7 +18,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="ItemEnumerator">Item enumerator</param>
 		/// <param name="Offset">Number of records to skip.</param>
-		public OffsetEnumerator(IEnumerator ItemEnumerator, int Offset)
+		public OffsetEnumerator(IResultSetEnumerator ItemEnumerator, int Offset)
 		{
 			this.e = ItemEnumerator;
 			this.offset = this.offset0 = Offset;
@@ -38,7 +34,18 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public bool MoveNext()
 		{
-			while (this.e.MoveNext())
+			return this.MoveNextAsync().Result;
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MoveNextAsync()
+		{
+			while (await this.e.MoveNextAsync())
 			{
 				if (this.offset > 0)
 					this.offset--;

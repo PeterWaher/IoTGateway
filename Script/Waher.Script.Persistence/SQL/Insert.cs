@@ -48,6 +48,17 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
+			return this.EvaluateAsync(Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node asynchronously, using the variables provided in 
+		/// the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public async Task<IElement> EvaluateAsync(Variables Variables)
+		{
 			IDataSource Source = this.source.GetSource(Variables);
 			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
 			ScriptNode Node;
@@ -76,7 +87,7 @@ namespace Waher.Script.Persistence.SQL
 				Obj[Column] = E.AssociatedObjectValue;
 			}
 
-			Source.Insert(Obj);
+			await Source.Insert(Obj);
 
 			return new ObjectValue(Obj);
 		}

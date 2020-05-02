@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -80,6 +81,17 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
+			return this.EvaluateAsync(Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node asynchronously, using the variables provided in 
+		/// the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public async Task<IElement> EvaluateAsync(Variables Variables)
+		{
 			IElement E;
 			int Top;
 			int Offset;
@@ -154,7 +166,7 @@ namespace Waher.Script.Persistence.SQL
 
 			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
 			Dictionary<string, int> Columns = new Dictionary<string, int>();
-			IEnumerator e;
+			IResultSetEnumerator e;
 			RecordEnumerator e2;
 			int NrRecords = 0;
 
@@ -172,12 +184,12 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.groupBy is null)
 			{
-				e = Source.Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
+				e = await Source.Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
 				Offset = 0;
 				Top = int.MaxValue;
 			}
 			else
-				e = Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
+				e = await Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 
 			if (this.groupBy != null)
 			{
@@ -217,7 +229,7 @@ namespace Waher.Script.Persistence.SQL
 			else
 				e2 = new RecordEnumerator(e, this.columns, Variables);
 
-			while (e2.MoveNext())
+			while (await e2.MoveNextAsync())
 			{
 				Items.AddLast(e2.CurrentRecord);
 				NrRecords++;

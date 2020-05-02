@@ -37,19 +37,21 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public IEnumerator Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			return Find(this.collectionName, Offset, Top, Where, Variables, Order, Node);
 		}
 
-		internal static IEnumerator Find(string Collection, int Offset, int Top, ScriptNode Where, Variables Variables,
+		internal static async Task<IResultSetEnumerator> Find(string Collection, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			object[] FindParameters = new object[] { Collection, Offset, Top, Convert(Where, Variables), Convert(Order) };
 			object Obj = FindMethod.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			await Task;
 
 			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 			if (PI is null)
@@ -59,7 +61,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-			return Enumerable.GetEnumerator();
+			return new SynchEnumerator(Enumerable.GetEnumerator());
 		}
 
 		private static MethodInfo findMethod = null;
@@ -286,27 +288,27 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Updates a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to update</param>
-		public void Update(IEnumerable<object> Objects)
+		public Task Update(IEnumerable<object> Objects)
 		{
-			Task _ = Database.Update(Objects);
+			return Database.Update(Objects);
 		}
 
 		/// <summary>
 		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to delete</param>
-		public void Delete(IEnumerable<object> Objects)
+		public Task Delete(IEnumerable<object> Objects)
 		{
-			Task _ = Database.Delete(Objects);
+			return Database.Delete(Objects);
 		}
 
 		/// <summary>
 		/// Inserts an object.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public void Insert(object Object)
+		public Task Insert(object Object)
 		{
-			Task _ = Database.Insert(Object);
+			return Database.Insert(Object);
 		}
 
 		/// <summary>

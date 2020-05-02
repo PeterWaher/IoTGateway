@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -41,12 +41,23 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
+			return this.EvaluateAsync(Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node asynchronously, using the variables provided in 
+		/// the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public async Task<IElement> EvaluateAsync(Variables Variables)
+		{
 			IDataSource Source = this.source.GetSource(Variables);
-			IEnumerator e = Source.Find(0, int.MaxValue, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
+			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
 			LinkedList<object> ToUpdate = new LinkedList<object>();
 			int Count = 0;
 
-			while (e.MoveNext())
+			while (await e.MoveNextAsync())
 			{
 				ObjectProperties Properties = new ObjectProperties(e.Current, Variables, false);
 
@@ -57,7 +68,7 @@ namespace Waher.Script.Persistence.SQL
 				Count++;
 			}
 
-			Source.Update(ToUpdate);
+			await Source.Update(ToUpdate);
 
 			return new DoubleNumber(Count);
 		}

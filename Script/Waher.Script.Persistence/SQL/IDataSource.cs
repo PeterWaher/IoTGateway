@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL
@@ -20,26 +20,26 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		IEnumerator Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
 
 		/// <summary>
 		/// Updates a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to update</param>
-		void Update(IEnumerable<object> Objects);
+		Task Update(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to delete</param>
-		void Delete(IEnumerable<object> Objects);
+		Task Delete(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Inserts an object.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		void Insert(object Object);
+		Task Insert(object Object);
 
 		/// <summary>
 		/// Name of corresponding collection.

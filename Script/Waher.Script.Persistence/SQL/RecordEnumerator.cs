@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -11,9 +10,9 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Enumerator that limits the return set to a maximum number of records.
 	/// </summary>
-	public class RecordEnumerator : IEnumerator
+	public class RecordEnumerator : IResultSetEnumerator
 	{
-		private readonly IEnumerator e;
+		private readonly IResultSetEnumerator e;
 		private readonly ScriptNode[] columns;
 		private readonly Variables variables;
 		private readonly int count;
@@ -25,7 +24,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="ItemEnumerator">Item enumerator</param>
 		/// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
 		/// <param name="Variables">Current set of variables.</param>
-		public RecordEnumerator(IEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
+		public RecordEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
 		{
 			this.e = ItemEnumerator;
 			this.columns = Columns;
@@ -48,7 +47,18 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public virtual bool MoveNext()
 		{
-			if (!this.e.MoveNext())
+			return this.MoveNextAsync().Result;
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MoveNextAsync()
+		{
+			if (!await this.e.MoveNextAsync())
 				return false;
 
 			int i;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -42,10 +43,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public IEnumerator Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			IEnumerator e = this.vector.VectorElements.GetEnumerator();
+			IResultSetEnumerator e = new SynchEnumerator(this.vector.VectorElements.GetEnumerator());
 			int i, c;
 
 			if (Where != null)
@@ -55,7 +56,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			{
 				List<IElement> Items = new List<IElement>();
 
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 				{
 					if (e.Current is Element E)
 						Items.Add(E);
@@ -81,7 +82,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				Items.Sort(Order2);
 
-				e = Items.GetEnumerator();
+				e = new SynchEnumerator(Items.GetEnumerator());
 			}
 
 			if (Offset > 0)
@@ -102,16 +103,16 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Updates a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to update</param>
-		public void Update(IEnumerable<object> Objects)
+		public Task Update(IEnumerable<object> Objects)
 		{
-			// Do nothing.
+			return Task.CompletedTask;	// Do nothing.
 		}
 
 		/// <summary>
 		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to delete</param>
-		public void Delete(IEnumerable<object> Objects)
+		public Task Delete(IEnumerable<object> Objects)
 		{
 			throw new ScriptRuntimeException("Unable to delete object", this.node);
 		}
@@ -120,7 +121,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Inserts an object.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public void Insert(object Object)
+		public Task Insert(object Object)
 		{
 			throw new ScriptRuntimeException("Unable to insert object", this.node);
 		}

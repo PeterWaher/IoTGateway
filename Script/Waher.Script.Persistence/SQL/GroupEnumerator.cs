@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -11,12 +12,12 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Enumerator that groups items into groups, and returns aggregated elements.
 	/// </summary>
-	public class GroupEnumerator : IEnumerator
+	public class GroupEnumerator : IResultSetEnumerator
 	{
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupNames;
 		private readonly Variables variables;
-		private readonly IEnumerator e;
+		private readonly IResultSetEnumerator e;
 		private bool processLast = false;
 		private Type lastType = null;
 		private IEnumerable<PropertyInfo> properties = null;
@@ -30,7 +31,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Variables">Current set of variables</param>
 		/// <param name="GroupBy">Group on these fields</param>
 		/// <param name="GroupNames">Names given to grouped fields</param>
-		public GroupEnumerator(IEnumerator ItemEnumerator, Variables Variables, ScriptNode[] GroupBy, ScriptNode[] GroupNames)
+		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, ScriptNode[] GroupBy, ScriptNode[] GroupNames)
 		{
 			this.e = ItemEnumerator;
 			this.variables = Variables;
@@ -48,6 +49,17 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public bool MoveNext()
 		{
+			return this.MoveNextAsync().Result;
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MoveNextAsync()
+		{
 			Dictionary<string, List<object>> Aggregated = null;
 			ObjectProperties Variables = null;
 			IElement E;
@@ -55,7 +67,7 @@ namespace Waher.Script.Persistence.SQL
 			int i, c = this.groupBy.Length;
 			object o1, o2;
 
-			while (this.processLast || e.MoveNext())
+			while (this.processLast || await e.MoveNextAsync())
 			{
 				this.processLast = false;
 

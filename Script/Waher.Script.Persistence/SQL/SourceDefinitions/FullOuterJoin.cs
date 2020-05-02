@@ -1,10 +1,7 @@
 ﻿using System;
-using Waher.Runtime.Inventory;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL.SourceDefinitions
 {
@@ -28,11 +25,17 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		}
 
 		/// <summary>
-		/// Gets the actual data source, from its definition.
+		/// Finds objects matching filter conditions in <paramref name="Where"/>.
 		/// </summary>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
-		/// <returns>Data Source</returns>
-		public override IDataSource GetSource(Variables Variables)
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>Enumerator.</returns>
+		public override Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			throw new NotImplementedException();
 		}

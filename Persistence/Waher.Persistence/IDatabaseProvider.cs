@@ -250,5 +250,15 @@ namespace Waher.Persistence
 		/// <param name="Object">Object</param>
 		/// <returns>Collection name.</returns>
 		Task<string> GetCollection(Object Object);
+
+		/// <summary>
+		/// Checks if a string is a label in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="Label">Label to check.</param>
+		/// <returns>If <paramref name="Label"/> is a label in the collection
+		/// defined by <paramref name="Collection"/>.</returns>
+		Task<bool> IsLabel(string Collection, string Label);
+
 	}
 }

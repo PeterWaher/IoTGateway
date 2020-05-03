@@ -580,6 +580,39 @@ namespace Waher.Persistence.Files
 			return await Labels.GetFieldNameAsync((uint)FieldCode);
 		}
 
+		/// <summary>
+		/// Checks if a string is a label in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="Label">Label to check.</param>
+		/// <returns>If <paramref name="Label"/> is a label in the collection
+		/// defined by <paramref name="Collection"/>.</returns>
+		public async Task<bool> IsLabel(string Collection, string Label)
+		{
+			if (string.IsNullOrEmpty(Collection))
+				Collection = this.defaultCollectionName;
+
+			LabelFile Labels;
+
+			lock (this.files)
+			{
+				if (!this.labelFiles.TryGetValue(Collection, out Labels))
+					Labels = null;
+			}
+
+			if (Labels is null)
+			{
+				await this.GetFile(Collection);     // Generates structures.
+
+				lock (this.files)
+				{
+					Labels = this.labelFiles[Collection];
+				}
+			}
+
+			return (await Labels.TryGetFieldCodeAsync(Label)).HasValue;
+		}
+
 		#endregion
 
 		#region Keys

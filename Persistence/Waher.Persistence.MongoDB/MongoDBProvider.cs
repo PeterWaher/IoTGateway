@@ -1549,6 +1549,22 @@ namespace Waher.Persistence.MongoDB
 			return Task.FromResult<string>(Serializer.CollectionName(Object));
 		}
 
+		/// <summary>
+		/// Checks if a string is a label in a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="Label">Label to check.</param>
+		/// <returns>If <paramref name="Label"/> is a label in the collection
+		/// defined by <paramref name="Collection"/>.</returns>
+		public async Task<bool> IsLabel(string CollectionName, string Label)
+		{
+			IMongoCollection<BsonDocument> Collection = this.GetCollection(CollectionName);
+			FilterDefinition<BsonDocument> BsonFilter = Builders<BsonDocument>.Filter.Ne<string>(Label, null);
+			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
+
+			return !(await ResultSet.SingleAsync<BsonDocument>() is null);
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

@@ -199,6 +199,27 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Tries to get the code for a specific field in a collection.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <returns>The field code, if one was found, or null otherwise.</returns>
+		public async Task<uint?> TryGetFieldCodeAsync(string FieldName)
+		{
+			await this.LockRead();
+			try
+			{
+				if (this.codesByLabel.TryGetValue(FieldName, out uint Result))
+					return Result;
+				else
+					return null;
+			}
+			finally
+			{
+				await this.EndRead();
+			}
+		}
+
+		/// <summary>
 		/// Gets the name of a field in a collection, given its code.
 		/// </summary>
 		/// <param name="FieldCode">Field code.</param>

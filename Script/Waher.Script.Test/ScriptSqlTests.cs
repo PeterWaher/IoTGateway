@@ -108,13 +108,11 @@ namespace Waher.Script.Test
 				object[] ExpectedRow = ExpectedOutput[RowIndex];
 				ObjectVector Row = M.GetRow(RowIndex) as ObjectVector;
 
-				Assert.IsNotNull("Object row vector expected.");
+				Assert.IsNotNull(Row, "Object row vector expected.");
 				Assert.AreEqual(NrColumns = ExpectedRow.Length, Row.Dimension, "Number of columns in response incorrect.");
 
 				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
-				{
 					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
-				}
 			}
 		}
 

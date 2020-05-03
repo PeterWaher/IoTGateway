@@ -56,5 +56,19 @@ namespace Waher.Script.Persistence.SQL
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Checks if the name refers to the source.
+		/// </summary>
+		/// <param name="Name">Name to check.</param>
+		/// <returns>If the name refers to the source.</returns>
+		bool IsSource(string Name);
+
+		/// <summary>
+		/// Checks if the label is a label in the source.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <returns>If the label is a label in the source.</returns>
+		Task<bool> IsLabel(string Label);
 	}
 }

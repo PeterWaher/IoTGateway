@@ -25,17 +25,11 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		}
 
 		/// <summary>
-		/// Finds objects matching filter conditions in <paramref name="Where"/>.
+		/// Gets the actual data source, from its definition.
 		/// </summary>
-		/// <param name="Offset">Offset at which to return elements.</param>
-		/// <param name="Top">Maximum number of elements to return.</param>
-		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
-		/// <param name="Order">Order at which to order the result set.</param>
-		/// <param name="Node">Script node performing the evaluation.</param>
-		/// <returns>Enumerator.</returns>
-		public override Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
-			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
+		/// <returns>Data Source</returns>
+		public override IDataSource GetSource(Variables Variables)
 		{
 			throw new NotImplementedException();
 		}

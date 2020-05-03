@@ -356,6 +356,20 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Insert">
             <summary>
             Executes an INSERT statement against the object database.
@@ -850,6 +864,13 @@
             <param name="Variables">Current set of variables.</param>
             <returns>Data Source</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinition.GetName(Waher.Script.Variables)">
+            <summary>
+            Gets the data source name, from its definition.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Data Source Name</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinition.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -872,17 +893,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.CrossJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.CrossJoin.GetSource(Waher.Script.Variables)">
             <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
+            Gets the actual data source, from its definition.
             </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
+            <returns>Data Source</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin">
             <summary>
@@ -900,17 +916,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.FullOuterJoin.GetSource(Waher.Script.Variables)">
             <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
+            Gets the actual data source, from its definition.
             </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
+            <returns>Data Source</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin">
             <summary>
@@ -928,17 +939,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.InnerJoin.GetSource(Waher.Script.Variables)">
             <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
+            Gets the actual data source, from its definition.
             </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
+            <returns>Data Source</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.Join">
             <summary>
@@ -990,52 +996,12 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.GetSource(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.GetName(Waher.Script.Variables)">
             <summary>
-            Gets the actual data source, from its definition.
+            Gets the data source name, from its definition.
             </summary>
             <param name="Variables">Current set of variables.</param>
-            <returns>Data Source</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
-            <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
-            </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
-            <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Update(System.Collections.Generic.IEnumerable{System.Object})">
-            <summary>
-            Updates a set of objects.
-            </summary>
-            <param name="Objects">Objects to update</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Delete(System.Collections.Generic.IEnumerable{System.Object})">
-            <summary>
-            Deletes a set of objects.
-            </summary>
-            <param name="Objects">Objects to delete</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Insert(System.Object)">
-            <summary>
-            Inserts an object.
-            </summary>
-            <param name="Object">Object to insert.</param>
-        </member>
-        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.CollectionName">
-            <summary>
-            Name of corresponding collection.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SQL.SourceDefinitions.Join.TypeName">
-            <summary>
-            Name of corresponding type.
-            </summary>
+            <returns>Data Source Name</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin">
             <summary>
@@ -1053,17 +1019,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin.GetSource(Waher.Script.Variables)">
             <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
+            Gets the actual data source, from its definition.
             </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
+            <returns>Data Source</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin">
             <summary>
@@ -1081,17 +1042,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.RightOuterJoin.GetSource(Waher.Script.Variables)">
             <summary>
-            Finds objects matching filter conditions in <paramref name="Where"/>.
+            Gets the actual data source, from its definition.
             </summary>
-            <param name="Offset">Offset at which to return elements.</param>
-            <param name="Top">Maximum number of elements to return.</param>
-            <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
-            <param name="Order">Order at which to order the result set.</param>
-            <param name="Node">Script node performing the evaluation.</param>
-            <returns>Enumerator.</returns>
+            <returns>Data Source</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference">
             <summary>
@@ -1143,16 +1099,24 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.GetName(Waher.Script.Variables)">
+            <summary>
+            Gets the data source name, from its definition.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Data Source Name</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.CollectionSource">
             <summary>
             Data Source defined by a collection name
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.#ctor(System.String)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.#ctor(System.String,System.String)">
             <summary>
             Data Source defined by a collection name
             </summary>
             <param name="CollectionName">Collection Name</param>
+            <param name="Alias">Alias for source.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
@@ -1170,14 +1134,6 @@
             <summary>
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.WildcardToRegex(System.String,System.String)">
-            <summary>
-            Converts a wildcard string to a regular expression string.
-            </summary>
-            <param name="s">String</param>
-            <param name="Wildcard">Wildcardd</param>
-            <returns>Regular expression</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
@@ -1207,16 +1163,176 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource">
+            <summary>
+            Data source formed through an INNER JOIN of two sources.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Data source formed through an INNER JOIN of two sources.
+            </summary>
+            <param name="Left">Left source</param>
+            <param name="LeftName">Name (or alias) of left source.</param>
+            <param name="Right">Right source</param>
+            <param name="RightName">Name (or alias) of right source.</param>
+            <param name="Conditions">Conditions for join.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.JoinedSource">
+            <summary>
+            Abstract base classes of joined sources.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Abstract base classes of joined sources.
+            </summary>
+            <param name="Left">Left source</param>
+            <param name="LeftName">Name (or alias) of left source.</param>
+            <param name="Right">Right source</param>
+            <param name="RightName">Name (or alias) of right source.</param>
+            <param name="Conditions">Conditions for join.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Left">
+            <summary>
+            Left source
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.LeftName">
+            <summary>
+            Name (or alias) of left source.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Right">
+            <summary>
+            Right source
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.RightName">
+            <summary>
+            Name (or alias) of right source.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Conditions">
+            <summary>
+            Conditions for join.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a set of objects.
+            </summary>
+            <param name="Objects">Objects to delete</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Combine(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Combines one or two restrictions.
+            </summary>
+            <param name="Where">WHERE clause.</param>
+            <param name="On">ON clause.</param>
+            <returns>Combined restrictions.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Reduce(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Reduces a where clause to fit the current data source.
+            </summary>
+            <param name="Source">Data Source to which the expression is to be reduced.</param>
+            <param name="Where">Where clause</param>
+            <returns>Reduced where clause, fitting the data source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Reduce(Waher.Script.Persistence.SQL.IDataSource,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[])">
+            <summary>
+            Reduces a sort order clause to fit the current data source.
+            </summary>
+            <param name="Source">Data Source to which the order is to be reduced.</param>
+            <param name="Order">Sort order</param>
+            <returns>Reduced sort order.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.TypeSource">
             <summary>
             Data Source defined by a type definition
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.#ctor(System.Type)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.#ctor(System.Type,System.String)">
             <summary>
             Data Source defined by a type definition
             </summary>
             <param name="Type">Type definition</param>
+            <param name="Alias">Optional alias for source.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.Type">
             <summary>
@@ -1276,15 +1392,31 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.VectorSource">
             <summary>
             Data Source defined by a vector.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.#ctor(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.#ctor(System.String,System.String,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Model.ScriptNode)">
             <summary>
             Data Source defined by a vector.
             </summary>
+            <param name="Name">Name of source.</param>
+            <param name="Alias">Alias for source.</param>
             <param name="Vector">Vector</param>
             <param name="Node">Node defining the vector.</param>
         </member>
@@ -1332,6 +1464,20 @@
             <summary>
             Name of corresponding type.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Update">
             <summary>

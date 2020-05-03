@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -14,18 +14,39 @@ namespace Waher.Script.Persistence.SQL.Sources
 	/// </summary>
 	public class VectorSource : IDataSource
 	{
+		private readonly Dictionary<Type, bool> types = new Dictionary<Type, bool>();
+		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
 		private readonly IVector vector;
 		private readonly ScriptNode node;
+		private readonly string name;
+		private readonly string alias;
 
 		/// <summary>
 		/// Data Source defined by a vector.
 		/// </summary>
+		/// <param name="Name">Name of source.</param>
+		/// <param name="Alias">Alias for source.</param>
 		/// <param name="Vector">Vector</param>
 		/// <param name="Node">Node defining the vector.</param>
-		public VectorSource(IVector Vector, ScriptNode Node)
+		public VectorSource(string Name, string Alias, IVector Vector, ScriptNode Node)
 		{
 			this.vector = Vector;
 			this.node = Node;
+			this.name = Name;
+			this.alias = Alias;
+
+			Type LastType = null;
+			Type T;
+
+			foreach (IElement E in Vector.ChildElements)
+			{
+				T = E.AssociatedObjectValue?.GetType();
+				if (T is null || T == LastType)
+					continue;
+
+				LastType = T;
+				this.types[T] = true;
+			}
 		}
 
 		/// <summary>
@@ -140,6 +161,48 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public string TypeName
 		{
 			get { throw new ScriptRuntimeException("Type not defined.", this.node); }
+		}
+
+		/// <summary>
+		/// Checks if the name refers to the source.
+		/// </summary>
+		/// <param name="Name">Name to check.</param>
+		/// <returns>If the name refers to the source.</returns>
+		public bool IsSource(string Name)
+		{
+			return 
+				string.Compare(this.name, Name, true) == 0 ||
+				string.Compare(this.alias, Name, true) == 0;
+		}
+
+		/// <summary>
+		/// Checks if the label is a label in the source.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <returns>If the label is a label in the source.</returns>
+		public Task<bool> IsLabel(string Label)
+		{
+			lock (this.isLabel)
+			{
+				if (!this.isLabel.TryGetValue(Label, out bool Result))
+				{
+					Result = false;
+
+					foreach (Type T in this.types.Keys)
+					{
+						if (!(T.GetRuntimeProperty(Label) is null &&
+							T.GetRuntimeField(Label) is null))
+						{
+							Result = true;
+							break;
+						}
+					}
+
+					this.isLabel[Label] = Result;
+				}
+
+				return Task.FromResult<bool>(Result);
+			}
 		}
 
 	}

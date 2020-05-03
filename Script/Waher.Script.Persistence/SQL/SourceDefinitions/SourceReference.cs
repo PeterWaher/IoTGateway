@@ -51,33 +51,42 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		/// <returns>Data Source</returns>
 		public override IDataSource GetSource(Variables Variables)
 		{
-			if (this.source is VariableReference Ref)
-				return GetDataSource(Ref, Variables);
+			string Alias;
+
+			if (this.alias is null)
+				Alias = string.Empty;
+			else if (this.alias is VariableReference Ref)
+				Alias = Ref.VariableName;
 			else
-				return GetDataSource(this.source.Evaluate(Variables), this.source);
+				Alias = this.alias.Evaluate(Variables).AssociatedObjectValue?.ToString();
+
+			if (this.source is VariableReference Ref2)
+				return GetDataSource(Ref2, Alias, Variables);
+			else
+				return GetDataSource(string.Empty, Alias, this.source.Evaluate(Variables), this.source);
 		}
 
-		private static IDataSource GetDataSource(IElement E, ScriptNode Source)
+		private static IDataSource GetDataSource(string Name, string Alias, IElement E, ScriptNode Source)
 		{
 			if (E.AssociatedObjectValue is Type T)
-				return new TypeSource(T);
+				return new TypeSource(T, Alias);
 			else if (E is StringValue S)
-				return new CollectionSource(S.Value);
+				return new CollectionSource(S.Value, Alias);
 			else if (E is IVector V)
-				return new VectorSource(V, Source);
+				return new VectorSource(Name, Alias, V, Source);
 			else
 				throw new ScriptRuntimeException("Data source type not supported.", Source);
 		}
 
-		private static IDataSource GetDataSource(VariableReference Source, Variables Variables)
+		private static IDataSource GetDataSource(VariableReference Source, string Alias, Variables Variables)
 		{
 			string Name = Source.VariableName;
 
 			if (Variables.TryGetVariable(Name, out Variable v))
-				return GetDataSource(v.ValueElement, Source);
+				return GetDataSource(Name, Alias, v.ValueElement, Source);
 
 			if (Expression.TryGetConstant(Name, Variables, out IElement ValueElement))
-				return GetDataSource(ValueElement, Source);
+				return GetDataSource(Name, Alias, ValueElement, Source);
 
 			if (Types.TryGetQualifiedNames(Name, out string[] QualifiedNames))
 			{
@@ -86,11 +95,11 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 					Type T = Types.GetType(QualifiedNames[0]);
 
 					if (!(T is null))
-						return new TypeSource(T);
+						return new TypeSource(T, Alias);
 				}
 			}
 
-			return new CollectionSource(Name);
+			return new CollectionSource(Name, Alias);
 		}
 
 		/// <summary>
@@ -150,6 +159,28 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			Result ^= Result << 5 ^ GetHashCode(this.alias);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Gets the data source name, from its definition.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Data Source Name</returns>
+		public override string GetName(Variables Variables)
+		{
+			ScriptNode N = this.alias ?? this.source;
+
+			if (N is VariableReference Ref)
+				return Ref.VariableName;
+			else
+			{
+				IElement E = N.Evaluate(Variables);
+
+				if (E is StringValue S)
+					return S.Value;
+				else
+					return E.AssociatedObjectValue?.ToString();
+			}
 		}
 
 	}

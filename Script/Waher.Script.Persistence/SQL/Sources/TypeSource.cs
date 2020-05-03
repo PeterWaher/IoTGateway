@@ -16,15 +16,19 @@ namespace Waher.Script.Persistence.SQL.Sources
 	/// </summary>
 	public class TypeSource : IDataSource
 	{
+		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
 		private readonly Type type;
+		private readonly string alias;
 
 		/// <summary>
 		/// Data Source defined by a type definition
 		/// </summary>
 		/// <param name="Type">Type definition</param>
-		public TypeSource(Type Type)
+		/// <param name="Alias">Optional alias for source.</param>
+		public TypeSource(Type Type, string Alias)
 		{
 			this.type = Type;
+			this.alias = Alias;
 		}
 
 		/// <summary>
@@ -45,13 +49,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			return Find(this.type, Offset, Top, Where, Variables, Order, Node);
+			return Find(this.type, Offset, Top, Where, Variables, Order, Node,
+				this.alias ?? this.type.Name);
 		}
 
 		internal static async Task<IResultSetEnumerator> Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables,
-			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
+			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node, string Name)
 		{
-			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables), Convert(Order) };
+			object[] FindParameters = new object[] { Offset, Top, 
+				Convert(Where, Variables, Name), Convert(Order) };
 			object Obj = FindMethod.MakeGenericMethod(T).Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
@@ -125,119 +131,180 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Result;
 		}
 
-		internal static Filter Convert(ScriptNode Conditions, Variables Variables)
+		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name)
 		{
 			if (Conditions is null)
 				return null;
 
-			Operators.Logical.And And = Conditions as Operators.Logical.And;
-			Operators.Dual.And And2 = And is null ? Conditions as Operators.Dual.And : null;
-
-			if (And != null || And2 != null)
+			if (Conditions is BinaryOperator Bin)
 			{
-				Filter L = Convert(And != null ? And.LeftOperand : And2.LeftOperand, Variables);
-				Filter R = Convert(And != null ? And.RightOperand : And2.RightOperand, Variables);
+				ScriptNode LO = Reduce(Bin.LeftOperand, Name);
+				ScriptNode RO = Reduce(Bin.RightOperand, Name);
 
-				if (L is null && R is null)
-					return null;
-				else if (L is null)
-					return R;
-				else if (R is null)
-					return L;
-				else
+				Operators.Logical.And And = Conditions as Operators.Logical.And;
+				Operators.Dual.And And2 = And is null ? Conditions as Operators.Dual.And : null;
+
+				if (And != null || And2 != null)
 				{
-					List<Filter> Filters = new List<Filter>();
+					Filter L = Convert(LO, Variables, Name);
+					Filter R = Convert(RO, Variables, Name);
 
-					if (L is FilterAnd L2)
-						Filters.AddRange(L2.ChildFilters);
+					if (L is null && R is null)
+						return null;
+					else if (L is null)
+						return R;
+					else if (R is null)
+						return L;
 					else
-						Filters.Add(L);
+					{
+						List<Filter> Filters = new List<Filter>();
 
-					if (R is FilterAnd R2)
-						Filters.AddRange(R2.ChildFilters);
+						if (L is FilterAnd L2)
+							Filters.AddRange(L2.ChildFilters);
+						else
+							Filters.Add(L);
+
+						if (R is FilterAnd R2)
+							Filters.AddRange(R2.ChildFilters);
+						else
+							Filters.Add(R);
+
+						return new FilterAnd(Filters.ToArray());
+					}
+				}
+
+				Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
+				Operators.Dual.Or Or2 = Or is null ? Conditions as Operators.Dual.Or : null;
+
+				if (Or != null || Or2 != null)
+				{
+					Filter L = Convert(LO, Variables, Name);
+					Filter R = Convert(RO, Variables, Name);
+
+					if (L is null || R is null)
+						return null;
 					else
-						Filters.Add(R);
+					{
+						List<Filter> Filters = new List<Filter>();
 
-					return new FilterAnd(Filters.ToArray());
+						if (L is FilterOr L2)
+							Filters.AddRange(L2.ChildFilters);
+						else
+							Filters.Add(L);
+
+						if (R is FilterOr R2)
+							Filters.AddRange(R2.ChildFilters);
+						else
+							Filters.Add(R);
+
+						return new FilterOr(Filters.ToArray());
+					}
+				}
+
+				if (LO is VariableReference LVar)
+				{
+					string FieldName = LVar.VariableName;
+					object Value = RO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+
+					if (Conditions is Operators.Comparisons.EqualTo ||
+						Conditions is Operators.Comparisons.EqualToElementWise ||
+						Conditions is Operators.Comparisons.IdenticalTo ||
+						Conditions is Operators.Comparisons.IdenticalToElementWise)
+					{
+						return new FilterFieldEqualTo(FieldName, Value);
+					}
+					else if (Conditions is Operators.Comparisons.NotEqualTo ||
+						Conditions is Operators.Comparisons.NotEqualToElementWise)
+					{
+						return new FilterFieldNotEqualTo(FieldName, Value);
+					}
+					else if (Conditions is Operators.Comparisons.GreaterThan)
+						return new FilterFieldGreaterThan(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
+						return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.LesserThan)
+						return new FilterFieldLesserThan(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
+						return new FilterFieldLesserOrEqualTo(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.Like Like)
+					{
+						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						return new FilterFieldLikeRegEx(FieldName, RegEx);
+					}
+					else if (Conditions is Operators.Comparisons.NotLike NotLike)
+					{
+						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+					}
+				}
+				else if (RO is VariableReference RVar)
+				{
+					string FieldName = RVar.VariableName;
+					object Value = LO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+
+					if (Conditions is Operators.Comparisons.EqualTo ||
+						Conditions is Operators.Comparisons.EqualToElementWise ||
+						Conditions is Operators.Comparisons.IdenticalTo ||
+						Conditions is Operators.Comparisons.IdenticalToElementWise)
+					{
+						return new FilterFieldEqualTo(FieldName, Value);
+					}
+					else if (Conditions is Operators.Comparisons.NotEqualTo ||
+						Conditions is Operators.Comparisons.NotEqualToElementWise)
+					{
+						return new FilterFieldNotEqualTo(FieldName, Value);
+					}
+					else if (Conditions is Operators.Comparisons.GreaterThan)
+						return new FilterFieldLesserThan(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
+						return new FilterFieldLesserOrEqualTo(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.LesserThan)
+						return new FilterFieldGreaterThan(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
+						return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+					else if (Conditions is Operators.Comparisons.Like Like)
+					{
+						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						return new FilterFieldLikeRegEx(FieldName, RegEx);
+					}
+					else if (Conditions is Operators.Comparisons.NotLike NotLike)
+					{
+						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+					}
 				}
 			}
-
-			Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
-			Operators.Dual.Or Or2 = Or is null ? Conditions as Operators.Dual.Or : null;
-
-			if (Or != null || Or2 != null)
+			else if (Conditions is UnaryOperator UnOp)
 			{
-				Filter L = Convert(Or != null ? Or.LeftOperand : Or2.LeftOperand, Variables);
-				Filter R = Convert(Or != null ? Or.RightOperand : Or2.RightOperand, Variables);
-
-				if (L is null || R is null)
-					return null;
-				else
+				if (Conditions is Operators.Logical.Not Not)
 				{
-					List<Filter> Filters = new List<Filter>();
-
-					if (L is FilterOr L2)
-						Filters.AddRange(L2.ChildFilters);
+					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name);
+					if (F is null)
+						return null;
+					else if (F is FilterNot Not2)
+						return Not2.ChildFilter;
 					else
-						Filters.Add(L);
-
-					if (R is FilterOr R2)
-						Filters.AddRange(R2.ChildFilters);
-					else
-						Filters.Add(R);
-
-					return new FilterOr(Filters.ToArray());
-				}
-			}
-
-			if (Conditions is Operators.Logical.Not Not)
-			{
-				Filter F = Convert(Not.Operand, Variables);
-				if (F is null)
-					return null;
-				else
-					return new FilterNot(F);
-			}
-			else if (Conditions is BinaryOperator Bin && Bin.LeftOperand is VariableReference Var)
-			{
-				string FieldName = Var.VariableName;
-				object Value = Bin.RightOperand.Evaluate(Variables)?.AssociatedObjectValue ?? null;
-
-				if (Conditions is Operators.Comparisons.EqualTo ||
-					Conditions is Operators.Comparisons.EqualToElementWise ||
-					Conditions is Operators.Comparisons.IdenticalTo ||
-					Conditions is Operators.Comparisons.IdenticalToElementWise)
-				{
-					return new FilterFieldEqualTo(FieldName, Value);
-				}
-				else if (Conditions is Operators.Comparisons.NotEqualTo ||
-					Conditions is Operators.Comparisons.NotEqualToElementWise)
-				{
-					return new FilterFieldNotEqualTo(FieldName, Value);
-				}
-				else if (Conditions is Operators.Comparisons.GreaterThan)
-					return new FilterFieldGreaterThan(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
-					return new FilterFieldGreaterOrEqualTo(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.LesserThan)
-					return new FilterFieldLesserThan(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
-					return new FilterFieldLesserOrEqualTo(FieldName, Value);
-				else if (Conditions is Operators.Comparisons.Like Like)
-				{
-					string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-					Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
-					return new FilterFieldLikeRegEx(FieldName, RegEx);
-				}
-				else if (Conditions is Operators.Comparisons.NotLike NotLike)
-				{
-					string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-					NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
-					return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+						return new FilterNot(F);
 				}
 			}
 
 			return null;
+		}
+
+		private static ScriptNode Reduce(ScriptNode Node, string Name)
+		{
+			if (Node is Operators.Membership.NamedMember N &&
+				N.Operand is VariableReference Ref &&
+				Ref.VariableName == Name)
+			{
+				return new VariableReference(N.Name, Node.Start, Node.Length, Node.Expression);
+			}
+			else
+				return Node;
 		}
 
 		/// <summary>
@@ -329,6 +396,39 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public string TypeName
 		{
 			get { return this.type.FullName; }
+		}
+
+		/// <summary>
+		/// Checks if the name refers to the source.
+		/// </summary>
+		/// <param name="Name">Name to check.</param>
+		/// <returns>If the name refers to the source.</returns>
+		public bool IsSource(string Name)
+		{
+			return 
+				string.Compare(this.type.Name, Name, true) == 0 ||
+				string.Compare(this.alias, Name, true) == 0;
+		}
+
+		/// <summary>
+		/// Checks if the label is a label in the source.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <returns>If the label is a label in the source.</returns>
+		public Task<bool> IsLabel(string Label)
+		{
+			lock (this.isLabel)
+			{
+				if (!this.isLabel.TryGetValue(Label, out bool Result))
+				{
+					Result = !(this.type.GetRuntimeProperty(Label) is null &&
+						this.type.GetRuntimeField(Label) is null);
+
+					this.isLabel[Label] = Result;
+				}
+
+				return Task.FromResult<bool>(Result);
+			}
 		}
 
 	}

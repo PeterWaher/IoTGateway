@@ -8,7 +8,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 	/// <summary>
 	/// Abstract base class for joins of two source definitions.
 	/// </summary>
-	public abstract class Join : SourceDefinition, IDataSource
+	public abstract class Join : SourceDefinition
 	{
 		private SourceDefinition left;
 		private SourceDefinition right;
@@ -131,74 +131,13 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		}
 
 		/// <summary>
-		/// Gets the actual data source, from its definition.
+		/// Gets the data source name, from its definition.
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
-		/// <returns>Data Source</returns>
-		public override sealed IDataSource GetSource(Variables Variables)
+		/// <returns>Data Source Name</returns>
+		public override string GetName(Variables Variables)
 		{
-			return this;
-		}
-
-		/// <summary>
-		/// Finds objects matching filter conditions in <paramref name="Where"/>.
-		/// </summary>
-		/// <param name="Offset">Offset at which to return elements.</param>
-		/// <param name="Top">Maximum number of elements to return.</param>
-		/// <param name="Where">Filter conditions.</param>
-		/// <param name="Variables">Current set of variables.</param>
-		/// <param name="Order">Order at which to order the result set.</param>
-		/// <param name="Node">Script node performing the evaluation.</param>
-		/// <returns>Enumerator.</returns>
-		public abstract Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
-			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
-
-		/// <summary>
-		/// Updates a set of objects.
-		/// </summary>
-		/// <param name="Objects">Objects to update</param>
-		public Task Update(IEnumerable<object> Objects)
-		{
-			throw InvalidOperation();
-		}
-
-		private static Exception InvalidOperation()
-		{
-			return new InvalidOperationException("Operation not permitted on joined sources.");
-		}
-
-		/// <summary>
-		/// Deletes a set of objects.
-		/// </summary>
-		/// <param name="Objects">Objects to delete</param>
-		public Task Delete(IEnumerable<object> Objects)
-		{
-			throw InvalidOperation();
-		}
-
-		/// <summary>
-		/// Inserts an object.
-		/// </summary>
-		/// <param name="Object">Object to insert.</param>
-		public Task Insert(object Object)
-		{
-			throw InvalidOperation();
-		}
-
-		/// <summary>
-		/// Name of corresponding collection.
-		/// </summary>
-		public string CollectionName
-		{
-			get => throw InvalidOperation();
-		}
-
-		/// <summary>
-		/// Name of corresponding type.
-		/// </summary>
-		public string TypeName
-		{
-			get => throw InvalidOperation();
+			return string.Empty;
 		}
 
 	}

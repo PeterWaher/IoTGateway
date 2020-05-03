@@ -132,6 +132,17 @@ namespace Waher.Script.Persistence.SQL
 
 					List.Add(PI.GetValue(o1));
 				}
+
+				foreach (FieldInfo FI in this.fields)
+				{
+					if (!Aggregated.TryGetValue(FI.Name, out List<object> List))
+					{
+						List = new List<object>();
+						Aggregated[FI.Name] = List;
+					}
+
+					List.Add(FI.GetValue(o1));
+				}
 			}
 
 			if (Aggregated is null)

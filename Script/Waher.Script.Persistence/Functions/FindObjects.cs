@@ -147,7 +147,9 @@ namespace Waher.Script.Persistence.Functions
 			string FieldName;
 			object Value;
 
-			if (Node is And And)
+			if (Node is null)
+				return null;
+			else if (Node is And And)
 				return new FilterAnd(this.Convert(And.LeftOperand, Variables), this.Convert(And.RightOperand, Variables));
 			else if (Node is Or Or)
 				return new FilterOr(this.Convert(Or.LeftOperand, Variables), this.Convert(Or.RightOperand, Variables));

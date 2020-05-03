@@ -199,6 +199,20 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Current set of properties.
+		/// </summary>
+		public IEnumerable<KeyValuePair<string, object>> Properties
+		{
+			get
+			{
+				if (this.propertiesUpdated)
+					this.BuildEnumerable();
+
+				return this.properties;
+			}
+		}
+
+		/// <summary>
 		/// <see cref="ICollection{T}.Count"/>
 		/// </summary>
 		public int Count

@@ -1204,6 +1204,27 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.JoinedObject">
+            <summary>
+            Represents a joined object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedObject.#ctor(System.Object,System.String,System.Object,System.String)">
+            <summary>
+            Represents a joined object.
+            </summary>
+            <param name="Left">Left object</param>
+            <param name="LeftName">Name of left source.</param>
+            <param name="Right">Right object</param>
+            <param name="RightName">Name of right source.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedObject.Item(System.String)">
+            <summary>
+            Gets property of field values from the joined object.
+            </summary>
+            <param name="Index">Property or field name.</param>
+            <returns>Property or field value, if exists; null otherwise.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.JoinedSource">
             <summary>
             Abstract base classes of joined sources.

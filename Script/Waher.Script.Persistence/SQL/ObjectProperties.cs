@@ -168,6 +168,8 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
+			bool Result = false;
+
 			if (!(Rec is null))
 			{
 				if (Rec.Item1 is null)
@@ -177,9 +179,13 @@ namespace Waher.Script.Persistence.SQL
 				else
 					Value = Rec.Item1.GetValue(this.obj);
 
-				Variable = this.CreateVariable(Name, Value);
+				if (!(Value is null))
+				{
+					Variable = this.CreateVariable(Name, Value);
+					return true;
+				}
 
-				return true;
+				Result = true;  // null may be a valid response. Check variable collections first.
 			}
 
 			if (this.variables2.TryGetVariable(Name, out Variable))
@@ -188,8 +194,8 @@ namespace Waher.Script.Persistence.SQL
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
 
-			Variable = null;
-			return false;
+			Variable = Result ? Variable = this.CreateVariable(Name, null) : null;
+			return Result;
 		}
 
 		private Variable CreateVariable(string Name, object Value)

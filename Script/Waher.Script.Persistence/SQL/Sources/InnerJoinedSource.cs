@@ -63,9 +63,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 			private readonly string leftName;
 			private readonly string rightName;
 			private readonly bool hasLeftName;
-			private readonly bool hasRightName;
 			private IResultSetEnumerator right;
-			private GenericObject current = null;
+			private JoinedObject current = null;
 
 			public InnerJoinEnumerator(IResultSetEnumerator Left, string LeftName,
 				IDataSource RightSource, string RightName, ScriptNode RightConditions,
@@ -74,11 +73,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 				this.left = Left;
 				this.leftName = LeftName;
 				this.rightName = RightName;
-				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
-				this.hasRightName = !string.IsNullOrEmpty(this.rightName);
 				this.rightSource = RightSource;
 				this.rightConditions = RightConditions;
 				this.variables = Variables;
+				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
 			}
 
 			public object Current => this.current;
@@ -96,18 +94,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 					{
 						if (await this.right.MoveNextAsync())
 						{
-							List<KeyValuePair<string, object>> Properties = new List<KeyValuePair<string, object>>();
-
-							if (this.left.Current is GenericObject LeftObj)
-								Properties.AddRange(LeftObj.Properties);
-
-							if (this.right.Current is GenericObject RightObj)
-								Properties.AddRange(RightObj.Properties);
-
-							if (this.hasRightName)
-								this.variables[this.rightName] = this.right.Current;
-
-							this.current = new GenericObject(string.Empty, string.Empty, Guid.Empty, Properties);
+							this.current = new JoinedObject(this.left.Current, this.leftName,
+								this.right.Current, this.rightName);
 
 							return true;
 						}
@@ -118,10 +106,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 					if (!await this.left.MoveNextAsync())
 						return false;
 
-					if (this.hasLeftName)
-						this.variables[this.leftName] = this.left.Current;
+					ObjectProperties LeftVariables = new ObjectProperties(this.left.Current, this.variables);
 
-					this.right = await this.rightSource.Find(0, int.MaxValue, this.rightConditions, this.variables,
+					if (this.hasLeftName)
+						LeftVariables[this.leftName] = this.left.Current;
+
+					this.right = await this.rightSource.Find(0, int.MaxValue, this.rightConditions, LeftVariables,
 						null, this.rightConditions);
 				}
 			}

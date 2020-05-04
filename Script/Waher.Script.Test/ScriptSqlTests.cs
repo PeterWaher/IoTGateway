@@ -143,11 +143,11 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void SQL_Test_03_INNER_JOIN()
 		{
-			this.Test("Select Order.OrderID, Order.OrderDate, Customer.CustomerName, Customer.ContactName, Customer.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID",
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
 				{
 					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 10), "P3", "CP3", "C2" }
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
 				});
 		}
 

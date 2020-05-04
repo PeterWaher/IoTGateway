@@ -51,6 +51,19 @@ The [source code](https://github.com/PeterWaher/IoTGateway) and libraries provid
 Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
 a **Commercial License**. Contact the author for details.
 
+**Note**: Distribution of code in source or compiled form, for purposes other than mentioned
+above, is not considered personal use and requires a commercial license, even if distribution 
+is made under an apparently free license. It facilitates the development of competing 
+software, without the investment in actually performing the corresponding coding. It also 
+can make the use of the original libraries obsolete, as free code apparently doing the same, 
+based on the original libraries, would be available under an apparently free license. (Thus, 
+making distribution free does not mitigate this effect.) Developers using the libraries to 
+enhance their own projects (brands, offerings or businesses, even if the software itself is 
+free), should therefore consider sponsoring the development of such software. It is the 
+express intent of the developer of these libraries to create libraries that facilitate the 
+development of great software for IoT. Also, the commercial license includes options to 
+request customizations of the libraries.
+
 All rights to the source code are reserved and exclusively owned by [Waher Data AB](http://waher.se/). 
 Any contributions made to the **IoT Gateway** repository become the intellectual property of [Waher Data AB](http://waher.se/).
 If you're interested in using the source code, as a whole, or in part, you need a license agreement 

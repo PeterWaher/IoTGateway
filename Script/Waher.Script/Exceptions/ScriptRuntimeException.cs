@@ -10,7 +10,7 @@ namespace Waher.Script.Exceptions
 	/// </summary>
 	public class ScriptRuntimeException : ScriptException 
 	{
-		private ScriptNode node;
+		private readonly ScriptNode node;
 
 		/// <summary>
 		/// Script runtime exception.

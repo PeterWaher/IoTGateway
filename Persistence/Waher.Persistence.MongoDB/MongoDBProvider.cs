@@ -1582,8 +1582,8 @@ namespace Waher.Persistence.MongoDB
 			if (Serializer is ObjectSerializer SerializerEx &&
 				SerializerEx.HasObjectId(Object))
 			{
-				return SerializerEx.TryGetFieldValue(SerializerEx.ObjectIdMemberName,
-					Object, out ObjectId);
+				ObjectId = SerializerEx.GetObjectId(Object, false).Result;	// No asynchronous process involved if not insering new object to create new Object ID.
+				return true;
 			}
 			else
 				return false;

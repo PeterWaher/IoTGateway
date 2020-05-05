@@ -408,6 +408,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 			s = Parser.PeekNextToken().ToUpper();
 			if (!string.IsNullOrEmpty(s) &&
+				IsAlpha(s) &&
 				s != "," &&
 				s != "INNER" &&
 				s != "OUTER" &&
@@ -430,6 +431,17 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
 
 			Source = new SourceReference(Node, Name, Start, Parser.Position - Start, Parser.Expression);
+
+			return true;
+		}
+
+		internal static bool IsAlpha(string s)
+		{
+			foreach (char ch in s)
+			{
+				if (!char.IsLetter(ch))
+					return false;
+			}
 
 			return true;
 		}

@@ -36,6 +36,7 @@ namespace Waher.Script.Test
 			Database.Register(filesProvider);
 
 			await Database.Clear("Orders");
+			await Database.Clear("WebUsers");
 
 			await Database.Insert(new Data.Order()
 			{
@@ -749,15 +750,28 @@ namespace Waher.Script.Test
 				});
 		}
 
+		[TestMethod]
+		public void INSERT_Test_01_INSERT_VALUES()
+		{
+			this.Test(
+				"insert into WebUsers (UserName, Password) values (\"User1\", \"Pwd1\");"+
+				"select UserName, Password from WebUsers order by UserName",
+				new object[][]
+				{
+					new object[] { "User1", "Pwd1" }
+				});
+		}
+
 		/* TODO:
-		 * UNION	
-		 * GROUP BY
-		 * HAVING
-		 * ORDER BY
-		 * TOP
-		 * DISTINCT
-		 * OFFSET
-		 * INSERT INTO (...) SELECT ...
+		 *	SELECT
+		 *		UNION	
+		 *		GROUP BY
+		 *		HAVING
+		 *		ORDER BY
+		 *		TOP
+		 *		DISTINCT
+		 *		OFFSET
+		 *	INSERT INTO (...) SELECT ...
 		 */
 
 	}

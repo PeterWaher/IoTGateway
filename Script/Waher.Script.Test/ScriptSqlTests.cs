@@ -119,7 +119,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_01_Orders()
+		public void SELECT_Test_01_Orders()
 		{
 			this.Test("Select OrderID, CustomerID, OrderDate from Orders",
 				new object[][]
@@ -131,7 +131,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_02_Customers()
+		public void SELECT_Test_02_Customers()
 		{
 			this.Test("Select CustomerID, CustomerName, ContactName, Country from Customers",
 				new object[][]
@@ -143,7 +143,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_03_INNER_JOIN()
+		public void SELECT_Test_03_INNER_JOIN()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -154,7 +154,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_04_LEFT_OUTER_JOIN()
+		public void SELECT_Test_04_LEFT_OUTER_JOIN()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -166,7 +166,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_05_LEFT_OUTER_JOIN_2()
+		public void SELECT_Test_05_LEFT_OUTER_JOIN_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -178,7 +178,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_06_RIGHT_OUTER_JOIN()
+		public void SELECT_Test_06_RIGHT_OUTER_JOIN()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -190,7 +190,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_07_RIGHT_OUTER_JOIN_2()
+		public void SELECT_Test_07_RIGHT_OUTER_JOIN_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -202,7 +202,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_08_FULL_OUTER_JOIN()
+		public void SELECT_Test_08_FULL_OUTER_JOIN()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -215,7 +215,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_09_FULL_OUTER_JOIN_2()
+		public void SELECT_Test_09_FULL_OUTER_JOIN_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -228,7 +228,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_10_FULL_OUTER_JOIN_3()
+		public void SELECT_Test_10_FULL_OUTER_JOIN_3()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -241,7 +241,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_11_CROSS_JOIN()
+		public void SELECT_Test_11_CROSS_JOIN()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID",
 				new object[][]
@@ -252,7 +252,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_12_CROSS_JOIN_2()
+		public void SELECT_Test_12_CROSS_JOIN_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers",
 				new object[][]
@@ -270,7 +270,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_13_Orders_WHERE()
+		public void SELECT_Test_13_Orders_WHERE()
 		{
 			this.Test("Select OrderID, CustomerID, OrderDate from Orders where OrderID=2",
 				new object[][]
@@ -280,7 +280,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_14_Customers_WHERE()
+		public void SELECT_Test_14_Customers_WHERE()
 		{
 			this.Test("Select CustomerID, CustomerName, ContactName, Country from Customers where CustomerID=2",
 				new object[][]
@@ -290,7 +290,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_15_INNER_JOIN_WHERE()
+		public void SELECT_Test_15_INNER_JOIN_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
 				new object[][]
@@ -300,7 +300,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_16_LEFT_OUTER_JOIN_WHERE()
+		public void SELECT_Test_16_LEFT_OUTER_JOIN_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
 				new object[][]
@@ -310,7 +310,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_17_LEFT_OUTER_JOIN_WHERE_2()
+		public void SELECT_Test_17_LEFT_OUTER_JOIN_WHERE_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
 				new object[][]
@@ -320,7 +320,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_18_RIGHT_OUTER_JOIN_WHERE()
+		public void SELECT_Test_18_RIGHT_OUTER_JOIN_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
 				new object[][]
@@ -330,7 +330,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_19_RIGHT_OUTER_JOIN_WHERE_2()
+		public void SELECT_Test_19_RIGHT_OUTER_JOIN_WHERE_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
 				new object[][]
@@ -340,7 +340,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_20_FULL_OUTER_JOIN_WHERE()
+		public void SELECT_Test_20_FULL_OUTER_JOIN_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
 				new object[][]
@@ -350,7 +350,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_21_FULL_OUTER_JOIN_WHERE_2()
+		public void SELECT_Test_21_FULL_OUTER_JOIN_WHERE_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
 				new object[][]
@@ -360,7 +360,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_22_FULL_OUTER_JOIN_3_WHERE()
+		public void SELECT_Test_22_FULL_OUTER_JOIN_3_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
 				new object[][]
@@ -370,7 +370,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_23_CROSS_JOIN_WHERE()
+		public void SELECT_Test_23_CROSS_JOIN_WHERE()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
 				new object[][]
@@ -380,7 +380,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void SQL_Test_24_CROSS_JOIN_WHERE_2()
+		public void SELECT_Test_24_CROSS_JOIN_WHERE_2()
 		{
 			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.OrderID=2",
 				new object[][]
@@ -391,9 +391,30 @@ namespace Waher.Script.Test
 				});
 		}
 
+		[TestMethod]
+		public void SELECT_Test_25_SELF_JOIN()
+		{
+			this.Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1 inner join Orders o2 on o1.OrderID=o2.CustomerID",
+				new object[][]
+				{
+					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
+					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
+				});
+		}
+
+		[TestMethod]
+		public void SELECT_Test_26_SELF_JOIN_2()
+		{
+			this.Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1, Orders o2 where o1.OrderID=o2.CustomerID",
+				new object[][]
+				{
+					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
+					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
+				});
+		}
+
 
 		/* TODO:
-		 * SELF join
 		 * UNION	
 		 * INSERT INTO (...) SELECT ...
 		 * 3 source join

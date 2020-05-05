@@ -44,8 +44,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, ScriptNode Where, ScriptNode[] GroupBy, 
-			ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset, 
+		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, ScriptNode Where, ScriptNode[] GroupBy,
+			ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset,
 			bool Distinct, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
@@ -118,7 +118,7 @@ namespace Waher.Script.Persistence.SQL
 				Offset = 0;
 
 			IDataSource Source = this.source.GetSource(Variables);
-			
+
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
@@ -266,22 +266,34 @@ namespace Waher.Script.Persistence.SQL
 			{
 				while (i < c)
 				{
-					if (this.columnNames[i] is VariableReference Ref)
+					ScriptNode Node = this.columnNames[i];
+
+					if (Node is VariableReference Ref)
 						Names[i++] = Ref.VariableName;
+					else if (Node is Operators.Membership.NamedMember N)
+						Names[i++] = N.Name;
 					else
 					{
-						E = this.columnNames[i]?.Evaluate(Variables);
+						try
+						{
+							E = this.columnNames[i]?.Evaluate(Variables);
+						}
+						catch (Exception)
+						{
+							E = null;
+						}
+
 						if (E is null)
 						{
 							if (Names[i] is null)
 								Names[i] = (i + 1).ToString();
-
-							i++;
 						}
 						else if (E is StringValue S)
-							Names[i++] = S.Value;
+							Names[i] = S.Value;
 						else
-							Names[i++] = Expression.ToString(E.AssociatedObjectValue);
+							Names[i] = Expression.ToString(E.AssociatedObjectValue);
+					
+						i++;
 					}
 				}
 			}

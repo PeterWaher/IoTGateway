@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Emoji.Emoji1</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Emoji.Emoji1.Emoji1SourceFileType">
+            <summary>
+            What source files to use when displaying emoji.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Emoji.Emoji1.Emoji1SourceFileType.Png64">
+            <summary>
+            64x64 PNG files stored in the Graphics/Emoji1/png/64x64 folder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Emoji.Emoji1.Emoji1SourceFileType.Png128">
+            <summary>
+            128x128 PNG files stored in the Graphics/Emoji1/png/128x128 folder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Emoji.Emoji1.Emoji1SourceFileType.Png512">
+            <summary>
+            512x512 PNG files stored in the Graphics/Emoji1/png/512x512 folder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Emoji.Emoji1.Emoji1SourceFileType.Svg">
+            <summary>
+            SVG files stored in the Graphics/Emoji1/svg folder.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Emoji.Emoji1.FileExistsHandler">
+            <summary>
+            Delegate to a FileExists method.
+            </summary>
+            <param name="path">Path to check.</param>
+            <returns>If the file exists.</returns>
+        </member>
+        <member name="T:Waher.Content.Emoji.Emoji1.ReadAllBytesHandler">
+            <summary>
+            Delegate to a ReadAllBytes method.
+            </summary>
+            <param name="path">Path of file to load.</param>
+            <returns>Contents of file.</returns>
+        </member>
+        <member name="T:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles">
+            <summary>
+            Provides emojis from Emoji One (http://emojione.com/) stored as local files.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.#ctor(Waher.Content.Emoji.Emoji1.Emoji1SourceFileType,System.Int32,System.Int32,System.String,System.String)">
+            <summary>
+            Provides emojis from Emoji One (http://emojione.com/) stored as local files.
+            </summary>
+            <param name="SourceFileType">Type of files to use.</param>
+            <param name="Width">Desired width of emojis.</param>
+            <param name="Height">Desired height of emojis.</param>
+            <param name="ZipFileName">Full path of the emoji1 zip file. It will be deleted after unpacking to <paramref name="ProgramDataFolder"/>.</param>
+            <param name="ProgramDataFolder">Folder to unzip emojis to.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.#ctor(Waher.Content.Emoji.Emoji1.Emoji1SourceFileType,System.Int32,System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Provides emojis from Emoji One (http://emojione.com/) stored as local files.
+            </summary>
+            <param name="SourceFileType">Type of files to use.</param>
+            <param name="Width">Desired width of emojis.</param>
+            <param name="Height">Desired height of emojis.</param>
+            <param name="ImageURL">URL for remote clients to fetch the image. If not provided, images are embedded into generated pages.
+            Include the string %FILENAME% where the name of the emoji image file is to be inserted.</param>
+            <param name="ZipFileName">Full path of the emoji1 zip file. It will be deleted after unpacking to <paramref name="ProgramDataFolder"/>.</param>
+            <param name="ProgramDataFolder">Folder to unzip emojis to.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.WaitUntilInitialized(System.Int32)">
+            <summary>
+            Waits until initialization is completed.
+            </summary>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+            <returns>If initialization completed successfully.</returns>
+        </member>
+        <member name="P:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.SourceFileType">
+            <summary>
+            Type of files to use.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.Width">
+            <summary>
+            Desired width of emojis.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.Height">
+            <summary>
+            Desired height of emojis.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.EmojiSupported(Waher.Content.Emoji.EmojiInfo)">
+            <summary>
+            If the emoji is supported by the emoji source.
+            </summary>
+            <param name="Emoji">Emoji</param>
+            <returns>If emoji is supported.</returns>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetFileName(Waher.Content.Emoji.EmojiInfo)">
+            <summary>
+            Gets the local file name for a given emoji.
+            </summary>
+            <param name="Emoji">Emoji</param>
+            <returns>Local file name.</returns>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GenerateHTML(System.Text.StringBuilder,Waher.Content.Emoji.EmojiInfo,System.Boolean)">
+            <summary>
+            Generates HTML for a given Emoji.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Emoji">Emoji</param>
+            <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GenerateHTML(System.Text.StringBuilder,Waher.Content.Emoji.EmojiInfo,System.Int32,System.Boolean)">
+            <summary>
+            Generates HTML for a given Emoji.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="Emoji">Emoji</param>
+            <param name="Level">Level (number of colons used to define the emoji)</param>
+            <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.CalcSize(System.Int32,System.Int32)">
+            <summary>
+            Calculates the size of an emoji.
+            </summary>
+            <param name="OrgSize">Original size.</param>
+            <param name="Level">Level</param>
+            <returns>Resulting size.</returns>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetUrl(Waher.Content.Emoji.EmojiInfo,System.Boolean)">
+            <summary>
+            Gets an URL for the emoji.
+            </summary>
+            <param name="Emoji">Emoji</param>
+            <param name="Embed">If emoji should be embedded.</param>
+            <returns>URL</returns>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.String@,System.Int32@,System.Int32@)">
+            <summary>
+            Gets the image source of an emoji.
+            </summary>
+            <param name="Emoji">Emoji</param>
+            <param name="Url">URL to emoji.</param>
+            <param name="Width">Width of emoji.</param>
+            <param name="Height">Height of emoji.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.Int32,System.String@,System.Int32@,System.Int32@)">
+            <summary>
+            Gets the image source of an emoji.
+            </summary>
+            <param name="Emoji">Emoji</param>
+            <param name="Level">Level (number of colons used to define the emoji)</param>
+            <param name="Url">URL to emoji.</param>
+            <param name="Width">Width of emoji.</param>
+            <param name="Height">Height of emoji.</param>
+        </member>
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.Dispose">
+            <summary>
+            <see cref="T:System.IDisposable"/>
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Language</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Language.Language">
+            <summary>
+            Contains information about a language.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.#ctor">
+            <summary>
+            Contains information about a language.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.Code">
+            <summary>
+            Language code.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.Name">
+            <summary>
+            Language name.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.Flag">
+            <summary>
+            Language flag.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.FlagWidth">
+            <summary>
+            Width of flag.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Language.FlagHeight">
+            <summary>
+            Height of flag.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.GetNamespaceAsync(System.String)">
+            <summary>
+            Gets the namespace object, given its name, if available.
+            </summary>
+            <param name="Name">Namespace.</param>
+            <returns>Namespace object, if found, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.GetNamespacesAsync">
+            <summary>
+            Gets available namespaces.
+            </summary>
+            <returns>Namespaces.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.CreateNamespaceAsync(System.String)">
+            <summary>
+            Creates a new language namespace, or updates an existing language namespace, if one exist with the same properties.
+            </summary>
+            <param name="Name">Namespace.</param>
+            <returns>Namespace object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.GetStringAsync(System.Type,System.Int32,System.String)">
+            <summary>
+            Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+            </summary>
+            <param name="Type">Type, whose namespace defines in what language namespace the string will be fetched.</param>
+            <param name="Id">String ID</param>
+            <param name="Default">Default (untranslated) string.</param>
+            <returns>Localized string.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Language.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Language.LanguageString">
+            <summary>
+            Contains a localized string.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.LanguageString.#ctor">
+            <summary>
+            Contains information about a namespace in a language.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.NamespaceId">
+            <summary>
+            Namespace ID.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.Id">
+            <summary>
+            String ID.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.Value">
+            <summary>
+            Localized value.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.Untranslated">
+            <summary>
+            If the string is untranslated.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.LanguageString.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Language.Namespace">
+            <summary>
+            Contains information about a namespace in a language.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.#ctor">
+            <summary>
+            Contains information about a namespace in a language.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Namespace.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Namespace.LanguageId">
+            <summary>
+            Language ID.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.Namespace.Name">
+            <summary>
+            Namespace.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.GetStringAsync(System.Int32)">
+            <summary>
+            Gets the string object, given its ID, if available.
+            </summary>
+            <param name="Id">String ID.</param>
+            <returns>String object, if found, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.GetStringAsync(System.Int32,System.String)">
+            <summary>
+            Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+            </summary>
+            <param name="Id">String ID</param>
+            <param name="Default">Default (untranslated) string.</param>
+            <returns>Localized string.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.GetStringsAsync">
+            <summary>
+            Gets available strings.
+            </summary>
+            <returns>Strings.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.CreateStringAsync(System.Int32,System.String,System.Boolean)">
+            <summary>
+            Creates a new language string, or updates an existing language string, if one exist with the same properties.
+            </summary>
+            <param name="Id">String ID</param>
+            <param name="Value">Localized value.</param>
+            <param name="Untranslated">If the string is untranslated.</param>
+            <returns>Namespace object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.DeleteStringAsync(System.Int32)">
+            <summary>
+            Deletes a string from the namespace.
+            </summary>
+            <param name="Id">String ID.</param>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Language.Translator">
+            <summary>
+            Basic access point for runtime language localization.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.Translator.SchemaResource">
+            <summary>
+            Resource name of embedded schema file.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.Translator.SchemaNamespace">
+            <summary>
+            Namespace of embedded schema file.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.Translator.SchemaRoot">
+            <summary>
+            Expected root in XML files.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.GetLanguageAsync(System.String)">
+            <summary>
+            Gets the languge object, given its language code, if available.
+            </summary>
+            <param name="Code">Language code.</param>
+            <returns>Language object, if found, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.GetLanguagesAsync">
+            <summary>
+            Gets available languages.
+            </summary>
+            <returns>Languages.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.CreateLanguageAsync(System.String,System.String,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Creates a new language, or updates an existing language, if one exist with the same code.
+            </summary>
+            <param name="Code">Language code.</param>
+            <param name="Name">Name.</param>
+            <param name="Flag">Flag.</param>
+            <param name="FlagWidth">Width of flag.</param>
+            <param name="FlagHeight">Height of flag.</param>
+            <returns>Language object.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Language.Translator.DefaultLanguageCode">
+            <summary>
+            Default language code.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.GetDefaultLanguageAsync">
+            <summary>
+            Gets the default language.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.ImportAsync(System.Xml.XmlReader)">
+            <summary>
+            Imports language strings into the language database.
+            </summary>
+            <param name="Xml">XML containing language information.</param>
+        </member>
+        <member name="M:Waher.Runtime.Language.Translator.ImportAsync(System.String)">
+            <summary>
+            Imports language strings into the language database.
+            </summary>
+            <param name="FileName">Language file.</param>
+        </member>
+    </members>
+</doc>

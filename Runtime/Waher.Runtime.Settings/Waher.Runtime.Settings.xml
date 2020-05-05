@@ -1,0 +1,363 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Settings</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Settings.RuntimeSettings">
+            <summary>
+            Static class managing persistent settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.String)">
+            <summary>
+            Gets a string-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.String)">
+            <summary>
+            Gets a string-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.String)">
+            <summary>
+            Sets a string-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.String)">
+            <summary>
+            Sets a string-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Int64)">
+            <summary>
+            Gets a long-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.Int64)">
+            <summary>
+            Gets a long-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.Int64)">
+            <summary>
+            Sets a long-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.Int64)">
+            <summary>
+            Sets a long-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Boolean)">
+            <summary>
+            Gets a bool-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.Boolean)">
+            <summary>
+            Gets a bool-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.Boolean)">
+            <summary>
+            Sets a bool-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.Boolean)">
+            <summary>
+            Sets a bool-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.DateTime)">
+            <summary>
+            Gets a DateTime-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.DateTime)">
+            <summary>
+            Gets a DateTime-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.DateTime)">
+            <summary>
+            Sets a DateTime-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.DateTime)">
+            <summary>
+            Sets a DateTime-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.TimeSpan)">
+            <summary>
+            Gets a TimeSpan-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.TimeSpan)">
+            <summary>
+            Gets a TimeSpan-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.TimeSpan)">
+            <summary>
+            Sets a TimeSpan-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.TimeSpan)">
+            <summary>
+            Sets a TimeSpan-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Double)">
+            <summary>
+            Gets a double-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.Double)">
+            <summary>
+            Gets a double-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.Double)">
+            <summary>
+            Sets a double-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.Double)">
+            <summary>
+            Sets a double-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.BooleanSetting">
+            <summary>
+            Boolean setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.BooleanSetting.#ctor">
+            <summary>
+            Boolean setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.BooleanSetting.#ctor(System.String,System.Boolean)">
+            <summary>
+            Boolean setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.BooleanSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.DateTimeSetting">
+            <summary>
+            DateTime setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DateTimeSetting.#ctor">
+            <summary>
+            DateTime setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DateTimeSetting.#ctor(System.String,System.DateTime)">
+            <summary>
+            DateTime setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.DateTimeSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.DoubleSetting">
+            <summary>
+            Double setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DoubleSetting.#ctor">
+            <summary>
+            Double setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DoubleSetting.#ctor(System.String,System.Double)">
+            <summary>
+            Double setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.DoubleSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.Int64Setting">
+            <summary>
+            Int64 setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Int64Setting.#ctor">
+            <summary>
+            Int64 setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Int64Setting.#ctor(System.String,System.Int64)">
+            <summary>
+            Int64 setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.Int64Setting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.Setting">
+            <summary>
+            Base abstract class for settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Setting.#ctor">
+            <summary>
+            Base abstract class for settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Setting.#ctor(System.String)">
+            <summary>
+            Base abstract class for settings.
+            </summary>
+            <param name="Key">Key name.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.Setting.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.Setting.Key">
+            <summary>
+            Key name.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.StringSetting">
+            <summary>
+            String setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.StringSetting.#ctor">
+            <summary>
+            String setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.StringSetting.#ctor(System.String,System.String)">
+            <summary>
+            String setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.StringSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting">
+            <summary>
+            TimeSpan setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting.#ctor">
+            <summary>
+            TimeSpan setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting.#ctor(System.String,System.TimeSpan)">
+            <summary>
+            TimeSpan setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+    </members>
+</doc>

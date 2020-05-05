@@ -280,6 +280,23 @@
             <returns>Field name.</returns>
             <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.IsLabel(System.String,System.String)">
+            <summary>
+            Checks if a string is a label in a given collection.
+            </summary>
+            <param name="Collection">Name of collection.</param>
+            <param name="Label">Label to check.</param>
+            <returns>If <paramref name="Label"/> is a label in the collection
+            defined by <paramref name="Collection"/>.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryGetObjectId(System.Object,System.Object@)">
+            <summary>
+            Tries to get the Object ID of an object, if it exists.
+            </summary>
+            <param name="Object">Object whose Object ID is of interest.</param>
+            <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
+            <returns>If an Object ID was found.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.RemoveBlocks(System.Int32)">
             <summary>
             Removes all blocks pertaining to a specific file.
@@ -1326,6 +1343,13 @@
             </summary>
             <param name="FieldName">Name of field.</param>
             <returns>Field code.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.TryGetFieldCodeAsync(System.String)">
+            <summary>
+            Tries to get the code for a specific field in a collection.
+            </summary>
+            <param name="FieldName">Name of field.</param>
+            <returns>The field code, if one was found, or null otherwise.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.LabelFile.GetFieldName(System.UInt32)">
             <summary>

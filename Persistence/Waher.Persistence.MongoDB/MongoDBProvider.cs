@@ -1565,6 +1565,30 @@ namespace Waher.Persistence.MongoDB
 			return !(await ResultSet.SingleAsync<BsonDocument>() is null);
 		}
 
+		/// <summary>
+		/// Tries to get the Object ID of an object, if it exists.
+		/// </summary>
+		/// <param name="Object">Object whose Object ID is of interest.</param>
+		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
+		/// <returns>If an Object ID was found.</returns>
+		public bool TryGetObjectId(object Object, out object ObjectId)
+		{
+			ObjectId = null;
+
+			if (Object is null)
+				return false;
+
+			IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
+			if (Serializer is ObjectSerializer SerializerEx &&
+				SerializerEx.HasObjectId(Object))
+			{
+				return SerializerEx.TryGetFieldValue(SerializerEx.ObjectIdMemberName,
+					Object, out ObjectId);
+			}
+			else
+				return false;
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

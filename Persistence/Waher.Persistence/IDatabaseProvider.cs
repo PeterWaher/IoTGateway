@@ -260,5 +260,13 @@ namespace Waher.Persistence
 		/// defined by <paramref name="Collection"/>.</returns>
 		Task<bool> IsLabel(string Collection, string Label);
 
+		/// <summary>
+		/// Tries to get the Object ID of an object, if it exists.
+		/// </summary>
+		/// <param name="Object">Object whose Object ID is of interest.</param>
+		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
+		/// <returns>If an Object ID was found.</returns>
+		bool TryGetObjectId(object Object, out object ObjectId);
+
 	}
 }

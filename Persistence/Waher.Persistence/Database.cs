@@ -770,5 +770,16 @@ namespace Waher.Persistence
 			return Provider.IsLabel(Collection, Label);
 		}
 
+		/// <summary>
+		/// Tries to get the Object ID of an object, if it exists.
+		/// </summary>
+		/// <param name="Object">Object whose Object ID is of interest.</param>
+		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
+		/// <returns>If an Object ID was found.</returns>
+		public static bool TryGetObjectId(object Object, out object ObjectId)
+		{
+			return Provider.TryGetObjectId(Object, out ObjectId);
+		}
+
 	}
 }

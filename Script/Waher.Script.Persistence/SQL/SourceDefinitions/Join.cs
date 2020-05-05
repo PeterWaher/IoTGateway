@@ -130,15 +130,5 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			return Result;
 		}
 
-		/// <summary>
-		/// Gets the data source name, from its definition.
-		/// </summary>
-		/// <param name="Variables">Current set of variables.</param>
-		/// <returns>Data Source Name</returns>
-		public override string GetName(Variables Variables)
-		{
-			return string.Empty;
-		}
-
 	}
 }

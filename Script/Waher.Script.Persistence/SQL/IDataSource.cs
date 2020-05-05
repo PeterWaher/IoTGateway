@@ -58,6 +58,14 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		/// <summary>
+		/// Collection name or alias.
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Checks if the name refers to the source.
 		/// </summary>
 		/// <param name="Name">Name to check.</param>

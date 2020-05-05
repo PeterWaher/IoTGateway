@@ -15,13 +15,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Data source formed through an INNER JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
-		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
-		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public InnerJoinedSource(IDataSource Left, string LeftName, 
-			IDataSource Right, string RightName, ScriptNode Conditions)
-			: base(Left, LeftName, Right, RightName, Conditions)
+		public InnerJoinedSource(IDataSource Left, IDataSource Right, ScriptNode Conditions)
+			: base(Left, Right, Conditions)
 		{
 		}
 
@@ -47,7 +44,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
 			RightWhere = this.Combine(RightWhere, this.Conditions);
 
-			e = new InnerJoinEnumerator(e, this.LeftName, this.Right, this.RightName,
+			e = new InnerJoinEnumerator(e, this.Left.Name, this.Right, this.Right.Name,
 				RightWhere, Variables);
 
 			if (!(Where is null))

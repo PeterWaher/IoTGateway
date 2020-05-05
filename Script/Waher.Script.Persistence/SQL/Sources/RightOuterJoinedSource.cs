@@ -15,13 +15,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Data source formed through an RIGHT [OUTER] JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
-		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
-		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public RightOuterJoinedSource(IDataSource Left, string LeftName, 
-			IDataSource Right, string RightName, ScriptNode Conditions)
-			: base(Right, RightName, Left, LeftName, Conditions)
+		public RightOuterJoinedSource(IDataSource Left, IDataSource Right, ScriptNode Conditions)
+			: base(Right, Left, Conditions)
 		{
 		}
 

@@ -15,13 +15,11 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Data source formed through an LEFT [OUTER] JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
-		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
-		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public LeftOuterJoinedSource(IDataSource Left, string LeftName, 
-			IDataSource Right, string RightName, ScriptNode Conditions)
-			: base(Left, LeftName, Right, RightName, Conditions)
+		public LeftOuterJoinedSource(IDataSource Left, IDataSource Right, 
+			ScriptNode Conditions)
+			: base(Left, Right, Conditions)
 		{
 		}
 
@@ -51,7 +49,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			ScriptNode RightWhere = this.Combine(await Reduce(this.Right, this.Left, Where), this.Conditions);
 
-			e = new LeftOuterJoinEnumerator(e, this.LeftName, this.Right, this.RightName,
+			e = new LeftOuterJoinEnumerator(e, this.Left.Name, this.Right, this.Right.Name,
 				RightWhere, Variables, this.Flipped);
 
 			if (!(Where is null))

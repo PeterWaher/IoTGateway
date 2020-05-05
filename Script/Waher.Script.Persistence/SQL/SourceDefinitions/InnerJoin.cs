@@ -31,10 +31,8 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		/// <returns>Data Source</returns>
 		public override IDataSource GetSource(Variables Variables)
 		{
-			return new InnerJoinedSource(
-				this.Left.GetSource(Variables), this.Left.GetName(Variables),
-				this.Right.GetSource(Variables), this.Right.GetName(Variables),
-				this.Conditions);
+			return new InnerJoinedSource(this.Left.GetSource(Variables), 
+				this.Right.GetSource(Variables), this.Conditions);
 		}
 
 	}

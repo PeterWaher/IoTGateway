@@ -164,6 +164,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		/// <summary>
+		/// Collection name or alias.
+		/// </summary>
+		public string Name
+		{
+			get => string.IsNullOrEmpty(this.alias) ? this.name : this.alias;
+		}
+
+		/// <summary>
 		/// Checks if the name refers to the source.
 		/// </summary>
 		/// <param name="Name">Name to check.</param>

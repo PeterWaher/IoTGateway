@@ -49,8 +49,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			return Find(this.type, Offset, Top, Where, Variables, Order, Node,
-				this.alias ?? this.type.Name);
+			return Find(this.type, Offset, Top, Where, Variables, Order, Node, this.Name);
 		}
 
 		internal static async Task<IResultSetEnumerator> Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables,
@@ -396,6 +395,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public string TypeName
 		{
 			get { return this.type.FullName; }
+		}
+
+		/// <summary>
+		/// Collection name or alias.
+		/// </summary>
+		public string Name
+		{
+			get => string.IsNullOrEmpty(this.alias) ? this.type.Name : this.alias;
 		}
 
 		/// <summary>

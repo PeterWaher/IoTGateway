@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
@@ -23,6 +26,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		private readonly bool hasRightName;
 		private readonly bool isLeftGen;
 		private readonly bool isRightGen;
+		private string objectId = null;
 
 		/// <summary>
 		/// Represents a joined object.
@@ -137,15 +141,38 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		/// <summary>
+		/// Joined Object ID
+		/// </summary>
+		public string ObjectId
+		{
+			get
+			{
+				if (this.objectId is null)
+				{
+					StringBuilder sb = new StringBuilder();
+
+					if (!(this.left is null) && Database.TryGetObjectId(this.left, out object Id))
+						sb.Append(Id.ToString());
+
+					sb.Append(':');
+
+					if (!(this.right is null) && Database.TryGetObjectId(this.right, out Id))
+						sb.Append(Id.ToString());
+
+					this.objectId = sb.ToString();
+				}
+
+				return this.objectId;
+			}
+		}
+
+		/// <summary>
 		/// <see cref="object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return (obj is JoinedObject Obj &&
-				!((this.left is null) ^ (Obj.left is null)) &&
-				!((this.right is null) ^ (Obj.right is null)) &&
-				(this.left?.Equals(Obj.left) ?? true) &&
-				(this.right?.Equals(Obj.right) ?? true));
+			return (obj is JoinedObject Obj && 
+				this.ObjectId == Obj.ObjectId);
 		}
 
 		/// <summary>
@@ -153,9 +180,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		public override int GetHashCode()
 		{
-			int Result = this.left?.GetHashCode() ?? 0;
-			Result ^= Result << 5 ^ (this.right?.GetHashCode() ?? 0);
-			return Result;
+			return this.ObjectId.GetHashCode();
 
 		}
 	}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -15,13 +14,11 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
-		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
-		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public FullOuterJoinedSource(IDataSource Left, string LeftName, 
-			IDataSource Right, string RightName, ScriptNode Conditions)
-			: base(Left, LeftName, Right, RightName, Conditions)
+		public FullOuterJoinedSource(IDataSource Left, IDataSource Right, 
+			ScriptNode Conditions)
+			: base(Left, Right, Conditions)
 		{
 		}
 
@@ -46,7 +43,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
 
-			LeftEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(LeftEnum, this.LeftName, this.Right, this.RightName,
+			LeftEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(LeftEnum, this.Left.Name, this.Right, this.Right.Name,
 				this.Combine(RightWhere, this.Conditions), Variables, false);
 
 			ScriptNode RightWhere2 = await Reduce(this.Right, Where);
@@ -55,10 +52,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 			IResultSetEnumerator RightEnum = await this.Right.Find(0, int.MaxValue,
 				RightWhere2, Variables, RightOrder2, Node);
 
-			ScriptNode LeftOrder2 = await Reduce(this.Left, this.Right, Where);
+			ScriptNode LeftWhere2 = await Reduce(this.Left, this.Right, Where);
 
-			RightEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(RightEnum, this.RightName, this.Left, this.LeftName,
-				this.Combine(LeftOrder2, this.Conditions), Variables, true);
+			RightEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(RightEnum, this.Right.Name, this.Left, this.Left.Name,
+				this.Combine(LeftWhere2, this.Conditions), Variables, true);
 
 			IResultSetEnumerator e = new FullOuterJoinEnumerator(LeftEnum, RightEnum);
 

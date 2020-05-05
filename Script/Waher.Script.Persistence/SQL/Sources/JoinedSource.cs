@@ -13,24 +13,17 @@ namespace Waher.Script.Persistence.SQL.Sources
 		private readonly IDataSource left;
 		private readonly IDataSource right;
 		private readonly ScriptNode conditions;
-		private readonly string leftName;
-		private readonly string rightName;
 
 		/// <summary>
 		/// Abstract base classes of joined sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
-		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
-		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public JoinedSource(IDataSource Left, string LeftName,
-			IDataSource Right, string RightName, ScriptNode Conditions)
+		public JoinedSource(IDataSource Left, IDataSource Right, ScriptNode Conditions)
 		{
 			this.left = Left;
-			this.leftName = LeftName;
 			this.right = Right;
-			this.rightName = RightName;
 			this.conditions = Conditions;
 		}
 
@@ -40,19 +33,9 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public IDataSource Left => this.left;
 
 		/// <summary>
-		/// Name (or alias) of left source.
-		/// </summary>
-		public string LeftName => this.leftName;
-
-		/// <summary>
 		/// Right source
 		/// </summary>
 		public IDataSource Right => this.right;
-
-		/// <summary>
-		/// Name (or alias) of right source.
-		/// </summary>
-		public string RightName => this.rightName;
 
 		/// <summary>
 		/// Conditions for join.
@@ -118,6 +101,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public string TypeName
 		{
 			get => throw InvalidOperation();
+		}
+
+		/// <summary>
+		/// Collection name or alias.
+		/// </summary>
+		public string Name
+		{
+			get => string.Empty;
 		}
 
 		/// <summary>
@@ -257,7 +248,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (N.Operand is VariableReference Ref)
 				{
 					if (Source.IsSource(Ref.VariableName))
-						return new KeyValuePair<ScriptNode, int>(new VariableReference(N.Name, 0, 0, N.Expression), 1);
+						return new KeyValuePair<ScriptNode, int>(N, 1);
 					else if (Source2?.IsSource(Ref.VariableName) ?? false)
 						return new KeyValuePair<ScriptNode, int>(N, 2);
 					else

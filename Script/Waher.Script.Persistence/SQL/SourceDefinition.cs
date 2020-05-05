@@ -31,13 +31,6 @@ namespace Waher.Script.Persistence.SQL
 		public abstract IDataSource GetSource(Variables Variables);
 
 		/// <summary>
-		/// Gets the data source name, from its definition.
-		/// </summary>
-		/// <param name="Variables">Current set of variables.</param>
-		/// <returns>Data Source Name</returns>
-		public abstract string GetName(Variables Variables);
-
-		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>

@@ -356,6 +356,11 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.IDataSource.Name">
+            <summary>
+            Collection name or alias.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.IDataSource.IsSource(System.String)">
             <summary>
             Checks if the name refers to the source.
@@ -864,13 +869,6 @@
             <param name="Variables">Current set of variables.</param>
             <returns>Data Source</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinition.GetName(Waher.Script.Variables)">
-            <summary>
-            Gets the data source name, from its definition.
-            </summary>
-            <param name="Variables">Current set of variables.</param>
-            <returns>Data Source Name</returns>
-        </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinition.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -996,13 +994,6 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.GetName(Waher.Script.Variables)">
-            <summary>
-            Gets the data source name, from its definition.
-            </summary>
-            <param name="Variables">Current set of variables.</param>
-            <returns>Data Source Name</returns>
-        </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin">
             <summary>
             LEFT [OUTER] JOIN of two source definitions.
@@ -1099,13 +1090,6 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.GetName(Waher.Script.Variables)">
-            <summary>
-            Gets the data source name, from its definition.
-            </summary>
-            <param name="Variables">Current set of variables.</param>
-            <returns>Data Source Name</returns>
-        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.CollectionSource">
             <summary>
             Data Source defined by a collection name
@@ -1163,6 +1147,11 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.Name">
+            <summary>
+            Collection name or alias.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.IsSource(System.String)">
             <summary>
             Checks if the name refers to the source.
@@ -1182,14 +1171,12 @@
             Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
             <summary>
             Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
             </summary>
             <param name="Left">Left source</param>
-            <param name="LeftName">Name (or alias) of left source.</param>
             <param name="Right">Right source</param>
-            <param name="RightName">Name (or alias) of right source.</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
@@ -1209,14 +1196,12 @@
             Data source formed through an INNER JOIN of two sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
             <summary>
             Data source formed through an INNER JOIN of two sources.
             </summary>
             <param name="Left">Left source</param>
-            <param name="LeftName">Name (or alias) of left source.</param>
             <param name="Right">Right source</param>
-            <param name="RightName">Name (or alias) of right source.</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
@@ -1252,6 +1237,11 @@
             <param name="Index">Property or field name.</param>
             <returns>Property or field value, if exists; null otherwise.</returns>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedObject.ObjectId">
+            <summary>
+            Joined Object ID
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedObject.Equals(System.Object)">
             <summary>
             <see cref="M:System.Object.Equals(System.Object)"/>
@@ -1267,14 +1257,12 @@
             Abstract base classes of joined sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
             <summary>
             Abstract base classes of joined sources.
             </summary>
             <param name="Left">Left source</param>
-            <param name="LeftName">Name (or alias) of left source.</param>
             <param name="Right">Right source</param>
-            <param name="RightName">Name (or alias) of right source.</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Left">
@@ -1282,19 +1270,9 @@
             Left source
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.LeftName">
-            <summary>
-            Name (or alias) of left source.
-            </summary>
-        </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Right">
             <summary>
             Right source
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.RightName">
-            <summary>
-            Name (or alias) of right source.
             </summary>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Conditions">
@@ -1340,6 +1318,11 @@
         <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.TypeName">
             <summary>
             Name of corresponding type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.Name">
+            <summary>
+            Collection name or alias.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.IsSource(System.String)">
@@ -1404,14 +1387,12 @@
             Data source formed through an LEFT [OUTER] JOIN of two sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
             <summary>
             Data source formed through an LEFT [OUTER] JOIN of two sources.
             </summary>
             <param name="Left">Left source</param>
-            <param name="LeftName">Name (or alias) of left source.</param>
             <param name="Right">Right source</param>
-            <param name="RightName">Name (or alias) of right source.</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource.Flipped">
@@ -1436,14 +1417,12 @@
             Data source formed through an RIGHT [OUTER] JOIN of two sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.RightOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Persistence.SQL.IDataSource,System.String,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.RightOuterJoinedSource.#ctor(Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Persistence.SQL.IDataSource,Waher.Script.Model.ScriptNode)">
             <summary>
             Data source formed through an RIGHT [OUTER] JOIN of two sources.
             </summary>
             <param name="Left">Left source</param>
-            <param name="LeftName">Name (or alias) of left source.</param>
             <param name="Right">Right source</param>
-            <param name="RightName">Name (or alias) of right source.</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.RightOuterJoinedSource.Flipped">
@@ -1521,6 +1500,11 @@
             Name of corresponding type.
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.Name">
+            <summary>
+            Collection name or alias.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.IsSource(System.String)">
             <summary>
             Checks if the name refers to the source.
@@ -1592,6 +1576,11 @@
         <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.TypeName">
             <summary>
             Name of corresponding type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.Name">
+            <summary>
+            Collection name or alias.
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.IsSource(System.String)">

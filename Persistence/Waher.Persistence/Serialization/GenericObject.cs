@@ -379,14 +379,14 @@ namespace Waher.Persistence.Serialization
 			if (this.propertiesByName is null)
 				this.BuildDictionary();
 
-			int Result = this.objectId.GetHashCode() ^
-				this.typeName.GetHashCode() ^
-				this.collectionName.GetHashCode();
+			int Result = this.objectId.GetHashCode();
+			Result ^= Result << 5 ^ this.typeName.GetHashCode();
+			Result ^= Result << 5 ^ this.collectionName.GetHashCode();
 
 			foreach (KeyValuePair<string, object> P in this.propertiesByName)
 			{
-				Result ^= P.Key.GetHashCode();
-				Result ^= P.Value.GetHashCode();
+				Result ^= Result << 5 ^ P.Key.GetHashCode();
+				Result ^= Result << 5 ^ P.Value.GetHashCode();
 			}
 
 			return Result;

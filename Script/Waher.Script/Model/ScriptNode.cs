@@ -326,5 +326,20 @@ namespace Waher.Script.Model
 
 			return Result;
 		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			if (this.start >= 0 && this.length > 0 &&
+				this.start + this.length <= this.expression.Script.Length)
+			{
+				return this.SubExpression;
+			}
+			else
+				return base.ToString();
+		}
+
 	}
 }

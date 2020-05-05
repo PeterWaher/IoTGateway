@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL.SourceDefinitions
 {
@@ -31,7 +32,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		/// <returns>Data Source</returns>
 		public override IDataSource GetSource(Variables Variables)
 		{
-			throw new NotImplementedException();
+			return new FullOuterJoinedSource(
+				this.Left.GetSource(Variables), this.Left.GetName(Variables),
+				this.Right.GetSource(Variables), this.Right.GetName(Variables),
+				this.Conditions);
 		}
 
 	}

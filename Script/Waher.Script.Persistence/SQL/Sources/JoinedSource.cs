@@ -24,7 +24,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Right">Right source</param>
 		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public JoinedSource(IDataSource Left, string LeftName, 
+		public JoinedSource(IDataSource Left, string LeftName,
 			IDataSource Right, string RightName, ScriptNode Conditions)
 		{
 			this.left = Left;
@@ -137,8 +137,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the label is a label in the source.</returns>
 		public async Task<bool> IsLabel(string Label)
 		{
-			return 
-				await this.left.IsLabel(Label) || 
+			return
+				await this.left.IsLabel(Label) ||
 				await this.right.IsLabel(Label);
 		}
 
@@ -155,7 +155,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			else if (On is null)
 				return Where;
 			else
-				return new Operators.Logical.And(Where, On, Where.Start, Where.Length, Where.Expression);
+				return new Operators.Logical.And(Where, On, 0, 0, Where.Expression);
 		}
 
 		/// <summary>
@@ -166,15 +166,56 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>Reduced where clause, fitting the data source.</returns>
 		protected static async Task<ScriptNode> Reduce(IDataSource Source, ScriptNode Where)
 		{
+			KeyValuePair<ScriptNode, int> P = await Reduce(Source, null, Where, 1);
+			return P.Key;
+		}
+
+		/// <summary>
+		/// Reduces a where clause to fit the current data sources.
+		/// </summary>
+		/// <param name="Source">Data Source to which the expression is to be reduced.</param>
+		/// <param name="Source2">Optional second source.</param>
+		/// <param name="Where">Where clause</param>
+		/// <returns>Reduced where clause, fitting the data sources.</returns>
+		protected static async Task<ScriptNode> Reduce(IDataSource Source, IDataSource Source2, ScriptNode Where)
+		{
+			KeyValuePair<ScriptNode, int> P = await Reduce(Source, Source2, Where, 1);
+			return P.Key;
+		}
+
+		/// <summary>
+		/// Reduces a where clause to fit the current data source.
+		/// </summary>
+		/// <param name="Source">Data Source to which the expression is to be reduced.</param>
+		/// <param name="Source2">Optional second source.</param>
+		/// <param name="Where">Where clause</param>
+		/// <param name="Mask">Source mask.</param>
+		/// <returns>Reduced where clause, fitting the data source.</returns>
+		private static async Task<KeyValuePair<ScriptNode, int>> Reduce(IDataSource Source, IDataSource Source2, ScriptNode Where, int Mask)
+		{
+			KeyValuePair<ScriptNode, int> P1, P2;
 			ScriptNode Op1;
 			ScriptNode Op2;
+			int s1;
+			int s2;
+			int s;
 
 			if (Where is null)
-				return null;
+				return Null;
 			else if (Where is BinaryOperator BinOp)
 			{
-				Op1 = await Reduce(Source, BinOp.LeftOperand);
-				Op2 = await Reduce(Source, BinOp.RightOperand);
+				P1 = await Reduce(Source, Source2, BinOp.LeftOperand, Mask);
+				Op1 = P1.Key;
+				s1 = P1.Value;
+
+				P2 = await Reduce(Source, Source2, BinOp.RightOperand, Mask);
+				Op2 = P2.Key;
+				s2 = P2.Value;
+
+				s = s1 | s2;
+
+				if ((s & Mask) == 0)
+					return Null;
 
 				bool IsAnd = BinOp is Operators.Logical.And || BinOp is Operators.Dual.And;
 				bool IsOr = !IsAnd && (Where is Operators.Logical.Or || Where is Operators.Dual.Or);
@@ -182,66 +223,77 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (IsAnd || IsOr)
 				{
 					if (Op1 is null)
-						return Op2;
+						return P2;
 					else if (Op2 is null)
-						return Op1;
+						return P1;
 					else if (IsAnd)
-						return new Operators.Logical.And(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+						return new KeyValuePair<ScriptNode, int>(new Operators.Logical.And(Op1, Op2, 0, 0, BinOp.Expression), s);
 					else if (IsOr)
-						return new Operators.Logical.Or(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+						return new KeyValuePair<ScriptNode, int>(new Operators.Logical.Or(Op1, Op2, 0, 0, BinOp.Expression), s);
 				}
 				else if (Op1 is null || Op2 is null)
-					return null;
+					return Null;
 				else if (Op1 == BinOp.LeftOperand && Op2 == BinOp.RightOperand)
-					return Where;
+					return new KeyValuePair<ScriptNode, int>(Where, s);
 				else if (BinOp is Operators.Comparisons.EqualTo)
-					return new Operators.Comparisons.EqualTo(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.EqualTo(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.GreaterThan)
-					return new Operators.Comparisons.GreaterThan(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.GreaterThan(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.GreaterThanOrEqualTo)
-					return new Operators.Comparisons.GreaterThanOrEqualTo(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.GreaterThanOrEqualTo(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.LesserThan)
-					return new Operators.Comparisons.LesserThan(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.LesserThan(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.LesserThanOrEqualTo)
-					return new Operators.Comparisons.LesserThanOrEqualTo(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.LesserThanOrEqualTo(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.Like)
-					return new Operators.Comparisons.Like(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.Like(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.NotEqualTo)
-					return new Operators.Comparisons.NotEqualTo(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.NotEqualTo(Op1, Op2, 0, 0, BinOp.Expression), s);
 				else if (BinOp is Operators.Comparisons.NotLike)
-					return new Operators.Comparisons.NotLike(Op1, Op2, BinOp.Start, BinOp.Length, BinOp.Expression);
-			}
-			else if (Where is UnaryOperator UnOp)
-			{
-				Op1 = await Reduce(Source, UnOp.Operand);
-				if (Op1 is null)
-					return null;
-
-				if (UnOp is Operators.Logical.Not)
-					return new Operators.Logical.Not(Op1, UnOp.Start, UnOp.Length, UnOp.Expression);
+					return new KeyValuePair<ScriptNode, int>(new Operators.Comparisons.NotLike(Op1, Op2, 0, 0, BinOp.Expression), s);
 			}
 			else if (Where is Operators.Membership.NamedMember N)
 			{
 				if (N.Operand is VariableReference Ref)
 				{
 					if (Source.IsSource(Ref.VariableName))
-						return N;
+						return new KeyValuePair<ScriptNode, int>(new VariableReference(N.Name, 0, 0, N.Expression), 1);
+					else if (Source2?.IsSource(Ref.VariableName) ?? false)
+						return new KeyValuePair<ScriptNode, int>(N, 2);
 					else
-						return null;
+						return Null;
 				}
 				else
-					return null;
+					return Null;
+			}
+			else if (Where is UnaryOperator UnOp)
+			{
+				P1 = await Reduce(Source, Source2, UnOp.Operand, Mask);
+				Op1 = P1.Key;
+				s1 = P1.Value;
+
+				if (Op1 is null)
+					return Null;
+
+				if (UnOp is Operators.Logical.Not)
+					return new KeyValuePair<ScriptNode, int>(new Operators.Logical.Not(Op1, 0, 0, UnOp.Expression), s1);
 			}
 			else if (Where is VariableReference Ref)
 			{
 				if (await Source.IsLabel(Ref.VariableName))
-					return Ref;
+					return new KeyValuePair<ScriptNode, int>(Ref, 1);
+				else if (!(Source2 is null) && await Source2.IsLabel(Ref.VariableName))
+					return new KeyValuePair<ScriptNode, int>(Ref, 2);
 				else
-					return null;
+					return Null;
 			}
+			else if (Where is ConstantElement C)
+				return new KeyValuePair<ScriptNode, int>(C, 0);
 
-			return Where;
+			return Null;
 		}
+
+		private static readonly KeyValuePair<ScriptNode, int> Null = new KeyValuePair<ScriptNode, int>(null, 0);
 
 		/// <summary>
 		/// Reduces a sort order clause to fit the current data source.

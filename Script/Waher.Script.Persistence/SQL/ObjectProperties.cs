@@ -194,7 +194,7 @@ namespace Waher.Script.Persistence.SQL
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
 
-			Variable = Result ? Variable = this.CreateVariable(Name, null) : null;
+			Variable = Result ? this.CreateVariable(Name, null) : null;
 			return Result;
 		}
 

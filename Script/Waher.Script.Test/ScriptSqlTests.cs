@@ -96,6 +96,8 @@ namespace Waher.Script.Test
 			Variables v = new Variables();
 			Expression Exp = new Expression(Script);
 			object Obj = Exp.Evaluate(v);
+			Console.Out.WriteLine(Expression.ToString(Obj));
+			
 			ObjectMatrix M = Obj as ObjectMatrix;
 			int NrRows, RowIndex;
 			int NrColumns, ColumnIndex;
@@ -151,5 +153,252 @@ namespace Waher.Script.Test
 				});
 		}
 
+		[TestMethod]
+		public void SQL_Test_04_LEFT_OUTER_JOIN()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_05_LEFT_OUTER_JOIN_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_06_RIGHT_OUTER_JOIN()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { null, null, "P1", "CP1", "C1" },
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_07_RIGHT_OUTER_JOIN_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { null, null, "P1", "CP1", "C1" },
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_08_FULL_OUTER_JOIN()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
+					new object[] { null, null, "P1", "CP1", "C1" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_09_FULL_OUTER_JOIN_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
+					new object[] { null, null, "P1", "CP1", "C1" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_10_FULL_OUTER_JOIN_3()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
+					new object[] { null, null, "P1", "CP1", "C1" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_11_CROSS_JOIN()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_12_CROSS_JOIN_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" },
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
+					new object[] { 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
+					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" },
+					new object[] { 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" },
+					new object[] { 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_13_Orders_WHERE()
+		{
+			this.Test("Select OrderID, CustomerID, OrderDate from Orders where OrderID=2",
+				new object[][]
+				{
+					new object[] { 2d, 3d, new DateTime(2020, 5, 1) }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_14_Customers_WHERE()
+		{
+			this.Test("Select CustomerID, CustomerName, ContactName, Country from Customers where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 2d, "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_15_INNER_JOIN_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
+				new object[][]
+				{
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_16_LEFT_OUTER_JOIN_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_17_LEFT_OUTER_JOIN_WHERE_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_18_RIGHT_OUTER_JOIN_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_19_RIGHT_OUTER_JOIN_WHERE_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_20_FULL_OUTER_JOIN_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_21_FULL_OUTER_JOIN_WHERE_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_22_FULL_OUTER_JOIN_3_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
+				new object[][]
+				{
+					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_23_CROSS_JOIN_WHERE()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
+				new object[][]
+				{
+					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
+				});
+		}
+
+		[TestMethod]
+		public void SQL_Test_24_CROSS_JOIN_WHERE_2()
+		{
+			this.Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.OrderID=2",
+				new object[][]
+				{
+					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
+					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
+					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" }
+				});
+		}
+
+
+		/* TODO:
+		 * SELF join
+		 * UNION	
+		 * INSERT INTO (...) SELECT ...
+		 * 3 source join
+		 */
+
 	}
 }
+ 

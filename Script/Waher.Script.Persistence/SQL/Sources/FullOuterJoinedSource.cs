@@ -7,19 +7,19 @@ using Waher.Script.Model;
 namespace Waher.Script.Persistence.SQL.Sources
 {
 	/// <summary>
-	/// Data source formed through an INNER JOIN of two sources.
+	/// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
 	/// </summary>
-	public class InnerJoinedSource : JoinedSource
+	public class FullOuterJoinedSource : JoinedSource
 	{
 		/// <summary>
-		/// Data source formed through an INNER JOIN of two sources.
+		/// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
 		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
 		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public InnerJoinedSource(IDataSource Left, string LeftName, 
+		public FullOuterJoinedSource(IDataSource Left, string LeftName, 
 			IDataSource Right, string RightName, ScriptNode Conditions)
 			: base(Left, LeftName, Right, RightName, Conditions)
 		{
@@ -41,14 +41,26 @@ namespace Waher.Script.Persistence.SQL.Sources
 			ScriptNode LeftWhere = await Reduce(this.Left, Where);
 			KeyValuePair<VariableReference, bool>[] LeftOrder = await Reduce(this.Left, Order);
 
-			IResultSetEnumerator e = await this.Left.Find(0, int.MaxValue,
+			IResultSetEnumerator LeftEnum = await this.Left.Find(0, int.MaxValue,
 				LeftWhere, Variables, LeftOrder, Node);
 
 			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
-			RightWhere = this.Combine(RightWhere, this.Conditions);
 
-			e = new InnerJoinEnumerator(e, this.LeftName, this.Right, this.RightName,
-				RightWhere, Variables);
+			LeftEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(LeftEnum, this.LeftName, this.Right, this.RightName,
+				this.Combine(RightWhere, this.Conditions), Variables, false);
+
+			ScriptNode RightWhere2 = await Reduce(this.Right, Where);
+			KeyValuePair<VariableReference, bool>[] RightOrder2 = await Reduce(this.Right, Order);
+
+			IResultSetEnumerator RightEnum = await this.Right.Find(0, int.MaxValue,
+				RightWhere2, Variables, RightOrder2, Node);
+
+			ScriptNode LeftOrder2 = await Reduce(this.Left, this.Right, Where);
+
+			RightEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(RightEnum, this.RightName, this.Left, this.LeftName,
+				this.Combine(LeftOrder2, this.Conditions), Variables, true);
+
+			IResultSetEnumerator e = new FullOuterJoinEnumerator(LeftEnum, RightEnum);
 
 			if (!(Where is null))
 				e = new ConditionalEnumerator(e, Variables, Where);
@@ -62,29 +74,20 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return e;
 		}
 
-		private class InnerJoinEnumerator : IResultSetEnumerator
+		private class FullOuterJoinEnumerator : IResultSetEnumerator
 		{
-			private readonly IResultSetEnumerator left;
-			private readonly IDataSource rightSource;
-			private readonly ScriptNode conditions;
-			private readonly Variables variables;
-			private readonly string leftName;
-			private readonly string rightName;
-			private readonly bool hasLeftName;
-			private IResultSetEnumerator right;
-			private JoinedObject current = null;
+			private readonly Dictionary<object, bool> reportedLeft = new Dictionary<object, bool>();
+			private readonly IResultSetEnumerator leftEnum;
+			private readonly IResultSetEnumerator rightEnum;
+			private object current;
+			private bool leftMode;
 
-			public InnerJoinEnumerator(IResultSetEnumerator Left, string LeftName,
-				IDataSource RightSource, string RightName, ScriptNode Conditions,
-				Variables Variables)
+			public FullOuterJoinEnumerator(IResultSetEnumerator Left, IResultSetEnumerator Right)
 			{
-				this.left = Left;
-				this.leftName = LeftName;
-				this.rightName = RightName;
-				this.rightSource = RightSource;
-				this.conditions = Conditions;
-				this.variables = Variables;
-				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
+				this.leftEnum = Left;
+				this.rightEnum = Right;
+				this.leftMode = true;
+				this.current = null;
 			}
 
 			public object Current => this.current;
@@ -96,39 +99,37 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			public async Task<bool> MoveNextAsync()
 			{
-				while (true)
+				if (this.leftMode)
 				{
-					if (!(this.right is null))
+					if (await this.leftEnum.MoveNextAsync())
 					{
-						if (await this.right.MoveNextAsync())
-						{
-							this.current = new JoinedObject(this.left.Current, this.leftName,
-								this.right.Current, this.rightName);
-
-							return true;
-						}
-						else
-							this.right = null;
+						this.current = this.leftEnum.Current;
+						this.reportedLeft[this.current] = true;
+						return true;
 					}
-
-					if (!await this.left.MoveNextAsync())
-						return false;
-
-					ObjectProperties LeftVariables = new ObjectProperties(this.left.Current, this.variables);
-
-					if (this.hasLeftName)
-						LeftVariables[this.leftName] = this.left.Current;
-
-					this.right = await this.rightSource.Find(0, int.MaxValue, this.conditions, LeftVariables,
-						null, this.conditions);
+					else
+						this.leftMode = false;
 				}
+
+				do
+				{
+					if (await this.rightEnum.MoveNextAsync())
+						this.current = this.rightEnum.Current;
+					else
+						return false;
+				}
+				while (this.reportedLeft.ContainsKey(this.current));
+
+				return true;
 			}
 
 			public void Reset()
 			{
+				this.reportedLeft.Clear();
 				this.current = null;
-				this.right = null;
-				this.left.Reset();
+				this.leftMode = true;
+				this.leftEnum.Reset();
+				this.rightEnum.Reset();
 			}
 		}
 	

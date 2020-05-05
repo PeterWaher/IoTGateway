@@ -301,7 +301,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				N.Operand is VariableReference Ref &&
 				Ref.VariableName == Name)
 			{
-				return new VariableReference(N.Name, Node.Start, Node.Length, Node.Expression);
+				return new VariableReference(N.Name, 0, 0, Node.Expression);
 			}
 			else
 				return Node;

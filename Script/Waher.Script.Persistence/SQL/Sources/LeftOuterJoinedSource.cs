@@ -7,23 +7,28 @@ using Waher.Script.Model;
 namespace Waher.Script.Persistence.SQL.Sources
 {
 	/// <summary>
-	/// Data source formed through an INNER JOIN of two sources.
+	/// Data source formed through an LEFT [OUTER] JOIN of two sources.
 	/// </summary>
-	public class InnerJoinedSource : JoinedSource
+	public class LeftOuterJoinedSource : JoinedSource
 	{
 		/// <summary>
-		/// Data source formed through an INNER JOIN of two sources.
+		/// Data source formed through an LEFT [OUTER] JOIN of two sources.
 		/// </summary>
 		/// <param name="Left">Left source</param>
 		/// <param name="LeftName">Name (or alias) of left source.</param>
 		/// <param name="Right">Right source</param>
 		/// <param name="RightName">Name (or alias) of right source.</param>
 		/// <param name="Conditions">Conditions for join.</param>
-		public InnerJoinedSource(IDataSource Left, string LeftName, 
+		public LeftOuterJoinedSource(IDataSource Left, string LeftName, 
 			IDataSource Right, string RightName, ScriptNode Conditions)
 			: base(Left, LeftName, Right, RightName, Conditions)
 		{
 		}
+
+		/// <summary>
+		/// If sources should be flipped in the <see cref="JoinedObject"/> instances created.
+		/// </summary>
+		protected virtual bool Flipped => false;
 
 		/// <summary>
 		/// Finds objects matching filter conditions in <paramref name="Where"/>.
@@ -44,11 +49,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 			IResultSetEnumerator e = await this.Left.Find(0, int.MaxValue,
 				LeftWhere, Variables, LeftOrder, Node);
 
-			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
-			RightWhere = this.Combine(RightWhere, this.Conditions);
+			ScriptNode RightWhere = this.Combine(await Reduce(this.Right, this.Left, Where), this.Conditions);
 
-			e = new InnerJoinEnumerator(e, this.LeftName, this.Right, this.RightName,
-				RightWhere, Variables);
+			e = new LeftOuterJoinEnumerator(e, this.LeftName, this.Right, this.RightName,
+				RightWhere, Variables, this.Flipped);
 
 			if (!(Where is null))
 				e = new ConditionalEnumerator(e, Variables, Where);
@@ -62,7 +66,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return e;
 		}
 
-		private class InnerJoinEnumerator : IResultSetEnumerator
+		internal class LeftOuterJoinEnumerator : IResultSetEnumerator
 		{
 			private readonly IResultSetEnumerator left;
 			private readonly IDataSource rightSource;
@@ -71,12 +75,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 			private readonly string leftName;
 			private readonly string rightName;
 			private readonly bool hasLeftName;
+			private readonly bool flipped;
+			private bool rightFirst;
 			private IResultSetEnumerator right;
 			private JoinedObject current = null;
+			private GenericObject defaultRight = null;
 
-			public InnerJoinEnumerator(IResultSetEnumerator Left, string LeftName,
+			public LeftOuterJoinEnumerator(IResultSetEnumerator Left, string LeftName,
 				IDataSource RightSource, string RightName, ScriptNode Conditions,
-				Variables Variables)
+				Variables Variables, bool Flipped)
 			{
 				this.left = Left;
 				this.leftName = LeftName;
@@ -85,6 +92,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				this.conditions = Conditions;
 				this.variables = Variables;
 				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
+				this.flipped = Flipped;
 			}
 
 			public object Current => this.current;
@@ -100,15 +108,51 @@ namespace Waher.Script.Persistence.SQL.Sources
 				{
 					if (!(this.right is null))
 					{
+						bool First = this.rightFirst;
+						this.rightFirst = false;
+
 						if (await this.right.MoveNextAsync())
 						{
-							this.current = new JoinedObject(this.left.Current, this.leftName,
-								this.right.Current, this.rightName);
+							if (this.flipped)
+							{
+								this.current = new JoinedObject(this.right.Current, this.rightName,
+									this.left.Current, this.leftName);
+							}
+							else
+							{
+								this.current = new JoinedObject(this.left.Current, this.leftName,
+									this.right.Current, this.rightName);
+							}
 
 							return true;
 						}
 						else
+						{
 							this.right = null;
+
+							if (First)
+							{
+								if (this.defaultRight is null)
+								{
+									this.defaultRight = new GenericObject(this.rightSource.CollectionName,
+										typeof(GenericObject).FullName, Guid.Empty,
+										new KeyValuePair<string, object>[0]);
+								}
+
+								if (this.flipped)
+								{
+									this.current = new JoinedObject(this.defaultRight, this.rightName,
+										this.left.Current, this.leftName);
+								}
+								else
+								{
+									this.current = new JoinedObject(this.left.Current, this.leftName,
+										this.defaultRight, this.rightName);
+								}
+
+								return true;
+							}
+						}
 					}
 
 					if (!await this.left.MoveNextAsync())
@@ -121,6 +165,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 					this.right = await this.rightSource.Find(0, int.MaxValue, this.conditions, LeftVariables,
 						null, this.conditions);
+
+					this.rightFirst = true;
 				}
 			}
 

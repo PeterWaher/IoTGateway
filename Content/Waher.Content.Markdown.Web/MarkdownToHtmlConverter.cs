@@ -185,7 +185,6 @@ namespace Waher.Content.Markdown.Web
 			}
 
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL, typeof(HttpException));
-			IUser User;
 
 			if (Doc.TryGetMetaData("UserVariable", out KeyValuePair<string, bool>[] MetaValues))
 			{
@@ -244,15 +243,14 @@ namespace Waher.Content.Markdown.Web
 						}
 					}
 
-					User = v.ValueObject as IUser;
-					if (User is null)
-					{
-						Authorized = false;
-						break;
-					}
-
 					if (!(Privilege is null))
 					{
+						if (!(v.ValueObject is IUser User))
+						{
+							Authorized = false;
+							break;
+						}
+
 						foreach (KeyValuePair<string, bool> P2 in Privilege)
 						{
 							if (!User.HasPrivilege(P2.Key))

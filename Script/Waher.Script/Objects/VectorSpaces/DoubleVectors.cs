@@ -12,7 +12,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	public sealed class DoubleVectors : VectorSpace
 	{
 		private DoubleVector zero = null;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of Double-valued vectors.

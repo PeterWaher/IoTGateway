@@ -34,11 +34,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public virtual ILeftModuleElement MultiplyScalarLeft(IRingElement Scalar, ILeftModuleElement ModuleElement)
 		{
-			IModuleElement E = ModuleElement as IModuleElement;
-			if (E is null)
-				return null;
-			else
+			if (ModuleElement is IModuleElement E)
 				return this.MultiplyScalar(Scalar, E);
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -49,11 +48,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public virtual IRightModuleElement MultiplyScalarRight(IRightModuleElement ModuleElement, IRingElement Scalar)
 		{
-			IModuleElement E = ModuleElement as IModuleElement;
-			if (E is null)
-				return null;
-			else
+			if (ModuleElement is IModuleElement E)
 				return this.MultiplyScalar(Scalar, E);
+			else
+				return null;
 		}
 
 		/// <summary>

@@ -17,7 +17,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	{
 		private double[] values;
 		private ICollection<IElement> elements;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Double-valued vector.
@@ -220,7 +220,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			int i;
 
 			for (i = 0; i < this.dimension; i++)
-				Result ^= this.values[i].GetHashCode();
+				Result ^= Values[i].GetHashCode();
 
 			return Result;
 		}

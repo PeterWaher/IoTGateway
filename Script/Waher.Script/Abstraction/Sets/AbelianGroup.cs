@@ -26,13 +26,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override sealed IGroupElement RightSubtract(IGroupElement Left, IGroupElement Right)
 		{
-			IAbelianGroupElement L = Left as IAbelianGroupElement;
-			IAbelianGroupElement R = Right as IAbelianGroupElement;
-
-			if (L is null || R is null)
-				return base.RightSubtract(Left, Right);
-			else
+			if (Left is IAbelianGroupElement L && Right is IAbelianGroupElement R)
 				return this.Subtract(L, R);
+			else
+				return base.RightSubtract(Left, Right);
 		}
 
 		/// <summary>
@@ -43,13 +40,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override sealed IGroupElement LeftSubtract(IGroupElement Left, IGroupElement Right)
 		{
-			IAbelianGroupElement L = Left as IAbelianGroupElement;
-			IAbelianGroupElement R = Right as IAbelianGroupElement;
-
-			if (L is null || R is null)
-				return base.LeftSubtract(Left, Right);
-			else
+			if (Left is IAbelianGroupElement L && Right is IAbelianGroupElement R)
 				return this.Subtract(R, L);
+			else
+				return base.LeftSubtract(Left, Right);
 		}
 
 		/// <summary>

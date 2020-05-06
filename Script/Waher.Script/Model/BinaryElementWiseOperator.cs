@@ -40,18 +40,15 @@ namespace Waher.Script.Model
 
 			if (!LS.Equals(RS))
 			{
-				IRightModule RM;
-				ILeftModule LM;
 				bool b;
 
 				try
 				{
-					b = !((RM = LS as IRightModule) is null) && RM.ScalarRing.Contains(Right);
+					b = LS is IRightModule RM && RM.ScalarRing.Contains(Right);
 				}
 				catch (Exception)
 				{
 					b = false;
-					RM = null;
 				}
 
 				if (b)
@@ -66,12 +63,11 @@ namespace Waher.Script.Model
 
 				try
 				{
-					b = !((LM = RS as ILeftModule) is null) && LM.ScalarRing.Contains(Left);
+					b = RS is ILeftModule LM && LM.ScalarRing.Contains(Left);
 				}
 				catch (Exception)
 				{
 					b = false;
-					LM = null;
 				}
 
 				if (b)

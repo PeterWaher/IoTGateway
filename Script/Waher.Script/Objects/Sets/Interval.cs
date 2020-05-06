@@ -13,11 +13,11 @@ namespace Waher.Script.Objects.Sets
 	/// </summary>
 	public sealed class Interval : Set, IVector
 	{
-		private double from;
-		private double to;
-		private double? stepSize;
-		private bool includesFrom;
-		private bool includesTo;
+		private readonly double from;
+		private readonly double to;
+		private readonly double? stepSize;
+		private readonly bool includesFrom;
+		private readonly bool includesTo;
 
 		/// <summary>
 		/// Interval

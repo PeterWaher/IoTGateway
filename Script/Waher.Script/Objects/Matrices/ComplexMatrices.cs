@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.Matrices
     public sealed class ComplexMatrices : Ring
     {
         private ComplexMatrix zero = null;
-        private int rows;
-        private int columns;
+        private readonly int rows;
+        private readonly int columns;
 
 		/// <summary>
 		/// Pseudo-ring of Complex-valued matrices.
@@ -82,11 +82,10 @@ namespace Waher.Script.Objects.Matrices
         /// <returns>If the element is contained in the set.</returns>
         public override bool Contains(IElement Element)
         {
-            ComplexMatrix M = Element as ComplexMatrix;
-            if (M is null)
+            if (Element is ComplexMatrix M)
+                return M.Rows == this.rows && M.Columns == this.columns;
+            else
                 return false;
-
-            return M.Rows == this.rows && M.Columns == this.columns;
         }
 
         /// <summary>

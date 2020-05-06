@@ -17,8 +17,8 @@ namespace Waher.Script.Objects.Matrices
     {
 		private double[,] values;
 		private ICollection<IElement> elements;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Double-valued matrix.
@@ -188,13 +188,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
 			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
 			double[,] v;
 			double n;
 			int x, y, z;
 
-			if (!(Number is null))
+			if (Element is DoubleNumber Number)
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -207,7 +205,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if (!((Matrix = Element as DoubleMatrix) is null))
+			else if (Element is DoubleMatrix Matrix)
 			{
 				if (Matrix.columns != this.rows)
 					return null;
@@ -242,13 +240,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
 			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
 			double[,] v;
 			double n;
 			int x, y, z;
 
-			if (!(Number is null))
+			if (Element is DoubleNumber Number)
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -261,7 +257,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if (!((Matrix = Element as DoubleMatrix) is null))
+			else if (Element is DoubleMatrix Matrix)
 			{
 				if (this.columns != Matrix.rows)
 					return null;
@@ -375,13 +371,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
 			double[,] v;
 			double n;
 			int x, y;
 
-			if (!(Number is null))
+			if (Element is DoubleNumber Number)
 			{
 				n = Number.Value;
 				v = new double[this.rows, this.columns];
@@ -394,7 +388,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new DoubleMatrix(v);
 			}
-			else if (!((Matrix = Element as DoubleMatrix) is null))
+			else if (Element is DoubleMatrix Matrix)
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
@@ -440,8 +434,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			DoubleMatrix Matrix = obj as DoubleMatrix;
-			if (Matrix is null)
+			if (!(obj is DoubleMatrix Matrix))
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -629,11 +622,10 @@ namespace Waher.Script.Objects.Matrices
             if (Index < 0 || Index >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            DoubleVector V = Value as DoubleVector;
-            if (V is null)
-                throw new ScriptException("Row vectors in a double matrix are required to be double vectors.");
+			if (!(Value is DoubleVector V))
+				throw new ScriptException("Row vectors in a double matrix are required to be double vectors.");
 
-            if (V.Dimension != this.columns)
+			if (V.Dimension != this.columns)
                 throw new ScriptException("Dimension mismatch.");
 
             double[] V2 = V.Values;
@@ -671,11 +663,10 @@ namespace Waher.Script.Objects.Matrices
             if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            DoubleNumber V = Value as DoubleNumber;
-            if (V is null)
-                throw new ScriptException("Elements in a double matrix must be double values.");
+			if (!(Value is DoubleNumber V))
+				throw new ScriptException("Elements in a double matrix must be double values.");
 
-            double[,] M = this.Values;
+			double[,] M = this.Values;
             this.elements = null;
 
             M[Row, Column] = V.Value;
@@ -734,14 +725,13 @@ namespace Waher.Script.Objects.Matrices
             if (Vector.Dimension != this.columns)
                 throw new ScriptException("Vector dimension does not match number of columns");
 
-            DoubleVector V = Vector as DoubleVector;
-            if (V is null)
-                throw new ScriptException("Row vectors in a double matrix must be double vectors.");
+			if (!(Vector is DoubleVector V))
+				throw new ScriptException("Row vectors in a double matrix must be double vectors.");
 
-            double[] V2 = V.Values;
+			double[] V2 = V.Values;
             double[,] M = this.Values;
             this.elements = null;
-            int i = 0;
+            int i;
 
             for (i = 0; i < this.columns; i++)
                 M[Row, i] = V2[i];
@@ -760,14 +750,13 @@ namespace Waher.Script.Objects.Matrices
             if (Vector.Dimension != this.rows)
                 throw new ScriptException("Vector dimension does not match number of rows");
 
-            DoubleVector V = Vector as DoubleVector;
-            if (V is null)
-                throw new ScriptException("Column vectors in a double matrix must be double vectors.");
+			if (!(Vector is DoubleVector V))
+				throw new ScriptException("Column vectors in a double matrix must be double vectors.");
 
-            double[] V2 = V.Values;
+			double[] V2 = V.Values;
             double[,] M = this.Values;
             this.elements = null;
-            int i = 0;
+            int i;
 
             for (i = 0; i < this.rows; i++)
                 M[i, Column] = V2[i];

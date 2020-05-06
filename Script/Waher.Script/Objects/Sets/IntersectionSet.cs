@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.Sets
     /// </summary>
     public sealed class IntersectionSet : Set
     {
-        private ISet set1;
-        private ISet set2;
+        private readonly ISet set1;
+        private readonly ISet set2;
 
         /// <summary>
         /// Represents a Intersection of two sets.
@@ -43,8 +43,7 @@ namespace Waher.Script.Objects.Sets
         /// <returns>If elements are equal.</returns>
         public override bool Equals(object obj)
         {
-            IntersectionSet S = obj as IntersectionSet;
-            if (S is null)
+            if (!(obj is IntersectionSet S))
                 return false;
 
             return (this.set1.Equals(S.set1) && this.set2.Equals(S.set2));

@@ -9,7 +9,7 @@ namespace Waher.Script.Units
 	/// </summary>
 	public sealed class AtomicUnit
 	{
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// Represents an atomic unit.
@@ -33,11 +33,10 @@ namespace Waher.Script.Units
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			AtomicUnit U = obj as AtomicUnit;
-			if (U is null)
-				return false;
-			else
+			if (obj is AtomicUnit U)
 				return this.name.Equals(U.name);
+			else
+				return false;
 		}
 
 		/// <summary>

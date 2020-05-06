@@ -50,10 +50,10 @@ namespace Waher.Script.Functions.Analytic
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
 					new Negate(
 						new Multiply(
-							new Csc(this.Argument, Start, Len, Expression),
-							new Cot(this.Argument, Start, Len, Expression),
-							Start, Len, Expression),
-						Start, Len, Expression));
+							new Csc(this.Argument, Start, Len, Exp),
+							new Cot(this.Argument, Start, Len, Exp),
+							Start, Len, Exp),
+						Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

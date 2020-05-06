@@ -62,9 +62,9 @@ namespace Waher.Script.Functions.Analytic
 					new Invert(
 						new Multiply(
 							this.Argument,
-							new ConstantElement(new DoubleNumber(log2), Start, Len, Expression),
-							Start, Len, Expression),
-						Start, Len, Expression));
+							new ConstantElement(new DoubleNumber(log2), Start, Len, Exp),
+							Start, Len, Exp),
+						Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

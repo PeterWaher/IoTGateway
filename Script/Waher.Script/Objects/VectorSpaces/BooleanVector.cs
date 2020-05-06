@@ -17,7 +17,7 @@ namespace Waher.Script.Objects.VectorSpaces
     {
         private bool[] values;
         private ICollection<IElement> elements;
-        private int dimension;
+        private readonly int dimension;
 
         /// <summary>
         /// Boolean-valued vector.
@@ -235,7 +235,7 @@ namespace Waher.Script.Objects.VectorSpaces
             int i;
 
             for (i = 0; i < this.dimension; i++)
-                Result ^= this.values[i].GetHashCode();
+                Result ^= Values[i].GetHashCode();
 
             return Result;
         }
@@ -308,8 +308,7 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            BooleanValue V = Value as BooleanValue;
-            if (V is null)
+            if (!(Value is BooleanValue V))
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
             bool[] Values = this.Values;

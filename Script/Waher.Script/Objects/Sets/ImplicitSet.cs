@@ -20,7 +20,7 @@ namespace Waher.Script.Objects.Sets
 		private readonly In[] setConditions;
 		private readonly Variables variables = null;
 		private FiniteSet finiteSet = null;
-		private bool doubleColon;
+		private readonly bool doubleColon;
 
 		/// <summary>
 		/// Represents an implicitly defined set

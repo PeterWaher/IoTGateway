@@ -55,10 +55,10 @@ namespace Waher.Script.Functions.Analytic
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
 					new Invert(
 						new Multiply(
-							new ConstantElement(DoubleNumber.TwoElement, Start, Len, Expression),
+							new ConstantElement(DoubleNumber.TwoElement, Start, Len, Exp),
 							this,
-							Start, Len, Expression),
-						Start, Len, Expression));
+							Start, Len, Exp),
+						Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

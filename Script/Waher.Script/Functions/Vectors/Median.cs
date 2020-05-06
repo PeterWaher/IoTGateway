@@ -92,12 +92,10 @@ namespace Waher.Script.Functions.Vectors
 
         private int Compare(IElement e1, IElement e2)
         {
-			IOrderedSet S2 = e2.AssociatedSet as IOrderedSet;
-
-			if (!(e1.AssociatedSet is IOrderedSet S1) || S2 is null || S1 != S2)
-				throw new ScriptRuntimeException("Cannot order elements.", this);
-
-			return S1.Compare(e1, e2);
+            if (e1.AssociatedSet is IOrderedSet S1 && e2.AssociatedSet is IOrderedSet S2 && S1 == S2)
+               return S1.Compare(e1, e2);
+            else
+                throw new ScriptRuntimeException("Cannot order elements.", this);
         }
 
     }

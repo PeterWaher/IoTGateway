@@ -47,11 +47,9 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public virtual IElement Evaluate(IElement Left, IElement Right)
 		{
-			IVector VR;
-
 			if (Left is IVector VL)
 			{
-				if (!((VR = Right as IVector) is null))
+				if (Right is IVector VR)
 				{
 					ISet LeftSet = Left.AssociatedSet;
 					ISet RightSet = Right.AssociatedSet;
@@ -80,7 +78,7 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				if (!((VR = Right as IVector) is null))
+				if (Right is IVector)
 				{
 					LinkedList<IElement> Result = new LinkedList<IElement>();
 

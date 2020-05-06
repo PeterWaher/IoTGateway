@@ -18,8 +18,8 @@ namespace Waher.Script.Objects.Matrices
 	{
 		private Complex[,] values;
 		private ICollection<IElement> elements;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Complex-valued matrix.
@@ -189,13 +189,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
 			Complex[,] Values = this.Values;
-			ComplexNumber Number = Element as ComplexNumber;
-			ComplexMatrix Matrix;
 			Complex[,] v;
 			Complex n;
 			int x, y, z;
 
-			if (!(Number is null))
+			if (Element is ComplexNumber Number)
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -208,7 +206,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if (!((Matrix = Element as ComplexMatrix) is null))
+			else if (Element is ComplexMatrix Matrix)
 			{
 				if (Matrix.columns != this.rows)
 					return null;
@@ -243,13 +241,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
 			Complex[,] Values = this.Values;
-			ComplexNumber Number = Element as ComplexNumber;
-			ComplexMatrix Matrix;
 			Complex[,] v;
 			Complex n;
 			int x, y, z;
 
-			if (!(Number is null))
+			if (Element is ComplexNumber Number)
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -262,7 +258,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if (!((Matrix = Element as ComplexMatrix) is null))
+			else if (Element is ComplexMatrix Matrix)
 			{
 				if (this.columns != Matrix.rows)
 					return null;
@@ -377,13 +373,11 @@ namespace Waher.Script.Objects.Matrices
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			Complex[,] Values = this.Values;
-			ComplexNumber Number = Element as ComplexNumber;
-			ComplexMatrix Matrix;
 			Complex[,] v;
 			Complex n;
 			int x, y;
 
-			if (!(Number is null))
+			if (Element is ComplexNumber Number)
 			{
 				n = Number.Value;
 				v = new Complex[this.rows, this.columns];
@@ -396,7 +390,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ComplexMatrix(v);
 			}
-			else if (!((Matrix = Element as ComplexMatrix) is null))
+			else if (Element is ComplexMatrix Matrix)
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
@@ -442,8 +436,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			ComplexMatrix Matrix = obj as ComplexMatrix;
-			if (Matrix is null)
+			if (!(obj is ComplexMatrix Matrix))
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -641,8 +634,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Index < 0 || Index >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			ComplexVector V = Value as ComplexVector;
-			if (V is null)
+			if (!(Value is ComplexVector V))
 				throw new ScriptException("Row vectors in a Complex matrix are required to be Complex vectors.");
 
 			if (V.Dimension != this.columns)
@@ -683,8 +675,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			ComplexNumber V = Value as ComplexNumber;
-			if (V is null)
+			if (!(Value is ComplexNumber V))
 				throw new ScriptException("Elements in a Complex matrix must be Complex values.");
 
 			Complex[,] M = this.Values;
@@ -746,14 +737,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Vector.Dimension != this.columns)
 				throw new ScriptException("Vector dimension does not match number of columns");
 
-			ComplexVector V = Vector as ComplexVector;
-			if (V is null)
+			if (!(Vector is ComplexVector V))
 				throw new ScriptException("Row vectors in a Complex matrix must be Complex vectors.");
 
 			Complex[] V2 = V.Values;
 			Complex[,] M = this.Values;
 			this.elements = null;
-			int i = 0;
+			int i;
 
 			for (i = 0; i < this.columns; i++)
 				M[Row, i] = V2[i];
@@ -772,14 +762,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Vector.Dimension != this.rows)
 				throw new ScriptException("Vector dimension does not match number of rows");
 
-			ComplexVector V = Vector as ComplexVector;
-			if (V is null)
+			if (!(Vector is ComplexVector V))
 				throw new ScriptException("Column vectors in a Complex matrix must be Complex vectors.");
 
 			Complex[] V2 = V.Values;
 			Complex[,] M = this.Values;
 			this.elements = null;
-			int i = 0;
+			int i;
 
 			for (i = 0; i < this.rows; i++)
 				M[i, Column] = V2[i];

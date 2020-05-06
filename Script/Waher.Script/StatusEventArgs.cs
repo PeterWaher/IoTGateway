@@ -17,8 +17,8 @@ namespace Waher.Script
 	/// </summary>
 	public class StatusEventArgs : EventArgs
 	{
-		private Expression expression;
-		private string status;
+		private readonly Expression expression;
+		private readonly string status;
 
 		/// <summary>
 		/// Event arguments for status events.

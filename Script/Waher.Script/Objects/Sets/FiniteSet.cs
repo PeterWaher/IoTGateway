@@ -12,7 +12,7 @@ namespace Waher.Script.Objects.Sets
     /// </summary>
     public sealed class FiniteSet : Set
     {
-        private Dictionary<IElement, bool> elements;
+        private readonly Dictionary<IElement, bool> elements;
 
         /// <summary>
         /// Represents a finite set.
@@ -42,8 +42,7 @@ namespace Waher.Script.Objects.Sets
         /// <returns>If elements are equal.</returns>
         public override bool Equals(object obj)
         {
-            FiniteSet S = obj as FiniteSet;
-            if (S is null)
+            if (!(obj is FiniteSet S))
                 return false;
 
             if (this.elements.Count != S.elements.Count)

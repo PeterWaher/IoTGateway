@@ -13,8 +13,8 @@ namespace Waher.Script.Units
 	/// </summary>
 	public sealed class Unit
 	{
-		private Prefix prefix;
-		private ICollection<KeyValuePair<AtomicUnit, int>> factors;
+		private readonly Prefix prefix;
+		private readonly ICollection<KeyValuePair<AtomicUnit, int>> factors;
 		private bool hasBaseUnits = false;
 		private bool hasReferenceUnits = false;
 
@@ -131,8 +131,7 @@ namespace Waher.Script.Units
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			Unit U = obj as Unit;
-			if (U is null)
+			if (!(obj is Unit U))
 				return false;
 
 			if (this.prefix != U.prefix || this.factors.Count != U.factors.Count)
@@ -744,7 +743,7 @@ namespace Waher.Script.Units
 		private static Dictionary<string, IBaseQuantity> referenceUnits = null;
 		private static Dictionary<string, KeyValuePair<AtomicUnit, int>[]> compoundUnits = null;
 		private static Dictionary<string, PhysicalQuantity> derivedUnits = null;
-		private static object synchObject = new object();
+		private static readonly object synchObject = new object();
 
 		static Unit()
 		{

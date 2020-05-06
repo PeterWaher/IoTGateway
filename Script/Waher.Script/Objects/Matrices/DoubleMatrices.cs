@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.Matrices
 	public sealed class DoubleMatrices : Ring
 	{
 		private DoubleMatrix zero = null;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Pseudo-ring of Double-valued matrices.
@@ -47,11 +47,11 @@ namespace Waher.Script.Objects.Matrices
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get 
+			get
 			{
 				if (this.zero is null)
 					this.zero = new DoubleMatrix(new double[this.rows, this.columns]);
-				
+
 				return this.zero;
 			}
 		}
@@ -71,11 +71,10 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			DoubleMatrix M = Element as DoubleMatrix;
-			if (M is null)
+			if (Element is DoubleMatrix M)
+				return M.Rows == this.rows && M.Columns == this.columns;
+			else
 				return false;
-
-			return M.Rows == this.rows && M.Columns == this.columns;
 		}
 
 		/// <summary>

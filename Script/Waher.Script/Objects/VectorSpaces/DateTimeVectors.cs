@@ -12,7 +12,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	/// </summary>
 	public sealed class DateTimeVectors : VectorSpace
 	{
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of DateTime-valued vectors.
@@ -54,11 +54,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			DateTimeVector v = Element as DateTimeVector;
-			if (v is null)
+			if (Element is DateTimeVector v)
+				return v.Dimension == this.dimension;
+			else
 				return false;
-
-			return v.Dimension == this.dimension;
 		}
 
 		/// <summary>

@@ -49,9 +49,9 @@ namespace Waher.Script.Functions.Analytic
 
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
 					new Multiply(
-						new Sec(this.Argument, Start, Len, Expression),
-						new Tan(this.Argument, Start, Len, Expression),
-						Start, Len, Expression));
+						new Sec(this.Argument, Start, Len, Exp),
+						new Tan(this.Argument, Start, Len, Exp),
+						Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

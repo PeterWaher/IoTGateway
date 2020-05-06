@@ -11,7 +11,7 @@ namespace Waher.Script.Exceptions
 	/// </summary>
 	public class ScriptReturnValueException : ScriptException 
 	{
-		private IElement returnValue;
+		private readonly IElement returnValue;
 
 		/// <summary>
 		/// Script runtime exception.

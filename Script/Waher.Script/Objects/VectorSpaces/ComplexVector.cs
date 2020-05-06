@@ -18,7 +18,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	{
 		private Complex[] values;
 		private ICollection<IElement> elements;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Complex-valued vector.
@@ -232,7 +232,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			int i;
 
 			for (i = 0; i < this.dimension; i++)
-				Result ^= this.values[i].GetHashCode();
+				Result ^= Values[i].GetHashCode();
 
 			return Result;
 		}
@@ -305,8 +305,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			if (Index < 0 || Index >= this.dimension)
 				throw new ScriptException("Index out of bounds.");
 
-			ComplexNumber V = Value as ComplexNumber;
-			if (V is null)
+			if (!(Value is ComplexNumber V))
 				throw new ScriptException("Elements in a complex vector are required to be complex values.");
 
 			Complex[] Values = this.Values;

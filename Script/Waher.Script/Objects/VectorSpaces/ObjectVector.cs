@@ -17,7 +17,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	{
 		private IElement[] values = null;
 		private ICollection<IElement> elements;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Object-valued vector.

@@ -14,7 +14,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		private static readonly BooleanValues scalarField = new BooleanValues();
 
 		private BooleanVector zero = null;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of Boolean-valued vectors.
@@ -46,11 +46,11 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get 
+			get
 			{
 				if (this.zero is null)
 					this.zero = new BooleanVector(new bool[this.dimension]);
-				
+
 				return this.zero;
 			}
 		}
@@ -62,11 +62,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			BooleanVector v = Element as BooleanVector;
-			if (v is null)
+			if (Element is BooleanVector v)
+				return v.Dimension == this.dimension;
+			else
 				return false;
-
-			return v.Dimension == this.dimension;
 		}
 
 		/// <summary>

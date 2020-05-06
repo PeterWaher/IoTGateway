@@ -24,11 +24,10 @@ namespace Waher.Script.Abstraction.Elements
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			ICommutativeRingElement E = Element as ICommutativeRingElement;
-			if (E is null)
-				return null;
-			else
+			if (Element is ICommutativeRingElement E)
 				return this.Multiply(E);
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -38,11 +37,10 @@ namespace Waher.Script.Abstraction.Elements
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			ICommutativeRingElement E = Element as ICommutativeRingElement;
-			if (E is null)
-				return null;
-			else
+			if (Element is ICommutativeRingElement E)
 				return this.Multiply(E);
+			else
+				return null;
 		}
 
 		/// <summary>

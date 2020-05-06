@@ -26,13 +26,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override sealed IRingElement RightDivide(IRingElement Left, IRingElement Right)
 		{
-			ICommutativeRingElement L = Left as ICommutativeRingElement;
-			ICommutativeRingElement R = Right as ICommutativeRingElement;
-
-			if (L is null || R is null)
-				return base.RightDivide(Left, Right);
-			else
+			if (Left is ICommutativeRingElement L && Right is ICommutativeRingElement R)
 				return this.Divide(L, R);
+			else
+				return base.RightDivide(Left, Right);
 		}
 
 		/// <summary>

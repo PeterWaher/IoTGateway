@@ -41,10 +41,7 @@ namespace Waher.Script.Model
 
 			if (this.bothDouble.HasValue && this.bothDouble.Value)
 			{
-				DoubleNumber DL = L as DoubleNumber;
-				DoubleNumber DR = R as DoubleNumber;
-
-				if (!(DL is null) && !(DR is null))
+				if (L is DoubleNumber DL && R is DoubleNumber DR)
 					return this.Evaluate(DL.Value, DR.Value);
 				else
 					this.bothDouble = false;
@@ -89,10 +86,7 @@ namespace Waher.Script.Model
 				{
 					this.bothBool = false;
 
-					DoubleNumber DL = L as DoubleNumber;
-					DoubleNumber DR = R as DoubleNumber;
-
-					if (!(DL is null) && !(DR is null))
+					if (L is DoubleNumber DL && R is DoubleNumber DR)
 					{
 						if (!this.bothDouble.HasValue)
 							this.bothDouble = true;
@@ -116,10 +110,7 @@ namespace Waher.Script.Model
         /// <returns>Result</returns>
         public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			BooleanValue BL = Left as BooleanValue;
-			BooleanValue BR = Right as BooleanValue;
-
-			if (!(BL is null) && !(BR is null))
+			if (Left is BooleanValue BL && Right is BooleanValue BR)
 				return this.Evaluate(BL.Value, BR.Value);
 			else
 			{
@@ -155,7 +146,7 @@ namespace Waher.Script.Model
 							throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
 					}
 
-					throw new ScriptRuntimeException("Scalar operands must be both boolean or double values or physical magnitudes.", this);
+					return this.Evaluate(l, r);
 				}
 			}
 		}

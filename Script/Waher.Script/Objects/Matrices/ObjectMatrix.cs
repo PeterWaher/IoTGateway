@@ -18,8 +18,8 @@ namespace Waher.Script.Objects.Matrices
 		private IElement[,] values;
 		private ICollection<IElement> elements;
 		private string[] columnNames = null;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Object-valued matrix.
@@ -250,7 +250,6 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
 			IElement[,] Values = this.Values;
-			ObjectMatrix Matrix;
 			IElement[,] v;
 			IElement n;
 			int x, y, z;
@@ -267,7 +266,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if (!((Matrix = Element as ObjectMatrix) is null))
+			else if (Element is ObjectMatrix Matrix)
 			{
 				if (Matrix.columns != this.rows)
 					return null;
@@ -309,7 +308,6 @@ namespace Waher.Script.Objects.Matrices
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
 			IElement[,] Values = this.Values;
-			ObjectMatrix Matrix;
 			IElement[,] v;
 			IElement n;
 			int x, y, z;
@@ -326,7 +324,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if (!((Matrix = Element as ObjectMatrix) is null))
+			else if (Element is ObjectMatrix Matrix)
 			{
 				if (this.columns != Matrix.rows)
 					return null;
@@ -379,7 +377,6 @@ namespace Waher.Script.Objects.Matrices
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			IElement[,] Values = this.Values;
-			ObjectMatrix Matrix;
 			IElement[,] v;
 			int x, y;
 
@@ -395,7 +392,7 @@ namespace Waher.Script.Objects.Matrices
 
 				return new ObjectMatrix(v);
 			}
-			else if (!((Matrix = Element as ObjectMatrix) is null))
+			else if (Element is ObjectMatrix Matrix)
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
@@ -441,8 +438,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			ObjectMatrix Matrix = obj as ObjectMatrix;
-			if (Matrix is null)
+			if (!(obj is ObjectMatrix Matrix))
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -645,8 +641,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Index < 0 || Index >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			IVector V = Value as IVector;
-			if (V is null)
+			if (!(Value is IVector V))
 				throw new ScriptException("Invalid row vector.");
 
 			if (V.Dimension != this.columns)

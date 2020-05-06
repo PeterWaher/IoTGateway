@@ -42,14 +42,7 @@ namespace Waher.Script.Functions.Analytic
 		public ScriptNode Differentiate(string VariableName, Variables Variables)
 		{
 			if (VariableName == this.DefaultVariableName)
-			{
-				int Start = this.Start;
-				int Len = this.Length;
-				Expression Exp = this.Expression;
-
-				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
-					this);
-			}
+				return this.DifferentiationChainRule(VariableName, Variables, this.Argument, this);
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
 		}

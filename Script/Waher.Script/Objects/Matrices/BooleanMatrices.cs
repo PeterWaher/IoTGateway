@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.Matrices
 	public sealed class BooleanMatrices : Ring
 	{
 		private BooleanMatrix zero = null;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Pseudo-ring of Boolean-valued matrices.
@@ -71,11 +71,10 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			BooleanMatrix M = Element as BooleanMatrix;
-			if (M is null)
+			if (Element is BooleanMatrix M)
+				return M.Rows == this.rows && M.Columns == this.columns;
+			else
 				return false;
-
-			return M.Rows == this.rows && M.Columns == this.columns;
 		}
 
 		/// <summary>

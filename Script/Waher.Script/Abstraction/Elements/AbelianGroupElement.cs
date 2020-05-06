@@ -24,11 +24,10 @@ namespace Waher.Script.Abstraction.Elements
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
-			IAbelianGroupElement E = Element as IAbelianGroupElement;
-            if (E is null)
-                return null;
-            else
-                return E.Add(this);
+			if (Element is IAbelianGroupElement E)
+				return E.Add(this);
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -38,11 +37,10 @@ namespace Waher.Script.Abstraction.Elements
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
-			IAbelianGroupElement E = Element as IAbelianGroupElement;
-			if (E is null)
-				return null;
-			else
+			if (Element is IAbelianGroupElement E)
 				return this.Add(E);
+			else
+				return null;
 		}
 
 		/// <summary>

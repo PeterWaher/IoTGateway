@@ -48,7 +48,7 @@ namespace Waher.Script.Functions.Analytic
 				Expression Exp = this.Expression;
 
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
-					new Cos(this.Argument, Start, Len, Expression));
+					new Cos(this.Argument, Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

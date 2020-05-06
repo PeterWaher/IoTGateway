@@ -58,15 +58,15 @@ namespace Waher.Script.Functions.Analytic
 				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
 					new Invert(
 						new Multiply(
-							new Scalar.Abs(this.Argument, Start, Len, Expression),
+							new Scalar.Abs(this.Argument, Start, Len, Exp),
 							new Sqrt(
 								new Subtract(
-									new Square(this.Argument, Start, Len, Expression),
-									new ConstantElement(DoubleNumber.OneElement, Start, Len, Expression),
-									Start, Len, Expression),
-								Start, Len, Expression),
-							Start, Len, Expression),
-						Start, Len, Expression));
+									new Square(this.Argument, Start, Len, Exp),
+									new ConstantElement(DoubleNumber.OneElement, Start, Len, Exp),
+									Start, Len, Exp),
+								Start, Len, Exp),
+							Start, Len, Exp),
+						Start, Len, Exp));
 			}
 			else
 				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);

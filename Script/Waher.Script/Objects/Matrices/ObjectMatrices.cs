@@ -12,8 +12,8 @@ namespace Waher.Script.Objects.Matrices
 	/// </summary>
 	public sealed class ObjectMatrices : Ring
 	{
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Pseudo-ring of Object-valued matrices.
@@ -65,11 +65,10 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			ObjectMatrix M = Element as ObjectMatrix;
-			if (M is null)
+			if (Element is ObjectMatrix M)
+				return M.Rows == this.rows && M.Columns == this.columns;
+			else
 				return false;
-
-			return M.Rows == this.rows && M.Columns == this.columns;
 		}
 
 		/// <summary>

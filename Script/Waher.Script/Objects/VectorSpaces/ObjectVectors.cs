@@ -46,7 +46,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				IElement Ref = null;
 				IElement Ref2 = null;
 				ISet Set = null;
-				ISet Set2 = null;
+				ISet Set2;
 
 				foreach (IElement Element in this.referenceVector.Elements)
 				{
@@ -114,11 +114,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			ObjectVector v = Element as ObjectVector;
-			if (v is null)
+			if (Element is ObjectVector v)
+				return v.Dimension == this.dimension;
+			else
 				return false;
-
-			return v.Dimension == this.dimension;
 		}
 
 		/// <summary>

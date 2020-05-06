@@ -10,8 +10,8 @@ namespace Waher.Script.Exceptions
 	/// </summary>
 	public class SyntaxException : ScriptException 
 	{
-		private string script;
-		private int position;
+		private readonly string script;
+		private readonly int position;
 
 		/// <summary>
 		/// Syntax error exception.

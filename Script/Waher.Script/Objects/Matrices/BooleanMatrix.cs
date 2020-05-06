@@ -17,8 +17,8 @@ namespace Waher.Script.Objects.Matrices
 	{
 		private bool[,] values;
 		private ICollection<IElement> elements;
-		private int rows;
-		private int columns;
+		private readonly int rows;
+		private readonly int columns;
 
 		/// <summary>
 		/// Boolean-valued matrix.
@@ -235,8 +235,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			BooleanMatrix Matrix = obj as BooleanMatrix;
-			if (Matrix is null)
+			if (!(obj is BooleanMatrix Matrix))
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
@@ -430,8 +429,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Index < 0 || Index >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			BooleanVector V = Value as BooleanVector;
-			if (V is null)
+			if (!(Value is BooleanVector V))
 				throw new ScriptException("Row vectors in a boolean matrix are required to be boolean vectors.");
 
 			if (V.Dimension != this.columns)
@@ -472,8 +470,7 @@ namespace Waher.Script.Objects.Matrices
 			if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
 				throw new ScriptException("Index out of bounds.");
 
-			BooleanValue V = Value as BooleanValue;
-			if (V is null)
+			if (!(Value is BooleanValue V))
 				throw new ScriptException("Elements in a boolean matrix must be boolean values.");
 
 			bool[,] M = this.Values;
@@ -535,14 +532,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Vector.Dimension != this.columns)
 				throw new ScriptException("Vector dimension does not match number of columns");
 
-			BooleanVector V = Vector as BooleanVector;
-			if (V is null)
+			if (!(Vector is BooleanVector V))
 				throw new ScriptException("Row vectors in a boolean matrix must be boolean vectors.");
 
 			bool[] V2 = V.Values;
 			bool[,] M = this.Values;
 			this.elements = null;
-			int i = 0;
+			int i;
 
 			for (i = 0; i < this.columns; i++)
 				M[Row, i] = V2[i];
@@ -561,14 +557,13 @@ namespace Waher.Script.Objects.Matrices
 			if (Vector.Dimension != this.rows)
 				throw new ScriptException("Vector dimension does not match number of rows");
 
-			BooleanVector V = Vector as BooleanVector;
-			if (V is null)
+			if (!(Vector is BooleanVector V))
 				throw new ScriptException("Column vectors in a boolean matrix must be boolean vectors.");
 
 			bool[] V2 = V.Values;
 			bool[,] M = this.Values;
 			this.elements = null;
-			int i = 0;
+			int i;
 
 			for (i = 0; i < this.rows; i++)
 				M[i, Column] = V2[i];

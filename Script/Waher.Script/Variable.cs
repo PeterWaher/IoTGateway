@@ -12,7 +12,7 @@ namespace Waher.Script
 	/// </summary>
 	public class Variable
 	{
-		private string name;
+		private readonly string name;
 		private IElement value;
 
 		/// <summary>

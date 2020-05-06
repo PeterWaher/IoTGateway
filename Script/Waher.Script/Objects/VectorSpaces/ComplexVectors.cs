@@ -15,7 +15,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		private static readonly ComplexNumbers scalarField = new ComplexNumbers();
 
 		private ComplexVector zero = null;
-		private int dimension;
+		private readonly int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of Complex-valued vectors.
@@ -47,18 +47,18 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get 
+			get
 			{
-                if (this.zero is null)
-                {
-                    Complex[] v = new Complex[this.dimension];
-                    int i;
+				if (this.zero is null)
+				{
+					Complex[] v = new Complex[this.dimension];
+					int i;
 
-                    for (i = 0; i < this.dimension; i++)
-                        v[i] = Complex.Zero;
+					for (i = 0; i < this.dimension; i++)
+						v[i] = Complex.Zero;
 
-                    this.zero = new ComplexVector(v);
-                }
+					this.zero = new ComplexVector(v);
+				}
 
 				return this.zero;
 			}
@@ -71,11 +71,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			ComplexVector v = Element as ComplexVector;
-			if (v is null)
+			if (Element is ComplexVector v)
+				return v.Dimension == this.dimension;
+			else
 				return false;
-
-			return v.Dimension == this.dimension;
 		}
 
 		/// <summary>

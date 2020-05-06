@@ -17,7 +17,7 @@ namespace Waher.Script.Objects.VectorSpaces
     {
         private DateTime[] values;
         private ICollection<IElement> elements;
-        private int dimension;
+        private readonly int dimension;
 
         /// <summary>
         /// DateTime-valued vector.
@@ -209,7 +209,7 @@ namespace Waher.Script.Objects.VectorSpaces
             int i;
 
             for (i = 0; i < this.dimension; i++)
-                Result ^= this.values[i].GetHashCode();
+                Result ^= Values[i].GetHashCode();
 
             return Result;
         }
@@ -282,11 +282,10 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            DateTimeValue V = Value as DateTimeValue;
-            if (V is null)
+            if (!(Value is DateTimeValue V))
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
-			DateTime[] Values = this.Values;
+            DateTime[] Values = this.Values;
             this.elements = null;
 
             Values[Index] = V.Value;

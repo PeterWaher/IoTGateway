@@ -18,8 +18,8 @@ namespace Waher.Script
 	/// </summary>
 	public class PreviewEventArgs : EventArgs
 	{
-		private Expression expression;
-		private IElement preview;
+		private readonly Expression expression;
+		private readonly IElement preview;
 
 		/// <summary>
 		/// Event arguments for preview events.

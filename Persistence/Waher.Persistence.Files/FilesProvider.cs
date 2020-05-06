@@ -60,7 +60,9 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable, IDatabaseProvider, ISerializerContext
 	{
+#if NETSTANDARD1_5
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+#endif
 
 		private SerializerCollection serializers;
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();

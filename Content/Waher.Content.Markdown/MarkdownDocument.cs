@@ -4777,15 +4777,8 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("<body>");
 			}
 
-			bool AddSection = (!Inclusion && this.detail is null && this.elements.First != null && !(this.elements.First.Value is Sections));
-			if (AddSection)
-				Output.AppendLine("<section>");
-
 			foreach (MarkdownElement E in this.elements)
 				E.GenerateHTML(Output);
-
-			if (AddSection)
-				Output.AppendLine("</section>");
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{

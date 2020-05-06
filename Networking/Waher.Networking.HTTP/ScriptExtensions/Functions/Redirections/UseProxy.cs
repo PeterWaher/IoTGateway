@@ -35,7 +35,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			throw new UseProxyException(Expression.ToString(Argument.AssociatedObjectValue));
+			throw new UseProxyException(Argument.AssociatedObjectValue?.ToString());
 		}
 	}
 }

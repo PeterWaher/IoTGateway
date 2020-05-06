@@ -35,7 +35,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			throw new TemporaryRedirectException(Expression.ToString(Argument.AssociatedObjectValue));
+			throw new TemporaryRedirectException(Argument.AssociatedObjectValue?.ToString());
 		}
 	}
 }

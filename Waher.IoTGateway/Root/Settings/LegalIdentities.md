@@ -58,7 +58,7 @@ JoinOther(Properties[]):=
 	s
 );
 
-foreach ID in Config.AllIdentities ?? [] do
+foreach ID in (Config.AllIdentities ?? []) do
 	]]| `((ID.Id))` ||||||||||
 |  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(JoinName(ID["FIRST"],ID["MIDDLE"],ID["LAST"]) ) )) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
 [[;

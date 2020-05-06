@@ -687,8 +687,9 @@ for the function. Each argument `x` can be defined to belong to one of five cate
 
 ### Conditional IF
 
-Conditional `IF`-statements can be written in various ways. Either using the `IF` and `THEN` keywords, followed by the optional `ELSE` keyword, or by
-using the `?` operator, followed by the optional `:` operator. There is also a quick null-check statement.
+Conditional `IF`-statements can be written in various ways. Either using the `IF` and `THEN` keywords, followed by the optional `ELSE` 
+keyword, or by using the `?` operator, followed by the optional `:` operator. There is also a quick null-check statement using the
+`??` operator. There is a `???` operator also, described in the following section.
 
 Examples:
 
@@ -701,6 +702,28 @@ Examples:
 **Note**: `IF`, `THEN` and `ELSE` are case insensitive. They are written here using upper case for clarity.
 
 **Note 2**: If no `ELSE` or `:` is present, the statement is evaluated to **null**.
+
+### Conditional Statements (DO/WHILE, WHILE/DO, FOR, FOREACH, TRY CATCH FINALLY)
+
+There are multiple ways to execute conditional loops. These statements have the same [order of presedence][]:
+
+| Operator | Meaning                   | Example              |
+|:--------:|:--------------------------|:--------------------:|
+| `DO` ... `WHILE` ... | Performs an action until a condition becomes **true**. | `DO Statement WHILE Condition` |
+| `WHILE` ... [`DO`] ... | While a condition is **true**, performs an action. | `WHILE Condition DO Statement` |
+| `FOREACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOREACH Variable in Collection DO Statement` |
+| `FOR EACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOR EACH Variable in Collection DO Statement` |
+| `FOR` ... `:=` ... `TO` ... [`STEP` ...] [`DO`] ... | Iterates a variable through a sequence of numerical values and performs an action on each iterated value. | `FOR Variable:=From TO Stop STEP StepSize DO Statement` |
+| `TRY` ... `CATCH` ... `FINALLY` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. Afterwards, a finalization statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `TRY Statement CATCH Exception FINALLY Done` |
+| `TRY` ... `CATCH` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `TRY Statement CATCH Exception` |
+| ... `???` ... | Short form for `TRY` ... `CATCH` ... | `... ??? Exception` |
+| `TRY` ... `FINALLY` ... | Executes a statement. Afterwards, a finalization statement is executed regardless if an exception has been thrown or not. Any exceptions are automatically propagated. | `TRY Statement FINALLY Done` |
+| `]]`...`[[` | Implicit print statement. This operation prints the contents between the `]]` and `[[` to the current console output. Any expressions embedded between `((` and `))` will be evaluated and the result displayed. | `a:=10;]]Value of a: ((a)).[[;` |
+
+**Note**: The `DO` keyword can be replaced by a `:`. 
+
+**Note 2**: The use of the `STEP` keyword together with the step size is optional. If omitted, a default step size of `1` or `-1` will be used, depending
+if the loop is ascending or descending.
 
 ### Lists
 
@@ -723,27 +746,6 @@ It is permissible to ignore arguments in a list. Such arguments will implicitly 
 	Arg1, Arg2,, Arg4
 
 Here, there third argument will have value **null**.
-
-### Conditional Statements (DO/WHILE, WHILE/DO, FOR, FOREACH, TRY CATCH FINALLY)
-
-There are multiple ways to execute conditional loops. These statements have the same [order of presedence][]:
-
-| Operator | Meaning                   | Example              |
-|:--------:|:--------------------------|:--------------------:|
-| `DO` ... `WHILE` ... | Performs an action until a condition becomes **true**. | `DO Statement WHILE Condition` |
-| `WHILE` ... [`DO`] ... | While a condition is **true**, performs an action. | `WHILE Condition DO Statement` |
-| `FOREACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOREACH Variable in Collection DO Statement` |
-| `FOR EACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOR EACH Variable in Collection DO Statement` |
-| `FOR` ... `:=` ... `TO` ... [`STEP` ...] [`DO`] ... | Iterates a variable through a sequence of numerical values and performs an action on each iterated value. | `FOR Variable:=From TO Stop STEP StepSize DO Statement` |
-| `TRY` ... `CATCH` ... `FINALLY` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. Afterwards, a finalization statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `TRY Statement CATCH Exception FINALLY Done` |
-| `TRY` ... `CATCH` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `TRY Statement CATCH Exception` |
-| `TRY` ... `FINALLY` ... | Executes a statement. Afterwards, a finalization statement is executed regardless if an exception has been thrown or not. Any exceptions are automatically propagated. | `TRY Statement FINALLY Done` |
-| `]]`...`[[` | Implicit print statement. This operation prints the contents between the `]]` and `[[` to the current console output. Any expressions embedded between `((` and `))` will be evaluated and the result displayed. | `a:=10;]]Value of a: ((a)).[[;` |
-
-**Note**: The `DO` keyword can be replaced by a `:`. 
-
-**Note 2**: The use of the `STEP` keyword together with the step size is optional. If omitted, a default step size of `1` or `-1` will be used, depending
-if the loop is ascending or descending.
 
 ### Sequences
 

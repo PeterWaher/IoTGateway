@@ -610,9 +610,22 @@ namespace Waher.Script
 					case '(':
 					case '[':
 					case '{':
-					case '?':
 						this.pos--;
 						return Condition;   // Null-check operator
+
+					case '?':
+						this.pos++;
+						if (this.PeekNextChar() == '?')
+						{
+							this.pos++;
+							IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+							return new TryCatch(Condition, IfTrue, Start, this.pos - Start, this);
+						}
+						else
+						{
+							IfTrue = this.AssertOperandNotNull(this.ParseStatement());
+							return new NullCheck(Condition, IfTrue, Start, this.pos - Start, this);
+						}
 
 					default:
 						IfTrue = this.AssertOperandNotNull(this.ParseStatement());
@@ -2219,9 +2232,16 @@ namespace Waher.Script
 						if (NullCheck)
 						{
 							this.pos++;
-
-							ScriptNode IfNull = this.AssertOperandNotNull(this.ParseObject());
-							Node = new NullCheck(Node, IfNull, Start, this.pos - Start, this);
+							if (this.PeekNextChar() == '?')
+							{
+								this.pos -= 2;
+								return Node;
+							}
+							else
+							{
+								ScriptNode IfNull = this.AssertOperandNotNull(this.ParseObject());
+								Node = new NullCheck(Node, IfNull, Start, this.pos - Start, this);
+							}
 							break;
 						}
 						else

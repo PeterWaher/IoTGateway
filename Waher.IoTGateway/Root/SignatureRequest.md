@@ -74,7 +74,7 @@ Parts Mode: **((Contract.PartsMode))**
 | Legal ID | Role |
 |:---------|:-----|[[;
 
-	foreach Part in Contract.Parts ?? [] do
+	foreach Part in (Contract.Parts ?? []) do
 		]]
 | `((Part.LegalId))` | ((MarkdownEncode(Part.Role) )) |[[;
 
@@ -86,7 +86,7 @@ Parameters
 | Name | Value | Description |
 |:-----|:------|:------------|[[;
 
-	foreach Parameter in Contract.Parameters ?? [] do
+	foreach Parameter in (Contract.Parameters ?? []) do
 		]]
 | **((MarkdownEncode(Parameter.Name) ))** | ((Parameter.ObjectValue)) | ((OneRow(Parameter.ToMarkdown(Language, Contract) ) )) |[[;
 
@@ -103,7 +103,7 @@ Client Signatures
 | Legal ID | Bare JID | Role | Transferable | Date | Time | Signature |
 |:---------|:---------|:-----|:------------:|:-----|:-----|:----------|[[;
 
-	foreach S in Contract.ClientSignatures ?? [] do
+	foreach S in (Contract.ClientSignatures ?? []) do
 		]]
 | `((S.LegalId))` | `((S.BareJid))` | ((MarkdownEncode(S.Role) )) | ((S.Transferable ? "✔" : "✗")) | ((MarkdownEncode(S.Timestamp.ToShortDateString() ) )) | ((MarkdownEncode(S.Timestamp.ToLongTimeString() ) )) | ((SignatureStyle(S.DigitalSignature) )) |[[;
 

@@ -2635,6 +2635,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -5497,6 +5498,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -8395,6 +8397,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -11266,6 +11269,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -14173,6 +14177,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -17044,6 +17049,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"
@@ -19951,6 +19957,7 @@
           "Waher.Content.Html": "1.0.11",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Runtime.Cache": "1.0.2",
+          "Waher.Runtime.Inventory": "1.0.12",
           "Waher.Runtime.Text": "1.0.0",
           "Waher.Script": "1.0.36",
           "Waher.Script.Graphs": "1.0.13"

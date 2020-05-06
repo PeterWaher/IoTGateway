@@ -61,6 +61,8 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />

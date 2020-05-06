@@ -286,6 +286,7 @@
   <Assembly fileName='Waher.Runtime.Timing.dll'/>
   <Assembly fileName='Waher.Script.dll'/>
   <Assembly fileName='Waher.Script.Content.dll'/>
+  <Assembly fileName='Waher.Script.Cryptography.dll'/>
   <Assembly fileName='Waher.Script.Fractals.dll'/>
   <Assembly fileName='Waher.Script.Graphs.dll'/>
   <Assembly fileName='Waher.Script.Persistence.dll'/>

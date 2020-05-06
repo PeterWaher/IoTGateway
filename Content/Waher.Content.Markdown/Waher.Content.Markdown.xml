@@ -431,6 +431,13 @@
             Links to server-side script files that should be included before processing the page.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.InitializationScript">
+            <summary>
+            Links to server-side script files that should be executed before before processing the page.
+            Initialization script are only executed once. To execute init script again, a new version
+            (timestamp) of the file must be present.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.MarkdownDocument.Parameters">
             <summary>
             Name of a query parameter recognized by the page.

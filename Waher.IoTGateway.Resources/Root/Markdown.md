@@ -1484,6 +1484,13 @@ Link to an icon for the page.
 
 Link to an image for the page.
 
+### Init
+
+Links to server-side script files that should be executed before processing the page. The script is only executed once, regardless of how
+many times the mrkdown page is processed. It can be used to initialize the backend appropriately. To execute the script again, a newer
+version must be available. The file time stamps are used to determine if a file is newer than a previous version or not. For script that 
+is to be executed every time the page is processed, see the [Script](#script) tag.
+
 ### JavaScript
 
 Links to JavaScript files that should be included in the generated HTML page.
@@ -1526,7 +1533,8 @@ Tells the browser to refresh the page after a given number of seconds.
 
 ### Script
 
-Links to server-side script files that should be included before processing the page.
+Links to server-side script files that should be included before processing the page. Script linked to here will be executed every time
+the markdown document is processed. For script that is to be executed only once, see the [Init](#init) tag.
 
 ### Subtitle
 

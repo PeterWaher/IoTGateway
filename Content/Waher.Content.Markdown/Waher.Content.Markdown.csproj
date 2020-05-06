@@ -35,6 +35,7 @@ https://waher.se/Markdown.md</Description>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />

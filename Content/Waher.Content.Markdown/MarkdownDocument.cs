@@ -13,6 +13,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
 using System.Collections;
 
@@ -210,7 +211,7 @@ namespace Waher.Content.Markdown
 		}
 
 		internal static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
-		internal static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
+		internal static Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// Preprocesses markdown text.
@@ -270,7 +271,62 @@ namespace Waher.Content.Markdown
 					{
 						if (M.Success)
 						{
-							string FileName2 = Settings.GetFileName(FileName, M2.Groups["ScriptFile"].Value);
+							string Tag = M2.Groups["Tag"].Value.ToUpper();
+							string FileName2 = M2.Groups["ScriptFile"].Value;
+
+							FileName2 = Settings.GetFileName(FileName, FileName2);
+
+							if (Tag == "INIT")
+							{
+								DateTime Timestamp = File.GetLastWriteTime(FileName2);
+								DateTime? LastExecuted;
+								Type RuntimeSettings = null;
+								MethodInfo Get;
+								MethodInfo Set;
+
+								lock (lastExecuted)
+								{
+									if (lastExecuted.TryGetValue(FileName, out DateTime TP))
+										LastExecuted = TP;
+									else
+										LastExecuted = null;
+								}
+
+								if (LastExecuted.HasValue && LastExecuted.Value >= Timestamp)
+									continue;
+
+								if (!LastExecuted.HasValue &&
+									!((RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings")) is null) &&
+									!((Get = RuntimeSettings.GetRuntimeMethod("Get", new Type[] { typeof(string), typeof(DateTime) })) is null))
+								{
+									LastExecuted = (DateTime)Get.Invoke(null, new object[] { FileName, DateTime.MinValue });
+
+									if (LastExecuted.HasValue && LastExecuted.Value >= Timestamp)
+									{
+										lock (lastExecuted)
+										{
+											lastExecuted[FileName] = LastExecuted.Value;
+										}
+										
+										continue;
+									}
+								}
+
+								lock (lastExecuted)
+								{
+									lastExecuted[FileName] = Timestamp;
+								}
+
+								if (RuntimeSettings is null)
+									RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings");
+
+								if (!(RuntimeSettings is null) &&
+									!((Set = RuntimeSettings.GetRuntimeMethod("Set", new Type[] { typeof(string), typeof(DateTime) })) is null))
+								{
+									Set.Invoke(null, new object[] { FileName, Timestamp });
+								}
+							}
+
 							Script = File.ReadAllText(FileName2);
 
 							if (!IsDynamic)
@@ -379,6 +435,8 @@ namespace Waher.Content.Markdown
 
 			return Markdown;
 		}
+
+		private static readonly Dictionary<string, DateTime> lastExecuted = new Dictionary<string, DateTime>();
 
 		internal void CheckException(Exception ex)
 		{
@@ -4591,6 +4649,7 @@ namespace Waher.Content.Markdown
 						case "DESCRIPTION":
 						case "HELP":
 						case "ICON":
+						case "INIT":
 						case "JAVASCRIPT":
 						case "LOGIN":
 						case "MASTER":
@@ -5325,6 +5384,19 @@ namespace Waher.Content.Markdown
 			get
 			{
 				return this.GetMetaData("SCRIPT");
+			}
+		}
+
+		/// <summary>
+		/// Links to server-side script files that should be executed before before processing the page.
+		/// Initialization script are only executed once. To execute init script again, a new version
+		/// (timestamp) of the file must be present.
+		/// </summary>
+		public string[] InitializationScript
+		{
+			get
+			{
+				return this.GetMetaData("INIT");
 			}
 		}
 

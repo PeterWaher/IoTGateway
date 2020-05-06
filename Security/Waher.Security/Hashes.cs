@@ -326,7 +326,7 @@ namespace Waher.Security
 		public static byte[] ComputeSHA256Hash(byte[] Data)
 		{
 			byte[] Result;
-
+			
 			using (SHA256 SHA256 = SHA256.Create())
 			{
 				Result = SHA256.ComputeHash(Data);

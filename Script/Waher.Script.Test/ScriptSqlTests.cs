@@ -754,11 +754,53 @@ namespace Waher.Script.Test
 		public void INSERT_Test_01_INSERT_VALUES()
 		{
 			this.Test(
-				"insert into WebUsers (UserName, Password) values (\"User1\", \"Pwd1\");"+
+				"insert into WebUsers (UserName, Password) values (\"User01\", \"Pwd01\");"+
 				"select UserName, Password from WebUsers order by UserName",
 				new object[][]
 				{
-					new object[] { "User1", "Pwd1" }
+					new object[] { "User01", "Pwd01" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_02_INSERT_SELECT_Columns()
+		{
+			this.Test(
+				"ToStr(i):=i<10?\"0\"+i:i;" +
+				"insert into WebUsers select UserName, Password from [foreach i in 2..10 do {UserName:\"User\"+ToStr(i),Password:\"Pwd\"+ToStr(i)}];" +
+				"select UserName, Password from WebUsers where UserName>=\"User02\" and UserName<=\"User10\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User02", "Pwd02" },
+					new object[] { "User03", "Pwd03" },
+					new object[] { "User04", "Pwd04" },
+					new object[] { "User05", "Pwd05" },
+					new object[] { "User06", "Pwd06" },
+					new object[] { "User07", "Pwd07" },
+					new object[] { "User08", "Pwd08" },
+					new object[] { "User09", "Pwd09" },
+					new object[] { "User10", "Pwd10" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_03_INSERT_SELECT_Objects()
+		{
+			this.Test(
+				"insert into WebUsers select * from [foreach i in 11..20 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
+				"select UserName, Password from WebUsers where UserName>=\"User11\" and UserName<=\"User20\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User11", "Pwd11" },
+					new object[] { "User12", "Pwd12" },
+					new object[] { "User13", "Pwd13" },
+					new object[] { "User14", "Pwd14" },
+					new object[] { "User15", "Pwd15" },
+					new object[] { "User16", "Pwd16" },
+					new object[] { "User17", "Pwd17" },
+					new object[] { "User18", "Pwd18" },
+					new object[] { "User19", "Pwd19" },
+					new object[] { "User20", "Pwd20" }
 				});
 		}
 
@@ -771,7 +813,6 @@ namespace Waher.Script.Test
 		 *		TOP
 		 *		DISTINCT
 		 *		OFFSET
-		 *	INSERT INTO (...) SELECT ...
 		 */
 
 	}

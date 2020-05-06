@@ -12,9 +12,9 @@ using Waher.Script.Operators;
 namespace Waher.Script.Persistence.SQL
 {
 	/// <summary>
-	/// Executes an INSERT statement against the object database.
+	/// Executes an INSERT ... VALUES ... statement against the object database.
 	/// </summary>
-	public class Insert : ScriptNode
+	public class InsertValues : ScriptNode
 	{
 		private SourceDefinition source;
 		private ElementList columns;
@@ -22,7 +22,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly int nrFields;
 
 		/// <summary>
-		/// Executes an INSERT statement against the object database.
+		/// Executes an INSERT ... VALUES ... statement against the object database.
 		/// </summary>
 		/// <param name="Source">Source to update objects from.</param>
 		/// <param name="Columns">Columns</param>
@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Insert(SourceDefinition Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
+		public InsertValues(SourceDefinition Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			if ((this.nrFields = Columns.Elements.Length) != Values.Elements.Length)
@@ -117,30 +117,25 @@ namespace Waher.Script.Persistence.SQL
 			if (!(Node is null) && !Callback(ref Node, State))
 				return false;
 
-			if (Node != this.source)
-			{
-				if (Node is SourceDefinition Source2)
-					this.source = Source2;
-				else
-					return false;
-			}
-
-			ScriptNode Temp;
-
-			Temp = this.columns;
-			if (!(Temp is null) && !Callback(ref Temp, State))
+			if (Node is SourceDefinition Source2)
+				this.source = Source2;
+			else
 				return false;
 
-			if (Temp is ElementList List1)
+			Node = this.columns;
+			if (!(Node is null) && !Callback(ref Node, State))
+				return false;
+
+			if (Node is ElementList List1)
 				this.columns = List1;
 			else
 				return false;
 
-			Temp = this.values;
-			if (!(Temp is null) && !Callback(ref Temp, State))
+			Node = this.values;
+			if (!(Node is null) && !Callback(ref Node, State))
 				return false;
 
-			if (Temp is ElementList List2)
+			if (Node is ElementList List2)
 				this.values = List2;
 			else
 				return false;
@@ -165,7 +160,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return (obj is Insert O &&
+			return (obj is InsertValues O &&
 				AreEqual(this.source, O.source) &&
 				AreEqual(this.columns, O.columns) &&
 				AreEqual(this.values, O.values) &&
@@ -183,7 +178,6 @@ namespace Waher.Script.Persistence.SQL
 			Result ^= Result << 5 ^ GetHashCode(this.values);
 			return Result;
 		}
-
 
 	}
 }

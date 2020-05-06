@@ -53,35 +53,48 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
 					return false;
 
-				if (Parser.NextToken() != "(")
-					return false;
+				switch (Parser.PeekNextToken().ToUpper())
+				{
+					case "(":
+						Parser.NextToken();
 
-				ScriptNode Node = Parser.ParseList();
-				if (!(Node is ElementList Columns))
-					Columns = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
+						ScriptNode Node = Parser.ParseList();
+						if (!(Node is ElementList Columns))
+							Columns = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
 
-				if (Parser.NextToken() != ")")
-					return false;
+						if (Parser.NextToken() != ")")
+							return false;
 
-				if (Parser.NextToken().ToUpper() != "VALUES")
-					return false;
+						if (Parser.NextToken().ToUpper() != "VALUES")
+							return false;
 
-				if (Parser.NextToken() != "(")
-					return false;
+						if (Parser.NextToken() != "(")
+							return false;
 
-				Node = Parser.ParseList();
-				if (!(Node is ElementList Values))
-					Values = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
+						Node = Parser.ParseList();
+						if (!(Node is ElementList Values))
+							Values = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
 
-				if (Values.Elements.Length != Columns.Elements.Length)
-					return false;
+						if (Values.Elements.Length != Columns.Elements.Length)
+							return false;
 
-				if (Parser.NextToken() != ")")
-					return false;
+						if (Parser.NextToken() != ")")
+							return false;
 
-				Result = new Insert(Source, Columns, Values, Parser.Start, Parser.Length, Parser.Expression);
+						Result = new InsertValues(Source, Columns, Values, Parser.Start, Parser.Length, Parser.Expression);
+						return true;
 
-				return true;
+					case "SELECT":
+						Node = Parser.ParseStatement();
+						if (!(Node is Select Select))
+							return false;
+
+						Result = new InsertSelect(Source, Select, Parser.Start, Parser.Position, Parser.Expression);
+						return true;
+
+					default:
+						return false;
+				}
 			}
 			catch (Exception)
 			{

@@ -107,7 +107,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						else if (Node is VariableReference Ref)
 							Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
 						else if (Node is NamedMember NamedMember)
-							Name=new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
+							Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
 
 						Columns.Add(Node);
 						ColumnNames.Add(Name);
@@ -408,8 +408,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 			s = Parser.PeekNextToken().ToUpper();
 			if (!string.IsNullOrEmpty(s) &&
-				IsAlpha(s) &&
-				s != "," &&
+				IsAlias(s) &&
 				s != "INNER" &&
 				s != "OUTER" &&
 				s != "LEFT" &&
@@ -420,7 +419,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s != "GROUP" &&
 				s != "ORDER" &&
 				s != "OFFSET" &&
-				s != "ON")
+				s != "ON" &&
+				s != "SELECT")
 			{
 				if (s == "AS")
 					Parser.NextToken();
@@ -435,11 +435,11 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			return true;
 		}
 
-		internal static bool IsAlpha(string s)
+		internal static bool IsAlias(string s)
 		{
 			foreach (char ch in s)
 			{
-				if (!char.IsLetter(ch))
+				if (!char.IsLetterOrDigit(ch) && ch != '_')
 					return false;
 			}
 

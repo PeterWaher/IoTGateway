@@ -1628,9 +1628,9 @@ v:=[{a:1,b:2},{a:2,b:1}];
 select a, b from v
 ```
 
-#### INSERT
+#### INSERT VALUES
 
-Simplified SQL `INSERT` statements can be executed against the object database. The inserted object is returned.
+SQL `INSERT` statements can be executed against the object database. The inserted object is returned.
 
 Syntax:
 
@@ -1670,6 +1670,33 @@ values
 	"Here", 
 	"Kilroy"
 )
+```
+
+#### INSERT SELECT
+
+You can insert multiple objects into a data source by combining an INSERT and a SELECT
+statement.
+
+Syntax:
+
+```
+INSERT
+INTO Source
+SELECT ...
+```
+
+Example:
+
+```
+insert
+into PersistedEvent 
+select
+	Timestamp,
+	Message,
+	Object,
+	Actor
+from
+	...
 ```
 
 #### UPDATE

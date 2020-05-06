@@ -1326,6 +1326,8 @@ The following functions are available in the `Waher.Script.Content` library.
 | `SaveFile(Obj,FileName)`        | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
 | `UrlDecode(s)`                  | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
 | `UrlEncode(s)`                  | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
+| `Utf8Decode(s)`                 | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
+| `Utf8Encode(s)`                 | Encodes a string using UTF-8. | [Example][Utf8EncodeExample] |
 | `XmlDecode(s)`                  | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
 | `XmlEncode(s)`                  | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
@@ -1342,8 +1344,36 @@ The following functions are available in the `Waher.Script.Content` library.
 [SaveFileExample]: Prompt.md?Expression=SaveFile(Graph,%22Graph.png%22)
 [UrlDecodeExample]: Prompt.md?Expression=UrlDecode(%22Hello%2bWorld%22)
 [UrlEncodeExample]: Prompt.md?Expression=UrlEncode(%22Hello%20World%22)
+[Utf8DecodeExample]: Prompt.md?Expression=Utf8Decode(Base64Decode("SGVsbG8="))
+[Utf8EncodeExample]: Prompt.md?Expression=Base64Encode(Utf8Encode(%22Hello%20World%22))
 [XmlDecodeExample]: Prompt.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
 [XmlEncodeExample]: Prompt.md?Expression=XmlEncode(%22%3Ctag%3E%22)
+
+#### Cryptography-related functions (Waher.Script.Cryptography)
+
+The following functions are available in the `Waher.Script.Cryptography` library.
+
+| Function                        | Description | Example |
+|---------------------------------|-------------|---------|
+| `Md5(Data)`                     | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
+| `Sha1(Data)`                    | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
+| `Sha2_256(Data)`                | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_256Example] |
+| `Sha2_384(Data)`                | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_384Example] |
+| `Sha2_512(Data)`                | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_512Example] |
+| `Sha3_224(Data)`                | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_224Example] |
+| `Sha3_256(Data)`                | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_256Example] |
+| `Sha3_384(Data)`                | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_384Example] |
+| `Sha3_512(Data)`                | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_512Example] |
+
+[Md5Example]: Prompt.md?Expression=Md5(Utf8Encode(%22Hello%22))
+[Sha1Example]: Prompt.md?Expression=Sha1(Utf8Encode(%22Hello%22))
+[Sha2_256Example]: Prompt.md?Expression=Sha2_256(Utf8Encode(%22Hello%22))
+[Sha2_384Example]: Prompt.md?Expression=Sha2_384(Utf8Encode(%22Hello%22))
+[Sha2_512Example]: Prompt.md?Expression=Sha2_512(Utf8Encode(%22Hello%22))
+[Sha3_224Example]: Prompt.md?Expression=Sha3_224(Utf8Encode(%22Hello%22))
+[Sha3_256Example]: Prompt.md?Expression=Sha3_256(Utf8Encode(%22Hello%22))
+[Sha3_384Example]: Prompt.md?Expression=Sha3_384(Utf8Encode(%22Hello%22))
+[Sha3_512Example]: Prompt.md?Expression=Sha3_512(Utf8Encode(%22Hello%22))
 
 #### XML-related functions (Waher.Script.Xml)
 

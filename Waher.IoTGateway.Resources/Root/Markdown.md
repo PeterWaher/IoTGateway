@@ -1524,8 +1524,8 @@ Link to previous document, in a paginated set of documents.
 ### Privilege
 
 Requered user privileges to display page. Meta-data tag can be used multiple times, one for each privilege required.
-The `IUser.HasPrivilege` method will be called to check that the valid user has the corresponding privilege, before
-the page is displayed.
+The `IUser.HasPrivilege` method (defined in `Waher.Security`) will be called to check that the valid user has the corresponding privilege, 
+before the page is displayed.
 
 ### Refresh
 
@@ -1546,7 +1546,8 @@ Use this key to provide a title for the document. The title of the page will be 
 
 ### UserVariable
 
-Name of the variable that will hold a reference to the `IUser` interface (defined in `Waher.Security`) for the currently logged in user.
+Name of the variable that will hold a reference to the user object for the currently logged in user. If privileges are defined using the 
+[Privilege](#privilege) meta-data tag, this user object must implement the `IUser` interface (defined in `Waher.Security`).
 
 ### VideoAutoplay
 

@@ -245,8 +245,7 @@ namespace Waher.Content.Markdown.Web
 
 					if (!(Privilege is null))
 					{
-						IUser User = v.ValueObject as IUser;
-						if (User is null)
+						if (!(v.ValueObject is IUser User))
 						{
 							Authorized = false;
 							break;

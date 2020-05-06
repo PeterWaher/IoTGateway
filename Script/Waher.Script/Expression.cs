@@ -2270,6 +2270,8 @@ namespace Waher.Script
 						break;
 
 					case '(':
+						bool WsBak = this.canSkipWhitespace;
+						this.canSkipWhitespace = true;
 						this.pos++;
 						Right = this.ParseList();
 
@@ -2277,6 +2279,7 @@ namespace Waher.Script
 						if (this.PeekNextChar() != ')')
 							throw new SyntaxException("Expected ).", this.pos, this.script);
 
+						this.canSkipWhitespace = WsBak;
 						this.pos++;
 
 						Ref = Node as VariableReference;
@@ -2307,6 +2310,8 @@ namespace Waher.Script
 						break;
 
 					case '[':
+						WsBak = this.canSkipWhitespace;
+						this.canSkipWhitespace = true;
 						this.pos++;
 						Right = this.ParseList();
 
@@ -2314,6 +2319,7 @@ namespace Waher.Script
 						if (this.PeekNextChar() != ']')
 							throw new SyntaxException("Expected ].", this.pos, this.script);
 
+						this.canSkipWhitespace = WsBak;
 						this.pos++;
 
 						if (Right is null)
@@ -3297,6 +3303,8 @@ namespace Waher.Script
 
 			if (ch == '(')
 			{
+				bool WsBak = this.canSkipWhitespace;
+				this.canSkipWhitespace = true;
 				this.pos++;
 				Node = this.ParseSequence();
 
@@ -3304,6 +3312,7 @@ namespace Waher.Script
 				if (this.PeekNextChar() != ')')
 					throw new SyntaxException("Expected ).", this.pos, this.script);
 
+				this.canSkipWhitespace = WsBak;
 				this.pos++;
 
 				if (Node is null)
@@ -3342,6 +3351,8 @@ namespace Waher.Script
 					return new VectorDefinition(new ScriptNode[0], Start, this.pos - Start, this);
 				}
 
+				bool WsBak = this.canSkipWhitespace;
+				this.canSkipWhitespace = true;
 				Node = this.ParseStatement();
 
 				this.SkipWhiteSpace();
@@ -3349,6 +3360,7 @@ namespace Waher.Script
 				{
 					case ']':
 						this.pos++;
+						this.canSkipWhitespace = WsBak;
 
 						if (Node is For For)
 						{
@@ -3426,6 +3438,7 @@ namespace Waher.Script
 						if (this.PeekNextChar() != ']')
 							throw new SyntaxException("Expected ].", this.pos, this.script);
 
+						this.canSkipWhitespace = WsBak;
 						this.pos++;
 
 						return new ImplicitVectorDefinition(Node, SuperSet, Conditions, Start, this.pos - Start, this);
@@ -3443,6 +3456,9 @@ namespace Waher.Script
 					this.pos++;
 					return new SetDefinition(new ScriptNode[0], Start, this.pos - Start, this);
 				}
+
+				bool WsBak = this.canSkipWhitespace;
+				this.canSkipWhitespace = true;
 
 				Node = this.ParseStatement();
 
@@ -3513,6 +3529,7 @@ namespace Waher.Script
 						if (ch != '}')
 							throw new SyntaxException("Expected }.", this.pos, this.script);
 
+						this.canSkipWhitespace = WsBak;
 						this.pos++;
 						return new ObjectExNihilo(Members, Start, this.pos - Start, this);
 					}
@@ -3538,6 +3555,7 @@ namespace Waher.Script
 					if (this.PeekNextChar() != '}')
 						throw new SyntaxException("Expected }.", this.pos, this.script);
 
+					this.canSkipWhitespace = WsBak;
 					this.pos++;
 
 					return new ImplicitSetDefinition(Node, SuperSet, Conditions, DoubleColon, Start, this.pos - Start, this);
@@ -3546,6 +3564,7 @@ namespace Waher.Script
 				if (ch != '}')
 					throw new SyntaxException("Expected }.", this.pos, this.script);
 
+				this.canSkipWhitespace = WsBak;
 				this.pos++;
 
 				if (Node is For For)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -43,17 +44,12 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			System.Text.Encoding Encoding = System.Text.Encoding.UTF8;
-
 			if (!(Argument1.AssociatedObjectValue is byte[] Bin))
-			{
-				string s = Argument1 is StringValue S ? S.Value : Expression.ToString(Argument1.AssociatedObjectValue);
-				Bin = Encoding.GetBytes(s);
-			}
+				throw new ScriptRuntimeException("Binary data expected.", this);
 
 			string ContentType = Argument2 is StringValue S2 ? S2.Value : Expression.ToString(Argument2.AssociatedObjectValue);
 
-			return this.DoDecode(Bin, ContentType, Encoding);
+			return this.DoDecode(Bin, ContentType, System.Text.Encoding.UTF8);
 		}
 
 		private IElement DoDecode(byte[] Data, string ContentType, System.Text.Encoding Encoding)

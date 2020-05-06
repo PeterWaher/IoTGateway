@@ -67,8 +67,7 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			if (Arguments.Length > 1)
 			{
-				Array A = Arguments[1].AssociatedObjectValue as Array;
-				if (A is null)
+				if (!(Arguments[1].AssociatedObjectValue is Array A))
 					throw new ScriptRuntimeException("Second parameter to Encode should be an array of acceptable content types.", this);
 
 				int i, c = A.Length;

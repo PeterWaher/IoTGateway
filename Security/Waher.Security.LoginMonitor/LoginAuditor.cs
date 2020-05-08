@@ -60,7 +60,7 @@ namespace Waher.Security.LoginMonitor
 			switch (Event.EventId)
 			{
 				case "LoginFailure":
-					return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp, 
+					return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
 						"Repeatedly failing login attempts.");
 
 				case "LoginSuccessful":
@@ -297,7 +297,7 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Tags">Predefined tags.</param>
 		/// <returns>Tags, including tags provided by external annotation.</returns>
-		public static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, params KeyValuePair<string,object>[] Tags)
+		public static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, params KeyValuePair<string, object>[] Tags)
 		{
 			AnnotateEndpointEventArgs e = new AnnotateEndpointEventArgs(RemoteEndpoint);
 
@@ -338,6 +338,63 @@ namespace Waher.Security.LoginMonitor
 			EP.Reset(true);
 
 			await Database.Update(EP);
+		}
+
+		/// <summary>
+		/// Handles a failed login attempt.
+		/// </summary>
+		/// <param name="Message">Log message</param>
+		/// <param name="UserName">Attempted user name.</param>
+		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="Protocol">Protocol</param>
+		/// <param name="Tags">Any informative tags.</param>
+		public static async void Fail(string Message, string UserName, string RemoteEndpoint, string Protocol,
+			params KeyValuePair<string, object>[] Tags)
+		{
+			try
+			{
+				Tags = await Annotate(RemoteEndpoint, Protocol, Tags);
+				Log.Notice(Message, UserName, RemoteEndpoint, "LoginFailure", Tags);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, string Protocol, 
+			params KeyValuePair<string, object>[] Tags)
+		{
+			int c = Tags?.Length ?? 0;
+			if (c == 0)
+				Tags = new KeyValuePair<string, object>[1];
+			else
+				Array.Resize<KeyValuePair<string, object>>(ref Tags, c + 1);
+
+			Tags[c] = new KeyValuePair<string, object>("Protocol", Protocol);
+			return await Annotate(RemoteEndpoint, Tags);
+		}
+
+		/// <summary>
+		/// Handles a successful login attempt.
+		/// </summary>
+		/// <param name="Message">Log message</param>
+		/// <param name="UserName">Attempted user name.</param>
+		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="Protocol">Protocol</param>
+		/// <param name="Tags">Any informative tags.</param>
+		public static async void Success(string Message, string UserName, string RemoteEndpoint, string Protocol,
+			params KeyValuePair<string, object>[] Tags)
+		{
+			try
+			{
+				Tags = await Annotate(RemoteEndpoint, Protocol, Tags);
+				Log.Informational(Message, UserName, RemoteEndpoint, "LoginSuccessful", Tags);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 	}

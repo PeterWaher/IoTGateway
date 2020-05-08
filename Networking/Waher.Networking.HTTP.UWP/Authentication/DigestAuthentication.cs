@@ -5,6 +5,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP.Authentication
 {
@@ -194,16 +195,12 @@ namespace Waher.Networking.HTTP.Authentication
 
 				if (Digest == Response)
 				{
-					Log.Informational("Login successful.", UserName, Request.RemoteEndPoint, "LoginSuccessful",
-						EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
-
+					LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 					return true;
 				}
 				else
 				{
-					Log.Notice("Login attempt failed.", UserName, Request.RemoteEndPoint, "LoginFailure",
-						EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "HTTP"));
-
+					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
 					User = null;
 				}
 			}

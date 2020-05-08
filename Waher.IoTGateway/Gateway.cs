@@ -1916,9 +1916,7 @@ namespace Waher.IoTGateway
 		{
 			if (xmppClient is null || xmppClient.UserName != UserName)
 			{
-				Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor,
-					new KeyValuePair<string, object>("Protocol", Protocol));
-
+				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
 				return LoginResult.InvalidLogin;
 			}
 
@@ -1975,9 +1973,7 @@ namespace Waher.IoTGateway
 				{
 					if (Connected)
 					{
-						Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor,
-							new KeyValuePair<string, object>("Protocol", Protocol));
-
+						LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
 						return LoginResult.InvalidLogin;
 					}
 					else
@@ -1986,23 +1982,21 @@ namespace Waher.IoTGateway
 							UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
 							string.IsNullOrEmpty(xmppCredentials.PasswordType))
 						{
-							Log.Informational("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.",
-								UserName, RemoteEndPoint, "LoginSuccessful", EventLevel.Minor, new KeyValuePair<string, object>("Protocol", Protocol));
+							LoginAuditor.Success("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.",
+								UserName, RemoteEndPoint, Protocol);
 
 							return LoginResult.Successful;
 						}
 						else
 						{
-							Log.Notice("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, "LoginFailure",
-								EventLevel.Minor, new KeyValuePair<string, object>("Protocol", Protocol));
+							LoginAuditor.Fail("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, Protocol);
 							return LoginResult.UnableToConnect;
 						}
 					}
 				}
 			}
 
-			Log.Informational("Successful login.", UserName, RemoteEndPoint, "LoginSuccessful", EventLevel.Minor,
-				new KeyValuePair<string, object>("Protocol", Protocol));
+			LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
 
 			if (xmppClient.State != XmppState.Connected &&
 				(xmppClient.PasswordHash != PasswordHash || xmppClient.PasswordHashMethod != PasswordHashMethod))
@@ -2056,9 +2050,8 @@ namespace Waher.IoTGateway
 
 			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 			{
-				Log.Informational("User logged in by default, since XMPP not configued and loopback interface not available.",
-					string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor,
-					new KeyValuePair<string, object>("Protocol", "Web"));
+				LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
+					string.Empty, Request.RemoteEndPoint, "Web");
 
 				Login.DoLogin(Request, From, true);
 				return;
@@ -2096,9 +2089,7 @@ namespace Waher.IoTGateway
 			if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
 #endif
 			{
-				Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful", EventLevel.Minor,
-					new KeyValuePair<string, object>("Protocol", "Web"));
-
+				LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
 				Login.DoLogin(Request, From, true);
 				return;
 			}
@@ -2160,9 +2151,7 @@ namespace Waher.IoTGateway
 
 						if (P.SessionId == CurrentSession)
 						{
-							Log.Informational("Local user logged in.", string.Empty, Request.RemoteEndPoint, "LoginSuccessful",
-								EventLevel.Minor, new KeyValuePair<string, object>("Protocol", "Web"));
-
+							LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
 							Login.DoLogin(Request, From, true);
 							break;
 						}

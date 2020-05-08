@@ -16,7 +16,7 @@
     <tags>networking communication xmpp iot chat</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.24"/>
-			<dependency id="Waher.Content.Emoji" version="1.0.2"/>
+			<dependency id="Waher.Content.Emoji" version="1.0.3"/>
 			<dependency id="Waher.Content.Html" version="1.0.11"/>
 			<dependency id="Waher.Content.Markdown" version="1.0.40"/>
       <dependency id="Waher.Content.Xml" version="1.0.8"/>

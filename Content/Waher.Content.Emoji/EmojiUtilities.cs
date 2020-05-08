@@ -9140,14 +9140,14 @@ namespace Waher.Content.Emoji
 	/// </summary>
 	public class EmojiInfo
 	{
-		private string shortName;
-		private string fileName;
-		private string description;
-		private string unicode;
-		private bool appleSupport;
-		private bool googleSupport;
-		private bool twitterSupport;
-		private bool emoji1Support;
+		private readonly string shortName;
+		private readonly string fileName;
+		private readonly string description;
+		private readonly string unicode;
+		private readonly bool appleSupport;
+		private readonly bool googleSupport;
+		private readonly bool twitterSupport;
+		private readonly bool emoji1Support;
 
 		/// <summary>
 		/// Contains information about an emoji.

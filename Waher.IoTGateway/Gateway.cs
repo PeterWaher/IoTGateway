@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
+using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Html;
@@ -59,6 +60,7 @@ using Waher.Security.LoginMonitor;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
+using Waher.Script.Graphs;
 
 namespace Waher.IoTGateway
 {
@@ -2894,6 +2896,43 @@ namespace Waher.IoTGateway
 		/// Event raised when a mail has been received.
 		/// </summary>
 		public static event MailEventHandler MailReceived = null;
+
+		/// <summary>
+		/// Sends a graph as a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Graph">Graph to send.</param>
+		/// <param name="Settings">Graph settings.</param>
+		public static void SendNotification(Graph Graph, GraphSettings Settings)
+		{
+			using (SKImage Image = Graph.CreateBitmap(Settings))
+			{
+				Gateway.SendNotification(Image);
+			}
+		}
+
+		/// <summary>
+		/// Sends an image as a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Image">Image to send.</param>
+		public static void SendNotification(SKImage Image)
+		{
+			byte[] Data = InternetContent.Encode(Image, null, out string ContentType);
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<figure>");
+			sb.Append("<img border=\"2\" width=\"");
+			sb.Append(Image.Width.ToString());
+			sb.Append("\" height=\"");
+			sb.Append(Image.Height.ToString());
+			sb.Append("\" src=\"data:");
+			sb.Append(ContentType);
+			sb.Append(";base64,");
+			sb.Append(Convert.ToBase64String(Data, 0, Data.Length));
+			sb.Append("\" />");
+			sb.Append("</figure>");
+
+			SendNotification(sb.ToString());
+		}
 
 		/// <summary>
 		/// Sends a notification message to configured notification recipients.

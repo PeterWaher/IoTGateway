@@ -136,6 +136,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.Output.GenericObjectOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> to expression strings.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Output.GenericObjectOutput.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.GenericObjectOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>
             Enumerator that only returns elements matching a set of conditions.

@@ -580,7 +580,7 @@ namespace Waher.Networking.HTTP
 						Content = Encoding.UTF8.GetBytes(ex.Message);
 						ContentType = "text/plain; charset=utf-8";
 					}
-
+					
 					if (this.statusCode >= 400 &&
 						this.httpServer.HasCustomErrors &&
 						(this.httpRequest.Header.Method != "POST" ||

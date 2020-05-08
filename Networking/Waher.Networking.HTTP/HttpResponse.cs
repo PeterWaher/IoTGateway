@@ -581,7 +581,12 @@ namespace Waher.Networking.HTTP
 						ContentType = "text/plain; charset=utf-8";
 					}
 
-					if (this.statusCode >= 400 && this.httpServer.HasCustomErrors)
+					if (this.statusCode >= 400 &&
+						this.httpServer.HasCustomErrors &&
+						(this.httpRequest.Header.Method != "POST" ||
+						this.httpRequest.Header.ContentType is null ||
+						!(this.httpRequest.Header.ContentType.Type.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
+						string.Compare(this.httpRequest.Header.ContentType.Type, "application/json", true) == 0)))
 					{
 						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content,
 							this.httpRequest, this);

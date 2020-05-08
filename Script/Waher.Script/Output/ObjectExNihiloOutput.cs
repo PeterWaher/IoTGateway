@@ -38,7 +38,7 @@ namespace Waher.Script.Output
 
 				sb.Append(P.Key);
 				sb.Append(':');
-				sb.Append(P.Value.ToString());
+				sb.Append(Expression.ToString(P.Value.AssociatedObjectValue));
 			}
 
 			sb.Append('}');

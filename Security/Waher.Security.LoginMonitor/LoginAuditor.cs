@@ -273,7 +273,11 @@ namespace Waher.Security.LoginMonitor
 				return DateTime.MaxValue;
 			}
 
-			return EP.Timestamps[i - 1].Add(this.intervals[i - 1].Interval);
+			DateTime Next = EP.Timestamps[i - 1].Add(this.intervals[i - 1].Interval);
+			if (Next <= DateTime.Now)
+				return null;
+			else
+				return Next;
 		}
 
 		private async Task Block(RemoteEndpoint EP, string Reason)

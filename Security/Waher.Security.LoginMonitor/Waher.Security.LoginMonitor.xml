@@ -4,6 +4,42 @@
         <name>Waher.Security.LoginMonitor</name>
     </assembly>
     <members>
+        <member name="T:Waher.Security.LoginMonitor.AnnotateEndpointEventArgs">
+            <summary>
+            Event arguments for endpoint annotation events.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.AnnotateEndpointEventArgs.#ctor(System.String)">
+            <summary>
+            Event arguments for endpoint annotation events.
+            </summary>
+            <param name="RemoteEndpoint">Remote endpoint.</param>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.AnnotateEndpointEventArgs.RemoteEndpoint">
+            <summary>
+            Remote endpoint.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.AnnotateEndpointEventArgs.GetTags">
+            <summary>
+            Gets annotations, in the form of an array of tags.
+            </summary>
+            <returns>Array of tags.</returns>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.AnnotateEndpointEventArgs.AddTag(System.String,System.Object)">
+            <summary>
+            Adds a tag to the list of tags.
+            </summary>
+            <param name="Key">Tag key name.</param>
+            <param name="Value">Tag value.</param>
+        </member>
+        <member name="T:Waher.Security.LoginMonitor.AnnotateEndpointEventHandler">
+            <summary>
+            Delegate for endpoint annotation event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
         <member name="T:Waher.Security.LoginMonitor.LoginAuditor">
             <summary>
             Class that monitors login events, and help applications determine malicious intent. 
@@ -75,12 +111,45 @@
             is allowed to login again.
             </returns>
         </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.Annotate(System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Annotates a remote endpoint.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+            <param name="Tags">Predefined tags.</param>
+            <returns>Tags, including tags provided by external annotation.</returns>
+        </member>
+        <member name="E:Waher.Security.LoginMonitor.LoginAuditor.AnnotateEndpoint">
+            <summary>
+            Event raised when an endpoint is to be annotated. Can be used to add additional information about an endpoint.
+            </summary>
+        </member>
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.UnblockAndReset(System.String,System.String)">
             <summary>
             Unblocks a remote endpoint and resets counters for it.
             </summary>
             <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
             <param name="Protocol">Protocol used to log in.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.Fail(System.String,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Handles a failed login attempt.
+            </summary>
+            <param name="Message">Log message</param>
+            <param name="UserName">Attempted user name.</param>
+            <param name="RemoteEndpoint">String representation of remote endpoint</param>
+            <param name="Protocol">Protocol</param>
+            <param name="Tags">Any informative tags.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.Success(System.String,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Handles a successful login attempt.
+            </summary>
+            <param name="Message">Log message</param>
+            <param name="UserName">Attempted user name.</param>
+            <param name="RemoteEndpoint">String representation of remote endpoint</param>
+            <param name="Protocol">Protocol</param>
+            <param name="Tags">Any informative tags.</param>
         </member>
         <member name="T:Waher.Security.LoginMonitor.LoginInterval">
             <summary>

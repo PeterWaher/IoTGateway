@@ -9,6 +9,13 @@ using Waher.Persistence.Filters;
 namespace Waher.Security.LoginMonitor
 {
 	/// <summary>
+	/// Delegate for endpoint annotation event handlers.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate Task AnnotateEndpointEventHandler(object Sender, AnnotateEndpointEventArgs e);
+
+	/// <summary>
 	/// Class that monitors login events, and help applications determine malicious intent. 
 	/// Register instance of class with <see cref="Log.Register(IEventSink)"/> to activate it.
 	/// Call its <see cref="GetEarliestLoginOpportunity(string, string)"/> method to get information about 
@@ -276,12 +283,47 @@ namespace Waher.Security.LoginMonitor
 				EP.Blocked = true;
 				EP.Reason = Reason;
 
-				Log.Alert("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major,
-					new KeyValuePair<string, object>("Reason", Reason));
+				KeyValuePair<string, object>[] Tags = await LoginAuditor.Annotate(EP.Endpoint, new KeyValuePair<string, object>("Reason", Reason));
+
+				Log.Alert("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
 
 				await Database.Update(EP);
 			}
 		}
+
+		/// <summary>
+		/// Annotates a remote endpoint.
+		/// </summary>
+		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="Tags">Predefined tags.</param>
+		/// <returns>Tags, including tags provided by external annotation.</returns>
+		public static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, params KeyValuePair<string,object>[] Tags)
+		{
+			AnnotateEndpointEventArgs e = new AnnotateEndpointEventArgs(RemoteEndpoint);
+
+			foreach (KeyValuePair<string, object> Tag in Tags)
+				e.AddTag(Tag.Key, Tag.Value);
+
+			AnnotateEndpointEventHandler h = AnnotateEndpoint;
+			if (!(h is null))
+			{
+				try
+				{
+					await h(null, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return e.GetTags();
+		}
+
+		/// <summary>
+		/// Event raised when an endpoint is to be annotated. Can be used to add additional information about an endpoint.
+		/// </summary>
+		public static event AnnotateEndpointEventHandler AnnotateEndpoint = null;
 
 		/// <summary>
 		/// Unblocks a remote endpoint and resets counters for it.

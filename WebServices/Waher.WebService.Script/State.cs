@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using SkiaSharp;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
@@ -17,6 +16,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Security;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.WebService.Script
 {
@@ -139,7 +139,7 @@ namespace Waher.WebService.Script
 			get => (this.watch.ElapsedTicks * 1000.0) / Stopwatch.Frequency;
 		}
 
-		private void Execute(object P)
+		private async void Execute(object P)
 		{
 			IElement Result;
 
@@ -168,10 +168,12 @@ namespace Waher.WebService.Script
 					this.watch.Stop();
 					this.watchdog?.Dispose();
 
-					Log.Notice("Script evaluated.", this.request.Resource.ResourceName, this.user.UserName, "ScriptEval",
+					KeyValuePair<string, object>[] Tags = await LoginAuditor.Annotate(this.request.RemoteEndPoint,
 						new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
 						new KeyValuePair<string, object>("Script", this.expression.Script),
 						new KeyValuePair<string, object>("Milliseconds", this.Milliseconds));
+
+					Log.Notice("Script evaluated.", this.request.Resource.ResourceName, this.user.UserName, "ScriptEval", Tags);
 				}
 
 				if (!this.response.HeaderSent)

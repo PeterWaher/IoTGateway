@@ -14,7 +14,7 @@ namespace Waher.Utility.GetEmojiCatalog
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main(string[] _)
 		{
 			string Html;
 

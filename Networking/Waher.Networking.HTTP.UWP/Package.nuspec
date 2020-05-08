@@ -23,6 +23,7 @@
       <dependency id="Waher.Runtime.Inventory" version="1.0.12"/>
       <dependency id="Waher.Script" version="1.0.36"/>
       <dependency id="Waher.Security" version="1.0.5"/>
+      <dependency id="Waher.Security.LoginMonitor" version="1.0.0"/>
     </dependencies>
   </metadata>
   <files>

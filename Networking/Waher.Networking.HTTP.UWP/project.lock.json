@@ -2455,6 +2455,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -2485,6 +2493,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -4963,6 +4982,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -4993,6 +5020,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -7507,6 +7545,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -7537,6 +7583,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -10024,6 +10081,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -10054,6 +10119,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -12577,6 +12653,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -12607,6 +12691,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -15094,6 +15189,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -15124,6 +15227,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     },
@@ -17647,6 +17761,14 @@
           "Waher.Events": "1.0.11"
         }
       },
+      "Waher.Persistence/1.0.16": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Runtime.Inventory": "1.0.12"
+        }
+      },
       "Waher.Runtime.Cache/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -17677,6 +17799,17 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
+        }
+      },
+      "Waher.Security.LoginMonitor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.0.11",
+          "Waher.Persistence": "1.0.16",
+          "Waher.Runtime.Inventory": "1.0.12",
+          "Waher.Security": "1.0.5"
         }
       }
     }
@@ -27562,6 +27695,11 @@
       "path": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj",
       "msbuildProject": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj"
     },
+    "Waher.Persistence/1.0.16": {
+      "type": "project",
+      "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
+      "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"
+    },
     "Waher.Runtime.Cache/1.0.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
@@ -27581,6 +27719,11 @@
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
+    },
+    "Waher.Security.LoginMonitor/1.0.0": {
+      "type": "project",
+      "path": "../../Security/Waher.Security.LoginMonitor/Waher.Security.LoginMonitor.csproj",
+      "msbuildProject": "../../Security/Waher.Security.LoginMonitor/Waher.Security.LoginMonitor.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -27638,6 +27781,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.LoginMonitor\\Waher.Security.LoginMonitor.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.LoginMonitor\\Waher.Security.LoginMonitor.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj"

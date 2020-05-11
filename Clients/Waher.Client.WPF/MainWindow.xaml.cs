@@ -30,6 +30,8 @@ using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
+using System.Runtime.CompilerServices;
+using System.Net.NetworkInformation;
 
 namespace Waher.Client.WPF
 {
@@ -58,6 +60,7 @@ namespace Waher.Client.WPF
 		internal static MainWindow currentInstance = null;
 		private static string appDataFolder = null;
 		private static FilesProvider databaseProvider = null;
+		private static readonly LinkedList<KeyValuePair<ParameterizedThreadStart, object>> guiUpdateQueue = new LinkedList<KeyValuePair<ParameterizedThreadStart, object>>();
 
 		public MainWindow()
 		{
@@ -484,7 +487,7 @@ namespace Waher.Client.WPF
 		private void FocusChatInput(object P)
 		{
 			Thread.Sleep(50);
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.FocusChatInput2), P);
+			MainWindow.UpdateGui(this.FocusChatInput2, P);
 		}
 
 		private void FocusChatInput2(object P)
@@ -495,12 +498,12 @@ namespace Waher.Client.WPF
 
 		public void OnChatMessage(object Sender, MessageEventArgs e)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ChatMessageReceived), e);
+			MainWindow.UpdateGui(this.ChatMessageReceived, e);
 		}
 
 		public void OnStateChange(object Sender, XmppState State)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.UpdateStateStatus), State);
+			MainWindow.UpdateGui(this.UpdateStateStatus, State);
 		}
 
 		private void UpdateStateStatus(object State)
@@ -785,9 +788,9 @@ namespace Waher.Client.WPF
 			Node.GetConfigurationForm((Sender, e2) =>
 			{
 				if (e2.Ok && e2.Form != null)
-					this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowForm), e2.Form);
+					MainWindow.UpdateGui(this.ShowForm, e2.Form);
 				else
-					this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowError), e2);
+					MainWindow.UpdateGui(this.ShowError, e2);
 			}, null);
 		}
 
@@ -889,14 +892,14 @@ namespace Waher.Client.WPF
 
 					if (Questions.First != null)
 					{
-						DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.UpdateGui(() =>
 						{
 							if (QuestionView is null)
 								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
 
 							foreach (Question Question2 in Questions)
 								QuestionView.NewQuestion(Question2);
-						}));
+						});
 					}
 				}
 				catch (Exception ex)
@@ -908,12 +911,9 @@ namespace Waher.Client.WPF
 
 		private QuestionView FindQuestionTab(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{
-			QuestionView QuestionView = null;
-
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
-				QuestionView = TabItem.Content as QuestionView;
-				if (QuestionView != null &&
+				if (TabItem.Content is QuestionView QuestionView &&
 					QuestionView.Owner == Owner &&
 					QuestionView.ProvisioningJid == ProvisioningClient.ProvisioningServerAddress)
 				{
@@ -937,7 +937,7 @@ namespace Waher.Client.WPF
 
 		internal static TabItem NewTab(string HeaderText)
 		{
-			return NewTab(HeaderText, out TextBlock HeaderLabel);
+			return NewTab(HeaderText, out TextBlock _);
 		}
 
 		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
@@ -1011,16 +1011,65 @@ namespace Waher.Client.WPF
 
 		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)
 		{
-			currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			MainWindow.UpdateGui(() =>
 			{
 				Mouse.OverrideCursor = null;
 				System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon);
-			}));
+			});
 		}
 
 		public static void MouseDefault()
 		{
-			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Mouse.OverrideCursor = null));
+			MainWindow.UpdateGui(() => Mouse.OverrideCursor = null);
 		}
+
+		public static void UpdateGui(ThreadStart Method)
+		{
+			UpdateGui((State) => ((ThreadStart)State)(), Method);
+		}
+
+		public static void UpdateGui(ParameterizedThreadStart Method, object State)
+		{
+			bool Start;
+
+			lock (guiUpdateQueue)
+			{
+				Start = guiUpdateQueue.First is null;
+				guiUpdateQueue.AddLast(new KeyValuePair<ParameterizedThreadStart, object>(Method, State));
+			}
+
+			if (Start)
+				currentInstance.Dispatcher.BeginInvoke(new ParameterizedThreadStart(DoUpdates), State);
+		}
+
+		private static void DoUpdates(object State)
+		{
+			ParameterizedThreadStart Method;
+
+			while (true)
+			{
+				lock (guiUpdateQueue)
+				{
+					if (guiUpdateQueue.First is null)
+						return;
+
+					KeyValuePair<ParameterizedThreadStart, object> P = guiUpdateQueue.First.Value;
+					guiUpdateQueue.RemoveFirst();
+
+					Method = P.Key;
+					State = P.Value;
+				}
+
+				try
+				{
+					Method(State);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
 	}
 }

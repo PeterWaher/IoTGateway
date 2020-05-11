@@ -101,8 +101,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 					await Database.Insert(Question);
 
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
+					MainWindow.UpdateGui(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)
@@ -140,8 +140,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 					await Database.Insert(Question);
 
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
+					MainWindow.UpdateGui(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)
@@ -178,8 +178,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 					await Database.Insert(Question);
 
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question)));
+					MainWindow.UpdateGui(() =>
+						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 				}
 			}
 			catch (Exception ex)
@@ -418,7 +418,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				// TODO: Pages, if more things available.
 
-				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				MainWindow.UpdateGui(() =>
 				{
 					TabItem TabItem = MainWindow.NewTab("Search Result");
 					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
@@ -427,7 +427,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					TabItem.Content = View;
 
 					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
-				}));
+				});
 			}
 			else
 				MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText);

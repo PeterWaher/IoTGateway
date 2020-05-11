@@ -115,7 +115,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 				MarkdownDocument Markdown = new MarkdownDocument(s, ChatView.GetMarkdownSettings());
 
-				MainWindow.Dispatcher.BeginInvoke(new ThreadStart(() => this.Refresh2(ChatListView, s, Markdown)));
+				MainWindow.UpdateGui(() => this.Refresh2(ChatListView, s, Markdown));
 			}
 			catch (Exception ex)
 			{

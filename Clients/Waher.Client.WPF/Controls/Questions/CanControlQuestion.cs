@@ -289,7 +289,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					this.availableParameterNames = Parameters;
 					await Database.Update(this);
 
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						SortedDictionary<string, bool> Selected = null;
 						bool AllSelected = this.parameterNames is null;
@@ -316,7 +316,7 @@ namespace Waher.Client.WPF.Controls.Questions
 								Tag = ParameterName
 							});
 						}
-					}));
+					});
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get control form." : e.ErrorText);
@@ -404,7 +404,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			this.TokenButtonClick(sender, e, false);
 		}
 
-		private void TokenButtonClick(object sender, RoutedEventArgs e, bool Result)
+		private void TokenButtonClick(object sender, RoutedEventArgs _, bool Result)
 		{
 			Button Button = (Button)sender;
 			object[] P = (object[])Button.Tag;

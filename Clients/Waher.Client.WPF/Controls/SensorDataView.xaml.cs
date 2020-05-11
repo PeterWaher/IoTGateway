@@ -100,7 +100,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void Request_OnErrorsReceived(object Sender, IEnumerable<ThingError> NewErrors)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.OnErrorsReceived), NewErrors);
+			MainWindow.UpdateGui(this.OnErrorsReceived, NewErrors);
 		}
 
 		private void OnErrorsReceived(object P)
@@ -131,7 +131,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void Request_OnFieldsReceived(object Sender, IEnumerable<Field> NewFields)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.OnFieldsReceived), NewFields);
+			MainWindow.UpdateGui(this.OnFieldsReceived, NewFields);
 		}
 
 		private void OnFieldsReceived(object P)
@@ -161,7 +161,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void Request_OnStateChanged(object Sender, SensorDataReadoutState NewState)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.OnStateChanged), NewState);
+			MainWindow.UpdateGui(this.OnStateChanged, NewState);
 		}
 
 		private void OnStateChanged(object P)

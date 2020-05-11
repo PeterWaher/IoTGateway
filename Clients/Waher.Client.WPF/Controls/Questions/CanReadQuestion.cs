@@ -415,7 +415,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					this.availableFieldNames = Fields;
 					await Database.Update(this);
 
-					DispatcherOperation Op = MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						SortedDictionary<string, bool> Selected = null;
 						bool AllSelected = this.fieldNames is null;
@@ -442,7 +442,7 @@ namespace Waher.Client.WPF.Controls.Questions
 								Tag = FieldName
 							});
 						}
-					}));
+					});
 				}
 			}
 			catch (Exception ex)
@@ -549,7 +549,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			this.TokenButtonClick(sender, e, false);
 		}
 
-		private void TokenButtonClick(object sender, RoutedEventArgs e, bool Result)
+		private void TokenButtonClick(object sender, RoutedEventArgs _, bool Result)
 		{
 			Button Button = (Button)sender;
 			object[] P = (object[])Button.Tag;

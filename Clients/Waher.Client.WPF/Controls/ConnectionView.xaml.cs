@@ -395,12 +395,11 @@ namespace Waher.Client.WPF.Controls
 
 		private void Node_Updated(object sender, EventArgs e)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.RefreshTree), sender);
+			MainWindow.UpdateGui(this.RefreshTree, sender);
 		}
 
 		private void RefreshTree(object P)
 		{
-			TreeNode Node = (TreeNode)P;
 			this.ConnectionTree.Items.Refresh();
 		}
 

@@ -200,7 +200,7 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ParameterDialog Dialog = new ParameterDialog(Form);
 
-				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => Dialog.ShowDialog()));
+				MainWindow.UpdateGui(() => Dialog.ShowDialog());
 			}
 			else
 				Form.Submit();
@@ -208,7 +208,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.XmppStateChanged), NewState);
+			MainWindow.UpdateGui(this.XmppStateChanged, NewState);
 		}
 
 		private void XmppStateChanged(object P)
@@ -306,7 +306,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Client_OnConnectionError(object Sender, Exception Exception)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowError), Exception);
+			MainWindow.UpdateGui(this.ShowError, Exception);
 		}
 
 		private void ShowError(object P)

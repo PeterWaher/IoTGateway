@@ -36,12 +36,12 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class QueryResultView : UserControl, ITabView
 	{
-		private Node node;
+		private readonly Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
+		private readonly LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
+		private readonly Node node;
+		private readonly TextBlock headerLabel;
 		private NodeQuery query;
-		private TextBlock headerLabel;
 		private StackPanel currentPanel;
-		private Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
-		private LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
 
 		public QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
@@ -78,7 +78,7 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			if (Call)
-				this.Dispatcher.BeginInvoke(new ThreadStart(this.UpdateGuiSta));
+				MainWindow.UpdateGui(this.UpdateGuiSta);
 		}
 
 		private void UpdateGuiSta()

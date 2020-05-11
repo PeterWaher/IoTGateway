@@ -898,7 +898,7 @@ namespace Waher.Client.WPF.Model
 
 		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			this.connections.Owner.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.PresenceSubscribe), e);
+			MainWindow.UpdateGui(this.PresenceSubscribe, e);
 		}
 
 		private void PresenceSubscribe(object P)
@@ -1116,8 +1116,8 @@ namespace Waher.Client.WPF.Model
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
 							{
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null)));
+								MainWindow.UpdateGui(() =>
+									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null));
 							}
 
 							this.OnUpdated();

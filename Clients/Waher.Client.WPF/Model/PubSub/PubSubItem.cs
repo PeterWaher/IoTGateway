@@ -199,11 +199,11 @@ namespace Waher.Client.WPF.Model.PubSub
 								{
 									Form["Payload"].Error = ex.Message;
 
-									MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									MainWindow.UpdateGui(() =>
 									{
 										Dialog = new ParameterDialog(Form);
 										Dialog.ShowDialog();
-									}));
+									});
 
 									return;
 								}
@@ -234,10 +234,10 @@ namespace Waher.Client.WPF.Model.PubSub
 
 						Dialog = new ParameterDialog(Form);
 
-						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.UpdateGui(() =>
 						{
 							Dialog.ShowDialog();
-						}));
+						});
 					}
 				}
 				else

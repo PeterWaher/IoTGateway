@@ -160,11 +160,11 @@ namespace Waher.Client.WPF.Model.Legal
 			Markdown.AppendLine();
 			Output(XmppClient.GetBareJID(e.To), Markdown, e.Identity.GetTags());
 
-			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			MainWindow.UpdateGui(() =>
 			{
 				MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e.From), XmppClient.GetBareJID(e.To),
 					Markdown.ToString(), true);
-			}));
+			});
 		}
 
 		internal static void Output(string JID, StringBuilder Markdown, KeyValuePair<string, object>[] Tags)
@@ -218,11 +218,11 @@ namespace Waher.Client.WPF.Model.Legal
 
 							Output(XmppClient.GetBareJID(e2.To), Markdown, Identity.GetTags());
 
-							MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+							MainWindow.UpdateGui(() =>
 							{
 								MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e2.From), XmppClient.GetBareJID(e2.To),
 									Markdown.ToString(), true);
-							}));
+							});
 						}
 					}
 				}

@@ -30,7 +30,7 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class SnifferView : UserControl, ITabView
 	{
-		private TreeNode node;
+		private readonly TreeNode node;
 		private TabSniffer sniffer;
 
 		public SnifferView(TreeNode Node)
@@ -60,12 +60,11 @@ namespace Waher.Client.WPF.Controls
 
 		public void Add(SniffItem Item)
 		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.AddItem), Item);
+			MainWindow.UpdateGui(this.AddItem, Item);
 		}
 
 		private void AddItem(object P)
 		{
-			int c = this.SnifferListView.Items.Count;
 			this.SnifferListView.Items.Add((SniffItem)P);
 			this.SnifferListView.ScrollIntoView(P);
 		}

@@ -13,7 +13,7 @@ namespace Waher.Client.WPF.Controls.Questions
 {
 	public abstract class NodeQuestion : Question
 	{
-		private Dictionary<string, X509Certificate2> certificates = new Dictionary<string, X509Certificate2>();
+		private readonly Dictionary<string, X509Certificate2> certificates = new Dictionary<string, X509Certificate2>();
 		private string[] serviceTokens = null;
 		private string[] deviceTokens = null;
 		private string[] userTokens = null;
@@ -133,10 +133,10 @@ namespace Waher.Client.WPF.Controls.Questions
 									this.certificates[Token2] = e.Certificate;
 								}
 
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								MainWindow.UpdateGui(() =>
 								{
 									this.AddToken(Details, Token2, e.Certificate, OnYes, OnNo, Range);
-								}));
+								});
 							}
 						}, Token);
 					}

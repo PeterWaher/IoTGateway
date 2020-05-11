@@ -265,11 +265,11 @@ namespace Waher.Client.WPF.Model.PubSub
 											}
 										}
 
-										MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+										MainWindow.UpdateGui(() =>
 										{
 											this.Account?.View?.NodeAdded(this, Node);
 											this.OnUpdated();
-										}));
+										});
 									}
 								}
 								else
@@ -283,10 +283,10 @@ namespace Waher.Client.WPF.Model.PubSub
 
 					ParameterDialog Dialog = new ParameterDialog(Form);
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						Dialog.ShowDialog();
-					}));
+					});
 				}
 				else
 					MainWindow.ErrorBox("Unable to get default node properties: " + e.ErrorText);

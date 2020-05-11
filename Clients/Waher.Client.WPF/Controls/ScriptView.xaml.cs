@@ -116,7 +116,7 @@ namespace Waher.Client.WPF.Controls
 
 					this.variables["Ans"] = Ans;
 
-					this.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						try
 						{
@@ -203,7 +203,7 @@ namespace Waher.Client.WPF.Controls
 							else
 								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ex);
 						}
-					}));
+					});
 				}
 				catch (Exception ex)
 				{
@@ -367,7 +367,7 @@ namespace Waher.Client.WPF.Controls
 
 		internal void Print(string Output)
 		{
-			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, false)));
+			MainWindow.UpdateGui(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, false));
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

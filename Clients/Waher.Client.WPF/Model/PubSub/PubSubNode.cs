@@ -322,11 +322,11 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Form["Payload"].Error = ex.Message;
 
-						MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+						MainWindow.UpdateGui(() =>
 						{
 							Dialog = new ParameterDialog(Form);
 							Dialog.ShowDialog();
-						}));
+						});
 
 						return;
 					}
@@ -352,10 +352,10 @@ namespace Waher.Client.WPF.Model.PubSub
 
 			Dialog = new ParameterDialog(Form);
 
-			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			MainWindow.UpdateGui(() =>
 			{
 				Dialog.ShowDialog();
-			}));
+			});
 		}
 
 		internal void ItemNotification(ItemNotificationEventArgs e)
@@ -381,11 +381,11 @@ namespace Waher.Client.WPF.Model.PubSub
 						}
 					}
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						Service?.Account?.View?.NodeAdded(this, Item);
 						this.OnUpdated();
-					}));
+					});
 				}
 			}
 		}
@@ -394,15 +394,15 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			if (this.TryGetChild(e.ItemId, out TreeNode N) && this.RemoveChild(N))
 			{
-				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				MainWindow.UpdateGui(() =>
 				{
 					Service?.Account?.View?.NodeRemoved(this, N);
 					this.OnUpdated();
-				}));
+				});
 			}
 		}
 
-		internal void Purged(NodeNotificationEventArgs e)
+		internal void Purged(NodeNotificationEventArgs _)
 		{
 			if (this.children is null)
 				return;
@@ -416,13 +416,13 @@ namespace Waher.Client.WPF.Model.PubSub
 				this.children = null;
 			}
 
-			MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+			MainWindow.UpdateGui(() =>
 			{
 				foreach (TreeNode Node in ToRemove)
 					Service?.Account?.View?.NodeRemoved(this, Node);
 
 				this.OnUpdated();
-			}));
+			});
 		}
 
 		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
@@ -505,10 +505,10 @@ namespace Waher.Client.WPF.Model.PubSub
 
 					ParameterDialog Dialog = new ParameterDialog(Form);
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						Dialog.ShowDialog();
-					}));
+					});
 				}
 				else
 					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);

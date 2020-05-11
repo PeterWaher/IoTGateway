@@ -90,11 +90,11 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						ParameterDialog Dialog = new ParameterDialog(e.SearchForm);
 						Dialog.ShowDialog();
-					}));
+					});
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText);
@@ -102,7 +102,7 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						TabItem TabItem = MainWindow.NewTab("Search Result");
 						MainWindow.currentInstance.Tabs.Items.Add(TabItem);
@@ -111,7 +111,7 @@ namespace Waher.Client.WPF.Model
 						TabItem.Content = View;
 
 						MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
-					}));
+					});
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText);
@@ -161,10 +161,10 @@ namespace Waher.Client.WPF.Model
 						ToRemove.AddLast(new KeyValuePair<TreeNode, TreeNode>(Node, Child));
 				}
 
-				MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				MainWindow.UpdateGui(() =>
 				{
 					View.NodeRemoved(Parent, Node);
-				}));
+				});
 			}
 		}
 

@@ -329,12 +329,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 								break;
 
 							case 1:
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
-									this.Add(e.Result[0].Unlocalized)));
+								MainWindow.UpdateGui(() =>
+									this.Add(e.Result[0].Unlocalized));
 								break;
 
 							default:
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								MainWindow.UpdateGui(() =>
 								{
 									SelectItemDialog Form = new SelectItemDialog("Add node", "Select type of node to add:",
 										"Add node of selected type.", "Type", "Class", e.Result)
@@ -350,7 +350,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 										if (Item.HasValue)
 											this.Add(Item.Value.Unlocalized);
 									}
-								}));
+								});
 								break;
 						}
 					}
@@ -371,11 +371,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					MainWindow.MouseDefault();
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						ParameterDialog Dialog = new ParameterDialog(Form);
 						Dialog.ShowDialog();
-					}));
+					});
 
 				}, (sender, e) =>
 				{
@@ -447,11 +447,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					MainWindow.MouseDefault();
 
-					MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+					MainWindow.UpdateGui(() =>
 					{
 						ParameterDialog Dialog = new ParameterDialog(Form);
 						Dialog.ShowDialog();
-					}));
+					});
 
 				}, (sender, e) =>
 				{
@@ -608,11 +608,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 							{
 								MainWindow.MouseDefault();
 
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								MainWindow.UpdateGui(() =>
 								{
 									ParameterDialog Dialog = new ParameterDialog(Form);
 									Dialog.ShowDialog();
-								}));
+								});
 							},
 							(sender2, e2) =>
 							{
@@ -628,24 +628,24 @@ namespace Waher.Client.WPF.Model.Concentrator
 							{
 								MainWindow.MouseDefault();
 
-								MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+								MainWindow.UpdateGui(() =>
 								{
 									ParameterDialog Dialog = new ParameterDialog(Form);
 									Dialog.ShowDialog();
-								}));
+								});
 							},
 							(sender2, e2) =>
 							{
 								if (e2.Ok)
 								{
-									MainWindow.currentInstance.Dispatcher.BeginInvoke(new ThreadStart(() =>
+									MainWindow.UpdateGui(() =>
 									{
 										TabItem TabItem = MainWindow.NewTab(Command.Name, out TextBlock HeaderLabel);
 										MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
 										QueryResultView ResultView = new QueryResultView(this, e2.Query, HeaderLabel);
 										TabItem.Content = ResultView;
-									}));
+									});
 								}
 
 								this.ShowCommandResult(e2, Command);

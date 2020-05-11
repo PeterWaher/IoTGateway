@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-//using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings.SettingObjects;
+using Waher.Runtime.Threading;
 
 namespace Waher.Runtime.Settings
 {
@@ -15,6 +12,8 @@ namespace Waher.Runtime.Settings
 	/// </summary>
 	public static class RuntimeSettings
 	{
+		private static readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+
 		#region String-valued settings
 
 		/// <summary>
@@ -36,10 +35,22 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<string> GetAsync(string Key, string DefaultValue)
 		{
-			foreach (StringSetting Setting in await Database.Find<StringSetting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
+			StringSetting Setting = await GetAsync<StringSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
+		}
 
-			return DefaultValue;
+		private static async Task<T> GetAsync<T>(string Key)
+		{
+			await synchObject.BeginRead();
+			try
+			{
+				T Setting = await Database.FindFirstDeleteRest<T>(new FilterFieldEqualTo("Key", Key));
+				return Setting;
+			}
+			finally
+			{
+				await synchObject.EndRead();
+			}
 		}
 
 		/// <summary>
@@ -61,26 +72,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, string Value)
 		{
-			foreach (StringSetting Setting in await Database.Find<StringSetting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				StringSetting Setting = await Database.FindFirstDeleteRest<StringSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new StringSetting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			StringSetting NewSetting = new StringSetting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion
@@ -106,10 +125,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<long> GetAsync(string Key, long DefaultValue)
 		{
-			foreach (Int64Setting Setting in await Database.Find<Int64Setting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
-
-			return DefaultValue;
+			Int64Setting Setting = await GetAsync<Int64Setting>(Key);
+			return Setting?.Value ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -131,26 +148,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, long Value)
 		{
-			foreach (Int64Setting Setting in await Database.Find<Int64Setting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				Int64Setting Setting = await Database.FindFirstDeleteRest<Int64Setting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new Int64Setting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			Int64Setting NewSetting = new Int64Setting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion
@@ -176,10 +201,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<bool> GetAsync(string Key, bool DefaultValue)
 		{
-			foreach (BooleanSetting Setting in await Database.Find<BooleanSetting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
-
-			return DefaultValue;
+			BooleanSetting Setting = await GetAsync<BooleanSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -201,26 +224,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, bool Value)
 		{
-			foreach (BooleanSetting Setting in await Database.Find<BooleanSetting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				BooleanSetting Setting = await Database.FindFirstDeleteRest<BooleanSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new BooleanSetting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			BooleanSetting NewSetting = new BooleanSetting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion
@@ -246,10 +277,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<DateTime> GetAsync(string Key, DateTime DefaultValue)
 		{
-			foreach (DateTimeSetting Setting in await Database.Find<DateTimeSetting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
-
-			return DefaultValue;
+			DateTimeSetting Setting = await GetAsync<DateTimeSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -271,26 +300,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, DateTime Value)
 		{
-			foreach (DateTimeSetting Setting in await Database.Find<DateTimeSetting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				DateTimeSetting Setting = await Database.FindFirstDeleteRest<DateTimeSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new DateTimeSetting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			DateTimeSetting NewSetting = new DateTimeSetting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion
@@ -316,10 +353,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<TimeSpan> GetAsync(string Key, TimeSpan DefaultValue)
 		{
-			foreach (TimeSpanSetting Setting in await Database.Find<TimeSpanSetting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
-
-			return DefaultValue;
+			TimeSpanSetting Setting = await GetAsync<TimeSpanSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -341,26 +376,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, TimeSpan Value)
 		{
-			foreach (TimeSpanSetting Setting in await Database.Find<TimeSpanSetting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				TimeSpanSetting Setting = await Database.FindFirstDeleteRest<TimeSpanSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new TimeSpanSetting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			TimeSpanSetting NewSetting = new TimeSpanSetting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion
@@ -386,10 +429,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<double> GetAsync(string Key, double DefaultValue)
 		{
-			foreach (DoubleSetting Setting in await Database.Find<DoubleSetting>(new FilterFieldEqualTo("Key", Key)))
-				return Setting.Value;
-
-			return DefaultValue;
+			DoubleSetting Setting = await GetAsync<DoubleSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -411,26 +452,34 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, double Value)
 		{
-			foreach (DoubleSetting Setting in await Database.Find<DoubleSetting>(new FilterFieldEqualTo("Key", Key)))
+			await synchObject.BeginWrite();
+			try
 			{
-				if (Setting.Value != Value)
+				DoubleSetting Setting = await Database.FindFirstDeleteRest<DoubleSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
 				{
-					Setting.Value = Value;
-					await Database.Update(Setting);
+					Setting = new DoubleSetting(Key, Value);
+					await Database.Insert(Setting);
 
-					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
-					return false;
+				{
+					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
 			}
-
-			DoubleSetting NewSetting = new DoubleSetting(Key, Value);
-			await Database.Insert(NewSetting);
-
-			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
-
-			return true;
+			finally
+			{
+				await synchObject.EndWrite();
+			}
 		}
 
 		#endregion

@@ -267,7 +267,7 @@ namespace Waher.Persistence
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>First Object, if found, null otherwise.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public async static Task<T> FindFirstDeleteRest<T>(params string[] SortOrder)
 		{
@@ -309,7 +309,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>First Object, if found, null otherwise.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static async Task<T> FindFirstDeleteRest<T>(Filter Filter, params string[] SortOrder)
 		{

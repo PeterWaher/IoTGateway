@@ -30,8 +30,8 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class QuestionView : UserControl, ITabView
 	{
-		private ProvisioningClient provisioningClient;
-		private XmppAccountNode owner;
+		private readonly ProvisioningClient provisioningClient;
+		private readonly XmppAccountNode owner;
 
 		public QuestionView(XmppAccountNode Owner, ProvisioningClient ProvisioningClient)
 		{

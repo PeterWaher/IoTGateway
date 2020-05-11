@@ -21,7 +21,7 @@ namespace Waher.Client.WPF.Dialogs
 	/// </summary>
 	public partial class SelectItemDialog : Window
 	{
-		private LocalizedString[] items;
+		private readonly LocalizedString[] items;
 
 		public SelectItemDialog(string Title, string Header, string OkTooltip, string TypeHeader, string ValueHeader, params LocalizedString[] Items)
 			: base()

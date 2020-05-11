@@ -12,8 +12,8 @@ namespace Waher.Client.WPF.Controls.Sniffers
 {
 	public class TabSniffer : ISniffer
 	{
-		private TabItem tabItem;
-		private SnifferView view;
+		private readonly TabItem tabItem;
+		private readonly SnifferView view;
 		private string snifferId = null;
 
 		public TabSniffer(TabItem TabItem, SnifferView View)

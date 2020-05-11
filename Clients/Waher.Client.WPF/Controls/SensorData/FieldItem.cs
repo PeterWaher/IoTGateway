@@ -14,8 +14,8 @@ namespace Waher.Client.WPF.Controls.SensorData
 	/// </summary>
 	public class FieldItem : ColorableItem
 	{
-		private Field field;
-		private QuantityField quantityField;
+		private readonly Field field;
+		private readonly QuantityField quantityField;
 
 		/// <summary>
 		/// Represents one item in a sensor data readout.

@@ -8,7 +8,7 @@ namespace Waher.Client.WPF.Controls.Script
 {
 	public class PrintOutput : TextWriter
 	{
-		private ScriptView scriptView;
+		private readonly ScriptView scriptView;
 
 		public PrintOutput(ScriptView ScriptView)
 		{

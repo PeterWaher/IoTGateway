@@ -14,7 +14,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 	/// </summary>
 	public class ErrorItem : ColorableItem
 	{
-		private ThingError error;
+		private readonly ThingError error;
 
 		/// <summary>
 		/// Represents one item in a sensor data output.

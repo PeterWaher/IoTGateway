@@ -17,8 +17,8 @@ namespace Waher.Client.WPF.Model.Things
 	/// </summary>
 	public class XmppActuator : XmppContact
 	{
-		private bool isSensor;
-		private bool suportsEvents;
+		private readonly bool isSensor;
+		private readonly bool suportsEvents;
 
 		public XmppActuator(TreeNode Parent, XmppClient Client, string BareJid, bool IsSensor, bool SupportsEventSubscripton)
 			: base(Parent, Client, BareJid)

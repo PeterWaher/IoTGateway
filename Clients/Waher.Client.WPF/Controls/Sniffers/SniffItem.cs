@@ -23,10 +23,10 @@ namespace Waher.Client.WPF.Controls.Sniffers
 	/// </summary>
 	public class SniffItem : ColorableItem
 	{
-		private SniffItemType type;
-		private DateTime timestamp;
-		private string message;
-		private byte[] data;
+		private readonly SniffItemType type;
+		private readonly DateTime timestamp;
+		private readonly string message;
+		private readonly byte[] data;
 
 		/// <summary>
 		/// Represents one item in a sniffer output.

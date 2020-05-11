@@ -21,7 +21,7 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public abstract class TreeNode : SelectableItem, IDisposable
 	{
-		private TreeNode parent;
+		private readonly TreeNode parent;
 		protected DisplayableParameters parameters = null;
 		protected SortedDictionary<string, TreeNode> children = null;
 		private object tag = null;

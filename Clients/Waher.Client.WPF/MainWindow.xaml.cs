@@ -501,7 +501,7 @@ namespace Waher.Client.WPF
 			MainWindow.UpdateGui(this.ChatMessageReceived, e);
 		}
 
-		public void OnStateChange(object Sender, XmppState State)
+		public void OnStateChange(object _, XmppState State)
 		{
 			MainWindow.UpdateGui(this.UpdateStateStatus, State);
 		}

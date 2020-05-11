@@ -16,8 +16,8 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected XmlWriter output;
 
+		private readonly object synchObject = new object();
 		private bool disposed = false;
-		private object synchObject = new object();
 
 		/// <summary>
 		/// Outputs sniffed data to an XML writer.

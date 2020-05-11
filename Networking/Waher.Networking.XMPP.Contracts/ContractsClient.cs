@@ -73,7 +73,8 @@ namespace Waher.Networking.XMPP.Contracts
             this.componentAddress = ComponentAddress;
             this.approvedSources = ApprovedSources;
             this.localEndpoint = null;
-            Task T = this.LoadKeys();
+
+            Task.Run(() => this.LoadKeys());
 
             this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
             this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);

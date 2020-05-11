@@ -1,21 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -267,7 +259,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (IsData)
 				{
-					Data = System.Convert.FromBase64String(E.InnerText);
+					Data = Convert.FromBase64String(E.InnerText);
 					Message = TabSniffer.HexToString(Data);
 				}
 				else

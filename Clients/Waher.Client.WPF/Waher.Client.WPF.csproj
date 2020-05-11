@@ -64,7 +64,7 @@
     <ManifestCertificateThumbprint>489A1520AE68C3C2EEA4966514C807E40DC68BC2</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Waher.Client.WPF_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Waher.Client.WPF_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -135,6 +135,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\Logs\LogItem.cs" />
+    <Compile Include="Controls\Logs\LogSink.cs" />
     <Compile Include="Controls\QueryResultView.xaml.cs">
       <DependentUpon>QueryResultView.xaml</DependentUpon>
     </Compile>
@@ -164,6 +166,9 @@
     </Compile>
     <Compile Include="Controls\QuestionView.xaml.cs">
       <DependentUpon>QuestionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LogView.xaml.cs">
+      <DependentUpon>LogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SnifferView.xaml.cs">
       <DependentUpon>SnifferView.xaml</DependentUpon>
@@ -213,6 +218,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\QuestionView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\LogView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -341,8 +350,9 @@
     <EmbeddedResource Include="Schema\Script.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Waher.Client.WPF_1_TemporaryKey.pfx" />
-    <None Include="Waher.Client.WPF_2_TemporaryKey.pfx" />
+    <EmbeddedResource Include="Schema\EventOutput.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="Waher.Client.WPF_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -457,6 +467,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
+      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
+      <Name>Waher.Runtime.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj">
       <Project>{6055882c-4fbb-4336-98e2-fa7594d6f143}</Project>
@@ -656,6 +670,13 @@
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.10.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
     <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.10.0\analyzers\dotnet\Microsoft.DependencyValidation.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\log_16.png" />
+    <Resource Include="Graphics\log_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Transforms\EventXmlToHtml.xslt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.1.68.1.1\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.68.1.1\build\net45\SkiaSharp.targets')" />

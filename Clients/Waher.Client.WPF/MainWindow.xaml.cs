@@ -9,13 +9,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using Microsoft.Win32;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
@@ -26,12 +24,11 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
 using System.Runtime.CompilerServices;
-using System.Net.NetworkInformation;
+using Waher.Runtime.Settings;
 
 namespace Waher.Client.WPF
 {
@@ -48,6 +45,7 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
 		public static RoutedUICommand Refresh = new RoutedUICommand("Refresh", "Refresh", typeof(MainWindow));
 		public static RoutedUICommand Sniff = new RoutedUICommand("Sniff", "Sniff", typeof(MainWindow));
+		public static RoutedUICommand EventLog = new RoutedUICommand("EventLog", "EventLog", typeof(MainWindow));
 		public static RoutedUICommand CloseTab = new RoutedUICommand("Close Tab", "CloseTab", typeof(MainWindow));
 		public static RoutedUICommand Chat = new RoutedUICommand("Chat", "Chat", typeof(MainWindow));
 		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
@@ -60,7 +58,7 @@ namespace Waher.Client.WPF
 		internal static MainWindow currentInstance = null;
 		private static string appDataFolder = null;
 		private static FilesProvider databaseProvider = null;
-		private static readonly LinkedList<KeyValuePair<ParameterizedThreadStart, object>> guiUpdateQueue = new LinkedList<KeyValuePair<ParameterizedThreadStart, object>>();
+		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new LinkedList<GuiUpdateTask>();
 
 		public MainWindow()
 		{
@@ -70,7 +68,7 @@ namespace Waher.Client.WPF
 			Types.Initialize(typeof(MainWindow).Assembly,
 				typeof(Content.InternetContent).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
-				typeof(Content.Markdown.MarkdownDocument).Assembly,
+				typeof(MarkdownDocument).Assembly,
 				typeof(XML).Assembly,
 				typeof(Content.Xsl.XSL).Assembly,
 				typeof(SensorData).Assembly,
@@ -78,9 +76,11 @@ namespace Waher.Client.WPF
 				typeof(Networking.XMPP.P2P.EndpointSecurity).Assembly,
 				typeof(Networking.XMPP.Provisioning.ProvisioningClient).Assembly,
 				typeof(Networking.XMPP.WebSocket.WebSocketBinding).Assembly,
+				typeof(Log).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
+				typeof(RuntimeSettings).Assembly,
 				typeof(Script.Expression).Assembly,
 				typeof(Script.Content.Functions.Encoding.Decode).Assembly,
 				typeof(Script.Graphs.Graph).Assembly,
@@ -99,30 +99,37 @@ namespace Waher.Client.WPF
 			if (!Directory.Exists(appDataFolder))
 				Directory.CreateDirectory(appDataFolder);
 
-			Task.Run(() =>
-			{
-				try
-				{
-					databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
-					databaseProvider.RepairIfInproperShutdown(appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt").Wait();
-					databaseProvider.Start().Wait();
-					Database.Register(databaseProvider);
-
-					Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),
-						new FilterFieldEqualTo("ProvisioningJID", string.Empty)));  // To prepare indices, etc.
-
-					ChatView.InitEmojis();
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-					ErrorBox(ex.Message);
-				}
-			});
-
 			InitializeComponent();
-
 			this.MainView.Load(this);
+
+			Task.Run(() => this.Start());
+		}
+
+		private async void Start()
+		{
+			try
+			{
+				this.MainView.ShowStatus("Initializing");
+
+				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
+				await databaseProvider.RepairIfInproperShutdown(appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
+				await databaseProvider.Start();
+				Database.Register(databaseProvider);
+
+				await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", string.Empty),
+					new FilterFieldEqualTo("ProvisioningJID", string.Empty)));  // To prepare indices, etc.
+
+				ChatView.InitEmojis();
+
+				this.MainView.ShowStatus("Initialization complete.");
+			}
+			catch (Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+				Log.Critical(ex);
+				this.MainView.ShowStatus("Failure to initialize: " + ex.Message);
+				ErrorBox(ex.Message);
+			}
 		}
 
 		public static string AppDataFolder
@@ -424,6 +431,34 @@ namespace Waher.Client.WPF
 			this.Tabs.SelectedItem = TabItem;
 		}
 
+		private void EventLog_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = true;
+		}
+
+		private void EventLog_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			LogView View;
+
+			foreach (TabItem Tab in this.Tabs.Items)
+			{
+				View = Tab.Content as LogView;
+				if (View is null || View.Sink is null)
+					continue;
+
+				Tab.Focus();
+				return;
+			}
+
+			TabItem TabItem = MainWindow.NewTab("Event Log");
+			this.Tabs.Items.Add(TabItem);
+
+			View = new LogView(true);
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
+		}
+
 		private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = this.Tabs.SelectedIndex > 0;
@@ -487,7 +522,7 @@ namespace Waher.Client.WPF
 		private void FocusChatInput(object P)
 		{
 			Thread.Sleep(50);
-			MainWindow.UpdateGui(this.FocusChatInput2, P);
+			UpdateGui(this.FocusChatInput2, P);
 		}
 
 		private void FocusChatInput2(object P)
@@ -498,15 +533,10 @@ namespace Waher.Client.WPF
 
 		public void OnChatMessage(object Sender, MessageEventArgs e)
 		{
-			MainWindow.UpdateGui(this.ChatMessageReceived, e);
+			UpdateGui(this.ChatMessageReceived, e);
 		}
 
-		public void OnStateChange(object _, XmppState State)
-		{
-			MainWindow.UpdateGui(this.UpdateStateStatus, State);
-		}
-
-		private void UpdateStateStatus(object State)
+		public void OnStateChange(object _, XmppState _2)
 		{
 			try
 			{
@@ -531,9 +561,9 @@ namespace Waher.Client.WPF
 				}
 
 				if (c == 0)
-					this.MainView.ConnectionStatus.Content = string.Empty;
+					this.MainView.ShowStatus(string.Empty);
 				else if (c == 1)
-					this.MainView.ConnectionStatus.Content = StateToString((XmppState)i);
+					this.MainView.ShowStatus(StateToString((XmppState)i));
 				else
 				{
 					StringBuilder sb = new StringBuilder();
@@ -551,7 +581,7 @@ namespace Waher.Client.WPF
 						sb.Append(StateToString((XmppState)P.Key));
 					}
 
-					this.MainView.ConnectionStatus.Content = sb.ToString();
+					this.MainView.ShowStatus(sb.ToString());
 				}
 			}
 			catch (Exception ex)
@@ -788,9 +818,9 @@ namespace Waher.Client.WPF
 			Node.GetConfigurationForm((Sender, e2) =>
 			{
 				if (e2.Ok && e2.Form != null)
-					MainWindow.UpdateGui(this.ShowForm, e2.Form);
+					UpdateGui(this.ShowForm, e2.Form);
 				else
-					MainWindow.UpdateGui(this.ShowError, e2);
+					UpdateGui(this.ShowError, e2);
 			}, null);
 		}
 
@@ -892,7 +922,7 @@ namespace Waher.Client.WPF
 
 					if (Questions.First != null)
 					{
-						MainWindow.UpdateGui(() =>
+						UpdateGui(() =>
 						{
 							if (QuestionView is null)
 								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
@@ -1011,7 +1041,7 @@ namespace Waher.Client.WPF
 
 		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)
 		{
-			MainWindow.UpdateGui(() =>
+			UpdateGui(() =>
 			{
 				Mouse.OverrideCursor = null;
 				System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon);
@@ -1020,55 +1050,89 @@ namespace Waher.Client.WPF
 
 		public static void MouseDefault()
 		{
-			MainWindow.UpdateGui(() => Mouse.OverrideCursor = null);
+			UpdateGui(() => Mouse.OverrideCursor = null);
 		}
 
 		public static void UpdateGui(ThreadStart Method)
 		{
-			UpdateGui((State) => ((ThreadStart)State)(), Method);
+			UpdateGui((State) => ((ThreadStart)State)(), Method.Method.DeclaringType + "." + Method.Method.Name, Method);
 		}
 
 		public static void UpdateGui(ParameterizedThreadStart Method, object State)
 		{
+			UpdateGui(Method, Method.Method.DeclaringType + "." + Method.Method.Name, State);
+		}
+
+		private static void UpdateGui(ParameterizedThreadStart Method, string Name, object State)
+		{
 			bool Start;
+			GuiUpdateTask Rec = new GuiUpdateTask()
+			{
+				Method = Method,
+				State = State,
+				Name = Name,
+				Requested = DateTime.Now
+			};
 
 			lock (guiUpdateQueue)
 			{
 				Start = guiUpdateQueue.First is null;
-				guiUpdateQueue.AddLast(new KeyValuePair<ParameterizedThreadStart, object>(Method, State));
+				guiUpdateQueue.AddLast(Rec);
 			}
 
 			if (Start)
-				currentInstance.Dispatcher.BeginInvoke(new ParameterizedThreadStart(DoUpdates), State);
+				currentInstance.Dispatcher.BeginInvoke(new ThreadStart(DoUpdates));
 		}
 
-		private static void DoUpdates(object State)
+		private static void DoUpdates()
 		{
-			ParameterizedThreadStart Method;
+			GuiUpdateTask Rec = null;
+			GuiUpdateTask Prev;
 
 			while (true)
 			{
 				lock (guiUpdateQueue)
 				{
-					if (guiUpdateQueue.First is null)
+					if (!(Rec is null))
+						guiUpdateQueue.RemoveFirst();
+
+					Prev = Rec;
+					Rec = guiUpdateQueue.First?.Value;
+					if (Rec is null)
 						return;
-
-					KeyValuePair<ParameterizedThreadStart, object> P = guiUpdateQueue.First.Value;
-					guiUpdateQueue.RemoveFirst();
-
-					Method = P.Key;
-					State = P.Value;
 				}
 
 				try
 				{
-					Method(State);
+					Rec.Started = DateTime.Now;
+					Rec.Method(Rec.State);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
+				finally
+				{
+					Rec.Ended = DateTime.Now;
+				}
+
+				TimeSpan TS;
+
+				if ((TS = (Rec.Ended - Rec.Started)).TotalSeconds >= 1)
+					Log.Notice("GUI update method is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
+				else if ((TS = (Rec.Ended - Rec.Requested)).TotalSeconds >= 1)
+					Log.Notice("GUI update pipeline is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
 			}
+		}
+
+		private class GuiUpdateTask
+		{
+			public ParameterizedThreadStart Method;
+			public object State;
+			public string Name;
+			public DateTime Requested;
+			public DateTime Started;
+			public DateTime Ended;
 		}
 
 	}

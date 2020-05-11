@@ -24,6 +24,7 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
         <CommandBinding Command="Refresh" Executed="Refresh_Executed" CanExecute="Refresh_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Sniff}" Executed="Sniff_Executed" CanExecute="Sniff_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.EventLog}" Executed="EventLog_Executed" CanExecute="EventLog_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.CloseTab}" Executed="CloseTab_Executed" CanExecute="CloseTab_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Chat}" Executed="Chat_Executed" CanExecute="Chat_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.ReadMomentary}" Executed="ReadMomentary_Executed" CanExecute="ReadMomentary_CanExecute" />
@@ -104,6 +105,11 @@
                         <Image Source="Graphics/Spy-icon.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Name="EventLogMenuItem" Header="Event _Log..." Command="{x:Static wcw:MainWindow.EventLog}" IsEnabled="{Binding ElementName=EventLogButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/log_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem/>
                 <MenuItem Name="ChatMenuItem" Header="C_hat..." Command="{x:Static wcw:MainWindow.Chat}" IsEnabled="{Binding ElementName=ChatButton, Path=IsEnabled}">
                     <MenuItem.Icon>
@@ -167,6 +173,9 @@
                 </Button>
                 <Button Name="SniffButton" ToolTip="Sniffer" Command="{x:Static wcw:MainWindow.Sniff}">
                     <Image Source="Graphics/Spy-icon.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="EventLogButton" ToolTip="Event Log" Command="{x:Static wcw:MainWindow.EventLog}">
+                    <Image Source="Graphics/log_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="EditToolBar">

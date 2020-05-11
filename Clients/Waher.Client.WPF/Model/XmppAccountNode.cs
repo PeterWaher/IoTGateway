@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using Waher.Events;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -58,7 +57,6 @@ namespace Waher.Client.WPF.Model
 		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
 		private readonly Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
-		private readonly Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
 		private readonly Connections connections;
 		private XmppClient client;
 		private PepClient pepClient;
@@ -195,7 +193,7 @@ namespace Waher.Client.WPF.Model
 			this.client.OnNormalMessage += Client_OnNormalMessage;
 
 			this.client.SetPresence(Availability.Chat);
-			
+
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
@@ -776,7 +774,7 @@ namespace Waher.Client.WPF.Model
 				else
 					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);
 
-				RosterItem Item = this.client[e.FromBareJID];
+				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
 				if (Item != null)
 					this.CheckRosterItemSubscriptions(Item);
 			}
@@ -1088,39 +1086,46 @@ namespace Waher.Client.WPF.Model
 
 							lock (this.children)
 							{
-								if (!this.children.ContainsKey(Item.JID))
-								{
-									if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
-									{
-										ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
-										Component = ThingRegistry;
-									}
-									else if (e2.HasFeature(PubSubClient.NamespacePubSub))
-									{
-										this.AddPepClient(Item.JID);
-										Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
-									}
-									else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
-										Component = new LegalService(this, Item.JID, Item.Name, Item.Node, e2.Features);
-									else if (e2.HasFeature(EventLog.NamespaceEventLogging))
-										Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
-									else
-										Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
-
-									this.children[Item.JID] = Component;
-								}
+								if (this.children.ContainsKey(Item.JID))
+									return;
 							}
 
-							if (Component != null)
-								this.connections.Owner.MainView.NodeAdded(this, Component);
+							if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
+							{
+								ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
+								Component = ThingRegistry;
+							}
+							else if (e2.HasFeature(PubSubClient.NamespacePubSub))
+							{
+								this.AddPepClient(Item.JID);
+								Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
+							}
+							else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
+								Component = new LegalService(this, Item.JID, Item.Name, Item.Node, e2.Features);
+							else if (e2.HasFeature(EventLog.NamespaceEventLogging))
+								Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
+							else
+								Component = new XmppComponent(this, Item.JID, Item.Name, Item.Node, e2.Features);
+
+							lock (this.children)
+							{
+								if (this.children.ContainsKey(Item.JID))
+								{
+									Component.Dispose();
+									return;
+								}
+
+								this.children[Item.JID] = Component;
+							}
+
+							this.connections.Owner.MainView.NodeAdded(this, Component);
+							this.OnUpdated();
 
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
 							{
 								MainWindow.UpdateGui(() =>
 									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null));
 							}
-
-							this.OnUpdated();
 						}
 						catch (Exception ex)
 						{
@@ -1316,17 +1321,24 @@ namespace Waher.Client.WPF.Model
 
 		public void RegisterComponent(XmppComponent Component)
 		{
-			if (!this.components.Contains(Component))
-				this.components.AddLast(Component);
+			lock (this.components)
+			{
+				if (!this.components.Contains(Component))
+					this.components.AddLast(Component);
+			}
 		}
 
-		public void UnregisterComponent(XmppComponent Component)
+		public bool UnregisterComponent(XmppComponent Component)
 		{
-			this.components.Remove(Component);
+			lock (this.components)
+			{
+				return this.components.Remove(Component);
+			}
 		}
 
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
+			LinkedList<IMenuAggregator> Aggregators = null;
 			MenuItem Item;
 
 			if (Node == this)
@@ -1342,10 +1354,24 @@ namespace Waher.Client.WPF.Model
 				Item.Click += this.ChangePassword_Click;
 			}
 
-			foreach (XmppComponent Component in this.components)
+			lock (this.components)
 			{
-				if (Component is IMenuAggregator MenuAggregator)
-					MenuAggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
+				foreach (XmppComponent Component in this.components)
+				{
+					if (Component is IMenuAggregator MenuAggregator)
+					{
+						if (Aggregators is null)
+							Aggregators = new LinkedList<IMenuAggregator>();
+
+						Aggregators.AddLast(MenuAggregator);
+					}
+				}
+			}
+
+			if (!(Aggregators is null))
+			{
+				foreach (IMenuAggregator Aggregator in Aggregators)
+					Aggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
 			}
 		}
 

@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventOutput"
+		   targetNamespace="http://waher.se/Schema/EventOutput.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/Schema/EventOutput.xsd"
+		   xmlns:mstns="http://waher.se/Schema/EventOutput.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="EventOutput">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Debug" type="Event"/>
+				<xs:element name="Informational" type="Event"/>
+				<xs:element name="Notice" type="Event"/>
+				<xs:element name="Warning" type="Event"/>
+				<xs:element name="Error" type="Event"/>
+				<xs:element name="Critical" type="Event"/>
+				<xs:element name="Alert" type="Event"/>
+				<xs:element name="Emergency" type="Event"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="Event">
+		<xs:sequence>
+			<xs:element name="Message" minOccurs="1" maxOccurs="1" type="Rows"/>
+			<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded" type="Tag"/>
+			<xs:element name="StackTrace" minOccurs="0" maxOccurs="1" type="Rows"/>
+		</xs:sequence>
+		<xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
+		<xs:attribute name="level" type="Level" use="required"/>
+		<xs:attribute name="id" type="xs:string" use="optional"/>
+		<xs:attribute name="object" type="xs:string" use="optional"/>
+		<xs:attribute name="actor" type="xs:string" use="optional"/>
+		<xs:attribute name="module" type="xs:string" use="optional"/>
+		<xs:attribute name="facility" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<xs:simpleType name="Level">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Minor"/>
+			<xs:enumeration value="Medium"/>
+			<xs:enumeration value="Major"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Rows">
+		<xs:sequence>
+			<xs:element name="Row" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Tag">
+		<xs:attribute name="key" type="xs:string" use="required"/>
+		<xs:attribute name="value" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+</xs:schema>

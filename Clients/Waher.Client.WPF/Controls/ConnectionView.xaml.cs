@@ -2,20 +2,11 @@
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Events;
 using Waher.Networking;
@@ -215,7 +206,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Sniff":
-						TabItem TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
+						TabItem TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SnifferView SnifferView = new SnifferView(null);
@@ -229,7 +220,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Chat":
-						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						ChatView ChatView = new ChatView(null);
@@ -244,7 +235,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "SensorData":
-						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SensorDataView SensorDataView = new SensorDataView(null, null, false);
@@ -256,7 +247,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "SearchResult":
-						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						SearchResultView SearchResultView = new SearchResultView();
@@ -268,7 +259,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case "Script":
-						TabItem = MainWindow.NewTab(System.IO.Path.GetFileName(FileName));
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						ScriptView ScriptView = new ScriptView();
@@ -277,6 +268,18 @@ namespace Waher.Client.WPF.Controls
 						this.MainWindow.Tabs.SelectedItem = TabItem;
 
 						ScriptView.Load(Xml, FileName);
+						break;
+
+					case "EventOutput":
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
+						this.MainWindow.Tabs.Items.Add(TabItem);
+
+						LogView LogView = new LogView(false);
+						TabItem.Content = LogView;
+
+						this.MainWindow.Tabs.SelectedItem = TabItem;
+
+						LogView.Load(Xml, FileName);
 						break;
 
 					default:
@@ -354,7 +357,7 @@ namespace Waher.Client.WPF.Controls
 				if (!int.TryParse(Dialog.XmppPort.Text, out int Port))
 					Port = XmppCredentials.DefaultPort;
 
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Dialog.XmppServer.Text, 
+				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Dialog.XmppServer.Text,
 					(TransportMethod)Dialog.ConnectionMethod.SelectedIndex, Port, Dialog.UrlEndpoint.Text,
 					Dialog.AccountName.Text, Dialog.PasswordHash, Dialog.PasswordHashMethod,
 					Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value,
@@ -371,7 +374,7 @@ namespace Waher.Client.WPF.Controls
 			this.NodeAdded(null, Node);
 		}
 
-		public void NodeAdded(TreeNode Parent, TreeNode ChildNode)
+		public void NodeAdded(TreeNode _, TreeNode ChildNode)
 		{
 			ChildNode.Updated += this.Node_Updated;
 			ChildNode.Added(this.MainWindow);
@@ -385,22 +388,61 @@ namespace Waher.Client.WPF.Controls
 			if (Parent is null)
 			{
 				this.connections.Delete(ChildNode);
-				this.ConnectionTree.Items.Remove(ChildNode);
+				MainWindow.UpdateGui(() => this.ConnectionTree.Items.Remove(ChildNode));
 			}
 			else
 				Parent.RemoveChild(ChildNode);
 
-			this.ConnectionTree.Items.Refresh();
+			MainWindow.UpdateGui(() => this.ConnectionTree.Items.Refresh());
 		}
 
 		private void Node_Updated(object sender, EventArgs e)
 		{
-			MainWindow.UpdateGui(this.RefreshTree, sender);
+			lock (this.syncObj)
+			{
+				if (this.refreshTimer is null)
+					this.refreshTimer = new Timer(RefreshTree, null, 250, Timeout.Infinite);
+			}
 		}
 
-		private void RefreshTree(object P)
+		public void ShowStatus(string Message)
 		{
-			this.ConnectionTree.Items.Refresh();
+			lock (this.syncObj)
+			{
+				if (this.status == Message)
+					return;
+
+				this.status = Message;
+				if (this.statusTimer is null)
+					this.statusTimer = new Timer(SetStatus, null, 250, Timeout.Infinite);
+			}
+		}
+
+		private string status = string.Empty;
+		private Timer refreshTimer = null;
+		private Timer statusTimer = null;
+		private readonly object syncObj = new object();
+
+		private void RefreshTree(object _)
+		{
+			lock (this.syncObj)
+			{
+				this.refreshTimer?.Dispose();
+				this.refreshTimer = null;
+			}
+
+			MainWindow.UpdateGui(() => this.ConnectionTree.Items.Refresh());
+		}
+
+		private void SetStatus(object _)
+		{
+			lock (this.syncObj)
+			{
+				this.statusTimer?.Dispose();
+				this.statusTimer = null;
+			}
+
+			MainWindow.UpdateGui(() => this.ConnectionStatus.Content = this.status);
 		}
 
 		private void ConnectionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -450,5 +492,6 @@ namespace Waher.Client.WPF.Controls
 			if (MainWindow != null)
 				MainWindow.SelectionChanged();
 		}
+
 	}
 }

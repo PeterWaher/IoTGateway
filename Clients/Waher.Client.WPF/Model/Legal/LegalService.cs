@@ -32,11 +32,8 @@ namespace Waher.Client.WPF.Model.Legal
 
 		public override void Dispose()
 		{
-			if (this.contractsClient != null)
-			{
-				this.contractsClient.Dispose();
-				this.contractsClient = null;
-			}
+			this.contractsClient?.Dispose();
+			this.contractsClient = null;
 
 			base.Dispose();
 		}
@@ -148,7 +145,7 @@ namespace Waher.Client.WPF.Model.Legal
 				{
 					if (!e2.Ok)
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
- 				}, null);
+				}, null);
 			}
 		}
 
@@ -287,8 +284,8 @@ namespace Waher.Client.WPF.Model.Legal
 
 						foreach (LegalIdentity Identity in e2.Identities)
 						{
-							if (Identity.State == IdentityState.Approved || 
-								Identity.State == IdentityState.Created || 
+							if (Identity.State == IdentityState.Approved ||
+								Identity.State == IdentityState.Created ||
 								Identity.State == IdentityState.Obsoleted)
 							{
 								this.contractsClient.CompromisedLegalIdentity(Identity.Id, null, null);

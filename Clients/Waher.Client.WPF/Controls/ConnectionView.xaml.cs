@@ -401,7 +401,7 @@ namespace Waher.Client.WPF.Controls
 			lock (this.syncObj)
 			{
 				if (this.refreshTimer is null)
-					this.refreshTimer = new Timer(RefreshTree, null, 250, Timeout.Infinite);
+					this.refreshTimer = new Timer(RefreshTree, null, 100, Timeout.Infinite);
 			}
 		}
 
@@ -414,7 +414,7 @@ namespace Waher.Client.WPF.Controls
 
 				this.status = Message;
 				if (this.statusTimer is null)
-					this.statusTimer = new Timer(SetStatus, null, 250, Timeout.Infinite);
+					this.statusTimer = new Timer(SetStatus, null, 100, Timeout.Infinite);
 			}
 		}
 

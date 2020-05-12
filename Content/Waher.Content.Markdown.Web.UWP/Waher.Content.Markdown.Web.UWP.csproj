@@ -114,6 +114,9 @@
   <ItemGroup>
     <Compile Include="MarkdownToHtmlConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptExtensions\Page.cs" />
+    <Compile Include="WebScript\WsCodec.cs" />
+    <Compile Include="WebScript\WsToX.cs" />
     <EmbeddedResource Include="Properties\Waher.Content.Markdown.Web.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +149,15 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Content\Waher.Content.Markdown.Web\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Content\Waher.Content.Markdown.Web\ScriptExtensions\*.cs" "$(ProjectDir)"ScriptExtensions /Y
+xcopy "$(SolutionDir)Content\Waher.Content.Markdown.Web\WebScript\*.cs" "$(ProjectDir)"WebScript /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

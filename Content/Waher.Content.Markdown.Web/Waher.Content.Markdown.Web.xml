@@ -64,6 +64,124 @@
             HTML settings for automatically converted content.
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.Web.WebScript.WsCodec">
+            <summary>
+            Web Script encoder/decoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.#ctor">
+            <summary>
+            Web Script encoder/decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Web.WebScript.WsCodec.WsContentTypes">
+            <summary>
+            Plain text content types.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Web.WebScript.WsCodec.WsFileExtensions">
+            <summary>
+            Plain text file extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsCodec.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsCodec.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the decoder decodes an object with a given content type.
+            </summary>
+            <param name="ContentType">Content type to decode.</param>
+            <param name="Grade">How well the decoder decodes the object.</param>
+            <returns>If the decoder can decode an object with the given type.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+            <summary>
+            Decodes an object.
+            </summary>
+            <param name="ContentType">Internet Content Type.</param>
+            <param name="Data">Encoded object.</param>
+            <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+            <param name="Fields">Any content-type related fields and their corresponding values.</param>
+            <param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+            <returns>Decoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.WebScript.WsToX">
+            <summary>
+            Converts Web Script-files to desired output, by evaluating the web script and encoding the results in accordance with accept headers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.#ctor">
+            <summary>
+            Converts Web Script-files to desired output, by evaluating the web script and encoding the results in accordance with accept headers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsToX.FromContentTypes">
+            <summary>
+            Converts content from these content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsToX.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsToX.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Script.Variables)">
+            <summary>
+            Performs the actual conversion.
+            </summary>
+            <param name="FromContentType">Content type of the content to convert from.</param>
+            <param name="From">Stream pointing to binary representation of content.</param>
+            <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
+            Otherwise, the parameter is the empty string.</param>
+            <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
+            <param name="URL">URL of resource, if accessed from a web server.</param>
+            <param name="ToContentType">Content type of the content to convert to.</param>
+            <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
+            <param name="Session">Session states.</param>
+            <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
+        </member>
         <member name="T:Waher.Networking.HTTP.ScriptExtensions.Page">
             <summary>
             Page-local variables.

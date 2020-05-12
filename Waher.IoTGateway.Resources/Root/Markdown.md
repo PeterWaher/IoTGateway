@@ -1392,6 +1392,24 @@ Data posted to a page can be accessed, in decoded form, by accessing the `Posted
 This makes it possible to implement a form into a Markdown page, and process posted information from script embedded in the document itself,
 or linked to it in the meta-data headers.
 
+### Web Services
+
+There are multiple ways to define web services using Markdown and/or script, as outlined in the following sub-sections.
+
+#### Web Script
+
+Web Script (Web Service, or *Waher Script*) is script that is stored in files with extension `.ws`. A client can POST data to such a
+Web Script file. The data will be decoded and made available in the script through the `Posted` variable. The result of the script is
+then encoded to the client, based on the `Accept` header in the HTTP Request. For JSON responses, the `Accept` header should have the
+value `application/json`.
+
+#### Markdown-based Services
+
+You can create separate Markdown files with the [`BodyOnly`](#bodyOnly) meta-data tag set to `true`, to create web services that return
+HTML directly. This is suitable if the response does not need to be parsed and conditionally processed, but only displayed to the user.
+A client POSTs data to such a Markdown file. The data will be decoded and made available in the script through the `Posted` variable. 
+The result of the script is then encoded to the client, based on the `Accept` header in the HTTP Request, which should be `text/html`.
+
 
 =========================================================================================================================================================
 

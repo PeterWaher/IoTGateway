@@ -7,7 +7,7 @@ using Waher.Runtime.Inventory;
 namespace Waher.IoTGateway.Cssx
 {
 	/// <summary>
-	/// CSSX encoder/decoder.
+	/// CSSX decoder.
 	/// </summary>
 	public class CssxDecoder : IContentDecoder
 	{

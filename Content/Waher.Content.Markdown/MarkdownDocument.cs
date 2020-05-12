@@ -307,7 +307,7 @@ namespace Waher.Content.Markdown
 										{
 											lastExecuted[FileName] = LastExecuted.Value;
 										}
-										
+
 										continue;
 									}
 								}
@@ -4494,6 +4494,12 @@ namespace Waher.Content.Markdown
 			if (this.settings.HtmlSettings is null)
 				this.settings.HtmlSettings = new HtmlSettings();
 
+			if (!Inclusion && this.metaData.TryGetValue("BODYONLY", out KeyValuePair<string, bool>[] Values))
+			{
+				if (CommonTypes.TryParse(Values[0].Key, out bool b) && b)
+					Inclusion = true;
+			}
+
 			if (!Inclusion)
 			{
 				StringBuilder sb = null;
@@ -4506,7 +4512,7 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("<html itemscope itemtype=\"http://schema.org/WebPage\">");
 				Output.AppendLine("<head>");
 
-				if (this.metaData.TryGetValue("TITLE", out KeyValuePair<string, bool>[] Values))
+				if (this.metaData.TryGetValue("TITLE", out Values))
 				{
 					foreach (KeyValuePair<string, bool> P in Values)
 					{
@@ -4641,6 +4647,7 @@ namespace Waher.Content.Markdown
 						case "ALTERNATE":
 						case "AUDIOAUTOPLAY":
 						case "AUDIOCONTROLS":
+						case "BODYONLY":
 						case "CONTENT-SECURITY-POLICY":
 						case "COPYRIGHT":
 						case "CACHE-CONTROL":

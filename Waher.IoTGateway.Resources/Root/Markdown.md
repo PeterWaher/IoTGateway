@@ -1449,6 +1449,14 @@ Default value, if not provided, is `false`.
 
 Write the name of the author or authors using this tag.
 
+### BodyOnly
+
+If only the contents of the body should be returned or not. This is useful if you create dynamic pages using the XmlHttpRequest object (AJAX),
+as it removes the DOCTYPE and header (and body tag) from the response, and only returns the corresponding HTML content. Value is a boolean 
+value. Strings representing `true`, include `1`, `true`, `yes` and `on`. Strings representing `false`, include `0`, `false`, `no` and `off`.
+
+Default value, if not provided, is `false`.
+
 ### Copyright
 
 Allows you to provide a link to a copyright statement.

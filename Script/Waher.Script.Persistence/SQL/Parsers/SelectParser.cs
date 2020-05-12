@@ -420,6 +420,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s != "ORDER" &&
 				s != "OFFSET" &&
 				s != "ON" &&
+				s != "SET" &&
 				s != "SELECT")
 			{
 				if (s == "AS")

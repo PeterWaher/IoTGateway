@@ -25,7 +25,7 @@ namespace Waher.IoTGateway.Cssx
 		/// <summary>
 		/// Converts content from these content types.
 		/// </summary>
-		public string[] FromContentTypes => new string[] { "text/x.cssx" };
+		public string[] FromContentTypes => new string[] { "text/x-cssx" };
 
 		/// <summary>
 		/// Converts content to these content types. 

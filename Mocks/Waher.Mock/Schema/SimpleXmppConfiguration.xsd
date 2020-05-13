@@ -81,7 +81,12 @@
 						<xs:documentation>If SCRAM-SHA-1 authentication should be allowed. (Default=true)</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="AllowEncryption" type="xs:boolean" minOccurs="0" default="true">
+        <xs:element name="AllowScramSHA256" type="xs:boolean" minOccurs="0" default="true">
+          <xs:annotation>
+            <xs:documentation>If SCRAM-SHA-256 authentication should be allowed. (Default=true)</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="AllowEncryption" type="xs:boolean" minOccurs="0" default="true">
 					<xs:annotation>
 						<xs:documentation>If Encryption (TLS) should be allowed. (Default=true)</xs:documentation>
 					</xs:annotation>

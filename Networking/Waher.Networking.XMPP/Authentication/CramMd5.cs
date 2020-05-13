@@ -23,6 +23,11 @@ namespace Waher.Networking.XMPP.Authentication
 		}
 
 		/// <summary>
+		/// Name of hash method.
+		/// </summary>
+		public override string HashMethodName => "CRAM-MD5";
+
+		/// <summary>
 		/// <see cref="AuthenticationMethod.Challenge"/>
 		/// </summary>
 		public override string Challenge(string Challenge, XmppClient Client)
@@ -34,7 +39,7 @@ namespace Waher.Networking.XMPP.Authentication
 			{
 				Pwd = Client.Password;
 				Client.PasswordHash = Pwd;
-				Client.PasswordHashMethod = "CRAM-MD5";
+				Client.PasswordHashMethod = this.HashMethodName;
 			}
 
 			byte[] HMAC = this.HMAC(Encoding.UTF8.GetBytes(Pwd), ChallengeBinary);

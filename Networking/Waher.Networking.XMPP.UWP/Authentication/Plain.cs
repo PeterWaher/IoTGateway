@@ -23,6 +23,11 @@ namespace Waher.Networking.XMPP.Authentication
 		}
 
 		/// <summary>
+		/// Name of hash method.
+		/// </summary>
+		public override string HashMethodName => "PLAIN";
+
+		/// <summary>
 		/// <see cref="AuthenticationMethod.Challenge"/>
 		/// </summary>
 		public override string Challenge(string Challenge, XmppClient Client)

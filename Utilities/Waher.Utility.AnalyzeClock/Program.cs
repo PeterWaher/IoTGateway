@@ -258,6 +258,7 @@ namespace Waher.Utility.AnalyzeClock
 					AllowDigestMD5 = true,
 					AllowPlain = true,
 					AllowScramSHA1 = true,
+					AllowScramSHA256 = true,
 					AllowRegistration = false
 				};
 

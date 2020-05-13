@@ -134,8 +134,9 @@
     <Compile Include="Authentication\HashedAuthenticationMethod.cs" />
     <Compile Include="Authentication\MD5AuthenticationMethod.cs" />
     <Compile Include="Authentication\Plain.cs" />
+    <Compile Include="Authentication\ScramAuthenticationMethod.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
-    <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
+    <Compile Include="Authentication\ScramSha256.cs" />
     <Compile Include="BitsOfBinary\BitsOfBinaryEventArgs.cs" />
     <Compile Include="BitsOfBinary\BobClient.cs" />
     <Compile Include="CustomPresenceEventArgs.cs" />

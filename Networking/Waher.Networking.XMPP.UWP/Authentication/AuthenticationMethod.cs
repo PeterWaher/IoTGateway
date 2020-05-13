@@ -17,6 +17,14 @@ namespace Waher.Networking.XMPP.Authentication
 		}
 
 		/// <summary>
+		/// Name of hash method.
+		/// </summary>
+		public abstract string HashMethodName
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Computes a response given a challenge from the server.
 		/// </summary>
 		/// <param name="Challenge">Challenge text.</param>

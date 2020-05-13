@@ -557,6 +557,7 @@ namespace Waher.IoTGateway.Setup
 				AllowPlain = this.allowInsecureMechanisms,
 				AllowRegistration = this.createAccount,
 				AllowScramSHA1 = true,
+				AllowScramSHA256 = true,
 				RequestRosterOnStartup = true
 			};
 

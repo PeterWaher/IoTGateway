@@ -1932,6 +1932,7 @@ namespace Waher.IoTGateway
 				Client.AllowDigestMD5 = xmppClient.AllowDigestMD5;
 				Client.AllowPlain = xmppClient.AllowPlain;
 				Client.AllowScramSHA1 = xmppClient.AllowScramSHA1;
+				Client.AllowScramSHA256 = xmppClient.AllowScramSHA256;
 				Client.AllowEncryption = xmppClient.AllowEncryption;
 
 				Client.OnStateChanged += (sender, NewState) =>

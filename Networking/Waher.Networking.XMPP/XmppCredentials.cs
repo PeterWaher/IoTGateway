@@ -41,6 +41,7 @@ namespace Waher.Networking.XMPP
 		private bool allowDigestMD5 = true;
 		private bool allowPlain = false;
 		private bool allowScramSHA1 = true;
+		private bool allowScramSHA256 = true;
 		private bool allowEncryption = true;
 		private bool allowRegistration = false;
 		private bool requestRosterOnStartup = true;
@@ -178,6 +179,15 @@ namespace Waher.Networking.XMPP
 		{
 			get { return this.allowScramSHA1; }
 			set { this.allowScramSHA1 = value; }
+		}
+
+		/// <summary>
+		/// If SCRAM-SHA-256 should be allowed, during authentication.
+		/// </summary>
+		public bool AllowScramSHA256
+		{
+			get { return this.allowScramSHA256; }
+			set { this.allowScramSHA256 = value; }
 		}
 
 		/// <summary>

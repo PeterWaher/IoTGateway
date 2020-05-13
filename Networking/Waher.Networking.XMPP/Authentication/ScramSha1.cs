@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Authentication
 {
@@ -10,15 +10,8 @@ namespace Waher.Networking.XMPP.Authentication
 	/// See RFC 5802 for a description of the SCRAM-SHA-1 method:
 	/// http://tools.ietf.org/html/rfc5802
 	/// </summary>
-	public class ScramSha1 : SHA1AuthenticationMethod
+	public class ScramSha1 : ScramAuthenticationMethod
 	{
-		private byte[] salt;
-		private readonly string nonce;
-		private string serverNonce;
-		private string saltString;
-		private string serverSignature;
-		private int nrIterations;
-
 		/// <summary>
 		/// Authentication method: SCRAM-SHA-1
 		/// 
@@ -27,121 +20,23 @@ namespace Waher.Networking.XMPP.Authentication
 		/// </summary>
 		/// <param name="Nonce">Nonce value.</param>
 		public ScramSha1(string Nonce)
+			: base(Nonce)
 		{
-			this.nonce = Nonce;
 		}
 
 		/// <summary>
-		/// <see cref="AuthenticationMethod.Challenge"/>
+		/// Name of hash method.
 		/// </summary>
-		public override string Challenge(string Challenge, XmppClient Client)
-		{
-			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
-			string ChallengeString = Encoding.UTF8.GetString(ChallengeBinary);
-
-			foreach (KeyValuePair<string, string> Pair in this.ParseCommaSeparatedParameterList(ChallengeString))
-			{
-				switch (Pair.Key.ToLower())
-				{
-					case "r":
-						this.serverNonce = Pair.Value;
-						break;
-
-					case "s":
-						this.saltString = Pair.Value;
-						this.salt = Convert.FromBase64String(this.saltString);
-						break;
-
-					case "i":
-						this.nrIterations = int.Parse(Pair.Value);
-						break;
-				}
-			}
-
-			if (string.IsNullOrEmpty(this.serverNonce) || !this.serverNonce.StartsWith(this.nonce) ||
-				this.salt is null || this.nrIterations <= 0)
-			{
-				throw new XmppException("Invalid challenge.");
-			}
-
-			byte[] SaltedPassword;
-
-			if (string.IsNullOrEmpty(Client.PasswordHash))
-			{
-				SaltedPassword = Hi(Encoding.UTF8.GetBytes(Client.Password), this.salt, this.nrIterations);     // Client.Pasword.Normalize()	- Normalize method avaialble in .NET 2.0
-				Client.PasswordHash = Convert.ToBase64String(SaltedPassword);
-				Client.PasswordHashMethod = "SCRAM-SHA-1";
-			}
-			else
-				SaltedPassword = Convert.FromBase64String(Client.PasswordHash);
-
-			byte[] ClientKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Client Key"));
-			byte[] StoredKey = H(ClientKey);
-
-			StringBuilder sb;
-
-			sb = new StringBuilder();
-			sb.Append("n=");
-			sb.Append(Client.UserName);
-			sb.Append(",r=");
-			sb.Append(this.nonce);
-			sb.Append(',');
-			sb.Append(ChallengeString);
-			sb.Append(",c=biws,r=");
-			sb.Append(this.serverNonce);
-
-			byte[] AuthenticationMessage = Encoding.UTF8.GetBytes(sb.ToString());
-			byte[] ClientSignature = HMAC(StoredKey, AuthenticationMessage);
-			byte[] ClientProof = XOR(ClientKey, ClientSignature);
-
-			byte[] ServerKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Server Key"));
-			byte[] ServerSignature = HMAC(ServerKey, AuthenticationMessage);
-
-			this.serverSignature = Convert.ToBase64String(ServerSignature);
-
-			sb = new StringBuilder();
-			sb.Append("c=biws,r=");     // biws="n,,"
-			sb.Append(this.serverNonce);
-			sb.Append(",p=");
-			sb.Append(Convert.ToBase64String(ClientProof));
-
-			return Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
-		}
-
-		private byte[] Hi(byte[] String, byte[] Salt, int NrIterations)
-		{
-			byte[] U1 = HMAC(String, CONCAT(Salt, One));
-			byte[] U2 = HMAC(String, U1);
-			byte[] Response = XOR(U1, U2);
-
-			while (NrIterations > 2)
-			{
-				U1 = U2;
-				U2 = HMAC(String, U1);
-				Response = XOR(Response, U2);
-				NrIterations--;
-			}
-
-			return Response;
-		}
-
-		private static readonly byte[] One = new byte[] { 0, 0, 0, 1 };
+		public override string HashMethodName => "SCRAM-SHA-1";
 
 		/// <summary>
-		/// <see cref="AuthenticationMethod.CheckSuccess"/>
+		/// Hash function
 		/// </summary>
-		public override bool CheckSuccess(string Success, XmppClient Client)
+		/// <param name="Data">Data to hash.</param>
+		/// <returns>Hash of data.</returns>
+		public override byte[] H(byte[] Data)
 		{
-			byte[] ResponseBinary = Convert.FromBase64String(Success);
-			string ResponseString = Encoding.UTF8.GetString(ResponseBinary);
-
-			foreach (KeyValuePair<string, string> Pair in this.ParseCommaSeparatedParameterList(ResponseString))
-			{
-				if (Pair.Key.ToLower() == "v")
-					return (Pair.Value == this.serverSignature);
-			}
-
-			return false;
+			return Hashes.ComputeSHA1Hash(Data);
 		}
 
 	}

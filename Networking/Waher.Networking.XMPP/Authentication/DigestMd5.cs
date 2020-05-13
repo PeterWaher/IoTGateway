@@ -23,6 +23,11 @@ namespace Waher.Networking.XMPP.Authentication
 		}
 
 		/// <summary>
+		/// Name of hash method.
+		/// </summary>
+		public override string HashMethodName => "DIGEST-MD5";
+
+		/// <summary>
 		/// <see cref="AuthenticationMethod.Challenge"/>
 		/// </summary>
 		public override string Challenge(string Challenge, XmppClient Client)
@@ -140,7 +145,7 @@ namespace Waher.Networking.XMPP.Authentication
 				{
 					HPass = H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password));
 					Client.PasswordHash = Convert.ToBase64String(HPass);
-					Client.PasswordHashMethod = "DIGEST-MD5";
+					Client.PasswordHashMethod = this.HashMethodName;
 				}
 				else
 					HPass = Convert.FromBase64String(Client.PasswordHash);

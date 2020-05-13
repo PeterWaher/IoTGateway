@@ -183,6 +183,13 @@ namespace Waher.Mock
 						Result.AllowScramSHA1 = b;
 						break;
 
+					case "AllowScramSHA256":
+						if (!CommonTypes.TryParse(N.InnerText, out b))
+							b = false;
+
+						Result.AllowScramSHA256 = b;
+						break;
+
 					case "AllowEncryption":
 						if (!CommonTypes.TryParse(N.InnerText, out b))
 							b = false;
@@ -778,6 +785,10 @@ namespace Waher.Mock
 			Xml.Append("\t<AllowScramSHA1>");
 			Xml.Append(CommonTypes.Encode(Credentials.AllowScramSHA1));
 			Xml.AppendLine("</AllowScramSHA1>");
+
+			Xml.Append("\t<AllowScramSHA256>");
+			Xml.Append(CommonTypes.Encode(Credentials.AllowScramSHA256));
+			Xml.AppendLine("</AllowScramSHA256>");
 
 			Xml.Append("\t<AllowEncryption>");
 			Xml.Append(CommonTypes.Encode(Credentials.AllowEncryption));

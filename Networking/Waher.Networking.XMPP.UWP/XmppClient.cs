@@ -306,6 +306,7 @@ namespace Waher.Networking.XMPP
 		private bool allowCramMD5 = true;
 		private bool allowDigestMD5 = true;
 		private bool allowScramSHA1 = true;
+		private bool allowScramSHA256 = true;
 		private bool allowPlain = false;
 		private readonly bool sendHeartbeats = true;
 		private bool supportsPing = true;
@@ -555,6 +556,7 @@ namespace Waher.Networking.XMPP
 			this.allowDigestMD5 = Credentials.AllowDigestMD5;
 			this.allowPlain = Credentials.AllowPlain;
 			this.allowScramSHA1 = Credentials.AllowScramSHA1;
+			this.allowScramSHA256 = Credentials.AllowScramSHA256;
 			this.allowEncryption = Credentials.AllowEncryption;
 			this.requestRosterOnStartup = Credentials.RequestRosterOnStartup;
 			this.trustServer = Credentials.TrustServer;
@@ -2814,10 +2816,22 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.authenticationMethod is null)
 			{
-				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
+				if (this.allowScramSHA256 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-256") &&
+					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-256"))
+				{
+					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(32));
+					string s = "n,,n=" + this.userName + ",r=" + Nonce;
+					byte[] Data = Encoding.UTF8.GetBytes(s);
+
+					this.State = XmppState.Authenticating;
+					this.authenticationMethod = new ScramSha256(Nonce);
+					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
+						Convert.ToBase64String(Data) + "</auth>", null);
+				}
+				else if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
 				{
-					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(16));
+					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(20));
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
 					byte[] Data = Encoding.UTF8.GetBytes(s);
 
@@ -3116,6 +3130,15 @@ namespace Waher.Networking.XMPP
 		{
 			get { return this.allowScramSHA1; }
 			set { this.allowScramSHA1 = value; }
+		}
+
+		/// <summary>
+		/// If the SCRAM-SHA-1 authentication method is allowed or not. Default is true.
+		/// </summary>
+		public bool AllowScramSHA256
+		{
+			get { return this.allowScramSHA256; }
+			set { this.allowScramSHA256 = value; }
 		}
 
 		/// <summary>

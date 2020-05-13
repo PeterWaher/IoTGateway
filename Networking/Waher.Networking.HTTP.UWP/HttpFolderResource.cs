@@ -966,11 +966,14 @@ namespace Waher.Networking.HTTP
 			Session[" LastPostResource "] = Request.SubPath;
 			Session[" LastPostReferer "] = Referer;
 
-			if (!string.IsNullOrEmpty(Referer))
+			if (!string.IsNullOrEmpty(Referer) &&
+				Uri.TryCreate(Referer, UriKind.RelativeOrAbsolute, out Uri RefererUri) &&
+				string.Compare(Request.SubPath, RefererUri.AbsolutePath, true) == 0)
+			{
 				throw new SeeOtherException(Referer);  // PRG pattern.
-
-			Response.SendResponse();
-			Response.Dispose();
+			}
+			else
+				this.GET(Request, Response);
 		}
 	}
 }

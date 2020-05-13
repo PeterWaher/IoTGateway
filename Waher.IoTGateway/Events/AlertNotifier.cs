@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Emoji;
 using Waher.Content.Markdown;
 using Waher.Events;
 
@@ -74,14 +75,22 @@ namespace Waher.IoTGateway.Events
 			Markdown.Append(MarkdownDocument.Encode(Label));
 			Markdown.Append(" | ");
 
-			foreach (string Row in Value.Trim().Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
+			if (Value.Length > 2 && Value.StartsWith(":") && Value.EndsWith(":") &&
+				EmojiUtilities.TryGetEmoji(Value.Substring(1, Value.Length - 2), out EmojiInfo _))
 			{
-				if (First)
-					First = false;
-				else
-					Markdown.Append("<br/>");
+				Markdown.Append(Value);
+			}
+			else
+			{
+				foreach (string Row in Value.Trim().Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
+				{
+					if (First)
+						First = false;
+					else
+						Markdown.Append("<br/>");
 
-				Markdown.Append(MarkdownDocument.Encode(Row));
+					Markdown.Append(MarkdownDocument.Encode(Row));
+				}
 			}
 
 			Markdown.AppendLine(" |");

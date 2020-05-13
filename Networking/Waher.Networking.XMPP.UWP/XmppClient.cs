@@ -2825,7 +2825,7 @@ namespace Waher.Networking.XMPP
 
 					this.State = XmppState.Authenticating;
 					this.authenticationMethod = new ScramSha256(Nonce);
-					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
+					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-256'>" +
 						Convert.ToBase64String(Data) + "</auth>", null);
 				}
 				else if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&

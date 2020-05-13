@@ -72,10 +72,12 @@ namespace Waher.Script.Operators.Assignments
 					if (!(Property is null))
 					{
 						Type = Property.PropertyType;
-						if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
-							Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), new string[] { Name });
-						else
+						if (Type == typeof(object))
+							Property.SetValue(LeftValue, Right.AssociatedObjectValue, new string[] { Name });
+						else if (Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
 							Property.SetValue(LeftValue, Right, new string[] { Name });
+						else
+							Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), new string[] { Name });
 					}
 					else
 						throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + Type.FullName + "'.", this);

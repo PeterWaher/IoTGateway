@@ -80,10 +80,12 @@ namespace Waher.Script.Operators.Assignments
                 if (!(this.property is null))
                 {
                     Type = this.property.PropertyType;
-                    if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
-                        this.property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), this.nameIndex);
-                    else
+                    if (Type == typeof(object))
+                        this.property.SetValue(LeftValue, Right.AssociatedObjectValue, this.nameIndex);
+                    else if (Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
                         this.property.SetValue(LeftValue, Right, this.nameIndex);
+                    else
+                       this.property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), this.nameIndex);
                 }
                 else if (!(this.field is null))
                 {

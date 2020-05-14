@@ -54,10 +54,10 @@ namespace Waher.Script.Persistence.Output
 			if (First)
 				First = false;
 			else
-				sb.Append(',');
+				sb.Append(", ");
 
 			sb.Append(Name);
-			sb.Append(':');
+			sb.Append(": ");
 			sb.Append(Expression.ToString(Value));
 		}
 	}

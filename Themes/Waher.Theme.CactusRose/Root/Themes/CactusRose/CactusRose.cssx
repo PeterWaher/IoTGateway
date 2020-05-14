@@ -529,6 +529,7 @@ iframe
 
 code
 {
+    word-break: break-word;
 }
 
 pre
@@ -545,7 +546,6 @@ pre
     white-space: -moz-pre-wrap;
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
-    word-wrap: normal;
 }
 
 br

@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		/// <param name="URI">URI defining endpoint.</param>
 		/// <returns>Support grade.</returns>
-		public override Grade Handles(Uri URI)
+		public override Grade Supports(Uri URI)
 		{
 			switch (URI.Scheme.ToLower())
 			{

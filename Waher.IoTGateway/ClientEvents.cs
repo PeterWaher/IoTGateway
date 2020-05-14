@@ -281,7 +281,7 @@ namespace Waher.IoTGateway
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
 
-			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && Queue.WebSocket == Socket)
 			{
 				lock (Queue)
 				{
@@ -308,10 +308,10 @@ namespace Waher.IoTGateway
 		}
 
 
-		private static Cache<string, TabQueue> eventsByTabID = GetQueueCache();
-		private static Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
-		private static Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
-		private static Dictionary<string, Dictionary<string, List<(string, string, string)>>> tabIdsByLocation =
+		private static readonly Cache<string, TabQueue> eventsByTabID = GetQueueCache();
+		private static readonly Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
+		private static readonly Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
+		private static readonly Dictionary<string, Dictionary<string, List<(string, string, string)>>> tabIdsByLocation =
 			new Dictionary<string, Dictionary<string, List<(string, string, string)>>>(StringComparer.OrdinalIgnoreCase);
 
 		private static Cache<string, TabQueue> GetTimeoutCache()

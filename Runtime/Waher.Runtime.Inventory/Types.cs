@@ -872,5 +872,56 @@ namespace Waher.Runtime.Inventory
 			return Call(null, T, MethodName, Arguments);
 		}
 
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType FindBest<InterfaceType, ObjectType>(ObjectType Object)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			return FindBest<InterfaceType, ObjectType>(Object, Types.GetTypesImplementingInterface(typeof(InterfaceType)));
+		}
+
+
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
+		/// <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType FindBest<InterfaceType, ObjectType>(ObjectType Object, Type[] Interfaces)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			InterfaceType Best = default;
+			Grade BestGrade = Grade.NotAtAll;
+
+			foreach (Type T2 in Interfaces)
+			{
+				try
+				{
+					InterfaceType Enumerator = (InterfaceType)Activator.CreateInstance(T2);
+					Grade Grade = Enumerator.Supports(Object);
+					if (Grade > BestGrade)
+					{
+						Best = Enumerator;
+						BestGrade = Grade;
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return Best;
+		}
+
 	}
 }

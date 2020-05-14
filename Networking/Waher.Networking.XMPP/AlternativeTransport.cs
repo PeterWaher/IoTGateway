@@ -56,7 +56,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="URI">URI defining endpoint.</param>
 		/// <returns>Support grade.</returns>
-		public abstract Grade Handles(Uri URI);
+		public abstract Grade Supports(Uri URI);
 
 		/// <summary>
 		/// If the alternative binding mechanism handles heartbeats.

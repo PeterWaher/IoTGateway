@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Functions.Runtime.PropertyEnumerators;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -43,32 +46,29 @@ namespace Waher.Script.Functions.Runtime
 		{
 			IElement E = this.Argument.Evaluate(Variables);
 			object Obj = E.AssociatedObjectValue;
-			List<IElement> Elements = new List<IElement>();
+			IPropertyEnumerator Enumerator = GetEnumerator(Obj.GetType());
 
-			if (Obj is Type T)
+			return Enumerator?.EnumerateProperties(Obj) ?? ObjectValue.Null;
+		}
+
+		private static readonly Dictionary<Type, IPropertyEnumerator> enumerators = new Dictionary<Type, IPropertyEnumerator>();
+
+		private static IPropertyEnumerator GetEnumerator(Type T)
+		{
+			lock (enumerators)
 			{
-				foreach (PropertyInfo PI in T.GetRuntimeProperties())
-					Elements.Add(new StringValue(PI.Name));
-
-				return new ObjectVector(Elements);
+				if (enumerators.TryGetValue(T, out IPropertyEnumerator Enumerator))
+					return Enumerator;
 			}
-			else
+
+			IPropertyEnumerator Best = Types.FindBest<IPropertyEnumerator, Type>(T);
+			
+			lock (enumerators)
 			{
-				T = Obj.GetType();
-
-				foreach (PropertyInfo PI in T.GetRuntimeProperties())
-				{
-					Elements.Add(new StringValue(PI.Name));
-					Elements.Add(Expression.Encapsulate(PI.GetValue(Obj)));
-				}
-
-				ObjectMatrix M = new ObjectMatrix(Elements.Count / 2, 2, Elements)
-				{
-					ColumnNames = new string[] { "Name", "Value" }
-				};
-
-				return M;
+				enumerators[T] = Best;
 			}
+
+			return Best;
 		}
 
 		/// <summary>

@@ -11,7 +11,7 @@ function CheckEventsWS(TabID)
 	var Location = window.location;
 	var Uri;
 
-	if (Location.protocol == "https:")
+	if (Location.protocol === "https:")
 		Uri = "wss:";
 	else
 		Uri = "ws:";
@@ -39,7 +39,7 @@ function CheckEventsWS(TabID)
 
 		window.onbeforeunload = function ()
 		{
-			if (Socket != null && Socket.readyState == Socket.OPEN)
+			if (Socket && Socket.readyState === Socket.OPEN)
 			{
 				Socket.send(JSON.stringify({
 					"cmd": "Unregister"
@@ -55,8 +55,9 @@ function CheckEventsWS(TabID)
 
 	Socket.onmessage = function (event)
 	{
+		var Event;
 		var s = event.data;
-		if (s == "" || s == null)
+		if (s === "" || s === null)
 			return;
 
 		try
@@ -73,9 +74,7 @@ function CheckEventsWS(TabID)
 
 	Socket.onerror = function ()
 	{
-		delete Socket;
-
-		if (PingTimer !== null)
+		if (PingTimer)
 		{
 			window.clearInterval(PingTimer);
 			PingTimer = null;
@@ -98,13 +97,12 @@ function CheckEventsXHTTP(TabID)
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 			{
 				if (NeedsReload)
 				{
-					delete xhttp;
 					window.location.reload(false);
 					return;
 				}
@@ -117,7 +115,7 @@ function CheckEventsXHTTP(TabID)
 				{
 					var s = xhttp.responseText;
 
-					if (s != null && s != "")
+					if (s && s !== "")
 					{
 						try
 						{
@@ -128,7 +126,7 @@ function CheckEventsXHTTP(TabID)
 							throw "Invalid JSON received: " + s;
 						}
 
-						if (Events != null)
+						if (Events)
 						{
 							c = Events.length;
 							for (i = 0; i < c; i++)
@@ -145,8 +143,6 @@ function CheckEventsXHTTP(TabID)
 						xhttp.setRequestHeader("X-TabID", TabID);
 						xhttp.send(window.location.href);
 					}
-					else
-						delete xhttp;
 				}
 			}
 			else
@@ -164,8 +160,6 @@ function CheckEventsXHTTP(TabID)
 						xhttp.send(window.location.href);
 					}, 5000);
 				}
-				else
-					delete xhttp;
 			}
 		};
 	}
@@ -180,7 +174,7 @@ function CheckEventsXHTTP(TabID)
 
 function EvaluateEvent(Event)
 {
-	if (Event != null && Event.type.match(/^[a-zA-Z0-9]+$/g))
+	if (Event && Event.type.match(/^[a-zA-Z0-9]+$/g))
 	{
 		try
 		{
@@ -237,9 +231,9 @@ function EndsWith(String, Suffix)
 
 function CheckServerInstance(ID)
 {
-	if (ServerID == "")
+	if (ServerID === "")
 		ServerID = ID;
-	else if (ServerID != ID)
+	else if (ServerID !== ID)
 		Reload(null);
 }
 
@@ -249,7 +243,7 @@ var EventCheckingEnabled = true;
 
 try
 {
-	if (window.name.length == 36)
+	if (window.name.length === 36)
 		TabID = window.name;
 	else
 		TabID = window.name = CreateGUID();
@@ -269,25 +263,18 @@ function POST(Content, Resource)
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 			{
-				try
-				{
-					var s = xhttp.responseText;
-					var i = s.indexOf("<body>");
-					var j = s.indexOf("</body>");
+				var s = xhttp.responseText;
+				var i = s.indexOf("<body>");
+				var j = s.indexOf("</body>");
 
-					if (i >= 0 && j >= i)
-					{
-						s = s.substring(i + 6, j);
-						document.body.innerHTML = s;
-					}
-				}
-				finally
+				if (i >= 0 && j >= i)
 				{
-					delete xhttp;
+					s = s.substring(i + 6, j);
+					document.body.innerHTML = s;
 				}
 			}
 			else

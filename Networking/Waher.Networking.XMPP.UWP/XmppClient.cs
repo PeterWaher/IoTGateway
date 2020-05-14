@@ -497,29 +497,7 @@ namespace Waher.Networking.XMPP
 					Types.OnInvalidated += Types_OnInvalidated;
 				}
 
-				IAlternativeTransport Best = null;
-				Grade BestGrade = Grade.NotAtAll;
-
-				foreach (Type T in alternativeBindingMechanisms)
-				{
-					if (T.GetTypeInfo().IsAbstract)
-						continue;
-
-					try
-					{
-						IAlternativeTransport AlternativeTransport = (IAlternativeTransport)Activator.CreateInstance(T);
-						Grade Grade = AlternativeTransport.Handles(URI);
-						if (Grade > BestGrade)
-						{
-							Best = AlternativeTransport;
-							BestGrade = Grade;
-						}
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+				IAlternativeTransport Best = Types.FindBest<IAlternativeTransport, Uri>(URI, alternativeBindingMechanisms);
 
 				if (Best != null)
 				{

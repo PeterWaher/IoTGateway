@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP
 	/// <summary>
 	/// Base class for alternative transports.
 	/// </summary>
-	public interface IAlternativeTransport : ITextTransportLayer
+	public interface IAlternativeTransport : ITextTransportLayer, IProcessingSupport<Uri>
 	{
 		/// <summary>
 		/// If the alternative binding mechanism handles heartbeats.
@@ -16,13 +16,6 @@ namespace Waher.Networking.XMPP
 		{
 			get;
 		}
-
-		/// <summary>
-		/// How well the alternative transport handles the XMPP credentials provided.
-		/// </summary>
-		/// <param name="URI">URI defining endpoint.</param>
-		/// <returns>Support grade.</returns>
-		Grade Handles(Uri URI);
 
 		/// <summary>
 		/// Instantiates a new alternative connections.

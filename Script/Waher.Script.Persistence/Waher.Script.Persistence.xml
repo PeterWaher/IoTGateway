@@ -153,6 +153,30 @@
             <param name="Value">Value</param>
             <returns>Expression string.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.Output.GenericObjectPropertyEnumerator">
+            <summary>
+            Enumerates properties in a <see cref="T:Waher.Persistence.Serialization.GenericObject"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.GenericObjectPropertyEnumerator.#ctor">
+            <summary>
+            Enumerates properties in a <see cref="T:Waher.Persistence.Serialization.GenericObject"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.GenericObjectPropertyEnumerator.EnumerateProperties(System.Object)">
+            <summary>
+            Enumerates the properties of an object (of a type it supports).
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Property enumeration as a script element.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.GenericObjectPropertyEnumerator.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.ConditionalEnumerator">
             <summary>
             Enumerator that only returns elements matching a set of conditions.

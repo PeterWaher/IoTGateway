@@ -16,7 +16,7 @@
     <tags>networking communication xmpp websocket</tags>
     <dependencies>
 			<dependency id="System.Net.WebSockets.Client" version="4.3.2"/>
-			<dependency id="Waher.Content" version="1.0.24"/>
+			<dependency id="Waher.Content" version="1.0.25"/>
 			<dependency id="Waher.Content.Xml" version="1.0.8"/>
 			<dependency id="Waher.Events" version="1.0.11"/>
 			<dependency id="Waher.Networking.UWP" version="1.0.15"/>

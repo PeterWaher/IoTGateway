@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Script.Output
 {
 	/// <summary>
 	/// Interface for custom string output classes. Converts objects of a given type to an expression string.
 	/// </summary>
-	public interface ICustomStringOutput
+	public interface ICustomStringOutput : IProcessingSupport<Type>
 	{
-		/// <summary>
-		/// Type
-		/// </summary>
-		Type Type
-		{
-			get;
-		}
-
 		/// <summary>
 		/// Gets a string representing a value.
 		/// </summary>

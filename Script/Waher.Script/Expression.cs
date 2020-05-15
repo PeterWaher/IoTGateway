@@ -41,7 +41,7 @@ namespace Waher.Script
 		private static Dictionary<string, FunctionRef> functions = null;
 		private static Dictionary<string, IConstant> constants = null;
 		private static Dictionary<string, IKeyWord> customKeyWords = null;
-		private static Dictionary<Type, ICustomStringOutput> output = null;
+		private static readonly Dictionary<Type, ICustomStringOutput> output = new Dictionary<Type, ICustomStringOutput>();
 		private static readonly Dictionary<string, bool> keywords = GetKeywords();
 
 		private ScriptNode root;
@@ -76,7 +76,11 @@ namespace Waher.Script
 		{
 			functions = null;
 			constants = null;
-			output = null;
+
+			lock (output)
+			{
+				output.Clear();
+			}
 		}
 
 		private static Dictionary<string, bool> GetKeywords()
@@ -3269,40 +3273,6 @@ namespace Waher.Script
 
 					customKeyWords = Found;
 				}
-
-				if (output is null)
-				{
-					Dictionary<Type, ICustomStringOutput> Found = new Dictionary<Type, ICustomStringOutput>();
-					Type T2;
-					TypeInfo TI;
-
-					foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICustomStringOutput)))
-					{
-						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-							continue;
-
-						try
-						{
-							ICustomStringOutput Output = (ICustomStringOutput)Activator.CreateInstance(T);
-
-							T2 = Output.Type;
-							if (Found.ContainsKey(T2))
-							{
-								Log.Warning("Custom string output class with name " + T2.FullName + " previously registered. Class ignored.",
-									T.FullName, new KeyValuePair<string, object>("Previous", Output.GetType().FullName));
-							}
-							else
-								Found[T2] = Output;
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}
-
-					output = Found;
-				}
 			}
 		}
 
@@ -4253,11 +4223,27 @@ namespace Waher.Script
 				return "null";
 			else
 			{
-				if (output is null)
-					Search();
+				Type T = Value.GetType();
+				bool Found;
+				ICustomStringOutput StringOutput;
 
-				if (output.TryGetValue(Value.GetType(), out ICustomStringOutput Output))
-					return Output.GetString(Value);
+				lock (output)
+				{
+					Found = output.TryGetValue(T, out StringOutput);
+				}
+
+				if (!Found)
+				{
+					StringOutput = Types.FindBest<ICustomStringOutput, Type>(T);
+
+					lock (output)
+					{
+						output[T] = StringOutput;
+					}
+				}
+
+				if (!(StringOutput is null))
+					return StringOutput.GetString(Value);
 				else if (Value is IEnumerable Enumerable)
 				{
 					StringBuilder sb = new StringBuilder();

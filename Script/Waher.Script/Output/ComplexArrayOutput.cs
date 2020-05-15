@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Script.Output
 {
@@ -10,9 +10,11 @@ namespace Waher.Script.Output
 	public class ComplexArrayOutput : ICustomStringOutput
 	{
 		/// <summary>
-		/// Type
+		/// If the interface understands objects such as <paramref name="Object"/>.
 		/// </summary>
-		public Type Type => typeof(Complex[]);
+		/// <param name="Object">Object</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(Type Object) => Object == typeof(Complex[]) ? Grade.Ok : Grade.NotAtAll;
 
 		/// <summary>
 		/// Gets a string representing a value.

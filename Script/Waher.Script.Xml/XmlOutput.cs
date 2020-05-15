@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
+using Waher.Runtime.Inventory;
 using Waher.Script.Output;
 
 namespace Waher.Script.Xml
@@ -11,9 +12,11 @@ namespace Waher.Script.Xml
 	public class XmlOutput : ICustomStringOutput
 	{
 		/// <summary>
-		/// Type
+		/// If the interface understands objects such as <paramref name="Object"/>.
 		/// </summary>
-		public Type Type => typeof(XmlDocument);
+		/// <param name="Object">Object</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(Type Object) => Object == typeof(XmlDocument) ? Grade.Ok : Grade.NotAtAll;
 
 		/// <summary>
 		/// Gets a string representing a value.

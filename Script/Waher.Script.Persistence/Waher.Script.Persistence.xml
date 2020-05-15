@@ -141,10 +141,12 @@
             Converts values of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> to expression strings.
             </summary>
         </member>
-        <member name="P:Waher.Script.Persistence.Output.GenericObjectOutput.Type">
+        <member name="M:Waher.Script.Persistence.Output.GenericObjectOutput.Supports(System.Type)">
             <summary>
-            Type
+            If the interface understands objects such as <paramref name="Object"/>.
             </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.Output.GenericObjectOutput.GetString(System.Object)">
             <summary>

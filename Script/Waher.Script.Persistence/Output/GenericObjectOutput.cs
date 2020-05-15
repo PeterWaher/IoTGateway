@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Script.Abstraction.Elements;
+using Waher.Runtime.Inventory;
 using Waher.Script.Output;
 
 namespace Waher.Script.Persistence.Output
@@ -14,9 +13,11 @@ namespace Waher.Script.Persistence.Output
 	public class GenericObjectOutput : ICustomStringOutput
 	{
 		/// <summary>
-		/// Type
+		/// If the interface understands objects such as <paramref name="Object"/>.
 		/// </summary>
-		public Type Type => typeof(GenericObject);
+		/// <param name="Object">Object</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(Type Object) => Object == typeof(GenericObject) ? Grade.Ok : Grade.NotAtAll;
 
 		/// <summary>
 		/// Gets a string representing a value.

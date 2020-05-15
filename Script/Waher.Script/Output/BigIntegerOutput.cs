@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Script.Output
 {
@@ -11,9 +11,11 @@ namespace Waher.Script.Output
 	public class BigIntegerOutput : ICustomStringOutput
 	{
 		/// <summary>
-		/// Type
+		/// If the interface understands objects such as <paramref name="Object"/>.
 		/// </summary>
-		public Type Type => typeof(BigInteger);
+		/// <param name="Object">Object</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(Type Object) => Object == typeof(BigInteger) ? Grade.Ok : Grade.NotAtAll;
 
 		/// <summary>
 		/// Gets a string representing a value.

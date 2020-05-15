@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content
 {
@@ -516,7 +517,7 @@ namespace Waher.Content
 			Json.Append('{');
 
 			if (Indent.HasValue)
-				Indent = Indent + 1;
+				Indent++;
 
 			if (Object != null)
 			{
@@ -573,7 +574,58 @@ namespace Waher.Content
 			if (!First && Indent.HasValue)
 			{
 				Json.AppendLine();
-				Indent = Indent - 1;
+				Indent--;
+				Json.Append(new string('\t', Indent.Value));
+			}
+
+			Json.Append('}');
+		}
+
+		/// <summary>
+		/// Encodes an object as JSON.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Json">JSON Output.</param>
+		/// <param name="Indent">If JSON should be indented.</param>
+		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent, StringBuilder Json)
+		{
+			bool First = true;
+
+			Json.Append('{');
+
+			if (Indent.HasValue)
+				Indent++;
+
+			if (Object != null)
+			{
+				foreach (KeyValuePair<string, IElement> Member in Object)
+				{
+					if (First)
+						First = false;
+					else
+						Json.Append(',');
+
+					if (Indent.HasValue)
+					{
+						Json.AppendLine();
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append('"');
+					Json.Append(Encode(Member.Key));
+					Json.Append("\":");
+
+					if (Indent.HasValue)
+						Json.Append(' ');
+
+					Encode(Member.Value.AssociatedObjectValue, Indent, Json);
+				}
+			}
+
+			if (!First && Indent.HasValue)
+			{
+				Json.AppendLine();
+				Indent--;
 				Json.Append(new string('\t', Indent.Value));
 			}
 
@@ -624,6 +676,8 @@ namespace Waher.Content
 				}
 				else if (Object is IEnumerable<KeyValuePair<string, object>> Obj)
 					Encode(Obj, Indent, Json, null);
+				else if (Object is IEnumerable<KeyValuePair<string, IElement>> Obj2)
+					Encode(Obj2, Indent, Json);
 				else if (Object is IEnumerable E)
 				{
 					IEnumerator e = E.GetEnumerator();
@@ -632,7 +686,7 @@ namespace Waher.Content
 					Json.Append('[');
 
 					if (Indent.HasValue)
-						Indent = Indent + 1;
+						Indent++;
 
 					while (e.MoveNext())
 					{
@@ -653,7 +707,7 @@ namespace Waher.Content
 					if (!First && Indent.HasValue)
 					{
 						Json.AppendLine();
-						Indent = Indent - 1;
+						Indent--;
 						Json.Append(new string('\t', Indent.Value));
 					}
 

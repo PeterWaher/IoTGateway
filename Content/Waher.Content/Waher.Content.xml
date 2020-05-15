@@ -1127,6 +1127,14 @@
             <param name="Indent">If JSON should be indented.</param>
             <param name="AdditionalProperties">Optional additional properties.</param>
         </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Waher.Script.Abstraction.Elements.IElement}},System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes an object as JSON.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Json">JSON Output.</param>
+            <param name="Indent">If JSON should be indented.</param>
+        </member>
         <member name="T:Waher.Content.Multipart.AlternativeCodec">
             <summary>
             Decoder of alternative data.

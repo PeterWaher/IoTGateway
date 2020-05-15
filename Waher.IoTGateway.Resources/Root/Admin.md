@@ -39,7 +39,7 @@ foreach Item in Waher.IoTGateway.Gateway.GetSettingsMenu(Request,"User") do
 	MenuItem(MarkdownEncode(Item.Title),Item.Url);
 MenuFooter();
 
-MenuHeader("Database");
+MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md");
 MenuItem("Search Event Log","/EventLog.md");
 MenuItem("Prompt","/Prompt.md");

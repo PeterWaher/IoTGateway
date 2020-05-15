@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
@@ -96,66 +98,14 @@ namespace Waher.IoTGateway
 			if (!(Obj is string Location) || string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
-			Uri Uri = new Uri(Location);
-			string Resource = Uri.LocalPath;
-			List<(string, string, string)> Query = null;
-			string s;
-
-			if (!string.IsNullOrEmpty(Uri.Query))
-			{
-				Query = new List<(string, string, string)>();
-				int i;
-
-				s = Uri.Query;
-				if (s.StartsWith("?"))
-					s = s.Substring(1);
-
-				foreach (string Part in s.Split('&'))
-				{
-					i = Part.IndexOf('=');
-					if (i < 0)
-						Query.Add((Part, string.Empty, string.Empty));
-					else
-					{
-						string s2 = Part.Substring(i + 1);
-						Query.Add((Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2)));
-					}
-				}
-			}
+			TabQueue Queue = Register(Request, null, Location, TabID);
+			StringBuilder Json = null;
 
 			Response.ContentType = "application/json";
 
-			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
-			{
-				HttpFieldCookie Cookie = Request.Header.Cookie;
-				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
-
-				Queue = new TabQueue(TabID, HttpSessionID, Request.Session);
-				eventsByTabID[TabID] = Queue;
-			}
-
-			lock (locationByTabID)
-			{
-				if (!locationByTabID.TryGetValue(TabID, out s) || s != Resource)
-					locationByTabID[TabID] = Resource;
-			}
-
-			lock (tabIdsByLocation)
-			{
-				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
-				{
-					TabIds = new Dictionary<string, List<(string, string, string)>>();
-					tabIdsByLocation[Resource] = TabIds;
-				}
-
-				TabIds[TabID] = Query;
-			}
-
-			StringBuilder Json = null;
-
 			lock (Queue)
 			{
-				if (Queue.Queue.First != null)
+				if (!(Queue.Queue.First is null))
 				{
 					foreach (string Event in Queue.Queue)
 					{
@@ -174,7 +124,7 @@ namespace Waher.IoTGateway
 					Queue.Response = Response;
 			}
 
-			if (Json != null)
+			if (!(Json is null))
 			{
 				timeoutByTabID.Remove(TabID);
 
@@ -187,31 +137,34 @@ namespace Waher.IoTGateway
 				timeoutByTabID[TabID] = Queue;
 		}
 
-		internal static void RegisterWebSocket(WebSocket Socket, string Location, string TabID)
+		private static TabQueue Register(HttpRequest Request, WebSocket Socket, string Location, string TabID)
 		{
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
-			List<(string, string, string)> Query = null;
+			(string, string, string)[] Query = null;
+			Variables Session = Request.Session;
 			string s;
 
 			if (!string.IsNullOrEmpty(Uri.Query))
 			{
-				Query = new List<(string, string, string)>();
-				int i;
 
 				s = Uri.Query;
 				if (s.StartsWith("?"))
 					s = s.Substring(1);
 
-				foreach (string Part in s.Split('&'))
+				string[] Parts = s.Split('&');
+				Query = new (string, string, string)[Parts.Length];
+				int i, j = 0;
+
+				foreach (string Part in Parts)
 				{
 					i = Part.IndexOf('=');
 					if (i < 0)
-						Query.Add((Part, string.Empty, string.Empty));
+						Query[j++] = (Part, string.Empty, string.Empty);
 					else
 					{
 						string s2 = Part.Substring(i + 1);
-						Query.Add((Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2)));
+						Query[j++] = (Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2));
 					}
 				}
 			}
@@ -220,10 +173,10 @@ namespace Waher.IoTGateway
 				Queue.WebSocket = Socket;
 			else
 			{
-				HttpFieldCookie Cookie = Socket.HttpRequest.Header.Cookie;
+				HttpFieldCookie Cookie = Request.Header.Cookie;
 				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
 
-				Queue = new TabQueue(TabID, HttpSessionID, Socket.HttpRequest.Session)
+				Queue = new TabQueue(TabID, HttpSessionID, Session)
 				{
 					WebSocket = Socket
 				};
@@ -239,15 +192,86 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
+				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, (string, string, string)[]> TabIds))
 				{
-					TabIds = new Dictionary<string, List<(string, string, string)>>();
+					TabIds = new Dictionary<string, (string, string, string)[]>();
 					tabIdsByLocation[Resource] = TabIds;
 				}
 
 				TabIds[TabID] = Query;
 			}
 
+			Type UserType;
+			object UserObject;
+
+			if (!(Session is null) && Session.TryGetVariable(" User ", out Variable UserVariable))
+			{
+				UserObject = UserId(UserVariable.ValueObject);
+
+				lock (usersByTabID)
+				{
+					if (!usersByTabID.TryGetValue(TabID, out object Obj2) || !Obj2.Equals(UserObject))
+						usersByTabID[TabID] = UserObject;
+				}
+
+				UserType = UserObject.GetType();
+
+				lock (tabIdsByUser)
+				{
+					if (!tabIdsByUser.TryGetValue(UserType, out Dictionary<object, Dictionary<string, (string, string, string)[]>> UserObjects))
+					{
+						UserObjects = new Dictionary<object, Dictionary<string, (string, string, string)[]>>();
+						tabIdsByUser[UserType] = UserObjects;
+					}
+
+					if (!UserObjects.TryGetValue(UserObject, out Dictionary<string, (string, string, string)[]> TabIds))
+					{
+						TabIds = new Dictionary<string, (string, string, string)[]>();
+						UserObjects[UserObject] = TabIds;
+					}
+
+					TabIds[TabID] = Query;
+				}
+			}
+			else
+			{
+				lock (usersByTabID)
+				{
+					if (!usersByTabID.TryGetValue(TabID, out UserObject))
+						UserObject = null;
+				}
+
+				if (!(UserObject is null))
+				{
+					UserType = UserObject.GetType();
+
+					lock (tabIdsByUser)
+					{
+						if (tabIdsByUser.TryGetValue(UserType, out Dictionary<object, Dictionary<string, (string, string, string)[]>> UserObjects))
+						{
+							if (UserObjects.Remove(UserObject) && UserObjects.Count == 0)
+								tabIdsByUser.Remove(UserType);
+						}
+					}
+				}
+			}
+
+			return Queue;
+		}
+
+		private static object UserId(object User)
+		{
+			if (User is IUser User2)
+				return User2.UserName;
+			else if (User is GenericObject GenObj)
+				return GenObj.ObjectId;
+			else
+				return User;
+		}
+
+		internal static void RegisterWebSocket(WebSocket Socket, string Location, string TabID)
+		{
+			TabQueue Queue = Register(Socket.HttpRequest, Socket, Location, TabID);
 			LinkedList<string> ToSend = null;
 
 			lock (Queue)
@@ -278,9 +302,6 @@ namespace Waher.IoTGateway
 
 		internal static void UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
 		{
-			Uri Uri = new Uri(Location);
-			string Resource = Uri.LocalPath;
-
 			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && Queue.WebSocket == Socket)
 			{
 				lock (Queue)
@@ -289,37 +310,24 @@ namespace Waher.IoTGateway
 				}
 			}
 
-			lock (locationByTabID)
-			{
-				if (locationByTabID.TryGetValue(TabID, out string s) && s == Resource)
-					locationByTabID.Remove(TabID);
-				else
-					return;
-			}
-
-			lock (tabIdsByLocation)
-			{
-				if (tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<(string, string, string)>> TabIds))
-				{
-					if (TabIds.Remove(TabID) && TabIds.Count == 0)
-						tabIdsByLocation.Remove(Resource);
-				}
-			}
+			Uri Uri = new Uri(Location);
+			Remove(TabID, Uri.LocalPath);
 		}
 
 
 		private static readonly Cache<string, TabQueue> eventsByTabID = GetQueueCache();
 		private static readonly Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
 		private static readonly Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
-		private static readonly Dictionary<string, Dictionary<string, List<(string, string, string)>>> tabIdsByLocation =
-			new Dictionary<string, Dictionary<string, List<(string, string, string)>>>(StringComparer.OrdinalIgnoreCase);
+		private static readonly Dictionary<string, object> usersByTabID = new Dictionary<string, object>();
+		private static readonly Dictionary<string, Dictionary<string, (string, string, string)[]>> tabIdsByLocation =
+			new Dictionary<string, Dictionary<string, (string, string, string)[]>>(StringComparer.OrdinalIgnoreCase);
+		private static readonly Dictionary<Type, Dictionary<object, Dictionary<string, (string, string, string)[]>>> tabIdsByUser =
+			new Dictionary<Type, Dictionary<object, Dictionary<string, (string, string, string)[]>>>();
 
 		private static Cache<string, TabQueue> GetTimeoutCache()
 		{
 			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(20));
-
 			Result.Removed += TimeoutCacheItem_Removed;
-
 			return Result;
 		}
 
@@ -353,9 +361,7 @@ namespace Waher.IoTGateway
 		private static Cache<string, TabQueue> GetQueueCache()
 		{
 			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
-
 			Result.Removed += QueueCacheItem_Removed;
-
 			return Result;
 		}
 
@@ -363,29 +369,62 @@ namespace Waher.IoTGateway
 		{
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
-			string Location;
 
 			lock (Queue)
 			{
 				Queue.Queue.Clear();
 			}
 
+			Remove(TabID, null);
+		}
+
+		private static void Remove(string TabID, string Resource)
+		{
+			string Location;
+			object User;
+
 			lock (locationByTabID)
 			{
-				if (locationByTabID.TryGetValue(TabID, out Location))
+				if (locationByTabID.TryGetValue(TabID, out Location) && (Resource is null || Location == Resource))
 					locationByTabID.Remove(TabID);
 				else
 					Location = null;
 			}
 
-			if (Location != null)
+			if (!(Location != null))
 			{
 				lock (tabIdsByLocation)
 				{
-					if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<(string, string, string)>> TabIDs))
+					if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, (string, string, string)[]> TabIDs))
 					{
 						if (TabIDs.Remove(TabID) && TabIDs.Count == 0)
 							tabIdsByLocation.Remove(Location);
+					}
+				}
+			}
+
+			lock (usersByTabID)
+			{
+				if (usersByTabID.TryGetValue(TabID, out User))
+					usersByTabID.Remove(TabID);
+				else
+					User = null;
+			}
+
+			if (!(User is null))
+			{
+				Type UserType = User.GetType();
+
+				lock (tabIdsByUser)
+				{
+					if (tabIdsByUser.TryGetValue(UserType, out Dictionary<object, Dictionary<string, (string, string, string)[]>> UserObjects) &&
+						UserObjects.TryGetValue(User, out Dictionary<string, (string, string, string)[]> TabIDs))
+					{
+						if (TabIDs.Remove(TabID) && TabIDs.Count == 0 &&
+							UserObjects.Remove(User) && UserObjects.Count == 0)
+						{ 
+							tabIdsByUser.Remove(UserType);
+						}
 					}
 				}
 			}
@@ -409,6 +448,62 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Returns a list of active users
+		/// </summary>
+		/// <returns>List of active users.</returns>
+		public static object[] GetActiveUsers()
+		{
+			List<object> Result = new List<object>();
+
+			lock (tabIdsByUser)
+			{
+				foreach (KeyValuePair<Type, Dictionary<object, Dictionary<string, (string, string, string)[]>>> P in tabIdsByUser)
+					Result.AddRange(P.Value.Keys);
+			}
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location)
+		{
+			return GetTabIDsForLocation(Location, new KeyValuePair<string, string>[0]);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location, string QueryParameter1, string QueryParameterValue1)
+		{
+			return GetTabIDsForLocation(Location, new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameter2">Name of query parameter 2 in query filter.</param>
+		/// <param name="QueryParameterValue2">Value of query parameter 2 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location, string QueryParameter1, string QueryParameterValue1,
+			string QueryParameter2, string QueryParameterValue2)
+		{
+			return GetTabIDsForLocation(Location,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1),
+				new KeyValuePair<string, string>(QueryParameter2, QueryParameterValue2));
+		}
+
+		/// <summary>
 		/// Gets the Tab IDs of all tabs that display a particular resource.
 		/// </summary>
 		/// <param name="Location">Resource.</param>
@@ -424,91 +519,331 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Location">Resource.</param>
 		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
-		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
 		/// <returns>Tab IDs</returns>
 		public static string[] GetTabIDsForLocation(string Location, bool IgnoreCase,
-			params KeyValuePair<string, string>[] QueryFilter)
+			string QueryParameter1, string QueryParameterValue1)
 		{
+			return GetTabIDsForLocation(Location, IgnoreCase, new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameter2">Name of query parameter 2 in query filter.</param>
+		/// <param name="QueryParameterValue2">Value of query parameter 2 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location, bool IgnoreCase,
+			string QueryParameter1, string QueryParameterValue1,
+			string QueryParameter2, string QueryParameterValue2)
+		{
+			return GetTabIDsForLocation(Location, IgnoreCase,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1),
+				new KeyValuePair<string, string>(QueryParameter2, QueryParameterValue2));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location, bool IgnoreCase, params KeyValuePair<string, string>[] QueryFilter)
+		{
+			lock (tabIdsByLocation)
+			{
+				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, (string, string, string)[]> TabIDs))
+					return ProcessQueryFilterLocked(TabIDs, QueryFilter, IgnoreCase);
+				else
+					return new string[0];
+			}
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User)
+		{
+			return GetTabIDsForUser(User, null, false, new KeyValuePair<string, string>[0]);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, params KeyValuePair<string, string>[] QueryFilter)
+		{
+			return GetTabIDsForUser(User, null, false, QueryFilter);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, bool IgnoreCase,
+			string QueryParameter1, string QueryParameterValue1)
+		{
+			return GetTabIDsForUser(User, IgnoreCase, new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameter2">Name of query parameter 2 in query filter.</param>
+		/// <param name="QueryParameterValue2">Value of query parameter 2 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, bool IgnoreCase,
+			string QueryParameter1, string QueryParameterValue1,
+			string QueryParameter2, string QueryParameterValue2)
+		{
+			return GetTabIDsForUser(User, IgnoreCase,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1),
+				new KeyValuePair<string, string>(QueryParameter2, QueryParameterValue2));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, bool IgnoreCase, params KeyValuePair<string, string>[] QueryFilter)
+		{
+			return GetTabIDsForUser(User, null, IgnoreCase, QueryFilter);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location)
+		{
+			return GetTabIDsForUser(User, Location, new KeyValuePair<string, string>[0]);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location,
+			string QueryParameter1, string QueryParameterValue1)
+		{
+			return GetTabIDsForUser(User, Location,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameter2">Name of query parameter 2 in query filter.</param>
+		/// <param name="QueryParameterValue2">Value of query parameter 2 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location,
+			string QueryParameter1, string QueryParameterValue1,
+			string QueryParameter2, string QueryParameterValue2)
+		{
+			return GetTabIDsForUser(User, Location,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1),
+				new KeyValuePair<string, string>(QueryParameter2, QueryParameterValue2));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location, params KeyValuePair<string, string>[] QueryFilter)
+		{
+			return GetTabIDsForUser(User, Location, false, QueryFilter);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location, bool IgnoreCase,
+			string QueryParameter1, string QueryParameterValue1)
+		{
+			return GetTabIDsForUser(User, Location, IgnoreCase,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryParameter1">Name of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameterValue1">Value of query parameter 1 in query filter.</param>
+		/// <param name="QueryParameter2">Name of query parameter 2 in query filter.</param>
+		/// <param name="QueryParameterValue2">Value of query parameter 2 in query filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location, bool IgnoreCase,
+			string QueryParameter1, string QueryParameterValue1,
+			string QueryParameter2, string QueryParameterValue2)
+		{
+			return GetTabIDsForUser(User, Location, IgnoreCase,
+				new KeyValuePair<string, string>(QueryParameter1, QueryParameterValue1),
+				new KeyValuePair<string, string>(QueryParameter2, QueryParameterValue2));
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that a specific user views.
+		/// </summary>
+		/// <param name="User">User object.</param>
+		/// <param name="Location">If restricting the tabs to a given location.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForUser(object User, string Location, bool IgnoreCase, params KeyValuePair<string, string>[] QueryFilter)
+		{
+			User = UserId(User);
+			Type T = User.GetType();
 			string[] Result;
+
+			lock (tabIdsByUser)
+			{
+				if (tabIdsByUser.TryGetValue(T, out Dictionary<object, Dictionary<string, (string, string, string)[]>> UserObjects) &&
+					UserObjects.TryGetValue(User, out Dictionary<string, (string, string, string)[]> TabIDs))
+				{
+					Result = ProcessQueryFilterLocked(TabIDs, QueryFilter, IgnoreCase);
+				}
+				else
+					return new string[0];
+			}
+
+			if (string.IsNullOrEmpty(Location))
+				return Result;
+
+			List<string> Result2 = new List<string>();
 
 			lock (tabIdsByLocation)
 			{
-				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<(string, string, string)>> TabIDs))
+				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, (string, string, string)[]> TabIDs))
 				{
-					if (QueryFilter is null || QueryFilter.Length == 0)
+					foreach (string TabID in Result)
 					{
-						Result = new string[TabIDs.Count];
-						TabIDs.Keys.CopyTo(Result, 0);
+						if (TabIDs.ContainsKey(TabID))
+							Result2.Add(TabID);
 					}
-					else
+				}
+			}
+
+			return Result2.ToArray();
+		}
+
+		private static string[] ProcessQueryFilterLocked(Dictionary<string, (string, string, string)[]> TabIDs,
+			KeyValuePair<string, string>[] QueryFilter, bool IgnoreCase)
+		{
+			string[] Result;
+
+			if (QueryFilter is null || QueryFilter.Length == 0)
+			{
+				Result = new string[TabIDs.Count];
+				TabIDs.Keys.CopyTo(Result, 0);
+			}
+			else
+			{
+				List<string> Match = new List<string>();
+				bool Found;
+				bool IsMatch;
+
+				foreach (KeyValuePair<string, (string, string, string)[]> P in TabIDs)
+				{
+					IsMatch = true;
+
+					foreach (KeyValuePair<string, string> Q in QueryFilter)
 					{
-						List<string> Match = new List<string>();
-						bool Found;
-						bool IsMatch;
-
-						foreach (KeyValuePair<string, List<(string, string, string)>> P in TabIDs)
+						if (Q.Value is null)
 						{
-							IsMatch = true;
+							Found = true;
 
-							foreach (KeyValuePair<string, string> Q in QueryFilter)
+							if (P.Value != null)
 							{
-								if (Q.Value is null)
+								foreach ((string, string, string) Q2 in P.Value)
 								{
-									Found = true;
-
-									if (P.Value != null)
+									if (Q2.Item1 == Q.Key)
 									{
-										foreach ((string, string, string) Q2 in P.Value)
-										{
-											if (Q2.Item1 == Q.Key)
-											{
-												Found = false;
-												break;
-											}
-										}
-									}
-
-									if (!Found)
-									{
-										IsMatch = false;
-										break;
-									}
-								}
-								else
-								{
-									Found = false;
-
-									if (P.Value != null)
-									{
-										foreach ((string, string, string) Q2 in P.Value)
-										{
-											if (Q2.Item1 == Q.Key && 
-												(string.Compare(Q2.Item2, Q.Value, IgnoreCase) == 0 ||
-												string.Compare(Q2.Item3, Q.Value, IgnoreCase) == 0))
-											{
-												Found = true;
-												break;
-											}
-										}
-									}
-
-									if (!Found)
-									{
-										IsMatch = false;
+										Found = false;
 										break;
 									}
 								}
 							}
 
-							if (IsMatch)
-								Match.Add(P.Key);
+							if (!Found)
+							{
+								IsMatch = false;
+								break;
+							}
 						}
+						else
+						{
+							Found = false;
 
-						Result = Match.ToArray();
+							if (P.Value != null)
+							{
+								foreach ((string, string, string) Q2 in P.Value)
+								{
+									if (Q2.Item1 == Q.Key &&
+										(string.Compare(Q2.Item2, Q.Value, IgnoreCase) == 0 ||
+										string.Compare(Q2.Item3, Q.Value, IgnoreCase) == 0))
+									{
+										Found = true;
+										break;
+									}
+								}
+							}
+
+							if (!Found)
+							{
+								IsMatch = false;
+								break;
+							}
+						}
 					}
+
+					if (IsMatch)
+						Match.Add(P.Key);
 				}
-				else
-					Result = new string[0];
+
+				Result = Match.ToArray();
 			}
 
 			return Result;
@@ -531,7 +866,7 @@ namespace Waher.IoTGateway
 
 				default:
 					Dictionary<string, bool> Result = new Dictionary<string, bool>();
-					Dictionary<string, List<(string, string, string)>> TabIDs;
+					Dictionary<string, (string, string, string)[]> TabIDs;
 
 					lock (tabIdsByLocation)
 					{
@@ -569,6 +904,31 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
+		/// <summary>
+		/// Gets all open Tab IDs for logged in users.
+		/// </summary>
+		/// <returns>Tab IDs.</returns>
+		public static string[] GetTabIDsForUsers()
+		{
+			Dictionary<string, bool> Result = new Dictionary<string, bool>();
+
+			lock (tabIdsByUser)
+			{
+				foreach (Dictionary<object, Dictionary<string, (string, string, string)[]>> P in tabIdsByUser.Values)
+				{
+					foreach (Dictionary<string, (string, string, string)[]> P2 in P.Values)
+					{
+						foreach (string TabID in P2.Keys)
+							Result[TabID] = true;
+					}
+				}
+			}
+
+			string[] Result2 = new string[Result.Count];
+			Result.Keys.CopyTo(Result2, 0);
+			return Result2;
+		}
+
 		private class TabQueue
 		{
 			public string TabID;
@@ -583,6 +943,23 @@ namespace Waher.IoTGateway
 				this.TabID = ID;
 				this.SessionID = SessionID;
 				this.Session = Session;
+			}
+		}
+
+		/// <summary>
+		/// Puses an event to a set of Tabs, given their Tab IDs.
+		/// </summary>
+		/// <param name="TabIDs">Tab IDs.</param>
+		/// <param name="Type">Event Type.</param>
+		/// <param name="Data">Event Data.</param>
+		public static void PushEvent(string[] TabIDs, string Type, object Data)
+		{
+			if (Data is string s)
+				PushEvent(TabIDs, Type, s, false, null, null);
+			else
+			{
+				s = JSON.Encode(Data, false);
+				PushEvent(TabIDs, Type, s, true, null, null);
 			}
 		}
 

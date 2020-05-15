@@ -188,6 +188,7 @@ namespace Waher.Content.Markdown.Web
 
 			if (Doc.TryGetMetaData("UserVariable", out KeyValuePair<string, bool>[] MetaValues))
 			{
+				object User = null;
 				bool Authorized = true;
 
 				if (!Doc.TryGetMetaData("Login", out KeyValuePair<string, bool>[] Login))
@@ -204,7 +205,9 @@ namespace Waher.Content.Markdown.Web
 						break;
 					}
 
-					if (!Session.TryGetVariable(P.Key, out v))
+					if (Session.TryGetVariable(P.Key, out v))
+						User = v.ValueObject;
+					else
 					{
 						Uri LoginUrl = null;
 						string LoginFileName = null;
@@ -245,7 +248,7 @@ namespace Waher.Content.Markdown.Web
 
 					if (!(Privilege is null))
 					{
-						if (!(v.ValueObject is IUser User))
+						if (!(v.ValueObject is IUser User2))
 						{
 							Authorized = false;
 							break;
@@ -253,7 +256,7 @@ namespace Waher.Content.Markdown.Web
 
 						foreach (KeyValuePair<string, bool> P2 in Privilege)
 						{
-							if (!User.HasPrivilege(P2.Key))
+							if (!User2.HasPrivilege(P2.Key))
 							{
 								Authorized = false;
 								break;
@@ -290,6 +293,8 @@ namespace Waher.Content.Markdown.Web
 
 					throw new ForbiddenException("Access denied.");
 				}
+
+				Session[" User "] = User;
 			}
 
 			if (Doc.TryGetMetaData("AudioControls", out MetaValues))

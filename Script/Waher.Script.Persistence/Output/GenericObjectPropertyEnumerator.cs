@@ -31,7 +31,6 @@ namespace Waher.Script.Persistence.Output
 			if (Object is GenericObject Obj)
 			{
 				List<IElement> Elements = new List<IElement>();
-				Type T = Object.GetType();
 
 				if (!string.IsNullOrEmpty(Obj.CollectionName) && !Obj.TryGetFieldValue("CollectionName", out object _))
 				{

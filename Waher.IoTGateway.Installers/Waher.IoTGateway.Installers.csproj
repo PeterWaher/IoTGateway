@@ -83,6 +83,7 @@
     <Compile Include=".bak\Waher.Events\ITags.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\IProcessingSupport.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Q.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Z.cs" />
@@ -91,6 +92,9 @@
     <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Properties.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\DefaultPropertyEnumerator.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\IPropertyEnumerator.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\TypePropertyEnumerator.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Scalar\Boolean.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Count.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Left.cs" />

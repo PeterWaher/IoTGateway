@@ -970,10 +970,7 @@ namespace Waher.Networking
 		{
 			lock (this.synchObj)
 			{
-				if (!this.connected)
-					throw new InvalidOperationException("Not connected.");
-
-				if (!this.sending)
+				if (!this.connected || !this.sending)
 					return Task.FromResult<bool>(true);
 
 				if (this.idleQueue is null)

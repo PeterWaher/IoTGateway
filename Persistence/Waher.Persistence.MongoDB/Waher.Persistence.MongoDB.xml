@@ -405,7 +405,7 @@
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetCollections">
             <summary>
-            Gets an array of available collection.s
+            Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
         </member>
@@ -431,6 +431,12 @@
             <param name="Label">Label to check.</param>
             <returns>If <paramref name="Label"/> is a label in the collection
             defined by <paramref name="Collection"/>.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetLabels(System.String)">
+            <summary>
+            Gets an array of available labels for a collection.
+            </summary>
+            <returns>Array of labels.</returns>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryGetObjectId(System.Object,System.Object@)">
             <summary>

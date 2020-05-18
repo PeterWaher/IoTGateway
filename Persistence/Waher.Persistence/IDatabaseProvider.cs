@@ -232,7 +232,7 @@ namespace Waher.Persistence
 		IPersistentDictionary GetDictionary(string Collection);
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		Task<string[]> GetCollections();
@@ -259,6 +259,12 @@ namespace Waher.Persistence
 		/// <returns>If <paramref name="Label"/> is a label in the collection
 		/// defined by <paramref name="Collection"/>.</returns>
 		Task<bool> IsLabel(string Collection, string Label);
+
+		/// <summary>
+		/// Gets an array of available labels for a collection.
+		/// </summary>
+		/// <returns>Array of labels.</returns>
+		Task<string[]> GetLabels(string Collection);
 
 		/// <summary>
 		/// Tries to get the Object ID of an object, if it exists.

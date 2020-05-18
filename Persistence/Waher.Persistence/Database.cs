@@ -771,6 +771,15 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Gets an array of available labels for a collection.
+		/// </summary>
+		/// <returns>Array of labels.</returns>
+		public static Task<string[]> GetLabels(string Collection)
+		{
+			return Provider.GetLabels(Collection);
+		}
+
+		/// <summary>
 		/// Tries to get the Object ID of an object, if it exists.
 		/// </summary>
 		/// <param name="Object">Object whose Object ID is of interest.</param>

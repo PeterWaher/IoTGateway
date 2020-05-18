@@ -1514,7 +1514,7 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		public async Task<string[]> GetCollections()
@@ -1563,6 +1563,15 @@ namespace Waher.Persistence.MongoDB
 			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
 
 			return !(await ResultSet.SingleAsync<BsonDocument>() is null);
+		}
+
+		/// <summary>
+		/// Gets an array of available labels for a collection.
+		/// </summary>
+		/// <returns>Array of labels.</returns>
+		public Task<string[]> GetLabels(string Collection)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>

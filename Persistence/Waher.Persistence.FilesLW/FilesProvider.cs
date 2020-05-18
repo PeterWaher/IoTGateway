@@ -616,6 +616,36 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets an array of available labels for a collection.
+		/// </summary>
+		/// <returns>Array of labels.</returns>
+		public async Task<string[]> GetLabels(string Collection)
+		{
+			if (string.IsNullOrEmpty(Collection))
+				Collection = this.defaultCollectionName;
+
+			LabelFile Labels;
+
+			lock (this.files)
+			{
+				if (!this.labelFiles.TryGetValue(Collection, out Labels))
+					Labels = null;
+			}
+
+			if (Labels is null)
+			{
+				await this.GetFile(Collection);     // Generates structures.
+
+				lock (this.files)
+				{
+					Labels = this.labelFiles[Collection];
+				}
+			}
+
+			return (await Labels.GetLabelsAsync());
+		}
+
+		/// <summary>
 		/// Tries to get the Object ID of an object, if it exists.
 		/// </summary>
 		/// <param name="Object">Object whose Object ID is of interest.</param>
@@ -1314,7 +1344,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		public Task<string[]> GetCollections()

@@ -289,6 +289,12 @@
             <returns>If <paramref name="Label"/> is a label in the collection
             defined by <paramref name="Collection"/>.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetLabels(System.String)">
+            <summary>
+            Gets an array of available labels for a collection.
+            </summary>
+            <returns>Array of labels.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.TryGetObjectId(System.Object,System.Object@)">
             <summary>
             Tries to get the Object ID of an object, if it exists.
@@ -407,7 +413,7 @@
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetCollections">
             <summary>
-            Gets an array of available collection.s
+            Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
         </member>
@@ -1350,6 +1356,12 @@
             </summary>
             <param name="FieldName">Name of field.</param>
             <returns>The field code, if one was found, or null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.GetLabelsAsync">
+            <summary>
+            Gets an array of available labels.
+            </summary>
+            <returns>Array of labels.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.LabelFile.GetFieldName(System.UInt32)">
             <summary>

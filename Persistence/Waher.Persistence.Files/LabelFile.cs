@@ -220,6 +220,28 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets an array of available labels.
+		/// </summary>
+		/// <returns>Array of labels.</returns>
+		public async Task<string[]> GetLabelsAsync()
+		{
+			string[] Result;
+
+			await this.LockRead();
+			try
+			{
+				Result = new string[this.codesByLabel.Count];
+				this.codesByLabel.Keys.CopyTo(Result, 0);
+			}
+			finally
+			{
+				await this.EndRead();
+			}
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Gets the name of a field in a collection, given its code.
 		/// </summary>
 		/// <param name="FieldCode">Field code.</param>

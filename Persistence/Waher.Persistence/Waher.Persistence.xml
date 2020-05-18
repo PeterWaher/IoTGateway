@@ -2894,6 +2894,12 @@
             <returns>If <paramref name="Label"/> is a label in the collection
             defined by <paramref name="Collection"/>.</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.GetLabels(System.String)">
+            <summary>
+            Gets an array of available labels for a collection.
+            </summary>
+            <returns>Array of labels.</returns>
+        </member>
         <member name="M:Waher.Persistence.Database.TryGetObjectId(System.Object,System.Object@)">
             <summary>
             Tries to get the Object ID of an object, if it exists.
@@ -3594,7 +3600,7 @@
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.GetCollections">
             <summary>
-            Gets an array of available collection.s
+            Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
         </member>
@@ -3620,6 +3626,12 @@
             <param name="Label">Label to check.</param>
             <returns>If <paramref name="Label"/> is a label in the collection
             defined by <paramref name="Collection"/>.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.GetLabels(System.String)">
+            <summary>
+            Gets an array of available labels for a collection.
+            </summary>
+            <returns>Array of labels.</returns>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.TryGetObjectId(System.Object,System.Object@)">
             <summary>
@@ -3735,7 +3747,7 @@
         </member>
         <member name="M:Waher.Persistence.ILedgerProvider.GetCollections">
             <summary>
-            Gets an array of available collection.s
+            Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
         </member>
@@ -3865,7 +3877,7 @@
         </member>
         <member name="M:Waher.Persistence.Ledger.GetCollections">
             <summary>
-            Gets an array of available collection.s
+            Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
         </member>

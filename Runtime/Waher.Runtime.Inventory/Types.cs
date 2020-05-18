@@ -59,6 +59,16 @@ namespace Waher.Runtime.Inventory
 			return null;
 		}
 
+		/// <summary>
+		/// Checks if <paramref name="FullName"/> references a type in the inventory.
+		/// </summary>
+		/// <param name="FullName">Full name</param>
+		/// <returns>If <paramref name="FullName"/> references a type.</returns>
+		public static bool IsType(string FullName)
+		{
+			return !(GetType(FullName) is null);
+		}
+
 		private static Exception NotInitializedException()
 		{
 			return new Exception("Inventory engine not initialized properly. Make sure to call Waher.Runtime.Inventory.Types.Initialize() or Waher.Runtime.Inventory.Loader.TypesLoader.Initialize() first.");

@@ -393,7 +393,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.responseSent = true;
 
-				if (this.httpServer != null)
+				if (!(this.httpServer is null) && !(this.httpRequest is null))
 				{
 					if (this.HeaderSent)
 						this.httpServer.RequestResponded(this.httpRequest, this.statusCode);

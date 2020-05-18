@@ -65,6 +65,33 @@
             <param name="PlainText">Text to include.</param>
             <returns>Escaped text.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.Functions.MarkdownToHtml">
+            <summary>
+            MarkdownToHtml(s)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.MarkdownToHtml.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            MarkdownToHtml(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.MarkdownToHtml.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.MarkdownToHtml.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.PreprocessMarkdown">
             <summary>
             PreprocessMarkdown(Markdown)

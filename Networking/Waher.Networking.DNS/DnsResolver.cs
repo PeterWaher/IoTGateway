@@ -200,7 +200,7 @@ namespace Waher.Networking.DNS
 							switch (Message.RCode)
 							{
 								case RCode.NXDomain:
-									throw new GenericException("Domain name not found.", Object: Name);
+									throw new GenericException("Domain name not found: " + Name, Object: Name);
 							}
 						}
 						catch (TimeoutException)

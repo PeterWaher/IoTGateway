@@ -67,7 +67,7 @@ namespace Waher.Persistence.Files
 			bool LabelsExists = File.Exists(LabelsFileName);
 			LabelFile Result = new LabelFile(LabelsFileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider);
 			uint LastCode = 0;
-						uint Code = 1;
+			uint Code = 1;
 
 			if (LabelsExists)
 			{
@@ -268,7 +268,7 @@ namespace Waher.Persistence.Files
 				if (this.labelsByCode.TryGetValue(FieldCode, out string Result))
 					return Result;
 				else
-					throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), nameof(FieldCode));
+					throw new ArgumentException("Field code unknown: " + FieldCode.ToString() + ", Collection: " + this.CollectionName, nameof(FieldCode));
 			}
 			finally
 			{

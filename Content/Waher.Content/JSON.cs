@@ -714,7 +714,11 @@ namespace Waher.Content
 					Json.Append(']');
 				}
 				else
-					throw new ArgumentException("Unsupported type: " + T.FullName, nameof(Object));
+				{
+					Json.Append('"');
+					Json.Append(Encode(Object.ToString()));
+					Json.Append('"');
+				}
 			}
 		}
 

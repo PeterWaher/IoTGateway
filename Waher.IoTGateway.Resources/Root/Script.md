@@ -1391,6 +1391,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 |--------------------------|-------------|---------|
 | `LoadMarkdown(FileName)` | Loads a markdown file and preprocesses it before returning it as a string. | [Example][LoadMarkdownExample] |
 | `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
+| `MarkdownToHtml(s)`      | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
 | `PreprocessMarkdown(MD)` | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 
 The following predefined context-specific constants (read-only variables) are available in inline script:
@@ -1402,6 +1403,7 @@ The following predefined context-specific constants (read-only variables) are av
 
 [LoadMarkdownExample]: Prompt.md?Expression=LoadMarkdown(%22File.md%22)
 [MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_sister%22)
+[MarkdowntoHtmlExample]: Prompt.md?Expression=MarkdownToHtml(%22:file_folder:%22)
 [PreprocessMarkdownExample]: Prompt.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
 
 #### XSL-related functions (Waher.Content.Xsl)

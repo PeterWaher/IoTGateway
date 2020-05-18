@@ -17,7 +17,7 @@
     <dependencies>
       <dependency id="Waher.Content" version="1.0.25"/>
       <dependency id="Waher.Networking.HTTP.UWP" version="1.0.42"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.12"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.13"/>
 			<dependency id="Waher.Security" version="1.0.5"/>
 			<dependency id="Waher.Security.JWS" version="1.0.4"/>
 		</dependencies>

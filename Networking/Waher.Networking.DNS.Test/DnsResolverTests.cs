@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -18,7 +18,7 @@ namespace Waher.Networking.DNS.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(Database).Assembly,
@@ -61,7 +61,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[ExpectedException(typeof(GenericException))]
 		public async Task Test_04_NonexistantName()
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("dettanamnfinnsinte.se");
@@ -152,6 +152,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_15_Resolve_DNSBL_Lookup_OK_IP()
 		{
 			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("194.9.95.112"), "zen.spamhaus.org");

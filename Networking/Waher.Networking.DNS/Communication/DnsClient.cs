@@ -221,7 +221,7 @@ namespace Waher.Networking.DNS.Communication
 
 				DnsClient.WriteUInt16(ID, Request);
 
-				byte b = (byte)((int)OpCode.Query << 3);
+				byte b = (byte)((int)OpCode << 3);
 				if (Recursive)
 					b |= 1;
 

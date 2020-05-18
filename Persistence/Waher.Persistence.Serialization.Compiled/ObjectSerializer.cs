@@ -709,7 +709,10 @@ namespace Waher.Persistence.Serialization
 						CSharp.AppendLine("\t\t\tstring TypeName = FieldName;");
 
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
-						CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
+					{
+						CSharp.AppendLine("\t\t\tif (TypeName.IndexOf('.') < 0)");
+						CSharp.AppendLine("\t\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
+					}
 
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
@@ -725,7 +728,10 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (this.typeInfo.IsAbstract)
+				{
+					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\tthrow new SerializationException(\"Unable to create an instance of the abstract class " + this.type.FullName + ".\", this.ValueType);");
+				}
 				else
 				{
 					CSharp.AppendLine();
@@ -1413,6 +1419,14 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\tpublic override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 				CSharp.AppendLine("\t\t{");
+				CSharp.AppendLine("\t\t\tType T = UntypedValue?.GetType();");
+				CSharp.AppendLine("\t\t\tif (!(T is null) && T != typeof(" + this.type.FullName + "))");
+				CSharp.AppendLine("\t\t\t{");
+				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = this.context.GetObjectSerializer(T);");
+				CSharp.AppendLine("\t\t\t\tSerializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
+				CSharp.AppendLine("\t\t\t\treturn;");
+				CSharp.AppendLine("\t\t\t}");
+				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
 				CSharp.AppendLine("\t\t\tISerializer WriterBak = Writer;");
 				CSharp.AppendLine();
@@ -2553,7 +2567,7 @@ namespace Waher.Persistence.Serialization
 					else
 						TypeName = FieldName;
 
-					if (this.typeNameSerialization == TypeNameSerialization.LocalName)
+					if (this.typeNameSerialization == TypeNameSerialization.LocalName && TypeName.IndexOf('.') < 0)
 						TypeName = this.type.Namespace + "." + TypeName;
 
 					Type DesiredType = Types.GetType(TypeName);
@@ -3127,6 +3141,14 @@ namespace Waher.Persistence.Serialization
 			else
 			{
 #endif
+				Type T = Value?.GetType();
+				if (!(T is null) && T != this.type)
+				{
+					IObjectSerializer Serializer = this.context.GetObjectSerializer(T);
+					Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+					return;
+				}
+
 				ISerializer WriterBak = Writer;
 
 				if (!Embedded)

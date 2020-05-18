@@ -496,7 +496,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\tstring TypeName = Reader.ReadString();");
 
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
-					CSharp.AppendLine("\t\t\tTypeName = \"" + this.type.Namespace + ".\" + TypeName;");
+				{
+					CSharp.AppendLine("\t\t\tif (TypeName.IndexOf('.') < 0)");
+					CSharp.AppendLine("\t\t\t\tTypeName = \"" + this.type.Namespace + ".\" + TypeName;");
+				}
 
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
@@ -1532,6 +1535,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic override void Serialize(IBsonWriter Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 			CSharp.AppendLine("\t\t{");
+			CSharp.AppendLine("\t\t\tType T = UntypedValue?.GetType();");
+			CSharp.AppendLine("\t\t\tif (!(T is null) && T != typeof(" + this.type.FullName + "))");
+			CSharp.AppendLine("\t\t\t{");
+			CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = this.context.GetObjectSerializer(T);");
+			CSharp.AppendLine("\t\t\t\tSerializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
+			CSharp.AppendLine("\t\t\t\treturn;");
+			CSharp.AppendLine("\t\t\t}");
+			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tWriter.WriteStartDocument();");

@@ -61,7 +61,7 @@ namespace Waher.Persistence
 		Task Flush();
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		Task<string[]> GetCollections();

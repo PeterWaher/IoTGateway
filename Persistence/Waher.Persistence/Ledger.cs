@@ -124,7 +124,7 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Gets an array of available collection.s
+		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		public static Task<string[]> GetCollections()

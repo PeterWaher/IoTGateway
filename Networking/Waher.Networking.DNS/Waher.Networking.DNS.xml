@@ -52,6 +52,12 @@
             </summary>
             <param name="Message">DNS Message</param>
         </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsClient.ProcessMessageFailure(System.UInt16)">
+            <summary>
+            Request resulted in a failure.
+            </summary>
+            <param name="ID">Original request ID.</param>
+        </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsClient.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>

@@ -58,22 +58,31 @@ namespace Waher.Networking.DNS.Communication
 					Request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/dns-message");
 					
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-					Response.EnsureSuccessStatusCode();
 
-					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-
-					this.ReceiveBinary(Bin);
-
-					try
+					if (Response.IsSuccessStatusCode)
 					{
-						DnsMessage DnsResponse = new DnsMessage(Bin);
-						this.ProcessIncomingMessage(DnsResponse);
-					}
-					catch (Exception ex)
-					{
-						Log.Error("Unable to process DNS packet: " + ex.Message);
-					}
+						byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 
+						this.ReceiveBinary(Bin);
+
+						try
+						{
+							DnsMessage DnsResponse = new DnsMessage(Bin);
+							this.ProcessIncomingMessage(DnsResponse);
+						}
+						catch (Exception ex)
+						{
+							Log.Error("Unable to process DNS packet: " + ex.Message);
+						}
+					}
+					else
+					{
+						ushort ID = Message[0];
+						ID <<= 8;
+						ID |= Message[1];
+
+						this.ProcessMessageFailure(ID);
+					}
 				}
 			}
 		}

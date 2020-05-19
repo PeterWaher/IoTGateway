@@ -189,6 +189,44 @@ namespace Waher.Networking.DNS.Communication
 		}
 
 		/// <summary>
+		/// Request resulted in a failure.
+		/// </summary>
+		/// <param name="ID">Original request ID.</param>
+		protected virtual void ProcessMessageFailure(ushort ID)
+		{
+			Rec Rec;
+
+			lock (this.outgoingMessages)
+			{
+				if (this.outgoingMessages.TryGetValue(ID, out Rec))
+					this.outgoingMessages.Remove(ID);
+				else
+					return;
+			}
+
+			try
+			{
+				DnsMessage Message = new DnsMessage(new byte[]
+				{
+					(byte)(ID >> 8),
+					(byte)(ID & 255),
+					0x80,	// Response
+					(byte)RCode.ServFail,
+					0, 0,	// QDCOUNT
+					0, 0,	// ANCOUNT
+					0, 0,	// NSCOUNT
+					0, 0	// ARCOUNT
+				});
+
+				Rec.Callback?.Invoke(this, new DnsMessageEventArgs(Message, Rec.State));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public virtual void Dispose()
@@ -209,7 +247,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendRequest(OpCode OpCode, bool Recursive, Question[] Questions, 
+		public void SendRequest(OpCode OpCode, bool Recursive, Question[] Questions,
 			IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
 		{
 			using (MemoryStream Request = new MemoryStream())
@@ -261,7 +299,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Questions">Questions</param>
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public Task<DnsMessage> SendRequestAsync(OpCode OpCode, bool Recursive, 
+		public Task<DnsMessage> SendRequestAsync(OpCode OpCode, bool Recursive,
 			Question[] Questions, IPEndPoint Destination, int Timeout)
 		{
 			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
@@ -522,7 +560,7 @@ namespace Waher.Networking.DNS.Communication
 
 					if (!(getAscii is null))
 						Label = (string)getAscii.Invoke(idnMapping, new object[] { Label });
-					
+
 					Output.WriteByte((byte)Label.Length);
 
 					byte[] Bin = Encoding.ASCII.GetBytes(Label);

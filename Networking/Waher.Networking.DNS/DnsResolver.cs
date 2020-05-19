@@ -181,7 +181,7 @@ namespace Waher.Networking.DNS
 			{
 				while (true)
 				{
-					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination);
+					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination, false);
 					string CName = null;
 
 					if (Response is null)
@@ -304,7 +304,7 @@ namespace Waher.Networking.DNS
 
 			try
 			{
-				return Query(Name, TYPE, CLASS, 2000, null);
+				return Query(Name, TYPE, CLASS, 2000, null, true);
 			}
 			finally
 			{
@@ -315,7 +315,7 @@ namespace Waher.Networking.DNS
 			}
 		}
 
-		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination)
+		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination, bool ReturnRaw)
 		{
 			DnsResponse Response;
 			DnsMessage Message;
@@ -342,6 +342,8 @@ namespace Waher.Networking.DNS
 
 			if (Response is null)
 			{
+				bool Save = true;
+
 				try
 				{
 					DnsClient Client = Destination is null ? (DnsClient)httpsClient : (DnsClient)udpClient;
@@ -356,7 +358,11 @@ namespace Waher.Networking.DNS
 					switch (Message.RCode)
 					{
 						case RCode.NXDomain:
-							throw new GenericException("Domain name not found: " + Name, Object: Name);
+							if (ReturnRaw)
+								Save = false;
+							else
+								throw new GenericException("Domain name not found: " + Name, Object: Name);
+							break;
 					}
 				}
 				catch (TimeoutException)
@@ -365,7 +371,12 @@ namespace Waher.Networking.DNS
 				}
 
 				if (Message is null || Message.RCode != RCode.NoError)
-					return null;
+				{
+					if (ReturnRaw)
+						Save = false;
+					else
+						return null;
+				}
 
 				uint Ttl = 60 * 60 * 24 * 30;       // Maximum TTL = 30 days
 
@@ -374,15 +385,16 @@ namespace Waher.Networking.DNS
 					Name = Name,
 					Type = TYPE,
 					Class = CLASS,
-					Answer = CheckTtl(ref Ttl, Message.Answer),
-					Authority = CheckTtl(ref Ttl, Message.Authority),
-					Additional = CheckTtl(ref Ttl, Message.Additional),
-					Raw = Message.Binary
+					Answer = CheckTtl(ref Ttl, Message?.Answer),
+					Authority = CheckTtl(ref Ttl, Message?.Authority),
+					Additional = CheckTtl(ref Ttl, Message?.Additional),
+					Raw = Message?.Binary
 				};
 
 				Response.Expires = DateTime.Now.AddSeconds(Ttl);
 
-				await Database.Insert(Response);
+				if (Save)
+					await Database.Insert(Response);
 			}
 
 			return Response;

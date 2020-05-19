@@ -10,7 +10,7 @@ using Waher.Networking.DNS.ResourceRecords;
 namespace Waher.Networking.DNS.Test
 {
 	[TestClass]
-	public class DnsHttpsClientTests : DnsClientTests
+	public class DnsHttpsClientTestsGoogle : DnsClientTests
 	{
 		protected override DnsClient CreateClient()
 		{

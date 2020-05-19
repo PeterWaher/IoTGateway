@@ -20,6 +20,7 @@ namespace Waher.Networking.DNS.Communication
 		private ResourceRecord[] answer = null;
 		private ResourceRecord[] authority = null;
 		private ResourceRecord[] additional = null;
+		private byte[] raw = null;
 
 		/// <summary>
 		/// Stored DNS Query
@@ -103,6 +104,16 @@ namespace Waher.Networking.DNS.Communication
 		{
 			get => this.additional;
 			set => this.additional = value;
+		}
+
+		/// <summary>
+		/// Raw DNS message
+		/// </summary>
+		[DefaultValueNull]
+		public byte[] Raw
+		{
+			get => this.raw;
+			set => this.raw = value;
 		}
 	}
 }

@@ -178,6 +178,11 @@
             </summary>
             <param name="Data">Binary representation of a DNS message.</param>
         </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsMessage.Binary">
+            <summary>
+            Binary response.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.DNS.Communication.DnsMessage.ID">
             <summary>
             Message identifier
@@ -317,6 +322,11 @@
             Additional resource records
             </summary>
         </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsResponse.Raw">
+            <summary>
+            Raw DNS message
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
             Implements a DNS UDP-based client.
@@ -430,6 +440,16 @@
             <param name="Name">Domain Name to resolve</param>
             <param name="TYPE">Resource Record Type of interest.</param>
             <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
             <param name="CLASS">Resource Record Class of interest.</param>
             <returns>Answer to the query</returns>
             <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>

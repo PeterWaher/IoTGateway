@@ -11,6 +11,7 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	public class DnsMessage
 	{
+		private readonly byte[] binary;
 		private readonly ushort id;
 		private readonly bool response;
 		private readonly OpCode opCode;
@@ -30,6 +31,8 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Data">Binary representation of a DNS message.</param>
 		public DnsMessage(byte[] Data)
 		{
+			this.binary = Data;
+
 			using (MemoryStream ms = new MemoryStream(Data))
 			{
 				this.id = DnsClient.ReadUInt16(ms);
@@ -67,6 +70,11 @@ namespace Waher.Networking.DNS.Communication
 				this.additional = DnsClient.ReadResourceRecords(ms, ARCOUNT);
 			}
 		}
+
+		/// <summary>
+		/// Binary response.
+		/// </summary>
+		public byte[] Binary => this.binary;
 
 		/// <summary>
 		/// Message identifier

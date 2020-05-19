@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Events;
 using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
@@ -154,7 +155,6 @@ namespace Waher.Networking.DNS
 			LinkedList<KeyValuePair<string, IPEndPoint>> Backup = null;
 			TYPE? ExpectedType;
 			IPEndPoint Destination = null;
-			string LastName = null;
 			int Timeout = 2000;     // Local timeout
 
 			if (Enum.TryParse<TYPE>(TYPE.ToString(), out TYPE T))
@@ -181,85 +181,17 @@ namespace Waher.Networking.DNS
 			{
 				while (true)
 				{
-					DnsResponse Response = null;
-					DnsMessage Message;
-
-					if (LastName is null || LastName != Name)
-					{
-						LastName = Name;
-
-						try
-						{
-							Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
-								new FilterFieldEqualTo("Name", Name),
-								new FilterFieldEqualTo("Type", TYPE),
-								new FilterFieldEqualTo("Class", CLASS)));
-
-							if (!(Response is null) && Response.Expires <= DateTime.Now)
-							{
-								await Database.Delete(Response);
-								Response = null;
-							}
-						}
-						catch (Exception)
-						{
-							// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
-							await Database.Clear("DnsCache");
-							Response = null;
-						}
-					}
+					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination);
+					string CName = null;
 
 					if (Response is null)
 					{
-						try
-						{
-							DnsClient Client = Destination is null ? (DnsClient)httpsClient : (DnsClient)udpClient;
-							if (Client is null)
-								Client = udpClient;
+						Destination = await NextDestination(Backup);
+						if (Destination is null)
+							throw new IOException("Unable to resolve DNS query.");
 
-							Message = await Client.SendRequestAsync(OpCode.Query, true, new Question[]
-							{
-								new Question(Name, TYPE, CLASS)
-							}, Destination, Timeout);
-
-							switch (Message.RCode)
-							{
-								case RCode.NXDomain:
-									throw new GenericException("Domain name not found: " + Name, Object: Name);
-							}
-						}
-						catch (TimeoutException)
-						{
-							Message = null;
-						}
-
-						if (Message is null || Message.RCode != RCode.NoError)
-						{
-							Destination = await NextDestination(Backup);
-							if (Destination is null)
-								throw new IOException("Unable to resolve DNS query.");
-
-							continue;   // Check an alternative
-						}
-
-						uint Ttl = 60 * 60 * 24 * 30;       // Maximum TTL = 30 days
-
-						Response = new DnsResponse()
-						{
-							Name = Name,
-							Type = TYPE,
-							Class = CLASS,
-							Answer = CheckTtl(ref Ttl, Message.Answer),
-							Authority = CheckTtl(ref Ttl, Message.Authority),
-							Additional = CheckTtl(ref Ttl, Message.Additional)
-						};
-
-						Response.Expires = DateTime.Now.AddSeconds(Ttl);
-
-						await Database.Insert(Response);
+						continue;   // Check an alternative
 					}
-
-					string CName = null;
 
 					if (!(Response.Answer is null))
 					{
@@ -343,6 +275,117 @@ namespace Waher.Networking.DNS
 					nestingDepth--;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Resolves a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <returns>Answer to the query</returns>
+		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+		public static Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS)
+		{
+			lock (synchObject)
+			{
+				if (nestingDepth == 0 && networkChanged)
+				{
+					networkChanged = false;
+					udpClient?.Dispose();
+					udpClient = null;
+				}
+
+				if (udpClient is null)
+					udpClient = new DnsUdpClient();
+
+				nestingDepth++;
+			}
+
+			try
+			{
+				return Query(Name, TYPE, CLASS, 2000, null);
+			}
+			finally
+			{
+				lock (synchObject)
+				{
+					nestingDepth--;
+				}
+			}
+		}
+
+		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination)
+		{
+			DnsResponse Response;
+			DnsMessage Message;
+
+			try
+			{
+				Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
+					new FilterFieldEqualTo("Name", Name),
+					new FilterFieldEqualTo("Type", TYPE),
+					new FilterFieldEqualTo("Class", CLASS)));
+
+				if (!(Response is null) && (Response.Expires <= DateTime.Now || Response.Raw is null))
+				{
+					await Database.Delete(Response);
+					Response = null;
+				}
+			}
+			catch (Exception)
+			{
+				// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
+				await Database.Clear("DnsCache");
+				Response = null;
+			}
+
+			if (Response is null)
+			{
+				try
+				{
+					DnsClient Client = Destination is null ? (DnsClient)httpsClient : (DnsClient)udpClient;
+					if (Client is null)
+						Client = udpClient;
+
+					Message = await Client.SendRequestAsync(OpCode.Query, true, new Question[]
+					{
+						new Question(Name, TYPE, CLASS)
+					}, Destination, Timeout);
+
+					switch (Message.RCode)
+					{
+						case RCode.NXDomain:
+							throw new GenericException("Domain name not found: " + Name, Object: Name);
+					}
+				}
+				catch (TimeoutException)
+				{
+					Message = null;
+				}
+
+				if (Message is null || Message.RCode != RCode.NoError)
+					return null;
+
+				uint Ttl = 60 * 60 * 24 * 30;       // Maximum TTL = 30 days
+
+				Response = new DnsResponse()
+				{
+					Name = Name,
+					Type = TYPE,
+					Class = CLASS,
+					Answer = CheckTtl(ref Ttl, Message.Answer),
+					Authority = CheckTtl(ref Ttl, Message.Authority),
+					Additional = CheckTtl(ref Ttl, Message.Additional),
+					Raw = Message.Binary
+				};
+
+				Response.Expires = DateTime.Now.AddSeconds(Ttl);
+
+				await Database.Insert(Response);
+			}
+
+			return Response;
 		}
 
 		private static async Task<IPEndPoint> NextDestination(LinkedList<KeyValuePair<string, IPEndPoint>> Backup)

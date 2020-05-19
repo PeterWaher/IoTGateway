@@ -144,6 +144,24 @@
             <param name="Destination">Destination. If null, default destination is assumed.</param>
             <param name="Timeout">Timeout, in milliseconds.</param>
         </member>
+        <member name="T:Waher.Networking.DNS.Communication.DnsHttpsClient">
+            <summary>
+            Implements a DNS over HTTPS (DoH)-based client.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsHttpsClient.#ctor(System.Uri)">
+            <summary>
+            Implements a DNS over HTTPS (DoH)-based client.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsHttpsClient.SendAsync(System.Byte[],System.Net.IPEndPoint)">
+            <summary>
+            Sends a message to a destination.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Destination">Destination. If null, default destination
+            is assumed.</param>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsMessage">
             <summary>
             Represents a DNS message
@@ -301,7 +319,7 @@
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.#ctor">
             <summary>
-            Implements a DNS TCP-based client.
+            Implements a DNS UDP-based client.
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.SendAsync(System.Byte[],System.Net.IPEndPoint)">

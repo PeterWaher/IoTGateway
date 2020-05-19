@@ -10,11 +10,11 @@ using Waher.Networking.DNS.ResourceRecords;
 namespace Waher.Networking.DNS.Test
 {
 	[TestClass]
-	public class DnsUdpClientTests : DnsClientTests
+	public class DnsHttpsClientTests : DnsClientTests
 	{
 		protected override DnsClient CreateClient()
 		{
-			return new DnsUdpClient();
+			return new DnsHttpsClient(new Uri("https://dns.google/dns-query"));
 		}
 	}
 }

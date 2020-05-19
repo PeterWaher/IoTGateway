@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Networking.Sniffers;
-using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
 

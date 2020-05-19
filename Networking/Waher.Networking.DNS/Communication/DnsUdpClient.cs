@@ -3,14 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.IO;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking.DNS.Enumerations;
-using Waher.Networking.DNS.ResourceRecords;
-using Waher.Networking.Sniffers;
-using Waher.Runtime.Cache;
-using Waher.Runtime.Timing;
 
 namespace Waher.Networking.DNS.Communication
 {
@@ -31,7 +25,7 @@ namespace Waher.Networking.DNS.Communication
 		private UdpClient udp = null;
 
 		/// <summary>
-		/// Implements a DNS TCP-based client.
+		/// Implements a DNS UDP-based client.
 		/// </summary>
 		public DnsUdpClient()
 			: base()

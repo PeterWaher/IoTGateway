@@ -311,7 +311,6 @@ namespace Waher.Networking.DNS.Communication
 					new TimeoutException("No response returned within the given time."));
 			}, Result);
 
-
 			this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
 			{
 				this.scheduler?.Remove(TP);

@@ -13,7 +13,7 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	public class DnsHttpsClient : DnsClient
 	{
-        private readonly Uri uri;
+        private Uri uri;
 
 		/// <summary>
 		/// Implements a DNS over HTTPS (DoH)-based client.
@@ -23,6 +23,15 @@ namespace Waher.Networking.DNS.Communication
 		{
 			this.uri = Uri;
 			this.Init();
+		}
+
+		/// <summary>
+		/// DNS over HTTPS URI.
+		/// </summary>
+		public Uri Uri
+		{
+			get => this.uri;
+			set => this.uri = value;
 		}
 
 		/// <summary>

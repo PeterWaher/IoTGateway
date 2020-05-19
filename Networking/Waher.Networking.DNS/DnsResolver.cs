@@ -24,6 +24,7 @@ namespace Waher.Networking.DNS
 	/// RFC 3596: https://tools.ietf.org/html/rfc3596: DNS Extensions to Support IP Version 6
 	/// RFC 5782: https://tools.ietf.org/html/rfc5782: DNS Blacklists and Whitelists
 	/// RFC 7208: https://tools.ietf.org/html/rfc7208: Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
+	/// RFC 8484: https://tools.ietf.org/html/rfc8484: DNS Queries over HTTPS (DoH)
 	/// </summary>
 	public static class DnsResolver
 	{
@@ -36,13 +37,34 @@ namespace Waher.Networking.DNS
 		private static readonly object synchObject = new object();
 		private static readonly Random rnd = new Random();
 		private static ushort nextId = 0;
-		private static DnsUdpClient client = null;
+		private static DnsHttpsClient httpsClient = null;
+		private static DnsUdpClient udpClient = null;
 		private static bool networkChanged = false;
 		private static int nestingDepth = 0;
 
 		static DnsResolver()
 		{
 			NetworkChange.NetworkAddressChanged += (sender, e) => networkChanged = true;
+		}
+
+		/// <summary>
+		/// URI used in DNS over HTTPS (DoH) requests. Setting the property to null disables DNS over HTTPS (DoH).
+		/// </summary>
+		public static Uri DnsOverHttpsUri
+		{
+			get => httpsClient?.Uri;
+			set
+			{
+				if (value is null)
+				{
+					httpsClient?.Dispose();
+					httpsClient = null;
+				}
+				else if (httpsClient is null)
+					httpsClient = new DnsHttpsClient(value);
+				else
+					httpsClient.Uri = value;
+			}
 		}
 
 		/// <summary>
@@ -127,8 +149,7 @@ namespace Waher.Networking.DNS
 		/// <param name="CLASS">Resource Record Class of interest.</param>
 		/// <returns>Answer to the query</returns>
 		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
-		public static async Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE,
-			TYPE? ExceptionType, QCLASS CLASS)
+		public static async Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS)
 		{
 			LinkedList<KeyValuePair<string, IPEndPoint>> Backup = null;
 			TYPE? ExpectedType;
@@ -146,12 +167,12 @@ namespace Waher.Networking.DNS
 				if (nestingDepth == 0 && networkChanged)
 				{
 					networkChanged = false;
-					client?.Dispose();
-					client = null;
+					udpClient?.Dispose();
+					udpClient = null;
 				}
 
-				if (client is null)
-					client = new DnsUdpClient();
+				if (udpClient is null)
+					udpClient = new DnsUdpClient();
 
 				nestingDepth++;
 			}
@@ -192,7 +213,11 @@ namespace Waher.Networking.DNS
 					{
 						try
 						{
-							Message = await client.SendRequestAsync(OpCode.Query, true, new Question[]
+							DnsClient Client = Destination is null ? (DnsClient)httpsClient : (DnsClient)udpClient;
+							if (Client is null)
+								Client = udpClient;
+
+							Message = await Client.SendRequestAsync(OpCode.Query, true, new Question[]
 							{
 								new Question(Name, TYPE, CLASS)
 							}, Destination, Timeout);

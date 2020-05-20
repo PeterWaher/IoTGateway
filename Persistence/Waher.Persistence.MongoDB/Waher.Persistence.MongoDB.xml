@@ -336,6 +336,14 @@
             <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.RemoveIndex(System.String,System.String[])">
+            <summary>
+            Removes an index from a collection, if one exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
             <summary>
             Analyzes the database and exports findings to XML.

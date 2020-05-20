@@ -1132,6 +1132,49 @@ namespace Waher.Persistence.Files
 
 			StringBuilder sb = new StringBuilder();
 
+			string s = this.GetIndexFileName(File, FieldNames);
+			bool Exists = System.IO.File.Exists(s);
+
+			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
+				Regenerate = true;
+
+			lock (this.synchObj)
+			{
+				IndexFile = new IndexBTreeFile(s, File, this, FieldNames);
+			}
+
+			await File.AddIndex(IndexFile, Regenerate);
+
+			sb.Clear();
+
+			sb.AppendLine("Index");
+			sb.AppendLine(File.CollectionName);
+
+			foreach (string FieldName in FieldNames)
+				sb.AppendLine(FieldName);
+
+			if (s.StartsWith(this.folder))
+				s = s.Substring(this.folder.Length);
+
+			KeyValuePair<bool, object> P = await this.master.TryGetValueAsync(s);
+			string s2 = sb.ToString();
+
+			if (this.NeedsMasterRegistryUpdate(P, s, s2))
+				await this.master.AddAsync(s, s2, true);
+
+			return IndexFile;
+		}
+
+		/// <summary>
+		/// Gets an index file name.
+		/// </summary>
+		/// <param name="File">Object file.</param>
+		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+		/// <returns>Index file name.</returns>
+		public string GetIndexFileName(ObjectBTreeFile File, params string[] FieldNames)
+		{
+			StringBuilder sb = new StringBuilder();
 			string s;
 			bool Exists;
 
@@ -1175,37 +1218,7 @@ namespace Waher.Persistence.Files
 #endif
 			sb.Append(".index");
 
-			s = sb.ToString();
-			Exists = System.IO.File.Exists(s);
-
-			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
-				Regenerate = true;
-
-			lock (this.synchObj)
-			{
-				IndexFile = new IndexBTreeFile(s, File, this, FieldNames);
-			}
-
-			await File.AddIndex(IndexFile, Regenerate);
-
-			sb.Clear();
-
-			sb.AppendLine("Index");
-			sb.AppendLine(File.CollectionName);
-
-			foreach (string FieldName in FieldNames)
-				sb.AppendLine(FieldName);
-
-			if (s.StartsWith(this.folder))
-				s = s.Substring(this.folder.Length);
-
-			KeyValuePair<bool, object> P = await this.master.TryGetValueAsync(s);
-			string s2 = sb.ToString();
-
-			if (this.NeedsMasterRegistryUpdate(P, s, s2))
-				await this.master.AddAsync(s, s2, true);
-
-			return IndexFile;
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -2690,6 +2703,64 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
 			await GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
+		}
+
+		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public async Task RemoveIndex(string CollectionName, string[] FieldNames)
+		{
+			ObjectBTreeFile File = await this.GetFile(CollectionName);
+			IndexBTreeFile[] Indices = File.Indices;
+			IndexBTreeFile IndexFile = null;
+			string[] Fields;
+			int i, c;
+
+			foreach (IndexBTreeFile I in Indices)
+			{
+				if ((c = (Fields = I.FieldNames).Length) != FieldNames.Length)
+					continue;
+
+				for (i = 0; i < c; i++)
+				{
+					if (Fields[i] != FieldNames[i])
+						break;
+				}
+
+				if (i < c)
+					continue;
+
+				IndexFile = I;
+				break;
+			}
+
+			string s = this.GetIndexFileName(File, FieldNames);
+			bool Exists = System.IO.File.Exists(s);
+
+			if (!(IndexFile is null))
+			{
+				File.Remove(IndexFile);
+				IndexFile.Dispose();
+			}
+
+			if (Exists)
+				System.IO.File.Delete(s);
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.AppendLine("Index");
+			sb.AppendLine(File.CollectionName);
+
+			foreach (string FieldName in FieldNames)
+				sb.AppendLine(FieldName);
+
+			if (s.StartsWith(this.folder))
+				s = s.Substring(this.folder.Length);
+
+			await this.master.RemoveAsync(s);
 		}
 
 		#endregion

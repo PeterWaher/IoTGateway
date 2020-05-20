@@ -312,5 +312,25 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Order;
 		}
 
+		/// <summary>
+		/// Creates an index in the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+		public Task CreateIndex(string Name, string[] Fields)
+		{
+			throw InvalidOperation();
+		}
+
+		/// <summary>
+		/// Drops an index from the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <returns>If an index was found and dropped.</returns>
+		public async Task<bool> DropIndex(string Name)
+		{
+			throw InvalidOperation();
+		}
+
 	}
 }

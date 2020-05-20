@@ -1250,6 +1250,28 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task RemoveIndex(string CollectionName, string[] FieldNames)
+		{
+			IMongoCollection<BsonDocument> Collection;
+			List<BsonDocument> Indices;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.DefaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			IAsyncCursor<BsonDocument> Cursor = Collection.Indexes.List();
+			Indices = Cursor.ToList<BsonDocument>();
+
+			return ObjectSerializer.RemoveIndex(Collection, Indices, FieldNames);
+		}
+
+		/// <summary>
 		/// Analyzes the database and exports findings to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>

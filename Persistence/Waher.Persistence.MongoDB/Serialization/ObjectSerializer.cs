@@ -18,6 +18,7 @@ using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
+using System.Linq;
 
 namespace Waher.Persistence.MongoDB.Serialization
 {
@@ -2226,6 +2227,48 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			await Collection.Indexes.CreateOneAsync(NewIndex);
+		}
+
+		internal static Task RemoveIndex(IMongoCollection<BsonDocument> Collection, List<BsonDocument> Indices, string[] FieldNames)
+		{
+			BsonDocument ToRemove = null;
+
+			foreach (BsonDocument Index in Indices)
+			{
+				BsonDocument Key = Index["key"].AsBsonDocument;
+				if (Key.ElementCount != FieldNames.Length)
+					continue;
+
+				IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
+				IEnumerator e2 = FieldNames.GetEnumerator();
+
+				bool Found = true;
+
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					if (e1.Current.Name != (string)e2.Current)
+					{
+						Found = false;
+						break;
+					}
+				}
+
+				if (Found)
+				{
+					ToRemove = Index;
+					break;
+				}
+			}
+
+			if (ToRemove is null)
+				return Task.CompletedTask;
+
+			if (!ToRemove.Names.Contains("name"))
+				throw new IOException("MongoDB index name not found.");
+
+			string Name = ToRemove["name"].AsString;
+
+			return Collection.Indexes.DropOneAsync(Name);
 		}
 
 		private static string GetLocation(Type T)

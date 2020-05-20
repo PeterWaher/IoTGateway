@@ -1785,6 +1785,61 @@ where
 	Type=EventType.Informational
 ```
 
+#### CREATE
+
+You can create indices in the object database using SQL `CREATE` statements.
+
+Syntax:
+
+```
+CREATE INDEX
+	Name
+ON
+	Source
+(
+	Field1[ ASC|DESC][,
+	Field2[ ASC|DESC][,
+	...]]
+)
+
+The Index Name can be used at a later stage, for instance, to drop the index.
+
+Example:
+
+```
+CREATE INDEX
+	WebUserEMail
+ON
+	WebUsers
+(
+	EMail,
+	UserName
+)
+```
+
+#### DROP
+
+You can also drop indices from the object database using SQL `DROP` statements.
+
+Syntax:
+
+```
+DROP INDEX
+	Name
+ON
+	Source
+
+The Index Name is defined when creating indices using the `CREATE INDEX` command.
+
+Example:
+
+```
+DROP INDEX
+	WebUserEMail
+ON
+	WebUsers
+```
+
 ### XML
 
 The `Waher.Script.Xml` library extends the script engine to understand XML embedded in the script.

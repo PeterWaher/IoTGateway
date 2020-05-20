@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Settings;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
@@ -50,7 +51,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		internal static async Task<IResultSetEnumerator> Find(string Collection, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node, string Name)
 		{
-			object[] FindParameters = new object[] { Collection, Offset, Top, 
+			object[] FindParameters = new object[] { Collection, Offset, Top,
 				TypeSource.Convert(Where, Variables, Name), TypeSource.Convert(Order) };
 			object Obj = FindMethod.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
@@ -194,6 +195,43 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Creates an index in the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+		public async Task CreateIndex(string Name, string[] Fields)
+		{
+			await Database.AddIndex(this.collectionName, Fields);
+
+			StringBuilder sb = new StringBuilder();
+			foreach (string Field in Fields)
+				sb.AppendLine(Field);
+
+			await RuntimeSettings.SetAsync("SQL.INDEX." + this.collectionName + "." + Name, sb.ToString());
+		}
+
+		/// <summary>
+		/// Drops an index from the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <returns>If an index was found and dropped.</returns>
+		public async Task<bool> DropIndex(string Name)
+		{
+			string Key = "SQL.INDEX." + this.collectionName + "." + Name;
+			string s = await RuntimeSettings.GetAsync(Key, string.Empty);
+			string[] Fields = s.Split(crlf, StringSplitOptions.RemoveEmptyEntries);
+			if (Fields.Length == 0)
+				return false;
+
+			await Database.RemoveIndex(this.collectionName, Fields);
+			await RuntimeSettings.SetAsync(Key, string.Empty);
+
+			return true;
+		}
+
+		private static readonly char[] crlf = new char[] { '\r', '\n' };
 
 	}
 }

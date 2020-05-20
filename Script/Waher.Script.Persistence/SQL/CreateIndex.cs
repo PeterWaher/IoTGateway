@@ -12,33 +12,38 @@ using Waher.Script.Operators;
 namespace Waher.Script.Persistence.SQL
 {
 	/// <summary>
-	/// Executes an INSERT ... VALUES ... statement against the object database.
+	/// Executes an CREATE INDEX ... ON ... (...) statement against the object database.
 	/// </summary>
-	public class InsertValues : ScriptNode
+	public class CreateIndex : ScriptNode
 	{
+		private ScriptNode name;
 		private SourceDefinition source;
-		private ElementList columns;
-		private ElementList values;
-		private readonly int nrFields;
+		private readonly ScriptNode[] columns;
+		private readonly bool[] ascending;
+		private readonly int nrColumns;
 
 		/// <summary>
-		/// Executes an INSERT ... VALUES ... statement against the object database.
+		/// Executes an CREATE INDEX ... ON ... (...) statement against the object database.
 		/// </summary>
-		/// <param name="Source">Source to update objects from.</param>
+		/// <param name="Name">Name of index.</param>
+		/// <param name="Source">Source to create index in.</param>
 		/// <param name="Columns">Columns</param>
-		/// <param name="Values">Values</param>
+		/// <param name="Ascending">If columns are escending (true) or descending (false).</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public InsertValues(SourceDefinition Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
+		public CreateIndex(ScriptNode Name, SourceDefinition Source, ScriptNode[] Columns, bool[] Ascending,
+			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
-			if ((this.nrFields = Columns.Elements.Length) != Values.Elements.Length)
-				throw new ArgumentException("Column and Value lists must have the same lengths.", nameof(Values));
+			this.nrColumns = Columns.Length;
+			if (Ascending.Length != this.nrColumns)
+				throw new ArgumentException("Number of columns does not match number of ascending argument values.", nameof(Ascending));
 
+			this.name = Name;
 			this.source = Source;
 			this.columns = Columns;
-			this.values = Values;
+			this.ascending = Ascending;
 		}
 
 		/// <summary>
@@ -60,46 +65,19 @@ namespace Waher.Script.Persistence.SQL
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = this.source.GetSource(Variables);
-			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
-			ScriptNode Node;
-			IElement E;
-			string Column;
+			string Name = InsertValues.GetName(this.name, Variables);
+			string[] Fields = new string[this.nrColumns];
 			int i;
 
-			for (i = 0; i < this.nrFields; i++)
+			for (i = 0; i < this.nrColumns; i++)
 			{
-				Column = GetName(this.columns.Elements[i], Variables);
-
-				Node = this.values.Elements[i];
-				E = Node.Evaluate(Variables);
-
-				Obj[Column] = E.AssociatedObjectValue;
+				string s = InsertValues.GetName(this.columns[i], Variables);
+				Fields[i] = this.ascending[i] ? s : "-" + s;
 			}
 
-			await Source.Insert(Obj);
+			await Source.CreateIndex(Name, Fields);
 
-			return new ObjectValue(Obj);
-		}
-
-		/// <summary>
-		/// Gets a name from a script node, either by using the name of a variable reference, or evaluating the node to a string.
-		/// </summary>
-		/// <param name="Node">Node</param>
-		/// <param name="Variables">Variables</param>
-		/// <returns>Name</returns>
-		/// <exception cref="ScriptRuntimeException">If node is not a variable reference, or does not evaluate to a string value.</exception>
-		public static string GetName(ScriptNode Node, Variables Variables)
-		{
-			if (Node is VariableReference Ref)
-				return Ref.VariableName;
-			else
-			{
-				IElement E = Node.Evaluate(Variables);
-				if (E.AssociatedObjectValue is string s)
-					return s;
-				else
-					throw new ScriptRuntimeException("Exepected variable reference or string value.", Node);
-			}
+			return new StringValue(Name);
 		}
 
 		/// <summary>
@@ -113,15 +91,18 @@ namespace Waher.Script.Persistence.SQL
 		{
 			if (DepthFirst)
 			{
+				if (!(this.name?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
 				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
-
-				if (!(this.columns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
-					return false;
-
-				if (!(this.values?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				
+				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst))
 					return false;
 			}
+
+			if (!(this.name is null) && !Callback(ref this.name, State))
+				return false;
 
 			ScriptNode Node = this.source;
 			if (!(Node is null) && !Callback(ref Node, State))
@@ -132,33 +113,23 @@ namespace Waher.Script.Persistence.SQL
 			else
 				return false;
 
-			Node = this.columns;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			int i;
 
-			if (Node is ElementList List1)
-				this.columns = List1;
-			else
-				return false;
-
-			Node = this.values;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
-
-			if (Node is ElementList List2)
-				this.values = List2;
-			else
-				return false;
+			for (i = 0; i < this.nrColumns; i++)
+			{
+				if (!(this.columns[i] is null) && !Callback(ref this.columns[i], State))
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
+				if (!(this.name?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
 				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!(this.columns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
-					return false;
-
-				if (!(this.values?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst))
 					return false;
 			}
 
@@ -170,10 +141,11 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return (obj is InsertValues O &&
+			return (obj is CreateIndex O &&
+				AreEqual(this.name, O.name) &&
 				AreEqual(this.source, O.source) &&
 				AreEqual(this.columns, O.columns) &&
-				AreEqual(this.values, O.values) &&
+				AreEqual(this.ascending, O.ascending) &&
 				base.Equals(obj));
 		}
 
@@ -183,9 +155,10 @@ namespace Waher.Script.Persistence.SQL
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.name);
 			Result ^= Result << 5 ^ GetHashCode(this.source);
 			Result ^= Result << 5 ^ GetHashCode(this.columns);
-			Result ^= Result << 5 ^ GetHashCode(this.values);
+			Result ^= Result << 5 ^ GetHashCode(this.ascending);
 			return Result;
 		}
 

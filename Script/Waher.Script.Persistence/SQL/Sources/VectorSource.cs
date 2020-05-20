@@ -129,13 +129,18 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Task.CompletedTask;	// Do nothing.
 		}
 
+		private Exception InvalidOperation()
+		{
+			return new ScriptRuntimeException("Operation not permitted on joined sources.", this.node);
+		}
+
 		/// <summary>
 		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to delete</param>
 		public Task Delete(IEnumerable<object> Objects)
 		{
-			throw new ScriptRuntimeException("Unable to delete object", this.node);
+			throw this.InvalidOperation();
 		}
 
 		/// <summary>
@@ -144,7 +149,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Object">Object to insert.</param>
 		public Task Insert(object Object)
 		{
-			throw new ScriptRuntimeException("Unable to insert object", this.node);
+			throw this.InvalidOperation();
 		}
 
 		/// <summary>
@@ -211,6 +216,26 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				return Task.FromResult<bool>(Result);
 			}
+		}
+
+		/// <summary>
+		/// Creates an index in the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+		public Task CreateIndex(string Name, string[] Fields)
+		{
+			throw this.InvalidOperation();
+		}
+
+		/// <summary>
+		/// Drops an index from the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <returns>If an index was found and dropped.</returns>
+		public Task<bool> DropIndex(string Name)
+		{
+			throw InvalidOperation();
 		}
 
 	}

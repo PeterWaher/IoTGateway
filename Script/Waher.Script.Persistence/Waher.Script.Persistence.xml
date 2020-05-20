@@ -212,6 +212,57 @@
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.CreateIndex">
+            <summary>
+            Executes an CREATE INDEX ... ON ... (...) statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Model.ScriptNode[],System.Boolean[],System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes an CREATE INDEX ... ON ... (...) statement against the object database.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Source">Source to create index in.</param>
+            <param name="Columns">Columns</param>
+            <param name="Ascending">If columns are escending (true) or descending (false).</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.CustomOrderEnumerator">
             <summary>
             Enumerator that reorders a sequence of items.
@@ -317,6 +368,55 @@
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.DropIndex">
+            <summary>
+            Executes an DROP INDEX ... ON ... statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Persistence.SQL.SourceDefinition,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes an DROP INDEX ... ON ... statement against the object database.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Source">Source to create index in.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.GroupEnumerator">
             <summary>
             Enumerator that groups items into groups, and returns aggregated elements.
@@ -418,6 +518,19 @@
             <param name="Label">Label</param>
             <returns>If the label is a label in the source.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.InsertSelect">
             <summary>
             Executes an INSERT SELECT statement against the object database.
@@ -497,6 +610,15 @@
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertValues.GetName(Waher.Script.Model.ScriptNode,Waher.Script.Variables)">
+            <summary>
+            Gets a name from a script node, either by using the name of a variable reference, or evaluating the node to a string.
+            </summary>
+            <param name="Node">Node</param>
+            <param name="Variables">Variables</param>
+            <returns>Name</returns>
+            <exception cref="T:Waher.Script.Exceptions.ScriptRuntimeException">If node is not a variable reference, or does not evaluate to a string value.</exception>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertValues.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
@@ -639,6 +761,39 @@
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.CreateParser">
+            <summary>
+            Parses a CREATE statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.CreateParser.#ctor">
+            <summary>
+            Parses a CREATE statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.CreateParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.CreateParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.CreateParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.CreateParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Parsers.DeleteParser">
             <summary>
             Parses a DELETE statement
@@ -665,6 +820,39 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Parsers.DeleteParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
+            <summary>
+            Tries to parse a script node.
+            </summary>
+            <param name="Parser">Custom parser.</param>
+            <param name="Result">Parsed Script Node.</param>
+            <returns>If successful in parsing a script node.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Parsers.DropParser">
+            <summary>
+            Parses a DROP statement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.DropParser.#ctor">
+            <summary>
+            Parses a DROP statement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DropParser.KeyWord">
+            <summary>
+            Keyword associated with custom parser.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DropParser.Aliases">
+            <summary>
+            Keyword aliases, if available, null if none.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Parsers.DropParser.InternalKeywords">
+            <summary>
+            Any keywords used internally by the custom parser.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Parsers.DropParser.TryParse(Waher.Script.Model.ScriptParser,Waher.Script.Model.ScriptNode@)">
             <summary>
             Tries to parse a script node.
             </summary>
@@ -1258,6 +1446,20 @@
             <param name="Label">Label</param>
             <returns>If the label is a label in the source.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <returns>If an index was found and dropped.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource">
             <summary>
             Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
@@ -1474,6 +1676,20 @@
             <param name="Order">Sort order</param>
             <returns>Reduced sort order.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <returns>If an index was found and dropped.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource">
             <summary>
             Data source formed through an LEFT [OUTER] JOIN of two sources.
@@ -1611,6 +1827,20 @@
             <param name="Label">Label</param>
             <returns>If the label is a label in the source.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <returns>If an index was found and dropped.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.VectorSource">
             <summary>
             Data Source defined by a vector.
@@ -1688,6 +1918,20 @@
             </summary>
             <param name="Label">Label</param>
             <returns>If the label is a label in the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <returns>If an index was found and dropped.</returns>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Update">
             <summary>

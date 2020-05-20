@@ -391,6 +391,15 @@
             If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
             <returns>Index file.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetIndexFileName(Waher.Persistence.Files.ObjectBTreeFile,System.String[])">
+            <summary>
+            Gets an index file name.
+            </summary>
+            <param name="File">Object file.</param>
+            <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+            If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+            <returns>Index file name.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.CloseFile(System.String)">
             <summary>
             Closes files related to a collection.
@@ -724,6 +733,14 @@
         <member name="M:Waher.Persistence.Files.FilesProvider.AddIndex(System.String,System.String[])">
             <summary>
             Adds an index to a collection, if one does not already exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.RemoveIndex(System.String,System.String[])">
+            <summary>
+            Removes an index from a collection, if one exist.
             </summary>
             <param name="CollectionName">Name of collection.</param>
             <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
@@ -1866,6 +1883,13 @@
             </summary>
             <param name="Index">Index file to add.</param>
             <param name="Regenerate">If the index is to be regenerated.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.RemoveIndex(Waher.Persistence.Files.IndexBTreeFile)">
+            <summary>
+            Removes an index from the file.
+            </summary>
+            <param name="Index">Index file to add.</param>
+            <returns>If the index was found and removed.</returns>
         </member>
         <member name="P:Waher.Persistence.Files.ObjectBTreeFile.Indices">
             <summary>

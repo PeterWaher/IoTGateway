@@ -78,5 +78,18 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Label">Label</param>
 		/// <returns>If the label is a label in the source.</returns>
 		Task<bool> IsLabel(string Label);
+
+		/// <summary>
+		/// Creates an index in the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		/// <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+		Task CreateIndex(string Name, string[] Fields);
+
+		/// <summary>
+		/// Drops an index from the source.
+		/// </summary>
+		/// <param name="Name">Name of index.</param>
+		Task<bool> DropIndex(string Name);
 	}
 }

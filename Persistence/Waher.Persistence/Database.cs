@@ -666,6 +666,17 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public static Task RemoveIndex(string CollectionName, string[] FieldNames)
+		{
+			return Provider.RemoveIndex(CollectionName, FieldNames);
+		}
+
+		/// <summary>
 		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
 		/// </summary>
 		public static Task StartBulk()

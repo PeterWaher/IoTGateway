@@ -2834,6 +2834,14 @@
             <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
         </member>
+        <member name="M:Waher.Persistence.Database.RemoveIndex(System.String,System.String[])">
+            <summary>
+            Removes an index from a collection, if one exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
         <member name="M:Waher.Persistence.Database.StartBulk">
             <summary>
             Starts bulk-proccessing of data. Must be followed by a call to <see cref="M:Waher.Persistence.Database.EndBulk"/>.
@@ -3556,6 +3564,14 @@
         <member name="M:Waher.Persistence.IDatabaseProvider.AddIndex(System.String,System.String[])">
             <summary>
             Adds an index to a collection, if one does not already exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.RemoveIndex(System.String,System.String[])">
+            <summary>
+            Removes an index from a collection, if one exist.
             </summary>
             <param name="CollectionName">Name of collection.</param>
             <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.

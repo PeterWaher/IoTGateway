@@ -192,6 +192,14 @@ namespace Waher.Persistence
 		Task AddIndex(string CollectionName, string[] FieldNames);
 
 		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		Task RemoveIndex(string CollectionName, string[] FieldNames);
+
+		/// <summary>
 		/// Starts bulk-proccessing of data. Must be followed by a call to <see cref="EndBulk"/>.
 		/// </summary>
 		Task StartBulk();

@@ -2742,7 +2742,7 @@ namespace Waher.Persistence.Files
 
 			if (!(IndexFile is null))
 			{
-				File.Remove(IndexFile);
+				File.RemoveIndex(IndexFile);
 				IndexFile.Dispose();
 			}
 

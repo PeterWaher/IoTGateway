@@ -255,6 +255,7 @@
   <Assembly fileName='Waher.Networking.MQTT.dll'/>
   <Assembly fileName='Waher.Networking.PeerToPeer.dll'/>
   <Assembly fileName='Waher.Networking.UPnP.dll'/>
+  <Assembly fileName='Waher.Networking.WHOIS.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.Avatar.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.BOSH.dll'/>

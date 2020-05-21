@@ -386,7 +386,7 @@ namespace Waher.Networking.HTTP
 								{
 									sb.Append("Too many failed login attempts in a row registered. Try again in ");
 
-									TimeSpan Span = DateTime.Now - TP;
+									TimeSpan Span = TP - DateTime.Now;
 									double d;
 
 									if ((d = Span.TotalDays) >= 1)

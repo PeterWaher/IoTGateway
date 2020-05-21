@@ -223,6 +223,11 @@
             Reason for blocking the endpoint.
             </summary>
         </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.WhoIs">
+            <summary>
+            WHOIS information about the remote endpoint.
+            </summary>
+        </member>
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.LastFailed">
             <summary>
             Checks if last login attempt was a failed login attempt.

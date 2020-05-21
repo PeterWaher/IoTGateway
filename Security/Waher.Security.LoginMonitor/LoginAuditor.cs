@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 
@@ -288,8 +290,33 @@ namespace Waher.Security.LoginMonitor
 				EP.Reason = Reason;
 
 				KeyValuePair<string, object>[] Tags = await LoginAuditor.Annotate(EP.Endpoint, new KeyValuePair<string, object>("Reason", Reason));
+				StringBuilder sb = new StringBuilder();
 
-				Log.Alert("Remote endpoint blocked.", EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
+				sb.Append("Remote endpoint blocked.");
+
+				if (IPAddress.TryParse(EP.Endpoint, out IPAddress Address))
+				{
+					try
+					{
+						string s = await WhoIsClient.Query(Address);
+
+						sb.AppendLine();
+						sb.AppendLine();
+						sb.AppendLine("WHOIS Information:");
+						sb.AppendLine();
+						sb.AppendLine("```");
+						sb.AppendLine(s);
+						sb.AppendLine("```");
+
+						EP.WhoIs = s;
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				Log.Alert(sb.ToString(), EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
 
 				await Database.Update(EP);
 			}

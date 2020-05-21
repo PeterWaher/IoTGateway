@@ -18,6 +18,7 @@ namespace Waher.Security.LoginMonitor
 		private string endpoint = null;
 		private string lastProtocol = string.Empty;
 		private string reason = string.Empty;
+		private string whois = string.Empty;
 		private bool blocked = false;
 		private int[] state = null;
 		private DateTime[] timestamps = null;
@@ -106,6 +107,16 @@ namespace Waher.Security.LoginMonitor
 		{
 			get => this.reason;
 			set => this.reason = value;
+		}
+
+		/// <summary>
+		/// WHOIS information about the remote endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string WhoIs
+		{
+			get => this.whois;
+			set => this.whois = value;
 		}
 
 		/// <summary>

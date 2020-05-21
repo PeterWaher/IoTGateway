@@ -359,7 +359,7 @@ namespace Waher.Networking
 		/// Disposes of the object. The underlying <see cref="TcpClient"/> is either disposed directly, or when asynchronous
 		/// operations have ceased.
 		/// </summary>
-		public void Dispose()
+		public virtual void Dispose()
 		{
 #if WINDOWS_UWP
 			bool Cancel;

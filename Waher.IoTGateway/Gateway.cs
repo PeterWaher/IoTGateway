@@ -1969,6 +1969,8 @@ namespace Waher.IoTGateway
 						PasswordHash = Client.PasswordHash;
 						PasswordHashMethod = Client.PasswordHashMethod;
 					}
+			
+					LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
 				}
 				else
 				{
@@ -1996,8 +1998,6 @@ namespace Waher.IoTGateway
 					}
 				}
 			}
-
-			LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
 
 			if (xmppClient.State != XmppState.Connected &&
 				(xmppClient.PasswordHash != PasswordHash || xmppClient.PasswordHashMethod != PasswordHashMethod))

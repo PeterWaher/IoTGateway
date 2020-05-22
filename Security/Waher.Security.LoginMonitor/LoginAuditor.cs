@@ -293,33 +293,45 @@ namespace Waher.Security.LoginMonitor
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("Remote endpoint blocked.");
-
-				if (IPAddress.TryParse(EP.Endpoint, out IPAddress Address))
-				{
-					try
-					{
-						string s = await WhoIsClient.Query(Address);
-
-						sb.AppendLine();
-						sb.AppendLine();
-						sb.AppendLine("WHOIS Information:");
-						sb.AppendLine();
-						sb.AppendLine("```");
-						sb.AppendLine(s);
-						sb.AppendLine("```");
-
-						EP.WhoIs = s;
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+				EP.WhoIs = await AppendWhoIsInfo(sb, EP.Endpoint);
 
 				Log.Alert(sb.ToString(), EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
 
 				await Database.Update(EP);
 			}
+		}
+
+		/// <summary>
+		/// Appends WHOIS information to a Markdown document.
+		/// </summary>
+		/// <param name="Markdown">Markdown being built.</param>
+		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <returns>WHOIS information found, or <see cref="string.Empty"/> if no information found.</returns>
+		public static async Task<string> AppendWhoIsInfo(StringBuilder Markdown, string RemoteEndpoint)
+		{
+			if (IPAddress.TryParse(RemoteEndpoint, out IPAddress Address))
+			{
+				try
+				{
+					string s = await WhoIsClient.Query(Address);
+
+					Markdown.AppendLine();
+					Markdown.AppendLine();
+					Markdown.AppendLine("WHOIS Information:");
+					Markdown.AppendLine();
+					Markdown.AppendLine("```");
+					Markdown.AppendLine(s);
+					Markdown.AppendLine("```");
+
+					return s;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return string.Empty;
 		}
 
 		/// <summary>

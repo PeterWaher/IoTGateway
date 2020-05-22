@@ -1819,9 +1819,11 @@ ON
 
 #### DROP
 
-You can also drop indices from the object database using SQL `DROP` statements.
+You can also drop indices and collections from the object database using SQL `DROP` statements.
 
-Syntax:
+##### DROP INDEX
+
+To drop an index from the object database, use the `DROP INDEX` statement. Syntax:
 
 ```
 DROP INDEX
@@ -1837,6 +1839,21 @@ Example:
 DROP INDEX
 	WebUserEMail
 ON
+	WebUsers
+```
+
+##### DROP TABLE/COLLECTION
+
+To drop a collection from the object database, use the `DROP COLLECTION` (or `DROP TABLE`) statement. Syntax:
+
+```
+DROP COLLECTION|TABLE
+	Source
+
+Example:
+
+```
+DROP COLLECTION
 	WebUsers
 ```
 

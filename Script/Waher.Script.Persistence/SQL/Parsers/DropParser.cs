@@ -48,21 +48,34 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			try
 			{
 				string s = Parser.NextToken().ToUpper();
-				if (s != "INDEX")
-					return false;
+				switch (s)
+				{
+					case "INDEX":
+						ScriptNode Name = Parser.ParseNoWhiteSpace();
 
-				ScriptNode Name = Parser.ParseNoWhiteSpace();
+						s = Parser.NextToken().ToUpper();
+						if (s != "ON")
+							return false;
 
-				s = Parser.NextToken().ToUpper();
-				if (s != "ON")
-					return false;
+						if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
+							return false;
 
-				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
-					return false;
+						Result = new DropIndex(Name, Source, Parser.Start, Parser.Length, Parser.Expression);
 
-				Result = new DropIndex(Name, Source, Parser.Start, Parser.Length, Parser.Expression);
+						return true;
 
-				return true;
+					case "TABLE":
+					case "COLLECTION":
+						if (!SelectParser.TryParseSources(Parser, out Source))
+							return false;
+
+						Result = new DropCollection(Source, Parser.Start, Parser.Length, Parser.Expression);
+
+						return true;
+
+					default:
+						return false;
+				}
 			}
 			catch (Exception)
 			{

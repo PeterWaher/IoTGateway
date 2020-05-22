@@ -1620,6 +1620,26 @@ namespace Waher.Persistence.MongoDB
 				return false;
 		}
 
+		/// <summary>
+		/// Drops a collection, if it exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		public Task DropCollection(string CollectionName)
+		{
+			lock (this.collections)
+			{
+				this.collections.Remove(CollectionName);
+
+				if (CollectionName == this.lastCollectionName)
+				{
+					this.lastCollection = null;
+					this.lastCollectionName = string.Empty;
+				}
+			}
+
+			return this.database.DropCollectionAsync(CollectionName);
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

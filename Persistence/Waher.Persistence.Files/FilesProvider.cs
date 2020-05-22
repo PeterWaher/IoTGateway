@@ -1395,6 +1395,53 @@ namespace Waher.Persistence.Files
 			return Task.FromResult<string>(Serializer.CollectionName(Object));
 		}
 
+		/// <summary>
+		/// Drops a collection, if it exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		public async Task DropCollection(string CollectionName)
+		{
+			ObjectBTreeFile File = await GetFile(CollectionName, false);
+			if (File is null)
+				return;
+
+			foreach (IndexBTreeFile Index in File.Indices)
+				await this.RemoveIndex(File, Index);
+
+			LabelFile Labels;
+			string s, s2;
+
+			lock (this.files)
+			{
+				this.files.Remove(CollectionName);
+
+				if (this.labelFiles.TryGetValue(CollectionName, out Labels))
+					this.labelFiles.Remove(CollectionName);
+				else
+					Labels = null;
+			}
+
+			s = File.FileName;
+			s2 = File.BlobFileName;
+
+			File.Dispose();
+
+			if (System.IO.File.Exists(s))
+				System.IO.File.Delete(s);
+
+			if (System.IO.File.Exists(s2))
+				System.IO.File.Delete(s2);
+
+			if (!(Labels is null))
+			{
+				s = Labels.FileName;
+				Labels.Dispose();
+
+				if (System.IO.File.Exists(s))
+					System.IO.File.Delete(s);
+			}
+		}
+
 		#endregion
 
 		#region Objects
@@ -2093,18 +2140,23 @@ namespace Waher.Persistence.Files
 					await Output.StartCollection(File.CollectionName);
 					try
 					{
-						foreach (IndexBTreeFile Index in File.Indices)
+						IndexBTreeFile[] Indices = File.Indices;
+
+						if (!(Indices is null))
 						{
-							await Output.StartIndex();
+							foreach (IndexBTreeFile Index in Indices)
+							{
+								await Output.StartIndex();
 
-							string[] FieldNames = Index.FieldNames;
-							bool[] Ascending = Index.Ascending;
-							int i, c = Math.Min(FieldNames.Length, Ascending.Length);
+								string[] FieldNames = Index.FieldNames;
+								bool[] Ascending = Index.Ascending;
+								int i, c = Math.Min(FieldNames.Length, Ascending.Length);
 
-							for (i = 0; i < c; i++)
-								await Output.ReportIndexField(FieldNames[i], Ascending[i]);
+								for (i = 0; i < c; i++)
+									await Output.ReportIndexField(FieldNames[i], Ascending[i]);
 
-							await Output.EndIndex();
+								await Output.EndIndex();
+							}
 						}
 
 						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(true))
@@ -2715,7 +2767,6 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
 			IndexBTreeFile[] Indices = File.Indices;
-			IndexBTreeFile IndexFile = null;
 			string[] Fields;
 			int i, c;
 
@@ -2733,11 +2784,14 @@ namespace Waher.Persistence.Files
 				if (i < c)
 					continue;
 
-				IndexFile = I;
+				await this.RemoveIndex(File, I);
 				break;
 			}
+		}
 
-			string s = this.GetIndexFileName(File, FieldNames);
+		private async Task RemoveIndex(ObjectBTreeFile File, IndexBTreeFile IndexFile)
+		{
+			string s = IndexFile.IndexFile.FileName;
 			bool Exists = System.IO.File.Exists(s);
 
 			if (!(IndexFile is null))
@@ -2750,12 +2804,18 @@ namespace Waher.Persistence.Files
 				System.IO.File.Delete(s);
 
 			StringBuilder sb = new StringBuilder();
+			int i, c = IndexFile.FieldNames.Length;
 
 			sb.AppendLine("Index");
 			sb.AppendLine(File.CollectionName);
 
-			foreach (string FieldName in FieldNames)
-				sb.AppendLine(FieldName);
+			for (i = 0; i < c; i++)
+			{
+				if (!IndexFile.Ascending[i])
+					sb.Append('-');
+
+				sb.AppendLine(IndexFile.FieldNames[i]);
+			}
 
 			if (s.StartsWith(this.folder))
 				s = s.Substring(this.folder.Length);

@@ -282,5 +282,11 @@ namespace Waher.Persistence
 		/// <returns>If an Object ID was found.</returns>
 		bool TryGetObjectId(object Object, out object ObjectId);
 
+		/// <summary>
+		/// Drops a collection, if it exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		Task DropCollection(string CollectionName);
+
 	}
 }

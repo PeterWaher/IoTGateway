@@ -460,7 +460,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 		private static Exception InvalidOperation()
 		{
-			throw new InvalidOperationException("Indices for types are defined in the class definition, not by script.");
+			throw new InvalidOperationException("Indices and collections for types are defined in the class definition, not by script.");
+		}
+
+		/// <summary>
+		/// Drops the collection from the source.
+		/// </summary>
+		public Task DropCollection()
+		{
+			throw InvalidOperation();
 		}
 
 	}

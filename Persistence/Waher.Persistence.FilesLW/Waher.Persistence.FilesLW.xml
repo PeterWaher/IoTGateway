@@ -440,6 +440,12 @@
             <param name="Object">Object</param>
             <returns>Collection name.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.DropCollection(System.String)">
+            <summary>
+            Drops a collection, if it exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.

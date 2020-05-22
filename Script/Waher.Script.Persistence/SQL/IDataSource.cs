@@ -91,5 +91,10 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Name">Name of index.</param>
 		Task<bool> DropIndex(string Name);
+
+		/// <summary>
+		/// Drops the collection from the source.
+		/// </summary>
+		Task DropCollection();
 	}
 }

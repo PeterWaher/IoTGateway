@@ -233,5 +233,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 		private static readonly char[] crlf = new char[] { '\r', '\n' };
 
+		/// <summary>
+		/// Drops the collection from the source.
+		/// </summary>
+		public Task DropCollection()
+		{
+			return Database.DropCollection(this.collectionName);
+		}
+
 	}
 }

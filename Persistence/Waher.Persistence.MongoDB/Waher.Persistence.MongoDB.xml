@@ -454,6 +454,12 @@
             <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
             <returns>If an Object ID was found.</returns>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DropCollection(System.String)">
+            <summary>
+            Drops a collection, if it exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+        </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase">
             <summary>
             Abstract base class for generated object serializers.

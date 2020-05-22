@@ -238,5 +238,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 			throw InvalidOperation();
 		}
 
+		/// <summary>
+		/// Drops the collection from the source.
+		/// </summary>
+		public Task DropCollection()
+		{
+			throw InvalidOperation();
+		}
+
 	}
 }

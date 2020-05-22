@@ -327,7 +327,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Name">Name of index.</param>
 		/// <returns>If an index was found and dropped.</returns>
-		public async Task<bool> DropIndex(string Name)
+		public Task<bool> DropIndex(string Name)
+		{
+			throw InvalidOperation();
+		}
+
+		/// <summary>
+		/// Drops the collection from the source.
+		/// </summary>
+		public Task DropCollection()
 		{
 			throw InvalidOperation();
 		}

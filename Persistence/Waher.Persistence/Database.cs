@@ -801,5 +801,14 @@ namespace Waher.Persistence
 			return Provider.TryGetObjectId(Object, out ObjectId);
 		}
 
+		/// <summary>
+		/// Drops a collection, if it exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		public static Task DropCollection(string CollectionName)
+		{
+			return Provider.DropCollection(CollectionName);
+		}
+
 	}
 }

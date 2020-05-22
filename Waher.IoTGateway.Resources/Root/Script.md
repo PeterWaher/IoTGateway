@@ -1357,23 +1357,23 @@ The following functions are available in the `Waher.Script.Cryptography` library
 |---------------------------------|-------------|---------|
 | `Md5(Data)`                     | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
 | `Sha1(Data)`                    | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
-| `Sha2_256(Data)`                | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_256Example] |
-| `Sha2_384(Data)`                | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_384Example] |
-| `Sha2_512(Data)`                | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2_512Example] |
-| `Sha3_224(Data)`                | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_224Example] |
-| `Sha3_256(Data)`                | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_256Example] |
-| `Sha3_384(Data)`                | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_384Example] |
-| `Sha3_512(Data)`                | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3_512Example] |
+| `Sha2_256(Data)`                | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2256Example] |
+| `Sha2_384(Data)`                | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2384Example] |
+| `Sha2_512(Data)`                | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2512Example] |
+| `Sha3_224(Data)`                | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3224Example] |
+| `Sha3_256(Data)`                | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
+| `Sha3_384(Data)`                | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
+| `Sha3_512(Data)`                | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
 
 [Md5Example]: Prompt.md?Expression=Md5(Utf8Encode(%22Hello%22))
 [Sha1Example]: Prompt.md?Expression=Sha1(Utf8Encode(%22Hello%22))
-[Sha2_256Example]: Prompt.md?Expression=Sha2_256(Utf8Encode(%22Hello%22))
-[Sha2_384Example]: Prompt.md?Expression=Sha2_384(Utf8Encode(%22Hello%22))
-[Sha2_512Example]: Prompt.md?Expression=Sha2_512(Utf8Encode(%22Hello%22))
-[Sha3_224Example]: Prompt.md?Expression=Sha3_224(Utf8Encode(%22Hello%22))
-[Sha3_256Example]: Prompt.md?Expression=Sha3_256(Utf8Encode(%22Hello%22))
-[Sha3_384Example]: Prompt.md?Expression=Sha3_384(Utf8Encode(%22Hello%22))
-[Sha3_512Example]: Prompt.md?Expression=Sha3_512(Utf8Encode(%22Hello%22))
+[Sha2256Example]: Prompt.md?Expression=Sha2_256(Utf8Encode(%22Hello%22))
+[Sha2384Example]: Prompt.md?Expression=Sha2_384(Utf8Encode(%22Hello%22))
+[Sha2512Example]: Prompt.md?Expression=Sha2_512(Utf8Encode(%22Hello%22))
+[Sha3224Example]: Prompt.md?Expression=Sha3_224(Utf8Encode(%22Hello%22))
+[Sha3256Example]: Prompt.md?Expression=Sha3_256(Utf8Encode(%22Hello%22))
+[Sha3384Example]: Prompt.md?Expression=Sha3_384(Utf8Encode(%22Hello%22))
+[Sha3512Example]: Prompt.md?Expression=Sha3_512(Utf8Encode(%22Hello%22))
 
 #### XML-related functions (Waher.Script.Xml)
 

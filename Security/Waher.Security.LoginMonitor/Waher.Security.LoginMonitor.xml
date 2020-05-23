@@ -111,6 +111,14 @@
             is allowed to login again.
             </returns>
         </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.AppendWhoIsInfo(System.Text.StringBuilder,System.String)">
+            <summary>
+            Appends WHOIS information to a Markdown document.
+            </summary>
+            <param name="Markdown">Markdown being built.</param>
+            <param name="RemoteEndpoint">Remote Endpoint.</param>
+            <returns>WHOIS information found, or <see cref="F:System.String.Empty"/> if no information found.</returns>
+        </member>
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.Annotate(System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Annotates a remote endpoint.

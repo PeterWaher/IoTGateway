@@ -448,74 +448,13 @@ namespace Waher.Persistence.Files.Searching
 
 				case ObjectSerializer.TYPE_GUID:
 					Guid Guid = (Guid)Value;
-					byte[] A = Guid.ToByteArray();
-
-					A[15]++;
-					if (A[15] == 0)
+					if (Increment(ref Guid))
 					{
-						A[14]++;
-						if (A[14] == 0)
-						{
-							A[13]++;
-							if (A[13] == 0)
-							{
-								A[12]++;
-								if (A[12] == 0)
-								{
-									A[11]++;
-									if (A[11] == 0)
-									{
-										A[10]++;
-										if (A[10] == 0)
-										{
-											A[9]++;
-											if (A[9] == 0)
-											{
-												A[8]++;
-												if (A[8] == 0)
-												{
-													A[6]++;
-													if (A[6] == 0)
-													{
-														A[7]++;
-														if (A[7] == 0)
-														{
-															A[4]++;
-															if (A[4] == 0)
-															{
-																A[5]++;
-																if (A[5] == 0)
-																{
-																	A[0]++;
-																	if (A[0] == 0)
-																	{
-																		A[1]++;
-																		if (A[1] == 0)
-																		{
-																			A[2]++;
-																			if (A[2] == 0)
-																			{
-																				A[3]++;
-																				if (A[3] == 0)
-																					return false;
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
+						Value = Guid;
+						return true;
 					}
-
-					Value = new Guid(A);
-					return true;
+					else
+						return false;
 
 				case ObjectSerializer.TYPE_BYTEARRAY:
 					byte[] Bin = (byte[])((byte[])Value).Clone();
@@ -660,6 +599,83 @@ namespace Waher.Persistence.Files.Searching
 			string s = Value.Value;
 			Increment(ref s);
 			Value = new CaseInsensitiveString(s);
+			return true;
+		}
+
+		/// <summary>
+		/// Increments <paramref name="Value"/> to the smallest value greater than <paramref name="Value"/>.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>If operation was successful.</returns>
+		public static bool Increment(ref Guid Value)
+		{
+			byte[] A = Value.ToByteArray();
+
+			A[15]++;
+			if (A[15] == 0)
+			{
+				A[14]++;
+				if (A[14] == 0)
+				{
+					A[13]++;
+					if (A[13] == 0)
+					{
+						A[12]++;
+						if (A[12] == 0)
+						{
+							A[11]++;
+							if (A[11] == 0)
+							{
+								A[10]++;
+								if (A[10] == 0)
+								{
+									A[9]++;
+									if (A[9] == 0)
+									{
+										A[8]++;
+										if (A[8] == 0)
+										{
+											A[6]++;
+											if (A[6] == 0)
+											{
+												A[7]++;
+												if (A[7] == 0)
+												{
+													A[4]++;
+													if (A[4] == 0)
+													{
+														A[5]++;
+														if (A[5] == 0)
+														{
+															A[0]++;
+															if (A[0] == 0)
+															{
+																A[1]++;
+																if (A[1] == 0)
+																{
+																	A[2]++;
+																	if (A[2] == 0)
+																	{
+																		A[3]++;
+																		if (A[3] == 0)
+																			return false;
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			Value = new Guid(A);
 			return true;
 		}
 
@@ -885,74 +901,13 @@ namespace Waher.Persistence.Files.Searching
 
 				case ObjectSerializer.TYPE_GUID:
 					Guid Guid = (Guid)Value;
-					byte[] A = Guid.ToByteArray();
-
-					A[15]--;
-					if (A[15] == 0xff)
+					if (!Decrement(ref Guid))
+						return false;
+					else
 					{
-						A[14]--;
-						if (A[14] == 0xff)
-						{
-							A[13]--;
-							if (A[13] == 0xff)
-							{
-								A[12]--;
-								if (A[12] == 0xff)
-								{
-									A[11]--;
-									if (A[11] == 0xff)
-									{
-										A[10]--;
-										if (A[10] == 0xff)
-										{
-											A[9]--;
-											if (A[9] == 0xff)
-											{
-												A[8]--;
-												if (A[8] == 0xff)
-												{
-													A[6]--;
-													if (A[6] == 0xff)
-													{
-														A[7]--;
-														if (A[7] == 0xff)
-														{
-															A[4]--;
-															if (A[4] == 0xff)
-															{
-																A[5]--;
-																if (A[5] == 0xff)
-																{
-																	A[0]--;
-																	if (A[0] == 0xff)
-																	{
-																		A[1]--;
-																		if (A[1] == 0xff)
-																		{
-																			A[2]--;
-																			if (A[2] == 0xff)
-																			{
-																				A[3]--;
-																				if (A[3] == 0xff)
-																					return false;
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
+						Value = Guid;
+						return true;
 					}
-
-					Value = new Guid(A);
-					return true;
 
 				case ObjectSerializer.TYPE_BYTEARRAY:
 					byte[] Bin = (byte[])((byte[])Value).Clone();
@@ -1104,6 +1059,83 @@ namespace Waher.Persistence.Files.Searching
 				return false;
 
 			Value = new CaseInsensitiveString(s);
+			return true;
+		}
+
+		/// <summary>
+		/// Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>If operation was successful.</returns>
+		public static bool Decrement(ref Guid Value)
+		{
+			byte[] A = Value.ToByteArray();
+
+			A[15]--;
+			if (A[15] == 0xff)
+			{
+				A[14]--;
+				if (A[14] == 0xff)
+				{
+					A[13]--;
+					if (A[13] == 0xff)
+					{
+						A[12]--;
+						if (A[12] == 0xff)
+						{
+							A[11]--;
+							if (A[11] == 0xff)
+							{
+								A[10]--;
+								if (A[10] == 0xff)
+								{
+									A[9]--;
+									if (A[9] == 0xff)
+									{
+										A[8]--;
+										if (A[8] == 0xff)
+										{
+											A[6]--;
+											if (A[6] == 0xff)
+											{
+												A[7]--;
+												if (A[7] == 0xff)
+												{
+													A[4]--;
+													if (A[4] == 0xff)
+													{
+														A[5]--;
+														if (A[5] == 0xff)
+														{
+															A[0]--;
+															if (A[0] == 0xff)
+															{
+																A[1]--;
+																if (A[1] == 0xff)
+																{
+																	A[2]--;
+																	if (A[2] == 0xff)
+																	{
+																		A[3]--;
+																		if (A[3] == 0xff)
+																			return false;
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			Value = new Guid(A);
 			return true;
 		}
 

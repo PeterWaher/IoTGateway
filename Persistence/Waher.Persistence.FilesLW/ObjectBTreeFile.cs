@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -9,7 +8,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Filters;
@@ -5056,7 +5054,26 @@ namespace Waher.Persistence.Files
 					{
 						IndexBTreeFile Index = this.FindBestIndex(SortOrder);
 
-						if (!(Index is null))
+						if (Index is null)
+						{
+							if (this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
+								!(Serializer is null) &&
+								Serializer.HasObjectIdField)
+							{
+								if (SortOrder[0] == Serializer.ObjectIdMemberName)
+								{
+									Result = await this.GetTypedEnumeratorAsync<T>(Locked);
+									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
+								}
+								else if (SortOrder[0] == "-" + Serializer.ObjectIdMemberName)
+								{
+									Result = await this.GetTypedEnumeratorAsync<T>(Locked);
+									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
+									Result = new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
+								}
+							}
+						}
+						else
 						{
 							if (Index.SameSortOrder(null, SortOrder))
 								Result = await Index.GetTypedEnumerator<T>(Locked);
@@ -5415,31 +5432,79 @@ namespace Waher.Persistence.Files
 
 				if (Index is null)
 				{
-					if (Filter is FilterFieldEqualTo)
+					if (this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
+						!(Serializer is null) &&
+						Serializer.HasObjectIdField &&
+						Serializer.ObjectIdMemberName == FilterFieldValue.FieldName)
 					{
-						if (this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
-							!(Serializer is null) &&
-							Serializer.HasObjectIdField && Serializer.ObjectIdMemberName == FilterFieldValue.FieldName)
+						Guid ObjectId;
+
+						if (Value is Guid Guid)
+							ObjectId = Guid;
+						else if (Value is string s)
+							ObjectId = new Guid(s);
+						else if (Value is byte[] ba)
+							ObjectId = new Guid(ba);
+						else
+							return new Searching.EmptyCursor<T>();
+
+						if (Filter is FilterFieldEqualTo)
 						{
 							try
 							{
-								Guid ObjectId;
-
-								if (Value is Guid)
-									ObjectId = (Guid)Value;
-								else if (Value is string)
-									ObjectId = new Guid((string)Value);
-								else if (Value is byte[])
-									ObjectId = new Guid((byte[])Value);
-								else
-									return new Searching.EmptyCursor<T>();
 
 								T Obj = await this.LoadObject<T>(ObjectId);
-								return new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId);
+								return new Searching.ObjectIdCursor<T>(
+									new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId), 
+									FilterFieldValue.FieldName);
 							}
 							catch (Exception)
 							{
-								return new Searching.EmptyCursor<T>();
+								Cursor = new Searching.EmptyCursor<T>();
+							}
+						}
+						else if (Filter is FilterFieldGreaterThan)
+						{
+							if (Searching.Comparison.Increment(ref ObjectId))
+							{
+								BlockInfo Info = (await this.FindNodeLocked(ObjectId))
+									?? await this.FindLeafNodeLocked(ObjectId);
+								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+								e.SetStartingPoint(Info);
+
+								return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
+							}
+						}
+						else if (Filter is FilterFieldGreaterOrEqualTo)
+						{
+							BlockInfo Info = (await this.FindNodeLocked(ObjectId))
+								?? await this.FindLeafNodeLocked(ObjectId);
+							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+							e.SetStartingPoint(Info);
+
+							return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
+						}
+						else if (Filter is FilterFieldLesserThan)
+						{
+							BlockInfo Info = (await this.FindNodeLocked(ObjectId))
+								?? await this.FindLeafNodeLocked(ObjectId);
+							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+							e.SetStartingPoint(Info);
+
+							return new Searching.ReversedCursor<T>(
+								new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName), this.timeoutMilliseconds);
+						}
+						else if (Filter is FilterFieldLesserOrEqualTo)
+						{
+							if (Searching.Comparison.Increment(ref ObjectId))
+							{
+								BlockInfo Info = (await this.FindNodeLocked(ObjectId))
+								?? await this.FindLeafNodeLocked(ObjectId);
+								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+								e.SetStartingPoint(Info);
+
+								return new Searching.ReversedCursor<T>(
+									new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName), this.timeoutMilliseconds);
 							}
 						}
 					}
@@ -5454,9 +5519,7 @@ namespace Waher.Persistence.Files
 					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
 						this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
 				}
-
-
-				if (Filter is FilterFieldEqualTo)
+				else if (Filter is FilterFieldEqualTo)
 				{
 					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
 					bool UntilFirstFail;

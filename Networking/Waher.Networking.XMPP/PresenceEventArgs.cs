@@ -359,6 +359,16 @@ namespace Waher.Networking.XMPP
 		public XmlElement Presence { get { return this.presence; } }
 
 		/// <summary>
+		/// XMPP Client. Is null if event raised by a component.
+		/// </summary>
+		public XmppClient Client { get { return this.client; } }
+
+		/// <summary>
+		/// XMPP Component. Is null if event raised by a client.
+		/// </summary>
+		public XmppComponent Component { get { return this.component; } }
+
+		/// <summary>
 		/// If the connection is being tested.
 		/// </summary>
 		internal bool Testing

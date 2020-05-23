@@ -2297,6 +2297,13 @@
             <param name="Value">Value</param>
             <returns>If operation was successful.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.Searching.Comparison.Increment(System.Guid@)">
+            <summary>
+            Increments <paramref name="Value"/> to the smallest value greater than <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>If operation was successful.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(System.Object@)">
             <summary>
             Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
@@ -2333,6 +2340,13 @@
             <returns>If operation was successful.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(Waher.Persistence.CaseInsensitiveString@)">
+            <summary>
+            Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>If operation was successful.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.Comparison.Decrement(System.Guid@)">
             <summary>
             Decrements <paramref name="Value"/> to the largest value smaller than <paramref name="Value"/>.
             </summary>
@@ -2772,6 +2786,83 @@
             <summary>
             Gets an array of constant fields. Can return null, if there are no constant fields.
             </summary>
+        </member>
+        <member name="T:Waher.Persistence.Files.Searching.ObjectIdCursor`1">
+            <summary>
+            Provides a cursor based on Object IDs.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.#ctor(Waher.Persistence.Files.ICursor{`0},System.String)">
+            <summary>
+            Provides a cursor based on Object IDs.
+            </summary>
+            <param name="Cursor">Cursor to be filtered.</param>
+            <param name="ObjectIdFieldName">Field Name of the ObjectID field.</param>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.Current">
+            <summary>
+            Gets the element in the collection at the current position of the enumerator.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">If the enumeration has not started. 
+            Call <see cref="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.MoveNextAsync"/> to start the enumeration after creating or resetting it.</exception>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.CurrentSerializer">
+            <summary>
+            Serializer used to deserialize <see cref="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.Current"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.CurrentTypeCompatible">
+            <summary>
+            If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.Current"/> 
+            will be null, even if there exists an object at the current position.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ObjectIdCursor`1.CurrentObjectId">
+            <summary>
+            Gets the Object ID of the current object.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">If the enumeration has not started. 
+            Call <see cref="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.MoveNextAsync"/> to start the enumeration after creating or resetting it.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.MovePreviousAsync">
+            <summary>
+            Advances the enumerator to the previous element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the previous element; false if
+            the enumerator has passed the beginning of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.SameSortOrder(System.String[],System.String[])">
+            <summary>
+            If the index ordering corresponds to a given sort order.
+            </summary>
+            <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ObjectIdCursor`1.ReverseSortOrder(System.String[],System.String[])">
+            <summary>
+            If the index ordering is a reversion of a given sort order.
+            </summary>
+            <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
         </member>
         <member name="T:Waher.Persistence.Files.Searching.PagesCursor`1">
             <summary>

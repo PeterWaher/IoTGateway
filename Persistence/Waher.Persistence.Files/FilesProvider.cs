@@ -1456,12 +1456,12 @@ namespace Waher.Persistence.Files
 		{
 			Guid OID;
 
-			if (ObjectId is Guid)
-				OID = (Guid)ObjectId;
-			else if (ObjectId is string)
-				OID = new Guid((string)ObjectId);
-			else if (ObjectId is byte[])
-				OID = new Guid((byte[])ObjectId);
+			if (ObjectId is Guid Guid)
+				OID = Guid;
+			else if (ObjectId is string s)
+				OID = new Guid(s);
+			else if (ObjectId is byte[] ba)
+				OID = new Guid(ba);
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
@@ -1560,12 +1560,12 @@ namespace Waher.Persistence.Files
 		{
 			Guid OID;
 
-			if (ObjectId is Guid)
-				OID = (Guid)ObjectId;
-			else if (ObjectId is string)
-				OID = new Guid((string)ObjectId);
-			else if (ObjectId is byte[])
-				OID = new Guid((byte[])ObjectId);
+			if (ObjectId is Guid Guid)
+				OID = Guid;
+			else if (ObjectId is string s)
+				OID = new Guid(s);
+			else if (ObjectId is byte[] ba)
+				OID = new Guid(ba);
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 

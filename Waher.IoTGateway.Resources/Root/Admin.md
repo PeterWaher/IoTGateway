@@ -41,6 +41,7 @@ MenuFooter();
 
 MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md");
+MenuItem("Restore","/Settings/Restore.md");
 MenuItem("Search Event Log","/EventLog.md");
 MenuItem("Prompt","/Prompt.md");
 MenuFooter();

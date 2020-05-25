@@ -2458,7 +2458,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4969,7 +4969,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7516,7 +7516,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10036,7 +10036,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12592,7 +12592,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15112,7 +15112,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17668,7 +17668,7 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Runtime.Cache/1.0.2": {
+      "Waher.Runtime.Cache/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27583,7 +27583,7 @@
       "path": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj",
       "msbuildProject": "../Waher.Networking.UWP/Waher.Networking.UWP.csproj"
     },
-    "Waher.Runtime.Cache/1.0.2": {
+    "Waher.Runtime.Cache/1.0.3": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj"

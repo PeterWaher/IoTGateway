@@ -10,8 +10,9 @@ namespace Waher.Runtime.Cache
 	/// </summary>
 	/// <typeparam name="KeyType">Cache key type.</typeparam>
 	/// <typeparam name="ValueType">Cache value type.</typeparam>
-	public class Cache<KeyType, ValueType> : IDisposable
+	public class Cache<KeyType, ValueType> : ICache
 	{
+		private readonly Guid id = Guid.NewGuid();
 		private readonly Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
@@ -38,6 +39,8 @@ namespace Waher.Runtime.Cache
 				this.timer = new Timer(this.TimerCallback, null, 5000, 5000);
 			else
 				this.timer = null;
+
+			Caches.Register(this.id, this);
 		}
 
 		/// <summary>
@@ -45,6 +48,8 @@ namespace Waher.Runtime.Cache
 		/// </summary>
 		public void Dispose()
 		{
+			Caches.Unregister(this.id);
+
 			this.timer?.Dispose();
 			this.timer = null;
 

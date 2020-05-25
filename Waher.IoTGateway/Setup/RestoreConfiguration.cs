@@ -16,8 +16,9 @@ using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Script;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Language;
+using Waher.Script;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -323,6 +324,8 @@ namespace Waher.IoTGateway.Setup
 
 					this.reloadConfiguration = true;
 					await DoAnalyze(TabID);
+
+					Caches.ClearAll();
 				}
 
 				StringBuilder Result = new StringBuilder();

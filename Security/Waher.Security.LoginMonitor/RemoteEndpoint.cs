@@ -22,7 +22,7 @@ namespace Waher.Security.LoginMonitor
 		private bool blocked = false;
 		private int[] state = null;
 		private DateTime[] timestamps = null;
-		private DateTime creted = DateTime.MinValue;
+		private DateTime created = DateTime.MinValue;
 
 		/// <summary>
 		/// Login state information relating to a remote endpoint
@@ -57,10 +57,10 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// When record was created.
 		/// </summary>
-		public DateTime Creted
+		public DateTime Created
 		{
-			get => this.creted;
-			set => this.creted = value;
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>

@@ -201,7 +201,7 @@
             String-representation of remote endpoint.
             </summary>
         </member>
-        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Creted">
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Created">
             <summary>
             When record was created.
             </summary>

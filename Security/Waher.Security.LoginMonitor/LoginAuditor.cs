@@ -124,7 +124,7 @@ namespace Waher.Security.LoginMonitor
 				{
 					Endpoint = RemoteEndpoint,
 					LastProtocol = Protocol,
-					Creted = DateTime.Now,
+					Created = DateTime.Now,
 					Blocked = false,
 					State = new int[this.nrIntervals],
 					Timestamps = new DateTime[this.nrIntervals]

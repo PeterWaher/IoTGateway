@@ -42,7 +42,7 @@ namespace Waher.IoTGateway.Events
 
 					Markdown.AppendLine("===============");
 					Markdown.AppendLine();
-					Markdown.AppendLine(MarkdownDocument.Encode(Event.Message));
+					Markdown.AppendLine(Event.Message);
 					Markdown.AppendLine();
 					Markdown.AppendLine("| Information ||");
 					Markdown.AppendLine("|:------|:-----|");

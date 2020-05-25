@@ -98,19 +98,12 @@ namespace Waher.IoTGateway.WebResources
 						sb.Append("Too many failed login attempts in a row registered. Try again after ");
 						sb.Append(TP.ToLongTimeString());
 
-						if (TP.Date == Today)
-							sb.Append(TP.ToLongTimeString());
-						else
+						if (TP.Date != Today)
 						{
 							if (TP.Date == Today.AddDays(1))
-							{
-								sb.Append(TP.ToLongTimeString());
-								sb.Append(" tomorrow at ");
-								sb.Append(TP.ToLongTimeString());
-							}
+								sb.Append(" tomorrow");
 							else
 							{
-								sb.Append(TP.ToLongTimeString());
 								sb.Append(", ");
 								sb.Append(TP.ToShortDateString());
 							}

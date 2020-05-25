@@ -549,7 +549,18 @@ namespace Waher.Persistence
 		/// <returns>Task object for synchronization purposes.</returns>
 		public static Task Export(IDatabaseExport Output)
 		{
-			return Provider.Export(Output);
+			return Export(Output, null);
+		}
+
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Export(IDatabaseExport Output, string[] CollectionNames)
+		{
+			return Provider.Export(Output, CollectionNames);
 		}
 
 		/// <summary>

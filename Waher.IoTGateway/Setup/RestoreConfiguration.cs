@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -13,13 +12,10 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
-using Waher.IoTGateway;
-using Waher.IoTGateway.Setup;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Runtime.Language;
 
@@ -191,12 +187,17 @@ namespace Waher.IoTGateway.Setup
 
 			Request.DataStream.CopyTo(File);
 
-            if (!More)
-                File.Flush();
+			if (!More)
+				File.Flush();
 
 			ShowStatus(TabID, Name + "Bytes", Export.FormatBytes(File.Length) + " received of " + Name + " file.");
 
 			Response.StatusCode = 200;
+		}
+
+		private static void CollectionFound(string TabID, string CollectionName)
+		{
+			ClientEvents.PushEvent(new string[] { TabID }, "CollectionFound", CollectionName, false);
 		}
 
 		private static void ShowStatus(string TabID, string Id, string Message)
@@ -236,13 +237,18 @@ namespace Waher.IoTGateway.Setup
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
-			if (!Parameters.TryGetValue("overwrite", out Obj) || !(Obj is bool Overwrite))
+			if (!Parameters.TryGetValue("overwrite", out Obj) || !(Obj is bool Overwrite) ||
+				!Parameters.TryGetValue("onlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections) ||
+				!Parameters.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections))
+			{
 				throw new BadRequestException();
+			}
 
 			BackupFile = GetAndRemoveFile(HttpSessionID, this.backupFilePerSession);
 			KeyFile = GetAndRemoveFile(HttpSessionID, this.keyFilePerSession);
 
-			this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(), Overwrite);
+			this.Restore(BackupFile, KeyFile, TabID, Request.Session["backupFileName"]?.ToString(),
+				Overwrite, OnlySelectedCollections, SelectedCollections);
 
 			Response.StatusCode = 200;
 		}
@@ -284,7 +290,8 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private async void Restore(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string BackupFileName, bool Overwrite)
+		private async void Restore(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string BackupFileName, bool Overwrite,
+			bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			ICryptoTransform AesTransform1 = null;
 			ICryptoTransform AesTransform2 = null;
@@ -304,16 +311,17 @@ namespace Waher.IoTGateway.Setup
 				string Extension = Path.GetExtension(BackupFileName);
 				ValidateBackupFile Import = new ValidateBackupFile(BackupFileName, null);
 
-				(AesTransform1, cs1) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, false);
+				(AesTransform1, cs1) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, false, false, new string[0]);
 
 				if (Overwrite)
 				{
 					ShowStatus(TabID, "Restoring backup.");
 					Import = new RestoreBackupFile(BackupFileName, Import.ObjectIdMap);
 
-					(AesTransform2, cs2) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, true);
-					this.reloadConfiguration = true;
+					(AesTransform2, cs2) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, true,
+						OnlySelectedCollections, SelectedCollections);
 
+					this.reloadConfiguration = true;
 					await DoAnalyze(TabID);
 				}
 
@@ -416,8 +424,8 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID, string Extension,
-			ValidateBackupFile Import, bool Overwrite)
+		private static async Task<(ICryptoTransform, CryptoStream)> DoImport(TemporaryFile BackupFile, TemporaryFile KeyFile, string TabID,
+			string Extension, ValidateBackupFile Import, bool Overwrite, bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			ICryptoTransform AesTransform = null;
 			CryptoStream cs = null;
@@ -427,15 +435,15 @@ namespace Waher.IoTGateway.Setup
 			switch (Extension.ToLower())
 			{
 				case ".xml":
-					await RestoreXml(BackupFile, TabID, Import, Overwrite);
+					await RestoreXml(BackupFile, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case ".bin":
-					await RestoreBinary(BackupFile, TabID, Import, Overwrite);
+					await RestoreBinary(BackupFile, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case ".gz":
-					await RestoreCompressed(BackupFile, TabID, Import, Overwrite);
+					await RestoreCompressed(BackupFile, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case ".bak":
@@ -444,7 +452,7 @@ namespace Waher.IoTGateway.Setup
 
 					KeyFile.Position = 0;
 
-					(AesTransform, cs) = await RestoreEncrypted(BackupFile, KeyFile, TabID, Import, Overwrite);
+					(AesTransform, cs) = await RestoreEncrypted(BackupFile, KeyFile, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				default:
@@ -454,7 +462,8 @@ namespace Waher.IoTGateway.Setup
 			return (AesTransform, cs);
 		}
 
-		private static async Task RestoreXml(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite)
+		private static async Task RestoreXml(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite,
+			bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			XmlReaderSettings Settings = new XmlReaderSettings()
 			{
@@ -469,8 +478,9 @@ namespace Waher.IoTGateway.Setup
 			};
 			XmlReader r = XmlReader.Create(BackupFile, Settings);
 			DateTime LastReport = DateTime.Now;
+			bool ImportCollection = !OnlySelectedCollections;
 			bool DatabaseStarted = false;
-			bool CollectonStarted = false;
+			bool CollectionStarted = false;
 			bool IndexStarted = false;
 			bool ObjectStarted = false;
 			bool FilesStarted = false;
@@ -521,20 +531,32 @@ namespace Waher.IoTGateway.Setup
 								IndexStarted = false;
 							}
 
-							if (CollectonStarted)
+							if (CollectionStarted)
 								await Import.EndCollection();
 
-							await Import.StartCollection(CollectionName);
-							CollectonStarted = true;
+							if (OnlySelectedCollections)
+								ImportCollection = Array.IndexOf(SelectedCollections, CollectionName) >= 0;
+
+							if (ImportCollection)
+							{
+								await Import.StartCollection(CollectionName);
+								CollectionStarted = true;
+
+								CollectionFound(TabID, CollectionName);
+							}
+							else
+								CollectionStarted = false;
 							break;
 
 						case "Index":
-							if (r.Depth != 3 || !CollectonStarted)
+							if (r.Depth != 3 || !CollectionStarted)
 								throw new Exception("Index element not expected.");
 
-							await Import.StartIndex();
-							IndexStarted = true;
-
+							if (ImportCollection)
+							{
+								await Import.StartIndex();
+								IndexStarted = true;
+							}
 							break;
 
 						case "Field":
@@ -571,7 +593,8 @@ namespace Waher.IoTGateway.Setup
 								if (string.IsNullOrEmpty(FieldName))
 									throw new Exception("Invalid field name.");
 
-								await Import.ReportIndexField(FieldName, Ascending);
+								if (ImportCollection)
+									await Import.ReportIndexField(FieldName, Ascending);
 							}
 							else
 								throw new Exception("Field attributes expected.");
@@ -579,7 +602,7 @@ namespace Waher.IoTGateway.Setup
 							break;
 
 						case "Obj":
-							if (r.Depth != 3 || !CollectonStarted)
+							if (r.Depth != 3 || !CollectionStarted)
 								throw new Exception("Obj element not expected.");
 
 							if (IndexStarted)
@@ -625,20 +648,26 @@ namespace Waher.IoTGateway.Setup
 								}
 								while (r2.MoveToNextAttribute());
 
-								await Import.StartObject(ObjectId, TypeName);
-								ObjectStarted = true;
+								if (ImportCollection)
+								{
+									await Import.StartObject(ObjectId, TypeName);
+									ObjectStarted = true;
+								}
 
 								while (await r2.ReadAsync())
 								{
 									if (r2.IsStartElement())
 									{
 										KeyValuePair<string, object> P = await ReadValue(r2);
-										await Import.ReportProperty(P.Key, P.Value);
+
+										if (ImportCollection)
+											await Import.ReportProperty(P.Key, P.Value);
 									}
 								}
 							}
 
-							await Import.EndObject();
+							if (ImportCollection)
+								await Import.EndObject();
 							break;
 
 						case "Files":
@@ -657,10 +686,10 @@ namespace Waher.IoTGateway.Setup
 								IndexStarted = false;
 							}
 
-							if (CollectonStarted)
+							if (CollectionStarted)
 							{
 								await Import.EndCollection();
-								CollectonStarted = false;
+								CollectionStarted = false;
 							}
 
 							if (DatabaseStarted)
@@ -741,7 +770,7 @@ namespace Waher.IoTGateway.Setup
 			if (IndexStarted)
 				await Import.EndIndex();
 
-			if (CollectonStarted)
+			if (CollectionStarted)
 				await Import.EndCollection();
 
 			if (DatabaseStarted)
@@ -1180,7 +1209,8 @@ namespace Waher.IoTGateway.Setup
 			return new KeyValuePair<string, object>(PropertyName, Value);
 		}
 
-		private static async Task RestoreBinary(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite)
+		private static async Task RestoreBinary(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite,
+			bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			int Version = BackupFile.ReadByte();
 			if (Version != 1)
@@ -1188,6 +1218,7 @@ namespace Waher.IoTGateway.Setup
 
 			DateTime LastReport = DateTime.Now;
 			byte Command;
+			bool ImportCollection = !OnlySelectedCollections;
 
 			using (BinaryReader r = new BinaryReader(BackupFile, Encoding.UTF8, true))
 			{
@@ -1217,7 +1248,14 @@ namespace Waher.IoTGateway.Setup
 
 							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 							{
-								await Import.StartCollection(CollectionName);
+								if (OnlySelectedCollections)
+									ImportCollection = Array.IndexOf(SelectedCollections, CollectionName) >= 0;
+
+								if (ImportCollection)
+								{
+									await Import.StartCollection(CollectionName);
+									CollectionFound(TabID, CollectionName);
+								}
 
 								byte b;
 
@@ -1226,35 +1264,45 @@ namespace Waher.IoTGateway.Setup
 									switch (b)
 									{
 										case 1:
-											await Import.StartIndex();
+											if (ImportCollection)
+												await Import.StartIndex();
 
 											while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
 											{
 												Ascending = r.ReadBoolean();
-												await Import.ReportIndexField(FieldName, Ascending);
+											
+												if (ImportCollection)
+													await Import.ReportIndexField(FieldName, Ascending);
 											}
 
-											await Import.EndIndex();
+											if (ImportCollection)
+												await Import.EndIndex();
 											break;
 
 										case 2:
 											ObjectId = r.ReadString();
 											TypeName = r.ReadString();
 
-											await Import.StartObject(ObjectId, TypeName);
+											if (ImportCollection)
+												await Import.StartObject(ObjectId, TypeName);
 
 											byte PropertyType = r.ReadByte();
 											string PropertyName = r.ReadString();
+											object PropertyValue;
 
 											while (!string.IsNullOrEmpty(PropertyName))
 											{
-												await Import.ReportProperty(PropertyName, ReadValue(r, PropertyType));
+												PropertyValue = ReadValue(r, PropertyType);
+
+												if (ImportCollection)
+													await Import.ReportProperty(PropertyName, PropertyValue);
 
 												PropertyType = r.ReadByte();
 												PropertyName = r.ReadString();
 											}
 
-											await Import.EndObject();
+											if (ImportCollection)
+												await Import.EndObject();
 											break;
 
 										default:
@@ -1264,7 +1312,8 @@ namespace Waher.IoTGateway.Setup
 									ShowReport(TabID, Import, ref LastReport, Overwrite);
 								}
 
-								await Import.EndCollection();
+								if (ImportCollection)
+									await Import.EndCollection();
 							}
 
 							await Import.EndExport();
@@ -1368,8 +1417,8 @@ namespace Waher.IoTGateway.Setup
 								Original.DocumentElement["DefaultPage"].InnerText = s;
 								break;
 
-							// TODO: Ports ?
-							// TODO: FileFolders ?
+								// TODO: Ports ?
+								// TODO: FileFolders ?
 						}
 					}
 				}
@@ -1428,7 +1477,7 @@ namespace Waher.IoTGateway.Setup
 					return new CaseInsensitiveString(r.ReadString());
 
 				case BinaryExportFormat.TYPE_ARRAY:
-                    r.ReadString(); // Type name
+					r.ReadString(); // Type name
 					long NrElements = r.ReadInt64();
 
 					List<object> List = new List<object>();
@@ -1464,16 +1513,17 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private static async Task RestoreCompressed(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite)
+		private static async Task RestoreCompressed(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite,
+			bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			using (GZipStream gz = new GZipStream(BackupFile, CompressionMode.Decompress, true))
 			{
-				await RestoreBinary(gz, TabID, Import, Overwrite);
+				await RestoreBinary(gz, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 			}
 		}
 
 		private static async Task<(ICryptoTransform, CryptoStream)> RestoreEncrypted(Stream BackupFile, Stream KeyFile, string TabID, ValidateBackupFile Import,
-			bool Overwrite)
+			bool Overwrite, bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			XmlDocument Doc = new XmlDocument();
 
@@ -1501,7 +1551,7 @@ namespace Waher.IoTGateway.Setup
 			ICryptoTransform AesTransform = WebResources.StartExport.aes.CreateDecryptor(Key, IV);
 			CryptoStream cs = new CryptoStream(BackupFile, AesTransform, CryptoStreamMode.Read);
 
-			await RestoreCompressed(cs, TabID, Import, Overwrite);
+			await RestoreCompressed(cs, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections);
 
 			return (AesTransform, cs);
 		}

@@ -2778,6 +2778,14 @@
             <param name="Output">Database will be output to this interface.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
+            <summary>
+            Performs an export of the entire database.
+            </summary>
+            <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
         <member name="M:Waher.Persistence.Database.Clear(System.String)">
             <summary>
             Clears a collection of all objects.
@@ -3522,11 +3530,12 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
             <summary>
             Performs an export of the entire database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Clear(System.String)">

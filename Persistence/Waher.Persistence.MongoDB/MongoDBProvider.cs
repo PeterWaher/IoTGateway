@@ -1382,8 +1382,9 @@ namespace Waher.Persistence.MongoDB
 		/// Performs an export of the entire database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output)
+		public async Task Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			await Output.StartExport();
 			try
@@ -1396,6 +1397,9 @@ namespace Waher.Persistence.MongoDB
 
 				foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
 				{
+					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, CollectionName) < 0)
+						continue;
+
 					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
 
 					await Output.StartCollection(CollectionName);

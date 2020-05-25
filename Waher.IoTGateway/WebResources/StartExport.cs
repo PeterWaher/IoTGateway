@@ -19,7 +19,7 @@ namespace Waher.IoTGateway.WebResources
 	/// <summary>
 	/// Starts data export
 	/// </summary>
-	public class StartExport : HttpSynchronousResource, IHttpPostMethod
+	public class StartExport : HttpAsynchronousResource, IHttpPostMethod
 	{
 		internal static RNGCryptoServiceProvider rnd = new RNGCryptoServiceProvider();
 		internal static AesCryptoServiceProvider aes = GetCryptoProvider();
@@ -78,66 +78,72 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async void POST(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
-
-			if (!Request.HasData ||
-				!(Request.DecodeData() is Dictionary<string, object> RequestObj) ||
-				!RequestObj.TryGetValue("TypeOfFile", out object Obj) ||
-				!(Obj is string TypeOfFile) ||
-				!RequestObj.TryGetValue("Database", out Obj) ||
-				!(Obj is bool Database) ||
-				!RequestObj.TryGetValue("WebContent", out Obj) ||
-				!(Obj is bool WebContent))
+			try
 			{
-				throw new BadRequestException();
-			}
+				Gateway.AssertUserAuthenticated(Request);
 
-			KeyValuePair<string, IExportFormat> Exporter = GetExporter(TypeOfFile);
-
-			lock (synchObject)
-			{
-				if (exporting)
+				if (!Request.HasData ||
+					!(Request.DecodeData() is Dictionary<string, object> RequestObj) ||
+					!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile) ||
+					!RequestObj.TryGetValue("Database", out Obj) || !(Obj is bool Database) ||
+					!RequestObj.TryGetValue("WebContent", out Obj) || !(Obj is bool WebContent) ||
+					!RequestObj.TryGetValue("OnlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections) ||
+					!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections))
 				{
-					Response.StatusCode = 409;
-					Response.StatusMessage = "Conflict";
-					Response.ContentType = "text/plain";
-					Response.Write("Export is underway.");
-					return;
+					throw new BadRequestException();
 				}
-				else
-					exporting = true;
-			}
 
-			Export.ExportType = TypeOfFile;
-			Export.ExportDatabase = Database;
-			Export.ExportWebContent = WebContent;
+				KeyValuePair<string, IExportFormat> Exporter = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
 
-			List<string> Folders = new List<string>();
-
-			foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
-			{
-				if (RequestObj.TryGetValue(FolderCategory.CategoryId, out Obj) && Obj is bool b)
+				lock (synchObject)
 				{
-					Export.SetExportFolderAsync(FolderCategory.CategoryId, b).Wait();
-
-					if (b)
-						Folders.AddRange(FolderCategory.Folders);
+					if (exporting)
+					{
+						Response.StatusCode = 409;
+						Response.StatusMessage = "Conflict";
+						Response.ContentType = "text/plain";
+						Response.Write("Export is underway.");
+						return;
+					}
+					else
+						exporting = true;
 				}
+
+				Export.ExportType = TypeOfFile;
+				Export.ExportDatabase = Database;
+				Export.ExportWebContent = WebContent;
+
+				List<string> Folders = new List<string>();
+
+				foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
+				{
+					if (RequestObj.TryGetValue(FolderCategory.CategoryId, out Obj) && Obj is bool b)
+					{
+						await Export.SetExportFolderAsync(FolderCategory.CategoryId, b);
+
+						if (b)
+							Folders.AddRange(FolderCategory.Folders);
+					}
+				}
+
+				Task _ = DoExport(Exporter.Value, Database, WebContent, Folders.ToArray());
+
+				Response.StatusCode = 200;
+				Response.ContentType = "text/plain";
+				Response.Write(Exporter.Key);
 			}
-
-			Task _ = DoExport(Exporter.Value, Database, WebContent, Folders.ToArray());
-
-			Response.StatusCode = 200;
-			Response.ContentType = "text/plain";
-			Response.Write(Exporter.Key);
+			catch (Exception ex)
+			{
+				Response.SendResponse(ex);
+			}
 		}
 
 		private static bool exporting = false;
 		private static readonly object synchObject = new object();
 
-		internal static KeyValuePair<string, IExportFormat> GetExporter(string TypeOfFile)
+		internal static KeyValuePair<string, IExportFormat> GetExporter(string TypeOfFile, bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			IExportFormat Output;
 			string BasePath = Export.FullExportFolder;
@@ -159,7 +165,7 @@ namespace Waher.IoTGateway.WebResources
 					Settings.Async = true;
 					XmlWriter XmlOutput = XmlWriter.Create(fs, Settings);
 					string FileName = FullFileName.Substring(BasePath.Length);
-					Output = new XmlExportFormat(FileName, Created, XmlOutput, fs);
+					Output = new XmlExportFormat(FileName, Created, XmlOutput, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Binary":
@@ -167,7 +173,7 @@ namespace Waher.IoTGateway.WebResources
 					fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(FullFileName);
 					FileName = FullFileName.Substring(BasePath.Length);
-					Output = new BinaryExportFormat(FileName, Created, fs, fs);
+					Output = new BinaryExportFormat(FileName, Created, fs, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Compressed":
@@ -176,7 +182,7 @@ namespace Waher.IoTGateway.WebResources
 					Created = File.GetCreationTime(FullFileName);
 					FileName = FullFileName.Substring(BasePath.Length);
 					GZipStream gz = new GZipStream(fs, CompressionLevel.Optimal, false);
-					Output = new BinaryExportFormat(FileName, Created, gz, fs);
+					Output = new BinaryExportFormat(FileName, Created, gz, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Encrypted":
@@ -198,7 +204,7 @@ namespace Waher.IoTGateway.WebResources
 					CryptoStream cs = new CryptoStream(fs, AesTransform, CryptoStreamMode.Write);
 
 					gz = new GZipStream(cs, CompressionLevel.Optimal, false);
-					Output = new BinaryExportFormat(FileName, Created, gz, fs, cs, 32);
+					Output = new BinaryExportFormat(FileName, Created, gz, fs, cs, 32, OnlySelectedCollections, SelectedCollections);
 
 					string BasePath2 = Export.FullKeyExportFolder;
 
@@ -303,7 +309,7 @@ namespace Waher.IoTGateway.WebResources
 							Path.Combine(Gateway.RootFolder, "Data"), false, true);
 					}
 
-					await Persistence.Database.Export(Output);
+					await Persistence.Database.Export(Output, Output.CollectionNames);
 				}
 
 				if (WebContent || Folders.Length > 0)

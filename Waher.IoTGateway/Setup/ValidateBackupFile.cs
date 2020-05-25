@@ -51,6 +51,7 @@ namespace Waher.IoTGateway.Setup
 		private long nrProperties = 0;
 		private long nrFiles = 0;
 		private long nrFileBytes = 0;
+
 		/// <summary>
 		/// Class validating the status of a backup file.
 		/// </summary>
@@ -117,6 +118,14 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public virtual void Dispose()
 		{
+		}
+
+		/// <summary>
+		/// Optional array of collection nmes to export. If null, all collections will be exported.
+		/// </summary>
+		public string[] CollectionNames
+		{
+			get => null;
 		}
 
 		/// <summary>

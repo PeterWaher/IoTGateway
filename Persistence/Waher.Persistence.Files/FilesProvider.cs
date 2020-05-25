@@ -18,6 +18,7 @@ using Waher.Persistence.Serialization.ValueTypes;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using System.Collections.ObjectModel;
 
 namespace Waher.Persistence.Files
 {
@@ -2127,8 +2128,9 @@ namespace Waher.Persistence.Files
 		/// Performs an export of the entire database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output)
+		public async Task Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			ObjectBTreeFile[] Files = this.Files;
 
@@ -2137,6 +2139,9 @@ namespace Waher.Persistence.Files
 			{
 				foreach (ObjectBTreeFile File in Files)
 				{
+					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
+						continue;
+
 					await Output.StartCollection(File.CollectionName);
 					try
 					{

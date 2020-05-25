@@ -24,7 +24,19 @@ function ToggleOverwriteExisting()
     var Element = document.getElementById("RestoreButton");
     Element.innerText = OverwriteExisting ? "Restore" : "Verify";
 
+    Element = document.getElementById("OnlySelectedCollections");
+    Element.parentElement.style.display = OverwriteExisting ? "block" : "none";
+
     HideNext();
+}
+
+function ToggleSelectedCollections()
+{
+    var CheckBox = document.getElementById("OnlySelectedCollections");
+    var OnlySelectedCollections = CheckBox.checked;
+
+    var Element = document.getElementById("SelectedCollections");
+    Element.style.display = OnlySelectedCollections ? "block" : "none";
 }
 
 function Restore()
@@ -118,12 +130,35 @@ function Restore()
                     }
                 };
 
+                var SelectedCollections = [];
+                var Collections = document.getElementById("Collections");
+                var Loop = Collections.firstElementChild;
+                var Next;
+
+                while (Loop)
+                {
+                    Next = Loop.nextElementSibling;
+
+                    if (Loop.tagName === "P")
+                    {
+                        Loop = Loop.firstElementChild;
+                        if (Loop.tagName === "INPUT" && Loop.checked)
+                            SelectedCollections.push(Loop.getAttribute("data-collection"));
+                    }
+
+                    Loop = Next;
+                }
+
+                var Req = {
+                    "overwrite": document.getElementById("OverwriteExisting").checked,
+                    "onlySelectedCollections": document.getElementById("OnlySelectedCollections").checked,
+                    "selectedCollections": SelectedCollections
+                };
+
                 xhttp.open("POST", "/Settings/Restore", true);
                 xhttp.setRequestHeader("Content-Type", "application/json");
                 xhttp.setRequestHeader("X-TabID", TabID);
-                xhttp.send(JSON.stringify({
-                    "overwrite": document.getElementById("OverwriteExisting").checked
-                }));
+                xhttp.send(JSON.stringify(Req));
             }
         }
     };
@@ -165,4 +200,42 @@ function HideNext()
 {
     var Element = document.getElementById("NextButton");
     Element.style.display = "none";
+}
+
+function CollectionFound(CollectionName)
+{
+    var Collections = document.getElementById("Collections");
+    var Loop = Collections.firstElementChild;
+    var Next;
+
+    while (Loop)
+    {
+        Next = Loop.nextElementSibling;
+
+        if (Loop.tagName === "P")
+        {
+            Loop = Loop.firstElementChild;
+            if (Loop.tagName === "INPUT" && Loop.checked && Loop.getAttribute("data-collection") === CollectionName)
+                return;
+        }
+
+        Loop = Next;
+    }
+
+    var P = document.createElement("P");
+    Collections.appendChild(P);
+
+    var Input = document.createElement("INPUT");
+    var Name = "Collection_" + CollectionName;
+    Input.setAttribute("type", "checkbox");
+    Input.setAttribute("name", Name);
+    Input.setAttribute("id", Name);
+    Input.setAttribute("data-collection", CollectionName);
+    P.appendChild(Input);
+
+    var Label = document.createElement("LABEL");
+    Label.setAttribute("for", Name);
+    Label.setAttribute("title", "If checked, objects in collection " + CollectionName + " will be restored.");
+    Label.innerText = CollectionName;
+    P.appendChild(Label);
 }

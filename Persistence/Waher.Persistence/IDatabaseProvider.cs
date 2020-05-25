@@ -142,8 +142,9 @@ namespace Waher.Persistence
 		/// Performs an export of the entire database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		Task Export(IDatabaseExport Output);
+		Task Export(IDatabaseExport Output, string[] CollectionNames);
 
 		/// <summary>
 		/// Clears a collection of all objects.

@@ -18,6 +18,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		private readonly DateTime created;
 		private FileStream fs;
 		private readonly string fileName;
+		private readonly bool onlySelectedCollections;
+		private readonly Array selectedCollections;
 
 		/// <summary>
 		/// Abstract base class for export formats.
@@ -25,11 +27,37 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="FileName">Name of file</param>
 		/// <param name="Created">When file was created</param>
 		/// <param name="File">File stream</param>
-		public ExportFormat(string FileName, DateTime Created, FileStream File)
+		/// <param name="OnlySelectedCollections">If only selected collections should be exported.</param>
+		/// <param name="SelectedCollections">Array of selected collections.</param>
+		public ExportFormat(string FileName, DateTime Created, FileStream File, bool OnlySelectedCollections, Array SelectedCollections)
 		{
 			this.fileName = FileName;
 			this.created = Created;
 			this.fs = File;
+			this.onlySelectedCollections = OnlySelectedCollections;
+			this.selectedCollections = SelectedCollections;
+		}
+
+		/// <summary>
+		/// Optional array of collection nmes to export. If null, all collections will be exported.
+		/// </summary>
+		public string[] CollectionNames
+		{
+			get
+			{
+				if (this.onlySelectedCollections)
+				{
+					int i, c = this.selectedCollections.Length;
+					string[] Result = new string[c];
+
+					for (i = 0; i < c; i++)
+						Result[i] = this.selectedCollections.GetValue(i).ToString();
+
+					return Result;
+				}
+				else
+					return null;
+			}
 		}
 
 		/// <summary>
@@ -61,6 +89,16 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.fs.Dispose();
 				this.fs = null;
 			}
+		}
+
+		/// <summary>
+		/// Checks if a collection is to be exported or not.
+		/// </summary>
+		/// <param name="CollectionName">Collection Name.</param>
+		/// <returns>If the collection is to be exported or not.</returns>
+		protected bool ExportCollection(string CollectionName)
+		{
+			return !this.onlySelectedCollections || Array.IndexOf(this.selectedCollections, CollectionName) >= 0;
 		}
 
 		/// <summary>

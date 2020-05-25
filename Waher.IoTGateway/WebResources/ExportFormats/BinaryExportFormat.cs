@@ -156,6 +156,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		private readonly int blockSize;
 		private LinkedList<string> errors = null;
 		private LinkedList<Exception> exceptions = null;
+		private bool exportCollection = false;
 
 		/// <summary>
 		/// Binary File export
@@ -164,8 +165,10 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="Created">When file was created</param>
 		/// <param name="Output">Binary Output</param>
 		/// <param name="File">File stream</param>
-		public BinaryExportFormat(string FileName, DateTime Created, Stream Output, FileStream File)
-			: this(FileName, Created, Output, File, null, 0)
+		/// <param name="OnlySelectedCollections">If only selected collections should be exported.</param>
+		/// <param name="SelectedCollections">Array of selected collections.</param>
+		public BinaryExportFormat(string FileName, DateTime Created, Stream Output, FileStream File, bool OnlySelectedCollections, Array SelectedCollections)
+			: this(FileName, Created, Output, File, null, 0, OnlySelectedCollections, SelectedCollections)
 		{
 		}
 
@@ -178,8 +181,11 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="File">File stream</param>
 		/// <param name="CryptoStream">Cryptographic stream</param>
 		/// <param name="BlockSize">Cryptographic block size</param>
-		public BinaryExportFormat(string FileName, DateTime Created, Stream Output, FileStream File, CryptoStream CryptoStream, int BlockSize)
-			: base(FileName, Created, File)
+		/// <param name="OnlySelectedCollections">If only selected collections should be exported.</param>
+		/// <param name="SelectedCollections">Array of selected collections.</param>
+		public BinaryExportFormat(string FileName, DateTime Created, Stream Output, FileStream File, CryptoStream CryptoStream, int BlockSize, 
+			bool OnlySelectedCollections, Array SelectedCollections)
+			: base(FileName, Created, File, OnlySelectedCollections, SelectedCollections)
 		{
 			this.output = Output;
 			this.w = new BinaryWriter(this.output, Encoding.UTF8);
@@ -336,7 +342,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="CollectionName">Name of collection</param>
 		public override Task StartCollection(string CollectionName)
 		{
-			this.w.Write(CollectionName);
+			if (this.exportCollection = this.ExportCollection(CollectionName))
+				this.w.Write(CollectionName);
+
 			return Task.CompletedTask;
 		}
 
@@ -345,7 +353,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override Task EndCollection()
 		{
-			this.w.Write((byte)0);
+			if (this.exportCollection)
+				this.w.Write((byte)0);
+
 			return Task.CompletedTask;
 		}
 
@@ -354,7 +364,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override Task StartIndex()
 		{
-			this.w.Write((byte)1);
+			if (this.exportCollection)
+				this.w.Write((byte)1);
+
 			return Task.CompletedTask;
 		}
 
@@ -363,7 +375,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override Task EndIndex()
 		{
-			this.w.Write(string.Empty);
+			if (this.exportCollection)
+				this.w.Write(string.Empty);
+
 			return Task.CompletedTask;
 		}
 
@@ -374,8 +388,12 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
 		public override Task ReportIndexField(string FieldName, bool Ascending)
 		{
-			this.w.Write(FieldName);
-			this.w.Write(Ascending);
+			if (this.exportCollection)
+			{
+				this.w.Write(FieldName);
+				this.w.Write(Ascending);
+			}
+
 			return Task.CompletedTask;
 		}
 
@@ -386,9 +404,13 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="TypeName">Type name of object.</param>
 		public override Task<string> StartObject(string ObjectId, string TypeName)
 		{
-			this.w.Write((byte)2);
-			this.w.Write(ObjectId);
-			this.w.Write(TypeName);
+			if (this.exportCollection)
+			{
+				this.w.Write((byte)2);
+				this.w.Write(ObjectId);
+				this.w.Write(TypeName);
+			}
+
 			return Task.FromResult<string>(ObjectId);
 		}
 
@@ -397,8 +419,12 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override Task EndObject()
 		{
-			this.w.Write(TYPE_NULL);
-			this.w.Write(string.Empty);
+			if (this.exportCollection)
+			{
+				this.w.Write(TYPE_NULL);
+				this.w.Write(string.Empty);
+			}
+
 			return this.UpdateClient(false);
 		}
 
@@ -409,212 +435,215 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="PropertyValue">Property value.</param>
 		public override Task ReportProperty(string PropertyName, object PropertyValue)
 		{
-			if (PropertyValue is null)
+			if (this.exportCollection)
 			{
-				this.w.Write(TYPE_NULL);
-				if (PropertyName != null)
-					this.w.Write(PropertyName);
-			}
-			else if (PropertyValue is Enum)
-			{
-				this.w.Write(TYPE_ENUM);
-				if (PropertyName != null)
-					this.w.Write(PropertyName);
-				this.w.Write(PropertyValue.ToString());
-			}
-			else
-			{
-				switch (Type.GetTypeCode(PropertyValue.GetType()))
+				if (PropertyValue is null)
 				{
-					case TypeCode.Boolean:
-						this.w.Write(TYPE_BOOLEAN);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((bool)PropertyValue);
-						break;
-
-					case TypeCode.Byte:
-						this.w.Write(TYPE_BYTE);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((byte)PropertyValue);
-						break;
-
-					case TypeCode.Char:
-						this.w.Write(TYPE_CHAR);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((char)PropertyValue);
-						break;
-
-					case TypeCode.DateTime:
-						this.w.Write(TYPE_DATETIME);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-
-						DateTime DT = (DateTime)PropertyValue;
-
-						this.w.Write((byte)DT.Kind);
-						this.w.Write(DT.Ticks);
-						break;
-
-					case TypeCode.Decimal:
-						this.w.Write(TYPE_DECIMAL);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((decimal)PropertyValue);
-						break;
-
-					case TypeCode.Double:
-						this.w.Write(TYPE_DOUBLE);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((double)PropertyValue);
-						break;
-
-					case TypeCode.Int16:
-						this.w.Write(TYPE_INT16);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((short)PropertyValue);
-						break;
-
-					case TypeCode.Int32:
-						this.w.Write(TYPE_INT32);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((int)PropertyValue);
-						break;
-
-					case TypeCode.Int64:
-						this.w.Write(TYPE_INT64);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((long)PropertyValue);
-						break;
-
-					case TypeCode.SByte:
-						this.w.Write(TYPE_SBYTE);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((sbyte)PropertyValue);
-						break;
-
-					case TypeCode.Single:
-						this.w.Write(TYPE_SINGLE);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((float)PropertyValue);
-						break;
-
-					case TypeCode.String:
-						this.w.Write(TYPE_STRING);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((string)PropertyValue);
-						break;
-
-					case TypeCode.UInt16:
-						this.w.Write(TYPE_UINT16);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((ushort)PropertyValue);
-						break;
-
-					case TypeCode.UInt32:
-						this.w.Write(TYPE_UINT32);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((uint)PropertyValue);
-						break;
-
-					case TypeCode.UInt64:
-						this.w.Write(TYPE_UINT64);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						this.w.Write((ulong)PropertyValue);
-						break;
-
-					case TypeCode.DBNull:
-					case TypeCode.Empty:
-						this.w.Write(TYPE_NULL);
-						if (PropertyName != null)
-							this.w.Write(PropertyName);
-						break;
-
-					case TypeCode.Object:
-						if (PropertyValue is TimeSpan TS)
-						{
-							this.w.Write(TYPE_TIMESPAN);
+					this.w.Write(TYPE_NULL);
+					if (PropertyName != null)
+						this.w.Write(PropertyName);
+				}
+				else if (PropertyValue is Enum)
+				{
+					this.w.Write(TYPE_ENUM);
+					if (PropertyName != null)
+						this.w.Write(PropertyName);
+					this.w.Write(PropertyValue.ToString());
+				}
+				else
+				{
+					switch (Type.GetTypeCode(PropertyValue.GetType()))
+					{
+						case TypeCode.Boolean:
+							this.w.Write(TYPE_BOOLEAN);
 							if (PropertyName != null)
 								this.w.Write(PropertyName);
-							this.w.Write(TS.Ticks);
-						}
-						else if (PropertyValue is DateTimeOffset DTO)
-						{
-							this.w.Write(TYPE_DATETIMEOFFSET);
+							this.w.Write((bool)PropertyValue);
+							break;
+
+						case TypeCode.Byte:
+							this.w.Write(TYPE_BYTE);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((byte)PropertyValue);
+							break;
+
+						case TypeCode.Char:
+							this.w.Write(TYPE_CHAR);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((char)PropertyValue);
+							break;
+
+						case TypeCode.DateTime:
+							this.w.Write(TYPE_DATETIME);
 							if (PropertyName != null)
 								this.w.Write(PropertyName);
 
-							DT = DTO.DateTime;
-							TS = DTO.Offset;
+							DateTime DT = (DateTime)PropertyValue;
 
 							this.w.Write((byte)DT.Kind);
 							this.w.Write(DT.Ticks);
-							this.w.Write(TS.Ticks);
-						}
-						else if (PropertyValue is CaseInsensitiveString CiString)
-						{
-							this.w.Write(TYPE_CI_STRING);
-							if (PropertyName != null)
-								this.w.Write(PropertyName);
-							this.w.Write(CiString.Value);
-						}
-						else if (PropertyValue is byte[] Bin)
-						{
-							this.w.Write(TYPE_BYTEARRAY);
-							if (PropertyName != null)
-								this.w.Write(PropertyName);
-							this.w.Write(Bin.Length);
-							this.w.Write(Bin);
-						}
-						else if (PropertyValue is Guid Id)
-						{
-							this.w.Write(TYPE_GUID);
-							if (PropertyName != null)
-								this.w.Write(PropertyName);
-							this.w.Write(Id.ToByteArray());
-						}
-						else if (PropertyValue is Array A)
-						{
-							this.w.Write(TYPE_ARRAY);
-							if (PropertyName != null)
-								this.w.Write(PropertyName);
-							this.w.Write(PropertyValue.GetType().GetElementType().FullName);
+							break;
 
-							this.w.Write(A.LongLength);
-							foreach (object Obj in A)
-								this.ReportProperty(null, Obj);
-						}
-						else if (PropertyValue is GenericObject Obj)
-						{
-							this.w.Write(TYPE_OBJECT);
+						case TypeCode.Decimal:
+							this.w.Write(TYPE_DECIMAL);
 							if (PropertyName != null)
 								this.w.Write(PropertyName);
-							this.w.Write(Obj.TypeName);
+							this.w.Write((decimal)PropertyValue);
+							break;
 
-							foreach (KeyValuePair<string, object> P in Obj)
-								this.ReportProperty(P.Key, P.Value);
+						case TypeCode.Double:
+							this.w.Write(TYPE_DOUBLE);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((double)PropertyValue);
+							break;
 
+						case TypeCode.Int16:
+							this.w.Write(TYPE_INT16);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((short)PropertyValue);
+							break;
+
+						case TypeCode.Int32:
+							this.w.Write(TYPE_INT32);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((int)PropertyValue);
+							break;
+
+						case TypeCode.Int64:
+							this.w.Write(TYPE_INT64);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((long)PropertyValue);
+							break;
+
+						case TypeCode.SByte:
+							this.w.Write(TYPE_SBYTE);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((sbyte)PropertyValue);
+							break;
+
+						case TypeCode.Single:
+							this.w.Write(TYPE_SINGLE);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((float)PropertyValue);
+							break;
+
+						case TypeCode.String:
+							this.w.Write(TYPE_STRING);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((string)PropertyValue);
+							break;
+
+						case TypeCode.UInt16:
+							this.w.Write(TYPE_UINT16);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((ushort)PropertyValue);
+							break;
+
+						case TypeCode.UInt32:
+							this.w.Write(TYPE_UINT32);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((uint)PropertyValue);
+							break;
+
+						case TypeCode.UInt64:
+							this.w.Write(TYPE_UINT64);
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							this.w.Write((ulong)PropertyValue);
+							break;
+
+						case TypeCode.DBNull:
+						case TypeCode.Empty:
 							this.w.Write(TYPE_NULL);
-							this.w.Write(string.Empty);
-						}
-						else
-							throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
-						break;
+							if (PropertyName != null)
+								this.w.Write(PropertyName);
+							break;
 
-					default:
-						throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
+						case TypeCode.Object:
+							if (PropertyValue is TimeSpan TS)
+							{
+								this.w.Write(TYPE_TIMESPAN);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(TS.Ticks);
+							}
+							else if (PropertyValue is DateTimeOffset DTO)
+							{
+								this.w.Write(TYPE_DATETIMEOFFSET);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+
+								DT = DTO.DateTime;
+								TS = DTO.Offset;
+
+								this.w.Write((byte)DT.Kind);
+								this.w.Write(DT.Ticks);
+								this.w.Write(TS.Ticks);
+							}
+							else if (PropertyValue is CaseInsensitiveString CiString)
+							{
+								this.w.Write(TYPE_CI_STRING);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(CiString.Value);
+							}
+							else if (PropertyValue is byte[] Bin)
+							{
+								this.w.Write(TYPE_BYTEARRAY);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(Bin.Length);
+								this.w.Write(Bin);
+							}
+							else if (PropertyValue is Guid Id)
+							{
+								this.w.Write(TYPE_GUID);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(Id.ToByteArray());
+							}
+							else if (PropertyValue is Array A)
+							{
+								this.w.Write(TYPE_ARRAY);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(PropertyValue.GetType().GetElementType().FullName);
+
+								this.w.Write(A.LongLength);
+								foreach (object Obj in A)
+									this.ReportProperty(null, Obj);
+							}
+							else if (PropertyValue is GenericObject Obj)
+							{
+								this.w.Write(TYPE_OBJECT);
+								if (PropertyName != null)
+									this.w.Write(PropertyName);
+								this.w.Write(Obj.TypeName);
+
+								foreach (KeyValuePair<string, object> P in Obj)
+									this.ReportProperty(P.Key, P.Value);
+
+								this.w.Write(TYPE_NULL);
+								this.w.Write(string.Empty);
+							}
+							else
+								throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
+							break;
+
+						default:
+							throw new Exception("Unhandled property value type: " + PropertyValue.GetType().FullName);
+					}
 				}
 			}
 

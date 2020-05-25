@@ -102,8 +102,13 @@ Choose what you want to be included in the manual backup, and press the Backup b
 the Analyze button to analyze the database and generate a report.
 
 <p>
-<input id="Database" name="Database" type="checkbox" {{Export.ExportDatabase ? "checked" : ""}}/>
+<input id="Database" name="Database" type="checkbox" {{Export.ExportDatabase ? "checked" : ""}} onclick="ToggleSelectCollections()"/>
 <label for="Database">Database contents.</label>
+</p>
+
+<p style="display:{{Export.ExportDatabase ? "block" : "none"}}">
+<input type="checkbox" name="OnlySelectedCollections" id="OnlySelectedCollections" onclick="ToggleSelectedCollections()"/>
+<label for="OnlySelectedCollections" title="If only selected collections are to be backed up.">Only backup selected collections.</label>
 </p>
 
 <p>
@@ -129,6 +134,17 @@ the Analyze button to analyze the database and generate a report.
 <option value="Encrypted"{{ExportType=="Encrypted" ? " selected" : ""}}>Compressed and Encrypted Binary</option>
 </select>
 </p>
+
+<fieldset id="SelectedCollections" style="display:none">
+<legend>Collections</legend>
+<div id='Collections'>
+{{foreach CollectionName in Database.GetCollections().Result do ]]
+<p>
+<input type="checkbox" name="Collection_((CollectionName))" data-collection="((CollectionName))" id="Collection_((CollectionName))"/>
+<label for="Collection_((CollectionName))" title="If checked, objects in collection ((CollectionName)) will be exported.">((CollectionName))</label>
+</p>[[}}
+</div>
+</fieldset>
 
 <p>
 <button type="button" onclick="StartExport();">Backup</button>

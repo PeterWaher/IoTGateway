@@ -2791,7 +2791,7 @@ namespace Waher.IoTGateway
 
 			await Export.SetLastBackupAsync(Now);
 
-			KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted");
+			KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted", false, new string[0]);
 			string FileName = Exporter.Key;
 
 			ExportFormat.UpdateClientsFileUpdated(FileName, -1, Now);

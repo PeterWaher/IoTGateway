@@ -1,30 +1,48 @@
 ﻿function StartExport()
 {
-    var Request = {
-        "TypeOfFile": document.getElementById("TypeOfFile").value
-    };
-    var ExportContents = document.getElementById("ExportContents");
-    var Elements = ExportContents.elements;
-    var i, c = Elements.length;
+	var SelectedCollections = [];
+	var Collections = document.getElementById("Collections");
+	var Loop = Collections.firstElementChild;
+	var Next;
 
-    for (i = 0; i < c; i++)
-    {
-        var Element = Elements[i];
-        if (Element.tagName == "INPUT" && Element.type == "checkbox")
-            Request[Element.name] = Element.checked;
-    }
+	while (Loop)
+	{
+		Next = Loop.nextElementSibling;
+
+		if (Loop.tagName === "P")
+		{
+			Loop = Loop.firstElementChild;
+			if (Loop.tagName === "INPUT" && Loop.checked)
+				SelectedCollections.push(Loop.getAttribute("data-collection"));
+		}
+
+		Loop = Next;
+	}
+
+	var Request = {
+		"TypeOfFile": document.getElementById("TypeOfFile").value,
+		"selectedCollections": SelectedCollections
+	};
+	var ExportContents = document.getElementById("ExportContents");
+	var Elements = ExportContents.elements;
+	var i, c = Elements.length;
+
+	for (i = 0; i < c; i++)
+	{
+		var Element = Elements[i];
+		if (Element.tagName === "INPUT" && Element.type === "checkbox")
+			Request[Element.name] = Element.checked;
+	}
 
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 				AddExportFile(xhttp.responseText, false);
 			else
 				ShowError(xhttp);
-
-			delete xhttp;
 		}
 	};
 
@@ -40,43 +58,43 @@ function AddExportFile(FileName, IsKey)
 	var Parent;
 
 	Loop = Loop.firstChild;
-	while (Loop != null && Loop.tagName != "TABLE")
+	while (Loop && Loop.tagName !== "TABLE")
 		Loop = Loop.nextSibling;
 
 	Parent = Loop;
 	Loop = Loop.firstChild;
-	while (Loop != null)
+	while (Loop)
 	{
-		if (Loop.tagName == "TBODY")
+		if (Loop.tagName === "TBODY")
 		{
 			Parent = Loop;
 			Loop = Loop.firstChild;
 		}
 		else
 		{
-			if (Loop.tagName == "TR")
+			if (Loop.tagName === "TR")
 			{
-				if (FirstRow == null)
-					FirstRow = Loop;
-				else
+				if (FirstRow)
 				{
 					AddExportRow(Parent, Loop, FileName, IsKey);
 					return;
 				}
+				else
+					FirstRow = Loop;
 			}
-			else if (Loop.tagName == "THEAD")
+			else if (Loop.tagName === "THEAD")
 				FirstRow = Loop;
 
 			Loop = Loop.nextSibling;
 		}
 	}
 
-	if (FirstRow != null)
+	if (FirstRow)
 	{
 		Loop = FirstRow.nextSibling;
-		while (Loop != null)
+		while (Loop)
 		{
-			if (Loop.tagName=="TBODY")
+			if (Loop.tagName === "TBODY")
 			{
 				AddExportRow(Loop, null, FileName, IsKey);
 				return;
@@ -93,10 +111,10 @@ function AddExportRow(Parent, Before, FileName, IsKey)
 {
 	var Tr = document.createElement("TR");
 
-	if (Before == null)
-		Parent.appendChild(Tr);
-	else
+	if (Before)
 		Parent.insertBefore(Tr, Before);
+	else
+		Parent.appendChild(Tr);
 
 	var i;
 
@@ -105,11 +123,12 @@ function AddExportRow(Parent, Before, FileName, IsKey)
 		var Td = document.createElement("TD");
 		Tr.appendChild(Td);
 
-		if (i == 0)
+		if (i === 0)
 		{
 			var a = document.createElement("A");
 			Td.appendChild(a);
 
+			a.setAttribute("target", "_blank");
 			a.innerText = FileName;
 
 			if (IsKey)
@@ -125,32 +144,32 @@ function FindExportFile(FileName)
 	var Loop = document.getElementById("ExportFiles");
 
 	Loop = Loop.firstChild;
-	while (Loop != null && Loop.tagName != "TABLE")
+	while (Loop && Loop.tagName !== "TABLE")
 		Loop = Loop.nextSibling;
 
 	Parent = Loop;
 	Loop = Loop.firstChild;
-	while (Loop != null)
+	while (Loop)
 	{
-		if (Loop.tagName == "TBODY")
+		if (Loop.tagName === "TBODY")
 			Loop = Loop.firstChild;
 		else
 		{
-			if (Loop.tagName == "TR")
+			if (Loop.tagName === "TR")
 			{
 				var Loop2 = Loop.firstChild;
 
-				while (Loop2 != null && Loop2.tagName != "TD")
+				while (Loop2 && Loop2.tagName !== "TD")
 					Loop2 = Loop2.nextSibling;
 
-				if (Loop2 != null)
+				if (Loop2)
 				{
 					var Loop3 = Loop2.firstChild;
 
-					while (Loop3 != null && Loop3.tagName != "A")
+					while (Loop3 && Loop3.tagName !== "A")
 						Loop3 = Loop3.nextSibling;
 
-					if (Loop3 != null && Loop3.innerText == FileName)
+					if (Loop3 && Loop3.innerText === FileName)
 						return Loop2;
 				}
 			}
@@ -165,7 +184,7 @@ function FindExportFile(FileName)
 function UpdateExport(Data)
 {
 	var Td = FindExportFile(Data.fileName);
-	if (Td == null)
+	if (!Td)
 	{
 		AddExportFile(Data.fileName, Data.isKey);
 		Td = FindExportFile(Data.fileName);
@@ -174,9 +193,9 @@ function UpdateExport(Data)
 	var i = 0;
 
 	Td = Td.nextSibling;
-	while (Td != null)
+	while (Td)
 	{
-		if (Td.tagName == "TD")
+		if (Td.tagName === "TD")
 		{
 			i++;
 			switch (i)
@@ -210,9 +229,9 @@ function DeleteExport(FileName)
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 			{
 				var Td = FindExportFile(FileName);
 				var Tr = Td.parentNode;
@@ -220,8 +239,6 @@ function DeleteExport(FileName)
 			}
 			else
 				ShowError(xhttp);
-
-			delete xhttp;
 		}
 	};
 
@@ -235,23 +252,21 @@ function UpdateBackupSettings()
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 				window.alert("Backup settings have been successfully updated.");
 			else
 				ShowError(xhttp);
-
-			delete xhttp;
 		}
 	};
 
 	xhttp.open("POST", "/UpdateBackupSettings", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.send(document.getElementById("AutomaticBackups").checked + '\n' +
-		document.getElementById("BackupTime").value + '\n' + 
-		document.getElementById("KeepDays").value + '\n' + 
-		document.getElementById("KeepMonths").value + '\n' + 
+		document.getElementById("BackupTime").value + '\n' +
+		document.getElementById("KeepDays").value + '\n' +
+		document.getElementById("KeepMonths").value + '\n' +
 		document.getElementById("KeepYears").value);
 }
 
@@ -260,14 +275,12 @@ function UpdateBackupFolderSettings()
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status == 200)
+			if (xhttp.status === 200)
 				window.alert("Backup folder settings have been successfully updated.");
 			else
 				ShowError(xhttp);
-
-			delete xhttp;
 		}
 	};
 
@@ -280,33 +293,48 @@ function UpdateBackupFolderSettings()
 function FileDeleted(Data)
 {
 	var Td = FindExportFile(Data.fileName);
-	if (Td == null)
-		return;
-
-	var Tr = Td.parentNode;
-
-	Tr.parentNode.removeChild(Tr);
+	if (Td)
+	{
+		var Tr = Td.parentNode;
+		Tr.parentNode.removeChild(Tr);
+	}
 }
 
 function StartAnalyze(Repair)
 {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function ()
-    {
-        if (xhttp.readyState == 4)
-        {
-            if (xhttp.status == 200)
-                AddExportFile(xhttp.responseText, false);
-            else
-                ShowError(xhttp);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState === 4)
+		{
+			if (xhttp.status === 200)
+				AddExportFile(xhttp.responseText, false);
+			else
+				ShowError(xhttp);
+		}
+	};
 
-            delete xhttp;
-        }
-    };
+	xhttp.open("POST", "/StartAnalyze", true);
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.send(JSON.stringify({
+		"repair": Repair
+	}));
+}
 
-    xhttp.open("POST", "/StartAnalyze", true);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(JSON.stringify({
-        "repair": Repair
-    }));
+function ToggleSelectCollections()
+{
+	var CheckBox = document.getElementById("Database");
+	var ExportDatabase = CheckBox.checked;
+
+	var ChcekBox2 = document.getElementById("OnlySelectedCollections");
+	ChcekBox2.parentElement.style.display = ExportDatabase ? "block" : "none";
+}
+
+function ToggleSelectedCollections()
+{
+	var CheckBox = document.getElementById("OnlySelectedCollections");
+	var OnlySelectedCollections = CheckBox.checked;
+
+	var Element = document.getElementById("SelectedCollections");
+	Element.style.display = OnlySelectedCollections ? "block" : "none";
 }

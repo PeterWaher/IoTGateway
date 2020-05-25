@@ -49,6 +49,22 @@ existing data with the contents of the backup file. If not checked, the backup f
 <label for="OverwriteExisting" title="If you want to replace existing data with the contents of the backup file, check this box.">Overwrite existing data.</label>
 </p>
 
+<p style="display:none">
+<input type="checkbox" name="OnlySelectedCollections" id="OnlySelectedCollections" onclick="ToggleSelectedCollections()"/>
+<label for="OnlySelectedCollections" title="If only selected collections are to be restored.">Only restore selected collections.</label>
+</p>
+
+<fieldset id="SelectedCollections" style="display:none">
+<legend>Collections</legend>
+<div id='Collections'>
+{{foreach CollectionName in Database.GetCollections().Result do ]]
+<p>
+<input type="checkbox" name="Collection_((CollectionName))" data-collection="((CollectionName))" id="Collection_((CollectionName))"/>
+<label for="Collection_((CollectionName))" title="If checked, objects in collection ((CollectionName)) will be restored.">((CollectionName))</label>
+</p>[[}}
+</div>
+</fieldset>
+
 </div>
 
 <p>

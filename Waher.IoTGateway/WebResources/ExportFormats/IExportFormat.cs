@@ -20,6 +20,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		}
 
 		/// <summary>
+		/// Optional array of collection nmes to export. If null, all collections will be exported.
+		/// </summary>
+		string[] CollectionNames
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Starts export
 		/// </summary>
 		Task Start();

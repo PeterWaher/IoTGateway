@@ -154,7 +154,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// http://jabber.org/protocol/pubsub#multi-collection
 		/// </summary>
-		public const string NamespacePubSubMultiCollecton = "http://jabber.org/protocol/pubsub#multi-collection";
+		public const string NamespacePubSubMultiCollection = "http://jabber.org/protocol/pubsub#multi-collection";
 
 		/// <summary>
 		/// http://jabber.org/protocol/pubsub#multi-items
@@ -332,7 +332,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void CreateNode(string ServiceAddress, string Name, NodeConfiguration Configuration,
 			NodeEventHandler Callback, object State)
 		{
-			this.CreateNode(this.componentAddress, Name, Configuration.ToForm(this), Callback, State);
+			this.CreateNode(ServiceAddress, Name, Configuration.ToForm(this), Callback, State);
 		}
 
 		/// <summary>

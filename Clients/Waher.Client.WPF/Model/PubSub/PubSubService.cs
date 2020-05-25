@@ -39,7 +39,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		internal bool SupportsemberAffiliation;
 		internal bool SupportsMetaData;
 		internal bool SupportsModifyAffiliations;
-		internal bool SupportsMultiCollecton;
+		internal bool SupportsMultiCollection;
 		internal bool SupportsMultiItems;
 		internal bool SupportsOutcastAffiliation;
 		internal bool SupportsPersistentItems;
@@ -79,7 +79,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			this.SupportsemberAffiliation = Features.ContainsKey(PubSubClient.NamespacePubSubemberAffiliation);
 			this.SupportsMetaData = Features.ContainsKey(PubSubClient.NamespacePubSubMetaData);
 			this.SupportsModifyAffiliations = Features.ContainsKey(PubSubClient.NamespacePubSubModifyAffiliations);
-			this.SupportsMultiCollecton = Features.ContainsKey(PubSubClient.NamespacePubSubMultiCollecton);
+			this.SupportsMultiCollection = Features.ContainsKey(PubSubClient.NamespacePubSubMultiCollection);
 			this.SupportsMultiItems = Features.ContainsKey(PubSubClient.NamespacePubSubMultiItems);
 			this.SupportsOutcastAffiliation = Features.ContainsKey(PubSubClient.NamespacePubSubOutcastAffiliation);
 			this.SupportsPersistentItems = Features.ContainsKey(PubSubClient.NamespacePubSubPersistentItems);

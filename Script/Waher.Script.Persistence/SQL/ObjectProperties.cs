@@ -154,12 +154,17 @@ namespace Waher.Script.Persistence.SQL
 
 					if (PI is null && FI is null)
 					{
-						PI = this.type.GetRuntimeProperty("Item");
+						if (this.dictionary is null)
+						{
+							PI = this.type.GetRuntimeProperty("Item");
 
-						if (PI is null)
-							Rec = null;
+							if (PI is null)
+								Rec = null;
+							else
+								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+						}
 						else
-							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+							Rec = null;
 					}
 					else
 						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
@@ -172,10 +177,22 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(Rec is null))
 			{
+				Result = true;  // null may be a valid response. Check variable collections first.
+			
 				if (Rec.Item1 is null)
 					Value = Rec.Item2.GetValue(this.obj);
 				else if (Rec.Item3)
-					Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+				{
+					try
+					{
+						Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+					}
+					catch (KeyNotFoundException)
+					{
+						Value = null;
+						Result = false;
+					}
+				}
 				else
 					Value = Rec.Item1.GetValue(this.obj);
 
@@ -184,8 +201,6 @@ namespace Waher.Script.Persistence.SQL
 					Variable = this.CreateVariable(Name, Value);
 					return true;
 				}
-
-				Result = true;  // null may be a valid response. Check variable collections first.
 			}
 
 			if (this.variables2.TryGetVariable(Name, out Variable))

@@ -67,28 +67,26 @@ function Restore()
 
                     Reader.onload = function (e)
                     {
-                        if (e.target.readyState == FileReader.DONE)
+                        if (e.target.readyState === FileReader.DONE)
                         {
                             UploadState.pos = EndRange;
 
                             var xhttp = new XMLHttpRequest();
                             xhttp.onreadystatechange = function ()
                             {
-                                if (xhttp.readyState == 4)
+                                if (xhttp.readyState === 4)
                                 {
-                                    if (xhttp.status == 200)
+                                    if (xhttp.status === 200)
                                         UploadState.Advance();
                                     else
                                         ShowError(xhttp);
-
-                                    delete xhttp;
                                 }
                             };
 
                             xhttp.open("POST", FileRec.resource, true);
                             xhttp.setRequestHeader("Content-Type", "application/octet-stream");
 
-                            if (UploadState.block == 0)
+                            if (UploadState.block === 0)
                                 xhttp.setRequestHeader("X-FileName", FileRec.file.name);
 
                             xhttp.setRequestHeader("X-TabID", TabID);
@@ -113,12 +111,10 @@ function Restore()
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function ()
                 {
-                    if (xhttp.readyState == 4)
+                    if (xhttp.readyState === 4)
                     {
-                        if (xhttp.status != 200)
+                        if (xhttp.status !== 200)
                             ShowError(xhttp);
-
-                        delete xhttp;
                     }
                 };
 
@@ -148,7 +144,7 @@ function Restore()
         };
     }
 
-    if (c + d == 0)
+    if (c + d === 0)
     {
         window.alert("No files selected.");
         return;

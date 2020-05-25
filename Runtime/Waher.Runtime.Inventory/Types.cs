@@ -418,8 +418,6 @@ namespace Waher.Runtime.Inventory
 
 					try
 					{
-						Log.Informational("Starting module.", T.FullName);
-
 						Module = (IModule)Activator.CreateInstance(T);
 						Modules.Add(Module);
 					}
@@ -436,11 +434,11 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						Tasks.Add(Module2.Start());
+						Tasks.Add(StartModule(Module2, 60000));	// 1 min timeout
 					}
 					catch (Exception ex)
 					{
-						Log.Error("Unable to start module: " + ex.Message, Module2.GetType().FullName);
+						Log.Critical(ex);
 					}
 				}
 
@@ -457,6 +455,41 @@ namespace Waher.Runtime.Inventory
 			}
 			else
 				return true;
+		}
+
+		private static async Task StartModule(IModule Module, int TimeoutMilliseconds)
+		{
+			Type T = Module.GetType();
+
+			try
+			{
+				Log.Informational("Starting module.", T.FullName);
+
+				Task<int> TimeoutTask = Timeout(TimeoutMilliseconds);
+				Task<int> StartTask = StartModule2(Module);
+				Task<int> First = await Task.WhenAny<int>(StartTask, TimeoutTask);
+
+				if (await First != 0)
+					Log.Warning("Starting module takes too long time. Startup continues in the background.", T.FullName);
+				else
+					Log.Informational("Module started.", T.FullName);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Unable to start module: " + ex.Message, T.FullName);
+			}
+		}
+
+		private static async Task<int> StartModule2(IModule Module)
+		{
+			await Module.Start();
+			return 0;
+		}
+
+		private static async Task<int> Timeout(int Milliseconds)
+		{
+			await Task.Delay(Milliseconds);
+			return 1;
 		}
 
 		/// <summary>

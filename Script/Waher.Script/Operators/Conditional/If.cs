@@ -35,8 +35,9 @@ namespace Waher.Script.Operators.Conditional
         public override IElement Evaluate(Variables Variables)
         {
             IElement Condition = this.left.Evaluate(Variables);
+            bool? b = ToBoolean(Condition);
 
-            if (Condition is BooleanValue b)
+            if (b.HasValue)
             {
                 if (b.Value)
                     return this.middle.Evaluate(Variables);
@@ -52,11 +53,23 @@ namespace Waher.Script.Operators.Conditional
             return this.Evaluate(Condition, IfTrue, IfFalse);
         }
 
+        private static bool? ToBoolean(IElement Value)
+        {
+            if (Value is BooleanValue b)
+                return b.Value;
+            else if (Value is DoubleNumber d)
+                return d.Value != 0;
+            else
+                return null;
+        }
+
         private IElement Evaluate(IElement Condition, IElement IfTrue, IElement IfFalse)
         {
             if (Condition.IsScalar)
             {
-                if (Condition is BooleanValue b)
+                bool? b = ToBoolean(Condition);
+
+                if (b.HasValue)
                 {
                     if (b.Value)
                         return IfTrue;
@@ -64,7 +77,7 @@ namespace Waher.Script.Operators.Conditional
                         return IfFalse;
                 }
 
-                throw new ScriptRuntimeException("Conditions must be boolean values, or encapsulate boolean values.", this);
+                throw new ScriptRuntimeException("Conditions must be boolean values, canonically correspond to boolean values, or encapsulate boolean values.", this);
             }
             else
             {

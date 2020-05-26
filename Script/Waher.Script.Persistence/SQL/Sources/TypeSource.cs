@@ -55,8 +55,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 		internal static async Task<IResultSetEnumerator> Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node, string Name)
 		{
-			object[] FindParameters = new object[] { Offset, Top, 
-				Convert(Where, Variables, Name), Convert(Order) };
+			bool Complete = true;
+			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, Name, ref Complete), Convert(Order) };
 			object Obj = FindMethod.MakeGenericMethod(T).Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
@@ -71,7 +71,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-			return new SynchEnumerator(Enumerable.GetEnumerator());
+			IResultSetEnumerator Result = new SynchEnumerator(Enumerable.GetEnumerator());
+
+			if (!Complete)
+				Result = new ConditionalEnumerator(Result, Variables, Where);
+
+			return Result;
 		}
 
 		private static MethodInfo findMethod = null;
@@ -130,7 +135,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Result;
 		}
 
-		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name)
+		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name, ref bool Complete)
 		{
 			if (Conditions is null)
 				return null;
@@ -145,8 +150,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				if (And != null || And2 != null)
 				{
-					Filter L = Convert(LO, Variables, Name);
-					Filter R = Convert(RO, Variables, Name);
+					Filter L = Convert(LO, Variables, Name, ref Complete);
+					Filter R = Convert(RO, Variables, Name, ref Complete);
 
 					if (L is null && R is null)
 						return null;
@@ -177,8 +182,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				if (Or != null || Or2 != null)
 				{
-					Filter L = Convert(LO, Variables, Name);
-					Filter R = Convert(RO, Variables, Name);
+					Filter L = Convert(LO, Variables, Name, ref Complete);
+					Filter R = Convert(RO, Variables, Name, ref Complete);
 
 					if (L is null || R is null)
 						return null;
@@ -237,6 +242,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
+					else
+						Complete = false;
 				}
 				else if (RO is VariableReference RVar)
 				{
@@ -275,13 +282,17 @@ namespace Waher.Script.Persistence.SQL.Sources
 						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
+					else
+						Complete = false;
 				}
+				else
+					Complete = false;
 			}
 			else if (Conditions is UnaryOperator UnOp)
 			{
 				if (Conditions is Operators.Logical.Not Not)
 				{
-					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name);
+					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name, ref Complete);
 					if (F is null)
 						return null;
 					else if (F is FilterNot Not2)
@@ -289,7 +300,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 					else
 						return new FilterNot(F);
 				}
+				else
+					Complete = false;
 			}
+			else if (Conditions is VariableReference Ref)
+				return new FilterFieldEqualTo(Ref.VariableName, true);
+			else
+				Complete = false;
 
 			return null;
 		}
@@ -412,7 +429,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the name refers to the source.</returns>
 		public bool IsSource(string Name)
 		{
-			return 
+			return
 				string.Compare(this.type.Name, Name, true) == 0 ||
 				string.Compare(this.alias, Name, true) == 0;
 		}

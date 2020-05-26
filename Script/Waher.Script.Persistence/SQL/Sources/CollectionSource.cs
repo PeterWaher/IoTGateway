@@ -51,8 +51,9 @@ namespace Waher.Script.Persistence.SQL.Sources
 		internal static async Task<IResultSetEnumerator> Find(string Collection, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node, string Name)
 		{
-			object[] FindParameters = new object[] { Collection, Offset, Top,
-				TypeSource.Convert(Where, Variables, Name), TypeSource.Convert(Order) };
+			bool Complete = true;
+			object[] FindParameters = new object[] { Collection, Offset, Top, 
+				TypeSource.Convert(Where, Variables, Name, ref Complete), TypeSource.Convert(Order) };
 			object Obj = FindMethod.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
@@ -67,7 +68,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-			return new SynchEnumerator(Enumerable.GetEnumerator());
+			IResultSetEnumerator Result = new SynchEnumerator(Enumerable.GetEnumerator());
+
+			if (!Complete)
+				Result = new ConditionalEnumerator(Result, Variables, Where);
+
+			return Result;
 		}
 
 		private static MethodInfo findMethod = null;

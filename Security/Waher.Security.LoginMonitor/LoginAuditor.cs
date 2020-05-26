@@ -101,7 +101,30 @@ namespace Waher.Security.LoginMonitor
 				return s;
 		}
 
-		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol)
+		/// <summary>
+		/// Gets an annotated Remote endpoint state object, if one is available.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <returns>Annotated state object, if available. Null otherwise.</returns>
+		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint)
+		{
+			string s = this.RemovePort(RemoteEndpoint);
+			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, false);
+			if (EP is null)
+				return null;
+
+			if (string.IsNullOrEmpty(EP.WhoIs))
+			{
+				if (IPAddress.TryParse(s, out IPAddress Address) && !IPAddress.IsLoopback(Address))
+					EP.WhoIs = await WhoIsClient.Query(Address);
+
+				await EP.Annotate();
+			}
+
+			return EP;
+		}
+
+		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol, bool CreateNew)
 		{
 			RemoteEndpoint EP;
 
@@ -120,6 +143,9 @@ namespace Waher.Security.LoginMonitor
 
 			if (EP is null)
 			{
+				if (!CreateNew)
+					return null;
+
 				EP = new RemoteEndpoint()
 				{
 					Endpoint = RemoteEndpoint,
@@ -171,7 +197,7 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="Protocol">Protocol used to log in.</param>
 		public async Task ProcessLoginSuccessful(string RemoteEndpoint, string Protocol)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
 			if (EP.LastProtocol == Protocol && !EP.LastFailed)
 				return;
 
@@ -195,7 +221,7 @@ namespace Waher.Security.LoginMonitor
 		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
 		public async Task<bool> ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp, string Reason)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
 			int i;
 
 			if (EP.Blocked)
@@ -254,7 +280,7 @@ namespace Waher.Security.LoginMonitor
 		/// </returns>
 		public async Task<DateTime?> GetEarliestLoginOpportunity(string RemoteEndpoint, string Protocol)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
 
 			if (EP.Blocked)
 				return DateTime.MaxValue;
@@ -289,7 +315,7 @@ namespace Waher.Security.LoginMonitor
 				EP.Blocked = true;
 				EP.Reason = Reason;
 
-				KeyValuePair<string, object>[] Tags = await LoginAuditor.Annotate(EP.Endpoint, new KeyValuePair<string, object>("Reason", Reason));
+				KeyValuePair<string, object>[] Tags = await EP.Annotate(new KeyValuePair<string, object>("Reason", Reason));
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("Remote endpoint blocked.");
@@ -372,12 +398,23 @@ namespace Waher.Security.LoginMonitor
 		/// Unblocks a remote endpoint and resets counters for it.
 		/// </summary>
 		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		public Task UnblockAndReset(string RemoteEndpoint)
+		{
+			return this.UnblockAndReset(RemoteEndpoint, string.Empty);
+		}
+
+		/// <summary>
+		/// Unblocks a remote endpoint and resets counters for it.
+		/// </summary>
+		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
 		public async Task UnblockAndReset(string RemoteEndpoint, string Protocol)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
 
-			EP.LastProtocol = Protocol;
+			if (!string.IsNullOrEmpty(Protocol))
+				EP.LastProtocol = Protocol;
+
 			EP.Reset(true);
 
 			await Database.Update(EP);
@@ -405,7 +442,7 @@ namespace Waher.Security.LoginMonitor
 			}
 		}
 
-		private static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, string Protocol, 
+		private static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)
 		{
 			int c = Tags?.Length ?? 0;

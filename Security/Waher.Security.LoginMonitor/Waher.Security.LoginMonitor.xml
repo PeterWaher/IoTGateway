@@ -73,6 +73,13 @@
             </summary>
             <param name="Event">Event to queue.</param>
         </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.GetAnnotatedStateObject(System.String)">
+            <summary>
+            Gets an annotated Remote endpoint state object, if one is available.
+            </summary>
+            <param name="RemoteEndpoint">Remote Endpoint.</param>
+            <returns>Annotated state object, if available. Null otherwise.</returns>
+        </member>
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ProcessLoginSuccessful(System.String,System.String)">
             <summary>
             Processes a successful login attempt.
@@ -131,6 +138,12 @@
             <summary>
             Event raised when an endpoint is to be annotated. Can be used to add additional information about an endpoint.
             </summary>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.UnblockAndReset(System.String)">
+            <summary>
+            Unblocks a remote endpoint and resets counters for it.
+            </summary>
+            <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
         </member>
         <member name="M:Waher.Security.LoginMonitor.LoginAuditor.UnblockAndReset(System.String,System.String)">
             <summary>
@@ -234,6 +247,31 @@
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.WhoIs">
             <summary>
             WHOIS information about the remote endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.City">
+            <summary>
+            City related to the endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Region">
+            <summary>
+            Region related to the endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Country">
+            <summary>
+            Country related to the endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Code">
+            <summary>
+            Country Code related to the endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.Flag">
+            <summary>
+            Flag related to the endpoint.
             </summary>
         </member>
         <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.LastFailed">

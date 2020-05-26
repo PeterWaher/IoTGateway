@@ -34,6 +34,10 @@ MenuItem(Text,Url):=
 [[
 );
 
+MenuHeader("Communication");
+MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1");
+MenuFooter();
+
 MenuHeader("Configuration Settings");
 foreach Item in Waher.IoTGateway.Gateway.GetSettingsMenu(Request,"User") do
 	MenuItem(MarkdownEncode(Item.Title),Item.Url);

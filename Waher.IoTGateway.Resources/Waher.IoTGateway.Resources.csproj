@@ -154,6 +154,10 @@
     <None Remove="Root\Master.md" />
     <None Remove="Root\Prompt.js" />
     <None Remove="Root\Prompt.md" />
+    <None Remove="Root\RemoteEndpoint.js" />
+    <None Remove="Root\RemoteEndpoint.md" />
+    <None Remove="Root\RemoteEndpointClear.ws" />
+    <None Remove="Root\RemoteEndpoints.md" />
     <None Remove="Root\robots.txt" />
     <None Remove="Root\Script.md" />
     <None Remove="Root\Smileys.md" />
@@ -515,6 +519,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\zenburn.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\RemoteEndpointClear.ws">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\RemoteEndpoint.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\RemoteEndpoint.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\RemoteEndpoints.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Admin.cssx">

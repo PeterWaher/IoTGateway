@@ -1347,6 +1347,10 @@
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
               <File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
+              <File Id='RemoteEndpoint.js' Name='RemoteEndpoint.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoint.js'/>
+              <File Id='RemoteEndpoint.md' Name='RemoteEndpoint.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoint.md'/>
+              <File Id='RemoteEndpointClear.ws' Name='RemoteEndpointClear.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpointClear.ws'/>
+              <File Id='RemoteEndpoints.md' Name='RemoteEndpoints.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoints.md'/>
               <File Id='robots.txt' Name='robots.txt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\robots.txt'/>
               <File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Script.md'/>
               <File Id='SignatureRequest.js' Name='SignatureRequest.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\SignatureRequest.js' />
@@ -1366,6 +1370,10 @@
               <RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
+              <RemoveFile Id='RemoveRemoteEndpoint.js' Name='RemoteEndpoint.js' On='uninstall'/>
+              <RemoveFile Id='RemoveRemoteEndpoint.md' Name='RemoteEndpoint.md' On='uninstall'/>
+              <RemoveFile Id='RemoveRemoteEndpointClear.ws' Name='RemoteEndpointClear.ws' On='uninstall'/>
+              <RemoveFile Id='RemoveRemoteEndpoints.md' Name='RemoteEndpoints.md' On='uninstall'/>
               <RemoveFile Id='Removerobots.txt' Name='robots.txt' On='uninstall'/>
               <RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
               <RemoveFile Id='RemoveSignatureRequest.js' Name='SignatureRequest.js' On='uninstall'/>

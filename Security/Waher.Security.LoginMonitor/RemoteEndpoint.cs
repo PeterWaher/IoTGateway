@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Security.LoginMonitor
@@ -19,6 +19,11 @@ namespace Waher.Security.LoginMonitor
 		private string lastProtocol = string.Empty;
 		private string reason = string.Empty;
 		private string whois = string.Empty;
+		private string city = string.Empty;
+		private string region = string.Empty;
+		private string country = string.Empty;
+		private string code = string.Empty;
+		private string flag = string.Empty;
 		private bool blocked = false;
 		private int[] state = null;
 		private DateTime[] timestamps = null;
@@ -120,6 +125,56 @@ namespace Waher.Security.LoginMonitor
 		}
 
 		/// <summary>
+		/// City related to the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string City
+		{
+			get => this.city;
+			set => this.city = value;
+		}
+
+		/// <summary>
+		/// Region related to the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Region
+		{
+			get => this.region;
+			set => this.region = value;
+		}
+
+		/// <summary>
+		/// Country related to the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Country
+		{
+			get => this.country;
+			set => this.country = value;
+		}
+
+		/// <summary>
+		/// Country Code related to the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Code
+		{
+			get => this.code;
+			set => this.code = value;
+		}
+
+		/// <summary>
+		/// Flag related to the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Flag
+		{
+			get => this.flag;
+			set => this.flag = value;
+		}
+
+		/// <summary>
 		/// Checks if last login attempt was a failed login attempt.
 		/// </summary>
 		public bool LastFailed
@@ -153,6 +208,39 @@ namespace Waher.Security.LoginMonitor
 				this.blocked = false;
 				this.reason = string.Empty;
 			}
+		}
+
+		internal async Task<KeyValuePair<string, object>[]> Annotate(params KeyValuePair<string, object>[] Tags)
+		{
+			Tags = await LoginAuditor.Annotate(this.endpoint, Tags);
+
+			foreach (KeyValuePair<string, object> Tag in Tags)
+			{
+				switch (Tag.Key)
+				{
+					case "City":
+						this.city = Tag.Value.ToString();
+						break;
+
+					case "Region":
+						this.region = Tag.Value.ToString();
+						break;
+
+					case "Country":
+						this.country = Tag.Value.ToString();
+						break;
+
+					case "Code":
+						this.code = Tag.Value.ToString();
+						break;
+
+					case "Flag":
+						this.flag = Tag.Value.ToString();
+						break;
+				}
+			}
+
+			return Tags;
 		}
 
 	}

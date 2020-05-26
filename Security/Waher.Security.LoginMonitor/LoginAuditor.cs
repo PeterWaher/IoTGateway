@@ -119,6 +119,7 @@ namespace Waher.Security.LoginMonitor
 					EP.WhoIs = await WhoIsClient.Query(Address);
 
 				await EP.Annotate();
+				await Database.Update(EP);
 			}
 
 			return EP;

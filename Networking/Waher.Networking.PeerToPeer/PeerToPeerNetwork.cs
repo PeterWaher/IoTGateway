@@ -438,7 +438,7 @@ namespace Waher.Networking.PeerToPeer
 			try
 			{
 				RemoteEndPoint2 = this.CheckLocalRemoteEndpoint(RemoteEndPoint);
-				await Client.ConnectAsync(RemoteEndPoint2.Address, RemoteEndPoint2.Port);
+				await Client.ConnectAsync(RemoteEndPoint2.Address, RemoteEndPoint2.Port, true);
 			}
 			catch (Exception ex)
 			{

@@ -168,7 +168,7 @@ namespace Waher.Networking.PeerToPeer
 			this.packetSize = 0;
 			this.offset = 0;
 			this.resynchCallback = ResynchCallback;
-			this.tcpConnection.Bind();
+			this.tcpConnection?.Continue();
 		}
 
 		/// <summary>

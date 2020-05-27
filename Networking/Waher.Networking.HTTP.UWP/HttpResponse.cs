@@ -358,6 +358,45 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Gets the first header value matching a given header field name.
+		/// </summary>
+		/// <param name="FieldName">Header field name.</param>
+		/// <returns>First header value correspondig to <paramref name="FieldName"/>.</returns>
+		public string GetFirstHeader(string FieldName)
+		{
+			switch (FieldName.ToUpper())
+			{
+				case "DATE": return CommonTypes.EncodeRfc822(this.date);
+				case "EXPIRES": return this.expires.HasValue ? CommonTypes.EncodeRfc822(this.expires.Value) : null;
+				case "SERVER": return this.server;
+				case "CONTENT-LANGUAGE": return this.contentLanguage;
+				case "CONTENT-TYPE": return this.contentType;
+				case "CONTENT-LENGTH": return this.contentLength.HasValue ? this.contentLength.Value.ToString() : null;
+
+				case "SET-COOKIE":
+					if (this.cookies != null)
+					{
+						foreach (Cookie Cookie in this.cookies)
+							return Cookie.ToString();
+					}
+
+					return null;
+
+				default:
+					if (this.customHeaders != null)
+					{
+						foreach (KeyValuePair<string, string> P in this.customHeaders)
+						{
+							if (string.Compare(P.Key, FieldName, true) == 0)
+								return P.Value;
+						}
+					}
+
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Gets the System.Text.Encoding in which the output is written.
 		/// </summary>
 		public override Encoding Encoding

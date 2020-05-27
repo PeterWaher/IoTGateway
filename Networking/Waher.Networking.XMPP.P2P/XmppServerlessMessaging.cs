@@ -560,6 +560,7 @@ namespace Waher.Networking.XMPP.P2P
 						else
 							Result.CallCallbacks();
 					});
+
 					Result.HeaderSent = true;
 					await Result.SendAsync(Header);
 					this.TransmitText(Header);

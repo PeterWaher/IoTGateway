@@ -115,7 +115,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			try
 			{
-				this.response.Dispose();
+				this.response?.Dispose();
 			}
 			catch (Exception ex)
 			{

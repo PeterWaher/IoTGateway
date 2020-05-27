@@ -367,7 +367,7 @@ namespace Waher.Networking
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					throw new ObjectDisposedException("Object already disposed.");
+					return;
 
 				if (Cancel = this.connecting || this.reading || this.sending)
 					this.disposing = true;
@@ -383,7 +383,7 @@ namespace Waher.Networking
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					throw new ObjectDisposedException("Object already disposed.");
+					return;
 
 				if (this.connecting || this.reading || this.sending)
 				{

@@ -379,7 +379,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				this.client.SendAsync(Xml, Callback);
+				Task _ = this.client.SendAsync(Xml, Callback);
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 		}
@@ -1246,7 +1246,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (Handlers.ContainsKey(Key))
-					throw new ArgumentException("Handler already registered.", nameof(LocalName));
+					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 
 				Handlers[Key] = Handler;
 
@@ -1317,7 +1317,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (this.messageHandlers.ContainsKey(Key))
-					throw new ArgumentException("Handler already registered.", nameof(LocalName));
+					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 
 				this.messageHandlers[Key] = Handler;
 

@@ -2395,7 +2395,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (Handlers.ContainsKey(Key))
-					throw new ArgumentException("Handler already registered.", nameof(LocalName));
+					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 
 				Handlers[Key] = Handler;
 
@@ -2472,7 +2472,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (this.messageHandlers.ContainsKey(Key))
-					throw new ArgumentException("Handler already registered.", nameof(LocalName));
+					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 
 				this.messageHandlers[Key] = Handler;
 
@@ -2526,7 +2526,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (this.messageFormHandlers.ContainsKey(FormType))
-					throw new ArgumentException("Handler already registered.", nameof(FormType));
+					throw new ArgumentException("Handler already registered: " + FormType, nameof(FormType));
 
 				this.messageFormHandlers[FormType] = Handler;
 			}
@@ -2568,7 +2568,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				if (this.presenceHandlers.ContainsKey(Key))
-					throw new ArgumentException("Handler already registered.", nameof(LocalName));
+					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 
 				this.presenceHandlers[Key] = Handler;
 

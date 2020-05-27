@@ -276,7 +276,7 @@ namespace Waher.IoTGateway
 
 			lock (Queue)
 			{
-				if (Queue.Queue.First != null)
+				if (!(Queue.Queue.First is null))
 				{
 					ToSend = new LinkedList<string>();
 
@@ -287,7 +287,7 @@ namespace Waher.IoTGateway
 				}
 			}
 
-			if (ToSend != null)
+			if (!(ToSend is null))
 			{
 				foreach (string s2 in ToSend)
 					Socket.Send(s2, 4096);
@@ -337,7 +337,7 @@ namespace Waher.IoTGateway
 			{
 				HttpResponse Response = e.Value.Response;
 
-				if (Response != null)
+				if (!(Response is null))
 				{
 					try
 					{
@@ -391,7 +391,7 @@ namespace Waher.IoTGateway
 					Location = null;
 			}
 
-			if (!(Location != null))
+			if (!(Location is null))
 			{
 				lock (tabIdsByLocation)
 				{
@@ -795,7 +795,7 @@ namespace Waher.IoTGateway
 						{
 							Found = true;
 
-							if (P.Value != null)
+							if (!(P.Value is null))
 							{
 								foreach ((string, string, string) Q2 in P.Value)
 								{
@@ -817,7 +817,7 @@ namespace Waher.IoTGateway
 						{
 							Found = false;
 
-							if (P.Value != null)
+							if (!(P.Value is null))
 							{
 								foreach ((string, string, string) Q2 in P.Value)
 								{
@@ -1023,7 +1023,7 @@ namespace Waher.IoTGateway
 
 			foreach (string TabID in TabIDs)
 			{
-				if (TabID != null && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+				if (!(TabID is null) && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 				{
 					if (!string.IsNullOrEmpty(UserVariable))
 					{
@@ -1033,7 +1033,7 @@ namespace Waher.IoTGateway
 							continue;
 						}
 
-						if (Privileges != null)
+						if (!(Privileges is null))
 						{
 							bool HasPrivileges = true;
 
@@ -1053,9 +1053,9 @@ namespace Waher.IoTGateway
 
 					lock (Queue)
 					{
-						if (Queue.WebSocket != null)
+						if (!(Queue.WebSocket is null))
 							Queue.WebSocket.Send(Json.ToString(), 4096);
-						else if (Queue.Response != null)
+						else if (!(Queue.Response is null))
 						{
 							try
 							{

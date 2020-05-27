@@ -5460,7 +5460,7 @@ namespace Waher.Persistence.Files
 							}
 							catch (Exception)
 							{
-								Cursor = new Searching.EmptyCursor<T>();
+								return new Searching.EmptyCursor<T>();
 							}
 						}
 						else if (Filter is FilterFieldGreaterThan)
@@ -5524,7 +5524,7 @@ namespace Waher.Persistence.Files
 					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
 					bool UntilFirstFail;
 
-					if (Index.ReverseSortOrder(null, Filter2.ConstantFields))
+					if (Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
 						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(Locked,
@@ -5533,7 +5533,7 @@ namespace Waher.Persistence.Files
 					else
 					{
 						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
-						UntilFirstFail = Index.SameSortOrder(null, Filter2.ConstantFields);
+						UntilFirstFail = Index.SameSortOrder(Filter2.ConstantFields, SortOrder);
 
 						if (!UntilFirstFail)
 						{

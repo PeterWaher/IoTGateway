@@ -571,30 +571,28 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task<PeerConnection> ConnectToAsync(string FullJID, AddressInfo Info)
 		{
 			PeerConnection Connection;
-			IPAddress Addr;
+			string Ip;
+			int Port;
 
 			if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())
 			{
-				if (IPAddress.TryParse(Info.LocalIp, out Addr))
-				{
-					this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + FullJID + ")");
-					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
-					this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + FullJID + ")");
-				}
-				else
-					Connection = null;
+				Ip = Info.LocalIp;
+				Port = Info.LocalPort;
 			}
 			else
 			{
-				if (IPAddress.TryParse(Info.ExternalIp, out Addr))
-				{
-					this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + FullJID + ")");
-					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
-					this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + FullJID + ")");
-				}
-				else
-					Connection = null;
+				Ip = Info.ExternalIp;
+				Port = Info.ExternalPort;
 			}
+
+			if (IPAddress.TryParse(Ip, out IPAddress Addr))
+			{
+				this.Information("Connecting to " + Ip + ":" + Port.ToString() + " (" + FullJID + ")");
+				Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Port));
+				this.Information("Connected to to " + Ip + ":" + Port.ToString() + " (" + FullJID + ")");
+			}
+			else
+				Connection = null;
 
 			return Connection;
 		}
@@ -604,11 +602,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.p2pNetwork != null)
-			{
-				this.p2pNetwork.Dispose();
-				this.p2pNetwork = null;
-			}
+			this.p2pNetwork?.Dispose();
+			this.p2pNetwork = null;
 
 			if (this.peersByFullJid != null)
 			{

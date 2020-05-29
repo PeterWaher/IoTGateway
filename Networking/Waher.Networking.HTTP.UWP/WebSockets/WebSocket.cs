@@ -957,7 +957,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		private byte[] Encode(ushort Code, string Reason)
 		{
-			byte[] Bin = Encoding.UTF8.GetBytes(Reason);
+			byte[] Bin = Encoding.UTF8.GetBytes(Reason ?? string.Empty);
 			int c = Bin.Length;
 			byte[] Payload = new byte[c + 2];
 

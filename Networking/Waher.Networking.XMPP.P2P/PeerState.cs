@@ -621,11 +621,8 @@ namespace Waher.Networking.XMPP.P2P
 
 			this.CallCallbacks();
 
-			if (this.peer != null)
-			{
-				this.peer.Dispose();
-				this.peer = null;
-			}
+			this.peer?.Dispose();
+			this.peer = null;
 		}
 
 		private void ProcessStream(string Xml)

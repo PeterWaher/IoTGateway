@@ -226,6 +226,8 @@ namespace Waher.Networking.PeerToPeer
 							try
 							{
 								BinaryTcpClient Client = new BinaryTcpClient(TcpClient);
+								Client.Bind(true);
+
 								Connection = new PeerConnection(Client, this,
 									(IPEndPoint)TcpClient.Client.RemoteEndPoint, this.encapsulatePackets);
 

@@ -99,8 +99,7 @@ namespace Waher.Networking.Cluster
 			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
 			this.currentStatus.Removed += CurrentStatus_Removed;
 
-			if (Types.TryGetModuleParameter("Scheduler", out object Obj) &&
-				Obj is Scheduler Scheduler)
+			if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
 			{
 				this.scheduler = Scheduler;
 				this.internalScheduler = false;

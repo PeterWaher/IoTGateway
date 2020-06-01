@@ -1279,6 +1279,9 @@ namespace Waher.Networking.HTTP
 		/// <returns>Session states, or null if not found and not crerated.</returns>
 		public Variables GetSession(string SessionId, bool CreateIfNotFound)
 		{
+			if (this.sessions is null)
+				return null;
+
 			if (this.sessions.TryGetValue(SessionId, out Variables Result))
 				return Result;
 

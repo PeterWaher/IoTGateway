@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.HTTPX
 {
 	internal static class HttpxChunks
 	{
-		private static Dictionary<XmppClient, int> registrationsPerClient = new Dictionary<XmppClient, int>();
+		private readonly static Dictionary<XmppClient, int> registrationsPerClient = new Dictionary<XmppClient, int>();
 		internal static Cache<string, ChunkRecord> chunkedStreams = null;
 
 		internal static void RegisterChunkReceiver(XmppClient Client)

@@ -104,20 +104,52 @@ namespace Waher.Networking.PeerToPeer
 			{
 				byte[] Addr = Address.GetAddressBytes();
 
-				if (Addr[0] == 127)
-					return false;   // Loopback address range: 127.0.0.0 - 127.255.255.55
+				// https://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xhtml
 
-				else if (Addr[0] == 10)
-					return false;   // Private address range: 10.0.0.0 - 10.255.255.55
+				switch (Addr[0])
+				{
+					case 0:
+						return false;   // 000.X.X.X/8: Reserved for self-identification [RFC1122]
 
-				else if (Addr[0] == 172 && Addr[1] >= 16 && Addr[1] <= 31)
-					return false;   // Private address range: 172.16.0.0 - 172.31.255.255
+					case 10:
+						return false;   // 010.X.X.X/8: Reserved for Private-Use Networks [RFC1918]
 
-				else if (Addr[0] == 192 && Addr[1] == 168)
-					return false;   // Private address range: 192.168.0.0 - 192.168.255.255
+					case 100:           // 100.64.X.X/10 reserved for Shared Address Space [RFC6598].
+						return (Addr[1] & 0xc0) != 64;
 
-				else if (Addr[0] == 169 && Addr[1] == 254)
-					return false;   // Link-local address range: 169.254.0.0 - 169.254.255.255
+					case 127:           // 127.X.X.X/8 reserved for Loopback [RFC1122]
+						return false;
+
+					case 169:           // 169.254.X.X/16 reserved for Link Local
+						return Addr[1] != 254;
+
+					case 172:           // 172.16.0.0/12 reserved for Private-Use Networks
+						return (Addr[1] & 0xf0) != 16;
+
+					case 192:
+						switch (Addr[1])
+						{
+							case 0:
+								switch (Addr[2])
+								{
+									case 0:				// 192.0.0.0/24 reserved for IANA IPv4 Special Purpose Address Registry
+										return false;
+
+									case 2:				// 192.0.2.X/24  reserved for TEST-NET-1
+										return false;
+
+									default:
+										return true;
+								}
+
+							case 88:
+								return Addr[2] != 99;   // 192.88.99.X/24 reserved for 6to4 Relay Anycast
+
+							case 168:
+								return false;           // 192.168.0.0/16 reserved for Private-Use Networks
+						}
+						break;
+				}
 
 				return true;
 			}

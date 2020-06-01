@@ -620,7 +620,7 @@ namespace Waher.Networking.HTTP
 						ContentType = "text/plain; charset=utf-8";
 					}
 
-					if (this.statusCode >= 400 &&
+					if (this.statusCode >= 400 && !(this.httpServer is null) &&
 						this.httpServer.HasCustomErrors &&
 						(this.httpRequest.Header.Method != "POST" ||
 						this.httpRequest.Header.ContentType is null ||
@@ -677,7 +677,7 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nServer: ");
 						Output.Append(this.server);
 					}
-					else if (!string.IsNullOrEmpty(this.httpServer.Name))
+					else if (!string.IsNullOrEmpty(this.httpServer?.Name))
 					{
 						Output.Append("\r\nServer: ");
 						Output.Append(this.httpServer.Name);

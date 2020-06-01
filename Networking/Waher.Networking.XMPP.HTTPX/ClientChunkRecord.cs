@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -16,18 +17,18 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal SortedDictionary<int, Chunk> chunks = null;
 		internal HttpResponse response;
 		internal HttpxResponseDataEventHandler dataCallback;
-        internal IE2eSymmetricCipher symmetricCipher;
-        internal object state;
+		internal IE2eSymmetricCipher symmetricCipher;
+		internal object state;
 		internal string streamId;
 		internal string from;
 		internal string to;
-        internal string endpointReference;
+		internal string endpointReference;
 		internal int nextChunk = 0;
-        internal bool e2e;
+		internal bool e2e;
 
-		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response, 
-			HttpxResponseDataEventHandler DataCallback, object State, string StreamId, string From, string To, bool E2e, 
-            string EndpointReference, IE2eSymmetricCipher SymmetricCipher)
+		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response,
+			HttpxResponseDataEventHandler DataCallback, object State, string StreamId, string From, string To, bool E2e,
+			string EndpointReference, IE2eSymmetricCipher SymmetricCipher)
 			: base()
 		{
 			this.client = Client;
@@ -39,22 +40,25 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.from = From;
 			this.to = To;
 			this.e2e = E2e;
-            this.endpointReference = EndpointReference;
-            this.symmetricCipher = SymmetricCipher;
+			this.endpointReference = EndpointReference;
+			this.symmetricCipher = SymmetricCipher;
 		}
 
 		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
-				try
+				if (Data.Length > 0 || Last)
 				{
-					this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state));
-				}
-				catch (Exception)
-				{
-					this.client.CancelTransfer(this.e.From, this.streamId);
-					return false;
+					try
+					{
+						this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state));
+					}
+					catch (Exception)
+					{
+						this.client.CancelTransfer(this.e.From, this.streamId);
+						return false;
+					}
 				}
 
 				this.nextChunk++;
@@ -123,19 +127,35 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		public override void Dispose()
+		internal override void Fail(string Message)
 		{
-			if (this.response != null)
+			if (this.response is null)
+				return;
+
+			try
 			{
-				this.response.Dispose();
-				this.response = null;
+				this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state));
+			}
+			catch (Exception)
+			{
+				// Ignore
 			}
 
-			if (this.chunks != null)
-			{
-				this.chunks.Clear();
-				this.chunks = null;
-			}
+			if (!this.response.HeaderSent)
+				this.response.SendResponse(new InternalServerErrorException(Message));
+
+			this.client.CancelTransfer(this.e.From, this.streamId);
+
+			this.Done();
+		}
+
+		public override void Dispose()
+		{
+			this.response?.Dispose();
+			this.response = null;
+
+			this.chunks?.Clear();
+			this.chunks = null;
 		}
 	}
 }

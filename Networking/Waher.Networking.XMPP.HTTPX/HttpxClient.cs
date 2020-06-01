@@ -560,21 +560,24 @@ namespace Waher.Networking.XMPP.HTTPX
 				int Count = e.Count;
 				int d;
 
-				while (Count-- > 0)
+				while (Count > 0)
 				{
 					switch (Rx.State)
 					{
 						case 0:
 							Rx.BlockSize = Buffer[Offset++];
+							Count--;
 							Rx.State++;
 							break;
 
 						case 1:
 							Rx.BlockSize <<= 8;
 							Rx.BlockSize |= Buffer[Offset++];
+							Count--;
 
 							if (Rx.BlockSize == 0)
 							{
+								HttpxChunks.chunkedStreams.Remove(Rx.Key);
 								Rec.ChunkReceived(Rx.Nr++, true, new byte[0]);
 								e.Stream.Dispose();
 								return;
@@ -594,6 +597,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							Array.Copy(Buffer, Offset, Rx.Block, Rx.BlockPos, d);
 							Offset += d;
 							Rx.BlockPos += d;
+							Count -= d;
 
 							if (Rx.BlockPos >= Rx.BlockSize)
 							{
@@ -603,6 +607,11 @@ namespace Waher.Networking.XMPP.HTTPX
 									Rx.Block = this.e2e.Decrypt(Rx.EndpointReference, Id, Rx.StreamId, Rx.From, Rx.To, Rx.Block, Rx.SymmetricCipher);
 									if (Rx.Block is null)
 									{
+										string Message = "Decryption of chunk " + Rx.Nr.ToString() + " failed.";
+#if LOG_SOCKS5_EVENTS
+										this.client.Error(Message);
+#endif
+										Rec.Fail(Message);
 										e.Stream.Dispose();
 										return;
 									}
@@ -634,7 +643,11 @@ namespace Waher.Networking.XMPP.HTTPX
 #endif
 			Socks5Receiver Rx = (Socks5Receiver)e.State;
 
-			HttpxChunks.chunkedStreams.Remove(Rx.Key);
+			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
+			{
+				HttpxChunks.chunkedStreams.Remove(Rx.Key);
+				Rec.ChunkReceived(Rx.Nr++, true, new byte[0]);
+			}
 		}
 
 	}

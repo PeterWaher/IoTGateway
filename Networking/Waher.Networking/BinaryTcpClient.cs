@@ -233,6 +233,7 @@ namespace Waher.Networking
 			await this.client.ConnectAsync(new HostName(Address.ToString()), Port.ToString(), SocketProtectionLevel.PlainSocket);
 			return this.PostConnect(Paused);
 #else
+			Log.Debug("Connecting to " + Address + ":" + Port);	// TODO: Remove
 			await this.tcpClient.ConnectAsync(Address, Port);
 			return this.PostConnect(Paused);
 #endif

@@ -172,7 +172,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				get
 				{
-					return Gateway.XmppClient.UserName;
+					return Gateway.XmppClient?.UserName;
 				}
 			}
 

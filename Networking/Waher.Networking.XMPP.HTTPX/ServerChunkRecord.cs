@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal string id;
 		internal string from;
 		internal string to;
-        internal string e2eReference;
+		internal string e2eReference;
 		internal int nextChunk = 0;
 		internal int maxChunkSize;
 		internal bool sipub;
@@ -27,9 +27,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal bool s5;
 		internal bool jingle;
 
-		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request, 
-			IEndToEndEncryption E2e, string EndpointReference, TemporaryFile File, int MaxChunkSize, bool Sipub, bool Ibb, 
-            bool Socks5, bool Jingle)
+		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request,
+			IEndToEndEncryption E2e, string EndpointReference, TemporaryFile File, int MaxChunkSize, bool Sipub, bool Ibb,
+			bool Socks5, bool Jingle)
 			: base()
 		{
 			this.server = Server;
@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.to = To;
 			this.request = Request;
 			this.e2e = E2e;
-            this.e2eReference = EndpointReference;
+			this.e2eReference = EndpointReference;
 			this.file = File;
 			this.maxChunkSize = MaxChunkSize;
 			this.sipub = Sipub;
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			if (Nr == this.nextChunk)
 			{
-				this.file.Write(Data, 0, Data.Length);
+				this.file?.Write(Data, 0, Data.Length);
 				this.nextChunk++;
 
 				if (Last)
@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Chunk.Nr == this.nextChunk)
 								{
-									this.file.Write(Chunk.Data, 0, Chunk.Data.Length);
+									this.file?.Write(Chunk.Data, 0, Chunk.Data.Length);
 									this.nextChunk++;
 									this.chunks.Remove(Chunk.Nr);
 
@@ -100,23 +100,24 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void Done()
 		{
-			this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize, 
+			this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
 				this.sipub, this.ibb, this.s5, this.jingle);
+		}
+
+		internal override void Fail(string Message)
+		{
+			this.file?.Dispose();
+			this.file = null;
+			this.Done();
 		}
 
 		public override void Dispose()
 		{
-			if (this.request != null)
-			{
-				this.request.Dispose();
-				this.request = null;
-			}
+			this.request?.Dispose();
+			this.request = null;
 
-			if (this.chunks != null)
-			{
-				this.chunks.Clear();
-				this.chunks = null;
-			}
+			this.chunks?.Clear();
+			this.chunks = null;
 		}
 	}
 }

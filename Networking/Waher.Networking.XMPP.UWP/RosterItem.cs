@@ -193,7 +193,24 @@ namespace Waher.Networking.XMPP
 		/// <returns>If the item is in the group.</returns>
 		public bool IsInGroup(string Group)
 		{
-			return Array.IndexOf<string>(this.groups, Group) >= 0;
+			return this.IsInGroup(Group, false);
+		}
+
+		/// <summary>
+		/// Checks if the roster item is in a specific group.
+		/// </summary>
+		/// <param name="Group">Name of group.</param>
+		/// <param name="IgnoreCase">If comparison should be case insensitive (default=false).</param>
+		/// <returns>If the item is in the group.</returns>
+		public bool IsInGroup(string Group, bool IgnoreCase)
+		{
+			foreach (string s in this.groups)
+			{
+				if (string.Compare(s, Group, IgnoreCase) == 0)
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>

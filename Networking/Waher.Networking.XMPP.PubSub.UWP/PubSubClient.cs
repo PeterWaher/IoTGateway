@@ -1564,6 +1564,7 @@ namespace Waher.Networking.XMPP.PubSub
 		private void EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
 			string SubscriptionId = string.Empty;
+			string ReplyTo = e.From;
 			DateTime? Delay = null;
 
 			foreach (XmlNode N in e.Message.ChildNodes)
@@ -1598,6 +1599,21 @@ namespace Waher.Networking.XMPP.PubSub
 								Delay = Timestamp;
 							}
 							break;
+
+						case "addresses":
+							if (E.NamespaceURI == "http://jabber.org/protocol/address")
+							{
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "address" && XML.Attribute(E2, "type") == "replyto")
+									{
+										ReplyTo = XML.Attribute(E2, "jid");
+										break;
+									}
+								}
+
+							}
+							break;
 					}
 				}
 			}
@@ -1620,7 +1636,7 @@ namespace Waher.Networking.XMPP.PubSub
 										case "item":
 											string ItemId = XML.Attribute(E2, "id");
 											string Publisher = XML.Attribute(E2, "publisher");
-											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, E2, Delay, e);
+											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, ReplyTo, E2, Delay, e);
 
 											try
 											{
@@ -1634,7 +1650,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 										case "retract":
 											ItemId = XML.Attribute(E2, "id");
-											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, E2, Delay, e);
+											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, ReplyTo, E2, Delay, e);
 
 											try
 											{

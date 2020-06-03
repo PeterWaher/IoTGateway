@@ -929,6 +929,17 @@ namespace Waher.Content
 		/// Gets a (possibly big) resource, given its URI.
 		/// </summary>
 		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return GetTempFileAsync(Uri, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>

@@ -862,6 +862,22 @@ PlantUML is installed in the program data folder.
 
 For more information about PlantUML syntax, see the [PlantUML Language Reference Guide](http://plantuml.com/PlantUML_Language_Reference_Guide.pdf).
 
+### Comments
+
+You can add comments to Markdown documents. Comments are not exported when rendering output. Comments are put in separate blocks, each row
+prefixed by double slash `//`. Example:
+
+	This is a paragraph
+
+	// This is a comment on one row
+
+	This is another paragraph
+
+	// Comments can be written
+	// on multiple rows, but
+	// each row needs to be
+	// prefixed by //.
+
 ### Horizontal rules
 
 Horizontal rules can be used to separate sections of the text. There are various ways of including a horizontal rule. On a separate line, write a

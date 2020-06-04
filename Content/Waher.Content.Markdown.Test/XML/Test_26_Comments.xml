@@ -1,0 +1,40 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_26_Comments.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<CommentBlock>
+			<Row> Beginning document with a comment.</Row>
+		</CommentBlock>
+		<Paragraph>
+			<InlineText>This is paragraph 1</InlineText>
+		</Paragraph>
+		<CommentBlock>
+			<Row> A one-line comment</Row>
+		</CommentBlock>
+		<Paragraph>
+			<InlineText>This is paragraph 2</InlineText>
+		</Paragraph>
+		<CommentBlock>
+			<Row> Adding comments</Row>
+			<Row> on multiple lines.</Row>
+		</CommentBlock>
+		<Paragraph>
+			<InlineText>This is the third paragraph.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>In this fourth paragraph</InlineText>
+			<LineBreak />
+			<InlineText>a line break is inserted.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>The fifth paragraph is separated from the fourth by a line containing only spaces.</InlineText>
+		</Paragraph>
+		<CommentBlock>
+			<Row> Terminating document with a comment.</Row>
+		</CommentBlock>
+	</elements>
+	<references />
+</parsedMakdown>

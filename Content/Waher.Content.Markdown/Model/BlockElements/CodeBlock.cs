@@ -50,7 +50,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.start = Start;
 			this.end = End;
 			this.indent = Indent;
-			this.indentString = Indent <= 0 ? string.Empty : new string('\t', Indent);
+			this.indentString = this.indent <= 0 ? string.Empty : new string('\t', this.indent);
 			this.language = Language;
 			this.handler = GetHandler(this.language);
 		}

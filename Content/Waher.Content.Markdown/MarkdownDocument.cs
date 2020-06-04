@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -15,7 +16,6 @@ using Waher.Events;
 using Waher.Script;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
-using System.Collections;
 
 namespace Waher.Content.Markdown
 {
@@ -596,6 +596,16 @@ namespace Waher.Content.Markdown
 					else
 						Elements.AddLast(new DeleteBlocks(this, Content));
 
+					continue;
+				}
+				else if (Block.IsPrefixedBy("//", false))
+				{
+					string[] Comment = new string[Block.End - Block.Start + 1];
+
+					for (i = Block.Start; i <= Block.End; i++)
+						Comment[i] = Block.Rows[i].Substring(2);
+
+					Elements.AddLast(new CommentBlock(this,Comment));
 					continue;
 				}
 				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true, true) || this.IsUnderline(Block.Rows[0], '*', true, true)))

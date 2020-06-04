@@ -1146,6 +1146,75 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.Model.BlockElements.CommentBlock">
+            <summary>
+            Represents a comment block in a markdown document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.#ctor(Waher.Content.Markdown.MarkdownDocument,System.String[])">
+            <summary>
+            Represents a comment block in a markdown document.
+            </summary>
+            <param name="Document">Markdown document.</param>
+            <param name="Rows">Rows</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown for the markdown element.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateHTML(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GeneratePlainText(System.Text.StringBuilder)">
+            <summary>
+            Generates plain text for the markdown element.
+            </summary>
+            <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CommentBlock.InlineSpanElement">
+            <summary>
+            If the element is an inline span element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.SameMetaData(Waher.Content.Markdown.Model.MarkdownElement)">
+            <summary>
+            If the current object has same meta-data as <paramref name="E"/>
+            (but not necessarily same content).
+            </summary>
+            <param name="E">Element to compare to.</param>
+            <returns>If same meta-data as <paramref name="E"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current object.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GetHashCode">
+            <summary>
+            Serves as the default hash function.
+            </summary>
+            <returns>A hash code for the current object.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions">
             <summary>
             Definition descriptions

@@ -2669,7 +2669,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
 		/// <returns>Collections with errors.</returns>
-		public async Task RepairIfInproperShutdown(string XsltPath)
+		public async Task<string[]> RepairIfInproperShutdown(string XsltPath)
 		{
 			string StartFileName = this.folder + "Start.txt";
 			string StopFileName = this.folder + "Stop.txt";
@@ -2731,10 +2731,12 @@ namespace Waher.Persistence.Files
 								string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
 						}
 
-						await this.Repair(w, XsltPath, this.folder, false);
+						return await this.Repair(w, XsltPath, this.folder, false);
 					}
 				}
 			}
+
+			return new string[0];
 		}
 
 		/// <summary>

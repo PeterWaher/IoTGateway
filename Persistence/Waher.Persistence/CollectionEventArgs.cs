@@ -30,6 +30,6 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Collection
 		/// </summary>
-		public object Collection => this.collection;
+		public string Collection => this.collection;
 	}
 }

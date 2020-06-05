@@ -2282,7 +2282,9 @@ namespace Waher.Networking.XMPP
 
 				case QoSLevel.Acknowledged:
 					Xml.Clear();
-					Xml.Append("<qos:acknowledged xmlns:qos='urn:xmpp:qos'>");
+					Xml.Append("<qos:acknowledged xmlns:qos='");
+					Xml.Append(XmppClient.NamespaceQualityOfService);
+					Xml.Append("'>");
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
 
@@ -2294,7 +2296,9 @@ namespace Waher.Networking.XMPP
 					string MsgId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 
 					Xml.Clear();
-					Xml.Append("<qos:assured xmlns:qos='urn:xmpp:qos' msgId='");
+					Xml.Append("<qos:assured xmlns:qos='");
+					Xml.Append(XmppClient.NamespaceQualityOfService);
+					Xml.Append("' msgId='");
 					Xml.Append(MsgId);
 					Xml.Append("'>");
 					Xml.Append(MessageXml);
@@ -2323,7 +2327,9 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<qos:deliver xmlns:qos='urn:xmpp:qos' msgId='");
+							Xml.Append("<qos:deliver xmlns:qos='");
+							Xml.Append(XmppClient.NamespaceQualityOfService);
+							Xml.Append("' msgId='");
 							Xml.Append(MsgId);
 							Xml.Append("'/>");
 

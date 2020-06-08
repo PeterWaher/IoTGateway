@@ -259,12 +259,18 @@ namespace Waher.Networking.HTTP
 				foreach (KeyValuePair<TcpListener, bool> P in Listeners)
 					P.Key.Stop();
 #endif
+				this.OnNetworkChanged?.Invoke(this, new EventArgs());
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when the network has been changed.
+		/// </summary>
+		public event EventHandler OnNetworkChanged = null;
 
 		/// <summary>
 		/// If the server is to adapt to network changes automatically.

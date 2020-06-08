@@ -1632,7 +1632,7 @@ automatically:
 
 If the markdown page is static, and no `Cache-Control` tag is present, the following will be used:
 
-	Cache-Control: no-transform,public,max-age=86400,s-maxage=86400
+	Cache-Control: no-transform,public,max-age=60,s-maxage=60,stale-while-revalidate=604800
 
 ### Content-Security-Policy
 

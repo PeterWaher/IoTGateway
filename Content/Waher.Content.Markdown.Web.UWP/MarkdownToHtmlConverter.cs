@@ -347,7 +347,7 @@ namespace Waher.Content.Markdown.Web
 						if (Doc.IsDynamic)
 							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 						else
-							Response.SetHeader("Cache-Control", "no-transform,public,max-age=86400,s-maxage=86400");
+							Response.SetHeader("Cache-Control", "no-transform,public,max-age=60,s-maxage=60,stale-while-revalidate=604800");
 					}
 
 					this.CopyHttpHeader("Access-Control-Allow-Origin", Doc, Response);

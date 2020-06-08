@@ -573,7 +573,6 @@ namespace Waher.IoTGateway
 
 				ISystemConfiguration CurrentConfiguration = null;
 				LinkedList<HttpResource> SetupResources = null;
-				StringBuilder sb;
 
 				if (!Configured)
 				{
@@ -734,19 +733,8 @@ namespace Waher.IoTGateway
 
 				loggedIn = new LoggedIn(webServer);
 
-				sb = new StringBuilder();
-
-				foreach (int Port in webServer.OpenPorts)
-					sb.AppendLine(Port.ToString());
-
-				try
-				{
-					File.WriteAllText(appDataFolder + "Ports.txt", sb.ToString());
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				WriteWebServerOpenPorts();
+				webServer.OnNetworkChanged += (sender, e) => WriteWebServerOpenPorts();
 
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
@@ -930,6 +918,23 @@ namespace Waher.IoTGateway
 					return 1;
 				else
 					return string.Compare(x.GetType().FullName, y.GetType().FullName);
+			}
+		}
+
+		private static void WriteWebServerOpenPorts()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			foreach (int Port in webServer.OpenPorts)
+				sb.AppendLine(Port.ToString());
+
+			try
+			{
+				File.WriteAllText(appDataFolder + "Ports.txt", sb.ToString());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

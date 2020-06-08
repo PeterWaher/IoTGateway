@@ -1176,10 +1176,10 @@ namespace Waher.Persistence.Files
 		public string GetIndexFileName(ObjectBTreeFile File, params string[] FieldNames)
 		{
 			StringBuilder sb = new StringBuilder();
-			string s;
-			bool Exists;
 
 #if NETSTANDARD1_5
+			string s;
+			bool Exists;
 			byte[] Hash;
 
 			foreach (string FieldName in FieldNames)

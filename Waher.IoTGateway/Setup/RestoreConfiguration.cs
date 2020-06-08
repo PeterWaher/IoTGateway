@@ -1340,8 +1340,6 @@ namespace Waher.IoTGateway.Setup
 							{
 								long Length = r.ReadInt64();
 
-								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
-
 								if (Path.IsPathRooted(FileName))
 								{
 									if (FileName.StartsWith(Gateway.AppDataFolder))
@@ -1349,6 +1347,8 @@ namespace Waher.IoTGateway.Setup
 									else
 										throw new Exception("Absolute path names not allowed: " + FileName);
 								}
+
+								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
 
 								using (TemporaryFile File = new TemporaryFile())
 								{

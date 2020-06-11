@@ -175,9 +175,9 @@ namespace Waher.Client.WPF
 					this.WindowState = WindowState;
 
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
-				if (Value != null && Value is string)
+				if (Value != null && Value is string s2)
 				{
-					this.MainView.FileName = (string)Value;
+					this.MainView.FileName = s2;
 					if (!string.IsNullOrEmpty(this.MainView.FileName))
 						this.MainView.Load(this.MainView.FileName);
 				}
@@ -425,7 +425,7 @@ namespace Waher.Client.WPF
 			View = new SnifferView(Node);
 			TabItem.Content = View;
 
-			View.Sniffer = new TabSniffer(TabItem, View);
+			View.Sniffer = new TabSniffer(View);
 			Node.AddSniffer(View.Sniffer);
 
 			this.Tabs.SelectedItem = TabItem;

@@ -8,9 +8,9 @@ namespace Waher.Networking.Sniffers
     /// <summary>
     /// Sniffer that stores events in memory.
     /// </summary>
-    public class InMemorySniffer : ISniffer, IEnumerable<SnifferEvent>
+    public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>
     {
-        private LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
+        private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
 
         /// <summary>
         /// Sniffer that stores events in memory.
@@ -22,96 +22,104 @@ namespace Waher.Networking.Sniffers
         /// <summary>
         /// Called to inform the viewer of an error state.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Error">Error.</param>
-        public void Error(string Error)
+        public override void Error(DateTime Timestamp, string Error)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferError(Error));
+                this.events.AddLast(new SnifferError(Timestamp, Error));
             }
         }
 
         /// <summary>
         /// Called to inform the viewer of an exception state.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Exception">Exception.</param>
-        public void Exception(string Exception)
+        public override void Exception(DateTime Timestamp, string Exception)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferException(Exception));
+                this.events.AddLast(new SnifferException(Timestamp, Exception));
             }
         }
 
         /// <summary>
         /// Called to inform the viewer of something.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Comment">Comment.</param>
-        public void Information(string Comment)
+        public override void Information(DateTime Timestamp, string Comment)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferInformation(Comment));
+                this.events.AddLast(new SnifferInformation(Timestamp, Comment));
             }
         }
 
         /// <summary>
         /// Called when binary data has been received.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Data">Binary Data.</param>
-        public void ReceiveBinary(byte[] Data)
+        public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferRxBinary(Data));
+                this.events.AddLast(new SnifferRxBinary(Timestamp, Data));
             }
         }
 
         /// <summary>
         /// Called when text has been received.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Text">Text</param>
-        public void ReceiveText(string Text)
+        public override void ReceiveText(DateTime Timestamp, string Text)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferRxText(Text));
+                this.events.AddLast(new SnifferRxText(Timestamp, Text));
             }
         }
 
         /// <summary>
         /// Called when binary data has been transmitted.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Data">Binary Data.</param>
-        public void TransmitBinary(byte[] Data)
+        public override void TransmitBinary(DateTime Timestamp, byte[] Data)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferTxBinary(Data));
+                this.events.AddLast(new SnifferTxBinary(Timestamp, Data));
             }
         }
 
         /// <summary>
         /// Called when text has been transmitted.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Text">Text</param>
-        public void TransmitText(string Text)
+        public override void TransmitText(DateTime Timestamp, string Text)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferTxText(Text));
+                this.events.AddLast(new SnifferTxText(Timestamp, Text));
             }
         }
 
         /// <summary>
         /// Called to inform the viewer of a warning state.
         /// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
         /// <param name="Warning">Warning.</param>
-        public void Warning(string Warning)
+        public override void Warning(DateTime Timestamp, string Warning)
         {
             lock (this.events)
             {
-                this.events.AddLast(new SnifferWarning(Warning));
+                this.events.AddLast(new SnifferWarning(Timestamp, Warning));
             }
         }
 

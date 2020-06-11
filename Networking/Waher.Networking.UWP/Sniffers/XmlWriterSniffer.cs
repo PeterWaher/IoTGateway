@@ -8,7 +8,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Outputs sniffed data to an XML writer.
 	/// </summary>
-	public class XmlWriterSniffer : ISniffer, IDisposable
+	public class XmlWriterSniffer : SnifferBase, IDisposable
 	{
 		/// <summary>
 		/// XML output writer.
@@ -49,13 +49,13 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveBinary"/>
 		/// </summary>
-		public virtual void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, "Rx");
+				this.HexOutput(Timestamp, Data, "Rx");
 		}
 
-		private void HexOutput(byte[] Data, string TagName)
+		private void HexOutput(DateTime Timestamp, byte[] Data, string TagName)
 		{
 			if (this.disposed)
 				return;
@@ -68,7 +68,7 @@ namespace Waher.Networking.Sniffers
 					try
 					{
 						this.output.WriteStartElement(TagName);
-						this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
+						this.output.WriteAttributeString("timestamp", Encode(Timestamp));
 
 						switch (this.binaryPresentationMethod)
 						{
@@ -157,21 +157,21 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.TransmitBinary"/>
 		/// </summary>
-		public virtual void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, "Tx");
+				this.HexOutput(Timestamp, Data, "Tx");
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveText"/>
 		/// </summary>
-		public virtual void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine("Rx", Text);
+			this.WriteLine(Timestamp, "Rx", Text);
 		}
 
-		private void WriteLine(string TagName, string Text)
+		private void WriteLine(DateTime Timestamp, string TagName, string Text)
 		{
 			if (this.disposed)
 				return;
@@ -201,7 +201,7 @@ namespace Waher.Networking.Sniffers
 						try
 						{
 							this.output.WriteStartElement(TagName);
-							this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
+							this.output.WriteAttributeString("timestamp", Encode(Timestamp));
 
 							foreach (string Row in GetRows(Text))
 								this.output.WriteElementString("Row", Row);
@@ -246,41 +246,41 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.TransmitText"/>
 		/// </summary>
-		public virtual void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine("Tx", Text);
+			this.WriteLine(Timestamp, "Tx", Text);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Information"/>
 		/// </summary>
-		public virtual void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			this.WriteLine("Info", Comment);
+			this.WriteLine(Timestamp, "Info", Comment);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Warning"/>
 		/// </summary>
-		public virtual void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			this.WriteLine("Warning", Warning);
+			this.WriteLine(Timestamp, "Warning", Warning);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Error"/>
 		/// </summary>
-		public virtual void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			this.WriteLine("Error", Error);
+			this.WriteLine(Timestamp, "Error", Error);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Exception"/>
 		/// </summary>
-		public virtual void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			this.WriteLine("Exception", Exception);
+			this.WriteLine(Timestamp, "Exception", Exception);
 		}
 
 		/// <summary>

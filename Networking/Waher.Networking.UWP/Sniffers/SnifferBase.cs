@@ -1,117 +1,149 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
 {
-	/// <summary>
-	/// Interface for sniffers. Sniffers can be added to <see cref="ISniffable"/> classes to eavesdrop on communication performed on that
-	/// particular node.
-	/// </summary>
-	public interface ISniffer
-	{
+    /// <summary>
+    /// Abstract base class for sniffers. Implements default method overloads.
+    /// </summary>
+    public abstract class SnifferBase : ISniffer
+    {
+        /// <summary>
+        /// Abstract base class for sniffers. Implements default method overloads.
+        /// </summary>
+        public SnifferBase()
+        {
+        }
+
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		void ReceiveBinary(byte[] Data);
+		public virtual void ReceiveBinary(byte[] Data)
+		{
+			this.ReceiveBinary(DateTime.Now, Data);
+		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		void ReceiveBinary(DateTime Timestamp, byte[] Data);
+		public abstract void ReceiveBinary(DateTime Timestamp, byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		void TransmitBinary(byte[] Data);
+		public virtual void TransmitBinary(byte[] Data)
+		{
+			this.TransmitBinary(DateTime.Now, Data);
+		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		void TransmitBinary(DateTime Timestamp, byte[] Data);
+		public abstract void TransmitBinary(DateTime Timestamp, byte[] Data);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		void ReceiveText(string Text);
+		public virtual void ReceiveText(string Text)
+		{
+			this.ReceiveText(DateTime.Now, Text);
+		}
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		void ReceiveText(DateTime Timestamp, string Text);
+		public abstract void ReceiveText(DateTime Timestamp, string Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		void TransmitText(string Text);
+		public virtual void TransmitText(string Text)
+		{
+			this.TransmitText(DateTime.Now, Text);
+		}
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		void TransmitText(DateTime Timestamp, string Text);
+		public abstract void TransmitText(DateTime Timestamp, string Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		void Information(string Comment);
+		public virtual void Information(string Comment)
+		{
+			this.Information(DateTime.Now, Comment);
+		}
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		void Information(DateTime Timestamp, string Comment);
+		public abstract void Information(DateTime Timestamp, string Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		void Warning(string Warning);
+		public virtual void Warning(string Warning)
+		{
+			this.Warning(DateTime.Now, Warning);
+		}
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		void Warning(DateTime Timestamp, string Warning);
+		public abstract void Warning(DateTime Timestamp, string Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		void Error(string Error);
+		public virtual void Error(string Error)
+		{
+			this.Error(DateTime.Now, Error);
+		}
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		void Error(DateTime Timestamp, string Error);
+		public abstract void Error(DateTime Timestamp, string Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		void Exception(string Exception);
+		public virtual void Exception(string Exception)
+		{
+			this.Exception(DateTime.Now, Exception);
+		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		void Exception(DateTime Timestamp, string Exception);
+		public abstract void Exception(DateTime Timestamp, string Exception);
+
 	}
 }

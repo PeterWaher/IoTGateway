@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// <summary>
 	/// Class redirecting sniffer output to a remote client.
 	/// </summary>
-	public class RemoteSniffer : ISniffer
+	public class RemoteSniffer : SnifferBase
 	{
 		private readonly string id;
 		private readonly string fullJID;
@@ -82,14 +82,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<rxBin>");
 			Xml.Append(Convert.ToBase64String(Data));
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.Send(Xml);
 		}
 
-		private StringBuilder GetHeader(DateTime Now)
+		private StringBuilder GetHeader(DateTime Timestamp)
 		{
 			StringBuilder Xml = new StringBuilder();
 			Xml.Append("<sniff xmlns='");
@@ -106,7 +106,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("' snifferId='");
 			Xml.Append(this.id);
 			Xml.Append("' timestamp='");
-			Xml.Append(XML.Encode(Now));
+			Xml.Append(XML.Encode(Timestamp));
 			Xml.Append("'>");
 
 			return Xml;
@@ -121,14 +121,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<txBin>");
 			Xml.Append(Convert.ToBase64String(Data));
@@ -140,14 +140,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<rx>");
 			Xml.Append(XML.Encode(Text));
@@ -159,14 +159,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<tx>");
 			Xml.Append(XML.Encode(Text));
@@ -178,14 +178,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<info>");
 			Xml.Append(XML.Encode(Comment));
@@ -197,14 +197,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<warning>");
 			Xml.Append(XML.Encode(Warning));
@@ -216,14 +216,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<error>");
 			Xml.Append(XML.Encode(Error));
@@ -235,14 +235,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			DateTime Now = DateTime.Now;
-			if (this.HasExpired(Now))
+			if (this.HasExpired(Timestamp))
 				return;
 
-			StringBuilder Xml = this.GetHeader(Now);
+			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<exception>");
 			Xml.Append(XML.Encode(Exception));

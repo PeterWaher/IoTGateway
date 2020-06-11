@@ -268,7 +268,7 @@ namespace Waher.Client.WPF.Controls
 					Message = E.InnerText;
 				}
 
-				this.Add(new SniffItem(Type, Message, Data, ForegroundColor, BackgroundColor));
+				this.Add(new SniffItem(Timestamp, Type, Message, Data, ForegroundColor, BackgroundColor));
 			}
 		}
 

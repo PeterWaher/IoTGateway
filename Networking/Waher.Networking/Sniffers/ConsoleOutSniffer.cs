@@ -44,7 +44,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Outputs sniffed data to <see cref="Console.Out"/>.
 	/// </summary>
-	public class ConsoleOutSniffer : ISniffer
+	public class ConsoleOutSniffer : SnifferBase
 	{
 		private const int TabWidth = 8;
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
@@ -67,39 +67,39 @@ namespace Waher.Networking.Sniffers
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.Output(Text, ConsoleColor.Black, ConsoleColor.White);
+			this.Output(Timestamp, Text, ConsoleColor.Black, ConsoleColor.White);
 		}
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.Output(Text, ConsoleColor.White, ConsoleColor.DarkBlue);
+			this.Output(Timestamp, Text, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.BinaryOutput(Data, ConsoleColor.Black, ConsoleColor.White);
+			this.BinaryOutput(Timestamp, Data, ConsoleColor.Black, ConsoleColor.White);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.BinaryOutput(Data, ConsoleColor.White, ConsoleColor.DarkBlue);
+			this.BinaryOutput(Timestamp, Data, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
-		private void BinaryOutput(byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
+		private void BinaryOutput(DateTime Timestamp, byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
 		{
 			switch (this.binaryPresentationMethod)
 			{
@@ -117,21 +117,21 @@ namespace Waher.Networking.Sniffers
 						i = (i + 1) & 31;
 						if (i == 0)
 						{
-							this.Output(Row.ToString(), Fg, Bg);
+							this.Output(Timestamp, Row.ToString(), Fg, Bg);
 							Row.Clear();
 						}
 					}
 
 					if (i != 0)
-						this.Output(Row.ToString(), Fg, Bg);
+						this.Output(Timestamp, Row.ToString(), Fg, Bg);
 					break;
 
 				case BinaryPresentationMethod.Base64:
-					this.Output(System.Convert.ToBase64String(Data), Fg, Bg);
+					this.Output(Timestamp, Convert.ToBase64String(Data), Fg, Bg);
 					break;
 
 				case BinaryPresentationMethod.ByteCount:
-					this.Output("<" + Data.Length.ToString() + " bytes>", Fg, Bg);
+					this.Output(Timestamp, "<" + Data.Length.ToString() + " bytes>", Fg, Bg);
 					break;
 			}
 		}
@@ -140,39 +140,39 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			this.Output(Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
+			this.Output(Timestamp, Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			this.Output(Warning, ConsoleColor.Black, ConsoleColor.Yellow);
+			this.Output(Timestamp, Warning, ConsoleColor.Black, ConsoleColor.Yellow);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			this.Output(Error, ConsoleColor.Yellow, ConsoleColor.Red);
+			this.Output(Timestamp, Error, ConsoleColor.Yellow, ConsoleColor.Red);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			this.Output(Exception, ConsoleColor.White, ConsoleColor.DarkRed);
+			this.Output(Timestamp, Exception, ConsoleColor.White, ConsoleColor.DarkRed);
 		}
 
-		private void Output(string s, ConsoleColor Fg, ConsoleColor Bg)
+		private void Output(DateTime _, string s, ConsoleColor Fg, ConsoleColor Bg)
 		{
 			lock (Console.Out)
 			{

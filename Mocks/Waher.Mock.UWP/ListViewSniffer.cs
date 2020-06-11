@@ -12,9 +12,9 @@ namespace Waher.Mock
 	/// <summary>
 	/// Sniffer displaying incoming events in a ListView component.
 	/// </summary>
-	public class ListViewSniffer : ISniffer
+	public class ListViewSniffer : SnifferBase
 	{
-		private ListView listView;
+		private readonly ListView listView;
 		private int maxItems = 1000;
 
 		/// <summary>
@@ -60,19 +60,21 @@ namespace Waher.Mock
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SniffItem(SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			this.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SniffItem(SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			this.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
 		}
 
 		internal static string HexToString(byte[] Data)
@@ -98,55 +100,61 @@ namespace Waher.Mock
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SniffItem(SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
+			this.Add(new SniffItem(Timestamp, SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SniffItem(SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
+			this.Add(new SniffItem(Timestamp, SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			this.Add(new SniffItem(SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
+			this.Add(new SniffItem(Timestamp, SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			this.Add(new SniffItem(SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
+			this.Add(new SniffItem(Timestamp, SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			this.Add(new SniffItem(SniffItemType.Error, Error, null, Colors.White, Colors.Red));
+			this.Add(new SniffItem(Timestamp, SniffItemType.Error, Error, null, Colors.White, Colors.Red));
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			this.Add(new SniffItem(SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
+			this.Add(new SniffItem(Timestamp, SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
 		}
 	}
 }

@@ -7,14 +7,15 @@ namespace Waher.Networking.Sniffers.Model
 	/// </summary>
 	public abstract class SnifferEvent
 	{
-		private DateTime timestamp;
+		private readonly DateTime timestamp;
 
 		/// <summary>
 		/// Base class for sniffer events.
 		/// </summary>
-		public SnifferEvent()
+		/// <param name="Timestamp">Timestamp of event.</param>
+		public SnifferEvent(DateTime Timestamp)
 		{
-			this.timestamp = DateTime.Now;
+			this.timestamp = Timestamp;
 		}
 
 		/// <summary>

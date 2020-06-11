@@ -12,7 +12,7 @@ namespace Waher.Mock
 	/// </summary>
 	public class ListViewEventSink : EventSink
 	{
-		private ListView listView;
+		private readonly ListView listView;
 		private int maxItems = 1000;
 
 		/// <summary>
@@ -66,35 +66,35 @@ namespace Waher.Mock
 			switch (Event.Type)
 			{
 				case EventType.Debug:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.Indigo));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.White, Colors.Indigo));
 					break;
 
 				case EventType.Informational:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.Black, Colors.White));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.Black, Colors.White));
 					break;
 
 				case EventType.Notice:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.Black, Colors.LemonChiffon));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.Black, Colors.LemonChiffon));
 					break;
 
 				case EventType.Warning:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.Black, Colors.Yellow));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.Black, Colors.Yellow));
 					break;
 
 				case EventType.Error:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.IndianRed));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.White, Colors.IndianRed));
 					break;
 
 				case EventType.Critical:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.Crimson));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.White, Colors.Crimson));
 					break;
 
 				case EventType.Alert:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.Maroon));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.White, Colors.Maroon));
 					break;
 
 				case EventType.Emergency:
-					this.Add(new SniffItem(SniffItemType.Information, Event.Message, null, Colors.White, Colors.Black));
+					this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Message, null, Colors.White, Colors.Black));
 					break;
 			}
 

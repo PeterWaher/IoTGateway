@@ -212,7 +212,7 @@ namespace Waher.Client.WPF.Controls
 						SnifferView SnifferView = new SnifferView(null);
 						TabItem.Content = SnifferView;
 
-						SnifferView.Sniffer = new TabSniffer(TabItem, SnifferView);
+						SnifferView.Sniffer = new TabSniffer(SnifferView);
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
 

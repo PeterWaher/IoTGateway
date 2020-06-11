@@ -7,14 +7,15 @@ namespace Waher.Networking.Sniffers.Model
 	/// </summary>
 	public abstract class SnifferTextEvent : SnifferEvent
 	{
-		private string text;
+		private readonly string text;
 
 		/// <summary>
 		/// Base class for text-based sniffer events.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text.</param>
-		public SnifferTextEvent(string Text)
-			: base()
+		public SnifferTextEvent(DateTime Timestamp, string Text)
+			: base(Timestamp)
 		{
 			this.text = Text;
 		}

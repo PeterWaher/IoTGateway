@@ -8,14 +8,14 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Outputs sniffed data to a text writer.
 	/// </summary>
-	public class TextWriterSniffer : ISniffer, IDisposable
+	public class TextWriterSniffer : SnifferBase, IDisposable
 	{
 		/// <summary>
 		/// Text output writer.
 		/// </summary>
 		protected TextWriter output;
 
-		private BinaryPresentationMethod binaryPresentationMethod;
+		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private bool disposed = false;
 		private bool includeTimestamp = false;
 
@@ -58,16 +58,16 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveBinary"/>
 		/// </summary>
-		public virtual void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, this.Prefix("Rx"));
+				this.HexOutput(Data, this.Prefix(Timestamp, "Rx"));
 		}
 
-		private string Prefix(string Type)
+		private string Prefix(DateTime Timestamp, string Type)
 		{
 			if (this.includeTimestamp)
-				return Type + " (" + DateTime.Now.ToString("T") + "): ";
+				return Type + " (" + Timestamp.ToString("T") + "): ";
 			else
 				return Type + ": ";
 		}
@@ -121,18 +121,18 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.TransmitBinary"/>
 		/// </summary>
-		public virtual void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, this.Prefix("Tx"));
+				this.HexOutput(Data, this.Prefix(Timestamp, "Tx"));
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveText"/>
 		/// </summary>
-		public virtual void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(this.Prefix("Rx") + Text);
+			this.WriteLine(this.Prefix(Timestamp, "Rx") + Text);
 		}
 
 		private void WriteLine(string s)
@@ -154,41 +154,41 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.TransmitText"/>
 		/// </summary>
-		public virtual void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(this.Prefix("Tx") + Text);
+			this.WriteLine(this.Prefix(Timestamp, "Tx") + Text);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Information"/>
 		/// </summary>
-		public virtual void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			this.WriteLine(this.Prefix("Info") + Comment);
+			this.WriteLine(this.Prefix(Timestamp, "Info") + Comment);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Warning"/>
 		/// </summary>
-		public virtual void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			this.WriteLine(this.Prefix("Warning") + Warning);
+			this.WriteLine(this.Prefix(Timestamp, "Warning") + Warning);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Error"/>
 		/// </summary>
-		public virtual void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			this.WriteLine(this.Prefix("Error") + Error);
+			this.WriteLine(this.Prefix(Timestamp, "Error") + Error);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Exception"/>
 		/// </summary>
-		public virtual void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			this.WriteLine(this.Prefix("Exception") + Exception);
+			this.WriteLine(this.Prefix(Timestamp, "Exception") + Exception);
 		}
 
 		/// <summary>

@@ -10,9 +10,10 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Represents a sniffer binary transmission event.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Data.</param>
-		public SnifferTxBinary(byte[] Data)
-			: base(Data)
+		public SnifferTxBinary(DateTime Timestamp, byte[] Data)
+			: base(Timestamp, Data)
 		{
 		}
 
@@ -22,7 +23,7 @@ namespace Waher.Networking.Sniffers.Model
 		/// <param name="Sniffer">Sniffer.</param>
 		public override void Replay(ISniffer Sniffer)
 		{
-			Sniffer.TransmitBinary(this.Data);
+			Sniffer.TransmitBinary(this.Timestamp, this.Data);
 		}
 
         /// <summary>

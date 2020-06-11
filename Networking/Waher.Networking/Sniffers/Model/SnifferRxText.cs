@@ -10,9 +10,10 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Represents a sniffer text reception event.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text.</param>
-		public SnifferRxText(string Text)
-			: base(Text)
+		public SnifferRxText(DateTime Timestamp, string Text)
+			: base(Timestamp, Text)
 		{
 		}
 
@@ -22,7 +23,7 @@ namespace Waher.Networking.Sniffers.Model
 		/// <param name="Sniffer">Sniffer.</param>
 		public override void Replay(ISniffer Sniffer)
 		{
-			Sniffer.ReceiveText(this.Text);
+			Sniffer.ReceiveText(this.Timestamp, this.Text);
 		}
 
         /// <summary>

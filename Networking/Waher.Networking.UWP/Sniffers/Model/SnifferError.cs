@@ -10,9 +10,10 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Represents a sniffer error event.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text.</param>
-		public SnifferError(string Text)
-			: base(Text)
+		public SnifferError(DateTime Timestamp, string Text)
+			: base(Timestamp, Text)
 		{
 		}
 
@@ -22,7 +23,7 @@ namespace Waher.Networking.Sniffers.Model
 		/// <param name="Sniffer">Sniffer.</param>
 		public override void Replay(ISniffer Sniffer)
 		{
-			Sniffer.Error(this.Text);
+			Sniffer.Error(this.Timestamp, this.Text);
 		}
 
         /// <summary>

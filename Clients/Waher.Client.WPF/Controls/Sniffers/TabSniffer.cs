@@ -10,15 +10,13 @@ using Waher.Client.WPF.Controls;
 
 namespace Waher.Client.WPF.Controls.Sniffers
 {
-	public class TabSniffer : ISniffer
+	public class TabSniffer : SnifferBase
 	{
-		private readonly TabItem tabItem;
 		private readonly SnifferView view;
 		private string snifferId = null;
 
-		public TabSniffer(TabItem TabItem, SnifferView View)
+		public TabSniffer(SnifferView View)
 		{
-			this.tabItem = TabItem;
 			this.view = View;
 		}
 
@@ -28,14 +26,14 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			set { this.snifferId = value; }
 		}
 
-		public void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.view.Add(new SniffItem(SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
 		}
 
-		public void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.view.Add(new SniffItem(SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
 		}
 
 		internal static string HexToString(byte[] Data)
@@ -58,34 +56,34 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			return Output.ToString().TrimEnd();
 		}
 
-		public void ReceiveText(string Text)
+		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.view.Add(new SniffItem(SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
 		}
 
-		public void TransmitText(string Text)
+		public override void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.view.Add(new SniffItem(SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
 		}
 
-		public void Information(string Comment)
+		public override void Information(DateTime Timestamp, string Comment)
 		{
-			this.view.Add(new SniffItem(SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
-		public void Warning(string Warning)
+		public override void Warning(DateTime Timestamp, string Warning)
 		{
-			this.view.Add(new SniffItem(SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
 		}
 
-		public void Error(string Error)
+		public override void Error(DateTime Timestamp, string Error)
 		{
-			this.view.Add(new SniffItem(SniffItemType.Error, Error, null, Colors.White, Colors.Red));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.Error, Error, null, Colors.White, Colors.Red));
 		}
 
-		public void Exception(string Exception)
+		public override void Exception(DateTime Timestamp, string Exception)
 		{
-			this.view.Add(new SniffItem(SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
 		}
 	}
 }

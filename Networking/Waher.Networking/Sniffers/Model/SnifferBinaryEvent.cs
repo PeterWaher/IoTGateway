@@ -7,14 +7,15 @@ namespace Waher.Networking.Sniffers.Model
 	/// </summary>
 	public abstract class SnifferBinaryEvent : SnifferEvent
 	{
-		private byte[] data;
+		private readonly byte[] data;
 
 		/// <summary>
 		/// Base class for binary-based sniffer events.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Data.</param>
-		public SnifferBinaryEvent(byte[] Data)
-			: base()
+		public SnifferBinaryEvent(DateTime Timestamp, byte[] Data)
+			: base(Timestamp)
 		{
 			this.data = Data;
 		}

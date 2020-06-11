@@ -31,16 +31,17 @@ namespace Waher.Client.WPF.Controls.Sniffers
 		/// <summary>
 		/// Represents one item in a sniffer output.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Type">Type of sniff record.</param>
 		/// <param name="Message">Message</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public SniffItem(SniffItemType Type, string Message, byte[] Data, Color ForegroundColor, Color BackgroundColor)
+		public SniffItem(DateTime Timestamp, SniffItemType Type, string Message, byte[] Data, Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
 			this.type = Type;
-			this.timestamp = DateTime.Now;
+			this.timestamp = Timestamp;
 			this.message = Message;
 			this.data = Data;
 		}

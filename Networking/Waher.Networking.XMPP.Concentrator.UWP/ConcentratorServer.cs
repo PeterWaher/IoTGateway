@@ -43,7 +43,6 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private readonly Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
 		private readonly Dictionary<string, DataSourceRec> dataSources = new Dictionary<string, DataSourceRec>();
-		private readonly Dictionary<string, Dictionary<string, DataSourceRec>> subscriptions = new Dictionary<string, Dictionary<string, DataSourceRec>>();
 		private readonly Dictionary<string, Query> queries = new Dictionary<string, Query>();
 		private readonly object synchObject = new object();
 		private SensorServer sensorServer = null;
@@ -3275,10 +3274,10 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						Xml.Append("<void/>");
 					}
-					else if (Element is bool)
+					else if (Element is bool b)
 					{
 						Xml.Append("<boolean>");
-						Xml.Append(CommonTypes.Encode((bool)Element));
+						Xml.Append(CommonTypes.Encode(b));
 						Xml.Append("</boolean>");
 					}
 					else if (Element is SKColor cl)
@@ -3304,22 +3303,22 @@ namespace Waher.Networking.XMPP.Concentrator
 							Xml.Append("</dateTime>");
 						}
 					}
-					else if (Element is double)
+					else if (Element is double d)
 					{
 						Xml.Append("<double>");
-						Xml.Append(CommonTypes.Encode((double)Element));
+						Xml.Append(CommonTypes.Encode(d));
 						Xml.Append("</double>");
 					}
-					else if (Element is float)
+					else if (Element is float f)
 					{
 						Xml.Append("<double>");
-						Xml.Append(CommonTypes.Encode((float)Element));
+						Xml.Append(CommonTypes.Encode(f));
 						Xml.Append("</double>");
 					}
-					else if (Element is decimal)
+					else if (Element is decimal dec)
 					{
 						Xml.Append("<double>");
-						Xml.Append(CommonTypes.Encode((decimal)Element));
+						Xml.Append(CommonTypes.Encode(dec));
 						Xml.Append("</double>");
 					}
 					else if (Element is Duration)

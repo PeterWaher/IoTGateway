@@ -123,7 +123,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}, State);
 		}
 
-		private void DataSourcesResponse(IqResultEventArgs e, DataSourcesEventHandler Callback, object State)
+		private void DataSourcesResponse(IqResultEventArgs e, DataSourcesEventHandler Callback, object _)
 		{
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
@@ -230,7 +230,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}, State);
 		}
 
-		private void BooleanResponse(IqResultEventArgs e, BooleanResponseEventHandler Callback, object State)
+		private void BooleanResponse(IqResultEventArgs e, BooleanResponseEventHandler Callback, object _)
 		{
 			XmlElement E;
 
@@ -331,7 +331,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'/>");
 		}
 
-		private void BooleansResponse(IqResultEventArgs e, BooleansResponseEventHandler Callback, object State)
+		private void BooleansResponse(IqResultEventArgs e, BooleansResponseEventHandler Callback, object _)
 		{
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
@@ -440,7 +440,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private void NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, NodeInformationEventHandler Callback, object State)
+		private void NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, NodeInformationEventHandler Callback, object _)
 		{
 			XmlElement E;
 			NodeInformation NodeInfo = null;
@@ -684,7 +684,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		private void NodesResponse(IqResultEventArgs e, bool Parameters, bool Messages,
-			NodesInformationEventHandler Callback, object State)
+			NodesInformationEventHandler Callback, object _)
 		{
 			XmlElement E;
 			NodeInformation[] NodeInfo;
@@ -1630,42 +1630,42 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							case "rxBin":
 								byte[] Bin = Convert.FromBase64String(E.InnerText);
-								Sniffer.ReceiveBinary(Bin);
+								Sniffer.ReceiveBinary(Timestamp, Bin);
 								break;
 
 							case "txBin":
 								Bin = Convert.FromBase64String(E.InnerText);
-								Sniffer.TransmitBinary(Bin);
+								Sniffer.TransmitBinary(Timestamp, Bin);
 								break;
 
 							case "rx":
 								string s = E.InnerText;
-								Sniffer.ReceiveText(s);
+								Sniffer.ReceiveText(Timestamp, s);
 								break;
 
 							case "tx":
 								s = E.InnerText;
-								Sniffer.TransmitText(s);
+								Sniffer.TransmitText(Timestamp, s);
 								break;
 
 							case "info":
 								s = E.InnerText;
-								Sniffer.Information(s);
+								Sniffer.Information(Timestamp, s);
 								break;
 
 							case "warning":
 								s = E.InnerText;
-								Sniffer.Warning(s);
+								Sniffer.Warning(Timestamp, s);
 								break;
 
 							case "error":
 								s = E.InnerText;
-								Sniffer.Error(s);
+								Sniffer.Error(Timestamp, s);
 								break;
 
 							case "exception":
 								s = E.InnerText;
-								Sniffer.Exception(s);
+								Sniffer.Exception(Timestamp, s);
 								break;
 
 							case "expired":
@@ -1674,7 +1674,7 @@ namespace Waher.Networking.XMPP.Concentrator
 									this.sniffers.Remove(SnifferId);
 								}
 
-								Sniffer.Information("Remote sniffer expired.");
+								Sniffer.Information(Timestamp, "Remote sniffer expired.");
 								break;
 
 							default:
@@ -1684,7 +1684,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					catch (Exception)
 					{
-						Sniffer.Error("Badly encoded sniffer data was received: " + E.OuterXml);
+						Sniffer.Error(Timestamp, "Badly encoded sniffer data was received: " + E.OuterXml);
 					}
 				}
 			}
@@ -2585,9 +2585,31 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(TimeoutSeconds.ToString());
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
+			this.AppendEventTypeAttributes(Xml, EventTypes);
 			Xml.Append("'/>");
 
 			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		private void AppendEventTypeAttributes(StringBuilder Xml, SourceEventType EventTypes)
+		{
+			if (!EventTypes.HasFlag(SourceEventType.NodeAdded))
+				Xml.Append("' nodeAdded='false");
+
+			if (!EventTypes.HasFlag(SourceEventType.NodeUpdated))
+				Xml.Append("' nodeUpdated='false");
+
+			if (!EventTypes.HasFlag(SourceEventType.NodeStatusChanged))
+				Xml.Append("' nodeStatusChanged='false");
+
+			if (!EventTypes.HasFlag(SourceEventType.NodeRemoved))
+				Xml.Append("' nodeRemoved='false");
+
+			if (!EventTypes.HasFlag(SourceEventType.NodeMovedUp))
+				Xml.Append("' nodeMovedUp='false");
+
+			if (!EventTypes.HasFlag(SourceEventType.NodeMovedDown))
+				Xml.Append("' nodeMovedDown='false");
 		}
 
 		/// <summary>
@@ -2613,6 +2635,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(SourceID));
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			this.AppendEventTypeAttributes(Xml, EventTypes);
 			Xml.Append("'/>");
 
 			this.client.SendIqSet(To, Xml.ToString(), Callback, State);

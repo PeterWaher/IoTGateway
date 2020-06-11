@@ -557,10 +557,10 @@ namespace Waher.Networking.XMPP
 
 			foreach (object Attribute in Assembly.GetCustomAttributes())
 			{
-				if (Attribute is AssemblyTitleAttribute)
-					Title = ((AssemblyTitleAttribute)Attribute).Title;
-				else if (Attribute is AssemblyProductAttribute)
-					Product = ((AssemblyProductAttribute)Attribute).Product;
+				if (Attribute is AssemblyTitleAttribute AssemblyTitleAttribute)
+					Title = AssemblyTitleAttribute.Title;
+				else if (Attribute is AssemblyProductAttribute AssemblyProductAttribute)
+					Product = AssemblyProductAttribute.Product;
 			}
 
 			if (!string.IsNullOrEmpty(Title))
@@ -1987,9 +1987,9 @@ namespace Waher.Networking.XMPP
 
 						case "error":
 							XmppException StreamException = GetStreamExceptionObject(E);
-							if (StreamException is SeeOtherHostException)
+							if (StreamException is SeeOtherHostException SeeOtherHostException)
 							{
-								this.host = ((SeeOtherHostException)StreamException).NewHost;
+								this.host = SeeOtherHostException.NewHost;
 								this.inputState = -1;
 
 								this.Information("Reconnecting to " + this.host);

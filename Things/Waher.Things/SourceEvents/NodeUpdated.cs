@@ -30,7 +30,20 @@ namespace Waher.Things.SourceEvents
 		/// <param name="Caller">Original caller.</param>
 		public static Task<NodeUpdated> FromNode(INode Node, Language Language, RequestOrigin Caller)
 		{
-			return FromNode(Node, Language, Caller, string.Empty);
+			return FromNode(Node, Language, Caller, string.Empty, null);
+		}
+
+		/// <summary>
+		/// Creates an event object from a node object.
+		/// </summary>
+		/// <param name="Node">Node added.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Caller">Original caller.</param>
+		/// <param name="AdditionalParameters">Additional node parameters.</param>
+		public static Task<NodeUpdated> FromNode(INode Node, Language Language, RequestOrigin Caller,
+			params Parameter[] AdditionalParameters)
+		{
+			return FromNode(Node, Language, Caller, string.Empty, AdditionalParameters);
 		}
 
 		/// <summary>
@@ -40,12 +53,32 @@ namespace Waher.Things.SourceEvents
 		/// <param name="Language">Language</param>
 		/// <param name="Caller">Original caller.</param>
 		/// <param name="OldId">Old Node ID, if differrent from previous NodeId.</param>
-		public static async Task<NodeUpdated> FromNode(INode Node, Language Language, RequestOrigin Caller, string OldId)
+		public static Task<NodeUpdated> FromNode(INode Node, Language Language, RequestOrigin Caller, string OldId)
+		{
+			return FromNode(Node, Language, Caller, OldId, null);
+		}
+
+		/// <summary>
+		/// Creates an event object from a node object.
+		/// </summary>
+		/// <param name="Node">Node added.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Caller">Original caller.</param>
+		/// <param name="OldId">Old Node ID, if differrent from previous NodeId.</param>
+		/// <param name="AdditionalParameters">Additional node parameters.</param>
+		public static async Task<NodeUpdated> FromNode(INode Node, Language Language, RequestOrigin Caller, string OldId,
+			params Parameter[] AdditionalParameters)
 		{
 			List<Parameter> Parameters = new List<Parameter>();
 
 			foreach (Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
 				Parameters.Add(P);
+
+			if (!(AdditionalParameters is null))
+			{
+				foreach (Parameter P in AdditionalParameters)
+					Parameters.Add(P);
+			}
 
 			return new NodeUpdated()
 			{

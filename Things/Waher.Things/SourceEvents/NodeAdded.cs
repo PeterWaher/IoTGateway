@@ -33,12 +33,32 @@ namespace Waher.Things.SourceEvents
 		/// <param name="Language">Language</param>
 		/// <param name="Caller">Original caller.</param>
 		/// <param name="Sniffable">If the node is sniffable.</param>
-		public static async Task<NodeAdded> FromNode(INode Node, Language Language, RequestOrigin Caller, bool Sniffable)
+		public static Task<NodeAdded> FromNode(INode Node, Language Language, RequestOrigin Caller, bool Sniffable)
+		{
+			return FromNode(Node, Language, Caller, Sniffable, null);
+		}
+
+		/// <summary>
+		/// Creates an event object from a node object.
+		/// </summary>
+		/// <param name="Node">Node added.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Caller">Original caller.</param>
+		/// <param name="Sniffable">If the node is sniffable.</param>
+		/// <param name="AdditionalParameters">Additional node parameters.</param>
+		public static async Task<NodeAdded> FromNode(INode Node, Language Language, RequestOrigin Caller, bool Sniffable,
+			params Parameter[] AdditionalParameters)
 		{
 			List<Parameter> Parameters = new List<Parameter>();
 
 			foreach (Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
 				Parameters.Add(P);
+
+			if (!(AdditionalParameters is null))
+			{
+				foreach (Parameter P in AdditionalParameters)
+					Parameters.Add(P);
+			}
 
 			return new NodeAdded()
 			{

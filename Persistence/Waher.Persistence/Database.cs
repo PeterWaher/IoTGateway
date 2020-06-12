@@ -161,6 +161,7 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
+			where T : class
 		{
 			return Provider.Find<T>(0, int.MaxValue, SortOrder);
 		}
@@ -174,6 +175,7 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			return Provider.Find<T>(0, int.MaxValue, Filter, SortOrder);
 		}
@@ -188,6 +190,7 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
 		{
 			return Provider.Find<T>(Offset, MaxCount, SortOrder);
 		}
@@ -203,6 +206,7 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			return Provider.Find<T>(Offset, MaxCount, Filter, SortOrder);
 		}
@@ -270,11 +274,13 @@ namespace Waher.Persistence
 		/// <returns>First Object, if found, null otherwise.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public async static Task<T> FindFirstDeleteRest<T>(params string[] SortOrder)
+			where T : class
 		{
 			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, SortOrder));
 		}
 
 		private static async Task<T> FirstDeleteRest<T>(IEnumerable<T> Set)
+			where T : class
 		{
 			T Result = default;
 			bool First = true;
@@ -312,6 +318,7 @@ namespace Waher.Persistence
 		/// <returns>First Object, if found, null otherwise.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static async Task<T> FindFirstDeleteRest<T>(Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
@@ -325,11 +332,13 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public async static Task<T> FindFirstIgnoreRest<T>(params string[] SortOrder)
+			where T : class
 		{
 			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, SortOrder));
 		}
 
 		private static T FirstIgnoreRest<T>(IEnumerable<T> Set)
+			where T : class
 		{
 			foreach (T Obj in Set)
 				return Obj;
@@ -347,6 +356,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static async Task<T> FindFirstIgnoreRest<T>(Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, Filter, SortOrder));
 		}
@@ -509,14 +519,55 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object, or null if not found.</returns>
+		public static Task<T> TryLoadObject<T>(object ObjectId)
+			where T : class
+		{
+			return Provider.TryLoadObject<T>(ObjectId);
+		}
+
+		/// <summary>
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object, or null if not found.</returns>
+		public static Task<T> TryLoadObject<T>(string CollectionName, object ObjectId)
+			where T : class
+		{
+			return Provider.TryLoadObject<T>(CollectionName, ObjectId);
+		}
+
+		/// <summary>
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection in which the object resides.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object, or null if not found.</returns>
+		public static Task<object> TryLoadObject(string CollectionName, object ObjectId)
+		{
+			return Provider.TryLoadObject(CollectionName, ObjectId);
+		}
+
+		/// <summary>
 		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public static Task<T> LoadObject<T>(object ObjectId)
+		public static async Task<T> LoadObject<T>(object ObjectId)
+			where T : class
 		{
-			return Provider.LoadObject<T>(ObjectId);
+			T Result = await Provider.TryLoadObject<T>(ObjectId);
+			if (Result is null)
+				throw new KeyNotFoundException("Object not found.");
+
+			return Result;
 		}
 
 		/// <summary>
@@ -526,9 +577,14 @@ namespace Waher.Persistence
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public static Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+		public async static Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+			where T : class
 		{
-			return Provider.LoadObject<T>(CollectionName, ObjectId);
+			T Result = await Provider.TryLoadObject<T>(CollectionName, ObjectId);
+			if (Result is null)
+				throw new KeyNotFoundException("Object not found.");
+
+			return Result;
 		}
 
 		/// <summary>
@@ -537,9 +593,13 @@ namespace Waher.Persistence
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public static Task<object> LoadObject(string CollectionName, object ObjectId)
+		public static async Task<object> LoadObject(string CollectionName, object ObjectId)
 		{
-			return Provider.LoadObject(CollectionName, ObjectId);
+			object Result = await Provider.TryLoadObject(CollectionName, ObjectId);
+			if (Result is null)
+				throw new KeyNotFoundException("Object not found.");
+
+			return Result;
 		}
 
 		/// <summary>

@@ -73,7 +73,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreNotEqual(Guid.Empty, Obj.Default.ObjectId);
 			Assert.AreNotEqual(Guid.Empty, Obj.Simple.ObjectId);
 
-			ByReference Obj2 = await this.provider.LoadObject<ByReference>(Obj.ObjectId);
+			ByReference Obj2 = await this.provider.TryLoadObject<ByReference>(Obj.ObjectId);
+			Assert.IsNotNull(Obj2);
 
 			DBFilesObjectSerializationTests.AssertEqual(Obj2.Default, Obj.Default);
 			DBFilesObjectSerializationTests.AssertEqual(Obj2.Simple, Obj.Simple);

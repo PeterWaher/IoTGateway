@@ -515,7 +515,7 @@
             </summary>
             <param name="CollectionName">Name of collection.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.Object)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -523,7 +523,7 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.Guid)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.Guid)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -531,7 +531,7 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -540,7 +540,7 @@
             <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject(System.Type,System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject(System.Type,System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <paramref name="T"/>.
             </summary>
@@ -549,7 +549,7 @@
             <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Object)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.String,System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -558,7 +558,7 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Guid)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.String,System.Guid)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -567,7 +567,7 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject``1(System.String,System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject``1(System.String,System.Guid,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
@@ -577,7 +577,7 @@
             <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject(System.String,System.Object)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject(System.String,System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
             </summary>
@@ -585,7 +585,7 @@
             <param name="ObjectId">Object ID</param>
             <returns>Loaded object.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadObject(System.String,System.Object,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryLoadObject(System.String,System.Object,Waher.Persistence.Serialization.EmbeddedObjectSetter)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
             </summary>

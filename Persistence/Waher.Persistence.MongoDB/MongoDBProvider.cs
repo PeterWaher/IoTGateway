@@ -422,6 +422,7 @@ namespace Waher.Persistence.MongoDB
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
 		{
 			return this.Find<T>(Offset, MaxCount, (Filter)null, SortOrder);
 		}
@@ -437,6 +438,7 @@ namespace Waher.Persistence.MongoDB
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			string CollectionName = Serializer.CollectionName(null);
@@ -468,6 +470,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter,
 			params string[] SortOrder)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			string CollectionName = Serializer.CollectionName(null);
@@ -492,6 +495,7 @@ namespace Waher.Persistence.MongoDB
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			IMongoCollection<BsonDocument> Collection;
@@ -516,7 +520,6 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
-		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
@@ -556,6 +559,7 @@ namespace Waher.Persistence.MongoDB
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
 			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+			where T : class
 		{
 			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
 
@@ -983,12 +987,13 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(object ObjectId)
+		/// <returns>Loaded object, or null if not found.</returns>
+		public Task<T> TryLoadObject<T>(object ObjectId)
+			where T : class
 		{
 			ObjectId OID;
 
@@ -1003,16 +1008,17 @@ namespace Waher.Persistence.MongoDB
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
-			return this.LoadObject<T>(OID);
+			return this.TryLoadObject<T>(OID);
 		}
 
 		/// <summary>
-		/// Loads an object of a given type and Object ID.
+		/// Tries to load an object of a given type and Object ID.
 		/// </summary>
 		/// <typeparam name="T">Type of object to load.</typeparam>
 		/// <param name="ObjectId">Object ID of object to load.</param>
-		/// <returns>Loaded object.</returns>
-		public async Task<T> LoadObject<T>(ObjectId ObjectId)
+		/// <returns>Loaded object, or null if not found.</returns>
+		public async Task<T> TryLoadObject<T>(ObjectId ObjectId)
+			where T : class
 		{
 			string Key = typeof(T).FullName + " " + ObjectId.ToString();
 
@@ -1025,28 +1031,27 @@ namespace Waher.Persistence.MongoDB
 
 			foreach (T Item in ReferencedObjects)
 			{
-				if (First == null)
+				if (First is null)
 					First = Item;
 				else
 					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
 			}
 
-			if (First == null)
-				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
-
-			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
+			if (!(First is null))
+				this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
 
 			return First;
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+		/// <returns>Loaded object, or null if not found.</returns>
+		public Task<T> TryLoadObject<T>(string CollectionName, object ObjectId)
+			where T : class
 		{
 			ObjectId OID;
 
@@ -1061,17 +1066,18 @@ namespace Waher.Persistence.MongoDB
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
-			return this.LoadObject<T>(CollectionName, OID);
+			return this.TryLoadObject<T>(CollectionName, OID);
 		}
 
 		/// <summary>
-		/// Loads an object of a given type and Object ID.
+		/// Tries to load an object of a given type and Object ID.
 		/// </summary>
 		/// <typeparam name="T">Type of object to load.</typeparam>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID of object to load.</param>
-		/// <returns>Loaded object.</returns>
-		public async Task<T> LoadObject<T>(string CollectionName, ObjectId ObjectId)
+		/// <returns>Loaded object, or null if not found.</returns>
+		public async Task<T> TryLoadObject<T>(string CollectionName, ObjectId ObjectId)
+			where T : class
 		{
 			string Key = typeof(T).FullName + " " + ObjectId.ToString();
 
@@ -1084,27 +1090,25 @@ namespace Waher.Persistence.MongoDB
 
 			foreach (T Item in ReferencedObjects)
 			{
-				if (First == null)
+				if (First is null)
 					First = Item;
 				else
 					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
 			}
 
-			if (First == null)
-				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
-
-			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
+			if (!(First is null))
+				this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
 
 			return First;
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		public async Task<object> LoadObject(string CollectionName, object ObjectId)
+		/// <returns>Loaded object, or null if not found.</returns>
+		public async Task<object> TryLoadObject(string CollectionName, object ObjectId)
 		{
 			ObjectId OID;
 
@@ -1130,9 +1134,6 @@ namespace Waher.Persistence.MongoDB
 				else
 					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
 			}
-
-			if (First is null)
-				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
 
 			return First;
 		}
@@ -1581,7 +1582,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="CollectionName">Name of collection.</param>
 		/// <param name="Label">Label to check.</param>
 		/// <returns>If <paramref name="Label"/> is a label in the collection
-		/// defined by <paramref name="Collection"/>.</returns>
+		/// defined by <paramref name="CollectionName"/>.</returns>
 		public async Task<bool> IsLabel(string CollectionName, string Label)
 		{
 			IMongoCollection<BsonDocument> Collection = this.GetCollection(CollectionName);

@@ -94,22 +94,23 @@ namespace Waher.Persistence.Serialization
 		Task<Guid> SaveNewObject(object Value);
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter);
+		Task<T> TryLoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+			where T : class;
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <paramref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <paramref name="T"/>.
 		/// </summary>
 		/// <param name="T">Base type.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		Task<object> LoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter);
+		Task<object> TryLoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter);
 
 	}
 }

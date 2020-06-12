@@ -5192,14 +5192,14 @@ namespace Waher.Persistence.Files
 
 					foreach (Filter Filter2 in ChildFilters)
 					{
-						if (Filter2 is FilterFieldValue)
+						if (Filter2 is FilterFieldValue FilterFieldValue)
 						{
-							if (!(Filter2 is FilterFieldNotEqualTo))
+							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
 								if (Properties is null)
 									Properties = new List<string>();
 
-								FieldName = ((FilterFieldValue)Filter2).FieldName;
+								FieldName = FilterFieldValue.FieldName;
 								if (!Properties.Contains(FieldName))
 									Properties.Add(FieldName);
 							}
@@ -5686,14 +5686,14 @@ namespace Waher.Persistence.Files
 
 					foreach (Filter Filter2 in ChildFilters)
 					{
-						if (Filter2 is FilterFieldValue)
+						if (Filter2 is FilterFieldValue FilterFieldValue)
 						{
-							if (!(Filter2 is FilterFieldNotEqualTo))
+							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
 								if (Properties is null)
 									Properties = new List<string>();
 
-								Properties.Add(((FilterFieldValue)Filter2).FieldName);
+								Properties.Add(FilterFieldValue.FieldName);
 							}
 						}
 						else if (Filter2 is FilterFieldLikeRegEx FilterFieldLikeRegEx)

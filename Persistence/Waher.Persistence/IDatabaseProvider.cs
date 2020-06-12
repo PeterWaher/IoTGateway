@@ -40,7 +40,8 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder);
+		Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class;
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
@@ -52,7 +53,8 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder);
+		Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class;
 
 		/// <summary>
 		/// Finds objects in a given collection.
@@ -114,29 +116,31 @@ namespace Waher.Persistence
 		Task Delete(IEnumerable<object> Objects);
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		Task<T> LoadObject<T>(object ObjectId);
+		/// <returns>Loaded object, or null if not found.</returns>
+		Task<T> TryLoadObject<T>(object ObjectId)
+			where T : class;
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		Task<T> LoadObject<T>(string CollectionName, object ObjectId);
+		/// <returns>Loaded object, or null if not found.</returns>
+		Task<T> TryLoadObject<T>(string CollectionName, object ObjectId)
+			where T : class;
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
-		/// <returns>Loaded object.</returns>
-		Task<object> LoadObject(string CollectionName, object ObjectId);
+		/// <returns>Loaded object, or null if not found.</returns>
+		Task<object> TryLoadObject(string CollectionName, object ObjectId);
 
 		/// <summary>
 		/// Performs an export of the entire database.

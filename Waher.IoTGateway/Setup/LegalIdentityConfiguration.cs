@@ -756,7 +756,10 @@ namespace Waher.IoTGateway.Setup
 				else
 					Password = string.Empty;
 
-				ContractSignatureRequest SignatureRequest = await Database.LoadObject<ContractSignatureRequest>(RequestId);
+				ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId);
+				if (SignatureRequest is null)
+					throw new NotFoundException("Content Signature Request not found.");
+
 				if (SignatureRequest.Signed.HasValue)
 					throw new BadRequestException("Contract has already been signed.");
 
@@ -805,10 +808,6 @@ namespace Waher.IoTGateway.Setup
 				Response.ContentType = "application/json";
 				Response.Write(JSON.Encode(Sign, false));
 				Response.SendResponse();
-			}
-			catch (KeyNotFoundException)
-			{
-				Response.SendResponse(new NotFoundException("Content Signature Request not found."));
 			}
 			catch (Exception ex)
 			{

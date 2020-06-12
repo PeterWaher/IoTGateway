@@ -226,7 +226,6 @@
             <param name="CollectionName">Collection Name</param>
             <param name="Offset">Result offset.</param>
             <param name="MaxCount">Maximum number of objects to return.</param>
-            <param name="Filter">Optional filter. Can be null.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
@@ -243,47 +242,47 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryLoadObject``1(System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">Base type.</typeparam>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(MongoDB.Bson.ObjectId)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryLoadObject``1(MongoDB.Bson.ObjectId)">
             <summary>
-            Loads an object of a given type and Object ID.
+            Tries to load an object of a given type and Object ID.
             </summary>
             <typeparam name="T">Type of object to load.</typeparam>
             <param name="ObjectId">Object ID of object to load.</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.String,System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryLoadObject``1(System.String,System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">Base type.</typeparam>
             <param name="CollectionName">Name of collection in which the object resides.</param>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject``1(System.String,MongoDB.Bson.ObjectId)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryLoadObject``1(System.String,MongoDB.Bson.ObjectId)">
             <summary>
-            Loads an object of a given type and Object ID.
+            Tries to load an object of a given type and Object ID.
             </summary>
             <typeparam name="T">Type of object to load.</typeparam>
             <param name="CollectionName">Name of collection in which the object resides.</param>
             <param name="ObjectId">Object ID of object to load.</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.LoadObject(System.String,System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.TryLoadObject(System.String,System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
             </summary>
             <param name="CollectionName">Name of collection in which the object resides.</param>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Update(System.Object)">
             <summary>
@@ -439,7 +438,7 @@
             <param name="CollectionName">Name of collection.</param>
             <param name="Label">Label to check.</param>
             <returns>If <paramref name="Label"/> is a label in the collection
-            defined by <paramref name="Collection"/>.</returns>
+            defined by <paramref name="CollectionName"/>.</returns>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetLabels(System.String)">
             <summary>

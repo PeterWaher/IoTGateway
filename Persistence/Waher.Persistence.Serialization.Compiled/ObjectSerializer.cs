@@ -2991,13 +2991,17 @@ namespace Waher.Persistence.Serialization
 									{
 										case TYPE_GUID:
 											Guid RefObjectId = Reader.ReadGuid();
-											Task<object> SetTask = this.context.LoadObject(Member.MemberType, RefObjectId,
+											Task<object> SetTask = this.context.TryLoadObject(Member.MemberType, RefObjectId,
 												(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
 
 											if (!SetTask.Wait(10000))
 												throw new TimeoutException("Unable to load referenced object. Database timed out.");
 
-											Member.Set(Result, SetTask.Result);
+											object Value = SetTask.Result;
+											if (Value is null)
+												throw new KeyNotFoundException("Referenced object not found.");
+
+											Member.Set(Result, Value);
 											break;
 
 										case TYPE_NULL:

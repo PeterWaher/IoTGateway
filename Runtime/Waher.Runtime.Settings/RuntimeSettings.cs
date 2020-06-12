@@ -40,6 +40,7 @@ namespace Waher.Runtime.Settings
 		}
 
 		private static async Task<T> GetAsync<T>(string Key)
+			where T : class
 		{
 			await synchObject.BeginRead();
 			try

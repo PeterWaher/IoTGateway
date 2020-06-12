@@ -1453,7 +1453,8 @@ namespace Waher.Persistence.Files
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(object ObjectId)
+		public Task<T> TryLoadObject<T>(object ObjectId)
+			where T : class
 		{
 			Guid OID;
 
@@ -1466,7 +1467,7 @@ namespace Waher.Persistence.Files
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
-			return this.LoadObject<T>(OID);
+			return this.TryLoadObject<T>(OID);
 		}
 
 		/// <summary>
@@ -1475,9 +1476,10 @@ namespace Waher.Persistence.Files
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(Guid ObjectId)
+		public Task<T> TryLoadObject<T>(Guid ObjectId)
+			where T : class
 		{
-			return this.LoadObject<T>(ObjectId, null);
+			return this.TryLoadObject<T>(ObjectId, null);
 		}
 
 		/// <summary>
@@ -1487,7 +1489,8 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		public async Task<T> TryLoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
@@ -1498,7 +1501,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+						return (T)await File.TryLoadObjectLocked(ObjectId, Serializer);
 					}
 					finally
 					{
@@ -1512,7 +1515,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 			else
-				return (T)await File.LoadObject(ObjectId, Serializer);
+				return (T)await File.TryLoadObject(ObjectId, Serializer);
 		}
 
 		/// <summary>
@@ -1522,7 +1525,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<object> LoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		public async Task<object> TryLoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(T);
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
@@ -1533,7 +1536,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await File.LoadObjectLocked(ObjectId, Serializer);
+						return await File.TryLoadObjectLocked(ObjectId, Serializer);
 					}
 					finally
 					{
@@ -1547,7 +1550,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 			else
-				return await File.LoadObject(ObjectId, Serializer);
+				return await File.TryLoadObject(ObjectId, Serializer);
 		}
 
 		/// <summary>
@@ -1557,7 +1560,8 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(string CollectionName, object ObjectId)
+		public Task<T> TryLoadObject<T>(string CollectionName, object ObjectId)
+			where T : class
 		{
 			Guid OID;
 
@@ -1570,7 +1574,7 @@ namespace Waher.Persistence.Files
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
-			return this.LoadObject<T>(CollectionName, OID);
+			return this.TryLoadObject<T>(CollectionName, OID);
 		}
 
 		/// <summary>
@@ -1580,9 +1584,10 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public Task<T> LoadObject<T>(string CollectionName, Guid ObjectId)
+		public Task<T> TryLoadObject<T>(string CollectionName, Guid ObjectId)
+			where T : class
 		{
-			return this.LoadObject<T>(CollectionName, ObjectId, null);
+			return this.TryLoadObject<T>(CollectionName, ObjectId, null);
 		}
 
 		/// <summary>
@@ -1593,7 +1598,8 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<T> LoadObject<T>(string CollectionName, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		public async Task<T> TryLoadObject<T>(string CollectionName, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
@@ -1604,7 +1610,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+						return (T)await File.TryLoadObjectLocked(ObjectId, Serializer);
 					}
 					finally
 					{
@@ -1618,7 +1624,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 			else
-				return (T)await File.LoadObject(ObjectId, Serializer);
+				return (T)await File.TryLoadObject(ObjectId, Serializer);
 		}
 
 		/// <summary>
@@ -1627,9 +1633,9 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public Task<object> LoadObject(string CollectionName, object ObjectId)
+		public Task<object> TryLoadObject(string CollectionName, object ObjectId)
 		{
-			return this.LoadObject(CollectionName, ObjectId, null);
+			return this.TryLoadObject(CollectionName, ObjectId, null);
 		}
 
 		/// <summary>
@@ -1639,7 +1645,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<object> LoadObject(string CollectionName, object ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		public async Task<object> TryLoadObject(string CollectionName, object ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
 			Guid Id;
 
@@ -1661,7 +1667,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await File.LoadObjectLocked(ObjectId, Serializer);
+						return await File.TryLoadObjectLocked(ObjectId, Serializer);
 					}
 					finally
 					{
@@ -1675,7 +1681,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 			else
-				return await File.LoadObject(Id, Serializer);
+				return await File.TryLoadObject(Id, Serializer);
 
 		}
 
@@ -1814,6 +1820,7 @@ namespace Waher.Persistence.Files
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
 		{
 			return this.Find<T>(Offset, MaxCount, null, SortOrder);
 		}
@@ -1829,6 +1836,7 @@ namespace Waher.Persistence.Files
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));

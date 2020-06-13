@@ -2919,7 +2919,6 @@
             <summary>
             Gets an enumerator for all entries in the dictionary.
             </summary>
-            <param name="Locked">If the file should be locked.</param>
             <returns>Enumerator</returns>
         </member>
         <member name="P:Waher.Persistence.MongoDB.StringDictionary.CollectionName">

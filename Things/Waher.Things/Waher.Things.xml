@@ -4620,6 +4620,16 @@
             <param name="Caller">Original caller.</param>
             <param name="Sniffable">If the node is sniffable.</param>
         </member>
+        <member name="M:Waher.Things.SourceEvents.NodeAdded.FromNode(Waher.Things.INode,Waher.Runtime.Language.Language,Waher.Things.RequestOrigin,System.Boolean,Waher.Things.DisplayableParameters.Parameter[])">
+            <summary>
+            Creates an event object from a node object.
+            </summary>
+            <param name="Node">Node added.</param>
+            <param name="Language">Language</param>
+            <param name="Caller">Original caller.</param>
+            <param name="Sniffable">If the node is sniffable.</param>
+            <param name="AdditionalParameters">Additional node parameters.</param>
+        </member>
         <member name="M:Waher.Things.SourceEvents.NodeAdded.EmptyIfSame(System.String,System.String)">
             <summary>
             Returns <paramref name="Id1"/> if different, <see cref="F:System.String.Empty"/> if the same.
@@ -4847,6 +4857,15 @@
             <param name="Language">Language</param>
             <param name="Caller">Original caller.</param>
         </member>
+        <member name="M:Waher.Things.SourceEvents.NodeUpdated.FromNode(Waher.Things.INode,Waher.Runtime.Language.Language,Waher.Things.RequestOrigin,Waher.Things.DisplayableParameters.Parameter[])">
+            <summary>
+            Creates an event object from a node object.
+            </summary>
+            <param name="Node">Node added.</param>
+            <param name="Language">Language</param>
+            <param name="Caller">Original caller.</param>
+            <param name="AdditionalParameters">Additional node parameters.</param>
+        </member>
         <member name="M:Waher.Things.SourceEvents.NodeUpdated.FromNode(Waher.Things.INode,Waher.Runtime.Language.Language,Waher.Things.RequestOrigin,System.String)">
             <summary>
             Creates an event object from a node object.
@@ -4855,6 +4874,16 @@
             <param name="Language">Language</param>
             <param name="Caller">Original caller.</param>
             <param name="OldId">Old Node ID, if differrent from previous NodeId.</param>
+        </member>
+        <member name="M:Waher.Things.SourceEvents.NodeUpdated.FromNode(Waher.Things.INode,Waher.Runtime.Language.Language,Waher.Things.RequestOrigin,System.String,Waher.Things.DisplayableParameters.Parameter[])">
+            <summary>
+            Creates an event object from a node object.
+            </summary>
+            <param name="Node">Node added.</param>
+            <param name="Language">Language</param>
+            <param name="Caller">Original caller.</param>
+            <param name="OldId">Old Node ID, if differrent from previous NodeId.</param>
+            <param name="AdditionalParameters">Additional node parameters.</param>
         </member>
         <member name="P:Waher.Things.SourceEvents.NodeUpdated.OldId">
             <summary>

@@ -2746,6 +2746,31 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.Database.TryLoadObject``1(System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.TryLoadObject``1(System.String,System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.TryLoadObject(System.String,System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            </summary>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
         <member name="M:Waher.Persistence.Database.LoadObject``1(System.Object)">
             <summary>
             Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
@@ -3505,30 +3530,30 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.LoadObject``1(System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.TryLoadObject``1(System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">Base type.</typeparam>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.LoadObject``1(System.String,System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.TryLoadObject``1(System.String,System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">Base type.</typeparam>
             <param name="CollectionName">Name of collection in which the object resides.</param>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.LoadObject(System.String,System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.TryLoadObject(System.String,System.Object)">
             <summary>
-            Loads an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
             </summary>
             <param name="CollectionName">Name of collection in which the object resides.</param>
             <param name="ObjectId">Object ID</param>
-            <returns>Loaded object.</returns>
+            <returns>Loaded object, or null if not found.</returns>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
             <summary>

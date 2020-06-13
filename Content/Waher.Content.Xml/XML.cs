@@ -341,8 +341,6 @@ namespace Waher.Content.Xml
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
 		public static string Attribute(XmlElement E, string Name, string DefaultValue)
 		{
-
-
 			if (E.HasAttribute(Name))
 				return E.GetAttribute(Name);
 			else

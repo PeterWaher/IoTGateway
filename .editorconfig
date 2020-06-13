@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# DV2001: No Dependency Diagram linked
+dotnet_diagnostic.DV2001.severity = none

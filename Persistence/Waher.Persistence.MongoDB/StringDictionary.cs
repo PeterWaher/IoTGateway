@@ -330,7 +330,6 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Gets an enumerator for all entries in the dictionary.
 		/// </summary>
-		/// <param name="Locked">If the file should be locked.</param>
 		/// <returns>Enumerator</returns>
 		public async Task<IEnumerator<KeyValuePair<string, object>>> GetEnumeratorAsync()
 		{

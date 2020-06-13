@@ -379,6 +379,7 @@ namespace Waher.Networking
 			{
 				IAsyncAction _ = this.client.CancelIOAsync();
 			}
+		}
 #else
 			lock (this.synchObj)
 			{
@@ -395,7 +396,6 @@ namespace Waher.Networking
 
 				this.DoDisposeLocked();
 			}
-#endif
 		}
 
 		private Task AbortRead(object P)
@@ -405,6 +405,7 @@ namespace Waher.Networking
 
 			return Task.CompletedTask;
 		}
+#endif
 
 		private void DoDisposeLocked()
 		{

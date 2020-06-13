@@ -63,14 +63,14 @@ namespace Waher.Script.Content.Functions.InputOutput
 			List<KeyValuePair<string, string>> HeaderList = null;
 
 			if (Arguments.Length > 1)
-				HeaderList = GetHeaders(Arguments[1].AssociatedObjectValue);
+				HeaderList = GetHeaders(Arguments[1].AssociatedObjectValue, this);
 
 			object Result = InternetContent.GetAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
 
 			return new ObjectValue(Result);
 		}
 
-		internal static List<KeyValuePair<string, string>> GetHeaders(object Arg)
+		internal static List<KeyValuePair<string, string>> GetHeaders(object Arg, ScriptNode Node)
 		{
 			List<KeyValuePair<string, string>> HeaderList;
 
@@ -89,7 +89,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 				};
 			}
 			else
-				throw new ScriptRuntimeException("Invalid second parameter to Get. Should be either an accept string, or an object with protocol-specific headers or options.", this);
+				throw new ScriptRuntimeException("Invalid second parameter to Get. Should be either an accept string, or an object with protocol-specific headers or options.", Node);
 
 			return HeaderList;
 		}

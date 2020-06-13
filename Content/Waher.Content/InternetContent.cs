@@ -22,16 +22,19 @@ namespace Waher.Content
 		private static string[] canDecodeContentTypes = null;
 		private static string[] canDecodeFileExtensions = null;
 		private static string[] canGetUriSchemes = null;
+		private static string[] canPostToUriSchemes = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
 		private static IContentGetter[] getters = null;
+		private static IContentPoster[] posters = null;
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
 		private readonly static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IContentPoster[]> postersByScheme = new Dictionary<string, IContentPoster[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static InternetContent()
 		{
@@ -189,7 +192,7 @@ namespace Waher.Content
 				}
 			}
 
-			return Encoder != null;
+			return !(Encoder is null);
 		}
 
 		/// <summary>
@@ -375,7 +378,7 @@ namespace Waher.Content
 					Grade = P.Key;
 					Decoder = P.Value;
 
-					return Decoder != null;
+					return !(Decoder is null);
 				}
 			}
 
@@ -396,7 +399,7 @@ namespace Waher.Content
 				decoderByContentType[ContentType] = new KeyValuePair<Grade, IContentDecoder>(Grade, Decoder);
 			}
 
-			return Decoder != null;
+			return !(Decoder is null);
 		}
 
 		/// <summary>
@@ -594,7 +597,7 @@ namespace Waher.Content
 
 				string PathKey = FromContentType + " -> " + ToContentType;
 				if (convertersByStep.TryGetValue(PathKey, out Converter))
-					return Converter != null;
+					return !(Converter is null);
 
 				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))
 					return false;
@@ -624,7 +627,7 @@ namespace Waher.Content
 				int StepDistance;
 				bool First;
 
-				while (Queue.First != null)
+				while (!(Queue.First is null))
 				{
 					Step = Queue.First.Value;
 					Queue.RemoveFirst();
@@ -677,11 +680,11 @@ namespace Waher.Content
 					}
 				}
 
-				if (Best != null)
+				if (!(Best is null))
 				{
 					List<KeyValuePair<string, IContentConverter>> List = new List<KeyValuePair<string, IContentConverter>>();
 
-					while (Best != null)
+					while (!(Best is null))
 					{
 						List.Insert(0, new KeyValuePair<string, IContentConverter>(Best.From, Best.Converter));
 						Best = Best.Prev;
@@ -873,7 +876,7 @@ namespace Waher.Content
 		/// If a resource can be gotten, given its URI.
 		/// </summary>
 		/// <param name="Uri">URI of resource.</param>
-		/// <param name="Grade">How well the decoder decodes the object.</param>
+		/// <param name="Grade">How well the getter can get the resource.</param>
 		/// <param name="Getter">Best getter for the URI.</param>
 		/// <returns>If a resource with the given URI can be gotten.</returns>
 		public static bool CanGet(Uri Uri, out Grade Grade, out IContentGetter Getter)
@@ -908,7 +911,7 @@ namespace Waher.Content
 				}
 			}
 
-			return Getter != null;
+			return !(Getter is null);
 		}
 
 		/// <summary>
@@ -949,6 +952,170 @@ namespace Waher.Content
 				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
 
 			return Getter.GetTempFileAsync(Uri, TimeoutMs, Headers);
+		}
+
+		#endregion
+
+		#region Posting to resources
+
+		/// <summary>
+		/// Internet URI Schemes that can be posted to.
+		/// </summary>
+		public static string[] CanPostToUriSchemes
+		{
+			get
+			{
+				if (canPostToUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentPoster Poster in Posters)
+					{
+						foreach (string Scheme in Poster.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canPostToUriSchemes = Schemes;
+				}
+
+				return canPostToUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Posters.
+		/// </summary>
+		public static IContentPoster[] Posters
+		{
+			get
+			{
+				if (posters is null)
+					BuildPosters();
+
+				return posters;
+			}
+		}
+
+		private static void BuildPosters()
+		{
+			List<IContentPoster> Posters = new List<IContentPoster>();
+			Type[] PosterTypes = Types.GetTypesImplementingInterface(typeof(IContentPoster));
+			Dictionary<string, List<IContentPoster>> ByScheme = new Dictionary<string, List<IContentPoster>>();
+			IContentPoster Poster;
+			TypeInfo TI;
+
+			foreach (Type T in PosterTypes)
+			{
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					continue;
+
+				try
+				{
+					Poster = (IContentPoster)Activator.CreateInstance(T);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Posters.Add(Poster);
+
+				foreach (string Schema in Poster.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out List<IContentPoster> List))
+					{
+						List = new List<IContentPoster>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Poster);
+				}
+			}
+
+			lock (postersByScheme)
+			{
+				foreach (KeyValuePair<string, List<IContentPoster>> P in ByScheme)
+					postersByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			posters = Posters.ToArray();
+		}
+
+		/// <summary>
+		/// If a resource can be posted to, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the posted can post to the resource.</param>
+		/// <param name="Poster">Best poster for the URI.</param>
+		/// <returns>If a resource with the given URI can be posted to.</returns>
+		public static bool CanPost(Uri Uri, out Grade Grade, out IContentPoster Poster)
+		{
+			if (Uri is null)
+				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+
+			if (posters is null)
+				BuildPosters();
+
+			IContentPoster[] Posters;
+
+			lock (postersByScheme)
+			{
+				if (Uri is null || !postersByScheme.TryGetValue(Uri.Scheme, out Posters))
+				{
+					Poster = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Poster = null;
+
+			foreach (IContentPoster Poster2 in Posters)
+			{
+				if (Poster2.CanPost(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Poster = Poster2;
+				}
+			}
+
+			return !(Poster is null);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to post.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Poster.PostAsync(Uri, Data, Headers);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be posted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Poster.PostAsync(Uri, EncodedData, ContentType, Headers);
 		}
 
 		#endregion

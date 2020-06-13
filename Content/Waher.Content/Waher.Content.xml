@@ -860,6 +860,44 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
+        <member name="T:Waher.Content.IContentPoster">
+            <summary>
+            Basic interface for Internet Content posters. A class implementing this interface and having a default constructor, will be able
+            to partake in posting content through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentPoster.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentPoster.CanPost(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the poster is able to post to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
+            <returns>If the poster can post to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Object,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to post.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
         <member name="T:Waher.Content.IFileNameResource">
             <summary>
             Basic interface for resources having a FileName property.
@@ -1048,7 +1086,7 @@
             If a resource can be gotten, given its URI.
             </summary>
             <param name="Uri">URI of resource.</param>
-            <param name="Grade">How well the decoder decodes the object.</param>
+            <param name="Grade">How well the getter can get the resource.</param>
             <param name="Getter">Best getter for the URI.</param>
             <returns>If a resource with the given URI can be gotten.</returns>
         </member>
@@ -1076,6 +1114,44 @@
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanPostToUriSchemes">
+            <summary>
+            Internet URI Schemes that can be posted to.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Posters">
+            <summary>
+            Available Internet Content Posters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanPost(System.Uri,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentPoster@)">
+            <summary>
+            If a resource can be posted to, given its URI.
+            </summary>
+            <param name="Uri">URI of resource.</param>
+            <param name="Grade">How well the posted can post to the resource.</param>
+            <param name="Poster">Best poster for the URI.</param>
+            <returns>If a resource with the given URI can be posted to.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Object,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to post.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PostAsync(System.Uri,System.Byte[],System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
         </member>
         <member name="T:Waher.Content.JSON">
             <summary>
@@ -1667,6 +1743,81 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.Posters.PosterBase">
+            <summary>
+            Abstract base class for posters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Posters.PosterBase.#ctor">
+            <summary>
+            Abstract base class for posters.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Posters.PosterBase.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Posters.PosterBase.CanPost(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the poster is able to post to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
+            <returns>If the poster can post to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Object,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to post.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Posters.PosterBase.PostAsync(System.Uri,System.Byte[],System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="T:Waher.Content.Posters.WebPoster">
+            <summary>
+            Posts to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Posters.WebPoster.#ctor">
+            <summary>
+            Posts to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Posters.WebPoster.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Posters.WebPoster.CanPost(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the poster is able to post to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the poster would be able to post to a resource given the indicated URI.</param>
+            <returns>If the poster can post to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Posters.WebPoster.PostAsync(System.Uri,System.Byte[],System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Posts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
         </member>
         <member name="T:Waher.Content.Resources">
             <summary>

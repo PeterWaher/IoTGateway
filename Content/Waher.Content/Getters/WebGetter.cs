@@ -65,7 +65,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Get
 				})
 				{
-					this.PrepareHeaders(Request, Headers);
+					PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 					Response.EnsureSuccessStatusCode();
@@ -79,7 +79,7 @@ namespace Waher.Content.Getters
 			}
 		}
 
-		private void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers)
+		internal static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers)
 		{
 			if (!(Headers is null))
 			{
@@ -120,7 +120,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Get
 				})
 				{
-					this.PrepareHeaders(Request, Headers);
+					PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 					Response.EnsureSuccessStatusCode();

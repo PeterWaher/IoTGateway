@@ -232,44 +232,8 @@ namespace Waher.Networking.XMPP.HTTPX
 						await State.File.ReadAsync(Data, 0, Len);
 					}
 
-					switch (State.StatusCode)
-					{
-						case 301: throw new MovedPermanentlyException(State.HttpResponse.GetFirstHeader("Location"), Data, ContentType);
-						case 302: throw new FoundException(State.HttpResponse.GetFirstHeader("Location"), Data, ContentType);
-						case 303: throw new SeeOtherException(State.HttpResponse.GetFirstHeader("Location"), Data, ContentType);
-						case 304: throw new NotModifiedException();
-						case 305: throw new UseProxyException(State.HttpResponse.GetFirstHeader("Location"), Data, ContentType);
-						case 307: throw new TemporaryRedirectException(State.HttpResponse.GetFirstHeader("Location"), Data, ContentType);
-						case 400: throw new BadRequestException(Data, ContentType);
-						case 403: throw new ForbiddenException(Data, ContentType);
-						case 404: throw new NotFoundException(Data, ContentType);
-						case 405: throw new MethodNotAllowedException(GetMethods(State.HttpResponse.GetFirstHeader("Allow")), Data, ContentType);
-						case 408: throw new RequestTimeoutException(Data, ContentType);
-						case 409: throw new ConflictException(Data, ContentType);
-						case 410: throw new GoneException(Data, ContentType);
-						case 411: throw new PreconditionFailedException(Data, ContentType);
-						case 415: throw new UnsupportedMediaTypeException(Data, ContentType);
-						case 416: throw new RangeNotSatisfiableException(Data, ContentType);
-						case 421: throw new MisdirectedRequestException(Data, ContentType);
-						case 422: throw new UnprocessableEntityException(Data, ContentType);
-						case 423: throw new LockedException(Data, ContentType);
-						case 424: throw new FailedDependencyException(Data, ContentType);
-						case 426: throw new UpgradeRequiredException(State.HttpResponse.GetFirstHeader("Upgrade"), Data, ContentType);
-						case 429: throw new TooManyRequestsException(Data, ContentType);
-						case 428: throw new PreconditionRequiredException(Data, ContentType);
-						case 451: throw new UnavailableForLegalReasonsException(Data, ContentType);
-						case 500: throw new InternalServerErrorException(Data, ContentType);
-						case 501: throw new HTTP.NotImplementedException(Data, ContentType);
-						case 502: throw new BadGatewayException(Data, ContentType);
-						case 503: throw new ServiceUnavailableException(Data, ContentType);
-						case 504: throw new GatewayTimeoutException(Data, ContentType);
-						case 506: throw new VariantAlsoNegotiatesException(Data, ContentType);
-						case 507: throw new InsufficientStorageException(Data, ContentType);
-						case 508: throw new LoopDetectedException(Data, ContentType);
-						case 510: throw new NotExtendedException(Data, ContentType);
-						case 511: throw new NetworkAuthenticationRequiredException(Data, ContentType);
-						default: throw new HttpException(State.StatusCode, State.StatusMessage, Data, ContentType);
-					}
+					throw GetExceptionObject(State.StatusCode, State.StatusMessage, 
+						State.HttpResponse, Data, ContentType);
 				}
 			}
 			finally
@@ -282,6 +246,49 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				Timer?.Dispose();
 				Timer = null;
+			}
+		}
+
+		internal static Exception GetExceptionObject(int StatusCode, string StatusMessage,
+			HttpResponse Response, byte[] Data, string ContentType)
+		{
+			switch (StatusCode)
+			{
+				case 301: throw new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case 302: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case 303: throw new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case 304: throw new NotModifiedException();
+				case 305: throw new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case 307: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case 400: throw new BadRequestException(Data, ContentType);
+				case 403: throw new ForbiddenException(Data, ContentType);
+				case 404: throw new NotFoundException(Data, ContentType);
+				case 405: throw new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType);
+				case 408: throw new RequestTimeoutException(Data, ContentType);
+				case 409: throw new ConflictException(Data, ContentType);
+				case 410: throw new GoneException(Data, ContentType);
+				case 411: throw new PreconditionFailedException(Data, ContentType);
+				case 415: throw new UnsupportedMediaTypeException(Data, ContentType);
+				case 416: throw new RangeNotSatisfiableException(Data, ContentType);
+				case 421: throw new MisdirectedRequestException(Data, ContentType);
+				case 422: throw new UnprocessableEntityException(Data, ContentType);
+				case 423: throw new LockedException(Data, ContentType);
+				case 424: throw new FailedDependencyException(Data, ContentType);
+				case 426: throw new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType);
+				case 429: throw new TooManyRequestsException(Data, ContentType);
+				case 428: throw new PreconditionRequiredException(Data, ContentType);
+				case 451: throw new UnavailableForLegalReasonsException(Data, ContentType);
+				case 500: throw new InternalServerErrorException(Data, ContentType);
+				case 501: throw new HTTP.NotImplementedException(Data, ContentType);
+				case 502: throw new BadGatewayException(Data, ContentType);
+				case 503: throw new ServiceUnavailableException(Data, ContentType);
+				case 504: throw new GatewayTimeoutException(Data, ContentType);
+				case 506: throw new VariantAlsoNegotiatesException(Data, ContentType);
+				case 507: throw new InsufficientStorageException(Data, ContentType);
+				case 508: throw new LoopDetectedException(Data, ContentType);
+				case 510: throw new NotExtendedException(Data, ContentType);
+				case 511: throw new NetworkAuthenticationRequiredException(Data, ContentType);
+				default: throw new HttpException(StatusCode, StatusMessage, Data, ContentType);
 			}
 		}
 

@@ -9,32 +9,34 @@ using Waher.Script.Objects;
 namespace Waher.Script.Content.Functions.InputOutput
 {
 	/// <summary>
-	/// Get(Url)
+	/// Post(Url,Data)
 	/// </summary>
-	public class Get : FunctionMultiVariate
+	public class Post : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Get(Url)
+		/// Post(Url,Data)
 		/// </summary>
 		/// <param name="Url">URL.</param>
+		/// <param name="Data">Data</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Get(ScriptNode Url, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Url }, new ArgumentType[] { ArgumentType.Scalar }, Start, Length, Expression)
+		public Post(ScriptNode Url, ScriptNode Data, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Url, Data }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Get(Url,Headers)
+		/// Post(Url,Data,Headers)
 		/// </summary>
 		/// <param name="Url">URL.</param>
+		/// <param name="Data">Data</param>
 		/// <param name="Headers">Request headers.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Get(ScriptNode Url, ScriptNode Headers, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Url, Headers }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal }, Start, Length, Expression)
+		public Post(ScriptNode Url, ScriptNode Data, ScriptNode Headers, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Url, Data, Headers }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
 
@@ -43,13 +45,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "get"; }
+			get { return "post"; }
 		}
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "URL" };
+		public override string[] DefaultArgumentNames => new string[] { "URL", "Data" };
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -60,38 +62,15 @@ namespace Waher.Script.Content.Functions.InputOutput
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
+			object Data = Arguments[1].AssociatedObjectValue;
 			List<KeyValuePair<string, string>> HeaderList = null;
 
-			if (Arguments.Length > 1)
-				HeaderList = GetHeaders(Arguments[1].AssociatedObjectValue);
+			if (Arguments.Length > 2)
+				HeaderList = Get.GetHeaders(Arguments[1].AssociatedObjectValue);
 
-			object Result = InternetContent.GetAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
+			object Result = InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
 
 			return new ObjectValue(Result);
-		}
-
-		internal static List<KeyValuePair<string, string>> GetHeaders(object Arg)
-		{
-			List<KeyValuePair<string, string>> HeaderList;
-
-			if (Arg is IDictionary<string, IElement> Headers)
-			{
-				HeaderList = new List<KeyValuePair<string, string>>();
-
-				foreach (KeyValuePair<string, IElement> P in Headers)
-					HeaderList.Add(new KeyValuePair<string, string>(P.Key, P.Value.AssociatedObjectValue?.ToString()));
-			}
-			else if (Arg is string Accept)
-			{
-				HeaderList = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>("Accept", Accept)
-				};
-			}
-			else
-				throw new ScriptRuntimeException("Invalid second parameter to Get. Should be either an accept string, or an object with protocol-specific headers or options.", this);
-
-			return HeaderList;
 		}
 	}
 }

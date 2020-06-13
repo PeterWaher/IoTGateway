@@ -318,7 +318,17 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (!this.nodes.TryGetValue(Key, out Node))
-								return; // Parent not loaded.
+							{
+								if (string.IsNullOrEmpty(NodeUpdated.OldId))
+									return; // Parent not loaded.
+
+								string OldKey = NodeUpdated.Partition + " " + NodeUpdated.OldId;
+								if (!this.nodes.TryGetValue(OldKey, out Node))
+									return; // Parent not loaded.
+
+								this.nodes.Remove(OldKey);
+								this.nodes[Key] = Node;
+							}
 						}
 
 						Node.NodeInformation = new NodeInformation(NodeUpdated.NodeId, NodeUpdated.SourceId, NodeUpdated.Partition,

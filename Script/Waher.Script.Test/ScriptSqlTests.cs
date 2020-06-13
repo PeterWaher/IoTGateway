@@ -755,7 +755,7 @@ namespace Waher.Script.Test
 		{
 			this.Test(
 				"insert into WebUsers (UserName, Password) values (\"User01\", \"Pwd01\");"+
-				"select UserName, Password from WebUsers order by UserName",
+				"select UserName, Password from WebUsers where UserName=\"User01\" order by UserName",
 				new object[][]
 				{
 					new object[] { "User01", "Pwd01" }
@@ -801,6 +801,63 @@ namespace Waher.Script.Test
 					new object[] { "User18", "Pwd18" },
 					new object[] { "User19", "Pwd19" },
 					new object[] { "User20", "Pwd20" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_04_INSERT_OBJECT()
+		{
+			this.Test(
+				"insert into WebUsers object {UserName:\"User21\",Password:\"Pwd21\"};" +
+				"select UserName, Password from WebUsers where UserName=\"User21\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User21", "Pwd21" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_05_INSERT_OBJECTS_1()
+		{
+			this.Test(
+				"insert into WebUsers objects "+
+				"{UserName:\"User22\",Password:\"Pwd22\"}," +
+				"{UserName:\"User23\",Password:\"Pwd23\"}," +
+				"{UserName:\"User24\",Password:\"Pwd24\"};" +
+				"select UserName, Password from WebUsers where UserName>=\"User22\" and UserName<=\"User24\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User22", "Pwd22" },
+					new object[] { "User23", "Pwd23" },
+					new object[] { "User24", "Pwd24" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_06_INSERT_OBJECTS_2()
+		{
+			this.Test(
+				"insert into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
+				"select UserName, Password from WebUsers where UserName>=\"User25\" and UserName<=\"User27\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User25", "Pwd25" },
+					new object[] { "User26", "Pwd26" },
+					new object[] { "User27", "Pwd27" }
+				});
+		}
+
+		[TestMethod]
+		public void INSERT_Test_07_INSERT_OBJECTS_3()
+		{
+			this.Test(
+				"insert into WebUsers objects {foreach i in 28..30 do {UserName:\"User\"+i,Password:\"Pwd\"+i}};" +
+				"select UserName, Password from WebUsers where UserName>=\"User28\" and UserName<=\"User30\" order by UserName",
+				new object[][]
+				{
+					new object[] { "User28", "Pwd28" },
+					new object[] { "User29", "Pwd29" },
+					new object[] { "User30", "Pwd30" }
 				});
 		}
 

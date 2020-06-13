@@ -32,7 +32,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "INTO", "VALUES" };
+		public string[] InternalKeywords => new string[] { "INTO", "VALUES", "OBJECT", "OBJECTS" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -90,6 +90,17 @@ namespace Waher.Script.Persistence.SQL.Parsers
 							return false;
 
 						Result = new InsertSelect(Source, Select, Parser.Start, Parser.Position, Parser.Expression);
+						return true;
+
+					case "OBJECT":
+					case "OBJECTS":
+						Parser.NextToken();
+
+						Node = Parser.ParseList();
+						if (!(Node is ElementList Objects))
+							Objects = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
+
+						Result = new InsertObjects(Source, Objects, Parser.Start, Parser.Length, Parser.Expression);
 						return true;
 
 					default:

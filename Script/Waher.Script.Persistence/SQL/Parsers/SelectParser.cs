@@ -426,7 +426,9 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s != "OFFSET" &&
 				s != "ON" &&
 				s != "SET" &&
-				s != "SELECT")
+				s != "SELECT" &&
+				s != "OBJECT" &&
+				s != "OBJECTS")
 			{
 				if (s == "AS")
 					Parser.NextToken();

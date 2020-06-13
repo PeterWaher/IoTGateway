@@ -584,6 +584,55 @@
             Drops the collection from the source.
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.InsertObjects">
+            <summary>
+            Executes an INSERT ... OBJECT[S] ... statement against the object database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.ElementList,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes an INSERT ... OBJECT[S] ... statement against the object database.
+            </summary>
+            <param name="Source">Source to update objects from.</param>
+            <param name="Objects">Objects</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.InsertSelect">
             <summary>
             Executes an INSERT SELECT statement against the object database.

@@ -1710,7 +1710,7 @@ values
 
 #### INSERT SELECT
 
-You can insert multiple objects into a data source by combining an INSERT and a SELECT
+You can insert multiple objects into a data source by combining an `INSERT` and a `SELECT`
 statement.
 
 Syntax:
@@ -1734,6 +1734,67 @@ select
 from
 	...
 ```
+
+#### INSERT OBJECT
+
+You can insert an object ex nihilo into a collection using the `INSERT ... OBJECT` statement.
+
+Syntax:
+
+```
+INSERT
+INTO Source
+OBJECT ...
+```
+
+Example:
+
+```
+insert
+into PersistedEvent 
+object
+{
+	Timestamp=Now, 
+	Message="Kilroy was here", 
+	Object="Here", 
+	Actor="Kilroy"
+}
+```
+
+#### INSERT OBJECTS
+
+You can insert a vector or set of objects ex nihilo into a collection using the 
+`INSERT ... OBJECTS` statement.
+
+Syntax:
+
+```
+INSERT
+INTO Source
+OBJECTS [Object1, ..., ObjectN]
+```
+
+Example:
+
+```
+insert
+into PersistedEvent 
+objects
+[{
+	Timestamp=Now, 
+	Message="Kilroy was here", 
+	Object="Here", 
+	Actor="Kilroy"
+},
+{
+	Timestamp=Now, 
+	Message="Kilroy was here again", 
+	Object="Here", 
+	Actor="Kilroy"
+}]
+```
+
+**Note**: Objects can be returned as a vector, set, or simply as a list of elements separated with commas.
 
 #### UPDATE
 

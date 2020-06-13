@@ -1255,22 +1255,6 @@
           }
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/netstandard1.3/System.Net.Security.dll": {
-            "assetType": "runtime",
-            "rid": "win"
-          },
-          "runtimes/win7/lib/netcore50/_._": {
-            "assetType": "runtime",
-            "rid": "win7"
-          }
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -2463,15 +2447,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -2486,7 +2461,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -2497,12 +2472,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -2554,13 +2529,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -3946,15 +3922,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -5043,15 +5010,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -5066,7 +5024,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -5077,12 +5035,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -5134,13 +5092,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -6562,15 +6521,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -7659,15 +7609,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -7682,7 +7623,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -7693,12 +7634,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -7750,13 +7691,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -9151,15 +9093,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -10248,15 +10181,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -10271,7 +10195,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -10282,12 +10206,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -10339,13 +10263,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -11776,15 +11701,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -12873,15 +12789,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -12896,7 +12803,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -12907,12 +12814,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -12964,13 +12871,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -14365,15 +14273,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -15462,15 +15361,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -15485,7 +15375,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -15496,12 +15386,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -15553,13 +15443,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -16990,15 +16881,6 @@
           "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {}
         }
       },
-      "System.Net.Security/4.3.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.3/System.Net.Security.dll": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/netcore50/_._": {}
-        }
-      },
       "System.Net.Sockets/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -18087,15 +17969,6 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking/1.0.15": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Security": "4.3.2",
-          "Waher.Events": "1.0.11"
-        }
-      },
       "Waher.Networking.HTTP.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0.10586",
@@ -18110,7 +17983,7 @@
           "Waher.Runtime.Inventory": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -18121,12 +17994,12 @@
           "Waher.Events": "1.0.11"
         }
       },
-      "Waher.Networking.WHOIS/1.0.0": {
+      "Waher.Networking.WHOIS.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Waher.Networking": "1.0.15"
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
+          "Waher.Networking.UWP": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.16": {
@@ -18178,13 +18051,14 @@
           "Waher.Runtime.Inventory": "1.0.13"
         }
       },
-      "Waher.Security.LoginMonitor/1.0.0": {
+      "Waher.Security.LoginMonitor.UWP/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "NETStandard.Library": "1.6.1",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.10",
           "Waher.Events": "1.0.11",
-          "Waher.Networking.WHOIS": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.0.16",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Security": "1.0.5"
@@ -25260,38 +25134,6 @@
         "system.net.requests.nuspec"
       ]
     },
-    "System.Net.Security/4.3.2": {
-      "sha512": "xT2jbYpbBo3ha87rViHoTA6WdvqOAW37drmqyx/6LD8p7HEPT2qgdxoimRzWtPg8Jh4X5G9BV2seeTv4x6FYlA==",
-      "type": "package",
-      "path": "system.net.security/4.3.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net46/System.Net.Security.dll",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
-        "ref/net46/System.Net.Security.dll",
-        "ref/netstandard1.3/System.Net.Security.dll",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "runtimes/unix/lib/netstandard1.6/System.Net.Security.dll",
-        "runtimes/win/lib/net46/System.Net.Security.dll",
-        "runtimes/win/lib/netstandard1.3/System.Net.Security.dll",
-        "runtimes/win7/lib/netcore50/_._",
-        "system.net.security.4.3.2.nupkg.sha512",
-        "system.net.security.nuspec"
-      ]
-    },
     "System.Net.Sockets/4.3.0": {
       "sha512": "m6icV6TqQOAdgt5N/9I5KNpjom/5NFtkmGseEH+AK/hny8XrytLH3+b5M8zL/Ycg3fhIocFpUMyl/wpFnVRvdw==",
       "type": "package",
@@ -28100,11 +27942,6 @@
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"
     },
-    "Waher.Networking/1.0.15": {
-      "type": "project",
-      "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
-      "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"
-    },
     "Waher.Networking.HTTP.UWP/1.0.0": {
       "type": "project",
       "path": "../../Networking/Waher.Networking.HTTP.UWP/project.json",
@@ -28115,10 +27952,10 @@
       "path": "../../Networking/Waher.Networking.UWP/Waher.Networking.UWP.csproj",
       "msbuildProject": "../../Networking/Waher.Networking.UWP/Waher.Networking.UWP.csproj"
     },
-    "Waher.Networking.WHOIS/1.0.0": {
+    "Waher.Networking.WHOIS.UWP/1.0.0": {
       "type": "project",
-      "path": "../../Networking/Waher.Networking.WHOIS/Waher.Networking.WHOIS.csproj",
-      "msbuildProject": "../../Networking/Waher.Networking.WHOIS/Waher.Networking.WHOIS.csproj"
+      "path": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj",
+      "msbuildProject": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj"
     },
     "Waher.Persistence/1.0.16": {
       "type": "project",
@@ -28150,10 +27987,10 @@
       "path": "../Waher.Security.JWS/Waher.Security.JWS.csproj",
       "msbuildProject": "../Waher.Security.JWS/Waher.Security.JWS.csproj"
     },
-    "Waher.Security.LoginMonitor/1.0.0": {
+    "Waher.Security.LoginMonitor.UWP/1.0.0": {
       "type": "project",
-      "path": "../Waher.Security.LoginMonitor/Waher.Security.LoginMonitor.csproj",
-      "msbuildProject": "../Waher.Security.LoginMonitor/Waher.Security.LoginMonitor.csproj"
+      "path": "../Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj",
+      "msbuildProject": "../Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -28240,56 +28077,18 @@
   },
   "logs": [
     {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-arm.",
-      "libraryId": "System.Net.Security",
+      "code": "NU1605",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Detected package downgrade: Microsoft.NETCore.UniversalWindowsPlatform from 6.2.10 to 6.2.9. Reference the package directly from the project to select a different version. \r\n Waher.Security.JWT.UWP -> Waher.Networking.HTTP.UWP -> Waher.Security.LoginMonitor.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 6.2.10) \r\n Waher.Security.JWT.UWP -> Microsoft.NETCore.UniversalWindowsPlatform (>= 6.2.9)",
+      "libraryId": "Microsoft.NETCore.UniversalWindowsPlatform",
       "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-arm"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-arm-aot.",
-      "libraryId": "System.Net.Security",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-arm-aot"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x64.",
-      "libraryId": "System.Net.Security",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x64"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x64-aot.",
-      "libraryId": "System.Net.Security",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x64-aot"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x86.",
-      "libraryId": "System.Net.Security",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10586/win10-x86"
-      ]
-    },
-    {
-      "code": "NU1203",
-      "level": "Error",
-      "message": "System.Net.Security 4.3.2 provides a compile-time reference assembly for System.Net.Security on UAP,Version=v10.0.10586, but there is no run-time assembly compatible with win10-x86-aot.",
-      "libraryId": "System.Net.Security",
-      "targetGraphs": [
+        "UAP,Version=v10.0.10586",
+        "UAP,Version=v10.0.10586/win10-arm",
+        "UAP,Version=v10.0.10586/win10-arm-aot",
+        "UAP,Version=v10.0.10586/win10-x64",
+        "UAP,Version=v10.0.10586/win10-x64-aot",
+        "UAP,Version=v10.0.10586/win10-x86",
         "UAP,Version=v10.0.10586/win10-x86-aot"
       ]
     }

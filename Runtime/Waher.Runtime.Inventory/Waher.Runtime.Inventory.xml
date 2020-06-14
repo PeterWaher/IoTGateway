@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Inventory</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Inventory.Grade">
+            <summary>
+            Grade enumeration
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Inventory.Grade.Perfect">
+            <summary>
+            Match is perfect.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Inventory.Grade.Excellent">
+            <summary>
+            Match is excellent.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Inventory.Grade.Ok">
+            <summary>
+            Match is ok.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Inventory.Grade.Barely">
+            <summary>
+            Match is limited
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Inventory.Grade.NotAtAll">
+            <summary>
+            No match.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.IModule">
+            <summary>
+            Interface for late-bound modules loaded at runtime.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.IModule.Start">
+            <summary>
+            Starts the module.
+            </summary>
+            <returns>If an asynchronous start operation has been started, a wait handle is returned. This
+            wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
+            operation has been started, null can be returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.IModule.Stop">
+            <summary>
+            Stops the module.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.IProcessingSupport`1">
+            <summary>
+            Interface for detecting interfaces supporting objects with predefined features.
+            </summary>
+            <typeparam name="T">Type defining features to look for.</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.IProcessingSupport`1.Supports(`0)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.Types">
+            <summary>
+            Static class that dynamically manages types and interfaces available in the runtime environment.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetType(System.String)">
+            <summary>
+            Gets a type, given its full name.
+            </summary>
+            <param name="FullName">Full name of type.</param>
+            <returns>Type, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.IsType(System.String)">
+            <summary>
+            Checks if <paramref name="FullName"/> references a type in the inventory.
+            </summary>
+            <param name="FullName">Full name</param>
+            <returns>If <paramref name="FullName"/> references a type.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetTypesImplementingInterface(System.String)">
+            <summary>
+            Gets all types implementing a given interface.
+            </summary>
+            <param name="InterfaceFullName">Full name of interface.</param>
+            <returns>Types implementing the interface.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetTypesImplementingInterface(System.Type)">
+            <summary>
+            Gets all types implementing a given interface.
+            </summary>
+            <param name="Interface">Interface</param>
+            <returns>Types implementing the interface.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetTypesInNamespace(System.String)">
+            <summary>
+            Gets all types in a namespace. (Types in sub-namespaces are not included.)
+            </summary>
+            <param name="Namespace">Namespace.</param>
+            <returns>Types in the namespace.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetFirstAssemblyReferenceInNamespace(System.String)">
+            <summary>
+            Gets the assembly reference of the first type found in a namespace.
+            </summary>
+            <param name="Namespace">Namespace.</param>
+            <returns>Assembly reference of first type found in a namespace. If no such type was found, null is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetRootNamespaces">
+            <summary>
+            Gets an array of root namespaces.
+            </summary>
+            <returns>Array of root namespaces.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.IsRootNamespace(System.String)">
+            <summary>
+            Checks if a name is a root namespace.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name is a root namespace.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetSubNamespaces(System.String)">
+            <summary>
+            Gets an array of sub-namespaces to a given namespace.
+            </summary>
+            <param name="Namespace">Namespace</param>
+            <returns>Array of sub-namespaces.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.IsSubNamespace(System.String,System.String)">
+            <summary>
+            Checks if a local name in <paramref name="LocalName"/> represents a subnamespace from the point of view of the namespace
+            in <paramref name="Namespace"/>.
+            </summary>
+            <param name="Namespace">Namespace.</param>
+            <param name="LocalName">Local name.</param>
+            <returns>If the local name represents a subnamespace.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.TryGetQualifiedNames(System.String,System.String[]@)">
+            <summary>
+            Gets an array (possibly null) of qualified names relating to an unqualified name.
+            </summary>
+            <param name="UnqualifiedName">Unqualified name.</param>
+            <param name="QualifiedNames">Array of qualified names (null if none)</param>
+            <returns>If the unqualified name was recognized.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Invalidate">
+            <summary>
+            Invalidates type caches. This method should be called after having loaded assemblies dynamically, to make sure any types,
+            interfaces and namespaces in the newly loaded assemblies are included.
+            </summary>
+        </member>
+        <member name="E:Waher.Runtime.Inventory.Types.OnInvalidated">
+            <summary>
+            Event raised when the type cache has been invalidated. Can be used by code that themselves cache results and need to be updated
+            after new types are available.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.StopAllModules">
+            <summary>
+            Stops all modules.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.StopAllModules(System.Collections.Generic.IComparer{Waher.Runtime.Inventory.IModule})">
+            <summary>
+            Stops all modules.
+            </summary>
+            <param name="Order">Order in which modules should be stopped.
+            Default order is the reverse starting order, if no other order is provided.</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.Types.Modules">
+            <summary>
+            Loaded modules.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.StartAllModules(System.Int32)">
+            <summary>
+            Starts all loaded modules.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+            <returns>If all modules have been successfully started (true), or if at least one has not been
+            started within the time period defined by <paramref name="Timeout"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.StartAllModules(System.Int32,System.Collections.Generic.IComparer{Waher.Runtime.Inventory.IModule})">
+            <summary>
+            Starts all loaded modules.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+            <param name="Order">Order in which modules should be started.</param>
+            <returns>If all modules have been successfully started (true), or if at least one has not been
+            started within the time period defined by <paramref name="Timeout"/>.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.Types.NoTypes">
+            <summary>
+            Contains an empty array of types.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.Types.NoParameters">
+            <summary>
+            Contains an empty array of parameter values.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.SetModuleParameter(System.String,System.Object)">
+            <summary>
+            Sets a module parameter. This parameter value will be accessible to modules when they are loaded.
+            </summary>
+            <param name="Name">Parameter name.</param>
+            <param name="Value">Parameter value.</param>
+            <exception cref="T:System.ArgumentException">If a module parameter with the same name is already defined.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.TryGetModuleParameter(System.String,System.Object@)">
+            <summary>
+            Tries to get a module parameter value.
+            </summary>
+            <param name="Name">Name of module parameter.</param>
+            <param name="Value">Value of module parameter.</param>
+            <returns>If a module parameter with the same name was found.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.Types.IsInitialized">
+            <summary>
+            If the inventory has been initialized.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Initialize(System.Reflection.Assembly[])">
+            <summary>
+            Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.Types.Assemblies">
+            <summary>
+            Assemblies in the inventory.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.CreateObject(System.String,System.Object[])">
+            <summary>
+            Creates an object of a given type, given its full name.
+            </summary>
+            <param name="TypeName">Full type name.</param>
+            <param name="Parameters">Parameters to pass on to the constructor.</param>
+            <returns>Created object.</returns>
+            <exception cref="T:System.ArgumentException">If no type with the given name exists.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetProperty(System.Object,System.String)">
+            <summary>
+            Gets a property value (or field value) from an object.
+            </summary>
+            <param name="Object">Object instance.</param>
+            <param name="PropertyName">Name of property (or field).</param>
+            <returns>Property (or field) value.</returns>
+            <exception cref="T:System.ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">If there is no property or field with the given name.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.SetProperty(System.Object,System.String,System.Object)">
+            <summary>
+            Sets a property value (or field value) in an object.
+            </summary>
+            <param name="Object">Object instance.</param>
+            <param name="PropertyName">Name of property (or field).</param>
+            <param name="Value">Value to set.</param>
+            <exception cref="T:System.ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">If there is no property or field with the given name.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Call(System.Object,System.String,System.Object[])">
+            <summary>
+            Calls a method on an object.
+            </summary>
+            <param name="Object">Object instance.</param>
+            <param name="MethodName">Name of method.</param>
+            <param name="Arguments">Arguments to pass on to method.</param>
+            <returns>Result</returns>
+            <exception cref="T:System.ArgumentNullException">If <paramref name="Object"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">If there is no method with the given name and argument types.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.CallStatic(System.String,System.String,System.Object[])">
+            <summary>
+            Calls a static method on a class.
+            </summary>
+            <param name="TypeName">Name of class (or type).</param>
+            <param name="MethodName">Name of method.</param>
+            <param name="Arguments">Arguments to pass on to method.</param>
+            <returns>Result</returns>
+            <exception cref="T:System.ArgumentException">If there is no method with the given name and argument types.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.FindBest``2(``1)">
+            <summary>
+            Finds the best interface for a certain task.
+            </summary>
+            <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+            <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+            (i.e. implementing <see cref="T:Waher.Runtime.Inventory.IProcessingSupport`1"/>).</typeparam>
+            <param name="Object">Object with features to process.</param>
+            <returns>Best interface, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.FindBest``2(``1,System.Type[])">
+            <summary>
+            Finds the best interface for a certain task.
+            </summary>
+            <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+            <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+            (i.e. implementing <see cref="T:Waher.Runtime.Inventory.IProcessingSupport`1"/>).</typeparam>
+            <param name="Object">Object with features to process.</param>
+            <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
+            <returns>Best interface, if found, null otherwise.</returns>
+        </member>
+    </members>
+</doc>

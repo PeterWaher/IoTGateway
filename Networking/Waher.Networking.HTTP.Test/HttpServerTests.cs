@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.Test
 		private static ConsoleEventSink sink = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Runtime.Inventory.Types.Initialize(
 				typeof(HttpServerTests).Assembly,
@@ -35,15 +35,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static void ClassInitialize(TestContext _)
 		{
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
 
-			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
+			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			server = new HttpServer(8080, 8088, Certificate, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 
-			ServicePointManager.ServerCertificateValidationCallback = delegate(Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
+			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
 				return true;
 			};
@@ -52,11 +52,8 @@ namespace Waher.Networking.HTTP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (server != null)
-			{
-				server.Dispose();
-				server = null;
-			}
+			server?.Dispose();
+			server = null;
 
 			if (sink != null)
 			{
@@ -109,6 +106,7 @@ namespace Waher.Networking.HTTP.Test
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test02.txt");
 				string s = Encoding.UTF8.GetString(Data);
+				Assert.AreEqual(100000, s.Length);
 				Assert.AreEqual(new string('a', 100000), s);
 			}
 		}

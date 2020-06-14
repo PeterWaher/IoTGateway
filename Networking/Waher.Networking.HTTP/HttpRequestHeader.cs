@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Script;
+using Waher.Networking.HTTP.Vanity;
 
 namespace Waher.Networking.HTTP
 {
@@ -43,9 +43,10 @@ namespace Waher.Networking.HTTP
 		/// Contains information about all fields in an HTTP request header.
 		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
+		/// <param name="VanityResources">Registered vanity resources.</param>
 		/// <param name="UriScheme">URI Scheme.</param>
-		public HttpRequestHeader(string Header, string UriScheme)
-			: base(Header)
+		public HttpRequestHeader(string Header, VanityResources VanityResources, string UriScheme)
+			: base(Header, VanityResources)
 		{
 			this.uriScheme = UriScheme;
 		}
@@ -57,9 +58,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="Resource">Resource.</param>
 		/// <param name="Version">HTTP Version.</param>
 		/// <param name="UriScheme">URI scheme.</param>
+		/// <param name="VanityResources">Registered vanity resource.</param>
 		/// <param name="Headers">HTTP Header fields.</param>
-		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, params KeyValuePair<string, string>[] Headers)
-			: base(Method + " " + Resource + " HTTP/" + Version, Headers)
+		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, VanityResources VanityResources, 
+			params KeyValuePair<string, string>[] Headers)
+			: base(Method + " " + Resource + " HTTP/" + Version, VanityResources, Headers)
 		{
 			this.uriScheme = UriScheme;
 		}
@@ -68,7 +71,8 @@ namespace Waher.Networking.HTTP
 		/// Parses the first row of an HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>
-		protected override void ParseFirstRow(string Row)
+		/// <param name="VanityResources">Registered vanity resources.</param>
+		protected override void ParseFirstRow(string Row, VanityResources VanityResources)
 		{
 			int i = Row.IndexOf(' ');
 			if (i > 0)
@@ -78,7 +82,10 @@ namespace Waher.Networking.HTTP
 				int j = Row.LastIndexOf(' ');
 				if (j > 0 && j < Row.Length - 5 && Row.Substring(j + 1, 5) == "HTTP/")
 				{
-					this.resource = this.resourcePart = Row.Substring(i + 1, j - i - 1).Trim();
+					this.resourcePart = Row.Substring(i + 1, j - i - 1).Trim();
+					VanityResources?.CheckVanityResource(ref this.resourcePart);
+					this.resource = this.resourcePart;
+
 					if (CommonTypes.TryParse(Row.Substring(j + 6), out this.httpVersion))
 					{
 						i = this.resource.IndexOf('?');

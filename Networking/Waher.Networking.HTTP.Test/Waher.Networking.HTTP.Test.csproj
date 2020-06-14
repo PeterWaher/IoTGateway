@@ -100,6 +100,7 @@
     <Compile Include="CookieWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="VanityTests.cs" />
     <Compile Include="User.cs" />
     <Compile Include="WebSocketTests.cs" />
     <Compile Include="HttpServerTests.cs" />

@@ -125,7 +125,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						break;
 
 					case "data":
-						Header = new HttpRequestHeader(Method, Resource, Version, "httpx", HeaderFields.ToArray());
+						Header = new HttpRequestHeader(Method, Resource, Version, "httpx", this.server.VanityResources, HeaderFields.ToArray());
 
 						foreach (XmlNode N2 in N.ChildNodes)
 						{
@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			if (Header is null)
-				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", HeaderFields.ToArray());
+				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", this.server.VanityResources, HeaderFields.ToArray());
 
 			this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference,
 				MaxChunkSize, Sipub, Ibb, Socks5, Jingle);

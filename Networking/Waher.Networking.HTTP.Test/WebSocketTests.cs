@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP.Test
 		private WebSocketListener webSocketListener;
 
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static void ClassInitialize(TestContext _)
 		{
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
@@ -47,11 +47,8 @@ namespace Waher.Networking.HTTP.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (server != null)
-			{
-				server.Dispose();
-				server = null;
-			}
+			server?.Dispose();
+			server = null;
 
 			if (sink != null)
 			{
@@ -532,7 +529,7 @@ namespace Waher.Networking.HTTP.Test
 
 					Assert.AreEqual(i, int.Parse(s));
 
-					Thread.Sleep(60000);	// ClientWebSocket sends unsolicited pong messages to keep the connection alive.
+					Thread.Sleep(60000);    // ClientWebSocket sends unsolicited pong messages to keep the connection alive.
 				}
 			}
 		}
@@ -546,7 +543,7 @@ namespace Waher.Networking.HTTP.Test
 			{
 				e.Socket.Closed += (sender2, e2) =>
 				{
-					Result.SetResult(e2.Code == (int)WebSockets.WebSocketCloseStatus.Normal && 
+					Result.SetResult(e2.Code == (int)WebSockets.WebSocketCloseStatus.Normal &&
 						e2.Reason == "Manual");
 				};
 			};

@@ -252,6 +252,9 @@
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
     <Compile Include="TransferEncodings\InternalTransfer.cs" />
+    <Compile Include="Vanity\VanityExpression.cs" />
+    <Compile Include="Vanity\VanityMap.cs" />
+    <Compile Include="Vanity\VanityStep.cs" />
     <Compile Include="WebSockets\WebSocket.cs" />
     <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
     <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />
@@ -317,6 +320,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Redirections\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Redirections" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ServerErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ServerErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Vanity\*.cs" "$(ProjectDir)Vanity" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\WebSockets\*.cs" "$(ProjectDir)WebSockets" /Y
 </PreBuildEvent>
   </PropertyGroup>

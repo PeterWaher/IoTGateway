@@ -172,7 +172,7 @@ namespace Waher.Networking.HTTP
 				}
 
 				this.ReceiveText(Header);
-				this.header = new HttpRequestHeader(Header, this.encrypted ? "https" : "http");
+				this.header = new HttpRequestHeader(Header, this.server.VanityResources, this.encrypted ? "https" : "http");
 
 				if (this.header.HttpVersion < 1)
 				{

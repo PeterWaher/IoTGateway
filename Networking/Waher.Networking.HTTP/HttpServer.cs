@@ -19,6 +19,7 @@ using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
@@ -73,6 +74,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
+		private readonly VanityResources vanityResources = new VanityResources();
 		private ILoginAuditor loginAuditor = null;
 		private DateTime lastStat = DateTime.MinValue;
 		private string eTagSalt = string.Empty;
@@ -1572,7 +1574,8 @@ namespace Waher.Networking.HTTP
 			{
 				using (MemoryStream ms = new MemoryStream())
 				{
-					HttpRequest Request = new HttpRequest(new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", "http"), null, "Internal")
+					HttpRequest Request = new HttpRequest(
+						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "Internal")
 					{
 						Session = Session,
 						SubPath = SubPath,
@@ -1593,6 +1596,46 @@ namespace Waher.Networking.HTTP
 			else
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.Msg, null);
 		}
+
+		#endregion
+
+		#region Vanity resource names
+
+		/// <summary>
+		/// Registers a vanity resource.
+		/// </summary>
+		/// <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+		/// <param name="MapTo">Resources matching <paramref name="RegexPattern"/> will be mapped to resources of this type.
+		/// Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
+		public void RegisterVanityResource(string RegexPattern, string MapTo)
+		{
+			this.vanityResources.RegisterVanityResource(RegexPattern, MapTo);
+		}
+
+		/// <summary>
+		/// Unregisters a vanity resource.
+		/// </summary>
+		/// <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+		/// <returns>If a vanity resource matching the parameters was found, and consequently removed.</returns>
+		public bool UnregisterVanityResource(string RegexPattern)
+		{
+			return this.vanityResources.UnregisterVanityResource(RegexPattern);
+		}
+
+		/// <summary>
+		/// Checks if a resource name is a vanity resource name. If so, it is expanded to the true resource name.
+		/// </summary>
+		/// <param name="ResourceName">Resource name.</param>
+		/// <returns>If resource was a vanity resource, and has been updated to reflect the true resource name.</returns>
+		public bool CheckVanityResource(ref string ResourceName)
+		{
+			return this.vanityResources.CheckVanityResource(ref ResourceName);
+		}
+
+		/// <summary>
+		/// Vanity resources.
+		/// </summary>
+		public VanityResources VanityResources => this.vanityResources;
 
 		#endregion
 

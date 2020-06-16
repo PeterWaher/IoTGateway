@@ -1,0 +1,1925 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.BinaryOutputStream">
+            <summary>
+            Encapsulates a binary output stream.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.#ctor(System.IO.Stream)">
+            <summary>
+            Encapsulates a binary output stream.
+            </summary>
+            <param name="Output">Output stream.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.Dispose">
+            <summary>
+            Disposes of the object (but not the underlying stream).
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.FlushAsync">
+            <summary>
+            Flushes any pending or intermediate data.
+            </summary>
+            <returns>If output has been flushed.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.SendAsync(System.Byte[])">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.SendAsync(System.Byte[],System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.SendAsync(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte written.</param>
+            <param name="Count">Number of bytes written.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryOutputStream.SendAsync(System.Byte[],System.Int32,System.Int32,System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte to write.</param>
+            <param name="Count">Number of bytes to write.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="T:Waher.Networking.ExceptionEventHandler">
+            <summary>
+            Connection error event handler delegate.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Exception">Information about error received.</param>
+        </member>
+        <member name="T:Waher.Networking.BinaryTcpClient">
+            <summary>
+            Implements a binary TCP Client, by encapsulating a <see cref="T:System.Net.Sockets.TcpClient"/>. It also makes the use of <see cref="T:System.Net.Sockets.TcpClient"/>
+            safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
+            permitted pace.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.#ctor(Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a binary TCP Client, by encapsulating a <see cref="T:System.Net.Sockets.TcpClient"/>. It also maked the use of <see cref="T:System.Net.Sockets.TcpClient"/>
+            safe, making sure it can be disposed, even during an active connection attempt.
+            </summary>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.#ctor(System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a binary TCP Client, by encapsulating a <see cref="T:System.Net.Sockets.TcpClient"/>. It also maked the use of <see cref="T:System.Net.Sockets.TcpClient"/>
+            safe, making sure it can be disposed, even during an active connection attempt.
+            </summary>
+            <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.#ctor(System.Net.Sockets.TcpClient,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a binary TCP Client, by encapsulating a <see cref="T:System.Net.Sockets.TcpClient"/>. It also maked the use of <see cref="T:System.Net.Sockets.TcpClient"/>
+            safe, making sure it can be disposed, even during an active connection attempt.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.#ctor(System.Net.Sockets.TcpClient,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a binary TCP Client, by encapsulating a <see cref="T:System.Net.Sockets.TcpClient"/>. It also maked the use of <see cref="T:System.Net.Sockets.TcpClient"/>
+            safe, making sure it can be disposed, even during an active connection attempt.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.Client">
+            <summary>
+            Underlying <see cref="T:System.Net.Sockets.TcpClient"/> object.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.Stream">
+            <summary>
+            Stream object currently being used.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.String,System.Int32)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Host">Host Name or IP Address in string format.</param>
+            <param name="Port">Port number.</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Host">Host Name or IP Address in string format.</param>
+            <param name="Port">Port number.</param>
+            <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.Net.IPAddress,System.Int32)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Address">IP Address of the host.</param>
+            <param name="Port">Port number.</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.Net.IPAddress,System.Int32,System.Boolean)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Address">IP Address of the host.</param>
+            <param name="Port">Port number.</param>
+            <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.Net.IPAddress[],System.Int32)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Addresses">IP Addresses of the host.</param>
+            <param name="Port">Port number.</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ConnectAsync(System.Net.IPAddress[],System.Int32,System.Boolean)">
+            <summary>
+            Connects to a host using TCP.
+            </summary>
+            <param name="Addresses">IP Addresses of the host.</param>
+            <param name="Port">Port number.</param>
+            <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+            <returns>If connection was established. If false is returned, the object has been disposed during the connection attempt.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Bind">
+            <summary>
+            Binds to a <see cref="T:System.Net.Sockets.TcpClient"/> that was already connected when provided to the constructor.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Bind(System.Boolean)">
+            <summary>
+            Binds to a <see cref="T:System.Net.Sockets.TcpClient"/> that was already connected when provided to the constructor.
+            </summary>
+            <param name="Paused">If connection starts in a paused state (i.e. not waiting for incoming communication).</param>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.Connected">
+            <summary>
+            If the connection is open.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.DisposeWhenDone">
+            <summary>
+            Disposes the client when done sending all data.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Dispose">
+            <summary>
+            Disposes of the object. The underlying <see cref="T:System.Net.Sockets.TcpClient"/> is either disposed directly, or when asynchronous
+            operations have ceased.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Continue">
+            <summary>
+            Continues reading from the socket, if paused in an event handler.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.Paused">
+            <summary>
+            If the reading is paused.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnPaused">
+            <summary>
+            Event raised when reading on the socked has been paused. Call <see cref="M:Waher.Networking.BinaryTcpClient.Continue"/> to resume reading.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Disconnected">
+            <summary>
+            Method called when the connection has been disconnected.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.BinaryDataReceived(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Method called when binary data has been received.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.ToArray(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Converts a binary subset of a buffer into an array.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+            <returns>Array</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.Error(System.Exception)">
+            <summary>
+            Method called when an exception has been caught.
+            </summary>
+            <param name="ex">Exception</param>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnReceived">
+            <summary>
+            Event received when binary data has been received.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnError">
+            <summary>
+            Event raised when an error has occurred.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnDisconnected">
+            <summary>
+            Event raised when the connection has been disconnected.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.SendAsync(System.Byte[])">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.SendAsync(System.Byte[],System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.SendAsync(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte to write.</param>
+            <param name="Count">Number of bytes to write.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.SendAsync(System.Byte[],System.Int32,System.Int32,System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte to write.</param>
+            <param name="Count">Number of bytes to write.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnWriteQueueEmpty">
+            <summary>
+            Event raised when the write queue is empty.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.BinaryDataSent(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Method called when binary data has been sent.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte written.</param>
+            <param name="Count">Number of bytes written.</param>
+        </member>
+        <member name="E:Waher.Networking.BinaryTcpClient.OnSent">
+            <summary>
+            Event raised when a packet has been sent.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.FlushAsync">
+            <summary>
+            Flushes any pending or intermediate data.
+            </summary>
+            <returns>If output has been flushed.</returns>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols,System.Net.Security.RemoteCertificateValidationCallback)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Net.Security.RemoteCertificateValidationCallback)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Net.Security.RemoteCertificateValidationCallback,System.Boolean)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+            <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsClient(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Net.Security.RemoteCertificateValidationCallback,System.Boolean,System.String)">
+            <summary>
+            Upgrades a client connection to TLS.
+            </summary>
+            <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+            <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+            <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.RemoteCertificate">
+            <summary>
+            Certificate used by the remote endpoint.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.RemoteCertificateValid">
+            <summary>
+            If the remote certificate is valid.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate)">
+            <summary>
+            Upgrades a server connection to TLS.
+            </summary>
+            <param name="ServerCertificate">Server certificate.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols)">
+            <summary>
+            Upgrades a server connection to TLS.
+            </summary>
+            <param name="ServerCertificate">Server certificate.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean)">
+            <summary>
+            Upgrades a server connection to TLS.
+            </summary>
+            <param name="ServerCertificate">Server certificate.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="ClientCertificateRequired">If client certificates are required.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean,System.Net.Security.RemoteCertificateValidationCallback)">
+            <summary>
+            Upgrades a server connection to TLS.
+            </summary>
+            <param name="ServerCertificate">Server certificate.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="ClientCertificateRequired">If client certificates are required.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean,System.Net.Security.RemoteCertificateValidationCallback,System.Boolean)">
+            <summary>
+            Upgrades a server connection to TLS.
+            </summary>
+            <param name="ServerCertificate">Server certificate.</param>
+            <param name="Protocols">Allowed SSL/TLS protocols.</param>
+            <param name="ClientCertificateRequired">If client certificates are required.</param>
+            <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+            <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.IsEncrypted">
+            <summary>
+            If connection is encrypted or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.BinaryTcpClient.PauseReading">
+            <summary>
+            Allows the caller to pause reading.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.IBinaryTransmission">
+            <summary>
+            Interface for binary transmission.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransmission.SendAsync(System.Byte[])">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransmission.SendAsync(System.Byte[],System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Packet">Binary packet.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransmission.SendAsync(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte written.</param>
+            <param name="Count">Number of bytes written.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransmission.SendAsync(System.Byte[],System.Int32,System.Int32,System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte to write.</param>
+            <param name="Count">Number of bytes to write.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransmission.FlushAsync">
+            <summary>
+            Flushes any pending or intermediate data.
+            </summary>
+            <returns>If output has been flushed.</returns>
+        </member>
+        <member name="T:Waher.Networking.BinaryDataWrittenEventHandler">
+            <summary>
+            Event handler for binary packet events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte written.</param>
+            <param name="Count">Number of bytes written.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="T:Waher.Networking.BinaryDataReadEventHandler">
+            <summary>
+            Event handler for binary packet events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="T:Waher.Networking.AsyncEventHandler">
+            <summary>
+            Asynchronous Event Handler.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="T:Waher.Networking.IBinaryTransportLayer">
+            <summary>
+            Interface for binary transport layers.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.IBinaryTransportLayer.OnSent">
+            <summary>
+            Event raised when a packet has been sent.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.IBinaryTransportLayer.OnReceived">
+            <summary>
+            Event received when binary data has been received.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.IBinaryTransportLayer.Paused">
+            <summary>
+            If the reading is paused.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.IBinaryTransportLayer.Continue">
+            <summary>
+            Call this method to continue operation. Operation can be paused, by returning false from <see cref="E:Waher.Networking.IBinaryTransportLayer.OnReceived"/>.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.TextEventHandler">
+            <summary>
+            Event handler for text packet events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Text">Text packet.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="T:Waher.Networking.ITextTransportLayer">
+            <summary>
+            Interface for text transport layers.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ITextTransportLayer.SendAsync(System.String)">
+            <summary>
+            Sends a text packet.
+            </summary>
+            <param name="Text">Text packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.ITextTransportLayer.SendAsync(System.String,System.EventHandler)">
+            <summary>
+            Sends a text packet.
+            </summary>
+            <param name="Text">Text packet.</param>
+            <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="E:Waher.Networking.ITextTransportLayer.OnSent">
+            <summary>
+            Event raised when a packet has been sent.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.ITextTransportLayer.OnReceived">
+            <summary>
+            Event received when text data has been received.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.ITextTransportLayer.Paused">
+            <summary>
+            If the reading is paused.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.ITextTransportLayer.Continue">
+            <summary>
+            Call this method to continue operation. Operation can be paused, by returning false from <see cref="E:Waher.Networking.ITextTransportLayer.OnReceived"/>.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.RowTcpClient">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            Commands are sent as rows, and responses are returned as rows.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.#ctor(System.Text.Encoding,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            Commands are sent as rows, and responses are returned as rows.
+            </summary>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="MaxLength">Maximum number of characters in a row</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.#ctor(System.Text.Encoding,System.Int32,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            Commands are sent as rows, and responses are returned as rows.
+            </summary>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="MaxLength">Maximum number of characters in a row</param>
+            <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.#ctor(System.Net.Sockets.TcpClient,System.Text.Encoding,System.Int32,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            Commands are sent as rows, and responses are returned as rows.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="MaxLength">Maximum number of characters in a row</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.#ctor(System.Net.Sockets.TcpClient,System.Text.Encoding,System.Int32,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            Commands are sent as rows, and responses are returned as rows.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="MaxLength">Maximum number of characters in a row</param>
+            <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.TextDataReceived(System.String)">
+            <summary>
+            Method called when text data has been received.
+            </summary>
+            <param name="Data">Text data received.</param>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.SendAsync(System.String)">
+            <summary>
+            Sends a text packet.
+            </summary>
+            <param name="Packet">Text packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.SendAsync(System.String,System.EventHandler)">
+            <summary>
+            Sends a binary packet.
+            </summary>
+            <param name="Text">Binary packet.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.RowTcpClient.TextDataSent(System.String)">
+            <summary>
+            Method called when binary data has been sent.
+            </summary>
+            <param name="Data">Text data sent.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.ConsoleErrorSniffer">
+            <summary>
+            Outputs sniffed data to <see cref="P:System.Console.Error"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleErrorSniffer.#ctor(Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to <see cref="P:System.Console.Error"/>.
+            </summary>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.BinaryPresentationMethod">
+            <summary>
+            How binary data is to be presented.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.BinaryPresentationMethod.Hexadecimal">
+            <summary>
+            Has hexadecimal strings.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.BinaryPresentationMethod.Base64">
+            <summary>
+            Has base64 strings.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.BinaryPresentationMethod.ByteCount">
+            <summary>
+            Has simple byte counts.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.LineEnding">
+            <summary>
+            Type of line ending.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.LineEnding.PadWithSpaces">
+            <summary>
+            Pad with spaces until next rows. Makes sure line is colored properly.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.LineEnding.NewLine">
+            <summary>
+            End with new line characters. Is easier to read in a text editor.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.ConsoleOutSniffer">
+            <summary>
+            Outputs sniffed data to <see cref="P:System.Console.Out"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.#ctor(Waher.Networking.Sniffers.BinaryPresentationMethod,Waher.Networking.Sniffers.LineEnding)">
+            <summary>
+            Outputs sniffed data to <see cref="P:System.Console.Out"/>.
+            </summary>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+            <param name="LineEndingMethod">Line ending method.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.TransmitText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Text">Text</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Text">Text</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Data">Binary Data.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Data">Binary Data.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.Information(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Comment">Comment.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.Warning(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Warning">Warning.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.Error(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Error">Error.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.InMemorySniffer">
+            <summary>
+            Sniffer that stores events in memory.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.#ctor">
+            <summary>
+            Sniffer that stores events in memory.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Error(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Information(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.TransmitText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Warning(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.IEnumerable.GetEnumerator"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.GetEnumerator">
+            <summary>
+            <see cref="M:System.Collections.Generic.IEnumerable`1.GetEnumerator"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Replay(Waher.Networking.Sniffers.Sniffable)">
+            <summary>
+            Replays sniffer events.
+            </summary>
+            <param name="Sniffable">Receiver of sniffer events.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Replay(Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Replays sniffer events.
+            </summary>
+            <param name="Sniffers">Receiver of sniffer events.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToList">
+            <summary>
+            Returns recorded events as a typed list.
+            </summary>
+            <returns>Recorded events.</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToArray">
+            <summary>
+            Returns recorded events as an array.
+            </summary>
+            <returns>Recorded events.</returns>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.ISniffable">
+            <summary>
+            Interface for sniffable classes. Sniffable classes can receive <see cref="T:Waher.Networking.Sniffers.ISniffer"/> objects that eavesdrop on communication being performed
+            at the node.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffable.Add(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Adds a sniffer to the node.
+            </summary>
+            <param name="Sniffer">Sniffer to add.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffable.AddRange(System.Collections.Generic.IEnumerable{Waher.Networking.Sniffers.ISniffer})">
+            <summary>
+            Adds a range of sniffers to the node.
+            </summary>
+            <param name="Sniffers">Sniffers to add.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffable.Remove(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Removes a sniffer, if registered.
+            </summary>
+            <param name="Sniffer">Sniffer to remove.</param>
+            <returns>If the sniffer was found and removed.</returns>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.ISniffable.Sniffers">
+            <summary>
+            Registered sniffers.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.ISniffable.HasSniffers">
+            <summary>
+            If there are sniffers registered on the object.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.ISniffer">
+            <summary>
+            Interface for sniffers. Sniffers can be added to <see cref="T:Waher.Networking.Sniffers.ISniffable"/> classes to eavesdrop on communication performed on that
+            particular node.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Information(System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Information(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Warning(System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Warning(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Error(System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Error(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Exception(System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferBinaryEvent">
+            <summary>
+            Base class for binary-based sniffer events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferBinaryEvent.#ctor(System.DateTime,System.Byte[])">
+            <summary>
+            Base class for binary-based sniffer events.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Data.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.Model.SnifferBinaryEvent.Data">
+            <summary>
+            Data
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferError">
+            <summary>
+            Represents a sniffer error event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferError.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer error event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferError.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferError.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferEvent">
+            <summary>
+            Base class for sniffer events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferEvent.#ctor(System.DateTime)">
+            <summary>
+            Base class for sniffer events.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.Model.SnifferEvent.Timestamp">
+            <summary>
+            Timestamp of event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferEvent.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferException">
+            <summary>
+            Represents a sniffer exception event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferException.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer exception event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferException.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferException.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferInformation">
+            <summary>
+            Represents a sniffer information event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferInformation.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer information event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferInformation.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferInformation.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferRxBinary">
+            <summary>
+            Represents a sniffer binary reception event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxBinary.#ctor(System.DateTime,System.Byte[])">
+            <summary>
+            Represents a sniffer binary reception event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxBinary.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxBinary.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferRxText">
+            <summary>
+            Represents a sniffer text reception event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxText.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer text reception event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxText.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferRxText.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferTextEvent">
+            <summary>
+            Base class for text-based sniffer events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTextEvent.#ctor(System.DateTime,System.String)">
+            <summary>
+            Base class for text-based sniffer events.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.Model.SnifferTextEvent.Text">
+            <summary>
+            Text
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferTxBinary">
+            <summary>
+            Represents a sniffer binary transmission event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxBinary.#ctor(System.DateTime,System.Byte[])">
+            <summary>
+            Represents a sniffer binary transmission event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxBinary.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxBinary.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferTxText">
+            <summary>
+            Represents a sniffer text transmission event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxText.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer text transmission event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxText.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferTxText.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Model.SnifferWarning">
+            <summary>
+            Represents a sniffer warning event.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferWarning.#ctor(System.DateTime,System.String)">
+            <summary>
+            Represents a sniffer warning event.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferWarning.Replay(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            Replays the event to a given sniffer.
+            </summary>
+            <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferWarning.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.TextSnifferEvent">
+            <summary>
+            Delegate for text sniffer events.
+            </summary>
+            <param name="Text"></param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.Sniffable">
+            <summary>
+            Simple abstract base class for sniffable nodes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.#ctor(Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Simple abstract base class for sniffable nodes.
+            </summary>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Add(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.Add(Waher.Networking.Sniffers.ISniffer)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.AddRange(System.Collections.Generic.IEnumerable{Waher.Networking.Sniffers.ISniffer})">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.AddRange(System.Collections.Generic.IEnumerable{Waher.Networking.Sniffers.ISniffer})"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Remove(Waher.Networking.Sniffers.ISniffer)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffable.Remove(Waher.Networking.Sniffers.ISniffer)"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.Sniffable.Sniffers">
+            <summary>
+            Registered sniffers.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.Sniffable.HasSniffers">
+            <summary>
+            If there are sniffers registered on the object.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.GetEnumerator">
+            <summary>
+            Gets a typed enumerator.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an untyped enumerator.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.ReceiveBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.TransmitBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.ReceiveText(System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="E:Waher.Networking.Sniffers.Sniffable.OnReceiveText">
+            <summary>
+            Event received when a block of text has been received. Can be used to modify output.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.TransmitText(System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="E:Waher.Networking.Sniffers.Sniffable.OnTransmitText">
+            <summary>
+            Event received when a block of text has been sent. Can be used to modify output.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Information(System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="E:Waher.Networking.Sniffers.Sniffable.OnInformation">
+            <summary>
+            Event received when information is logged.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Warning(System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="E:Waher.Networking.Sniffers.Sniffable.OnWarning">
+            <summary>
+            Event received when a warning is logged.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Error(System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Sniffable.Exception(System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.SnifferBase">
+            <summary>
+            Abstract base class for sniffers. Implements default method overloads.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.#ctor">
+            <summary>
+            Abstract base class for sniffers. Implements default method overloads.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.ReceiveBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.TransmitBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.ReceiveText(System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.TransmitText(System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.TransmitText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Information(System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Information(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Warning(System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Warning(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Error(System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Error(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Exception(System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.SnifferEnumerator">
+            <summary>
+            Typed enumerator of sniffers.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferEnumerator.#ctor(Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Typed enumerator of sniffers.
+            </summary>
+            <param name="List">Array of sniffers.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.SnifferEnumerator.Current">
+            <summary>
+            Current sniffer.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferEnumerator.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferEnumerator.MoveNext">
+            <summary>
+            Moves to the next sniffer.
+            </summary>
+            <returns>If one was found.</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferEnumerator.Reset">
+            <summary>
+            Resets the enumerator.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.TextFileSniffer">
+            <summary>
+            Outputs sniffed data to a text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.#ctor(System.String,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to a text file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.#ctor(System.String,System.Int32,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to a text file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="DeleteAfterDays">Number of days files will be kept. All files older than this
+            in the corresponding folder will be removed. Default value is 7 days.</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.BeforeWrite">
+            <summary>
+            Method is called before writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.AfterWrite">
+            <summary>
+            Method is called after writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextFileSniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.TextWriterSniffer">
+            <summary>
+            Outputs sniffed data to a text writer.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.TextWriterSniffer.output">
+            <summary>
+            Text output writer.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.#ctor(System.IO.TextWriter,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to a text writer.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.TextWriterSniffer.IncludeTimestamp">
+            <summary>
+            If a timestamp should be included for each record logged.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.BeforeWrite">
+            <summary>
+            Method is called before writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.AfterWrite">
+            <summary>
+            Method is called after writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.DateTime,System.Byte[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.DateTime,System.Byte[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.TransmitText(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Information(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Information(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Warning(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Warning(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Error(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Error(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Exception(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.TextWriterSniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.XmlFileSniffer">
+            <summary>
+            Outputs sniffed data to an XML file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.#ctor(System.String,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to an XML file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.#ctor(System.String,System.Int32,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to an XML file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="DeleteAfterDays">Number of days files will be kept. All files older than this
+            in the corresponding folder will be removed. Default value is 7 days.</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.#ctor(System.String,System.String,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to an XML file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="Transform">Transform file name.</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.#ctor(System.String,System.String,System.Int32,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to an XML file.
+            </summary>
+            <param name="FileName">File Name. The following strings will be replaced by current values:
+            
+            %YEAR% = Current year.
+            %MONTH% = Current month.
+            %DAY% = Current day.
+            %HOUR% = Current hour.
+            %MINUTE% = Current minute.
+            %SECOND% = Current second.
+            
+            NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
+            </param>
+            <param name="Transform">Transform file name.</param>
+            <param name="DeleteAfterDays">Number of days files will be kept. All files older than this
+            in the corresponding folder will be removed. Default value is 7 days.</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.XmlFileSniffer.FileName">
+            <summary>
+            File Name.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.XmlFileSniffer.Transform">
+            <summary>
+            Transform to use.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.XmlFileSniffer.LastEvent">
+            <summary>
+            Timestamp of Last event
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.GetFileName(System.String,System.DateTime)">
+            <summary>
+            Gets the name of a file, given a file name template.
+            </summary>
+            <param name="TemplateFileName">File Name template.</param>
+            <param name="TP">Timestamp</param>
+            <returns>File name</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.MakeUnique(System.String@)">
+            <summary>
+            Makes a file name unique.
+            </summary>
+            <param name="FileName">File name.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.BeforeWrite">
+            <summary>
+            Method is called before writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.Sniffers.XmlWriterSniffer">
+            <summary>
+            Outputs sniffed data to an XML writer.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.Sniffers.XmlWriterSniffer.output">
+            <summary>
+            XML output writer.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.#ctor(System.Xml.XmlWriter,Waher.Networking.Sniffers.BinaryPresentationMethod)">
+            <summary>
+            Outputs sniffed data to an XML writer.
+            </summary>
+            <param name="Output">Output</param>
+            <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.BeforeWrite">
+            <summary>
+            Method is called before writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.AfterWrite">
+            <summary>
+            Method is called after writing something to the text file.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.DateTime,System.Byte[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.DateTime,System.Byte[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.TransmitText(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Information(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Information(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Warning(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Warning(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Error(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Error(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Exception(System.DateTime,System.String)">
+            <summary>
+            <see cref="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.TextTcpClient">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.#ctor(System.Text.Encoding,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            </summary>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.#ctor(System.Text.Encoding,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            </summary>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.#ctor(System.Net.Sockets.TcpClient,System.Text.Encoding,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.#ctor(System.Net.Sockets.TcpClient,System.Text.Encoding,System.Boolean,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="T:Waher.Networking.BinaryTcpClient"/>.
+            </summary>
+            <param name="Client">Encapsulate this <see cref="T:System.Net.Sockets.TcpClient"/> connection.</param>
+            <param name="Encoding">Text encoding to use.</param>
+            <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+            <param name="Sniffers">Sniffers.</param>
+        </member>
+        <member name="P:Waher.Networking.TextTcpClient.Encoding">
+            <summary>
+            Text encoding to use.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.BinaryDataReceived(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Method called when binary data has been received.
+            </summary>
+            <param name="Buffer">Binary Data Buffer</param>
+            <param name="Offset">Start index of first byte read.</param>
+            <param name="Count">Number of bytes read.</param>
+            <returns>If the process should be continued.</returns>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.TextDataReceived(System.String)">
+            <summary>
+            Method called when text data has been received.
+            </summary>
+            <param name="Data">Text data received.</param>
+        </member>
+        <member name="E:Waher.Networking.TextTcpClient.OnReceived">
+            <summary>
+            Event received when text data has been received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.SendAsync(System.String)">
+            <summary>
+            Sends a text packet.
+            </summary>
+            <param name="Text">Text packet.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.SendAsync(System.String,System.EventHandler)">
+            <summary>
+            Sends a text packet.
+            </summary>
+            <param name="Text">Text packet.</param>
+            <param name="Callback">Method to call when packet has been sent.</param>
+            <returns>If data was sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.TextTcpClient.TextDataSent(System.String)">
+            <summary>
+            Method called when text data has been sent.
+            </summary>
+            <param name="Text">Text data sent.</param>
+        </member>
+        <member name="E:Waher.Networking.TextTcpClient.OnSent">
+            <summary>
+            Event raised when a packet has been sent.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Events.Statistics</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Events.Statistics.EventStatistics">
+            <summary>
+            Contains event statistics.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerActor">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerEventId">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerFacility">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerModule">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerLevel">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerType">
+            <summary>
+            Number of events, per actor.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.PerStackTrace">
+            <summary>
+            Number of events, per stack trace (Only of type Critical, Alert and Emergency).
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.LastStat">
+            <summary>
+            Timestamp of last statistics. If <see cref="F:System.DateTime.MinValue"/>, no statistics has been retrieved since restart of server.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.EventStatistics.CurrentStat">
+            <summary>
+            Timestamp of current statistics.
+            </summary>
+        </member>
+        <member name="T:Waher.Events.Statistics.EventStatisticsSink">
+            <summary>
+            Calculates statistics on incoming events.
+            </summary>
+        </member>
+        <member name="M:Waher.Events.Statistics.EventStatisticsSink.#ctor(System.String)">
+            <summary>
+            Calculates statistics on incoming events.
+            </summary>
+            <param name="ObjectID">Object ID of event sink.</param>
+        </member>
+        <member name="M:Waher.Events.Statistics.EventStatisticsSink.GetStatisticsSinceLast">
+            <summary>
+            Gets statistics of events logged since last call to <see cref="M:Waher.Events.Statistics.EventStatisticsSink.GetStatisticsSinceLast"/>.
+            </summary>
+            <returns>Event statistics.</returns>
+        </member>
+        <member name="M:Waher.Events.Statistics.EventStatisticsSink.Queue(Waher.Events.Event)">
+            <summary>
+            Queues an event to be output.
+            </summary>
+            <param name="Event">Event to queue.</param>
+        </member>
+        <member name="T:Waher.Events.Statistics.Statistic">
+            <summary>
+            Contains statistical information about one item.
+            </summary>
+        </member>
+        <member name="M:Waher.Events.Statistics.Statistic.#ctor(System.Int64)">
+            <summary>
+            Contains statistical information about one item.
+            </summary>
+            <param name="InitialCount">Initial count.</param>
+        </member>
+        <member name="M:Waher.Events.Statistics.Statistic.Inc">
+            <summary>
+            Increments the counter.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.Statistic.Count">
+            <summary>
+            Counter
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.Statistic.First">
+            <summary>
+            First event.
+            </summary>
+        </member>
+        <member name="P:Waher.Events.Statistics.Statistic.Last">
+            <summary>
+            Last event.
+            </summary>
+        </member>
+    </members>
+</doc>

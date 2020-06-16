@@ -17,7 +17,6 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// </example>
 	public class Plot2DCurve : FunctionMultiVariate
 	{
-		private static readonly ArgumentType[] argumentTypes5Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		private static readonly ArgumentType[] argumentTypes4Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar };
 		private static readonly ArgumentType[] argumentTypes3Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar };
 		private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector };
@@ -99,12 +98,10 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			IVector X = Arguments[0] as IVector;
-			if (X is null)
+			if (!(Arguments[0] is IVector X))
 				throw new ScriptRuntimeException("Expected vector for X argument.", this);
 
-			IVector Y = Arguments[1] as IVector;
-			if (Y is null)
+			if (!(Arguments[1] is IVector Y))
 				throw new ScriptRuntimeException("Expected vector for Y argument.", this);
 
 			int Dimension = X.Dimension;
@@ -241,7 +238,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			int j = 0;
 			double r11, r12, r15;               // r13 & r14 always 0.
 			double r22, r23, r25;               // r21 & r24 always 0 for all except last equation, where r21 is -1.
-			double r31, r32, r33, r34, r35;
+			double /*r31,*/ r32, r33, r34, r35;
 			double[,] Rows = new double[N2, 3];
 			double a;
 
@@ -256,7 +253,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			r23 = 1;
 			r25 = 2 * V[j++];
 
-			r31 = 1;        // eq 2
+			// r31 = 1;        // eq 2
 			r32 = -2;
 			r33 = 2;
 			r34 = -1;
@@ -265,7 +262,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			while (true)
 			{
 				a = 1 / r11;
-				r11 = 1;
+				// r11 = 1;
 				r12 *= a;
 				r15 *= a;
 
@@ -273,7 +270,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 				// r22 is always 1. No need to scale row.
 
 				// r31 is always 1 at this point.
-				r31 -= r11;
+				// r31 -= r11;
 				r32 -= r12;
 				r35 -= r15;
 
@@ -281,7 +278,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 				{
 					r33 -= r32 * r23;
 					r35 -= r32 * r25;
-					r32 = 0;
+					// r32 = 0;
 				}
 
 				// r33 is always 0.
@@ -309,7 +306,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 				r23 = 1;
 				r25 = 2 * V[j++];
 
-				r31 = 1;        // eq 2
+				// r31 = 1;        // eq 2
 				r32 = -2;
 				r33 = 2;
 				r34 = -1;
@@ -326,7 +323,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			r25 = V[j++];
 
 			a = 1 / r11;
-			r11 = 1;
+			//r11 = 1;
 			r12 *= a;
 			r15 *= a;
 

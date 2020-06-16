@@ -31,10 +31,10 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class Graph2D : Graph
 	{
-		private LinkedList<IVector> x = new LinkedList<IVector>();
-		private LinkedList<IVector> y = new LinkedList<IVector>();
-		private LinkedList<object[]> parameters = new LinkedList<object[]>();
-		private LinkedList<DrawCallback> callbacks = new LinkedList<DrawCallback>();
+		private readonly LinkedList<IVector> x = new LinkedList<IVector>();
+		private readonly LinkedList<IVector> y = new LinkedList<IVector>();
+		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
+		private readonly LinkedList<DrawCallback> callbacks = new LinkedList<DrawCallback>();
 		private IElement minX, maxX;
 		private IElement minY, maxY;
 		private Type axisTypeX;
@@ -101,8 +101,26 @@ namespace Waher.Script.Graphs
 			this.minX = Min.CalcMin(X, null);
 			this.maxX = Max.CalcMax(X, null);
 
+			if (this.showZeroX && this.minX is AbelianGroup Gx)
+			{
+				List<IElement> Elements = new List<IElement> { this.minX, Gx.Zero };
+				this.minX = Min.CalcMin(X.Encapsulate(Elements, null) as IVector, null);
+
+				Elements = new List<IElement> { this.maxX, Gx.Zero };
+				this.maxX = Max.CalcMax(X.Encapsulate(Elements, null) as IVector, null);
+			}
+
 			this.minY = Min.CalcMin(Y, null);
 			this.maxY = Max.CalcMax(Y, null);
+
+			if (this.showZeroY && this.minY is AbelianGroup Gy)
+			{
+				List<IElement> Elements = new List<IElement> { this.minY, Gy.Zero };
+				this.minY = Min.CalcMin(Y.Encapsulate(Elements, null) as IVector, null);
+
+				Elements = new List<IElement> { this.maxY, Gy.Zero };
+				this.maxY = Max.CalcMax(Y.Encapsulate(Elements, null) as IVector, null);
+			}
 
 			if (HasNull)
 			{
@@ -150,7 +168,7 @@ namespace Waher.Script.Graphs
 				}
 			}
 
-			IElement Zero = null;
+			IElement Zero;
 
 			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
@@ -593,7 +611,7 @@ namespace Waher.Script.Graphs
 
 					if (this.showGrid)
 					{
-						if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
+						if (Label is DoubleNumber Lbl && Lbl.Value == 0)
 							Canvas.DrawLine(x3, f, x2, f, AxisPen);
 						else
 							Canvas.DrawLine(x3, f, x2, f, GridPen);
@@ -616,7 +634,7 @@ namespace Waher.Script.Graphs
 
 					if (this.showGrid)
 					{
-						if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
+						if (Label is DoubleNumber DLbl && DLbl.Value == 0)
 							Canvas.DrawLine(f, y1, f, y3, AxisPen);
 						else
 							Canvas.DrawLine(f, y1, f, y3, GridPen);

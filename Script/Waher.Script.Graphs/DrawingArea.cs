@@ -11,16 +11,16 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class DrawingArea
 	{
-		private IElement minX;
-		private IElement maxX;
-		private IElement minY;
-		private IElement maxY;
-		private int offsetX;
-		private int offsetY;
-		private int width;
-		private int height;
-		private float origoX;
-		private float origoY;
+		private readonly IElement minX;
+		private readonly IElement maxX;
+		private readonly IElement minY;
+		private readonly IElement maxY;
+		private readonly int offsetX;
+		private readonly int offsetY;
+		private readonly int width;
+		private readonly int height;
+		private readonly float origoX;
+		private readonly float origoY;
 
 		/// <summary>
 		/// Contains information about the current drawing area.

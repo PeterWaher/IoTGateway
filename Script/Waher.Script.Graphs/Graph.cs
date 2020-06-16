@@ -173,40 +173,40 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
-		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <returns>Bitmap</returns>
 		public SKImage CreateBitmap(Variables Variables)
 		{
-			return this.CreateBitmap(Variables, out GraphSettings Settings, out object[] States);
+			return this.CreateBitmap(Variables, out GraphSettings _, out object[] _);
 		}
 
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
-		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="Settings">Settings used to create the graph.</param>
 		/// <returns>Bitmap</returns>
 		public SKImage CreateBitmap(Variables Variables, out GraphSettings Settings)
 		{
-			return this.CreateBitmap(Variables, out Settings, out object[] States);
+			return this.CreateBitmap(Variables, out Settings, out object[] _);
 		}
 
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
-		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
 		public SKImage CreateBitmap(Variables Variables, out object[] States)
 		{
-			return this.CreateBitmap(Variables, out GraphSettings Settings, out States);
+			return this.CreateBitmap(Variables, out GraphSettings _, out States);
 		}
 
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
-		/// <param name="Variables">Variables from where default settings can be retrieved if not avalable in graph.</param>
+		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="Settings">Settings used to create the graph.</param>
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
@@ -224,7 +224,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public SKImage CreateBitmap(GraphSettings Settings)
 		{
-			return this.CreateBitmap(Settings, out object[] States);
+			return this.CreateBitmap(Settings, out object[] _);
 		}
 
 		/// <summary>
@@ -295,38 +295,30 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector distributed in the available area.</returns>
 		public static double[] Scale(IVector Vector, IElement Min, IElement Max, double Offset, double Size)
 		{
-			if (Vector is DoubleVector)
+			if (Vector is DoubleVector DV)
 			{
-				DoubleNumber dMax = Max as DoubleNumber;
-
-				if (!(Min is DoubleNumber dMin) || dMax is null)
+				if (!(Min is DoubleNumber dMin) || !(Max is DoubleNumber dMax))
 					throw new ScriptException("Incompatible values.");
 
-				return Scale(((DoubleVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
+				return Scale(DV.Values, dMin.Value, dMax.Value, Offset, Size);
 			}
-			else if (Vector is Interval)
+			else if (Vector is Interval I)
 			{
-				DoubleNumber dMax = Max as DoubleNumber;
-
-				if (!(Min is DoubleNumber dMin) || dMax is null)
+				if (!(Min is DoubleNumber dMin) || !(Max is DoubleNumber dMax))
 					throw new ScriptException("Incompatible values.");
 
-				return Scale(((Interval)Vector).GetArray(), dMin.Value, dMax.Value, Offset, Size);
+				return Scale(I.GetArray(), dMin.Value, dMax.Value, Offset, Size);
 			}
-			else if (Vector is DateTimeVector)
+			else if (Vector is DateTimeVector DTV)
 			{
-				DateTimeValue dMax = Max as DateTimeValue;
-
-				if (!(Min is DateTimeValue dMin) || dMax is null)
+				if (!(Min is DateTimeValue dMin) || !(Max is DateTimeValue dMax))
 					throw new ScriptException("Incompatible values.");
 
-				return Scale(((DateTimeVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
+				return Scale(DTV.Values, dMin.Value, dMax.Value, Offset, Size);
 			}
-			else if (Vector is ObjectVector)
+			else if (Vector is ObjectVector OV)
 			{
-				PhysicalQuantity MaxQ = Max as PhysicalQuantity;
-
-				if (Min is PhysicalQuantity MinQ && MaxQ != null)
+				if (Min is PhysicalQuantity MinQ && Max is PhysicalQuantity MaxQ)
 				{
 					if (MinQ.Unit != MaxQ.Unit)
 					{
@@ -351,9 +343,7 @@ namespace Waher.Script.Graphs
 				}
 				else
 				{
-					DoubleNumber MaxD = Max as DoubleNumber;
-
-					if (Min is DoubleNumber MinD && MaxD != null)
+					if (Min is DoubleNumber MinD && Max is DoubleNumber MaxD)
 					{
 						int i = 0;
 						int c = Vector.Dimension;
@@ -373,9 +363,7 @@ namespace Waher.Script.Graphs
 					}
 					else
 					{
-						DateTimeValue MaxDT = Max as DateTimeValue;
-
-						if (Min is DateTimeValue MinDT && MaxDT != null)
+						if (Min is DateTimeValue MinDT && Max is DateTimeValue MaxDT)
 						{
 							int i = 0;
 							int c = Vector.Dimension;
@@ -394,7 +382,7 @@ namespace Waher.Script.Graphs
 							return Scale(Vector2, MinDT.Value, MaxDT.Value, Offset, Size);
 						}
 						else
-							return Scale(((ObjectVector)Vector).Values, Offset, Size);
+							return Scale(OV.Values, Offset, Size);
 					}
 				}
 			}
@@ -504,13 +492,8 @@ namespace Waher.Script.Graphs
 		{
 			// (v-Offset)*(Max-Min)/Size+Min
 
-			if (Min is DoubleNumber && Max is DoubleNumber)
-			{
-				double min = ((DoubleNumber)Min).Value;
-				double max = ((DoubleNumber)Max).Value;
-
-				return new DoubleNumber((Value - Offset) * (max - min) / Size + min);
-			}
+			if (Min is DoubleNumber DMin && Max is DoubleNumber DMax)
+				return new DoubleNumber((Value - Offset) * (DMax.Value - DMin.Value) / Size + DMin.Value);
 			else
 			{
 				IElement Delta = Operators.Arithmetics.Subtract.EvaluateSubtraction(Max, Min, null);
@@ -645,17 +628,17 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector of labels.</returns>
 		public static IVector GetLabels(ref IElement Min, ref IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
-			if (Min is DoubleNumber && Max is DoubleNumber)
+			if (Min is DoubleNumber DMin && Max is DoubleNumber DMax)
 			{
 				LabelType = LabelType.Double;
-				return new DoubleVector(GetLabels(((DoubleNumber)Min).Value, ((DoubleNumber)Max).Value, ApproxNrLabels));
+				return new DoubleVector(GetLabels(DMin.Value, DMax.Value, ApproxNrLabels));
 			}
-			else if (Min is DateTimeValue && Max is DateTimeValue)
-				return new DateTimeVector(GetLabels(((DateTimeValue)Min).Value, ((DateTimeValue)Max).Value, ApproxNrLabels, out LabelType));
-			else if (Min is PhysicalQuantity && Max is PhysicalQuantity)
+			else if (Min is DateTimeValue DTMin && Max is DateTimeValue DTMax)
+				return new DateTimeVector(GetLabels(DTMin.Value, DTMax.Value, ApproxNrLabels, out LabelType));
+			else if (Min is PhysicalQuantity QMin && Max is PhysicalQuantity QMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
-				return new ObjectVector(GetLabels((PhysicalQuantity)Min, (PhysicalQuantity)Max, ApproxNrLabels));
+				return new ObjectVector(GetLabels(QMin, QMax, ApproxNrLabels));
 			}
 			else if (Min is StringValue && Max is StringValue)
 			{
@@ -775,10 +758,7 @@ namespace Waher.Script.Graphs
 						NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
 						Diff = Math.Abs(NrSteps - ApproxNrLabels);
 						if (Diff < BestDiff)
-						{
-							BestDiff = Diff;
 							BestStepSize = StepSize;
-						}
 					}
 				}
 			}
@@ -804,10 +784,7 @@ namespace Waher.Script.Graphs
 						NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
 						Diff = Math.Abs(NrSteps - ApproxNrLabels);
 						if (Diff < BestDiff)
-						{
-							BestDiff = Diff;
 							BestStepSize = StepSize;
-						}
 					}
 				}
 			}

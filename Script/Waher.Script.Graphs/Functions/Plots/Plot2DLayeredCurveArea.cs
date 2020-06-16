@@ -87,12 +87,10 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			IVector X = Arguments[0] as IVector;
-			if (X is null)
+			if (!(Arguments[0] is IVector X))
 				throw new ScriptRuntimeException("Expected vector for X argument.", this);
 
-			IVector Y = Arguments[1] as IVector;
-			if (Y is null)
+			if (!(Arguments[1] is IVector Y))
 				throw new ScriptRuntimeException("Expected vector for Y argument.", this);
 
 			int Dimension = X.Dimension;
@@ -124,12 +122,11 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 				IElement Zero;
 				ISet Set = DrawingArea.MinY.AssociatedSet;
-				IGroup Group = Set as IGroup;
 
-				if (Group is null)
-					Zero = new DoubleNumber(0);
-				else
+				if (Set is IGroup Group)
 					Zero = Group.AdditiveIdentity;
+				else
+					Zero = new DoubleNumber(0);
 
 				IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
 				IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;

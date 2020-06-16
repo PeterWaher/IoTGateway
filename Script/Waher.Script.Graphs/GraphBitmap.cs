@@ -12,7 +12,7 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class GraphBitmap : Graph, IDisposable
 	{
-		private SKImage bitmap;
+		private readonly SKImage bitmap;
 		private readonly int width;
 		private readonly int height;
 
@@ -48,8 +48,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
-			Graph G = Element as Graph;
-			if (G is null)
+			if (!(Element is Graph G))
 				return null;
 
 			GraphSettings Settings = new GraphSettings()
@@ -84,8 +83,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
-			Graph G = Element as Graph;
-			if (G is null)
+			if (!(Element is Graph G))
 				return null;
 
 			GraphSettings Settings = new GraphSettings()

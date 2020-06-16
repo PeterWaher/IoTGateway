@@ -69,12 +69,10 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			IVector Labels = Arguments[0] as IVector;
-			if (Labels is null)
+			if (!(Arguments[0] is IVector Labels))
 				throw new ScriptRuntimeException("Expected vector for Labels argument.", this);
 
-			IVector Values = Arguments[1] as IVector;
-			if (Values is null)
+			if (!(Arguments[1] is IVector Values))
 				throw new ScriptRuntimeException("Expected vector for Values argument.", this);
 
 			int Dimension = Labels.Dimension;

@@ -1358,7 +1358,7 @@ If the user does not access the server for 20 minutes by default, the session is
 ### Query parameters
 
 When loading a markdown page, any query parameters listed using the [PARAMETER metadata tag](#parameter) will be available as variables in script. 
-If the query variable is not avalable, the parameter will be set to the empty string. By default, the variable type is a string, unless
+If the query variable is not available, the parameter will be set to the empty string. By default, the variable type is a string, unless
 it can be parsed as a double number or a boolean value.
 
 ### Global variables

@@ -1008,6 +1008,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
 		public async Task UpgradeToTlsAsClient(SocketProtectionLevel Protocols, bool TrustRemoteEndpoint, string DomainName)
 		{
 			lock (this.synchObj)
@@ -1063,7 +1064,7 @@ namespace Waher.Networking
 		/// </summary>
 		public Certificate RemoteCertificate => this.remoteCertificate;
 #else
-		
+
 		/// <summary>
 		/// Upgrades a client connection to TLS.
 		/// </summary>
@@ -1136,8 +1137,7 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
-		/// <param name="DomainName">The domain name to validate certifictes for. By default,
-		/// this is the same as the host name.</param>
+		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
 		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName)
 		{

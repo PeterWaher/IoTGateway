@@ -67,6 +67,7 @@ namespace Waher.Networking.Sniffers
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void TransmitText(DateTime Timestamp, string Text)
 		{
 			this.Output(Timestamp, Text, ConsoleColor.Black, ConsoleColor.White);
@@ -76,6 +77,7 @@ namespace Waher.Networking.Sniffers
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
 			this.Output(Timestamp, Text, ConsoleColor.White, ConsoleColor.DarkBlue);
@@ -85,6 +87,7 @@ namespace Waher.Networking.Sniffers
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			this.BinaryOutput(Timestamp, Data, ConsoleColor.Black, ConsoleColor.White);
@@ -94,6 +97,7 @@ namespace Waher.Networking.Sniffers
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			this.BinaryOutput(Timestamp, Data, ConsoleColor.White, ConsoleColor.DarkBlue);
@@ -140,6 +144,7 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void Information(DateTime Timestamp, string Comment)
 		{
 			this.Output(Timestamp, Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
@@ -149,6 +154,7 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void Warning(DateTime Timestamp, string Warning)
 		{
 			this.Output(Timestamp, Warning, ConsoleColor.Black, ConsoleColor.Yellow);
@@ -158,6 +164,7 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void Error(DateTime Timestamp, string Error)
 		{
 			this.Output(Timestamp, Error, ConsoleColor.Yellow, ConsoleColor.Red);
@@ -167,6 +174,7 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		public override void Exception(DateTime Timestamp, string Exception)
 		{
 			this.Output(Timestamp, Exception, ConsoleColor.White, ConsoleColor.DarkRed);

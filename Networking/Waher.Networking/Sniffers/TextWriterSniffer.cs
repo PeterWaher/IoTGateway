@@ -56,7 +56,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.ReceiveBinary"/>
+		/// <see cref="ISniffer.ReceiveBinary(DateTime, byte[])"/>
 		/// </summary>
 		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
@@ -119,7 +119,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.TransmitBinary"/>
+		/// <see cref="ISniffer.TransmitBinary(DateTime, byte[])"/>
 		/// </summary>
 		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
@@ -128,7 +128,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.ReceiveText"/>
+		/// <see cref="ISniffer.ReceiveText(DateTime, String)"/>
 		/// </summary>
 		public override void ReceiveText(DateTime Timestamp, string Text)
 		{
@@ -152,7 +152,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.TransmitText"/>
+		/// <see cref="ISniffer.TransmitText(DateTime, String)"/>
 		/// </summary>
 		public override void TransmitText(DateTime Timestamp, string Text)
 		{
@@ -160,7 +160,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.Information"/>
+		/// <see cref="ISniffer.Information(DateTime, String)"/>
 		/// </summary>
 		public override void Information(DateTime Timestamp, string Comment)
 		{
@@ -168,7 +168,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.Warning"/>
+		/// <see cref="ISniffer.Warning(DateTime, String)"/>
 		/// </summary>
 		public override void Warning(DateTime Timestamp, string Warning)
 		{
@@ -176,7 +176,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.Error"/>
+		/// <see cref="ISniffer.Error(DateTime, String)"/>
 		/// </summary>
 		public override void Error(DateTime Timestamp, string Error)
 		{
@@ -184,7 +184,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffer.Exception"/>
+		/// <see cref="ISniffer.Exception(DateTime, String)"/>
 		/// </summary>
 		public override void Exception(DateTime Timestamp, string Exception)
 		{

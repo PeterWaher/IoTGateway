@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Cache</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Cache.Cache`2">
+            <summary>
+            Implements an in-memory cache.
+            </summary>
+            <typeparam name="KeyType">Cache key type.</typeparam>
+            <typeparam name="ValueType">Cache value type.</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.#ctor(System.Int32,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            Implements an in-memory cache.
+            </summary>
+            <param name="MaxItems">Maximum number of items in cache.</param>
+            <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
+            <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.MaxItems">
+            <summary>
+            Maximum number of items in cache.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.MaxTimeUsed">
+            <summary>
+            Maximum time to keep items that are being used.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.MaxTimeUnused">
+            <summary>
+            Maximum time to keep items that are not being used.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.TryGetValue(`0,`1@)">
+            <summary>
+            Tries to get a value from the cache.
+            </summary>
+            <param name="Key">Key of value.</param>
+            <param name="Value">Value, if found.</param>
+            <returns>If the item was found or not.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.Count">
+            <summary>
+            Number of items in cache
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.GetKeys">
+            <summary>
+            Gets all available keys in the cache.
+            </summary>
+            <returns>Array of keys.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.ContainsKey(`0)">
+            <summary>
+            Checks if a key is available in the cache.
+            </summary>
+            <param name="Key">Key</param>
+            <returns>If the key is available.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.Item(`0)">
+            <summary>
+            Access to values in the cache.
+            </summary>
+            <param name="Key">Value key</param>
+            <returns>Value corresponding to key.</returns>
+            <exception cref="T:System.ArgumentException">If key was not found.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Add(`0,`1)">
+            <summary>
+            Adds an item to the cache.
+            </summary>
+            <param name="Key"></param>
+            <param name="Value"></param>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Remove(`0)">
+            <summary>
+            Removes an item from the cache.
+            </summary>
+            <param name="Key">Key of item to remove.</param>
+            <returns>If an item with the given key was found and removed.</returns>
+        </member>
+        <member name="E:Waher.Runtime.Cache.Cache`2.Removed">
+            <summary>
+            Event raised when an item has been removed from the cache.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Clear">
+            <summary>
+            Clears the cache.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Cache.RemovedReason">
+            <summary>
+            Reason for removing the item.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Cache.RemovedReason.Replaced">
+            <summary>
+            Item was replaced by a newer value.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Cache.RemovedReason.NotUsed">
+            <summary>
+            Item has not been used.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Cache.RemovedReason.Old">
+            <summary>
+            Item is too old.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Cache.RemovedReason.Space">
+            <summary>
+            Cache is full and space had to be made for new items.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Cache.RemovedReason.Manual">
+            <summary>
+            Item was manually removed by the controlling application.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Cache.CacheItemEventHandler`2">
+            <summary>
+            Delegate for cache item removal event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Runtime.Cache.CacheItemEventArgs`2">
+            <summary>
+            Event arguments for cache item removal events.
+            </summary>
+            <typeparam name="KeyType">Cache key type.</typeparam>
+            <typeparam name="ValueType">Cache value type.</typeparam>
+        </member>
+        <member name="P:Waher.Runtime.Cache.CacheItemEventArgs`2.Key">
+            <summary>
+            Key of item that was removed.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.CacheItemEventArgs`2.Value">
+            <summary>
+            Value of item that was removed.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.CacheItemEventArgs`2.Reason">
+            <summary>
+            Reason for removing the item.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Cache.Caches">
+            <summary>
+            Repository of all active caches.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Caches.GetCaches">
+            <summary>
+            Gets active caches.
+            </summary>
+            <returns>Array of cache objects.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Caches.ClearAll">
+            <summary>
+            Clears all active caches.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Cache.ICache">
+            <summary>
+            Interface for caches.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.ICache.Clear">
+            <summary>
+            Clears the cache.
+            </summary>
+        </member>
+    </members>
+</doc>

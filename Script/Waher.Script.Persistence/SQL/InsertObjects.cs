@@ -8,6 +8,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators;
 
 namespace Waher.Script.Persistence.SQL
@@ -54,6 +55,7 @@ namespace Waher.Script.Persistence.SQL
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = this.source.GetSource(Variables);
+			List<IElement> Result = new List<IElement>();
 			IEnumerable<IElement> Objects;
 			IElement E;
 			long Count = 0;
@@ -88,6 +90,8 @@ namespace Waher.Script.Persistence.SQL
 
 						await Source.Insert(Item);
 						Count++;
+
+						Result.Add(new ObjectValue(Item));
 					}
 				}
 			}
@@ -96,7 +100,10 @@ namespace Waher.Script.Persistence.SQL
 				await Database.EndBulk();
 			}
 
-			return new DoubleNumber(Count);
+			if (Result.Count == 1)
+				return Result[0];
+			else
+				return new ObjectVector(Result.ToArray());
 		}
 
 		/// <summary>

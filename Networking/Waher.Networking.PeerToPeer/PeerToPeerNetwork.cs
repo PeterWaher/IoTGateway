@@ -60,14 +60,14 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New state.</param>
-	public delegate void PeerToPeerNetworkStateChangeEventHandler(object Sender, PeerToPeerNetworkState NewState);
+	public delegate Task PeerToPeerNetworkStateChangeEventHandler(object Sender, PeerToPeerNetworkState NewState);
 
 	/// <summary>
 	/// Event handler whenever a peer has connected.
 	/// </summary>
 	/// <param name="Listener">Sender of event.</param>
 	/// <param name="Peer">Peer connection.</param>
-	public delegate void PeerConnectedEventHandler(object Listener, PeerConnection Peer);
+	public delegate Task PeerConnectedEventHandler(object Listener, PeerConnection Peer);
 
 	/// <summary>
 	/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
@@ -469,7 +469,7 @@ namespace Waher.Networking.PeerToPeer
 						{
 							try
 							{
-								h(this, new UdpDatagramEventArgs(Data.RemoteEndPoint, Data.Buffer));
+								await h(this, new UdpDatagramEventArgs(Data.RemoteEndPoint, Data.Buffer));
 							}
 							catch (Exception ex)
 							{
@@ -519,7 +519,7 @@ namespace Waher.Networking.PeerToPeer
 					{
 						try
 						{
-							h(this, new UdpDatagramEventArgs(RemoteEndpoint, Datagram));
+							await h(this, new UdpDatagramEventArgs(RemoteEndpoint, Datagram));
 						}
 						catch (Exception ex)
 						{

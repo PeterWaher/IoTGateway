@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -10,15 +10,15 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void UdpDatagramEvent(object Sender, UdpDatagramEventArgs e);
+	public delegate Task UdpDatagramEvent(object Sender, UdpDatagramEventArgs e);
 
 	/// <summary>
 	/// Event arguments for UDP Datagram events.
 	/// </summary>
 	public class UdpDatagramEventArgs
 	{
-		private IPEndPoint remoteEndpoint;
-		private byte[] data;
+		private readonly IPEndPoint remoteEndpoint;
+		private readonly byte[] data;
 
 		/// <summary>
 		/// Event arguments for UDP Datagram events.

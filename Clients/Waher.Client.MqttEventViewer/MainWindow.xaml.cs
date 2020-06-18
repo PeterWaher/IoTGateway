@@ -1,19 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Events.MQTT;
 
@@ -74,27 +63,30 @@ namespace Waher.Client.MqttEventViewer
 			}
 		}
 
-		private void Mqtt_OnStateChanged(object Sender, MqttState NewState)
+		private async Task Mqtt_OnStateChanged(object Sender, MqttState NewState)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.ConnectionState.Content = NewState.ToString()));
 
 			if (NewState == MqttState.Connected)
-				this.Dispatcher.Invoke(new Action(() => this.mqtt.SUBSCRIBE(this.Topic.Text)));
+				await this.mqtt.SUBSCRIBE(this.Topic.Text);
 		}
 
-		private void Mqtt_OnError(object Sender, Exception Exception)
+		private Task Mqtt_OnError(object Sender, Exception Exception)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.Message.Content = Exception.Message));
+			return Task.CompletedTask;
 		}
 
-		private void Mqtt_OnConnectionError(object Sender, Exception Exception)
+		private Task Mqtt_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.Message.Content = Exception.Message));
+			return Task.CompletedTask;
 		}
 
-		private void Mqtt_OnSubscribed(object Sender, ushort PacketIdentifier)
+		private Task Mqtt_OnSubscribed(object Sender, ushort PacketIdentifier)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.Message.Content = "Subscribed to " + this.Topic.Text));
+			return Task.CompletedTask;
 		}
 
 		private void Receptor_OnEvent(object Sender, EventEventArgs e)
@@ -174,52 +166,52 @@ namespace Waher.Client.MqttEventViewer
 			try
 			{
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int)
-					this.Left = (int)Value;
+				if (Value != null && Value is int Left)
+					this.Left = Left;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int)
-					this.Top = (int)Value;
+				if (Value != null && Value is int Top)
+					this.Top = Top;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int)
-					this.Width = (int)Value;
+				if (Value != null && Value is int Width)
+					this.Width = Width;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int)
-					this.Height = (int)Value;
+				if (Value != null && Value is int Height)
+					this.Height = Height;
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string)
-					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), (string)Value);
+				if (Value != null && Value is string WindowState)
+					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), WindowState);
 
 				Value = Registry.GetValue(registryKey, "Host", string.Empty);
-				if (Value != null && Value is string)
-					this.Host.Text = (string)Value;
+				if (Value != null && Value is string Host)
+					this.Host.Text = Host;
 
 				Value = Registry.GetValue(registryKey, "UserName", string.Empty);
-				if (Value != null && Value is string)
-					this.UserName.Text = (string)Value;
+				if (Value != null && Value is string UserName)
+					this.UserName.Text = UserName;
 
 				Value = Registry.GetValue(registryKey, "Password", string.Empty);
-				if (Value != null && Value is string)
-					this.Password.Password = (string)Value;
+				if (Value != null && Value is string Password)
+					this.Password.Password = Password;
 
 				Value = Registry.GetValue(registryKey, "Topic", string.Empty);
-				if (Value != null && Value is string)
-					this.Topic.Text = (string)Value;
+				if (Value != null && Value is string Topic)
+					this.Topic.Text = Topic;
 
 				Value = Registry.GetValue(registryKey, "Port", 0);
-				if (Value != null && Value is int)
-					this.Port.Text = Value.ToString();
+				if (Value != null && Value is int Port)
+					this.Port.Text = Port.ToString();
 
 				Value = Registry.GetValue(registryKey, "Tls", 0);
-				if (Value != null && Value is int)
-					this.Tls.IsChecked = ((int)Value) != 0;
+				if (Value != null && Value is int Tls)
+					this.Tls.IsChecked = Tls != 0;
 
 				Value = Registry.GetValue(registryKey, "Trust", 0);
-				if (Value != null && Value is int)
-					this.Trust.IsChecked = ((int)Value) != 0;
+				if (Value != null && Value is int Trust)
+					this.Trust.IsChecked = Trust != 0;
 
 				GridView GridView = (GridView)this.EventListView.View;
 				int i;
@@ -227,8 +219,8 @@ namespace Waher.Client.MqttEventViewer
 				for (i = 0; i < 9; i++)
 				{
 					Value = Registry.GetValue(registryKey, "Col" + i.ToString(), GridView.Columns[i].Width);
-					if (Value != null && Value is int)
-						GridView.Columns[i].Width = (int)Value;
+					if (Value != null && Value is int ColWidth)
+						GridView.Columns[i].Width = ColWidth;
 				}
 			}
 			catch (Exception ex)

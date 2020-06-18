@@ -474,6 +474,11 @@
             Closes the connection and disposes of all resources.
             </summary>
         </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.DisposeAsync">
+            <summary>
+            Closes the connection and disposes of all resources.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.MQTT.MqttContent">
             <summary>
             Information about content received from the MQTT server.

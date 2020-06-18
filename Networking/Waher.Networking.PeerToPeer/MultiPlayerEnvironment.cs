@@ -1,16 +1,13 @@
 ﻿//#define LineListener
 
 using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
-using System.Net.Sockets;
 using Waher.Events;
 using Waher.Networking.MQTT;
-using Waher.Networking.UPnP;
-using Waher.Networking.PeerToPeer;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -70,21 +67,21 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New state.</param>
-	public delegate void MultiPlayerEnvironmentStateChangeEventHandler(object Sender, MultiPlayerState NewState);
+	public delegate Task MultiPlayerEnvironmentStateChangeEventHandler(object Sender, MultiPlayerState NewState);
 
 	/// <summary>
 	/// Event handler for player information events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="PlayerInformation">Player information.</param>
-	public delegate void MultiPlayerEnvironmentPlayerInformationEventHandler(object Sender, Player PlayerInformation);
+	public delegate Task MultiPlayerEnvironmentPlayerInformationEventHandler(object Sender, Player PlayerInformation);
 
 	/// <summary>
 	/// Event handler for game data events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void GameDataEventHandler(object Sender, GameDataEventArgs e);
+	public delegate Task GameDataEventHandler(object Sender, GameDataEventArgs e);
 
 	/// <summary>
 	/// Manages a multi-player environment.
@@ -128,7 +125,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="EstimatedMaxNrPlayers">Estimated number of maximum players.</param>
 		/// <param name="PlayerId">Player ID.</param>
 		/// <param name="PlayerMetaInfo">Meta-information about player.</param>
-		public MultiPlayerEnvironment(string ApplicationName, bool AllowMultipleApplicationsOnSameMachine, 
+		public MultiPlayerEnvironment(string ApplicationName, bool AllowMultipleApplicationsOnSameMachine,
 			string MqttServer, int MqttPort, bool MqttTls, string MqttUserName, string MqttPassword,
 			string MqttNegotiationTopic, int EstimatedMaxNrPlayers, Guid PlayerId, params KeyValuePair<string, string>[] PlayerMetaInfo)
 		{
@@ -143,14 +140,14 @@ namespace Waher.Networking.PeerToPeer
 			this.mqttPassword = MqttPassword;
 			this.mqttNegotiationTopic = MqttNegotiationTopic;
 
-			this.p2pNetwork = new PeerToPeerNetwork(AllowMultipleApplicationsOnSameMachine ? this.applicationName + " (" + PlayerId.ToString() + ")" : 
+			this.p2pNetwork = new PeerToPeerNetwork(AllowMultipleApplicationsOnSameMachine ? this.applicationName + " (" + PlayerId.ToString() + ")" :
 				this.applicationName, 0, 0, EstimatedMaxNrPlayers);
 			this.p2pNetwork.OnStateChange += this.P2PNetworkStateChange;
 			this.p2pNetwork.OnPeerConnected += this.P2pNetwork_OnPeerConnected;
 			this.p2pNetwork.OnUdpDatagramReceived += this.P2pNetwork_OnUdpDatagramReceived;
 		}
 
-		private void P2pNetwork_OnUdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		private async Task P2pNetwork_OnUdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
 			Player Player;
 
@@ -161,27 +158,27 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			if (Player.Connection != null)
-				Player.Connection.UdpDatagramReceived(Sender, e);
+				await Player.Connection.UdpDatagramReceived(Sender, e);
 		}
 
-		private void P2PNetworkStateChange(object Sender, PeerToPeerNetworkState NewState)
+		private async Task P2PNetworkStateChange(object Sender, PeerToPeerNetworkState NewState)
 		{
 			switch (NewState)
 			{
 				case PeerToPeerNetworkState.Created:
-					this.State = MultiPlayerState.Created;
+					await this.SetState(MultiPlayerState.Created);
 					break;
 
 				case PeerToPeerNetworkState.Reinitializing:
-					this.State = MultiPlayerState.Reinitializing;
+					await this.SetState(MultiPlayerState.Reinitializing);
 					break;
 
 				case PeerToPeerNetworkState.SearchingForGateway:
-					this.State = MultiPlayerState.SearchingForGateway;
+					await this.SetState(MultiPlayerState.SearchingForGateway);
 					break;
 
 				case PeerToPeerNetworkState.RegisteringApplicationInGateway:
-					this.State = MultiPlayerState.RegisteringApplicationInGateway;
+					await this.SetState(MultiPlayerState.RegisteringApplicationInGateway);
 					break;
 
 				case PeerToPeerNetworkState.Ready:
@@ -197,31 +194,31 @@ namespace Waher.Networking.PeerToPeer
 						this.mqttConnection.OnStateChanged += this.MqttConnection_OnStateChanged;
 						this.mqttConnection.OnContentReceived += this.MqttConnection_OnContentReceived;
 
-						this.State = MultiPlayerState.FindingPlayers;
+						await this.SetState(MultiPlayerState.FindingPlayers);
 					}
 					catch (Exception ex)
 					{
 						this.exception = ex;
-						this.State = MultiPlayerState.Error;
+						await this.SetState(MultiPlayerState.Error);
 					}
 					break;
 
 				case PeerToPeerNetworkState.Error:
 					this.exception = this.p2pNetwork.Exception;
-					this.State = MultiPlayerState.Error;
+					await this.SetState(MultiPlayerState.Error);
 					break;
 
 				case PeerToPeerNetworkState.Closed:
-					this.State = MultiPlayerState.Closed;
+					await this.SetState(MultiPlayerState.Closed);
 					break;
 			}
 		}
 
-		private void MqttConnection_OnStateChanged(object Sender, MqttState NewState)
+		private async Task MqttConnection_OnStateChanged(object Sender, MqttState NewState)
 		{
 			if (NewState == MqttState.Connected)
 			{
-				this.mqttConnection.SUBSCRIBE(this.mqttNegotiationTopic);
+				await this.mqttConnection.SUBSCRIBE(this.mqttNegotiationTopic);
 
 				BinaryOutput Output = new BinaryOutput();
 				Output.WriteByte(0);
@@ -230,7 +227,7 @@ namespace Waher.Networking.PeerToPeer
 				this.localPlayer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 				this.Serialize(this.localPlayer, Output);
 
-				this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
+				await this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 
 #if LineListener
 				Console.Out.WriteLine("Tx: HELLO(" + this.localPlayer.ToString() + ")");
@@ -286,173 +283,166 @@ namespace Waher.Networking.PeerToPeer
 				return new Player(PlayerId, PublicEndpoint, LocalEndpoint, PlayerMetaInfo);
 		}
 
-		private async void MqttConnection_OnContentReceived(object Sender, MqttContent Content)
+		private async Task MqttConnection_OnContentReceived(object Sender, MqttContent Content)
 		{
-			try
+			BinaryInput Input = Content.DataInput;
+			byte Command = Input.ReadByte();
+
+			switch (Command)
 			{
-				BinaryInput Input = Content.DataInput;
-				byte Command = Input.ReadByte();
+				case 0: // Hello
+					string ApplicationName = Input.ReadString();
+					if (ApplicationName != this.applicationName)
+						break;
 
-				switch (Command)
-				{
-					case 0: // Hello
-						string ApplicationName = Input.ReadString();
-						if (ApplicationName != this.applicationName)
-							break;
-
-						Player Player = this.Deserialize(Input);
-						if (Player is null)
-							break;
+					Player Player = this.Deserialize(Input);
+					if (Player is null)
+						break;
 
 #if LineListener
 					Console.Out.WriteLine("Rx: HELLO(" + Player.ToString() + ")");
 #endif
-						IPEndPoint ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
+					IPEndPoint ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-						lock (this.remotePlayersByEndpoint)
+					lock (this.remotePlayersByEndpoint)
+					{
+						this.remotePlayersByEndpoint[ExpectedEndpoint] = Player;
+						this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
+						this.playersById[Player.PlayerId] = Player;
+
+						this.UpdateRemotePlayersLocked();
+					}
+
+					MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
+					if (h != null)
+					{
+						try
 						{
-							this.remotePlayersByEndpoint[ExpectedEndpoint] = Player;
-							this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
-							this.playersById[Player.PlayerId] = Player;
-
-							this.UpdateRemotePlayersLocked();
+							await h(this, Player);
 						}
-
-						MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
-						if (h != null)
+						catch (Exception ex)
 						{
-							try
-							{
-								h(this, Player);
-							}
-							catch (Exception ex)
-							{
-								Events.Log.Critical(ex);
-							}
+							Log.Critical(ex);
 						}
+					}
+					break;
+
+				case 1:     // Interconnect
+					ApplicationName = Input.ReadString();
+					if (ApplicationName != this.applicationName)
 						break;
 
-					case 1:     // Interconnect
-						ApplicationName = Input.ReadString();
-						if (ApplicationName != this.applicationName)
-							break;
-
-						Player = this.Deserialize(Input);
-						if (Player is null)
-							break;
+					Player = this.Deserialize(Input);
+					if (Player is null)
+						break;
 
 #if LineListener
 					Console.Out.Write("Rx: INTERCONNECT(" + Player.ToString());
 #endif
-						int Index = 0;
-						int i, c;
-						LinkedList<Player> Players = new LinkedList<Player>();
-						bool LocalPlayerIncluded = false;
+					int Index = 0;
+					int i, c;
+					LinkedList<Player> Players = new LinkedList<Player>();
+					bool LocalPlayerIncluded = false;
 
-						Player.Index = Index++;
-						Players.AddLast(Player);
+					Player.Index = Index++;
+					Players.AddLast(Player);
 
-						c = (int)Input.ReadUInt();
-						for (i = 0; i < c; i++)
+					c = (int)Input.ReadUInt();
+					for (i = 0; i < c; i++)
+					{
+						Player = this.Deserialize(Input);
+						if (Player is null)
 						{
-							Player = this.Deserialize(Input);
-							if (Player is null)
-							{
 #if LineListener
 							Console.Out.Write("," + this.localPlayer.ToString());
 #endif
-								this.localPlayer.Index = Index++;
-								LocalPlayerIncluded = true;
-							}
-							else
-							{
+							this.localPlayer.Index = Index++;
+							LocalPlayerIncluded = true;
+						}
+						else
+						{
 #if LineListener
 							Console.Out.Write("," + Player.ToString());
 #endif
-								Player.Index = Index++;
-								Players.AddLast(Player);
-							}
+							Player.Index = Index++;
+							Players.AddLast(Player);
 						}
+					}
 
 #if LineListener
 					Console.Out.WriteLine(")");
 #endif
-						if (!LocalPlayerIncluded)
-							break;
-
-						this.mqttConnection.Dispose();
-						this.mqttConnection = null;
-
-						lock (this.remotePlayersByEndpoint)
-						{
-							this.remotePlayersByEndpoint.Clear();
-							this.remotePlayerIPs.Clear();
-							this.remotePlayersByIndex.Clear();
-							this.playersById.Clear();
-
-							this.remotePlayersByIndex[this.localPlayer.Index] = this.localPlayer;
-							this.playersById[this.localPlayer.PlayerId] = this.localPlayer;
-
-							foreach (Player Player2 in Players)
-							{
-								ExpectedEndpoint = Player2.GetExpectedEndpoint(this.p2pNetwork);
-
-								this.remotePlayersByIndex[Player2.Index] = Player2;
-								this.remotePlayersByEndpoint[ExpectedEndpoint] = Player2;
-								this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
-								this.playersById[Player2.PlayerId] = Player2;
-							}
-
-							this.UpdateRemotePlayersLocked();
-						}
-
-						this.State = MultiPlayerState.ConnectingPlayers;
-						await this.StartConnecting();
+					if (!LocalPlayerIncluded)
 						break;
 
-					case 2:     // Bye
-						ApplicationName = Input.ReadString();
-						if (ApplicationName != this.applicationName)
-							break;
+					this.mqttConnection.Dispose();
+					this.mqttConnection = null;
 
-						Guid PlayerId = Input.ReadGuid();
-						lock (this.remotePlayersByEndpoint)
+					lock (this.remotePlayersByEndpoint)
+					{
+						this.remotePlayersByEndpoint.Clear();
+						this.remotePlayerIPs.Clear();
+						this.remotePlayersByIndex.Clear();
+						this.playersById.Clear();
+
+						this.remotePlayersByIndex[this.localPlayer.Index] = this.localPlayer;
+						this.playersById[this.localPlayer.PlayerId] = this.localPlayer;
+
+						foreach (Player Player2 in Players)
 						{
-							if (!this.playersById.TryGetValue(PlayerId, out Player))
-								break;
+							ExpectedEndpoint = Player2.GetExpectedEndpoint(this.p2pNetwork);
+
+							this.remotePlayersByIndex[Player2.Index] = Player2;
+							this.remotePlayersByEndpoint[ExpectedEndpoint] = Player2;
+							this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
+							this.playersById[Player2.PlayerId] = Player2;
+						}
+
+						this.UpdateRemotePlayersLocked();
+					}
+
+					await this.SetState(MultiPlayerState.ConnectingPlayers);
+					await this.StartConnecting();
+					break;
+
+				case 2:     // Bye
+					ApplicationName = Input.ReadString();
+					if (ApplicationName != this.applicationName)
+						break;
+
+					Guid PlayerId = Input.ReadGuid();
+					lock (this.remotePlayersByEndpoint)
+					{
+						if (!this.playersById.TryGetValue(PlayerId, out Player))
+							break;
 
 #if LineListener
 						Console.Out.WriteLine("Rx: BYE(" + Player.ToString() + ")");
 #endif
-							ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
+						ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-							this.playersById.Remove(PlayerId);
-							this.remotePlayersByEndpoint.Remove(ExpectedEndpoint);
-							this.remotePlayersByIndex.Remove(Player.Index);
+						this.playersById.Remove(PlayerId);
+						this.remotePlayersByEndpoint.Remove(ExpectedEndpoint);
+						this.remotePlayersByIndex.Remove(Player.Index);
 
-							IPAddress ExpectedAddress = ExpectedEndpoint.Address;
-							bool AddressFound = false;
+						IPAddress ExpectedAddress = ExpectedEndpoint.Address;
+						bool AddressFound = false;
 
-							foreach (IPEndPoint EP in this.remotePlayersByEndpoint.Keys)
+						foreach (IPEndPoint EP in this.remotePlayersByEndpoint.Keys)
+						{
+							if (IPAddress.Equals(EP.Address, ExpectedAddress))
 							{
-								if (IPAddress.Equals(EP.Address, ExpectedAddress))
-								{
-									AddressFound = true;
-									break;
-								}
+								AddressFound = true;
+								break;
 							}
-
-							if (!AddressFound)
-								this.remotePlayerIPs.Remove(ExpectedAddress);
-
-							this.UpdateRemotePlayersLocked();
 						}
-						break;
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+
+						if (!AddressFound)
+							this.remotePlayerIPs.Remove(ExpectedAddress);
+
+						this.UpdateRemotePlayersLocked();
+					}
+					break;
 			}
 		}
 
@@ -465,7 +455,7 @@ namespace Waher.Networking.PeerToPeer
 			this.remotePlayersByEndpoint.Values.CopyTo(this.remotePlayers, 0);
 		}
 
-		private void P2pNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
+		private async Task P2pNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
 			IPEndPoint Endpoint = (IPEndPoint)Peer.Tcp.Client.Client.RemoteEndPoint;
 
@@ -491,10 +481,10 @@ namespace Waher.Networking.PeerToPeer
 			Output.WriteString(this.ExternalEndpoint.Address.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
-			Peer.SendTcp(Output.GetPacket());
+			await Peer.SendTcp(Output.GetPacket());
 		}
 
-		private Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player;
@@ -516,7 +506,7 @@ namespace Waher.Networking.PeerToPeer
 				catch (Exception)
 				{
 					Connection.Dispose();
-					return Task.FromResult<bool>(true);
+					return true;
 				}
 
 				if (Input.BytesLeft == 0)
@@ -531,7 +521,7 @@ namespace Waher.Networking.PeerToPeer
 					if (!this.playersById.TryGetValue(PlayerId, out Player))
 					{
 						Connection.Dispose();
-						return Task.FromResult<bool>(true);
+						return true;
 					}
 
 					if (Player.Connection is null)
@@ -551,19 +541,19 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						h(this, Player);
+						await h(this, Player);
 					}
 					catch (Exception ex)
 					{
-						Events.Log.Critical(ex);
+						Log.Critical(ex);
 					}
 				}
 
 				if (AllConnected)
-					this.State = MultiPlayerState.Ready;
+					await this.SetState(MultiPlayerState.Ready);
 
 				if (Packet is null)
-					return Task.FromResult<bool>(true);
+					return true;
 			}
 			else
 			{
@@ -573,7 +563,7 @@ namespace Waher.Networking.PeerToPeer
 
 			this.GameDataReceived(Player, Connection, Packet);
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
 		/// <summary>
@@ -593,7 +583,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Log.Critical(ex);
 				}
 			}
 		}
@@ -746,7 +736,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Log.Critical(ex);
 				}
 			}
 
@@ -775,7 +765,7 @@ namespace Waher.Networking.PeerToPeer
 			if (this.state != MultiPlayerState.FindingPlayers)
 				throw new Exception("The multiplayer environment is not in the state of finding players.");
 
-			this.State = MultiPlayerState.ConnectingPlayers;
+			await this.SetState(MultiPlayerState.ConnectingPlayers);
 
 			int Index = 0;
 			BinaryOutput Output = new BinaryOutput();
@@ -802,7 +792,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 			}
 
-			this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
+			this.mqttTerminatedPacketIdentifier = await this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 			this.mqttConnection.OnPublished += this.MqttConnection_OnPublished;
 
 #if LineListener
@@ -817,7 +807,7 @@ namespace Waher.Networking.PeerToPeer
 			Console.Out.WriteLine("Current player has index " + this.localPlayer.Index.ToString());
 #endif
 			if (this.remotePlayers.Length == 0)
-				this.State = MultiPlayerState.Ready;
+				await this.SetState(MultiPlayerState.Ready);
 			else
 			{
 				foreach (Player Player in this.remotePlayers)
@@ -845,7 +835,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private Task<bool> Connection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Connection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Guid PlayerId;
@@ -863,17 +853,17 @@ namespace Waher.Networking.PeerToPeer
 			catch (Exception)
 			{
 				Connection.Dispose();
-				return Task.FromResult<bool>(true);
+				return true;
 			}
 
 			Player Player = (Player)Connection.StateObject;
-			
+
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (!this.playersById.TryGetValue(PlayerId, out Player Player2) || Player2.PlayerId != Player.PlayerId)
 				{
 					Connection.Dispose();
-					return Task.FromResult<bool>(true);
+					return true;
 				}
 
 				Player.Connection = Connection;
@@ -891,25 +881,25 @@ namespace Waher.Networking.PeerToPeer
 			Output.WriteString(this.ExternalAddress.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
-			Connection.SendTcp(Output.GetPacket());
+			await Connection.SendTcp(Output.GetPacket());
 
 			MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
 			if (h != null)
 			{
 				try
 				{
-					h(this, Player);
+					await h(this, Player);
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Critical(ex);
+					Log.Critical(ex);
 				}
 			}
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
-		private Task<bool> Connection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Connection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player = (Player)Connection.StateObject;
@@ -928,21 +918,21 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			if (AllConnected)
-				this.State = MultiPlayerState.Ready;
+				await this.SetState(MultiPlayerState.Ready);
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
-		private void MqttConnection_OnError(object Sender, Exception Exception)
+		private async Task MqttConnection_OnError(object Sender, Exception Exception)
 		{
 			this.exception = Exception;
-			this.State = MultiPlayerState.Error;
+			await this.SetState(MultiPlayerState.Error);
 		}
 
-		private void MqttConnection_OnConnectionError(object Sender, Exception Exception)
+		private async Task MqttConnection_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.exception = Exception;
-			this.State = MultiPlayerState.Error;
+			await this.SetState(MultiPlayerState.Error);
 		}
 
 		/// <summary>
@@ -951,34 +941,35 @@ namespace Waher.Networking.PeerToPeer
 		public MultiPlayerState State
 		{
 			get { return this.state; }
-			internal set
+		}
+
+		internal async Task SetState(MultiPlayerState NewState)
+		{
+			if (this.state != NewState)
 			{
-				if (this.state != value)
+				this.state = NewState;
+
+				switch (NewState)
 				{
-					this.state = value;
+					case MultiPlayerState.Ready:
+						this.ready.Set();
+						break;
 
-					switch (value)
+					case MultiPlayerState.Error:
+						this.error.Set();
+						break;
+				}
+
+				MultiPlayerEnvironmentStateChangeEventHandler h = this.OnStateChange;
+				if (h != null)
+				{
+					try
 					{
-						case MultiPlayerState.Ready:
-							this.ready.Set();
-							break;
-
-						case MultiPlayerState.Error:
-							this.error.Set();
-							break;
+						await h(this, NewState);
 					}
-
-					MultiPlayerEnvironmentStateChangeEventHandler h = this.OnStateChange;
-					if (h != null)
+					catch (Exception ex)
 					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							Events.Log.Critical(ex);
-						}
+						Log.Critical(ex);
 					}
 				}
 			}
@@ -1069,27 +1060,26 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public void Dispose()
 		{
-			this.CloseMqtt();
+			Task _ = this.DisposeAsync();
+		}
 
-			this.State = MultiPlayerState.Closed;
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{ 
+			await this.CloseMqtt();
 
-			if (this.p2pNetwork != null)
-			{
-				this.p2pNetwork.Dispose();
-				this.p2pNetwork = null;
-			}
+			await this.SetState(MultiPlayerState.Closed);
 
-			if (this.ready != null)
-			{
-				this.ready.Dispose();
-				this.ready = null;
-			}
+			this.p2pNetwork?.Dispose();
+			this.p2pNetwork = null;
 
-			if (this.error != null)
-			{
-				this.error.Dispose();
-				this.error = null;
-			}
+			this.ready?.Dispose();
+			this.ready = null;
+
+			this.error?.Dispose();
+			this.error = null;
 
 			if (this.remotePlayersByEndpoint != null)
 			{
@@ -1110,7 +1100,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void CloseMqtt()
+		private async Task CloseMqtt()
 		{
 			if (this.mqttConnection != null)
 			{
@@ -1121,7 +1111,7 @@ namespace Waher.Networking.PeerToPeer
 					Output.WriteString(this.applicationName);
 					Output.WriteGuid(this.localPlayer.PlayerId);
 
-					this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
+					this.mqttTerminatedPacketIdentifier = await this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 					this.mqttConnection.OnPublished += this.MqttConnection_OnPublished;
 
 #if LineListener
@@ -1136,13 +1126,15 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
+		private Task MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
 		{
 			if (this.mqttConnection != null && PacketIdentifier == this.mqttTerminatedPacketIdentifier)
 			{
 				this.mqttConnection.Dispose();
 				this.mqttConnection = null;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

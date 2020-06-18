@@ -79,20 +79,24 @@ namespace Waher.Things.Mqtt.Model
 			this.Close();
 		}
 
-		private void CheckOnline(object _)
+		private async void CheckOnline(object _)
 		{
-			if (this.mqttClient != null)
+			try
 			{
-				try
+				if (this.mqttClient != null)
 				{
 					MqttState State = this.mqttClient.State;
 					if (State == MqttState.Offline || State == MqttState.Error)
-						this.mqttClient.Reconnect();
+						await this.mqttClient.Reconnect();
 				}
-				finally
-				{
-					this.nextCheck = Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckOnline, null);
-				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				this.nextCheck = Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckOnline, null);
 			}
 		}
 
@@ -117,7 +121,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private async void MqttClient_OnStateChanged(object Sender, MqttState NewState)
+		private async Task MqttClient_OnStateChanged(object Sender, MqttState NewState)
 		{
 			try
 			{
@@ -128,7 +132,7 @@ namespace Waher.Things.Mqtt.Model
 						await this.node.RemoveErrorAsync("Offline");
 						await this.node.RemoveErrorAsync("Error");
 
-						this.mqttClient.SUBSCRIBE("#", MqttQualityOfService.AtLeastOnce);
+						await this.mqttClient.SUBSCRIBE("#", MqttQualityOfService.AtLeastOnce);
 						break;
 
 					case MqttState.Error:
@@ -148,20 +152,21 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private void MqttClient_OnContentReceived(object Sender, MqttContent Content)
+		private Task MqttClient_OnContentReceived(object Sender, MqttContent Content)
 		{
 			lock (this.queue)
 			{
 				if (this.processing)
 				{
 					this.queue.AddLast(Content);
-					return;
+					return Task.CompletedTask;
 				}
 				else
 					this.processing = true;
 			}
 
 			this.Process(Content);
+			return Task.CompletedTask;
 		}
 
 		private readonly LinkedList<MqttContent> queue = new LinkedList<MqttContent>();
@@ -198,9 +203,10 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private void MqttClient_OnConnectionError(object Sender, Exception Exception)
+		private Task MqttClient_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.Reconnect();
+			return Task.CompletedTask;
 		}
 
 		private void Reconnect()

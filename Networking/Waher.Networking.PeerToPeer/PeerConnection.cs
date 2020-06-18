@@ -218,9 +218,9 @@ namespace Waher.Networking.PeerToPeer
 		/// buffered if a sending operation is being performed.
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
-		public void SendTcp(byte[] Packet)
+		public Task SendTcp(byte[] Packet)
 		{
-			this.SendTcp(Packet, null);
+			return this.SendTcp(Packet, null);
 		}
 
 		/// <summary>
@@ -229,13 +229,13 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public void SendTcp(byte[] Packet, EventHandler Callback)
+		public Task SendTcp(byte[] Packet, EventHandler Callback)
 		{
 			if (this.disposed)
-				return;
+				return Task.CompletedTask;
 
 			byte[] EncodedPacket = this.EncodePacket(Packet, false);
-			this.tcpConnection.SendAsync(EncodedPacket, Callback);
+			return this.tcpConnection.SendAsync(EncodedPacket, Callback);
 		}
 
 		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber)
@@ -425,7 +425,7 @@ namespace Waher.Networking.PeerToPeer
 			set { this.stateObject = value; }
 		}
 
-		internal void UdpDatagramReceived(object _, UdpDatagramEventArgs e)
+		internal async Task UdpDatagramReceived(object _, UdpDatagramEventArgs e)
 		{
 			if (this.encapsulatePackets)
 			{
@@ -498,11 +498,11 @@ namespace Waher.Networking.PeerToPeer
 						{
 							try
 							{
-								h(this, P.Value, 0, P.Value.Length);
+								await h(this, P.Value, 0, P.Value.Length);
 							}
 							catch (Exception ex)
 							{
-								Events.Log.Critical(ex);
+								Log.Critical(ex);
 							}
 						}
 					}
@@ -511,11 +511,11 @@ namespace Waher.Networking.PeerToPeer
 					{
 						try
 						{
-							h(this, FirstPacket, 0, FirstPacket.Length);
+							await h(this, FirstPacket, 0, FirstPacket.Length);
 						}
 						catch (Exception ex)
 						{
-							Events.Log.Critical(ex);
+							Log.Critical(ex);
 						}
 					}
 				}
@@ -533,11 +533,11 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						h(this, Packet, 0, Packet.Length);
+						await h(this, Packet, 0, Packet.Length);
 					}
 					catch (Exception ex)
 					{
-						Events.Log.Critical(ex);
+						Log.Critical(ex);
 					}
 				}
 			}

@@ -6,11 +6,13 @@ namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// Base class for all synchronous HTTP resources.
+	/// A synchronous resource responds within the method handler.
 	/// </summary>
 	public abstract class HttpSynchronousResource : HttpResource
 	{
 		/// <summary>
 		/// Base class for all synchronous HTTP resources.
+		/// A synchronous resource responds within the method handler.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		public HttpSynchronousResource(string ResourceName)

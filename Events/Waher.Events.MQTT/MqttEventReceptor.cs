@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Events;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.MQTT;
@@ -18,7 +17,7 @@ namespace Waher.Events.MQTT
 	/// </summary>
 	public class MqttEventReceptor : IDisposable
 	{
-		private MqttClient client;
+		private readonly MqttClient client;
 
 		/// <summary>
 		/// This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="Log"/>. 
@@ -42,7 +41,7 @@ namespace Waher.Events.MQTT
 			this.client.OnContentReceived -= Client_OnContentReceived;
 		}
 
-		private void Client_OnContentReceived(object Sender, MqttContent Content)
+		private Task Client_OnContentReceived(object Sender, MqttContent Content)
 		{
 			string Xml = System.Text.Encoding.UTF8.GetString(Content.Data);
 			XmlDocument Doc = new XmlDocument();
@@ -52,12 +51,12 @@ namespace Waher.Events.MQTT
 			}
 			catch (Exception)
 			{
-				return;
+				return Task.CompletedTask;
 			}
 
 			XmlElement E = Doc.DocumentElement;
 			if (E.LocalName != "log" || E.NamespaceURI != MqttEventSink.NamespaceEventLogging)
-				return;
+				return Task.CompletedTask;
 
 			XmlElement E2;
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
@@ -214,6 +213,8 @@ namespace Waher.Events.MQTT
 					Log.Critical(ex);
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

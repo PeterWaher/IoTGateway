@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 
@@ -54,13 +55,15 @@ namespace Waher.Networking.MQTT.Test
 						Error.Set();
 						break;
 				}
+
+				return Task.CompletedTask;
 			};
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect to MQTT broker.");
 		}
 
 		[TestMethod]
-		public void Test_02_Subscribe()
+		public async Task Test_02_Subscribe()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			int Count = 0;
@@ -73,38 +76,40 @@ namespace Waher.Networking.MQTT.Test
 
 				if (++Count == 10)
 					Done.Set();
+
+				return Task.CompletedTask;
 			};
 
-			this.client.SUBSCRIBE("#");
+			await this.client.SUBSCRIBE("#");
 			try
 			{
 				Assert.IsTrue(Done.WaitOne(60000), "Content not received correctly.");
 			}
 			finally
 			{
-				this.client.UNSUBSCRIBE("#");
+				await this.client.UNSUBSCRIBE("#");
 			}
 		}
 
 		[TestMethod]
-		public void Test_03_Publish_AtMostOne()
+		public async Task Test_03_Publish_AtMostOne()
 		{
-			this.Publish(MqttQualityOfService.AtMostOnce);
+			await this.Publish(MqttQualityOfService.AtMostOnce);
 		}
 
 		[TestMethod]
-		public void Test_04_Publish_AtLeastOnce()
+		public async void Test_04_Publish_AtLeastOnce()
 		{
-			this.Publish(MqttQualityOfService.AtLeastOnce);
+			await this.Publish(MqttQualityOfService.AtLeastOnce);
 		}
 
 		[TestMethod]
-		public void Test_05_Publish_ExactlyOne()
+		public async void Test_05_Publish_ExactlyOne()
 		{
-			this.Publish(MqttQualityOfService.ExactlyOnce);
+			await this.Publish(MqttQualityOfService.ExactlyOnce);
 		}
 
-		private void Publish(MqttQualityOfService QoS)
+		private async Task Publish(MqttQualityOfService QoS)
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
@@ -119,19 +124,21 @@ namespace Waher.Networking.MQTT.Test
 					Done.Set();
 				else
 					Error.Set();
+			
+				return Task.CompletedTask;
 			};
 
-			this.client.SUBSCRIBE("/Waher/IoT/Test", QoS);
+			await this.client.SUBSCRIBE("/Waher/IoT/Test", QoS);
 			try
 			{
-				this.client.PUBLISH("/Waher/IoT/Test", QoS, false,
+				await this.client.PUBLISH("/Waher/IoT/Test", QoS, false,
 					System.Text.Encoding.UTF8.GetBytes("Hello world."));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Content not published correctly.");
 			}
 			finally
 			{
-				this.client.UNSUBSCRIBE("/Waher/IoT/Test");
+				await this.client.UNSUBSCRIBE("/Waher/IoT/Test");
 			}
 		}
 
@@ -143,8 +150,8 @@ namespace Waher.Networking.MQTT.Test
 
 			this.Test_01_Connect();
 
-			this.client.OnPing += (sender, e) => Ping.Set();
-			this.client.OnPingResponse += (sender, e) => PingResp.Set();
+			this.client.OnPing += (sender, e) => { Ping.Set(); return Task.CompletedTask; };
+			this.client.OnPingResponse += (sender, e) => { PingResp.Set(); return Task.CompletedTask; };
 
 			Assert.IsTrue(Ping.WaitOne(60000), "Ping not sent properly.");
 			Assert.IsTrue(PingResp.WaitOne(60000), "Ping response not received properly.");

@@ -95,10 +95,11 @@ namespace Waher.Networking.XMPP.P2P
 			set { this.fullJid = value; }
 		}
 
-		private void P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
+		private Task P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
 			PeerState _ = new PeerState(Peer, this);
 			this.Information("Peer connected from " + Peer.RemoteEndpoint.ToString());
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

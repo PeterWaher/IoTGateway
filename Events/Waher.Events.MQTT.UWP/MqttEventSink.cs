@@ -53,22 +53,22 @@ namespace Waher.Events.MQTT
 				this.timer = new Timer(this.CheckConnection, null, 60000, 60000);
 		}
 
-		private void CheckConnection(object State)
+		private async void CheckConnection(object State)
 		{
-			if (this.client.State == MqttState.Offline || this.client.State == MqttState.Error || this.client.State == MqttState.Authenticating)
+			try
 			{
-				try
+				if (this.client.State == MqttState.Offline || this.client.State == MqttState.Error || this.client.State == MqttState.Authenticating)
 				{
-					this.client.Reconnect();
+					await this.client.Reconnect();
 				}
-				catch (Exception ex)
-				{
-					this.LogCritical(ex);
-				}
+			}
+			catch (Exception ex)
+			{
+				this.LogCritical(ex);
 			}
 		}
 
-		private void Client_OnStateChanged(object Sender, MqttState NewState)
+		private async Task Client_OnStateChanged(object Sender, MqttState NewState)
 		{
 			switch (NewState)
 			{
@@ -99,7 +99,7 @@ namespace Waher.Events.MQTT
 					}
 
 					if (ImmediateReconnect && this.timer != null)
-						this.client.Reconnect();
+						await this.client.Reconnect();
 					break;
 			}
 		}
@@ -191,10 +191,10 @@ namespace Waher.Events.MQTT
 				{
 					object Value = Tag.Value;
 
-					if (Value is bool)
+					if (Value is bool b)
 					{
 						Xml.Append("' type='xs:boolean' value='");
-						Xml.Append(CommonTypes.Encode((bool)Value));
+						Xml.Append(CommonTypes.Encode(b));
 						Xml.Append("'/>");
 					}
 					else if (Value is byte)
@@ -245,28 +245,28 @@ namespace Waher.Events.MQTT
 						Xml.Append(Value.ToString());
 						Xml.Append("'/>");
 					}
-					else if (Value is decimal)
+					else if (Value is decimal dec)
 					{
 						Xml.Append("' type='xs:decimal' value='");
-						Xml.Append(CommonTypes.Encode((decimal)Value));
+						Xml.Append(CommonTypes.Encode(dec));
 						Xml.Append("'/>");
 					}
-					else if (Value is double)
+					else if (Value is double dbl)
 					{
 						Xml.Append("' type='xs:double' value='");
-						Xml.Append(CommonTypes.Encode((double)Value));
+						Xml.Append(CommonTypes.Encode(dbl));
 						Xml.Append("'/>");
 					}
-					else if (Value is float)
+					else if (Value is float fl)
 					{
 						Xml.Append("' type='xs:float' value='");
-						Xml.Append(CommonTypes.Encode((float)Value));
+						Xml.Append(CommonTypes.Encode(fl));
 						Xml.Append("'/>");
 					}
-					else if (Value is DateTime)
+					else if (Value is DateTime dt)
 					{
 						Xml.Append("' type='xs:dateTime' value='");
-						Xml.Append(XML.Encode((DateTime)Value));
+						Xml.Append(XML.Encode(dt));
 						Xml.Append("'/>");
 					}
 					else if (Value is string || Value is char)
@@ -305,7 +305,7 @@ namespace Waher.Events.MQTT
 
 			Xml.Append("</log>");
 
-			byte[] Data = System.Text.Encoding.UTF8.GetBytes(Xml.ToString());
+			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			this.client.PUBLISH(this.topic, MqttQualityOfService.AtLeastOnce, false, Data);
 

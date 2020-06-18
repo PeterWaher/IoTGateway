@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using SkiaSharp;
-using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Queries
 {
@@ -33,14 +29,14 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class Column
 	{
-		private string columnId;
-		private string header;
-		private string dataSourceId;
-		private string partition;
-		private SKColor? fgColor;
-		private SKColor? bgColor;
-		private ColumnAlignment? alignment;
-		private byte? nrDecimals;
+		private readonly string columnId;
+		private readonly string header;
+		private readonly string dataSourceId;
+		private readonly string partition;
+		private readonly SKColor? fgColor;
+		private readonly SKColor? bgColor;
+		private readonly ColumnAlignment? alignment;
+		private readonly byte? nrDecimals;
 
 		/// <summary>
 		/// Defines a column in a table.

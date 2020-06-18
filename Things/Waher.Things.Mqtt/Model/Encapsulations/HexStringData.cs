@@ -57,11 +57,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new StringControlParameter("Value", "Publish", "Value:", "HEX value of topic.", RegExString,
-					(n) => Security.Hashes.BinaryToString(this.value),
+					(n) => Task.FromResult<string>(Security.Hashes.BinaryToString(this.value)),
 					(n, v) =>
 					{
 						this.value = Security.Hashes.StringToBinary(v);
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						return Task.CompletedTask;
 					})
 			};
 		}

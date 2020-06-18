@@ -62,11 +62,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new DateTimeControlParameter("Value", "Publish", "Value:", "Date & time value of topic.", null, null,
-					(n) => this.value,
+					(n) => Task.FromResult<DateTime?>(this.value),
 					(n, v) =>
 					{
 						this.value = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v.ToString()));
+						return Task.CompletedTask;
 					})
 			};
 		}

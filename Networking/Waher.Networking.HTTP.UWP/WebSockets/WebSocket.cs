@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		public event EventHandler Disposed = null;
 
-		internal bool WebSocketDataReceived(byte[] Data, int Offset, int NrRead)
+		internal async Task<bool> WebSocketDataReceived(byte[] Data, int Offset, int NrRead)
 		{
 			if (this.connection.HasSniffers)
 			{
@@ -226,13 +226,13 @@ namespace Waher.Networking.HTTP.WebSockets
 
 						if (this.rsv != 0)
 						{
-							this.Close(WebSocketCloseStatus.ProtocolError, "RSV must be 0.");
+							await this.Close(WebSocketCloseStatus.ProtocolError, "RSV must be 0.");
 							return false;
 						}
 
 						if (this.controlFrame && !this.fin)
 						{
-							this.Close(WebSocketCloseStatus.ProtocolError, "FIN must be 1 in control frames.");
+							await this.Close(WebSocketCloseStatus.ProtocolError, "FIN must be 1 in control frames.");
 							return false;
 						}
 
@@ -246,13 +246,13 @@ namespace Waher.Networking.HTTP.WebSockets
 
 						if (!this.masked)
 						{
-							this.Close(WebSocketCloseStatus.ProtocolError, "Payload must be masked.");
+							await this.Close(WebSocketCloseStatus.ProtocolError, "Payload must be masked.");
 							return false;
 						}
 
 						if (this.controlFrame && this.payloadLen >= 126)
 						{
-							this.Close(WebSocketCloseStatus.ProtocolError, "Control frame too large.");
+							await this.Close(WebSocketCloseStatus.ProtocolError, "Control frame too large.");
 							return false;
 						}
 
@@ -289,7 +289,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						{
 							if (this.payloadLen > this.listener.MaximumBinaryPayloadSize)
 							{
-								this.Close(WebSocketCloseStatus.TooBig, "Payload larger than maximum allowed payload.");
+								await this.Close(WebSocketCloseStatus.TooBig, "Payload larger than maximum allowed payload.");
 								return false;
 							}
 
@@ -408,15 +408,15 @@ namespace Waher.Networking.HTTP.WebSockets
 									if (!this.closed)
 									{
 										if (Code.HasValue)
-											this.Close(Code.Value, Reason);
+											await this.Close(Code.Value, Reason);
 										else
-											this.Close();
+											await this.Close();
 									}
 
 									return false;
 
 								case WebSocketOpcode.Ping:
-									this.Pong();
+									await this.Pong();
 									this.RaiseHeartbeat();
 									break;
 
@@ -486,7 +486,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 						if (this.rsv != 0)
 						{
-							this.Close(WebSocketCloseStatus.ProtocolError, "RSV must be 0.");
+							await this.Close(WebSocketCloseStatus.ProtocolError, "RSV must be 0.");
 							return false;
 						}
 						break;
@@ -546,7 +546,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 		}
 
-		private async void BeginWriteRaw(byte[] Frame, EventHandler Callback)
+		private async Task BeginWriteRaw(byte[] Frame, EventHandler Callback)
 		{
 			if (Frame is null)
 				throw new ArgumentException("Frame cannot be null.", nameof(Frame));
@@ -641,9 +641,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// Sends a text payload.
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
-		public void Send(string Payload)
+		public Task Send(string Payload)
 		{
-			this.Send(Payload, false, null);
+			return this.Send(Payload, false, null);
 		}
 
 		/// <summary>
@@ -651,9 +651,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="More">If text is fragmented, and more is to come.</param>
-		public void Send(string Payload, bool More)
+		public Task Send(string Payload, bool More)
 		{
-			this.Send(Payload, More, null);
+			return this.Send(Payload, More, null);
 		}
 
 		/// <summary>
@@ -662,10 +662,10 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="More">If text is fragmented, and more is to come.</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
-		public void Send(string Payload, bool More, EventHandler Callback)
+		public async Task Send(string Payload, bool More, EventHandler Callback)
 		{
 			byte[] Frame = this.CreateFrame(Payload, More);
-			this.BeginWriteRaw(Frame, Callback);
+			await this.BeginWriteRaw(Frame, Callback);
 
 			this.connection.Server.DataTransmitted(Frame.Length);
 			this.connection.TransmitText(Payload);
@@ -685,11 +685,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="More">If text is fragmented, and more is to come.</param>
-		public Task SendAsync(string Payload, bool More)
+		public async Task SendAsync(string Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.Send(Payload, More, (sender, e) => Result.SetResult(true));
-			return Result.Task;
+			await this.Send(Payload, More, (sender, e) => Result.SetResult(true));
+			await Result.Task;
 		}
 
 		/// <summary>
@@ -721,9 +721,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// Sends a binary payload.
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
-		public void Send(byte[] Payload)
+		public Task Send(byte[] Payload)
 		{
-			this.Send(Payload, false, null);
+			return this.Send(Payload, false, null);
 		}
 
 		/// <summary>
@@ -731,9 +731,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
-		public void Send(byte[] Payload, bool More)
+		public Task Send(byte[] Payload, bool More)
 		{
-			this.Send(Payload, More, null);
+			return this.Send(Payload, More, null);
 		}
 
 		/// <summary>
@@ -742,10 +742,10 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
-		public void Send(byte[] Payload, bool More, EventHandler Callback)
+		public async Task Send(byte[] Payload, bool More, EventHandler Callback)
 		{
 			byte[] Frame = this.CreateFrame(Payload, More);
-			this.BeginWriteRaw(Frame, Callback);
+			await this.BeginWriteRaw(Frame, Callback);
 
 			this.connection.Server.DataTransmitted(Frame.Length);
 			this.connection.TransmitBinary(Payload);
@@ -765,11 +765,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
-		public Task SendAsync(byte[] Payload, bool More)
+		public async Task SendAsync(byte[] Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.Send(Payload, More, (sender, e) => Result.SetResult(true));
-			return Result.Task;
+			await this.Send(Payload, More, (sender, e) => Result.SetResult(true));
+			await Result.Task;
 		}
 
 		private byte[] CreateFrame(string Payload, bool More)
@@ -855,21 +855,21 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <summary>
 		/// Closes the connection.
 		/// </summary>
-		public void Close()
+		public Task Close()
 		{
-			this.Close(null);
+			return this.Close(null);
 		}
 
 		/// <summary>
 		/// Closes the connection.
 		/// </summary>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
-		public void Close(EventHandler Callback)
+		public async Task Close(EventHandler Callback)
 		{
 			this.closed = true;
 
 			byte[] Frame = this.CreateFrame(null, WebSocketOpcode.Close, false);
-			this.BeginWriteRaw(Frame, Callback);
+			await this.BeginWriteRaw(Frame, Callback);
 
 			this.connection.Server.DataTransmitted(Frame.Length);
 			this.connection.TransmitBinary(Frame);
@@ -880,9 +880,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Code">Code</param>
 		/// <param name="Reason">Reason</param>
-		public void Close(WebSocketCloseStatus Code, string Reason)
+		public Task Close(WebSocketCloseStatus Code, string Reason)
 		{
-			this.Close((ushort)Code, Reason, null);
+			return this.Close((ushort)Code, Reason, null);
 		}
 
 		/// <summary>
@@ -890,20 +890,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Code">Code</param>
 		/// <param name="Reason">Reason</param>
-		public void Close(ushort Code, string Reason)
+		public Task Close(ushort Code, string Reason)
 		{
-			this.Close(Code, Reason, null);
-		}
-
-		/// <summary>
-		/// Closes the connection.
-		/// </summary>
-		/// <param name="Code">Code</param>
-		/// <param name="Reason">Reason</param>
-		/// <param name="Callback">Method to call when callback has been sent.</param>
-		public void Close(WebSocketCloseStatus Code, string Reason, EventHandler Callback)
-		{
-			this.Close((ushort)Code, Reason, Callback);
+			return this.Close(Code, Reason, null);
 		}
 
 		/// <summary>
@@ -912,12 +901,23 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="Code">Code</param>
 		/// <param name="Reason">Reason</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
-		public void Close(ushort Code, string Reason, EventHandler Callback)
+		public Task Close(WebSocketCloseStatus Code, string Reason, EventHandler Callback)
+		{
+			return this.Close((ushort)Code, Reason, Callback);
+		}
+
+		/// <summary>
+		/// Closes the connection.
+		/// </summary>
+		/// <param name="Code">Code</param>
+		/// <param name="Reason">Reason</param>
+		/// <param name="Callback">Method to call when callback has been sent.</param>
+		public async Task Close(ushort Code, string Reason, EventHandler Callback)
 		{
 			this.closed = true;
 
 			byte[] Frame = this.Encode(Code, Reason);
-			this.BeginWriteRaw(Frame, Callback);
+			await this.BeginWriteRaw(Frame, Callback);
 
 			this.connection.Server.DataTransmitted(Frame.Length);
 			this.connection.TransmitBinary(Frame);
@@ -926,11 +926,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <summary>
 		/// Closes the connection.
 		/// </summary>
-		public Task CloseAsync()
+		public async Task CloseAsync()
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.Close((sender, e) => Result.SetResult(true));
-			return Result.Task;
+			await this.Close((sender, e) => Result.SetResult(true));
+			await Result.Task;
 		}
 
 		/// <summary>
@@ -948,11 +948,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Code">Code</param>
 		/// <param name="Reason">Reason</param>
-		public Task CloseAsync(ushort Code, string Reason)
+		public async Task CloseAsync(ushort Code, string Reason)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.Close(Code, Reason, (sender, e) => Result.SetResult(true));
-			return Result.Task;
+			await this.Close(Code, Reason, (sender, e) => Result.SetResult(true));
+			await Result.Task;
 		}
 
 		private byte[] Encode(ushort Code, string Reason)
@@ -968,7 +968,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			return this.CreateFrame(Payload, WebSocketOpcode.Close, false);
 		}
 
-		private void Pong()
+		private async Task Pong()
 		{
 			byte[] Frame;
 			byte[] Bin;
@@ -985,7 +985,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			Frame = this.CreateFrame(Bin, WebSocketOpcode.Pong, false);
 
-			this.BeginWriteRaw(Frame, null);
+			await this.BeginWriteRaw(Frame, null);
 
 			this.connection.Server.DataTransmitted(Frame.Length);
 			this.connection.TransmitBinary(Frame);

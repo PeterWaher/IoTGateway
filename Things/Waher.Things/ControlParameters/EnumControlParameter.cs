@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Things;
 
 namespace Waher.Things.ControlParameters
 {
@@ -13,24 +10,24 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void EnumSetHandler(IThingReference Node, Enum Value);
+	public delegate Task EnumSetHandler(IThingReference Node, Enum Value);
 
 	/// <summary>
 	/// Get handler delegate for enumeration control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate Enum EnumGetHandler(IThingReference Node);
+	public delegate Task<Enum> EnumGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Enumeration control parameter.
 	/// </summary>
 	public class EnumControlParameter : ControlParameter
 	{
-		private EnumGetHandler getHandler;
-		private EnumSetHandler setHandler;
-		private Type enumType;
-		private string[] labels;
+		private readonly EnumGetHandler getHandler;
+		private readonly EnumSetHandler setHandler;
+		private readonly Type enumType;
+		private readonly string[] labels;
 
 		/// <summary>
 		/// String control parameter.
@@ -59,14 +56,14 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(IThingReference Node, Enum Value)
+		public async Task<bool> Set(IThingReference Node, Enum Value)
 		{
 			try
 			{
 				if (Value.GetType() != this.enumType)
 					return false;
 
-				this.setHandler(Node, Value);
+				await this.setHandler(Node, Value);
 				return true;
 			}
 			catch (Exception ex)
@@ -82,7 +79,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(IThingReference Node, string StringValue)
+		public override async Task<bool> SetStringValue(IThingReference Node, string StringValue)
 		{
 			Enum Value;
 
@@ -97,7 +94,7 @@ namespace Waher.Things.ControlParameters
 
 			try
 			{
-				this.setHandler(Node, Value);
+				await this.setHandler(Node, Value);
 			}
 			catch (Exception ex)
 			{
@@ -112,11 +109,11 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public Enum Get(IThingReference Node)
+		public async Task<Enum> Get(IThingReference Node)
 		{
 			try
 			{
-				return this.getHandler(Node);
+				return await this.getHandler(Node);
 			}
 			catch (Exception ex)
 			{
@@ -130,9 +127,10 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(IThingReference Node)
+		public override async Task<string> GetStringValue(IThingReference Node)
 		{
-			return this.Get(Node).ToString();
+			Enum Value = await this.Get(Node);
+			return Value.ToString();
 		}
 
 		/// <summary>
@@ -148,7 +146,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
+		public override Task ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			int i = 0;
 			int c = this.labels.Length;
@@ -165,6 +163,8 @@ namespace Waher.Things.ControlParameters
 				Output.WriteElementString("value", Option.ToString());
 				Output.WriteEndElement();
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

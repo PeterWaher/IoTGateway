@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.port = Port;
 			this.jid = JID;
 
-			this.State = Socks5State.Connecting;
+			Task _ = this.SetState(Socks5State.Connecting);
 			this.Information("Connecting to " + this.host + ":" + this.port.ToString());
 
 			this.client = new BinaryTcpClient();
@@ -114,7 +114,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				this.State = Socks5State.Error;
+				await this.SetState(Socks5State.Error);
 			}
 		}
 
@@ -149,12 +149,12 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void Client_OnDisconnected(object sender, EventArgs e)
 		{
-			this.State = Socks5State.Offline;
+			Task _ = this.SetState(Socks5State.Offline);
 		}
 
-		private void Client_OnError(object Sender, Exception Exception)
+		private Task Client_OnError(object Sender, Exception Exception)
 		{
-			this.State = Socks5State.Error;
+			return this.SetState(Socks5State.Error);
 		}
 
 		private Task Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
@@ -165,21 +165,21 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			return Task.FromResult<bool>(true);
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
 				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
 			try
 			{
-				this.ParseIncoming(Buffer, Offset, Count);
+				await this.ParseIncoming(Buffer, Offset, Count);
+				return true;
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+				return false;
 			}
-
-			return Task.FromResult<bool>(true);
 		}
 
 		/// <summary>
@@ -188,24 +188,25 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		public Socks5State State
 		{
 			get { return this.state; }
-			internal set
-			{
-				if (this.state != value)
-				{
-					this.state = value;
-					this.Information("State changed to " + this.state.ToString());
+		}
 
-					EventHandler h = this.OnStateChange;
-					if (h != null)
+		internal async Task SetState(Socks5State NewState)
+		{
+			if (this.state != NewState)
+			{
+				this.state = NewState;
+				this.Information("State changed to " + this.state.ToString());
+
+				EventHandlerAsync h = this.OnStateChange;
+				if (h != null)
+				{
+					try
 					{
-						try
-						{
-							h(this, new EventArgs());
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
+						await h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
 					}
 				}
 			}
@@ -229,7 +230,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Event raised whenever the state changes.
 		/// </summary>
-		public event EventHandler OnStateChange = null;
+		public event EventHandlerAsync OnStateChange = null;
 
 		/// <summary>
 		/// Host of SOCKS5 stream host.
@@ -263,7 +264,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (!this.disposed)
 			{
 				this.disposed = true;
-				this.State = Socks5State.Offline;
+				Task _ = this.SetState(Socks5State.Offline);
 
 				this.client?.Dispose();
 				this.client = null;
@@ -315,7 +316,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.Dispose();
 		}
 
-		private void ParseIncoming(byte[] Buffer, int Offset, int Count)
+		private async Task ParseIncoming(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.state == Socks5State.Connected)
 			{
@@ -324,7 +325,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						h(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
+						await h(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
 					}
 					catch (Exception ex)
 					{
@@ -336,7 +337,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				if (Count < 2 || Buffer[Offset++] < 5)
 				{
-					this.ToError();
+					await this.ToError();
 					return;
 				}
 
@@ -345,11 +346,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				switch (Method)
 				{
 					case 0: // No authentication.
-						this.State = Socks5State.Authenticated;
+						await this.SetState(Socks5State.Authenticated);
 						break;
 
 					default:
-						this.ToError();
+						await this.ToError();
 						return;
 				}
 			}
@@ -359,7 +360,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (Count < 5 || Buffer[Offset++] < 5)
 				{
-					this.ToError();
+					await this.ToError();
 					return;
 				}
 
@@ -368,52 +369,52 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				switch (REP)
 				{
 					case 0: // Succeeded
-						this.State = Socks5State.Connected;
+						await this.SetState(Socks5State.Connected);
 						break;
 
 					case 1:
 						this.Error("General SOCKS server failure.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 2:
 						this.Error("Connection not allowed by ruleset.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 3:
 						this.Error("Network unreachable.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 4:
 						this.Error("Host unreachable.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 5:
 						this.Error("Connection refused.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 6:
 						this.Error("TTL expired.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 7:
 						this.Error("Command not supported.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					case 8:
 						this.Error("Address type not supported.");
-						this.ToError();
+						await this.ToError();
 						break;
 
 					default:
 						this.Error("Unrecognized error code returned: " + REP.ToString());
-						this.ToError();
+						await this.ToError();
 						break;
 				}
 
@@ -429,7 +430,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						if (Offset + 4 > c)
 						{
 							this.Error("Expected more bytes.");
-							this.ToError();
+							await this.ToError();
 							return;
 						}
 
@@ -444,7 +445,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						if (Offset + NrBytes > c)
 						{
 							this.Error("Expected more bytes.");
-							this.ToError();
+							await this.ToError();
 							return;
 						}
 
@@ -456,7 +457,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						if (Offset + 16 > c)
 						{
 							this.Error("Expected more bytes.");
-							this.ToError();
+							await this.ToError();
 							return;
 						}
 
@@ -467,14 +468,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						break;
 
 					default:
-						this.ToError();
+						await this.ToError();
 						return;
 				}
 
 				if (Offset + 2 != c)
 				{
 					this.Error("Invalid number of bytes received.");
-					this.ToError();
+					await this.ToError();
 					return;
 				}
 
@@ -487,7 +488,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						h(this, new ResponseEventArgs(REP, Addr, DomainName, Port));
+						await h(this, new ResponseEventArgs(REP, Addr, DomainName, Port));
 					}
 					catch (Exception ex)
 					{
@@ -507,9 +508,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public event DataReceivedEventHandler OnDataReceived = null;
 
-		private void ToError()
+		private async Task ToError()
 		{
-			this.State = Socks5State.Error;
+			await this.SetState(Socks5State.Error);
 			this.client.Dispose();
 		}
 
@@ -644,7 +645,6 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.Request(Command.UDP_ASSOCIATE, DestinationDomainName, Port);
 		}
-
 
 	}
 }

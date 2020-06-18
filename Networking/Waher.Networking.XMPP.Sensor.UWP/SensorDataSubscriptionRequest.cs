@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Things;
@@ -14,10 +14,10 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class SensorDataSubscriptionRequest : SensorDataClientRequest 
 	{
-		private FieldSubscriptionRule[] fieldRules;
-		private Duration minInterval;
-		private Duration maxInterval;
-		private Duration maxAge;
+		private readonly FieldSubscriptionRule[] fieldRules;
+		private readonly Duration minInterval;
+		private readonly Duration maxInterval;
+		private readonly Duration maxAge;
 		private bool unsubscribed = false;
 
 		/// <summary>
@@ -115,26 +115,34 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		private void UnsubscribeResponse(object Sender, IqResultEventArgs e)
+		private Task UnsubscribeResponse(object Sender, IqResultEventArgs e)
 		{
 			if (!e.Ok)
-				this.Fail(e.ErrorText);
+				return this.Fail(e.ErrorText);
+			else
+				return Task.CompletedTask;
 		}
 
-		internal override void LogFields(IEnumerable<Field> Fields)
+		internal override Task LogFields(IEnumerable<Field> Fields)
 		{
 			if (this.unsubscribed)
+			{
 				this.Unsubscribe();
+				return Task.CompletedTask;
+			}
 			else
-				base.LogFields(Fields);
+				return base.LogFields(Fields);
 		}
 
-		internal override void LogErrors(IEnumerable<ThingError> Errors)
+		internal override Task LogErrors(IEnumerable<ThingError> Errors)
 		{
 			if (this.unsubscribed)
+			{
 				this.Unsubscribe();
+				return Task.CompletedTask;
+			}
 			else
-				base.LogErrors(Errors);
+				return base.LogErrors(Errors);
 		}
 
 	}

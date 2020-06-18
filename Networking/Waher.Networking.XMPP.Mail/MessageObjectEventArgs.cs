@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Mail
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.Mail
 	/// </summary>
 	/// <param name="Sender">Caller</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void MessageObjectEventHandler(object Sender, MessageObjectEventArgs e);
+	public delegate Task MessageObjectEventHandler(object Sender, MessageObjectEventArgs e);
 
 	/// <summary>
 	/// Message object event arguments.

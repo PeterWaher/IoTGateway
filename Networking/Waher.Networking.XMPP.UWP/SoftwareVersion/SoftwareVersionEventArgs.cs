@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.SoftwareVersion
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.SoftwareVersion
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SoftwareVersionEventHandler(object Sender, SoftwareVersionEventArgs e);
+	public delegate Task SoftwareVersionEventHandler(object Sender, SoftwareVersionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for software version responses.

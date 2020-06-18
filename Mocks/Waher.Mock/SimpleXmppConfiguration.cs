@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -276,6 +276,8 @@ namespace Waher.Mock
 								Failure.Set();
 								break;
 						}
+
+						return Task.CompletedTask;
 					};
 
 					switch (WaitHandle.WaitAny(new WaitHandle[] { Connected, Failure }, 20000))
@@ -555,6 +557,8 @@ namespace Waher.Mock
 									Failure.Set();
 									break;
 							}
+
+							return Task.CompletedTask;
 						};
 
 						switch (WaitHandle.WaitAny(new WaitHandle[] { Connected, Failure }, 20000))

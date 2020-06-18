@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PubSub
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeEventHandler(object Sender, NodeEventArgs e);
+	public delegate Task NodeEventHandler(object Sender, NodeEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node callback events.
 	/// </summary>
     public class NodeEventArgs : IqResultEventArgs
     {
-		private string nodeName;
+		private readonly string nodeName;
 
 		/// <summary>
 		/// Event arguments for node callback events.

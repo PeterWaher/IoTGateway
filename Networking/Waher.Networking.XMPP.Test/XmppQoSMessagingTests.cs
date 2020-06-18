@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -37,10 +33,10 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Received = new ManualResetEvent(false);
 			ManualResetEvent Delivered = new ManualResetEvent(false);
 
-			this.client2.OnNormalMessage += (sender, e) => Received.Set();
+			this.client2.OnNormalMessage += (sender, e) => { Received.Set(); return Task.CompletedTask; };
 
 			this.client1.SendMessage(Level, MessageType.Normal, this.client2.FullJID, string.Empty, "Hello", string.Empty, "en",
-				string.Empty, string.Empty, (sender, e) => Delivered.Set(), null);
+				string.Empty, string.Empty, (sender, e) => { Delivered.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Delivered.WaitOne(10000), "Message not delivered properly.");
 			Assert.IsTrue(Received.WaitOne(10000), "Message not received properly.");
@@ -57,13 +53,14 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.RegisterIqGetHandler("test", "test", (sender, e) =>
 			{
 				// Do nothing. Do not return result or error.
+				return Task.CompletedTask;
 			}, false);
 
 			this.client1.SendIqGet(this.client2.FullJID, "<test:test xmlns:test='test'/>", (sender, e) =>
 			{
 				e2 = e;
 				Done.Set();
-
+				return Task.CompletedTask;
 			}, null, 1000, 3, true, int.MaxValue);
 
 			Assert.IsTrue(Done.WaitOne(20000), "Retry function not working properly.");

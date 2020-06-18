@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Queries
 {
@@ -57,9 +54,9 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class QueryMessageEventArgs : QueryEventArgs
 	{
-		private QueryEventType type;
-		private QueryEventLevel level;
-		private string body;
+		private readonly QueryEventType type;
+		private readonly QueryEventLevel level;
+		private readonly string body;
 
 		/// <summary>
 		/// Defines a query message.
@@ -97,7 +94,7 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public string Body
 		{
-			get { return this.Body; }
+			get { return this.body; }
 		}
 	}
 }

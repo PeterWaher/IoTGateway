@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Waher.Networking.XMPP.Test": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "_TestExplorer_TestResultMessageMaxLength_": "100000"
+      }
+    }
+  }
+}

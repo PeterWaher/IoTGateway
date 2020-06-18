@@ -19,6 +19,7 @@ namespace Waher.Runtime.Inventory
 		private static readonly SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
 		private static readonly SortedDictionary<string, object> qualifiedNames = new SortedDictionary<string, object>();
 		private static readonly Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
+		private static readonly Dictionary<string, MethodInfo> tryParseMethods = new Dictionary<string, MethodInfo>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
 		private static readonly Type[] noTypes = new Type[0];
@@ -291,6 +292,7 @@ namespace Waher.Runtime.Inventory
 				namespacesPerNamespace.Clear();
 				rootNamespaces.Clear();
 				qualifiedNames.Clear();
+				tryParseMethods.Clear();
 			}
 
 			EventHandler h = OnInvalidated;
@@ -964,6 +966,56 @@ namespace Waher.Runtime.Inventory
 			}
 
 			return Best;
+		}
+
+		/// <summary>
+		/// Tries to parse an enumeration value in string form, given the full name of the enumeration type.
+		/// </summary>
+		/// <param name="TypeName">Full name of the enumeration type.</param>
+		/// <param name="StringValue">String representation of enumeration value.</param>
+		/// <param name="Value">Value, if parsed.</param>
+		/// <returns>If the string value could be parsed to an enumeration value of the given type.</returns>
+		public static bool TryParseEnum(string TypeName, string StringValue, out Enum Value)
+		{
+			Type T = GetType(TypeName);
+			if (T is null || !T.GetTypeInfo().IsEnum)
+			{
+				Value = null;
+				return false;
+			}
+
+			MethodInfo TryParse = null;
+
+			lock (synchObject)
+			{
+				if (!tryParseMethods.TryGetValue(TypeName, out TryParse))
+				{
+					foreach (MethodInfo MI in typeof(Enum).GetRuntimeMethods())
+					{
+						if (MI.ContainsGenericParameters && MI.IsStatic && MI.Name == "TryParse" &&
+							MI.ReturnType == typeof(bool) && MI.GetParameters().Length == 2)
+						{
+							TryParse = MI;
+							break;
+						}
+					}
+
+					TryParse = TryParse?.MakeGenericMethod(T);
+					tryParseMethods[TypeName] = TryParse;
+				}
+			}
+
+			if (TryParse is null)
+			{
+				Value = null;
+				return false;
+			}
+
+			object[] P = new object[] { StringValue, null };
+			bool Result = (bool)TryParse.Invoke(null, P);
+			
+			Value = (Enum)P[1];
+			return Result;
 		}
 
 	}

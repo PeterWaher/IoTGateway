@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Abuse
     /// </summary>
     /// <param name="Sender">Sender</param>
     /// <param name="e">Response.</param>
-    public delegate void BlockListEventHandler(object Sender, BlockListEventArgs e);
+    public delegate Task BlockListEventHandler(object Sender, BlockListEventArgs e);
 
     /// <summary>
     /// Event arguments for block-list response callbacks.

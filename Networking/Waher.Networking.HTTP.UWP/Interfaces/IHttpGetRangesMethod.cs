@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="FirstInterval">First byte range interval.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval);
+		Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval);
 
 		/// <summary>
 		/// If the GET method is allowed.

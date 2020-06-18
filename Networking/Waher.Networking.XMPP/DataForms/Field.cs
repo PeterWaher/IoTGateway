@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -239,7 +240,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 		}
 
-		private void FormUpdated(object Sender, IqResultEventArgs e)
+		private Task FormUpdated(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok && Sender is XmppClient Client && Client != null)
 			{
@@ -252,6 +253,8 @@ namespace Waher.Networking.XMPP.DataForms
 					}
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		internal bool Serialize(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)

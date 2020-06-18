@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
-using Waher.Persistence.Attributes;
 
 namespace Waher.Client.WPF.Controls.Questions
 {
@@ -22,6 +18,8 @@ namespace Waher.Client.WPF.Controls.Questions
 		public IsFriendQuestion()
 		{
 		}
+
+		public bool Response => this.response;
 
 		public override string QuestionString => "Allowed to connect?";
 
@@ -138,7 +136,7 @@ namespace Waher.Client.WPF.Controls.Questions
 			this.client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, Response, Range, this.RuleCallback, null);
 		}
 
-		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		private async Task RuleCallback(object Sender, IqResultEventArgs e)
 		{
 			try
 			{

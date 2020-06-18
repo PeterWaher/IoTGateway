@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Things.Queries
 {
@@ -9,9 +7,9 @@ namespace Waher.Things.Queries
 	/// </summary>
     public class Table
     {
-		private string tableId;
-		private string name;
-		private Column[] columns;
+		private readonly string tableId;
+		private readonly string name;
+		private readonly Column[] columns;
 
 		/// <summary>
 		/// Represents a table in a query result.

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -12,16 +10,16 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CanReadCallback(object Sender, CanReadResponseEventArgs e);
+	public delegate Task CanReadCallback(object Sender, CanReadResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for CanRead callback event arguments.
 	/// </summary>
 	public class CanReadResponseEventArgs : NodesEventArgs
 	{
-		private bool canRead;
-		private FieldType fieldTypes;
-		private string[] fieldNames;
+		private readonly bool canRead;
+		private readonly FieldType fieldTypes;
+		private readonly string[] fieldNames;
 
 		internal CanReadResponseEventArgs(IqResultEventArgs e, object State, string JID, bool CanRead, FieldType FieldTypes,
 			IThingReference[] Nodes, string[] FieldNames)

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Things;
-using Waher.Things.SensorData;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
 
 namespace Waher.Networking.XMPP.Provisioning
@@ -18,42 +16,42 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void RegistrationEventHandler(object Sender, RegistrationEventArgs e);
+	public delegate Task RegistrationEventHandler(object Sender, RegistrationEventArgs e);
 
 	/// <summary>
 	/// Delegate for update callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void UpdateEventHandler(object Sender, UpdateEventArgs e);
+	public delegate Task UpdateEventHandler(object Sender, UpdateEventArgs e);
 
 	/// <summary>
 	/// Delegate for node result callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeResultEventHandler(object Sender, NodeResultEventArgs e);
+	public delegate Task NodeResultEventHandler(object Sender, NodeResultEventArgs e);
 
 	/// <summary>
 	/// Delegate for node events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeEventHandler(object Sender, NodeEventArgs e);
+	public delegate Task NodeEventHandler(object Sender, NodeEventArgs e);
 
 	/// <summary>
 	/// Delegate for claimed events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ClaimedEventHandler(object Sender, ClaimedEventArgs e);
+	public delegate Task ClaimedEventHandler(object Sender, ClaimedEventArgs e);
 
 	/// <summary>
 	/// Delegate for search result event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SearchResultEventHandler(object Sender, SearchResultEventArgs e);
+	public delegate Task SearchResultEventHandler(object Sender, SearchResultEventArgs e);
 
 	/// <summary>
 	/// Implements an XMPP thing registry client interface.
@@ -251,7 +249,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</register>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -276,7 +274,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					try
 					{
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -369,7 +367,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</mine>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -392,7 +390,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					try
 					{
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -402,7 +400,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, State);
 		}
 
-		private void ClaimedHandler(object Sender, IqEventArgs e)
+		private async Task ClaimedHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string OwnerJid = XML.Attribute(E, "jid");
@@ -431,7 +429,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -453,7 +451,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, IqResultEventHandler Callback, object State)
+		public void Remove(string ThingJid, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Remove(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
@@ -465,7 +463,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, IqResultEventHandler Callback, object State)
+		public void Remove(string ThingJid, string NodeId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Remove(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
 		}
@@ -478,7 +476,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Optional Source ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, string SourceId, IqResultEventHandler Callback, object State)
+		public void Remove(string ThingJid, string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Remove(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
@@ -492,7 +490,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
+		public void Remove(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -506,13 +504,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						Callback(this, e);
+						await Callback(this, e);
 					}
 					catch (Exception ex)
 					{
@@ -522,7 +520,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, State);
 		}
 
-		private void RemovedHandler(object Sender, IqEventArgs e)
+		private async Task RemovedHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string NodeId = XML.Attribute(E, "id");
@@ -541,7 +539,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -664,7 +662,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</update>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
@@ -687,7 +685,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					try
 					{
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -702,7 +700,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(IqResultEventHandler Callback, object State)
+		public void Unregister(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Unregister(string.Empty, string.Empty, string.Empty, Callback, State);
 		}
@@ -713,7 +711,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, IqResultEventHandler Callback, object State)
+		public void Unregister(string NodeId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Unregister(NodeId, string.Empty, string.Empty, Callback, State);
 		}
@@ -725,7 +723,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, string SourceId, IqResultEventHandler Callback, object State)
+		public void Unregister(string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Unregister(NodeId, SourceId, string.Empty, Callback, State);
 		}
@@ -738,7 +736,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
+		public void Unregister(string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -749,13 +747,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						Callback(this, e);
+						await Callback(this, e);
 					}
 					catch (Exception ex)
 					{
@@ -771,7 +769,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, IqResultEventHandler Callback, object State)
+		public void Disown(string ThingJid, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Disown(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
@@ -783,7 +781,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, IqResultEventHandler Callback, object State)
+		public void Disown(string ThingJid, string NodeId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Disown(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
 		}
@@ -796,7 +794,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Optional Source ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, string SourceId, IqResultEventHandler Callback, object State)
+		public void Disown(string ThingJid, string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Disown(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
@@ -810,7 +808,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
+		public void Disown(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -824,13 +822,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						Callback(this, e);
+						await Callback(this, e);
 					}
 					catch (Exception ex)
 					{
@@ -840,7 +838,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, State);
 		}
 
-		private void DisownedHandler(object Sender, IqEventArgs e)
+		private async Task DisownedHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string NodeId = XML.Attribute(E, "id");
@@ -867,7 +865,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -911,6 +909,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.SendIqGet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
 			{
 				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
+				return Task.CompletedTask;
 			}, State);
 		}
 

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.PubSub
@@ -10,15 +9,15 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ConfigurationEventHandler(object Sender, ConfigurationEventArgs e);
+	public delegate Task ConfigurationEventHandler(object Sender, ConfigurationEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node configuration callback events.
 	/// </summary>
     public class ConfigurationEventArgs : DataFormEventArgs
     {
-		private string nodeName;
-		private NodeConfiguration configuration;
+		private readonly string nodeName;
+		private readonly NodeConfiguration configuration;
 
 		/// <summary>
 		/// Event arguments for node callback events.

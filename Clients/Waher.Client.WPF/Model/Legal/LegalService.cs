@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
-using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Client.WPF.Dialogs;
@@ -145,11 +144,14 @@ namespace Waher.Client.WPF.Model.Legal
 				{
 					if (!e2.Ok)
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
 
-		private void ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -162,6 +164,8 @@ namespace Waher.Client.WPF.Model.Legal
 				MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e.From), XmppClient.GetBareJID(e.To),
 					Markdown.ToString(), true);
 			});
+
+			return Task.CompletedTask;
 		}
 
 		internal static void Output(string JID, StringBuilder Markdown, KeyValuePair<string, object>[] Tags)
@@ -225,6 +229,9 @@ namespace Waher.Client.WPF.Model.Legal
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -261,6 +268,9 @@ namespace Waher.Client.WPF.Model.Legal
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -299,6 +309,9 @@ namespace Waher.Client.WPF.Model.Legal
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of identities." : e2.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Things;
-using Waher.Things.ControlParameters;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
-using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP.Control
 {
@@ -18,7 +16,7 @@ namespace Waher.Networking.XMPP.Control
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SetResultCallback(object Sender, SetResultEventArgs e);
+	public delegate Task SetResultCallback(object Sender, SetResultEventArgs e);
 
 	/// <summary>
 	/// Implements an XMPP control client interface.
@@ -579,7 +577,7 @@ namespace Waher.Networking.XMPP.Control
 			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
 		}
 
-		private void SetResultCallback(object Sender, IqResultEventArgs e)
+		private async Task SetResultCallback(object _, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SetResultCallback Callback = (SetResultCallback)P[0];
@@ -634,13 +632,16 @@ namespace Waher.Networking.XMPP.Control
 			else
 				e2 = new SetResultEventArgs(e, false, null, null, State);
 
-			try
+			if (!(Callback is null))
 			{
-				Callback(this, e2);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				try
+				{
+					await Callback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -759,7 +760,7 @@ namespace Waher.Networking.XMPP.Control
 			this.client.SendIqGet(To, Xml.ToString(), this.GetFormResult, new object[] { Callback, State, Nodes });
 		}
 
-		private void GetFormResult(object Sender, IqResultEventArgs e)
+		private async Task GetFormResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			DataFormResultEventHandler Callback = (DataFormResultEventHandler)P[0];
@@ -785,21 +786,25 @@ namespace Waher.Networking.XMPP.Control
 					Form.State = Nodes;
 			}
 
-			DataFormEventArgs e2 = new DataFormEventArgs(Form, e);
-			try
+			if (!(Callback is null))
 			{
-				e2.State = State;
-				Callback(this, e2);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				DataFormEventArgs e2 = new DataFormEventArgs(Form, e);
+				try
+				{
+					e2.State = State;
+					await Callback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
-		private void SubmitForm(object Sender, DataForm Form)
+		private Task SubmitForm(object _, DataForm Form)
 		{
 			this.Set(Form, null, null, (ThingReference[])Form.State);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -825,13 +830,15 @@ namespace Waher.Networking.XMPP.Control
 			Form.Client.SendIqSet(Form.From, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
 		}
 
-		private void CancelForm(object Sender, DataForm Form)
+		private Task CancelForm(object Sender, DataForm Form)
 		{
 			StringBuilder Xml = new StringBuilder();
 
 			Form.SerializeCancel(Xml);
 
 			// TODO: Cancel dynamic form.
+
+			return Task.CompletedTask;
 		}
 
 	}

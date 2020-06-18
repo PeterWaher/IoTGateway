@@ -74,11 +74,9 @@ namespace Waher.Service.GPIO
 			}
 #endif
 
-			Frame rootFrame = Window.Current.Content as Frame;
-
 			// Do not repeat app initialization when the Window already has content,
 			// just ensure that the window is active
-			if (rootFrame is null)
+			if (!(Window.Current.Content is Frame rootFrame))
 			{
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
@@ -128,7 +126,7 @@ namespace Waher.Service.GPIO
 		private UsbSerial arduinoUsb = null;
 		private RemoteDevice arduino = null;
 		private SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>> gpioPins = new SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>>();
-		private SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>> arduinoPins = new SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>>();
+		private readonly SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>> arduinoPins = new SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>>();
 
 		private async void StartActuator()
 		{
@@ -160,6 +158,8 @@ namespace Waher.Service.GPIO
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						this.RaiseOwnershipChanged();
+
+						return Task.CompletedTask;
 					};
 
 					thingRegistryClient.Disowned += (sender, e) =>
@@ -167,11 +167,14 @@ namespace Waher.Service.GPIO
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
 						this.Register();    // Will call this.OwnershipChanged() after successful registration.
+					
+						return Task.CompletedTask;
 					};
 
 					thingRegistryClient.Removed += (sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+						return Task.CompletedTask;
 					};
 				}
 
@@ -216,6 +219,8 @@ namespace Waher.Service.GPIO
 								xmppClient.Reconnect();
 							break;
 					}
+
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnPresenceSubscribe += (sender, e) =>
@@ -229,18 +234,23 @@ namespace Waher.Service.GPIO
 						xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
 					xmppClient.SetPresence(Availability.Chat);
+
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
 					e.Accept();
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
 					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 						xmppClient.RemoveRosterItem(e.BareJid);
+
+					return Task.CompletedTask;
 				};
 
 				gpio = GpioController.GetDefault();
@@ -484,6 +494,8 @@ namespace Waher.Service.GPIO
 					}
 
 					Request.ReportFields(true, Fields);
+						
+					return Task.CompletedTask;
 				};
 
 				if (arduino is null)
@@ -509,11 +521,12 @@ namespace Waher.Service.GPIO
 				string s = Pin.Key.PinNumber.ToString();
 
 				Parameters.Add(new BooleanControlParameter("GPIO" + s, "GPIO", "GPIO " + s + ".", "If the GPIO output should be high (checked) or low (unchecked).",
-					(Node) => Pin.Key.Read() == GpioPinValue.High,
+					(Node) => Task.FromResult<bool?>(Pin.Key.Read() == GpioPinValue.High),
 					(Node, Value) =>
 					{
 						Pin.Key.Write(Value ? GpioPinValue.High : GpioPinValue.Low);
 						Log.Informational("GPIO " + s + " turned " + (Value ? "HIGH" : "LOW"));
+						return Task.CompletedTask;
 					}));
 
 				List<string> Options = new List<string>();
@@ -528,13 +541,15 @@ namespace Waher.Service.GPIO
 				{
 					Parameters.Add(new StringControlParameter("GPIO" + s + "Mode", "GPIO Mode", "GPIO " + s + " Drive Mode:",
 						"The drive mode of the underlying hardware for the corresponding GPIO pin.", Options.ToArray(),
-						(Node) => Pin.Key.GetDriveMode().ToString(),
+						(Node) => Task.FromResult<string>(Pin.Key.GetDriveMode().ToString()),
 						(Node, Value) =>
 						{
 							GpioPinDriveMode Mode = (GpioPinDriveMode)Enum.Parse(typeof(GpioPinDriveMode), Value);
 
 							Pin.Key.SetDriveMode(Mode);
 							Log.Informational("GPIO " + s + " drive mode set to " + Value);
+
+							return Task.CompletedTask;
 						}));
 				}
 			}
@@ -558,11 +573,12 @@ namespace Waher.Service.GPIO
 					{
 						Parameters.Add(new BooleanControlParameter(Pin.Key, "Arduino D/O", "Arduino Digital Output on " + Pin.Key.ToString() + ".",
 							"If the Arduino digitial output should be high (checked) or low (unchecked).",
-							(Node) => arduino.digitalRead(byte.Parse(Pin.Key.Substring(1))) == PinState.HIGH,
+							(Node) => Task.FromResult<bool?>(arduino.digitalRead(byte.Parse(Pin.Key.Substring(1))) == PinState.HIGH),
 							(Node, Value) =>
 							{
 								arduino.digitalWrite(byte.Parse(Pin.Key.Substring(1)), Value ? PinState.HIGH : PinState.LOW);
 								Log.Informational("Arduino " + Pin.Key + " turned " + (Value ? "HIGH" : "LOW"));
+								return Task.CompletedTask;
 							}));
 
 						Capabilities = arduino.DeviceHardwareProfile.getPinCapabilitiesBitmask(byte.Parse(Pin.Key.Substring(1)));
@@ -598,7 +614,7 @@ namespace Waher.Service.GPIO
 					{
 						Parameters.Add(new StringControlParameter(Pin.Key + "Mode", "Arduino Mode", "Pin " + Pin.Key + " Drive Mode:",
 							"The drive mode of the underlying hardware for the corresponding Arduino pin.", Options.ToArray(),
-							(Node) => Pin.Key.StartsWith("D") ? arduino.getPinMode(byte.Parse(Pin.Key.Substring(1))).ToString() : arduino.getPinMode(Pin.Key).ToString(),
+							(Node) => Task.FromResult<string>(Pin.Key.StartsWith("D") ? arduino.getPinMode(byte.Parse(Pin.Key.Substring(1))).ToString() : arduino.getPinMode(Pin.Key).ToString()),
 							(Node, Value) =>
 							{
 								PinMode Mode = (PinMode)Enum.Parse(typeof(PinMode), Value);
@@ -609,6 +625,8 @@ namespace Waher.Service.GPIO
 									arduino.pinMode(Pin.Key, Mode);
 
 								Log.Informational("Arduino " + Pin.Key + " drive mode set to " + Value);
+
+								return Task.CompletedTask;
 							}));
 					}
 				}
@@ -757,6 +775,8 @@ namespace Waher.Service.GPIO
 
 					this.RaiseOwnershipChanged();
 				}
+
+				return Task.CompletedTask;
 			}, null);
 		}
 

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -12,15 +9,15 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CanControlCallback(object Sender, CanControlResponseEventArgs e);
+	public delegate Task CanControlCallback(object Sender, CanControlResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for CanControl callback event arguments.
 	/// </summary>
 	public class CanControlResponseEventArgs : NodesEventArgs
 	{
-		private bool canControl;
-		private string[] parameterNames;
+		private readonly bool canControl;
+		private readonly string[] parameterNames;
 
 		internal CanControlResponseEventArgs(IqResultEventArgs e, object State, string JID, bool CanControl, 
 			IThingReference[] Nodes, string[] ParameterNames)

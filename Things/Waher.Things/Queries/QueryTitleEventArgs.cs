@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Queries
 {
@@ -11,7 +7,7 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class QueryTitleEventArgs : QueryEventArgs
 	{
-		private string title;
+		private readonly string title;
 
 		/// <summary>
 		/// Event arguments for query title events.

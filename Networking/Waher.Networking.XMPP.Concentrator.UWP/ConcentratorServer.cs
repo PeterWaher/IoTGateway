@@ -148,63 +148,42 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentrator, this.UnregisterSnifferHandler, false);
 		}
 
-		private async void ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
+		private async Task ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
 		{
-			try
+			if (!e.Node.IsEmpty)
 			{
-				if (!e.Node.IsEmpty)
-				{
-					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
-					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
-						await LifeCycleManagement.Claimed(e.JID, e.IsPublic);
+				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+					await LifeCycleManagement.Claimed(e.JID, e.IsPublic);
 
-					string KeyId = this.KeyId(Ref);
+				string KeyId = this.KeyId(Ref);
 
-					await RuntimeSettings.SetAsync(KeyId, string.Empty);
-					await RuntimeSettings.SetAsync("IoTDisco." + KeyId, string.Empty);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				await RuntimeSettings.SetAsync(KeyId, string.Empty);
+				await RuntimeSettings.SetAsync("IoTDisco." + KeyId, string.Empty);
 			}
 		}
 
-		private async void ThingRegistryClient_Disowned(object Sender, NodeEventArgs e)
+		private async Task ThingRegistryClient_Disowned(object Sender, NodeEventArgs e)
 		{
-			try
+			if (!e.Node.IsEmpty)
 			{
-				if (!e.Node.IsEmpty)
-				{
-					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
 
-					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
-					{
-						await LifeCycleManagement.Disowned();
-						await this.RegisterNode(LifeCycleManagement);
-					}
+				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+				{
+					await LifeCycleManagement.Disowned();
+					await this.RegisterNode(LifeCycleManagement);
 				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
 			}
 		}
 
-		private async void ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
+		private async Task ThingRegistryClient_Removed(object Sender, NodeEventArgs e)
 		{
-			try
+			if (!e.Node.IsEmpty)
 			{
-				if (!e.Node.IsEmpty)
-				{
-					IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
-					if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
-						await LifeCycleManagement.Removed();
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				IThingReference Ref = await this.OnGetNode(e.Node.NodeId, e.Node.SourceId, e.Node.Partition);
+				if (Ref != null && Ref is ILifeCycleManagement LifeCycleManagement)
+					await LifeCycleManagement.Removed();
 			}
 		}
 
@@ -293,7 +272,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			foreach (Query Query in Queries)
-				Query.Abort();
+			{
+				Task _ = Query.Abort();
+			}
 
 			foreach (DataSourceRec Rec in Sources)
 				Rec.Source.OnEvent -= this.DataSource_OnEvent;
@@ -338,7 +319,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Capabilities
 
-		private void GetCapabilitiesHandler(object Sender, IqEventArgs e)
+		private Task GetCapabilitiesHandler(object Sender, IqEventArgs e)
 		{
 			StringBuilder Xml = new StringBuilder();
 			using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(false, true)))
@@ -393,6 +374,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			e.IqResult(Xml.ToString());
+
+			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -568,32 +551,25 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static readonly char[] Space = new char[] { ' ' };
 
-		private async void GetAllDataSourcesHandler(object Sender, IqEventArgs e)
+		private async Task GetAllDataSourcesHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<dataSources xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (IDataSource Source in this.DataSources)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				StringBuilder Xml = new StringBuilder();
-
-				Xml.Append("<dataSources xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (IDataSource Source in this.DataSources)
-				{
-					if (await Source.CanViewAsync(Caller))
-						await this.Export(Xml, Source, Language);
-				}
-
-				Xml.Append("</dataSources>");
-
-				e.IqResult(Xml.ToString());
+				if (await Source.CanViewAsync(Caller))
+					await this.Export(Xml, Source, Language);
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+
+			Xml.Append("</dataSources>");
+
+			e.IqResult(Xml.ToString());
 		}
 
 		private async Task Export(StringBuilder Xml, IDataSource DataSource, Language Language)
@@ -609,32 +585,25 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'/>");
 		}
 
-		private async void GetRootDataSourcesHandler(object Sender, IqEventArgs e)
+		private async Task GetRootDataSourcesHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<dataSources xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (IDataSource Source in this.RootDataSources)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				StringBuilder Xml = new StringBuilder();
-
-				Xml.Append("<dataSources xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (IDataSource Source in this.RootDataSources)
-				{
-					if (await Source.CanViewAsync(Caller))
-						await this.Export(Xml, Source, Language);
-				}
-
-				Xml.Append("</dataSources>");
-
-				e.IqResult(Xml.ToString());
+				if (await Source.CanViewAsync(Caller))
+					await this.Export(Xml, Source, Language);
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+
+			Xml.Append("</dataSources>");
+
+			e.IqResult(Xml.ToString());
 		}
 
 		private static Task<string> GetErrorMessage(Language Language, int StringId, string Message)
@@ -642,52 +611,45 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Language.GetStringAsync(typeof(ConcentratorServer), StringId, Message);
 		}
 
-		private async void GetChildDataSourcesHandler(object Sender, IqEventArgs e)
+		private async Task GetChildDataSourcesHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			string SourceId = XML.Attribute(e.Query, "src");
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "src");
-				DataSourceRec Rec;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<dataSources xmlns='");
-					Xml.Append(NamespaceConcentrator);
-
-					IEnumerable<IDataSource> ChildSources = Rec.Source.ChildSources;
-					if (ChildSources != null)
-					{
-						Xml.Append("'>");
-
-						foreach (IDataSource S in ChildSources)
-						{
-							if (await Rec.Source.CanViewAsync(Caller))
-								await this.Export(Xml, S, Language);
-						}
-
-						Xml.Append("</dataSources>");
-					}
-					else
-						Xml.Append("'/>");
-
-					e.IqResult(Xml.ToString());
-				}
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+			else
 			{
-				e.IqError(ex);
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<dataSources xmlns='");
+				Xml.Append(NamespaceConcentrator);
+
+				IEnumerable<IDataSource> ChildSources = Rec.Source.ChildSources;
+				if (ChildSources != null)
+				{
+					Xml.Append("'>");
+
+					foreach (IDataSource S in ChildSources)
+					{
+						if (await Rec.Source.CanViewAsync(Caller))
+							await this.Export(Xml, S, Language);
+					}
+
+					Xml.Append("</dataSources>");
+				}
+				else
+					Xml.Append("'/>");
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -695,14 +657,50 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Nodes
 
-		private async void ContainsNodeHandler(object Sender, IqEventArgs e)
+		private async Task ContainsNodeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			bool Result = (Node != null && await Node.CanViewAsync(Caller));
+
+			e.IqResult("<bool xmlns='" + NamespaceConcentrator + "'>" + CommonTypes.Encode(Result) + "</bool>");
+		}
+
+		private async Task ContainsNodesHandler(object Sender, IqEventArgs e)
+		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			StringBuilder Xml = new StringBuilder();
+			ThingReference ThingRef;
+			DataSourceRec Rec;
+			INode Node;
+			XmlElement E;
+			bool Result;
+
+			Xml.Append("<bools xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				E = N as XmlElement;
+				if (E is null || E.LocalName != "nd")
+					continue;
+
+				ThingRef = GetThingReference(E);
 
 				lock (this.synchObject)
 				{
@@ -715,66 +713,16 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-				bool Result = (Node != null && await Node.CanViewAsync(Caller));
+				Result = (Node != null && await Node.CanViewAsync(Caller));
 
-				e.IqResult("<bool xmlns='" + NamespaceConcentrator + "'>" + CommonTypes.Encode(Result) + "</bool>");
+				Xml.Append("<bool>");
+				Xml.Append(CommonTypes.Encode(Result));
+				Xml.Append("</bool>");
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
 
-		private async void ContainsNodesHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				StringBuilder Xml = new StringBuilder();
-				ThingReference ThingRef;
-				DataSourceRec Rec;
-				INode Node;
-				XmlElement E;
-				bool Result;
+			Xml.Append("</bools>");
 
-				Xml.Append("<bools xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (XmlNode N in e.Query.ChildNodes)
-				{
-					E = N as XmlElement;
-					if (E is null || E.LocalName != "nd")
-						continue;
-
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
-					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
-					}
-
-					if (Rec is null)
-						Node = null;
-					else
-						Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-					Result = (Node != null && await Node.CanViewAsync(Caller));
-
-					Xml.Append("<bool>");
-					Xml.Append(CommonTypes.Encode(Result));
-					Xml.Append("</bool>");
-				}
-
-				Xml.Append("</bools>");
-
-				e.IqResult(Xml.ToString());
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+			e.IqResult(Xml.ToString());
 		}
 
 		private async Task ExportAttributes(StringBuilder Xml, INode Node, Language Language)
@@ -851,57 +799,50 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'");
 		}
 
-		private async void GetNodeHandler(object Sender, IqEventArgs e)
+		private async Task GetNodeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node != null && await Node.CanViewAsync(Caller))
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<nodeInfo xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'");
+
+				await ExportAttributes(Xml, Node, Language);
+
+				if (Parameters || Messages)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node != null && await Node.CanViewAsync(Caller))
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<nodeInfo xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'");
-
-					await ExportAttributes(Xml, Node, Language);
-
-					if (Parameters || Messages)
-					{
-						Xml.Append(">");
-						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-						Xml.Append("</nodeInfo>");
-					}
-					else
-						Xml.Append("/>");
-
-					e.IqResult(Xml.ToString());
+					Xml.Append(">");
+					await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+					Xml.Append("</nodeInfo>");
 				}
 				else
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					Xml.Append("/>");
+
+				e.IqResult(Xml.ToString());
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+			else
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 		}
 
 		private async Task ExportParametersAndMessages(StringBuilder Xml, INode Node, bool Parameters, bool Messages,
@@ -930,158 +871,144 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private async void GetNodesHandler(object Sender, IqEventArgs e)
+		private async Task GetNodesHandler(object Sender, IqEventArgs e)
 		{
-			try
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			Language Language = await GetLanguage(e.Query);
+			StringBuilder Xml = new StringBuilder();
+			DataSourceRec Rec;
+			ThingReference ThingRef;
+			INode Node;
+			XmlElement E;
+
+			Xml.Append("<nodeInfos xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				Language Language = await GetLanguage(e.Query);
+				E = N as XmlElement;
+				if (E is null || E.LocalName != "nd")
+					continue;
+
+				ThingRef = GetThingReference(E);
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
+				}
+
+				if (Rec is null)
+					Node = null;
+				else
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+				if (Node is null || !(await Node.CanViewAsync(Caller)))
+				{
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
+
+				Xml.Append("<nodeInfo");
+				await ExportAttributes(Xml, Node, Language);
+
+				if (Parameters || Messages)
+				{
+					Xml.Append(">");
+					await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+					Xml.Append("</nodeInfo>");
+				}
+				else
+					Xml.Append("/>");
+			}
+
+			Xml.Append("</nodeInfos>");
+
+			e.IqResult(Xml.ToString());
+		}
+
+		private async Task GetAllNodesHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			string SourceId = XML.Attribute(e.Query, "src");
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+			else
+			{
 				StringBuilder Xml = new StringBuilder();
-				DataSourceRec Rec;
-				ThingReference ThingRef;
+				LinkedList<INode> Nodes = new LinkedList<INode>();
 				INode Node;
-				XmlElement E;
+				LinkedList<TypeInfo> OnlyIfDerivedFrom = null;
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					if (N.LocalName == "onlyIfDerivedFrom")
+					{
+						Type T = Types.GetType(N.InnerText.Trim());
+						if (T is null)
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+							return;
+						}
+
+						if (OnlyIfDerivedFrom is null)
+							OnlyIfDerivedFrom = new LinkedList<TypeInfo>();
+
+						OnlyIfDerivedFrom.AddLast(T.GetTypeInfo());
+					}
+				}
+
+				foreach (INode N in Rec.Source.RootNodes)
+					Nodes.AddLast(N);
 
 				Xml.Append("<nodeInfos xmlns='");
 				Xml.Append(NamespaceConcentrator);
 				Xml.Append("'>");
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				while (Nodes.First != null)
 				{
-					E = N as XmlElement;
-					if (E is null || E.LocalName != "nd")
-						continue;
+					Node = Nodes.First.Value;
+					Nodes.RemoveFirst();
 
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
+					if (Node.HasChildren)
 					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
+						foreach (INode N in await Node.ChildNodes)
+							Nodes.AddLast(N);
 					}
 
-					if (Rec is null)
-						Node = null;
-					else
-						Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-					if (Node is null || !(await Node.CanViewAsync(Caller)))
+					if ((OnlyIfDerivedFrom is null || this.IsAssignableFrom(OnlyIfDerivedFrom, Node)) && await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-						return;
-					}
+						Xml.Append("<nodeInfo");
+						await ExportAttributes(Xml, Node, Language);
 
-					Xml.Append("<nodeInfo");
-					await ExportAttributes(Xml, Node, Language);
-
-					if (Parameters || Messages)
-					{
-						Xml.Append(">");
-						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-						Xml.Append("</nodeInfo>");
+						if (Parameters || Messages)
+						{
+							Xml.Append(">");
+							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+							Xml.Append("</nodeInfo>");
+						}
+						else
+							Xml.Append("/>");
 					}
-					else
-						Xml.Append("/>");
 				}
 
 				Xml.Append("</nodeInfos>");
 
 				e.IqResult(Xml.ToString());
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void GetAllNodesHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "src");
-				DataSourceRec Rec;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-					LinkedList<INode> Nodes = new LinkedList<INode>();
-					INode Node;
-					LinkedList<TypeInfo> OnlyIfDerivedFrom = null;
-
-					foreach (XmlNode N in e.Query.ChildNodes)
-					{
-						if (N.LocalName == "onlyIfDerivedFrom")
-						{
-							Type T = Types.GetType(N.InnerText.Trim());
-							if (T is null)
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
-								return;
-							}
-
-							if (OnlyIfDerivedFrom is null)
-								OnlyIfDerivedFrom = new LinkedList<TypeInfo>();
-
-							OnlyIfDerivedFrom.AddLast(T.GetTypeInfo());
-						}
-					}
-
-					foreach (INode N in Rec.Source.RootNodes)
-						Nodes.AddLast(N);
-
-					Xml.Append("<nodeInfos xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					while (Nodes.First != null)
-					{
-						Node = Nodes.First.Value;
-						Nodes.RemoveFirst();
-
-						if (Node.HasChildren)
-						{
-							foreach (INode N in await Node.ChildNodes)
-								Nodes.AddLast(N);
-						}
-
-						if ((OnlyIfDerivedFrom is null || this.IsAssignableFrom(OnlyIfDerivedFrom, Node)) && await Node.CanViewAsync(Caller))
-						{
-							Xml.Append("<nodeInfo");
-							await ExportAttributes(Xml, Node, Language);
-
-							if (Parameters || Messages)
-							{
-								Xml.Append(">");
-								await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-								Xml.Append("</nodeInfo>");
-							}
-							else
-								Xml.Append("/>");
-						}
-					}
-
-					Xml.Append("</nodeInfos>");
-
-					e.IqResult(Xml.ToString());
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
 			}
 		}
 
@@ -1101,271 +1028,243 @@ namespace Waher.Networking.XMPP.Concentrator
 			return false;
 		}
 
-		private async void GetNodeInheritanceHandler(object Sender, IqEventArgs e)
+		private async Task GetNodeInheritanceHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node != null && await Node.CanViewAsync(Caller))
+			{
+				StringBuilder Xml = new StringBuilder();
+				Type T = Node.GetType();
+				SortedDictionary<string, bool> Interfaces = null;
+
+				Xml.Append("<inheritance xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'><baseClasses>");
+
+				do
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
+					TypeInfo TI = T.GetTypeInfo();
 
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node != null && await Node.CanViewAsync(Caller))
-				{
-					StringBuilder Xml = new StringBuilder();
-					Type T = Node.GetType();
-					SortedDictionary<string, bool> Interfaces = null;
-
-					Xml.Append("<inheritance xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'><baseClasses>");
-
-					do
+					foreach (Type Interface in TI.ImplementedInterfaces)
 					{
-						TypeInfo TI = T.GetTypeInfo();
+						if (Interfaces is null)
+							Interfaces = new SortedDictionary<string, bool>();
 
-						foreach (Type Interface in TI.ImplementedInterfaces)
-						{
-							if (Interfaces is null)
-								Interfaces = new SortedDictionary<string, bool>();
+						Interfaces[Interface.FullName] = true;
+					}
 
-							Interfaces[Interface.FullName] = true;
-						}
+					T = TI.BaseType;
 
-						T = TI.BaseType;
+					Xml.Append("<value>");
+					Xml.Append(XML.Encode(T.FullName));
+					Xml.Append("</value>");
+				}
+				while (T != typeof(object));
 
+				Xml.Append("</baseClasses>");
+
+				if (Interfaces != null)
+				{
+					Xml.Append("<interfaces>");
+
+					foreach (string Name in Interfaces.Keys)
+					{
 						Xml.Append("<value>");
-						Xml.Append(XML.Encode(T.FullName));
+						Xml.Append(XML.Encode(Name));
 						Xml.Append("</value>");
 					}
-					while (T != typeof(object));
 
-					Xml.Append("</baseClasses>");
-
-					if (Interfaces != null)
-					{
-						Xml.Append("<interfaces>");
-
-						foreach (string Name in Interfaces.Keys)
-						{
-							Xml.Append("<value>");
-							Xml.Append(XML.Encode(Name));
-							Xml.Append("</value>");
-						}
-
-						Xml.Append("</interfaces>");
-					}
-
-					Xml.Append("</inheritance>");
-
-					e.IqResult(Xml.ToString());
+					Xml.Append("</interfaces>");
 				}
-				else
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+
+				Xml.Append("</inheritance>");
+
+				e.IqResult(Xml.ToString());
 			}
-			catch (Exception ex)
+			else
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+		}
+
+		private async Task GetRootNodesHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			string SourceId = XML.Attribute(e.Query, "src");
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
 			{
-				e.IqError(ex);
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+			else
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<nodeInfos xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				foreach (INode Node in Rec.Source.RootNodes)
+				{
+					if (!await Node.CanViewAsync(Caller))
+						continue;
+
+					Xml.Append("<nodeInfo");
+					await ExportAttributes(Xml, Node, Language);
+
+					if (Parameters || Messages)
+					{
+						Xml.Append(">");
+						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+						Xml.Append("</nodeInfo>");
+					}
+					else
+						Xml.Append("/>");
+				}
+
+				Xml.Append("</nodeInfos>");
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
-		private async void GetRootNodesHandler(object Sender, IqEventArgs e)
+		private async Task GetChildNodesHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "src");
-				DataSourceRec Rec;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<nodeInfos xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				if (Node.HasChildren)
 				{
-					if (!this.dataSources.TryGetValue(SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<nodeInfos xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					foreach (INode Node in Rec.Source.RootNodes)
+					foreach (INode ChildNode in await Node.ChildNodes)
 					{
-						if (!await Node.CanViewAsync(Caller))
+						if (!await ChildNode.CanViewAsync(Caller))
 							continue;
 
 						Xml.Append("<nodeInfo");
-						await ExportAttributes(Xml, Node, Language);
+						await ExportAttributes(Xml, ChildNode, Language);
 
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+							await this.ExportParametersAndMessages(Xml, ChildNode, Parameters, Messages, Language, Caller);
 							Xml.Append("</nodeInfo>");
 						}
 						else
 							Xml.Append("/>");
 					}
-
-					Xml.Append("</nodeInfos>");
-
-					e.IqResult(Xml.ToString());
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+
+				Xml.Append("</nodeInfos>");
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
-		private async void GetChildNodesHandler(object Sender, IqEventArgs e)
+		private async Task GetAncestorsHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			bool Parameters = XML.Attribute(e.Query, "parameters", false);
+			bool Messages = XML.Attribute(e.Query, "messages", false);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			IThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<nodeInfos xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				while (Node != null)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
+					if (!await Node.CanViewAsync(Caller))
+						break;
 
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
+					Xml.Append("<nodeInfo");
+					await ExportAttributes(Xml, Node, Language);
 
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<nodeInfos xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					if (Node.HasChildren)
+					if (Parameters || Messages)
 					{
-						foreach (INode ChildNode in await Node.ChildNodes)
-						{
-							if (!await ChildNode.CanViewAsync(Caller))
-								continue;
-
-							Xml.Append("<nodeInfo");
-							await ExportAttributes(Xml, ChildNode, Language);
-
-							if (Parameters || Messages)
-							{
-								Xml.Append(">");
-								await this.ExportParametersAndMessages(Xml, ChildNode, Parameters, Messages, Language, Caller);
-								Xml.Append("</nodeInfo>");
-							}
-							else
-								Xml.Append("/>");
-						}
+						Xml.Append(">");
+						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
+						Xml.Append("</nodeInfo>");
 					}
+					else
+						Xml.Append("/>");
 
-					Xml.Append("</nodeInfos>");
-
-					e.IqResult(Xml.ToString());
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void GetAncestorsHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				bool Parameters = XML.Attribute(e.Query, "parameters", false);
-				bool Messages = XML.Attribute(e.Query, "messages", false);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				IThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
+					ThingRef = Node.Parent;
+					Node = ThingRef as INode;
+					if (Node is null)
+						Node = await Rec.Source.GetNodeAsync(Node.Parent);
 				}
 
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
+				Xml.Append("</nodeInfos>");
 
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<nodeInfos xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					while (Node != null)
-					{
-						if (!await Node.CanViewAsync(Caller))
-							break;
-
-						Xml.Append("<nodeInfo");
-						await ExportAttributes(Xml, Node, Language);
-
-						if (Parameters || Messages)
-						{
-							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</nodeInfo>");
-						}
-						else
-							Xml.Append("/>");
-
-						ThingRef = Node.Parent;
-						Node = ThingRef as INode;
-						if (Node is null)
-							Node = await Rec.Source.GetNodeAsync(Node.Parent);
-					}
-
-					Xml.Append("</nodeInfos>");
-
-					e.IqResult(Xml.ToString());
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+				e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1373,15 +1272,87 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Editing
 
-		private async void MoveNodeUpHandler(object Sender, IqEventArgs e)
+		private async Task MoveNodeUpHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			IThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				IThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else
+			{
+				await Node.MoveUpAsync(Caller);
+
+				e.IqResult(string.Empty);
+			}
+		}
+
+		private async Task MoveNodeDownHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			IThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else
+			{
+				await Node.MoveDownAsync(Caller);
+
+				e.IqResult(string.Empty);
+			}
+		}
+
+		private async Task MoveNodesUpHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			LinkedList<INode> RootNodes = null;
+			Dictionary<string, LinkedList<INode>> NodesPerParent = null;
+			IThingReference ThingRef;
+			DataSourceRec Rec;
+			INode Node;
+			XmlElement E;
+			string Key;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				E = N as XmlElement;
+				if (E is null || E.LocalName != "nd")
+					continue;
+
+				ThingRef = GetThingReference(E);
 
 				lock (this.synchObject)
 				{
@@ -1395,231 +1366,148 @@ namespace Waher.Networking.XMPP.Concentrator
 					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 				if (Node is null || !await Node.CanViewAsync(Caller))
+				{
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
 				else if (!await Node.CanEditAsync(Caller))
+				{
 					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					return;
+				}
+
+				ThingRef = Node.Parent;
+				if (ThingRef is null)
+				{
+					if (RootNodes is null)
+						RootNodes = new LinkedList<INode>();
+
+					RootNodes.AddLast(Node);
+				}
 				else
 				{
-					await Node.MoveUpAsync(Caller);
+					if (NodesPerParent is null)
+						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
-					e.IqResult(string.Empty);
+					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
+					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
+					{
+						Nodes = new LinkedList<INode>();
+						NodesPerParent[Key] = Nodes;
+					}
+
+					Nodes.AddLast(Node);
 				}
 			}
-			catch (Exception ex)
+
+			if (RootNodes != null)
 			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void MoveNodeDownHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				IThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
+				foreach (INode Node2 in RootNodes)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (!await Node.CanEditAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-				else
-				{
-					await Node.MoveDownAsync(Caller);
-
-					e.IqResult(string.Empty);
+					if (!await Node2.MoveUpAsync(Caller))
+						break;
 				}
 			}
-			catch (Exception ex)
+
+			if (NodesPerParent != null)
 			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void MoveNodesUpHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				LinkedList<INode> RootNodes = null;
-				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
-				IThingReference ThingRef;
-				DataSourceRec Rec;
-				INode Node;
-				XmlElement E;
-				string Key;
-
-				foreach (XmlNode N in e.Query.ChildNodes)
+				foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
 				{
-					E = N as XmlElement;
-					if (E is null || E.LocalName != "nd")
-						continue;
-
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
-					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
-					}
-
-					if (Rec is null)
-						Node = null;
-					else
-						Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-					if (Node is null || !await Node.CanViewAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-						return;
-					}
-					else if (!await Node.CanEditAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-						return;
-					}
-
-					ThingRef = Node.Parent;
-					if (ThingRef is null)
-					{
-						if (RootNodes is null)
-							RootNodes = new LinkedList<INode>();
-
-						RootNodes.AddLast(Node);
-					}
-					else
-					{
-						if (NodesPerParent is null)
-							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
-
-						Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
-						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
-						{
-							Nodes = new LinkedList<INode>();
-							NodesPerParent[Key] = Nodes;
-						}
-
-						Nodes.AddLast(Node);
-					}
-				}
-
-				if (RootNodes != null)
-				{
-					foreach (INode Node2 in RootNodes)
+					foreach (INode Node2 in Nodes2)
 					{
 						if (!await Node2.MoveUpAsync(Caller))
 							break;
 					}
 				}
-
-				if (NodesPerParent != null)
-				{
-					foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
-					{
-						foreach (INode Node2 in Nodes2)
-						{
-							if (!await Node2.MoveUpAsync(Caller))
-								break;
-						}
-					}
-				}
-
-				StringBuilder Xml = new StringBuilder();
-
-				e.IqResult(string.Empty);
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+
+			e.IqResult(string.Empty);
 		}
 
-		private async void MoveNodesDownHandler(object Sender, IqEventArgs e)
+		private async Task MoveNodesDownHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			LinkedList<INode> RootNodes = null;
+			Dictionary<string, LinkedList<INode>> NodesPerParent = null;
+			IThingReference ThingRef;
+			DataSourceRec Rec;
+			INode Node;
+			XmlElement E;
+			LinkedListNode<INode> Loop;
+			string Key;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				LinkedList<INode> RootNodes = null;
-				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
-				IThingReference ThingRef;
-				DataSourceRec Rec;
-				INode Node;
-				XmlElement E;
-				LinkedListNode<INode> Loop;
-				string Key;
+				E = N as XmlElement;
+				if (E is null || E.LocalName != "nd")
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				ThingRef = GetThingReference(E);
+
+				lock (this.synchObject)
 				{
-					E = N as XmlElement;
-					if (E is null || E.LocalName != "nd")
-						continue;
-
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
-					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
-					}
-
-					if (Rec is null)
-						Node = null;
-					else
-						Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-					if (Node is null || !await Node.CanViewAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-						return;
-					}
-					else if (!await Node.CanEditAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-						return;
-					}
-
-					ThingRef = Node.Parent;
-					if (ThingRef is null)
-					{
-						if (RootNodes is null)
-							RootNodes = new LinkedList<INode>();
-
-						RootNodes.AddLast(Node);
-					}
-					else
-					{
-						if (NodesPerParent is null)
-							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
-
-						Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
-						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
-						{
-							Nodes = new LinkedList<INode>();
-							NodesPerParent[Key] = Nodes;
-						}
-
-						Nodes.AddLast(Node);
-					}
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (RootNodes != null)
+				if (Rec is null)
+					Node = null;
+				else
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					Loop = RootNodes.Last;
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
+				else if (!await Node.CanEditAsync(Caller))
+				{
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					return;
+				}
+
+				ThingRef = Node.Parent;
+				if (ThingRef is null)
+				{
+					if (RootNodes is null)
+						RootNodes = new LinkedList<INode>();
+
+					RootNodes.AddLast(Node);
+				}
+				else
+				{
+					if (NodesPerParent is null)
+						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
+
+					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
+					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
+					{
+						Nodes = new LinkedList<INode>();
+						NodesPerParent[Key] = Nodes;
+					}
+
+					Nodes.AddLast(Node);
+				}
+			}
+
+			if (RootNodes != null)
+			{
+				Loop = RootNodes.Last;
+				while (Loop != null)
+				{
+					if (!await Loop.Value.MoveDownAsync(Caller))
+						break;
+
+					Loop = Loop.Previous;
+				}
+			}
+
+			if (NodesPerParent != null)
+			{
+				foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
+				{
+					Loop = Nodes2.Last;
 					while (Loop != null)
 					{
 						if (!await Loop.Value.MoveDownAsync(Caller))
@@ -1628,196 +1516,163 @@ namespace Waher.Networking.XMPP.Concentrator
 						Loop = Loop.Previous;
 					}
 				}
-
-				if (NodesPerParent != null)
-				{
-					foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
-					{
-						Loop = Nodes2.Last;
-						while (Loop != null)
-						{
-							if (!await Loop.Value.MoveDownAsync(Caller))
-								break;
-
-							Loop = Loop.Previous;
-						}
-					}
-				}
-
-				e.IqResult(string.Empty);
 			}
-			catch (Exception ex)
+
+			e.IqResult(string.Empty);
+		}
+
+		private async Task GetNodeParametersForEditHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				e.IqError(ex);
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else
+			{
+				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+				StringBuilder Xml = new StringBuilder();
+
+				Form.SerializeForm(Xml);
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
-		private async void GetNodeParametersForEditHandler(object Sender, IqEventArgs e)
+		private async Task SetNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (!await Node.CanEditAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-				else
-				{
-					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-					StringBuilder Xml = new StringBuilder();
-
-					Form.SerializeForm(Xml);
-
-					e.IqResult(Xml.ToString());
-				}
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else
 			{
-				e.IqError(ex);
-			}
-		}
+				DataForm Form = null;
 
-		private async void SetNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
+				foreach (XmlNode N in e.Query.ChildNodes)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (!await Node.CanEditAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-				else
-				{
-					DataForm Form = null;
-
-					foreach (XmlNode N in e.Query.ChildNodes)
+					if (N.LocalName == "x")
 					{
-						if (N.LocalName == "x")
+						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+						break;
+					}
+				}
+
+				if (Form is null)
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+				else
+				{
+					string OldNodeId = Node.NodeId;
+					string OldSourceId = Node.SourceId;
+					string OldPartition = Node.Partition;
+					string NewNodeId = Form["NodeId"]?.ValueString;
+					string NewSourceId = Form["SourceId"]?.ValueString;
+					string NewPartition = Form["Partition"]?.ValueString;
+					Parameters.SetEditableFormResult Result = null;
+
+					if (!string.IsNullOrEmpty(NewNodeId))
+					{
+						if (string.IsNullOrEmpty(NewSourceId))
+							NewSourceId = OldSourceId;
+
+						if (string.IsNullOrEmpty(NewPartition))
+							NewPartition = OldPartition;
+
+						if ((NewNodeId != OldNodeId ||
+							NewSourceId != OldSourceId ||
+							NewPartition != OldPartition) &&
+							await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
 						{
-							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-							break;
+							Result = new Parameters.SetEditableFormResult()
+							{
+								Errors = new KeyValuePair<string, string>[]
+								{
+										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+								}
+							};
 						}
 					}
 
-					if (Form is null)
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+					ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
+					bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+
+					if (Result is null)
+						Result = await Parameters.SetEditableForm(e, Node, Form, true);
+
+					if (Result.Errors is null)
+					{
+						StringBuilder Xml = new StringBuilder();
+
+						await Node.UpdateAsync();
+
+						Xml.Append("<nodeInfo xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'");
+						await ExportAttributes(Xml, Node, Language);
+						Xml.Append(">");
+						await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
+						Xml.Append("</nodeInfo>");
+
+						e.IqResult(Xml.ToString());
+
+						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+						Result.Tags.Add(new KeyValuePair<string, object>("Source", Node.SourceId));
+						Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node.Partition));
+
+						Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+
+						if (this.thingRegistryClient != null && LifeCycleManagement != null)
+						{
+							if (LifeCycleManagement.IsProvisioned)
+							{
+								if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+									await this.RegisterNode(LifeCycleManagement);
+								else
+									await this.UpdateNodeRegistration(LifeCycleManagement);
+							}
+							else if (PreProvisioned)
+								this.UnregisterNode(LifeCycleManagement);
+						}
+					}
 					else
 					{
-						string OldNodeId = Node.NodeId;
-						string OldSourceId = Node.SourceId;
-						string OldPartition = Node.Partition;
-						string NewNodeId = Form["NodeId"]?.ValueString;
-						string NewSourceId = Form["SourceId"]?.ValueString;
-						string NewPartition = Form["Partition"]?.ValueString;
-						Parameters.SetEditableFormResult Result = null;
-
-						if (!string.IsNullOrEmpty(NewNodeId))
-						{
-							if (string.IsNullOrEmpty(NewSourceId))
-								NewSourceId = OldSourceId;
-
-							if (string.IsNullOrEmpty(NewPartition))
-								NewPartition = OldPartition;
-
-							if ((NewNodeId != OldNodeId ||
-								NewSourceId != OldSourceId ||
-								NewPartition != OldPartition) &&
-								await Rec.Source.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
-							{
-								Result = new Parameters.SetEditableFormResult()
-								{
-									Errors = new KeyValuePair<string, string>[]
-									{
-										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
-									}
-								};
-							}
-						}
-
-						ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
-						bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
-
-						if (Result is null)
-							Result = await Parameters.SetEditableForm(e, Node, Form, true);
-
-						if (Result.Errors is null)
-						{
-							StringBuilder Xml = new StringBuilder();
-
-							await Node.UpdateAsync();
-
-							Xml.Append("<nodeInfo xmlns='");
-							Xml.Append(NamespaceConcentrator);
-							Xml.Append("'");
-							await ExportAttributes(Xml, Node, Language);
-							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
-							Xml.Append("</nodeInfo>");
-
-							e.IqResult(Xml.ToString());
-
-							Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-							Result.Tags.Add(new KeyValuePair<string, object>("Source", Node.SourceId));
-							Result.Tags.Add(new KeyValuePair<string, object>("Partition", Node.Partition));
-
-							Log.Informational("Node edited.", Node.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
-
-							if (this.thingRegistryClient != null && LifeCycleManagement != null)
-							{
-								if (LifeCycleManagement.IsProvisioned)
-								{
-									if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
-										await this.RegisterNode(LifeCycleManagement);
-									else
-										await this.UpdateNodeRegistration(LifeCycleManagement);
-								}
-								else if (PreProvisioned)
-									this.UnregisterNode(LifeCycleManagement);
-							}
-						}
-						else
-						{
-							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-							e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
-						}
+						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					}
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
 			}
 		}
 
@@ -1842,228 +1697,214 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Xml.ToString();
 		}
 
-		private async void GetCommonNodeParametersForEditHandler(object Sender, IqEventArgs e)
+		private async Task GetCommonNodeParametersForEditHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef;
+			DataSourceRec Rec;
+			INode Node;
+			XmlElement E;
+			DataForm Form = null;
+			DataForm Form2;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef;
-				DataSourceRec Rec;
-				INode Node;
-				XmlElement E;
-				DataForm Form = null;
-				DataForm Form2;
+				E = N as XmlElement;
+				if (E is null || E.LocalName != "nd")
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				ThingRef = GetThingReference(E);
+
+				lock (this.synchObject)
 				{
-					E = N as XmlElement;
-					if (E is null || E.LocalName != "nd")
-						continue;
-
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
-					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
-					}
-
-					if (Rec is null)
-					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-						return;
-					}
-
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-					if (Node is null || !await Node.CanViewAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-						return;
-					}
-					else if (!await Node.CanEditAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-						return;
-					}
-
-					if (Form is null)
-						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-					else
-					{
-						Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-						Parameters.MergeForms(Form, Form2);
-					}
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				if (Form is null)
+				if (Rec is null)
 				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 					return;
 				}
 
-				Form.RemoveExcluded();
-
-				StringBuilder Xml = new StringBuilder();
-
-				Form.SerializeForm(Xml);
-
-				e.IqResult(Xml.ToString());
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void SetCommonNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				LinkedList<Tuple<IDataSource, INode>> Nodes = null;
-				DataForm Form = null;
-				ThingReference ThingRef;
-				DataSourceRec Rec;
-				INode Node;
-
-				foreach (XmlNode N in e.Query.ChildNodes)
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					switch (N.LocalName)
-					{
-						case "nd":
-							ThingRef = GetThingReference((XmlElement)N);
-
-							lock (this.synchObject)
-							{
-								if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-									Rec = null;
-							}
-
-							if (Rec is null)
-								Node = null;
-							else
-								Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-							if (Node is null || !await Node.CanViewAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-								return;
-							}
-							else if (!await Node.CanEditAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
-
-							if (Nodes is null)
-								Nodes = new LinkedList<Tuple<IDataSource, INode>>();
-
-							Nodes.AddLast(new Tuple<IDataSource, INode>(Rec.Source, Node));
-							break;
-
-						case "x":
-							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-							break;
-					}
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
+				else if (!await Node.CanEditAsync(Caller))
+				{
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					return;
 				}
 
-				if (Nodes is null)
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (Form is null)
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+				if (Form is null)
+					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
 				else
 				{
-					foreach (Tuple<IDataSource, INode> P in Nodes)
+					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+					Parameters.MergeForms(Form, Form2);
+				}
+			}
+
+			if (Form is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				return;
+			}
+
+			Form.RemoveExcluded();
+
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeForm(Xml);
+
+			e.IqResult(Xml.ToString());
+		}
+
+		private async Task SetCommonNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
+		{
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			LinkedList<Tuple<IDataSource, INode>> Nodes = null;
+			DataForm Form = null;
+			ThingReference ThingRef;
+			DataSourceRec Rec;
+			INode Node;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				switch (N.LocalName)
+				{
+					case "nd":
+						ThingRef = GetThingReference((XmlElement)N);
+
+						lock (this.synchObject)
+						{
+							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+								Rec = null;
+						}
+
+						if (Rec is null)
+							Node = null;
+						else
+							Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+						if (Node is null || !await Node.CanViewAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+							return;
+						}
+						else if (!await Node.CanEditAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+
+						if (Nodes is null)
+							Nodes = new LinkedList<Tuple<IDataSource, INode>>();
+
+						Nodes.AddLast(new Tuple<IDataSource, INode>(Rec.Source, Node));
+						break;
+
+					case "x":
+						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+						break;
+				}
+			}
+
+			if (Nodes is null)
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (Form is null)
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+			else
+			{
+				foreach (Tuple<IDataSource, INode> P in Nodes)
+				{
+					string OldNodeId = P.Item2.NodeId;
+					string OldSourceId = P.Item2.SourceId;
+					string OldPartition = P.Item2.Partition;
+					string NewNodeId = Form["NodeId"]?.ValueString;
+					string NewSourceId = Form["SourceId"]?.ValueString;
+					string NewPartition = Form["Partition"]?.ValueString;
+					Parameters.SetEditableFormResult Result = null;
+
+					if (!string.IsNullOrEmpty(NewNodeId))
 					{
-						string OldNodeId = P.Item2.NodeId;
-						string OldSourceId = P.Item2.SourceId;
-						string OldPartition = P.Item2.Partition;
-						string NewNodeId = Form["NodeId"]?.ValueString;
-						string NewSourceId = Form["SourceId"]?.ValueString;
-						string NewPartition = Form["Partition"]?.ValueString;
-						Parameters.SetEditableFormResult Result = null;
+						if (string.IsNullOrEmpty(NewSourceId))
+							NewSourceId = OldSourceId;
 
-						if (!string.IsNullOrEmpty(NewNodeId))
+						if (string.IsNullOrEmpty(NewPartition))
+							NewPartition = OldPartition;
+
+						if ((NewNodeId != OldNodeId ||
+							NewSourceId != OldSourceId ||
+							NewPartition != OldPartition) &&
+							await P.Item1.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
 						{
-							if (string.IsNullOrEmpty(NewSourceId))
-								NewSourceId = OldSourceId;
-
-							if (string.IsNullOrEmpty(NewPartition))
-								NewPartition = OldPartition;
-
-							if ((NewNodeId != OldNodeId ||
-								NewSourceId != OldSourceId ||
-								NewPartition != OldPartition) &&
-								await P.Item1.GetNodeAsync(new ThingReference(NewNodeId, NewSourceId, NewPartition)) != null)
+							Result = new Parameters.SetEditableFormResult()
 							{
-								Result = new Parameters.SetEditableFormResult()
+								Errors = new KeyValuePair<string, string>[]
 								{
-									Errors = new KeyValuePair<string, string>[]
-									{
 										new KeyValuePair<string, string>("NodeId", "Identity already exists.")
-									}
-								};
-							}
-						}
-
-						ILifeCycleManagement LifeCycleManagement = P.Item2 as ILifeCycleManagement;
-						bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
-
-						if (Result is null)
-							Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
-
-						if (Result.Errors != null)
-						{
-							Form = null;
-							DataForm Form2 = null;
-
-							foreach (Tuple<IDataSource, INode> NodeRef in Nodes)
-							{
-								Node = NodeRef.Item2;
-
-								if (Form is null)
-									Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-								else
-								{
-									Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-									Parameters.MergeForms(Form, Form2);
 								}
-							}
-
-							Form.RemoveExcluded();
-
-							e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
-							break;
-						}
-
-						Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-						Result.Tags.Add(new KeyValuePair<string, object>("Source", P.Item2.SourceId));
-						Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Item2.Partition));
-
-						Log.Informational("Node edited.", P.Item2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
-
-						if (this.thingRegistryClient != null && LifeCycleManagement != null)
-						{
-							if (LifeCycleManagement.IsProvisioned)
-							{
-								if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
-									await this.RegisterNode(LifeCycleManagement);
-								else
-									await this.UpdateNodeRegistration(LifeCycleManagement);
-							}
-							else if (PreProvisioned)
-								this.UnregisterNode(LifeCycleManagement);
+							};
 						}
 					}
 
-					e.IqResult(string.Empty);
+					ILifeCycleManagement LifeCycleManagement = P.Item2 as ILifeCycleManagement;
+					bool PreProvisioned = LifeCycleManagement != null && LifeCycleManagement.IsProvisioned;
+
+					if (Result is null)
+						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
+
+					if (Result.Errors != null)
+					{
+						Form = null;
+						DataForm Form2 = null;
+
+						foreach (Tuple<IDataSource, INode> NodeRef in Nodes)
+						{
+							Node = NodeRef.Item2;
+
+							if (Form is null)
+								Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+							else
+							{
+								Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+								Parameters.MergeForms(Form, Form2);
+							}
+						}
+
+						Form.RemoveExcluded();
+
+						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+						break;
+					}
+
+					Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+					Result.Tags.Add(new KeyValuePair<string, object>("Source", P.Item2.SourceId));
+					Result.Tags.Add(new KeyValuePair<string, object>("Partition", P.Item2.Partition));
+
+					Log.Informational("Node edited.", P.Item2.NodeId, e.FromBareJid, "NodeEdited", EventLevel.Medium, Result.Tags.ToArray());
+
+					if (this.thingRegistryClient != null && LifeCycleManagement != null)
+					{
+						if (LifeCycleManagement.IsProvisioned)
+						{
+							if (string.IsNullOrEmpty(LifeCycleManagement.Owner))
+								await this.RegisterNode(LifeCycleManagement);
+							else
+								await this.UpdateNodeRegistration(LifeCycleManagement);
+						}
+						else if (PreProvisioned)
+							this.UnregisterNode(LifeCycleManagement);
+					}
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+
+				e.IqResult(string.Empty);
 			}
 		}
 
@@ -2071,279 +1912,258 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Creating & Destroying nodes
 
-		private async void GetAddableNodeTypesHandler(object Sender, IqEventArgs e)
+		private async Task GetAddableNodeTypesHandler(object Sender, IqEventArgs e)
 		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				return;
+			}
+			else if (!await Node.CanAddAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				return;
+			}
+
+			StringBuilder Xml = new StringBuilder();
+			INode PresumptiveChild;
+
+			Xml.Append("<nodeTypes xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
+			{
+				try
+				{
+					PresumptiveChild = (INode)Activator.CreateInstance(T);
+
+					if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
+					{
+						Xml.Append("<nodeType type='");
+						Xml.Append(XML.Encode(T.FullName));
+						Xml.Append("' name='");
+						Xml.Append(XML.Encode(await PresumptiveChild.GetTypeNameAsync(Language)));
+						Xml.Append("'/>");
+					}
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+			}
+
+			Xml.Append("</nodeTypes>");
+
+			e.IqResult(Xml.ToString());
+		}
+
+		private async Task GetParametersForNewNodeHandler(object Sender, IqEventArgs e)
+		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				return;
+			}
+			else if (!await Node.CanAddAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				return;
+			}
+
+			string TypeName = XML.Attribute(e.Query, "type");
+			Type Type = Types.GetType(TypeName);
+			if (Type is null)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+				return;
+			}
+
+			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
+			INode PresumptiveChild;
+
 			try
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				PresumptiveChild = (INode)Activator.CreateInstance(Type);
+			}
+			catch (Exception)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
 
-				lock (this.synchObject)
+			DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild,
+				await PresumptiveChild.GetTypeNameAsync(Language));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeForm(Xml);
+
+			string s = Xml.ToString();
+			e.IqResult(s);
+		}
+
+		private async Task CreateNewNodeHandler(object Sender, IqEventArgs e)
+		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				return;
+			}
+			else if (!await Node.CanAddAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				return;
+			}
+
+			string TypeName = XML.Attribute(e.Query, "type");
+			Type Type = Types.GetType(TypeName);
+			if (Type is null)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+				return;
+			}
+
+			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
+			INode PresumptiveChild;
+
+			try
+			{
+				PresumptiveChild = (INode)Activator.CreateInstance(Type);
+			}
+			catch (Exception)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
+			if (!await Node.AcceptsChildAsync(PresumptiveChild) || !await PresumptiveChild.AcceptsParentAsync(Node))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
+			DataForm Form = null;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				if (N.LocalName == "x")
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
+					Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+					break;
 				}
+			}
 
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
+			if (Form is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 12, "Missing form."), e.IQ));
+				return;
+			}
 
-				if (Node is null || !await Node.CanViewAsync(Caller))
+			Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
+
+			if (Result.Errors is null)
+			{
+				if (await Rec.Source.GetNodeAsync(PresumptiveChild) != null)
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-					return;
+					Result.Errors = new KeyValuePair<string, string>[]
+					{
+							new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+					};
 				}
-				else if (!await Node.CanAddAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					return;
-				}
+			}
 
+			if (Result.Errors is null)
+			{
 				StringBuilder Xml = new StringBuilder();
-				INode PresumptiveChild;
 
-				Xml.Append("<nodeTypes xmlns='");
+				await Node.AddAsync(PresumptiveChild);
+
+				Xml.Append("<nodeInfo xmlns='");
 				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
-				{
-					try
-					{
-						PresumptiveChild = (INode)Activator.CreateInstance(T);
-
-						if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
-						{
-							Xml.Append("<nodeType type='");
-							Xml.Append(XML.Encode(T.FullName));
-							Xml.Append("' name='");
-							Xml.Append(XML.Encode(await PresumptiveChild.GetTypeNameAsync(Language)));
-							Xml.Append("'/>");
-						}
-					}
-					catch (Exception)
-					{
-						continue;
-					}
-				}
-
-				Xml.Append("</nodeTypes>");
+				Xml.Append("'");
+				await ExportAttributes(Xml, PresumptiveChild, Language);
+				Xml.Append(">");
+				await this.ExportParametersAndMessages(Xml, PresumptiveChild, true, true, Language, Caller);
+				Xml.Append("</nodeInfo>");
 
 				e.IqResult(Xml.ToString());
+
+				Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
+				Result.Tags.Add(new KeyValuePair<string, object>("Parent", Node.NodeId));
+				Result.Tags.Add(new KeyValuePair<string, object>("Source", PresumptiveChild.SourceId));
+				Result.Tags.Add(new KeyValuePair<string, object>("Partition", PresumptiveChild.Partition));
+
+				Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
+
+				if (this.thingRegistryClient != null && PresumptiveChild is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
+					await this.RegisterNode(LifeCycleManagement);
 			}
-			catch (Exception ex)
+			else
 			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void GetParametersForNewNodeHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-					return;
-				}
-				else if (!await Node.CanAddAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					return;
-				}
-
-				string TypeName = XML.Attribute(e.Query, "type");
-				Type Type = Types.GetType(TypeName);
-				if (Type is null)
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
-					return;
-				}
-
-				if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
-					return;
-				}
-
-				INode PresumptiveChild;
-
-				try
-				{
-					PresumptiveChild = (INode)Activator.CreateInstance(Type);
-				}
-				catch (Exception)
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
-					return;
-				}
-
-				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild,
-					await PresumptiveChild.GetTypeNameAsync(Language));
-
-				StringBuilder Xml = new StringBuilder();
-
-				Form.SerializeForm(Xml);
-
-				string s = Xml.ToString();
-				e.IqResult(s);
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void CreateNewNodeHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-					return;
-				}
-				else if (!await Node.CanAddAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					return;
-				}
-
-				string TypeName = XML.Attribute(e.Query, "type");
-				Type Type = Types.GetType(TypeName);
-				if (Type is null)
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
-					return;
-				}
-
-				if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
-					return;
-				}
-
-				INode PresumptiveChild;
-
-				try
-				{
-					PresumptiveChild = (INode)Activator.CreateInstance(Type);
-				}
-				catch (Exception)
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
-					return;
-				}
-
-				if (!await Node.AcceptsChildAsync(PresumptiveChild) || !await PresumptiveChild.AcceptsParentAsync(Node))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
-					return;
-				}
-
-				DataForm Form = null;
-
-				foreach (XmlNode N in e.Query.ChildNodes)
-				{
-					if (N.LocalName == "x")
-					{
-						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-						break;
-					}
-				}
-
-				if (Form is null)
-				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 12, "Missing form."), e.IQ));
-					return;
-				}
-
-				Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
-
-				if (Result.Errors is null)
-				{
-					if (await Rec.Source.GetNodeAsync(PresumptiveChild) != null)
-					{
-						Result.Errors = new KeyValuePair<string, string>[]
-						{
-							new KeyValuePair<string, string>("NodeId", "Identity already exists.")
-						};
-					}
-				}
-
-				if (Result.Errors is null)
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					await Node.AddAsync(PresumptiveChild);
-
-					Xml.Append("<nodeInfo xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'");
-					await ExportAttributes(Xml, PresumptiveChild, Language);
-					Xml.Append(">");
-					await this.ExportParametersAndMessages(Xml, PresumptiveChild, true, true, Language, Caller);
-					Xml.Append("</nodeInfo>");
-
-					e.IqResult(Xml.ToString());
-
-					Result.Tags.Add(new KeyValuePair<string, object>("Full", e.From));
-					Result.Tags.Add(new KeyValuePair<string, object>("Parent", Node.NodeId));
-					Result.Tags.Add(new KeyValuePair<string, object>("Source", PresumptiveChild.SourceId));
-					Result.Tags.Add(new KeyValuePair<string, object>("Partition", PresumptiveChild.Partition));
-
-					Log.Informational("Node created.", PresumptiveChild.NodeId, e.FromBareJid, "NodeCreated", EventLevel.Major, Result.Tags.ToArray());
-
-					if (this.thingRegistryClient != null && PresumptiveChild is ILifeCycleManagement LifeCycleManagement && LifeCycleManagement.IsProvisioned)
-						await this.RegisterNode(LifeCycleManagement);
-				}
-				else
-				{
-					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild, await PresumptiveChild.GetTypeNameAsync(Language));
-					e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+				Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild, await PresumptiveChild.GetTypeNameAsync(Language));
+				e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 			}
 		}
 
@@ -2476,6 +2296,8 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					Log.Critical(ex);
 				}
+
+				return Task.CompletedTask;
 			}, null);
 		}
 
@@ -2548,119 +2370,104 @@ namespace Waher.Networking.XMPP.Concentrator
 				return Result.ToArray();
 		}
 
-		private async void DestroyNodeHandler(object Sender, IqEventArgs e)
+		private async Task DestroyNodeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
+			if (Node is null || !await Node.CanViewAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				return;
+			}
+			else if (!await Node.CanDestroyAsync(Caller))
+			{
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				return;
+			}
 
-				if (Node is null || !await Node.CanViewAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-					return;
-				}
-				else if (!await Node.CanDestroyAsync(Caller))
-				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					return;
-				}
-
-				IThingReference ParentRef = Node.Parent;
-				INode Parent = await Rec.Source.GetNodeAsync(Node.Parent);
-				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
-				{
+			INode Parent = await Rec.Source.GetNodeAsync(Node.Parent);
+			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+			{
 					new KeyValuePair<string, object>("Full", e.From),
 					new KeyValuePair<string, object>("Source", Node.SourceId),
 					new KeyValuePair<string, object>("Partition", Node.Partition)
-				};
+			};
 
-				if (Node is ILifeCycleManagement LifeCycleManagement)
-					this.UnregisterNode(LifeCycleManagement);
+			if (Node is ILifeCycleManagement LifeCycleManagement)
+				this.UnregisterNode(LifeCycleManagement);
 
-				if (Parent != null)
-					await Parent.RemoveAsync(Node);
+			if (Parent != null)
+				await Parent.RemoveAsync(Node);
 
-				await Node.DestroyAsync();
+			await Node.DestroyAsync();
 
-				Log.Informational("Node destroyed.", Node.NodeId, e.FromBareJid, "NodeDestroyed", EventLevel.Major, Tags);
+			Log.Informational("Node destroyed.", Node.NodeId, e.FromBareJid, "NodeDestroyed", EventLevel.Major, Tags);
 
-				e.IqResult(string.Empty);
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+			e.IqResult(string.Empty);
 		}
 
 		#endregion
 
 		#region Commands
 
-		private async void GetNodeCommandsHandler(object Sender, IqEventArgs e)
+		private async Task GetNodeCommandsHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<commands xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					if (Node.HasCommands)
-					{
-						foreach (ICommand Command in await Node.Commands)
-						{
-							if (!await Command.CanExecuteAsync(Caller))
-								continue;
-
-							await ExportXml(Xml, Command, Language);
-						}
-					}
-
-					Xml.Append("</commands>");
-
-					e.IqResult(Xml.ToString());
-				}
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
 			{
-				e.IqError(ex);
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<commands xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				if (Node.HasCommands)
+				{
+					foreach (ICommand Command in await Node.Commands)
+					{
+						if (!await Command.CanExecuteAsync(Caller))
+							continue;
+
+						await ExportXml(Xml, Command, Language);
+					}
+				}
+
+				Xml.Append("</commands>");
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -2727,52 +2534,45 @@ namespace Waher.Networking.XMPP.Concentrator
 			return null;
 		}
 
-		private async void GetCommandParametersHandler(object Sender, IqEventArgs e)
+		private async Task GetCommandParametersHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					string CommandId = XML.Attribute(e.Query, "command");
-					ICommand Command = await FindCommand(CommandId, Node);
-
-					if (Command is null)
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-					else if (!await Command.CanExecuteAsync(Caller))
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					else
-					{
-						DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
-						StringBuilder Xml = new StringBuilder();
-
-						Form.SerializeForm(Xml);
-
-						e.IqResult(Xml.ToString());
-					}
-				}
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
 			{
-				e.IqError(ex);
+				string CommandId = XML.Attribute(e.Query, "command");
+				ICommand Command = await FindCommand(CommandId, Node);
+
+				if (Command is null)
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+				else if (!await Command.CanExecuteAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				else
+				{
+					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+					StringBuilder Xml = new StringBuilder();
+
+					Form.SerializeForm(Xml);
+
+					e.IqResult(Xml.ToString());
+				}
 			}
 		}
 
@@ -2782,153 +2582,62 @@ namespace Waher.Networking.XMPP.Concentrator
 				Disposable.Dispose();
 		}
 
-		private async void ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
+		private async Task ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-				if (Rec is null)
-					Node = null;
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
+			{
+				string CommandId = XML.Attribute(e.Query, "command");
+				ICommand Command = await FindCommand(CommandId, Node);
+
+				if (Command is null)
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+				else if (!await Command.CanExecuteAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
 				{
-					string CommandId = XML.Attribute(e.Query, "command");
-					ICommand Command = await FindCommand(CommandId, Node);
+					DataForm Form = null;
 
-					if (Command is null)
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-					else if (!await Command.CanExecuteAsync(Caller))
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					else
+					foreach (XmlNode N in e.Query.ChildNodes)
 					{
-						DataForm Form = null;
-
-						foreach (XmlNode N in e.Query.ChildNodes)
+						if (N.LocalName == "x")
 						{
-							if (N.LocalName == "x")
-							{
-								Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-								break;
-							}
+							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+							break;
 						}
-
-						if (Form is null)
-						{
-							if (Command.Type != CommandType.Simple)
-							{
-								e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
-								return;
-							}
-						}
-						else
-						{
-							if (Command.Type != CommandType.Parametrized)
-							{
-								e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
-								return;
-							}
-
-							Command = Command.Copy();
-
-							Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
-
-							if (Result.Errors != null)
-							{
-								DisposeObject(Command);
-
-								Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
-								e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
-
-								return;
-							}
-						}
-
-						try
-						{
-							await Command.ExecuteCommandAsync();
-						}
-						finally
-						{
-							if (Command.Type != CommandType.Simple)
-								DisposeObject(Command);
-						}
-
-						e.IqResult(string.Empty);
 					}
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
 
-		private async void ExecuteNodeQueryHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					string CommandId = XML.Attribute(e.Query, "command");
-					string QueryId = XML.Attribute(e.Query, "queryId");
-					ICommand Command = await FindCommand(CommandId, Node);
-
-					if (Command is null)
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-					else if (!await Command.CanExecuteAsync(Caller))
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					else if (Command.Type != CommandType.Query)
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
-					else
+					if (Form is null)
 					{
-						DataForm Form = null;
-
-						foreach (XmlNode N in e.Query.ChildNodes)
-						{
-							if (N.LocalName == "x")
-							{
-								Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-								break;
-							}
-						}
-
-						if (Form is null)
+						if (Command.Type != CommandType.Simple)
 						{
 							e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+							return;
+						}
+					}
+					else
+					{
+						if (Command.Type != CommandType.Parametrized)
+						{
+							e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
 							return;
 						}
 
@@ -2939,137 +2648,208 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Result.Errors != null)
 						{
 							DisposeObject(Command);
+
+							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
 							e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+
 							return;
-						}
-
-						Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node);
-
-						lock (this.synchObject)
-						{
-							if (this.queries.ContainsKey(QueryId))
-								Query = null;
-							else
-								this.queries[QueryId] = Query;
-						}
-
-						if (Query is null)
-						{
-							DisposeObject(Command);
-							e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
-							return;
-						}
-
-						e.IqResult(string.Empty);
-
-						Query.OnAborted += Query_OnAborted;
-						Query.OnBeginSection += Query_OnBeginSection;
-						Query.OnDone += Query_OnDone;
-						Query.OnEndSection += Query_OnEndSection;
-						Query.OnMessage += Query_OnMessage;
-						Query.OnNewObject += Query_OnNewObject;
-						Query.OnNewRecords += Query_OnNewRecords;
-						Query.OnNewTable += Query_OnNewTable;
-						Query.OnStarted += Query_OnStarted;
-						Query.OnStatus += Query_OnStatus;
-						Query.OnTableDone += Query_OnTableDone;
-						Query.OnTitle += Query_OnTitle;
-
-						try
-						{
-							Query.Start();
-							await Command.StartQueryExecutionAsync(Query, Language);
-						}
-						catch (Exception ex)
-						{
-							lock (this.synchObject)
-							{
-								this.queries.Remove(QueryId);
-							}
-
-							Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
-							Query.Abort();
-							System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
-						}
-						finally
-						{
-							DisposeObject(Command);
 						}
 					}
-				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
 
-		private async void AbortNodeQueryHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else
-				{
-					string CommandId = XML.Attribute(e.Query, "command");
-					string QueryId = XML.Attribute(e.Query, "queryId");
-					ICommand Command = await FindCommand(CommandId, Node);
-
-					if (Command is null)
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-					else if (!await Command.CanExecuteAsync(Caller))
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-					else if (Command.Type != CommandType.Query)
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
-					else
+					try
 					{
-						Query Query;
-
-						lock (this.synchObject)
-						{
-							if (this.queries.TryGetValue(QueryId, out Query))
-								this.queries.Remove(QueryId);
-							else
-								Query = null;
-						}
-
-						if (Query is null)
-						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
-							return;
-						}
-
-						Query.Abort();
-
-						e.IqResult(string.Empty);
+						await Command.ExecuteCommandAsync();
 					}
+					finally
+					{
+						if (Command.Type != CommandType.Simple)
+							DisposeObject(Command);
+					}
+
+					e.IqResult(string.Empty);
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
 			}
 		}
 
-		private void Query_OnTitle(object Sender, QueryTitleEventArgs e)
+		private async Task ExecuteNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
+			{
+				string CommandId = XML.Attribute(e.Query, "command");
+				string QueryId = XML.Attribute(e.Query, "queryId");
+				ICommand Command = await FindCommand(CommandId, Node);
+
+				if (Command is null)
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+				else if (!await Command.CanExecuteAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				else if (Command.Type != CommandType.Query)
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				else
+				{
+					DataForm Form = null;
+
+					foreach (XmlNode N in e.Query.ChildNodes)
+					{
+						if (N.LocalName == "x")
+						{
+							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+							break;
+						}
+					}
+
+					if (Form is null)
+					{
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+						return;
+					}
+
+					Command = Command.Copy();
+
+					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+
+					if (Result.Errors != null)
+					{
+						DisposeObject(Command);
+						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+						return;
+					}
+
+					Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node);
+
+					lock (this.synchObject)
+					{
+						if (this.queries.ContainsKey(QueryId))
+							Query = null;
+						else
+							this.queries[QueryId] = Query;
+					}
+
+					if (Query is null)
+					{
+						DisposeObject(Command);
+						e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+						return;
+					}
+
+					e.IqResult(string.Empty);
+
+					Query.OnAborted += Query_OnAborted;
+					Query.OnBeginSection += Query_OnBeginSection;
+					Query.OnDone += Query_OnDone;
+					Query.OnEndSection += Query_OnEndSection;
+					Query.OnMessage += Query_OnMessage;
+					Query.OnNewObject += Query_OnNewObject;
+					Query.OnNewRecords += Query_OnNewRecords;
+					Query.OnNewTable += Query_OnNewTable;
+					Query.OnStarted += Query_OnStarted;
+					Query.OnStatus += Query_OnStatus;
+					Query.OnTableDone += Query_OnTableDone;
+					Query.OnTitle += Query_OnTitle;
+
+					try
+					{
+						await Query.Start();
+						await Command.StartQueryExecutionAsync(Query, Language);
+					}
+					catch (Exception ex)
+					{
+						lock (this.synchObject)
+						{
+							this.queries.Remove(QueryId);
+						}
+
+						await Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
+						await Query.Abort();
+
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+					finally
+					{
+						DisposeObject(Command);
+					}
+				}
+			}
+		}
+
+		private async Task AbortNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
+			{
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else
+			{
+				string CommandId = XML.Attribute(e.Query, "command");
+				string QueryId = XML.Attribute(e.Query, "queryId");
+				ICommand Command = await FindCommand(CommandId, Node);
+
+				if (Command is null)
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+				else if (!await Command.CanExecuteAsync(Caller))
+					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				else if (Command.Type != CommandType.Query)
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				else
+				{
+					Query Query;
+
+					lock (this.synchObject)
+					{
+						if (this.queries.TryGetValue(QueryId, out Query))
+							this.queries.Remove(QueryId);
+						else
+							Query = null;
+					}
+
+					if (Query is null)
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
+						return;
+					}
+
+					await Query.Abort();
+
+					e.IqResult(string.Empty);
+				}
+			}
+		}
+
+		private Task Query_OnTitle(object Sender, QueryTitleEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3085,6 +2865,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+
+			return Task.CompletedTask;
 		}
 
 		private void StartQueryProgress(StringBuilder Xml, QueryEventArgs e)
@@ -3121,7 +2903,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("</queryProgress>");
 		}
 
-		private void Query_OnTableDone(object Sender, QueryTableEventArgs e)
+		private Task Query_OnTableDone(object Sender, QueryTableEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3137,9 +2919,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnStatus(object Sender, QueryStatusEventArgs e)
+		private Task Query_OnStatus(object Sender, QueryStatusEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3155,9 +2939,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnStarted(object Sender, QueryEventArgs e)
+		private Task Query_OnStarted(object Sender, QueryEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3169,9 +2955,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnNewTable(object Sender, QueryNewTableEventArgs e)
+		private Task Query_OnNewTable(object Sender, QueryNewTableEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3249,9 +3037,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
+		private Task Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3376,9 +3166,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnNewObject(object Sender, QueryObjectEventArgs e)
+		private Task Query_OnNewObject(object Sender, QueryObjectEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3397,9 +3189,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnMessage(object Sender, QueryMessageEventArgs e)
+		private Task Query_OnMessage(object Sender, QueryMessageEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3419,9 +3213,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnEndSection(object Sender, QueryEventArgs e)
+		private Task Query_OnEndSection(object Sender, QueryEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3433,9 +3229,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnDone(object Sender, QueryEventArgs e)
+		private Task Query_OnDone(object Sender, QueryEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3447,9 +3245,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnBeginSection(object Sender, QueryTitleEventArgs e)
+		private Task Query_OnBeginSection(object Sender, QueryTitleEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3465,9 +3265,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
-		private void Query_OnAborted(object Sender, QueryEventArgs e)
+		private Task Query_OnAborted(object Sender, QueryEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3479,6 +3281,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
 		private class CommandComparer : IEqualityComparer<ICommand>
@@ -3504,119 +3308,202 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static readonly CommandComparer commandComparerInstance = new CommandComparer();
 
-		private async void GetCommonNodeCommandsHandler(object Sender, IqEventArgs e)
+		private async Task GetCommonNodeCommandsHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Dictionary<ICommand, bool> CommonCommands = null;
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			Language Language = await GetLanguage(e.Query);
+			ThingReference ThingRef;
+			DataSourceRec Rec;
+			XmlElement E;
+			INode Node;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				Dictionary<ICommand, bool> CommonCommands = null;
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				Language Language = await GetLanguage(e.Query);
-				ThingReference ThingRef;
-				DataSourceRec Rec;
-				XmlElement E;
-				INode Node;
+				E = N as XmlElement;
+				if (E is null || N.LocalName != "nd")
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				ThingRef = GetThingReference(E);
+
+				lock (this.synchObject)
 				{
-					E = N as XmlElement;
-					if (E is null || N.LocalName != "nd")
-						continue;
-
-					ThingRef = GetThingReference(E);
-
-					lock (this.synchObject)
-					{
-						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-							Rec = null;
-					}
-
-					if (Rec is null)
-						Node = null;
-					else
-						Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-					if (Node is null || !await Node.CanViewAsync(Caller))
-					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-						return;
-					}
-
-					if (!Node.HasCommands)
-					{
-						if (CommonCommands != null)
-							CommonCommands.Clear();
-
-						break;
-					}
-
-					if (CommonCommands is null)
-					{
-						CommonCommands = new Dictionary<ICommand, bool>(commandComparerInstance);
-
-						foreach (ICommand Command in await Node.Commands)
-						{
-							if (await Command.CanExecuteAsync(Caller))
-								CommonCommands[Command] = true;
-						}
-					}
-					else
-					{
-						Dictionary<ICommand, bool> CommonCommands2 = new Dictionary<ICommand, bool>(commandComparerInstance);
-
-						foreach (ICommand Command in await Node.Commands)
-						{
-							if (CommonCommands.ContainsKey(Command) && await Command.CanExecuteAsync(Caller))
-								CommonCommands2[Command] = true;
-						}
-
-						CommonCommands = CommonCommands2;
-					}
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
 				}
 
-				StringBuilder Xml = new StringBuilder();
+				if (Rec is null)
+					Node = null;
+				else
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-				Xml.Append("<commands xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				if (CommonCommands != null)
+				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					foreach (ICommand Command in CommonCommands.Keys)
-						await ExportXml(Xml, Command, Language);
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
 				}
 
-				Xml.Append("</commands>");
+				if (!Node.HasCommands)
+				{
+					if (CommonCommands != null)
+						CommonCommands.Clear();
 
-				e.IqResult(Xml.ToString());
+					break;
+				}
+
+				if (CommonCommands is null)
+				{
+					CommonCommands = new Dictionary<ICommand, bool>(commandComparerInstance);
+
+					foreach (ICommand Command in await Node.Commands)
+					{
+						if (await Command.CanExecuteAsync(Caller))
+							CommonCommands[Command] = true;
+					}
+				}
+				else
+				{
+					Dictionary<ICommand, bool> CommonCommands2 = new Dictionary<ICommand, bool>(commandComparerInstance);
+
+					foreach (ICommand Command in await Node.Commands)
+					{
+						if (CommonCommands.ContainsKey(Command) && await Command.CanExecuteAsync(Caller))
+							CommonCommands2[Command] = true;
+					}
+
+					CommonCommands = CommonCommands2;
+				}
 			}
-			catch (Exception ex)
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<commands xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			if (CommonCommands != null)
 			{
-				e.IqError(ex);
+				foreach (ICommand Command in CommonCommands.Keys)
+					await ExportXml(Xml, Command, Language);
 			}
+
+			Xml.Append("</commands>");
+
+			e.IqResult(Xml.ToString());
 		}
 
-		private async void GetCommonCommandParametersHandler(object Sender, IqEventArgs e)
+		private async Task GetCommonCommandParametersHandler(object Sender, IqEventArgs e)
 		{
-			try
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef;
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			XmlElement E;
+			INode Node;
+			ICommand Command = null;
+			ICommand Command2;
+			DataForm Form = null;
+			DataForm Form2;
+			string CommandId = XML.Attribute(e.Query, "command");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef;
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				XmlElement E;
-				INode Node;
-				ICommand Command = null;
-				ICommand Command2;
-				DataForm Form = null;
-				DataForm Form2;
-				string CommandId = XML.Attribute(e.Query, "command");
+				E = N as XmlElement;
+				if (E is null || N.LocalName != "nd")
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				ThingRef = GetThingReference(E);
+
+				lock (this.synchObject)
 				{
-					E = N as XmlElement;
-					if (E is null || N.LocalName != "nd")
-						continue;
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+						Rec = null;
+				}
 
+				if (Rec is null)
+					Node = null;
+				else
+					Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+				if (Node is null || !await Node.CanViewAsync(Caller))
+				{
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
+
+				if (Command is null)
+				{
+					Command = await FindCommand(CommandId, Node);
+
+					if (Command is null)
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+						return;
+					}
+					else if (!await Command.CanExecuteAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+						return;
+					}
+
+					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+				}
+				else
+				{
+					Command2 = await FindCommand(CommandId, Node);
+					if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+						return;
+					}
+					else if (!await Command2.CanExecuteAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+						return;
+					}
+
+					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Command2, await Command2.GetNameAsync(Language));
+					Parameters.MergeForms(Form, Form2);
+				}
+			}
+
+			if (Form is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				return;
+			}
+
+			Form.RemoveExcluded();
+
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeForm(Xml);
+
+			e.IqResult(Xml.ToString());
+		}
+
+		private async Task ExecuteCommonNodeCommandHandler(object Sender, IqEventArgs e)
+		{
+			LinkedList<INode> Nodes = null;
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef;
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			XmlElement E;
+			INode Node;
+			ICommand Command = null;
+			ICommand Command2;
+			DataForm Form = null;
+			string CommandId = XML.Attribute(e.Query, "command");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				E = N as XmlElement;
+				if (E is null)
+					continue;
+
+				if (E.LocalName == "nd")
+				{
 					ThingRef = GetThingReference(E);
 
 					lock (this.synchObject)
@@ -3635,6 +3522,11 @@ namespace Waher.Networking.XMPP.Concentrator
 						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
+
+					if (Nodes is null)
+						Nodes = new LinkedList<INode>();
+
+					Nodes.AddLast(Node);
 
 					if (Command is null)
 					{
@@ -3650,8 +3542,6 @@ namespace Waher.Networking.XMPP.Concentrator
 							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
-
-						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
 					}
 					else
 					{
@@ -3666,293 +3556,31 @@ namespace Waher.Networking.XMPP.Concentrator
 							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
-
-						Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Command2, await Command2.GetNameAsync(Language));
-						Parameters.MergeForms(Form, Form2);
 					}
 				}
-
-				if (Form is null)
-				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
-					return;
-				}
-
-				Form.RemoveExcluded();
-
-				StringBuilder Xml = new StringBuilder();
-
-				Form.SerializeForm(Xml);
-
-				e.IqResult(Xml.ToString());
+				else if (E.LocalName == "x")
+					Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
 			}
-			catch (Exception ex)
+
+			if (Nodes is null)
 			{
-				e.IqError(ex);
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				return;
 			}
-		}
 
-		private async void ExecuteCommonNodeCommandHandler(object Sender, IqEventArgs e)
-		{
-			try
+			if (Form is null)
 			{
-				LinkedList<INode> Nodes = null;
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef;
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				XmlElement E;
-				INode Node;
-				ICommand Command = null;
-				ICommand Command2;
-				DataForm Form = null;
-				string CommandId = XML.Attribute(e.Query, "command");
-
-				foreach (XmlNode N in e.Query.ChildNodes)
-				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
-
-					if (E.LocalName == "nd")
-					{
-						ThingRef = GetThingReference(E);
-
-						lock (this.synchObject)
-						{
-							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-								Rec = null;
-						}
-
-						if (Rec is null)
-							Node = null;
-						else
-							Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-						if (Node is null || !await Node.CanViewAsync(Caller))
-						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-							return;
-						}
-
-						if (Nodes is null)
-							Nodes = new LinkedList<INode>();
-
-						Nodes.AddLast(Node);
-
-						if (Command is null)
-						{
-							Command = await FindCommand(CommandId, Node);
-
-							if (Command is null)
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
-						}
-						else
-						{
-							Command2 = await FindCommand(CommandId, Node);
-							if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command2.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
-						}
-					}
-					else if (E.LocalName == "x")
-						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-				}
-
-				if (Nodes is null)
-				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
-					return;
-				}
-
-				if (Form is null)
-				{
-					if (Command.Type != CommandType.Simple)
-					{
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
-						return;
-					}
-				}
-				else
-				{
-					if (Command.Type != CommandType.Parametrized)
-					{
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
-						return;
-					}
-
-					Command = Command.Copy();
-
-					Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
-
-					if (Result.Errors != null)
-					{
-						DisposeObject(Command);
-						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
-						return;
-					}
-				}
-
-				StringBuilder Xml = new StringBuilder();
-				string ErrorMessage;
-
-				Xml.Append("<partialExecution xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (INode N in Nodes)
-				{
-					try
-					{
-						await Command.ExecuteCommandAsync();
-						ErrorMessage = null;
-					}
-					catch (Exception ex)
-					{
-						ErrorMessage = ex.Message;
-					}
-
-					if (ErrorMessage is null)
-						Xml.Append("<result>true</result>");
-					else
-					{
-						Xml.Append("<result error='");
-						Xml.Append(XML.Encode(ErrorMessage));
-						Xml.Append("'>false</result>");
-					}
-				}
-
 				if (Command.Type != CommandType.Simple)
-					DisposeObject(Command);
-
-				Xml.Append("</partialExecution>");
-
-				e.IqResult(Xml.ToString());
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
-		}
-
-		private async void ExecuteCommonNodeQueryHandler(object Sender, IqEventArgs e)
-		{
-			try
-			{
-				LinkedList<INode> Nodes = null;
-				LinkedList<Query> Queries = null;
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef;
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				XmlElement E;
-				INode Node;
-				ICommand Command = null;
-				ICommand Command2;
-				DataForm Form = null;
-				string CommandId = XML.Attribute(e.Query, "command");
-				string QueryId = XML.Attribute(e.Query, "queryId");
-
-				foreach (XmlNode N in e.Query.ChildNodes)
-				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
-
-					if (E.LocalName == "nd")
-					{
-						ThingRef = GetThingReference(E);
-
-						lock (this.synchObject)
-						{
-							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-								Rec = null;
-						}
-
-						if (Rec is null)
-							Node = null;
-						else
-							Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-						if (Node is null || !await Node.CanViewAsync(Caller))
-						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-							return;
-						}
-
-						if (Nodes is null)
-						{
-							Nodes = new LinkedList<INode>();
-							Queries = new LinkedList<Query>();
-						}
-
-						Nodes.AddLast(Node);
-						Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
-
-						if (Command is null)
-						{
-							Command = await FindCommand(CommandId, Node);
-
-							if (Command is null)
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
-						}
-						else
-						{
-							Command2 = await FindCommand(CommandId, Node);
-							if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command2.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
-						}
-					}
-					else if (E.LocalName == "x")
-						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
-				}
-
-				if (Nodes is null)
-				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
-					return;
-				}
-
-				if (Command.Type != CommandType.Query)
-				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
-					return;
-				}
-
-				if (Form is null)
 				{
 					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+					return;
+				}
+			}
+			else
+			{
+				if (Command.Type != CommandType.Parametrized)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
 					return;
 				}
 
@@ -3966,220 +3594,361 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					return;
 				}
+			}
 
-				CompoundQuery Query = new CompoundQuery(CommandId, QueryId, new object[] { Sender, e }, Language, Queries);
+			StringBuilder Xml = new StringBuilder();
+			string ErrorMessage;
 
-				lock (this.synchObject)
+			Xml.Append("<partialExecution xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (INode N in Nodes)
+			{
+				try
 				{
-					if (this.queries.ContainsKey(QueryId))
-						Query = null;
-					else
-						this.queries[QueryId] = Query;
+					await Command.ExecuteCommandAsync();
+					ErrorMessage = null;
+				}
+				catch (Exception ex)
+				{
+					ErrorMessage = ex.Message;
 				}
 
-				if (Query is null)
+				if (ErrorMessage is null)
+					Xml.Append("<result>true</result>");
+				else
 				{
-					DisposeObject(Command);
-					e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
-					return;
+					Xml.Append("<result error='");
+					Xml.Append(XML.Encode(ErrorMessage));
+					Xml.Append("'>false</result>");
 				}
+			}
 
-				Query.OnAborted += Query_OnAborted;
-				Query.OnBeginSection += Query_OnBeginSection;
-				Query.OnDone += Query_OnDone;
-				Query.OnEndSection += Query_OnEndSection;
-				Query.OnMessage += Query_OnMessage;
-				Query.OnNewObject += Query_OnNewObject;
-				Query.OnNewRecords += Query_OnNewRecords;
-				Query.OnNewTable += Query_OnNewTable;
-				Query.OnStarted += Query_OnStarted;
-				Query.OnStatus += Query_OnStatus;
-				Query.OnTableDone += Query_OnTableDone;
-				Query.OnTitle += Query_OnTitle;
-
-				StringBuilder Xml = new StringBuilder();
-				string ErrorMessage;
-				bool PartialSuccess = false;
-
-				Xml.Append("<partialExecution xmlns='");
-				Xml.Append(NamespaceConcentrator);
-				Xml.Append("'>");
-
-				foreach (INode N in Nodes)
-				{
-					try
-					{
-						await Command.StartQueryExecutionAsync(Query, Language);
-						ErrorMessage = null;
-					}
-					catch (Exception ex)
-					{
-						ErrorMessage = ex.Message;
-					}
-
-					if (ErrorMessage is null)
-					{
-						Xml.Append("<result>true</result>");
-						PartialSuccess = true;
-					}
-					else
-					{
-						Xml.Append("<result error='");
-						Xml.Append(XML.Encode(ErrorMessage));
-						Xml.Append("'>false</result>");
-					}
-				}
-
-				if (!PartialSuccess)
-				{
-					lock (this.synchObject)
-					{
-						this.queries.Remove(QueryId);
-					}
-
-					Query.Abort();
-				}
-
+			if (Command.Type != CommandType.Simple)
 				DisposeObject(Command);
 
-				Xml.Append("</partialExecution>");
+			Xml.Append("</partialExecution>");
 
-				e.IqResult(Xml.ToString());
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+			e.IqResult(Xml.ToString());
 		}
 
-		private async void AbortCommonNodeQueryHandler(object Sender, IqEventArgs e)
+		private async Task ExecuteCommonNodeQueryHandler(object Sender, IqEventArgs e)
 		{
-			try
+			LinkedList<INode> Nodes = null;
+			LinkedList<Query> Queries = null;
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef;
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			XmlElement E;
+			INode Node;
+			ICommand Command = null;
+			ICommand Command2;
+			DataForm Form = null;
+			string CommandId = XML.Attribute(e.Query, "command");
+			string QueryId = XML.Attribute(e.Query, "queryId");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				LinkedList<INode> Nodes = null;
-				LinkedList<Query> Queries = null;
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef;
-				Language Language = await GetLanguage(e.Query);
-				DataSourceRec Rec;
-				XmlElement E;
-				INode Node;
-				ICommand Command = null;
-				ICommand Command2;
-				string CommandId = XML.Attribute(e.Query, "command");
-				string QueryId = XML.Attribute(e.Query, "queryId");
+				E = N as XmlElement;
+				if (E is null)
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				if (E.LocalName == "nd")
 				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
+					ThingRef = GetThingReference(E);
 
-					if (E.LocalName == "nd")
+					lock (this.synchObject)
 					{
-						ThingRef = GetThingReference(E);
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
+					}
 
-						lock (this.synchObject)
-						{
-							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-								Rec = null;
-						}
+					if (Rec is null)
+						Node = null;
+					else
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
 
-						if (Rec is null)
-							Node = null;
-						else
-							Node = await Rec.Source.GetNodeAsync(ThingRef);
+					if (Node is null || !await Node.CanViewAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						return;
+					}
 
-						if (Node is null || !await Node.CanViewAsync(Caller))
-						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-							return;
-						}
+					if (Nodes is null)
+					{
+						Nodes = new LinkedList<INode>();
+						Queries = new LinkedList<Query>();
+					}
 
-						if (Nodes is null)
-						{
-							Nodes = new LinkedList<INode>();
-							Queries = new LinkedList<Query>();
-						}
+					Nodes.AddLast(Node);
+					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
 
-						Nodes.AddLast(Node);
-						Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
+					if (Command is null)
+					{
+						Command = await FindCommand(CommandId, Node);
 
 						if (Command is null)
 						{
-							Command = await FindCommand(CommandId, Node);
-
-							if (Command is null)
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
 						}
-						else
+						else if (!await Command.CanExecuteAsync(Caller))
 						{
-							Command2 = await FindCommand(CommandId, Node);
-							if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
-							{
-								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
-								return;
-							}
-							else if (!await Command2.CanExecuteAsync(Caller))
-							{
-								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-								return;
-							}
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+					}
+					else
+					{
+						Command2 = await FindCommand(CommandId, Node);
+						if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
+						}
+						else if (!await Command2.CanExecuteAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
 						}
 					}
 				}
+				else if (E.LocalName == "x")
+					Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+			}
 
-				if (Nodes is null)
+			if (Nodes is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				return;
+			}
+
+			if (Command.Type != CommandType.Query)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				return;
+			}
+
+			if (Form is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+				return;
+			}
+
+			Command = Command.Copy();
+
+			Parameters.SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+
+			if (Result.Errors != null)
+			{
+				DisposeObject(Command);
+				e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+				return;
+			}
+
+			CompoundQuery Query = new CompoundQuery(CommandId, QueryId, new object[] { Sender, e }, Language, Queries);
+
+			lock (this.synchObject)
+			{
+				if (this.queries.ContainsKey(QueryId))
+					Query = null;
+				else
+					this.queries[QueryId] = Query;
+			}
+
+			if (Query is null)
+			{
+				DisposeObject(Command);
+				e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+				return;
+			}
+
+			Query.OnAborted += Query_OnAborted;
+			Query.OnBeginSection += Query_OnBeginSection;
+			Query.OnDone += Query_OnDone;
+			Query.OnEndSection += Query_OnEndSection;
+			Query.OnMessage += Query_OnMessage;
+			Query.OnNewObject += Query_OnNewObject;
+			Query.OnNewRecords += Query_OnNewRecords;
+			Query.OnNewTable += Query_OnNewTable;
+			Query.OnStarted += Query_OnStarted;
+			Query.OnStatus += Query_OnStatus;
+			Query.OnTableDone += Query_OnTableDone;
+			Query.OnTitle += Query_OnTitle;
+
+			StringBuilder Xml = new StringBuilder();
+			string ErrorMessage;
+			bool PartialSuccess = false;
+
+			Xml.Append("<partialExecution xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (INode N in Nodes)
+			{
+				try
 				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
-					return;
+					await Command.StartQueryExecutionAsync(Query, Language);
+					ErrorMessage = null;
+				}
+				catch (Exception ex)
+				{
+					ErrorMessage = ex.Message;
 				}
 
-				if (Command.Type != CommandType.Query)
+				if (ErrorMessage is null)
 				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
-					return;
+					Xml.Append("<result>true</result>");
+					PartialSuccess = true;
 				}
+				else
+				{
+					Xml.Append("<result error='");
+					Xml.Append(XML.Encode(ErrorMessage));
+					Xml.Append("'>false</result>");
+				}
+			}
 
-				Query Query;
-
+			if (!PartialSuccess)
+			{
 				lock (this.synchObject)
 				{
-					if (this.queries.TryGetValue(QueryId, out Query))
-						this.queries.Remove(QueryId);
-					else
-						Query = null;
+					this.queries.Remove(QueryId);
 				}
 
-				if (Query is null)
-				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
-					return;
-				}
-
-				Query.Abort();
-
-				e.IqResult(string.Empty);
+				await Query.Abort();
 			}
-			catch (Exception ex)
+
+			DisposeObject(Command);
+
+			Xml.Append("</partialExecution>");
+
+			e.IqResult(Xml.ToString());
+		}
+
+		private async Task AbortCommonNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			LinkedList<INode> Nodes = null;
+			LinkedList<Query> Queries = null;
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef;
+			Language Language = await GetLanguage(e.Query);
+			DataSourceRec Rec;
+			XmlElement E;
+			INode Node;
+			ICommand Command = null;
+			ICommand Command2;
+			string CommandId = XML.Attribute(e.Query, "command");
+			string QueryId = XML.Attribute(e.Query, "queryId");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				e.IqError(ex);
+				E = N as XmlElement;
+				if (E is null)
+					continue;
+
+				if (E.LocalName == "nd")
+				{
+					ThingRef = GetThingReference(E);
+
+					lock (this.synchObject)
+					{
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+							Rec = null;
+					}
+
+					if (Rec is null)
+						Node = null;
+					else
+						Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+					if (Node is null || !await Node.CanViewAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						return;
+					}
+
+					if (Nodes is null)
+					{
+						Nodes = new LinkedList<INode>();
+						Queries = new LinkedList<Query>();
+					}
+
+					Nodes.AddLast(Node);
+					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
+
+					if (Command is null)
+					{
+						Command = await FindCommand(CommandId, Node);
+
+						if (Command is null)
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
+						}
+						else if (!await Command.CanExecuteAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+					}
+					else
+					{
+						Command2 = await FindCommand(CommandId, Node);
+						if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
+						}
+						else if (!await Command2.CanExecuteAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+					}
+				}
 			}
+
+			if (Nodes is null)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				return;
+			}
+
+			if (Command.Type != CommandType.Query)
+			{
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				return;
+			}
+
+			Query Query;
+
+			lock (this.synchObject)
+			{
+				if (this.queries.TryGetValue(QueryId, out Query))
+					this.queries.Remove(QueryId);
+				else
+					Query = null;
+			}
+
+			if (Query is null)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
+				return;
+			}
+
+			await Query.Abort();
+
+			e.IqResult(string.Empty);
 		}
 
 		#endregion
 
 		#region Sensor Data interface
 
-		private async void SensorServer_OnExecuteReadoutRequest(object Sender, SensorDataServerRequest Request)
+		private async Task SensorServer_OnExecuteReadoutRequest(object _, SensorDataServerRequest Request)
 		{
 			DateTime Now = DateTime.Now;
 			IThingReference[] Nodes = Request.Nodes;
@@ -4217,7 +3986,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							continue;
 						}
 
-						Sensor.StartReadout(Request);
+						await Sensor.StartReadout(Request);
 					}
 				}
 			}
@@ -4271,7 +4040,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (!Actuator.IsControllable)
 					return new ControlParameter[0];
 
-				return Actuator.GetControlParameters();
+				return await Actuator.GetControlParameters();
 			}
 			catch (Exception ex)
 			{
@@ -4284,114 +4053,100 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Sniffers
 
-		private async void RegisterSnifferHandler(object Sender, IqEventArgs e)
+		private async Task RegisterSnifferHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (!await Node.CanEditAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-				else if (!(Node is ISniffable Sniffable))
-					e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
-				else
-				{
-					DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1));
-					RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this);
-					DateTime MaxExpires = DateTime.Now.AddDays(1);
-
-					if (Expires > MaxExpires)
-						Expires = MaxExpires;
-
-					Sniffable.Add(Sniffer);
-
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<sniffer xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("' snifferId='");
-					Xml.Append(Sniffer.Id);
-					Xml.Append("' expires='");
-					Xml.Append(XML.Encode(Expires));
-					Xml.Append("'/>");
-
-					e.IqResult(Xml.ToString());
-				}
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else if (!(Node is ISniffable Sniffable))
+				e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+			else
 			{
-				e.IqError(ex);
+				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1));
+				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this);
+				DateTime MaxExpires = DateTime.Now.AddDays(1);
+
+				if (Expires > MaxExpires)
+					Expires = MaxExpires;
+
+				Sniffable.Add(Sniffer);
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<sniffer xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("' snifferId='");
+				Xml.Append(Sniffer.Id);
+				Xml.Append("' expires='");
+				Xml.Append(XML.Encode(Expires));
+				Xml.Append("'/>");
+
+				e.IqResult(Xml.ToString());
 			}
 		}
 
-		private async void UnregisterSnifferHandler(object Sender, IqEventArgs e)
+		private async Task UnregisterSnifferHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			ThingReference ThingRef = GetThingReference(e.Query);
+			DataSourceRec Rec;
+			INode Node;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				ThingReference ThingRef = GetThingReference(e.Query);
-				DataSourceRec Rec;
-				INode Node;
+				if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null)
+				Node = null;
+			else
+				Node = await Rec.Source.GetNodeAsync(ThingRef);
+
+			if (Node is null || !await Node.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			else if (!await Node.CanEditAsync(Caller))
+				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+			else if (!(Node is ISniffable Sniffable))
+				e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+			else
+			{
+				string Id = XML.Attribute(e.Query, "snifferId");
+
+				if (Sniffable.HasSniffers)
 				{
-					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null)
-					Node = null;
-				else
-					Node = await Rec.Source.GetNodeAsync(ThingRef);
-
-				if (Node is null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
-				else if (!await Node.CanEditAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-				else if (!(Node is ISniffable Sniffable))
-					e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
-				else
-				{
-					string Id = XML.Attribute(e.Query, "snifferId");
-
-					if (Sniffable.HasSniffers)
+					foreach (ISniffer Sniffer in Sniffable.Sniffers)
 					{
-						foreach (ISniffer Sniffer in Sniffable.Sniffers)
+						if (Sniffer is RemoteSniffer RemoteSniffer && RemoteSniffer.Id == Id)
 						{
-							if (Sniffer is RemoteSniffer RemoteSniffer && RemoteSniffer.Id == Id)
-							{
-								Sniffable.Remove(RemoteSniffer);
+							Sniffable.Remove(RemoteSniffer);
 
-								e.IqResult(string.Empty);
-								return;
-							}
+							e.IqResult(string.Empty);
+							return;
 						}
 					}
-
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
 			}
 		}
 
@@ -4399,19 +4154,19 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Data Source Events
 
-		private void DataSource_OnEvent(object Sender, SourceEvent Event)
+		private Task DataSource_OnEvent(object _, SourceEvent Event)
 		{
 			DataSourceRec Rec;
 
 			lock (this.synchObject)
 			{
 				if (!this.dataSources.TryGetValue(Event.SourceId, out Rec))
-					return;
+					return Task.CompletedTask;
 			}
 
 			SubscriptionRec[] Subscriptions = Rec.SubscriptionsStatic;
 			if (Subscriptions is null || Subscriptions.Length == 0 || this.client.State != XmppState.Connected)
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = null;
 			LinkedList<string> ToRemove = null;
@@ -4421,6 +4176,8 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (ToRemove != null)
 				this.Remove(Rec, ToRemove);
+
+			return Task.CompletedTask;
 		}
 
 		private void Remove(DataSourceRec Rec, LinkedList<string> ToRemove)
@@ -4652,165 +4409,150 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(SourceEvent.Timestamp));
 		}
 
-		private async void SubscribeHandler(object Sender, IqEventArgs e)
+		private async Task SubscribeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			string SourceId = XML.Attribute(e.Query, "src");
+			int TtlSeconds = XML.Attribute(e.Query, "ttl", 0);
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "src");
-				int TtlSeconds = XML.Attribute(e.Query, "ttl", 0);
-				DataSourceRec Rec;
-
-				lock (this.synchObject)
-				{
-					if (!this.dataSources.TryGetValue(SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-				else if (TtlSeconds <= 0)
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 23, "Invalid timeout value."), e.IQ));
-				else
-				{
-					DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
-					bool Parameters = XML.Attribute(e.Query, "parameters", false);
-					bool Messages = XML.Attribute(e.Query, "messages", false);
-					SourceEventType Types = SourceEventType.None;
-
-					if (XML.Attribute(e.Query, "nodeAdded", true))
-						Types |= SourceEventType.NodeAdded;
-
-					if (XML.Attribute(e.Query, "nodeUpdated", true))
-						Types |= SourceEventType.NodeUpdated;
-
-					if (XML.Attribute(e.Query, "nodeStatusChanged", true))
-						Types |= SourceEventType.NodeStatusChanged;
-
-					if (XML.Attribute(e.Query, "nodeRemoved", true))
-						Types |= SourceEventType.NodeRemoved;
-
-					if (XML.Attribute(e.Query, "nodeMovedUp", true))
-						Types |= SourceEventType.NodeMovedUp;
-
-					if (XML.Attribute(e.Query, "nodeMovedDown", true))
-						Types |= SourceEventType.NodeMovedDown;
-
-					SubscriptionRec SubscriptionRec;
-
-					lock (Rec.Subscriptions)
-					{
-						if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec))
-						{
-							SubscriptionRec.EventTypes |= Types;
-							SubscriptionRec.Messages |= Messages;
-							SubscriptionRec.Parameters |= Parameters;
-							SubscriptionRec.Language = Language;
-							SubscriptionRec.Expires = DateTime.Now.AddSeconds(TtlSeconds);
-						}
-						else
-						{
-							Rec.Subscriptions[e.From] = SubscriptionRec = new SubscriptionRec()
-							{
-								Jid = e.From,
-								EventTypes = Types,
-								Messages = Messages,
-								Parameters = Parameters,
-								Language = Language,
-								Expires = DateTime.Now.AddSeconds(TtlSeconds)
-							};
-
-							Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
-						}
-					}
-
-					e.IqResult(string.Empty);
-
-					if (GetEventsSince <= DateTime.Now)
-					{
-						StringBuilder Xml = null;
-						LinkedList<string> ToRemove = null;
-
-						foreach (SourceEvent Event in await Database.Find<SourceEvent>(new FilterAnd(new FilterFieldEqualTo("SourceId", SourceId),
-							new FilterFieldGreaterOrEqualTo("Timestamp", GetEventsSince)), "SourceId", "Timestamp"))
-						{
-							this.SendEventMessage(SubscriptionRec, Event, ref ToRemove, ref Xml);
-							if (ToRemove != null)
-							{
-								this.Remove(Rec, ToRemove);
-								break;
-							}
-						}
-					}
-				}
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
+					Rec = null;
 			}
-			catch (Exception ex)
+
+			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+			else if (TtlSeconds <= 0)
+				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 23, "Invalid timeout value."), e.IQ));
+			else
 			{
-				e.IqError(ex);
+				DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
+				bool Parameters = XML.Attribute(e.Query, "parameters", false);
+				bool Messages = XML.Attribute(e.Query, "messages", false);
+				SourceEventType Types = SourceEventType.None;
+
+				if (XML.Attribute(e.Query, "nodeAdded", true))
+					Types |= SourceEventType.NodeAdded;
+
+				if (XML.Attribute(e.Query, "nodeUpdated", true))
+					Types |= SourceEventType.NodeUpdated;
+
+				if (XML.Attribute(e.Query, "nodeStatusChanged", true))
+					Types |= SourceEventType.NodeStatusChanged;
+
+				if (XML.Attribute(e.Query, "nodeRemoved", true))
+					Types |= SourceEventType.NodeRemoved;
+
+				if (XML.Attribute(e.Query, "nodeMovedUp", true))
+					Types |= SourceEventType.NodeMovedUp;
+
+				if (XML.Attribute(e.Query, "nodeMovedDown", true))
+					Types |= SourceEventType.NodeMovedDown;
+
+				SubscriptionRec SubscriptionRec;
+
+				lock (Rec.Subscriptions)
+				{
+					if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec))
+					{
+						SubscriptionRec.EventTypes |= Types;
+						SubscriptionRec.Messages |= Messages;
+						SubscriptionRec.Parameters |= Parameters;
+						SubscriptionRec.Language = Language;
+						SubscriptionRec.Expires = DateTime.Now.AddSeconds(TtlSeconds);
+					}
+					else
+					{
+						Rec.Subscriptions[e.From] = SubscriptionRec = new SubscriptionRec()
+						{
+							Jid = e.From,
+							EventTypes = Types,
+							Messages = Messages,
+							Parameters = Parameters,
+							Language = Language,
+							Expires = DateTime.Now.AddSeconds(TtlSeconds)
+						};
+
+						Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
+					}
+				}
+
+				e.IqResult(string.Empty);
+
+				if (GetEventsSince <= DateTime.Now)
+				{
+					StringBuilder Xml = null;
+					LinkedList<string> ToRemove = null;
+
+					foreach (SourceEvent Event in await Database.Find<SourceEvent>(new FilterAnd(new FilterFieldEqualTo("SourceId", SourceId),
+						new FilterFieldGreaterOrEqualTo("Timestamp", GetEventsSince)), "SourceId", "Timestamp"))
+					{
+						this.SendEventMessage(SubscriptionRec, Event, ref ToRemove, ref Xml);
+						if (ToRemove != null)
+						{
+							this.Remove(Rec, ToRemove);
+							break;
+						}
+					}
+				}
 			}
 		}
 
-		private async void UnsubscribeHandler(object Sender, IqEventArgs e)
+		private async Task UnsubscribeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			Language Language = await GetLanguage(e.Query);
+			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			string SourceId = XML.Attribute(e.Query, "src");
+			DataSourceRec Rec;
+
+			lock (this.synchObject)
 			{
-				Language Language = await GetLanguage(e.Query);
-				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "src");
-				DataSourceRec Rec;
+				if (!this.dataSources.TryGetValue(SourceId, out Rec))
+					Rec = null;
+			}
 
-				lock (this.synchObject)
+			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+			else
+			{
+				SourceEventType Types = SourceEventType.None;
+
+				if (XML.Attribute(e.Query, "nodeAdded", true))
+					Types |= SourceEventType.NodeAdded;
+
+				if (XML.Attribute(e.Query, "nodeUpdated", true))
+					Types |= SourceEventType.NodeUpdated;
+
+				if (XML.Attribute(e.Query, "nodeStatusChanged", true))
+					Types |= SourceEventType.NodeStatusChanged;
+
+				if (XML.Attribute(e.Query, "nodeRemoved", true))
+					Types |= SourceEventType.NodeRemoved;
+
+				if (XML.Attribute(e.Query, "nodeMovedUp", true))
+					Types |= SourceEventType.NodeMovedUp;
+
+				if (XML.Attribute(e.Query, "nodeMovedDown", true))
+					Types |= SourceEventType.NodeMovedDown;
+
+				lock (Rec.Subscriptions)
 				{
-					if (!this.dataSources.TryGetValue(SourceId, out Rec))
-						Rec = null;
-				}
-
-				if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
-				else
-				{
-					DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
-					SourceEventType Types = SourceEventType.None;
-
-					if (XML.Attribute(e.Query, "nodeAdded", true))
-						Types |= SourceEventType.NodeAdded;
-
-					if (XML.Attribute(e.Query, "nodeUpdated", true))
-						Types |= SourceEventType.NodeUpdated;
-
-					if (XML.Attribute(e.Query, "nodeStatusChanged", true))
-						Types |= SourceEventType.NodeStatusChanged;
-
-					if (XML.Attribute(e.Query, "nodeRemoved", true))
-						Types |= SourceEventType.NodeRemoved;
-
-					if (XML.Attribute(e.Query, "nodeMovedUp", true))
-						Types |= SourceEventType.NodeMovedUp;
-
-					if (XML.Attribute(e.Query, "nodeMovedDown", true))
-						Types |= SourceEventType.NodeMovedDown;
-
-					lock (Rec.Subscriptions)
+					if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec SubscriptionRec))
 					{
-						if (Rec.Subscriptions.TryGetValue(e.From, out SubscriptionRec SubscriptionRec))
-						{
-							SubscriptionRec.EventTypes &= ~Types;
+						SubscriptionRec.EventTypes &= ~Types;
 
-							if (SubscriptionRec.EventTypes == SourceEventType.None)
-							{
-								Rec.Subscriptions.Remove(e.From);
-								Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
-							}
+						if (SubscriptionRec.EventTypes == SourceEventType.None)
+						{
+							Rec.Subscriptions.Remove(e.From);
+							Rec.SubscriptionsStatic = ToArray(Rec.Subscriptions);
 						}
 					}
-
-					e.IqResult(string.Empty);
 				}
-			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
+
+				e.IqResult(string.Empty);
 			}
 		}
 

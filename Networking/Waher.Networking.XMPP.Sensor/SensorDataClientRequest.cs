@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
+using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Things;
@@ -14,21 +14,21 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New State.</param>
-	public delegate void SensorDataReadoutStateChangedEventHandler(object Sender, SensorDataReadoutState NewState);
+	public delegate Task SensorDataReadoutStateChangedEventHandler(object Sender, SensorDataReadoutState NewState);
 
 	/// <summary>
 	/// Delegate for events triggered when readout errors have been received.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewErrors">New errors received. For a list of all errors received, see <see cref="SensorDataClientRequest.Errors"/>.</param>
-	public delegate void SensorDataReadoutErrorsReportedEventHandler(object Sender, IEnumerable<ThingError> NewErrors);
+	public delegate Task SensorDataReadoutErrorsReportedEventHandler(object Sender, IEnumerable<ThingError> NewErrors);
 
 	/// <summary>
 	/// Delegate for events triggered when readout fields have been received.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewFields">New fields received. For a list of all fields received, see <see cref="SensorDataClientRequest.ReadFields"/>.</param>
-	public delegate void SensorDataReadoutFieldsReportedEventHandler(object Sender, IEnumerable<Field> NewFields);
+	public delegate Task SensorDataReadoutFieldsReportedEventHandler(object Sender, IEnumerable<Field> NewFields);
 
 	/// <summary>
 	/// Manages a sensor data client request.
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private List<Field> readFields = null;
 		private List<ThingError> errors = null;
 		private SensorDataReadoutState state = SensorDataReadoutState.Requested;
-		private object synchObject = new object();
+		private readonly object synchObject = new object();
 		private bool queued;
 
 		/// <summary>
@@ -80,23 +80,24 @@ namespace Waher.Networking.XMPP.Sensor
 		public SensorDataReadoutState State
 		{
 			get { return this.state; }
-			internal set
-			{
-				if (this.state != value)
-				{
-					this.state = value;
+		}
 
-					SensorDataReadoutStateChangedEventHandler h = this.OnStateChanged;
-					if (h != null)
+		internal async Task SetState(SensorDataReadoutState NewState)
+		{
+			if (this.state != NewState)
+			{
+				this.state = NewState;
+
+				SensorDataReadoutStateChangedEventHandler h = this.OnStateChanged;
+				if (h != null)
+				{
+					try
 					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
+						await h(this, NewState);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
 					}
 				}
 			}
@@ -119,13 +120,13 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public event SensorDataReadoutFieldsReportedEventHandler OnFieldsReceived = null;
 
-		internal void Fail(string Reason)
+		internal async Task Fail(string Reason)
 		{
-			this.LogErrors(new ThingError[] { new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, Reason) });
-			this.State = SensorDataReadoutState.Failure;
+			await this.LogErrors(new ThingError[] { new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, Reason) });
+			await this.SetState(SensorDataReadoutState.Failure);
 		}
 
-		internal virtual void LogErrors(IEnumerable<ThingError> Errors)
+		internal virtual async Task LogErrors(IEnumerable<ThingError> Errors)
 		{
 			lock (this.synchObject)
 			{
@@ -140,7 +141,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				try
 				{
-					h(this, Errors);
+					await h(this, Errors);
 				}
 				catch (Exception ex)
 				{
@@ -149,7 +150,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		internal virtual void LogFields(IEnumerable<Field> Fields)
+		internal virtual async Task LogFields(IEnumerable<Field> Fields)
 		{
 			lock (this.synchObject)
 			{
@@ -168,7 +169,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				try
 				{
-					h(this, Fields);
+					await h(this, Fields);
 				}
 				catch (Exception ex)
 				{
@@ -181,18 +182,15 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			lock (this.synchObject)
 			{
-				if (this.readFields != null)
-					this.readFields.Clear();
-
-				if (this.errors != null)
-					this.errors.Clear();
+				this.readFields?.Clear();
+				this.errors?.Clear();
 			}
 		}
 
-		internal void Accept(bool Queued)
+		internal Task Accept(bool Queued)
 		{
 			this.queued = Queued;
-			this.State = SensorDataReadoutState.Accepted;
+			return this.SetState(SensorDataReadoutState.Accepted);
 		}
 
 		/// <summary>
@@ -235,18 +233,18 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public bool Queued { get { return this.queued; } }
 
-		internal void Started()
+		internal Task Started()
 		{
 			if (this.state == SensorDataReadoutState.Done || this.state == SensorDataReadoutState.Failure)
 				this.Clear();
 
-			this.State = SensorDataReadoutState.Started;
+			return this.SetState(SensorDataReadoutState.Started);
 		}
 
 		/// <summary>
 		/// Cancels the readout.
 		/// </summary>
-		public virtual void Cancel()
+		public virtual Task Cancel()
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -257,27 +255,26 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append("'/>");
 
 			this.sensorClient?.Client?.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
+
+			return Task.CompletedTask;
 		}
 
-		private void CancelResponse(object Sender, IqResultEventArgs e)
+		private Task CancelResponse(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
-				this.Cancelled();
+				return this.Cancelled();
 			else
-				this.Fail(e.ErrorText);
+				return this.Fail(e.ErrorText);
 		}
 
-		internal void Cancelled()
+		internal Task Cancelled()
 		{
-			this.State = SensorDataReadoutState.Cancelled;
+			return this.SetState(SensorDataReadoutState.Cancelled);
 		}
 
-		internal void Done()
+		internal Task Done()
 		{
-			if (this.errors is null)
-				this.State = SensorDataReadoutState.Done;
-			else
-				this.State = SensorDataReadoutState.Failure;
+			return this.SetState(this.errors is null ? SensorDataReadoutState.Done : SensorDataReadoutState.Failure);
 		}
 
 	}

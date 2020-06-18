@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
@@ -101,7 +101,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			using (Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName))
 			{
@@ -133,7 +133,7 @@ namespace Waher.Networking.HTTP
 						if (i <= 0)
 							throw new Exception("Unexpected end of stream.");
 
-						Response.Write(Buffer, 0, i);
+						await Response.Write(Buffer, 0, i);
 						Pos += i;
 					}
 				}

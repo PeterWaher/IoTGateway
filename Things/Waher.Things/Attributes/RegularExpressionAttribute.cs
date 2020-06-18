@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -12,7 +8,7 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class RegularExpressionAttribute : Attribute
 	{
-		private string pattern;
+		private readonly string pattern;
 
 		/// <summary>
 		/// Validates input against a regular expression.

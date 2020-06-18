@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using Waher.Content.Xml;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -39,55 +37,58 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Readout failed.
 		/// </summary>
 		/// <param name="Reason">Reason for failure.</param>
-		public new void Fail(string Reason)
+		public new Task Fail(string Reason)
 		{
-			base.Fail(Reason);
+			return base.Fail(Reason);
 		}
 
 		/// <summary>
 		/// Errors logged.
 		/// </summary>
 		/// <param name="Errors">Errors</param>
-		public new void LogErrors(IEnumerable<ThingError> Errors)
+		public new Task LogErrors(IEnumerable<ThingError> Errors)
 		{
-			base.LogErrors(Errors);
+			return base.LogErrors(Errors);
 		}
 
 		/// <summary>
 		/// Fields logged.
 		/// </summary>
 		/// <param name="Fields"></param>
-		public new void LogFields(IEnumerable<Field> Fields)
+		public new Task LogFields(IEnumerable<Field> Fields)
 		{
-			base.LogFields(Fields);
+			return base.LogFields(Fields);
 		}
 
 		/// <summary>
 		/// Readout accepted.
 		/// </summary>
 		/// <param name="Queued">If it has been queued.</param>
-		public new void Accept(bool Queued)
+		public new Task Accept(bool Queued)
 		{
-			base.Accept(Queued);
+			return base.Accept(Queued);
 		}
 
 		/// <summary>
 		/// Readout started.
 		/// </summary>
-		public new void Started()
+		public new Task Started()
 		{
-			base.Started();
+			return base.Started();
 		}
 
 		/// <summary>
 		/// Cancels the readout.
 		/// </summary>
-		public override void Cancel()
+		public override async Task Cancel()
 		{
 			try
 			{
-				this.OnCancel?.Invoke(this, new EventArgs());
-				this.State = SensorDataReadoutState.Cancelled;
+				await this.SetState(SensorDataReadoutState.Cancelled);
+
+				EventHandlerAsync h = this.OnCancel;
+				if (!(h is null))
+					await h(this, new EventArgs());
 			}
 			catch (Exception ex)
 			{
@@ -98,7 +99,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Event raised when readout is cancelled.
 		/// </summary>
-		public EventHandler OnCancel = null;
+		public EventHandlerAsync OnCancel = null;
 
 		/// <summary>
 		/// Readout complete.

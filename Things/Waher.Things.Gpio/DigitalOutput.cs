@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
 using Waher.Persistence.Attributes;
@@ -85,7 +83,7 @@ namespace Waher.Things.Gpio
 			return Language.GetStringAsync(typeof(Controller), 6, "Digital Output");
 		}
 
-		public void StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -99,7 +97,7 @@ namespace Waher.Things.Gpio
 						this.LogErrorAsync(Id, s);
 
 						Request.ReportErrors(true, new ThingError(this, s));
-						return;
+						return Task.CompletedTask;
 					}
 
 					this.SetDriveMode(this.mode);
@@ -140,6 +138,8 @@ namespace Waher.Things.Gpio
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public override Task DestroyAsync()
@@ -153,28 +153,28 @@ namespace Waher.Things.Gpio
 			return base.DestroyAsync();
 		}
 
-		public ControlParameter[] GetControlParameters()
+		public Task<ControlParameter[]> GetControlParameters()
 		{
-			return new ControlParameter[]
+			return Task.FromResult<ControlParameter[]>(new ControlParameter[]
 			{
 				new BooleanControlParameter("Value", "Output", "Value:", "Value of output.", this.GetValue, this.SetValue)
-			};
+			});
 		}
 
-		private bool? GetValue(IThingReference Node)
+		private Task<bool?> GetValue(IThingReference Node)
 		{
 			if (this.pin is null)
 			{
-				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
+				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus _))
 					return null;
 
 				this.SetDriveMode(this.mode);
 			}
 
-			return this.pin.Read() == GpioPinValue.High;
+			return Task.FromResult<bool?>(this.pin.Read() == GpioPinValue.High);
 		}
 
-		private void SetValue(IThingReference Node, bool Value)
+		private Task SetValue(IThingReference Node, bool Value)
 		{
 			if (this.pin is null)
 			{
@@ -185,6 +185,8 @@ namespace Waher.Things.Gpio
 			}
 
 			this.pin.Write(Value ? GpioPinValue.High : GpioPinValue.Low);
+		
+			return Task.CompletedTask;
 		}
 
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)

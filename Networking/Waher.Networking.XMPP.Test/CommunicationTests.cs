@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -132,7 +131,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
-		private void Client_OnStateChanged1(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged1(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -151,9 +150,11 @@ namespace Waher.Networking.XMPP.Test
 				case XmppState.Connecting:
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Client_OnStateChanged2(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged2(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -172,26 +173,32 @@ namespace Waher.Networking.XMPP.Test
 				case XmppState.Connecting:
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		void Client_OnError1(object Sender, Exception Exception)
+		Task Client_OnError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnError2(object Sender, Exception Exception)
+		Task Client_OnError2(object Sender, Exception Exception)
 		{
 			this.ex2 = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnConnectionError1(object Sender, Exception Exception)
+		Task Client_OnConnectionError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnConnectionError2(object Sender, Exception Exception)
+		Task Client_OnConnectionError2(object Sender, Exception Exception)
 		{
 			this.ex2 = Exception;
+			return Task.CompletedTask;
 		}
 
 		private int Wait1(int Timeout)

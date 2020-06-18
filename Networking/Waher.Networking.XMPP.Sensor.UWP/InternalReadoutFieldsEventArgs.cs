@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Sensor
@@ -10,14 +10,14 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void InternalReadoutFieldsEventHandler(object Sender, InternalReadoutFieldsEventArgs e);
+	public delegate Task InternalReadoutFieldsEventHandler(object Sender, InternalReadoutFieldsEventArgs e);
 
 	/// <summary>
 	/// Event arguments for internal readout field events.
 	/// </summary>
 	public class InternalReadoutFieldsEventArgs : InternalReadoutEventArgs
 	{
-		private IEnumerable<Field> fields;
+		private readonly IEnumerable<Field> fields;
 
 		/// <summary>
 		/// Event arguments for internal readout field events.

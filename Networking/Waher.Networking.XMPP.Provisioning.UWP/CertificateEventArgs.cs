@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CertificateCallback(object Sender, CertificateEventArgs e);
+	public delegate Task CertificateCallback(object Sender, CertificateEventArgs e);
 
 	/// <summary>
 	/// Event arguments for token callbacks.
@@ -26,9 +26,9 @@ namespace Waher.Networking.XMPP.Provisioning
 	public class CertificateEventArgs : IqResultEventArgs
 	{
 #if WINDOWS_UWP
-		private Certificate certificate;
+		private readonly Certificate certificate;
 #else
-		private X509Certificate2 certificate;
+		private readonly X509Certificate2 certificate;
 #endif
 
 		internal CertificateEventArgs(IqResultEventArgs e, object State, byte[] CertificateBlob)

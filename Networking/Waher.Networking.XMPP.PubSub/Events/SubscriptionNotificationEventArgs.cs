@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PubSub
 {
@@ -9,16 +8,16 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void SubscriptionNotificationEventHandler(object Sender, SubscriptionNotificationEventArgs e);
+	public delegate Task SubscriptionNotificationEventHandler(object Sender, SubscriptionNotificationEventArgs e);
 
 	/// <summary>
 	/// Event argument for subscription event notification events.
 	/// </summary>
 	public class SubscriptionNotificationEventArgs : MessageEventArgs
     {
-		private string nodeName;
-		private string jid;
-		private NodeSubscriptionStatus status;
+		private readonly string nodeName;
+		private readonly string jid;
+		private readonly NodeSubscriptionStatus status;
 
 		/// <summary>
 		/// Event argument for subscription event notification events.

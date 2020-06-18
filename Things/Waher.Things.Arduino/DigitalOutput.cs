@@ -40,7 +40,7 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
-		public void StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -59,7 +59,7 @@ namespace Waher.Things.Arduino
 					Fields.Add(new BooleanField(this, Now, "Value", Device.digitalRead(this.PinNr) == PinState.HIGH, FieldType.Momentary, FieldQoS.AutomaticReadout,
 						typeof(Module).Namespace, 13));
 				}
-				
+
 				if (Request.IsIncluded(FieldType.Identity))
 				{
 					Fields.Add(new Int32Field(this, Now, "Pin Number", this.PinNr, FieldType.Identity, FieldQoS.AutomaticReadout,
@@ -80,6 +80,8 @@ namespace Waher.Things.Arduino
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public override void Pin_ValueChanged(PinState NewState)
@@ -88,16 +90,16 @@ namespace Waher.Things.Arduino
 				typeof(Module).Namespace, 13));
 		}
 
-		public ControlParameter[] GetControlParameters()
+		public Task<ControlParameter[]> GetControlParameters()
 		{
 			RemoteDevice Device = this.Device;
 			if (Device is null)
-				return new ControlParameter[0];
+				return Task.FromResult<ControlParameter[]>(new ControlParameter[0]);
 
-			return new ControlParameter[]
+			return Task.FromResult<ControlParameter[]>(new ControlParameter[]
 			{
 				new BooleanControlParameter("Output", "Actuator", "Output:", "Digital output.",
-					(Node) => Device.digitalRead(this.PinNr) == PinState.HIGH,
+					(Node) => Task.FromResult<bool?>(Device.digitalRead(this.PinNr) == PinState.HIGH),
 					(Node, Value) =>
 					{
 						try
@@ -108,8 +110,10 @@ namespace Waher.Things.Arduino
 						{
 							Log.Critical(ex);
 						}
+
+						return Task.CompletedTask;
 					})
-			};
+			});
 		}
 
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)

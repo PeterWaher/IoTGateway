@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
+using System.Threading.Tasks;
 #if !WINDOWS_UWP
 using Waher.Content.Xsl;
 #endif
@@ -372,6 +373,8 @@ namespace Waher.Mock
 									Failure.Set();
 									break;
 							}
+
+							return Task.CompletedTask;
 						};
 
 						switch (WaitHandle.WaitAny(new WaitHandle[] { Connected, Failure }, 20000))

@@ -120,7 +120,7 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
-		public void StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -160,6 +160,8 @@ namespace Waher.Things.Arduino
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void CalcMomentary(List<Field> Fields, DateTime Now, ushort Raw)

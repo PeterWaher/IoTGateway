@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.BitsOfBinary;
@@ -49,14 +49,14 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Form">Data Form.</param>
-	public delegate void DataFormEventHandler(object Sender, DataForm Form);
+	public delegate Task DataFormEventHandler(object Sender, DataForm Form);
 
 	/// <summary>
 	/// Data form IQ result callback method delegate.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void DataFormResultEventHandler(object Sender, DataFormEventArgs e);
+	public delegate Task DataFormResultEventHandler(object Sender, DataFormEventArgs e);
 
 	/// <summary>
 	/// Implements support for data forms. Data Forms are defined in the following XEPs:
@@ -309,6 +309,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 									Bin = Convert.FromBase64String(s);
 									MediaField.Media.Binary = Bin;
+									MediaField.Media.ContentType = ContentType;
 									break;
 
 								case "http":
@@ -426,7 +427,7 @@ namespace Waher.Networking.XMPP.DataForms
 			List<KeyValuePair<string, string>> OptionStrings = null;
 			string Description = string.Empty;
 			string DataTypeName = null;
-			DataType DataType = null;
+			DataType DataType;
 			ValidationMethod ValidationMethod = null;
 			Field Field;
 			string Error = null;

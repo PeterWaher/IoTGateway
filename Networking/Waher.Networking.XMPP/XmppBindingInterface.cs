@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP
 {
@@ -47,9 +46,9 @@ namespace Waher.Networking.XMPP
 		/// Report an error on the connection.
 		/// </summary>
 		/// <param name="ex">Exception causing the error.</param>
-		public void ConnectionError(Exception ex)
+		public Task ConnectionError(Exception ex)
 		{
-			this.client.ConnectionError(ex);
+			return this.client.ConnectionError(ex);
 		}
 
 	}

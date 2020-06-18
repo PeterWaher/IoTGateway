@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.XMPP.P2P.E2E;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -88,7 +86,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void IdentityValidationEventHandler(object Sender, IdentityValidationEventArgs e);
+	public delegate Task IdentityValidationEventHandler(object Sender, IdentityValidationEventArgs e);
 
 	/// <summary>
 	/// Event arguments for identity validation responses

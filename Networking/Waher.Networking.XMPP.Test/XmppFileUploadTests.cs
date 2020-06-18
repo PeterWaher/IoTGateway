@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HttpFileUpload;
 
 namespace Waher.Networking.XMPP.Test
@@ -49,7 +46,7 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitConnected1(5000);
 		}
 
-		private void Client_OnStateChanged1(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged1(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -68,16 +65,20 @@ namespace Waher.Networking.XMPP.Test
 				case XmppState.Connecting:
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		void Client_OnError1(object Sender, Exception Exception)
+		Task Client_OnError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnConnectionError1(object Sender, Exception Exception)
+		Task Client_OnConnectionError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
+			return Task.CompletedTask;
 		}
 
 		private int Wait1(int Timeout)
@@ -165,6 +166,9 @@ namespace Waher.Networking.XMPP.Test
 					Done.Set();
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }), 5000);

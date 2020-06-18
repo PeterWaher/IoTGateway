@@ -206,9 +206,12 @@ namespace Waher.Things.Mqtt.Model
 								Current = Parent;
 								Parent = Parent.parent;
 							}
+
+							return Task.CompletedTask;
 						},
 						(sender, e) =>
 						{
+							return Task.CompletedTask;
 						}, null);
 
 					this.StartReadout(Request);

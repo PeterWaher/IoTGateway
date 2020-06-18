@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using Waher.Content;
-using Waher.Events;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.DataTypes;
@@ -111,27 +105,34 @@ namespace Waher.Client.WPF.Model.PubSub
 			this.pubSubClient.SubscriptionRequest += PubSubClient_SubscriptionRequest;
 		}
 
-		private void PubSubClient_SubscriptionRequest(object Sender, SubscriptionRequestEventArgs e)
+		private Task PubSubClient_SubscriptionRequest(object Sender, SubscriptionRequestEventArgs e)
 		{
 			// TODO
+			return Task.CompletedTask;
 		}
 
-		private void PubSubClient_NodePurged(object Sender, NodeNotificationEventArgs e)
+		private Task PubSubClient_NodePurged(object Sender, NodeNotificationEventArgs e)
 		{
 			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
 				Node.Purged(e);
+		
+			return Task.CompletedTask;
 		}
 
-		private void PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
+		private Task PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
 		{
 			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
 				Node.ItemRetracted(e);
+		
+			return Task.CompletedTask;
 		}
 
-		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
+		private Task PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
 		{
 			if (this.TryGetChild(e.NodeName, out TreeNode N) && N is PubSubNode Node)
 				Node.ItemNotification(e);
+
+			return Task.CompletedTask;
 		}
 
 		public PubSubClient PubSubClient
@@ -203,11 +204,17 @@ namespace Waher.Client.WPF.Model.PubSub
 									this.OnUpdated();
 									this.NodesAdded(new TreeNode[] { NewNode }, this);
 								}
+
+								return Task.CompletedTask;
+
 							}, Item);
 						}
 					}
 					else
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get root nodes." : e.ErrorText);
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 
@@ -274,12 +281,17 @@ namespace Waher.Client.WPF.Model.PubSub
 								}
 								else
 									MainWindow.ErrorBox("Unable to create node: " + e3.ErrorText);
+
+								return Task.CompletedTask;
 							}, null);
+
+							return Task.CompletedTask;
 						},
 						(sender2, e2) =>
 						{
-						// Do nothing.
-					}, string.Empty, string.Empty, Fields);
+							// Do nothing.
+							return Task.CompletedTask;
+						}, string.Empty, string.Empty, Fields);
 
 					ParameterDialog Dialog = new ParameterDialog(Form);
 
@@ -290,6 +302,8 @@ namespace Waher.Client.WPF.Model.PubSub
 				}
 				else
 					MainWindow.ErrorBox("Unable to get default node properties: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -68,11 +67,9 @@ namespace Waher.Mock.Lamp.UWP
 			}
 #endif
 
-			Frame rootFrame = Window.Current.Content as Frame;
-
 			// Do not repeat app initialization when the Window already has content,
 			// just ensure that the window is active
-			if (rootFrame is null)
+			if (!(Window.Current.Content is Frame rootFrame))
 			{
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
@@ -150,6 +147,7 @@ namespace Waher.Mock.Lamp.UWP
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						this.RaiseOwnershipChanged();
+						return Task.CompletedTask;
 					};
 
 					thingRegistryClient.Disowned += (sender, e) =>
@@ -157,11 +155,13 @@ namespace Waher.Mock.Lamp.UWP
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
 						this.Register();    // Will call this.OwnershipChanged() after successful registration.
+						return Task.CompletedTask;
 					};
 
 					thingRegistryClient.Removed += (sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+						return Task.CompletedTask;
 					};
 				}
 
@@ -205,6 +205,8 @@ namespace Waher.Mock.Lamp.UWP
 								xmppClient.Reconnect();
 							break;
 					}
+				
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnPresenceSubscribe += (sender, e) =>
@@ -218,18 +220,23 @@ namespace Waher.Mock.Lamp.UWP
 						xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
 					xmppClient.SetPresence(Availability.Chat);
+				
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
 					e.Accept();
+					return Task.CompletedTask;
 				};
 
 				xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
 					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 						xmppClient.RemoveRosterItem(e.BareJid);
+				
+					return Task.CompletedTask;
 				};
 
 				bool SwitchOn = false;
@@ -242,16 +249,19 @@ namespace Waher.Mock.Lamp.UWP
 					Log.Informational("Readout requested", string.Empty, Request.Actor);
 
 					Request.ReportFields(true, new BooleanField(ThingReference.Empty, Now, "Lamp", SwitchOn, FieldType.Momentary, FieldQoS.AutomaticReadout));
+				
+					return Task.CompletedTask;
 				};
 
 				controlServer = new ControlServer(xmppClient,
 					new BooleanControlParameter("Lamp", "Control", "Lamp switch on.", "If checked, lamp is turned on.",
-						(Node) => SwitchOn,
+						(Node) => Task.FromResult<bool?>(SwitchOn),
 						(Node, Value) =>
 						{
 							SwitchOn = Value;
 							Log.Informational("Lamp turned " + (SwitchOn ? "ON" : "OFF"));
 							UpdateMainWindow(SwitchOn);
+							return Task.CompletedTask;
 						}));
 
 				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
@@ -261,6 +271,7 @@ namespace Waher.Mock.Lamp.UWP
 				interoperabilityServer.OnGetInterfaces += (sender, e) =>
 				{
 					e.Add("XMPP.IoT.Actuator.Lamp");
+					return Task.CompletedTask;
 				};
 
 				xmppClient.Connect();
@@ -394,6 +405,9 @@ namespace Waher.Mock.Lamp.UWP
 
 					this.RaiseOwnershipChanged();
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

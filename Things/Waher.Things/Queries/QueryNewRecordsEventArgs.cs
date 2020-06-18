@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Queries
 {
@@ -11,7 +7,7 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class QueryNewRecordsEventArgs : QueryTableEventArgs
 	{
-		private Record[] records;
+		private readonly Record[] records;
 
 		/// <summary>
 		/// Base class for all query-related table events.

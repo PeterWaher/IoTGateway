@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void DataReceivedEventHandler(object Sender, DataReceivedEventArgs e);
+	public delegate Task DataReceivedEventHandler(object Sender, DataReceivedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for data reception events.

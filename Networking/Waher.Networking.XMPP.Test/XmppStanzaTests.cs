@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -17,7 +13,11 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
-			this.client2.OnChatMessage += (sender, e) => Done.Set();
+			this.client2.OnChatMessage += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
 
 			this.client1.SendChatMessage(this.client2.FullJID, "Hello");
 
@@ -29,7 +29,11 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
-			this.client2.OnChatMessage += (sender, e) => Done.Set();
+			this.client2.OnChatMessage += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
 
 			this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting");
 
@@ -41,7 +45,11 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new ManualResetEvent(false);
-			this.client2.OnChatMessage += (sender, e) => Done.Set();
+			this.client2.OnChatMessage += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
 
 			this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting", "en");
 
@@ -57,6 +65,8 @@ namespace Waher.Networking.XMPP.Test
 			{
 				if (e.From == this.client2.FullJID && e.Availability == Availability.Chat)
 					Done.Set();
+			
+				return Task.CompletedTask;
 			};
 
 			RosterItem Item1 = this.client1.GetRosterItem(this.client2.BareJID);
@@ -79,6 +89,8 @@ namespace Waher.Networking.XMPP.Test
 						e.Decline();
 						Error2.Set();
 					}
+
+					return Task.CompletedTask;
 				};
 
 				this.client1.RequestPresenceSubscription(this.client2.BareJID);
@@ -101,9 +113,10 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Presence not delivered properly.");
 		}
 
-		private void AddCustomXml(object Sender, CustomPresenceEventArgs e)
+		private Task AddCustomXml(object Sender, CustomPresenceEventArgs e)
 		{
 			e.Stanza.Append("<hola xmlns='bandola'>abc</hola>");
+			return Task.CompletedTask;
 		}
 
 		[TestMethod]
@@ -113,6 +126,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");
+				return Task.CompletedTask;
 			}, true);
 
 			this.client2.IqGet(this.client1.FullJID, "<query xmlns='test'/>", 10000);
@@ -125,6 +139,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");
+				return Task.CompletedTask;
 			}, true);
 
 			this.client2.IqSet(this.client1.FullJID, "<query xmlns='test'/>", 10000);

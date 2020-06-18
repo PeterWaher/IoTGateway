@@ -69,7 +69,7 @@ namespace Waher.Events.XMPP
 			}
 		}
 
-		private void Client_OnStateChanged(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -103,6 +103,8 @@ namespace Waher.Events.XMPP
 						this.client.Reconnect();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

@@ -316,10 +316,12 @@ namespace Waher.IoTGateway.Setup
 		private bool handlersAdded = false;
 		private ContractsClient prevClient = null;
 
-		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		private Task XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (NewState == XmppState.Connected)
 				this.GetLegalIdentities();
+
+			return Task.CompletedTask;
 		}
 
 		private void GetLegalIdentities()
@@ -331,6 +333,9 @@ namespace Waher.IoTGateway.Setup
 					approvedIdentities = this.SetLegalIdentities(e.Identities, null, false);
 					allIdentities = this.SetLegalIdentities(e.Identities, null, true);
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -386,7 +391,7 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private void ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
 			LegalIdentity ID = e.Identity;
 
@@ -407,6 +412,8 @@ namespace Waher.IoTGateway.Setup
 			Log.Notice("Legal Identity updated.", e.Identity.Id, Tags.ToArray());
 
 			this.UpdateClients(ID);
+
+			return Task.CompletedTask;
 		}
 
 		private void UpdateClients(LegalIdentity ID)
@@ -442,19 +449,22 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private void ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
+		private Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
 		{
 			Log.Notice("Smart contract signed.", e.ContractId, e.LegalId);
+			return Task.CompletedTask;
 		}
 
-		private void ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)
+		private Task ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)
 		{
 			Log.Notice("Smart contract updated.", e.ContractId);
+			return Task.CompletedTask;
 		}
 
-		private void ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)
+		private Task ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)
 		{
 			Log.Notice("Smart contract deleted.", e.ContractId);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -464,7 +474,7 @@ namespace Waher.IoTGateway.Setup
 		public override Task InitSetup(HttpServer WebServer)
 		{
 			this.applyLegalIdentity = WebServer.Register("/Settings/ApplyLegalIdentity", null, this.ApplyLegalIdentity, true, false, true);
-			this.contractAction = WebServer.Register("/Settings/ContractAction", null, this.ContractAction, false, false, true);
+			this.contractAction = WebServer.Register("/Settings/ContractAction", null, this.ContractAction, true, false, true);
 
 			return base.InitSetup(WebServer);
 		}
@@ -496,7 +506,7 @@ namespace Waher.IoTGateway.Setup
 			return base.SetupConfiguration(WebServer);
 		}
 
-		private void ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
+		private Task ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -582,10 +592,10 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
-			Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, new object[] { Password, TabID, ProtectWithPassword });
+			return Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, new object[] { Password, TabID, ProtectWithPassword });
 		}
 
-		private void ApplyResponse(object Sender, LegalIdentityEventArgs e)
+		private async Task ApplyResponse(object Sender, LegalIdentityEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string Password = (string)P[0];
@@ -615,7 +625,7 @@ namespace Waher.IoTGateway.Setup
 				}
 
 				this.Step = 1;
-				Task _ = Database.Update(this);
+				await Database.Update(this);
 
 				ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 
@@ -725,94 +735,87 @@ namespace Waher.IoTGateway.Setup
 			return null;
 		}
 
-		private async void ContractAction(HttpRequest Request, HttpResponse Response)
+		private async Task ContractAction(HttpRequest Request, HttpResponse Response)
 		{
-			try
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException("No content.");
+
+			string Password;
+			object Obj = Request.DecodeData();
+			if (!(Obj is Dictionary<string, object> Parameters))
+				throw new BadRequestException("Invalid content.");
+
+			if (!Parameters.TryGetValue("requestId", out Obj) || !(Obj is string RequestId) ||
+				!Parameters.TryGetValue("sign", out Obj) || !(Obj is bool Sign) ||
+				!Parameters.TryGetValue("protect", out Obj) || !(Obj is bool Protect))
 			{
-				Gateway.AssertUserAuthenticated(Request);
+				throw new BadRequestException("Invalid request.");
+			}
 
-				if (!Request.HasData)
-					throw new BadRequestException("No content.");
+			if (Protect)
+			{
+				if (!Parameters.TryGetValue("password", out Obj) || !(Obj is string s))
+					throw new BadRequestException("No password.");
 
-				string Password;
-				object Obj = Request.DecodeData();
-				if (!(Obj is Dictionary<string, object> Parameters))
-					throw new BadRequestException("Invalid content.");
+				Password = s;
+			}
+			else
+				Password = string.Empty;
 
-				if (!Parameters.TryGetValue("requestId", out Obj) || !(Obj is string RequestId) ||
-					!Parameters.TryGetValue("sign", out Obj) || !(Obj is bool Sign) ||
-					!Parameters.TryGetValue("protect", out Obj) || !(Obj is bool Protect))
+			ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId);
+			if (SignatureRequest is null)
+				throw new NotFoundException("Content Signature Request not found.");
+
+			if (SignatureRequest.Signed.HasValue)
+				throw new BadRequestException("Contract has already been signed.");
+
+			if (Protect)
+			{
+				if (approvedIdentities is null || approvedIdentities.Length == 0)
+					throw new BadRequestException("No approved legal identity found with which to sign the contract.");
+
+				string Id = null;
+
+				foreach (LegalIdentity ID in approvedIdentities)
 				{
-					throw new BadRequestException("Invalid request.");
-				}
+					string H = this.CalcPasswordhash(ID, Password);
 
-				if (Protect)
-				{
-					if (!Parameters.TryGetValue("password", out Obj) || !(Obj is string s))
-						throw new BadRequestException("No password.");
-
-					Password = s;
-				}
-				else
-					Password = string.Empty;
-
-				ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId);
-				if (SignatureRequest is null)
-					throw new NotFoundException("Content Signature Request not found.");
-
-				if (SignatureRequest.Signed.HasValue)
-					throw new BadRequestException("Contract has already been signed.");
-
-				if (Protect)
-				{
-					if (approvedIdentities is null || approvedIdentities.Length == 0)
-						throw new BadRequestException("No approved legal identity found with which to sign the contract.");
-
-					string Id = null;
-
-					foreach (LegalIdentity ID in approvedIdentities)
+					foreach (AlternativeField F in passwordHashes)
 					{
-						string H = this.CalcPasswordhash(ID, Password);
-
-						foreach (AlternativeField F in passwordHashes)
+						if (F.Key == ID.Id)
 						{
-							if (F.Key == ID.Id)
-							{
-								if (F.Value == H)
-									Id = F.Key;
+							if (F.Value == H)
+								Id = F.Key;
 
-								break;
-							}
-						}
-
-						if (!string.IsNullOrEmpty(Id))
 							break;
+						}
 					}
 
-					if (string.IsNullOrEmpty(Id))
-						throw new BadRequestException("Invalid password.");
+					if (!string.IsNullOrEmpty(Id))
+						break;
 				}
-				else if (this.protectWithPassword)
-					throw new BadRequestException("Legal identities protected with password.");
 
-				if (Sign)
-				{
-					SignatureRequest.Contract = await Gateway.ContractsClient.SignContractAsync(SignatureRequest.Contract, SignatureRequest.Role, false);
-					SignatureRequest.Signed = DateTime.Now;
-					await Database.Update(SignatureRequest);
-				}
-				else
-					await Database.Delete(SignatureRequest);
-
-				Response.StatusCode = 200;
-				Response.ContentType = "application/json";
-				Response.Write(JSON.Encode(Sign, false));
-				Response.SendResponse();
+				if (string.IsNullOrEmpty(Id))
+					throw new BadRequestException("Invalid password.");
 			}
-			catch (Exception ex)
+			else if (this.protectWithPassword)
+				throw new BadRequestException("Legal identities protected with password.");
+
+			if (Sign)
 			{
-				Response.SendResponse(ex);
+				SignatureRequest.Contract = await Gateway.ContractsClient.SignContractAsync(SignatureRequest.Contract, SignatureRequest.Role, false);
+				SignatureRequest.Signed = DateTime.Now;
+				await Database.Update(SignatureRequest);
 			}
+			else
+				await Database.Delete(SignatureRequest);
+
+			Response.StatusCode = 200;
+			Response.ContentType = "application/json";
+			await Response.Write(JSON.Encode(Sign, false));
+			await Response.SendResponse();
 		}
 
 

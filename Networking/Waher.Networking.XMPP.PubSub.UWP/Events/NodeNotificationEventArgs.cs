@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PubSub
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void NodeNotificationEventHandler(object Sender, NodeNotificationEventArgs e);
+	public delegate Task NodeNotificationEventHandler(object Sender, NodeNotificationEventArgs e);
 
 	/// <summary>
 	/// Event argument for node notification events.

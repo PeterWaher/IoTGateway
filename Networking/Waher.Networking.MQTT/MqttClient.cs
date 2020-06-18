@@ -229,7 +229,7 @@ namespace Waher.Networking.MQTT
 			}
 			catch (Exception ex)
 			{
-				this.ConnectionError(this, ex);
+				await this.ConnectionError(this, ex);
 			}
 		}
 
@@ -264,7 +264,7 @@ namespace Waher.Networking.MQTT
 			Task.Run(this.BeginConnect);
 		}
 
-		private void ConnectionError(object Sender, Exception ex)
+		private Task ConnectionError(object Sender, Exception ex)
 		{
 			MqttExceptionEventHandler h = this.OnConnectionError;
 			if (h != null)
@@ -283,6 +283,8 @@ namespace Waher.Networking.MQTT
 			this.Error(ex);
 
 			this.State = MqttState.Error;
+
+			return Task.CompletedTask;
 		}
 
 		private void CONNECT(int KeepAliveSeconds)

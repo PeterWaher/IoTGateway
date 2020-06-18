@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PEP
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Location"></param>
-	public delegate void UserLocationEventHandler(object Sender, UserLocationEventArguments Location);
+	public delegate Task UserLocationEventHandler(object Sender, UserLocationEventArguments Location);
 
 	/// <summary>
 	/// Event arguments for user location events.
 	/// </summary>
 	public class UserLocationEventArguments : PersonalEventNotificationEventArgs
 	{
-		private UserLocation location;
+		private readonly UserLocation location;
 
 		internal UserLocationEventArguments(UserLocation Location, PersonalEventNotificationEventArgs e):
 			base(e)

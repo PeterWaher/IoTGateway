@@ -712,7 +712,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		private Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
 			this.state = NewState;
 
@@ -731,6 +731,8 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.CallCallbacks();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

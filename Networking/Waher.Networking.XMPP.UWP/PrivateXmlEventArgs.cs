@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void PrivateXmlEventHandler(object Sender, PrivateXmlEventArgs e);
+	public delegate Task PrivateXmlEventHandler(object Sender, PrivateXmlEventArgs e);
 
 	/// <summary>
 	/// Event arguments for Private XML Storage callback methods.

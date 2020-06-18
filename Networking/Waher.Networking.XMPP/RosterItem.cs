@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.StanzaErrors;
@@ -357,7 +358,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void PingResult(object Sender, IqResultEventArgs e)
+		private Task PingResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -366,12 +367,14 @@ namespace Waher.Networking.XMPP
 			e2.Testing = false;
 
 			if (e.Ok)
-				return;
+				return Task.CompletedTask;
 
 			if (e.ErrorElement != null && e.ErrorElement.LocalName == FeatureNotImplementedException.LocalName)
-				return;
+				return Task.CompletedTask;
 
 			Client.Unavail(e2);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

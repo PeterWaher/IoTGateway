@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.client.UnregisterMessageHandler("cancel", HttpxClient.Namespace, this.CancelReceived, false);
 		}
 
-		private void ReqReceived(object Sender, IqEventArgs e)
+		private async Task ReqReceived(object Sender, IqEventArgs e)
 		{
 			if (this.requiresE2e && !e.UsesE2eEncryption)
 			{
@@ -194,12 +194,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Header is null)
 				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", this.server.VanityResources, HeaderFields.ToArray());
 
-			this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference,
-				MaxChunkSize, Sipub, Ibb, Socks5, Jingle);
+			await this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference,
+				MaxChunkSize, Ibb, Socks5);
 		}
 
-		internal void Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference,
-            int MaxChunkSize, bool Sipub, bool Ibb, bool Socks5, bool Jingle)
+		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference,
+            int MaxChunkSize, bool Ibb, bool Socks5)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
 			bool Result;
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
 							
-							this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 401, "Unauthorized", false, MaxChunkSize, Challenges.ToArray());
+							await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 401, "Unauthorized", false, MaxChunkSize, Challenges.ToArray());
 							Request.Dispose();
 							return;
 						}
@@ -246,32 +246,32 @@ namespace Waher.Networking.XMPP.HTTPX
 						{
 							if (!Request.HasData)
 							{
-								this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 100, "Continue", false, MaxChunkSize);
+								await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 100, "Continue", false, MaxChunkSize);
 								return;
 							}
 						}
 						else
 						{
-							this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 417, "Expectation Failed", true, MaxChunkSize);
+							await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 417, "Expectation Failed", true, MaxChunkSize);
 							Request.Dispose();
 							return;
 						}
 					}
 
-					this.ExecuteRequest(E2e, EndpointReference, Id, From, To, MaxChunkSize, Ibb, Socks5, Request, Resource);
+					await this.ExecuteRequest(E2e, EndpointReference, Id, From, To, MaxChunkSize, Ibb, Socks5, Request, Resource);
 					return;
 				}
 				else
 				{
 					this.server.RequestReceived(Request, From, null, null);
-					this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 404, "Not Found", false, MaxChunkSize);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 404, "Not Found", false, MaxChunkSize);
 					Result = true;
 				}
 			}
 			catch (HttpException ex)
 			{
 				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
-				this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, !Result, MaxChunkSize, ex.HeaderFields);
+				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, !Result, MaxChunkSize, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
@@ -279,7 +279,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				Log.Critical(ex);
 
-				this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 501, "Not Implemented", !Result, MaxChunkSize);
+				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 501, "Not Implemented", !Result, MaxChunkSize);
 			}
 			catch (IOException ex)
 			{
@@ -288,10 +288,10 @@ namespace Waher.Networking.XMPP.HTTPX
 				int Win32ErrorCode = ex.HResult & 0xFFFF;    
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
-					this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 507, "Insufficient Storage", true, MaxChunkSize);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 507, "Insufficient Storage", true, MaxChunkSize);
 				}
 				else
-					this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
 
 				Result = false;
 			}
@@ -301,36 +301,35 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				Log.Critical(ex);
 
-				this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", !Result, MaxChunkSize);
+				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", !Result, MaxChunkSize);
 			}
 
 			Request.Dispose();
 		}
 
-		private async void ExecuteRequest(IEndToEndEncryption E2e, string EndpointReference, string Id, string From, string To, 
+		private async Task ExecuteRequest(IEndToEndEncryption E2e, string EndpointReference, string Id, string From, string To, 
             int MaxChunkSize, bool Ibb, bool Socks5, HttpRequest Request, HttpResource Resource)
 		{
 			HttpResponse Response = null;
 
 			try
 			{
-				Response = new HttpResponse(
-					new HttpxResponse(this.client, E2e, EndpointReference, Id, From, To, MaxChunkSize,
-					Ibb ? this.ibbClient : null, Socks5 ? this.socks5Proxy : null), this.server, Request);
+				Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, From, To, MaxChunkSize, Ibb ? this.ibbClient : null, 
+					Socks5 ? this.socks5Proxy : null), this.server, Request);
 
-				await Task.Run(() => Resource.Execute(this.server, Request, Response));
+				await Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)
 			{
 				if (Response is null || !Response.HeaderSent)
-					this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, true, MaxChunkSize, ex.HeaderFields);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, true, MaxChunkSize, ex.HeaderFields);
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 
 				if (Response is null || !Response.HeaderSent)
-					this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
 			}
 			finally
 			{
@@ -338,11 +337,11 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private void SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, 
+		private Task SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, 
             string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, 
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, EndpointReference, Id, To, From, MaxChunkSize, null, null), this.server, Request)
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null), this.server, Request)
 			{
 				StatusCode = Code,
 				StatusMessage = Message,
@@ -357,19 +356,21 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (CloseAfterTransmission)
 				Response.SetHeader("Connection", "close");
 
-			Response.SendResponse();
+			return Response.SendResponse();
 
 			// TODO: Add error message content.
 		}
 
-		private void CancelReceived(object Sender, MessageEventArgs e)
+		private Task CancelReceived(object Sender, MessageEventArgs e)
 		{
 			if (this.requiresE2e && !e.UsesE2eEncryption)
-				return;
+				return Task.CompletedTask;
 
 			string StreamId = XML.Attribute(e.Content, "streamId");
 
 			HttpxResponse.CancelChunkedTransfer(e.From, e.To, StreamId);
+
+			return Task.CompletedTask;
 		}
 
 	}

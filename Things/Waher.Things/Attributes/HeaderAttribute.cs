@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -17,9 +13,9 @@ namespace Waher.Things.Attributes
 		/// </summary>
 		public const int DefaultPriority = 100;
 
-		private int stringId;
-		private string header;
-		private int priority;
+		private readonly int stringId;
+		private readonly string header;
+		private readonly int priority;
 
 		/// <summary>
 		/// Defines a header string for the property.

@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ResponseEventHandler(object Sender, ResponseEventArgs e);
+	public delegate Task ResponseEventHandler(object Sender, ResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for SOCKS5 responses.

@@ -12,8 +12,8 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 	/// </summary>
 	public class StringControlOperation : ControlOperation
 	{
-		private StringControlParameter parameter;
-		private string value;
+		private readonly StringControlParameter parameter;
+		private readonly string value;
 
 		/// <summary>
 		/// String control operation.
@@ -49,9 +49,9 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// Performs the control operation.
 		/// </summary>
 		/// <returns>If the operation was successful or not.</returns>
-		public override bool Set()
+		public override async Task<bool> Set()
 		{
-			bool Result = this.parameter.Set(this.Node, this.value);
+			bool Result = await this.parameter.Set(this.Node, this.value);
 
 			if (!Result)
 				ControlServer.ParameterValueInvalid(this.parameter.Name, this.Request);

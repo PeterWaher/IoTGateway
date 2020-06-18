@@ -212,7 +212,7 @@ namespace Waher.Networking.XMPP.Avatar
 		/// </summary>
 		public event IqEventHandler ValidateAccess = null;
 
-		private void QueryAvatarHandler(object Sender, IqEventArgs e)
+		private Task QueryAvatarHandler(object Sender, IqEventArgs e)
 		{
 			this.ValidateAccess?.Invoke(this, e);
 
@@ -229,169 +229,143 @@ namespace Waher.Networking.XMPP.Avatar
 			Response.Append("</data></query>");
 
 			e.IqResult(Response.ToString());
+
+			return Task.CompletedTask;
 		}
 
-		private async void Client_OnStateChanged(object Sender, XmppState NewState)
+		private async Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
-			try
+			if (NewState == XmppState.StreamOpened &&
+				this.localAvatar != null &&
+				this.localAvatar.BareJid != this.client.BareJID)
 			{
-				if (NewState == XmppState.StreamOpened &&
-					this.localAvatar != null &&
-					this.localAvatar.BareJid != this.client.BareJID)
-				{
-					this.localAvatar.BareJid = this.client.BareJID;
-					await Database.Update(this.localAvatar);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				this.localAvatar.BareJid = this.client.BareJID;
+				await Database.Update(this.localAvatar);
 			}
 		}
 
-		private async void Client_OnPresence(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			try
+			if (e.Type == PresenceType.Available && e.Presence.HasChildNodes)
 			{
-				if (e.Type == PresenceType.Available && e.Presence.HasChildNodes)
-				{
-					string Hash = null;
+				string Hash = null;
 
-					foreach (XmlNode N in e.Presence.ChildNodes)
+				foreach (XmlNode N in e.Presence.ChildNodes)
+				{
+					if (N.LocalName == "x" && N.NamespaceURI == "jabber:x:avatar")
 					{
-						if (N.LocalName == "x" && N.NamespaceURI == "jabber:x:avatar")
-						{
-							Hash = N.InnerText;
-							break;
-						}
+						Hash = N.InnerText;
+						break;
 					}
+				}
 
-					if (Hash != null)
+				if (Hash != null)
+				{
+					Avatar Avatar;
+					string FullJID = e.From;
+					string BareJID = e.FromBareJID;
+					bool LoadAvatar = false;
+					bool CheckDatabase = false;
+
+					lock (this.contactAvatars)
 					{
-						Avatar Avatar;
-						string FullJID = e.From;
-						string BareJID = e.FromBareJID;
-						bool LoadAvatar = false;
-						bool CheckDatabase = false;
-
-						lock (this.contactAvatars)
+						if (this.contactAvatars.TryGetValue(BareJID, out Avatar))
 						{
-							if (this.contactAvatars.TryGetValue(BareJID, out Avatar))
-							{
-								if (string.IsNullOrEmpty(Hash))
-									this.contactAvatars.Remove(BareJID);
-								else if (Avatar is null || Avatar.Hash != Hash)
-								{
-									if (Avatar != null)
-										this.contactAvatars[BareJID] = null;
-
-									LoadAvatar = true;
-								}
-							}
-							else
-							{
-								if (!string.IsNullOrEmpty(Hash))
-									LoadAvatar = CheckDatabase = true;
-							}
-						}
-
-						if (LoadAvatar)
-						{
-							try
+							if (string.IsNullOrEmpty(Hash))
+								this.contactAvatars.Remove(BareJID);
+							else if (Avatar is null || Avatar.Hash != Hash)
 							{
 								if (Avatar != null)
-									await Database.Delete(Avatar);
-								else
+									this.contactAvatars[BareJID] = null;
+
+								LoadAvatar = true;
+							}
+						}
+						else
+						{
+							if (!string.IsNullOrEmpty(Hash))
+								LoadAvatar = CheckDatabase = true;
+						}
+					}
+
+					if (LoadAvatar)
+					{
+						try
+						{
+							if (Avatar != null)
+								await Database.Delete(Avatar);
+							else
+							{
+								if (CheckDatabase)
 								{
-									if (CheckDatabase)
+									IEnumerable<Avatar> Avatars = await Database.Find<Avatar>(new FilterFieldEqualTo("BareJid", BareJID.ToLower()));
+
+									foreach (Avatar Avatar2 in Avatars)
 									{
-										IEnumerable<Avatar> Avatars = await Database.Find<Avatar>(new FilterFieldEqualTo("BareJid", BareJID.ToLower()));
+										if (Avatar is null && (Hash is null || Hash == Avatar2.Hash))
+											Avatar = Avatar2;
+										else
+											await Database.Delete(Avatar2);
+									}
 
-										foreach (Avatar Avatar2 in Avatars)
+									if (Avatar != null)
+									{
+										lock (this.contactAvatars)
 										{
-											if (Avatar is null && (Hash is null || Hash == Avatar2.Hash))
-												Avatar = Avatar2;
-											else
-												await Database.Delete(Avatar2);
+											this.contactAvatars[BareJID] = Avatar;
 										}
 
-										if (Avatar != null)
-										{
-											lock (this.contactAvatars)
-											{
-												this.contactAvatars[BareJID] = Avatar;
-											}
-
-											LoadAvatar = false;
-										}
+										LoadAvatar = false;
 									}
 								}
+							}
 
-								if (LoadAvatar)
+							if (LoadAvatar)
+							{
+								if (this.e2e is null)
 								{
-                                    if (this.e2e is null)
-                                    {
-                                        this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
-                                            new object[] { BareJID, Hash });
-                                    }
-                                    else
-                                    {
-                                        this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
-                                            FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
-                                            new object[] { BareJID, Hash });
-                                    }
+									this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+										new object[] { BareJID, Hash });
+								}
+								else
+								{
+									this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
+										FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+										new object[] { BareJID, Hash });
 								}
 							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
 						}
 					}
 				}
 			}
-			catch (Exception ex)
+		}
+
+		private async Task AvatarResponse(object Sender, IqResultEventArgs e2)
+		{
+			object[] P = (object[])e2.State;
+			string BareJID = (string)P[0];
+			string Hash = (string)P[1];
+
+			if (e2.Ok)
+				await this.ParseAvatar(BareJID, Hash, e2.FirstElement);
+			else
 			{
-				Log.Critical(ex);
+				this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
+					async (sender3, e3) =>
+					{
+						if (e3.Ok)
+							await this.ParseAvatar(BareJID, Hash, e3.FirstElement);
+						else
+							await this.ParseAvatar(BareJID, Hash, null);
+					}, null);
 			}
 		}
 
-        private async void AvatarResponse(object Sender, IqResultEventArgs e2)
-        {
-            try
-            {
-                object[] P = (object[])e2.State;
-                string BareJID = (string)P[0];
-                string Hash = (string)P[1];
-
-                if (e2.Ok)
-                    await this.ParseAvatar(BareJID, Hash, e2.FirstElement);
-                else
-                {
-                    this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
-                        async (sender3, e3) =>
-                        {
-                            try
-                            {
-                                if (e3.Ok)
-                                    await this.ParseAvatar(BareJID, Hash, e3.FirstElement);
-                                else
-                                    await this.ParseAvatar(BareJID, Hash, null);
-                            }
-                            catch (Exception ex3)
-                            {
-                                Log.Critical(ex3);
-                            }
-                        }, null);
-                }
-            }
-            catch (Exception ex2)
-            {
-                Log.Critical(ex2);
-            }
-        }
-
-        private async Task ParseAvatar(string BareJid, string Hash, XmlElement E)
+		private async Task ParseAvatar(string BareJid, string Hash, XmlElement E)
 		{
 			if (E != null && E.LocalName == "query" && (E.NamespaceURI == "jabber:iq:avatar" || E.NamespaceURI == "storage:client:avatar"))
 			{
@@ -454,7 +428,7 @@ namespace Waher.Networking.XMPP.Avatar
 					{
 						try
 						{
-							h(this, new AvatarEventArgs(BareJid, OldAvatar));
+							await h(this, new AvatarEventArgs(BareJid, OldAvatar));
 						}
 						catch (Exception ex)
 						{
@@ -472,7 +446,7 @@ namespace Waher.Networking.XMPP.Avatar
 					{
 						try
 						{
-							h(this, new AvatarEventArgs(BareJid, NewAvatar));
+							await h(this, new AvatarEventArgs(BareJid, NewAvatar));
 						}
 						catch (Exception ex)
 						{
@@ -486,7 +460,7 @@ namespace Waher.Networking.XMPP.Avatar
 				{
 					try
 					{
-						h(this, new AvatarEventArgs(BareJid, NewAvatar));
+						await h(this, new AvatarEventArgs(BareJid, NewAvatar));
 					}
 					catch (Exception ex)
 					{
@@ -580,67 +554,53 @@ namespace Waher.Networking.XMPP.Avatar
 			set => this.e2e = value;
 		}
 
-		private async void Client_OnRosterItemRemoved(object Sender, RosterItem Item)
+		private async Task Client_OnRosterItemRemoved(object _, RosterItem Item)
 		{
-			try
+			string BareJid = Item.BareJid;
+			Avatar Avatar;
+
+			lock (this.contactAvatars)
 			{
-				string BareJid = Item.BareJid;
-				Avatar Avatar;
-
-				lock (this.contactAvatars)
-				{
-					if (this.contactAvatars.TryGetValue(BareJid, out Avatar))
-						this.contactAvatars.Remove(BareJid);
-					else
-						Avatar = null;
-				}
-
-				if (Avatar != null && !string.IsNullOrEmpty(Avatar.ObjectId))
-					await Database.Delete(Avatar);
+				if (this.contactAvatars.TryGetValue(BareJid, out Avatar))
+					this.contactAvatars.Remove(BareJid);
 				else
-				{
-					IEnumerable<Avatar> Avatars = await Database.Find<Avatar>(new FilterFieldEqualTo("BareJid", BareJid.ToLower()));
-					await Database.Delete(Avatars);
-				}
+					Avatar = null;
 			}
-			catch (Exception ex)
+
+			if (Avatar != null && !string.IsNullOrEmpty(Avatar.ObjectId))
+				await Database.Delete(Avatar);
+			else
 			{
-				Log.Critical(ex);
+				IEnumerable<Avatar> Avatars = await Database.Find<Avatar>(new FilterFieldEqualTo("BareJid", BareJid.ToLower()));
+				await Database.Delete(Avatars);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when a vCard has been received. vCards can be requested to get access to embedded Avatars.
 		/// </summary>
-		public event IqResultEventHandler VCardReceived = null;
+		public event IqResultEventHandlerAsync VCardReceived = null;
 
-		private async void Client_OnRosterItemAdded(object Sender, RosterItem Item)
+		private async Task Client_OnRosterItemAdded(object _, RosterItem Item)
 		{
-			try
+			Avatar Avatar;
+
+			lock (this.contactAvatars)
 			{
-				Avatar Avatar;
-
-				lock (this.contactAvatars)
-				{
-					if (!this.contactAvatars.TryGetValue(Item.BareJid, out Avatar))
-						Avatar = null;
-				}
-
-				if (Avatar != null && string.IsNullOrEmpty(Avatar.ObjectId))
-				{
-					await Database.Insert(Avatar);
-
-					this.AvatarAdded?.Invoke(this, new AvatarEventArgs(Item.BareJid, Avatar));
-				}
-				else
-				{
-					this.client.SendIqGet(Item.BareJid, "<vCard xmlns='vcard-temp'/>",
-						(Sender2, e2) => Task.Run(() => this.ParseVCard(e2)), null);
-				}
+				if (!this.contactAvatars.TryGetValue(Item.BareJid, out Avatar))
+					Avatar = null;
 			}
-			catch (Exception ex)
+
+			if (Avatar != null && string.IsNullOrEmpty(Avatar.ObjectId))
 			{
-				Log.Critical(ex);
+				await Database.Insert(Avatar);
+
+				this.AvatarAdded?.Invoke(this, new AvatarEventArgs(Item.BareJid, Avatar));
+			}
+			else
+			{
+				this.client.SendIqGet(Item.BareJid, "<vCard xmlns='vcard-temp'/>",
+					(Sender2, e2) => Task.Run(() => this.ParseVCard(e2)), null);
 			}
 		}
 
@@ -702,7 +662,12 @@ namespace Waher.Networking.XMPP.Avatar
 					}
 
 					if (RaiseEvent)
-						this.VCardReceived?.Invoke(this, e);
+					{
+						IqResultEventHandlerAsync h = this.VCardReceived;
+						
+						if (!(h is null))
+							await h(this, e);
+					}
 				}
 			}
 			catch (Exception ex)
@@ -724,7 +689,7 @@ namespace Waher.Networking.XMPP.Avatar
 			}
 		}
 
-		private void Client_CustomPresenceXml(object Sender, CustomPresenceEventArgs e)
+		private Task Client_CustomPresenceXml(object Sender, CustomPresenceEventArgs e)
 		{
 			if (this.includeAvatarInPresence)
 			{
@@ -735,71 +700,64 @@ namespace Waher.Networking.XMPP.Avatar
 
 				e.Stanza.Append("</hash></x>");
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private async void Pep_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		private async Task Pep_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
 		{
-			try
+			UserAvatarReference Best = null;
+
+			foreach (UserAvatarReference Ref in e.AvatarMetaData.References)
 			{
-				UserAvatarReference Best = null;
-
-				foreach (UserAvatarReference Ref in e.AvatarMetaData.References)
+				if (Best is null ||
+					Best.Type != "image/png" ||
+					Ref.Bytes > Best.Bytes)
 				{
-					if (Best is null ||
-						Best.Type != "image/png" ||
-						Ref.Bytes > Best.Bytes)
-					{
-						Best = Ref;
-					}
-				}
-
-				if (Best != null)
-				{
-					Avatar Avatar = await this.GetAvatarAsync(e.FromBareJID);
-
-					if (Avatar is null || Avatar.Hash != Best.Id)
-					{
-						e.GetUserAvatarData(Best, async (sender2, e2) =>
-						{
-							try
-							{
-								if (e2.Ok && e2.AvatarImage != null)
-								{
-									if (Avatar is null || Avatar?.ObjectId is null)
-									{
-										Avatar = new Avatar(e.FromBareJID, e2.AvatarImage.ContentType, e2.AvatarImage.Data,
-											e2.AvatarImage.Width, e2.AvatarImage.Height)
-										{
-											Hash = Best.Id
-										};
-
-										await Database.Insert(Avatar);
-
-										this.AvatarAdded?.Invoke(this, new AvatarEventArgs(e.FromBareJID, Avatar));
-									}
-									else
-									{
-										Avatar.Hash = Best.Id;
-										Avatar.ContentType = e2.AvatarImage.ContentType;
-										Avatar.Binary = e2.AvatarImage.Data;
-
-										await Database.Update(Avatar);
-
-										this.AvatarUpdated?.Invoke(this, new AvatarEventArgs(e.FromBareJID, Avatar));
-									}
-								}
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-							}
-						}, null);
-					}
+					Best = Ref;
 				}
 			}
-			catch (Exception ex)
+
+			if (Best != null)
 			{
-				Log.Critical(ex);
+				Avatar Avatar = await this.GetAvatarAsync(e.FromBareJID);
+
+				if (Avatar is null || Avatar.Hash != Best.Id)
+				{
+					e.GetUserAvatarData(Best, async (sender2, e2) =>
+					{
+						if (e2.Ok && e2.AvatarImage != null)
+						{
+							AvatarEventHandler h;
+
+							if (Avatar is null || Avatar?.ObjectId is null)
+							{
+								Avatar = new Avatar(e.FromBareJID, e2.AvatarImage.ContentType, e2.AvatarImage.Data,
+									e2.AvatarImage.Width, e2.AvatarImage.Height)
+								{
+									Hash = Best.Id
+								};
+
+								await Database.Insert(Avatar);
+
+								h = this.AvatarAdded;
+							}
+							else
+							{
+								Avatar.Hash = Best.Id;
+								Avatar.ContentType = e2.AvatarImage.ContentType;
+								Avatar.Binary = e2.AvatarImage.Data;
+
+								await Database.Update(Avatar);
+
+								h = this.AvatarUpdated;
+							}
+
+							if (!(h is null))
+								await h(this, new AvatarEventArgs(e.FromBareJID, Avatar));
+						}
+					}, null);
+				}
 			}
 		}
 

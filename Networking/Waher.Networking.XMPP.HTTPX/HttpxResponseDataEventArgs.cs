@@ -12,18 +12,18 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void HttpxResponseDataEventHandler(object Sender, HttpxResponseDataEventArgs e);
+	public delegate Task HttpxResponseDataEventHandler(object Sender, HttpxResponseDataEventArgs e);
 
 	/// <summary>
 	/// Event arguments for HTTPX data responses.
 	/// </summary>
 	public class HttpxResponseDataEventArgs : EventArgs
 	{
-		private HttpxResponseEventArgs response;
-		private byte[] data;
-		private string streamId;
-		private bool last;
-		private object state;
+		private readonly HttpxResponseEventArgs response;
+		private readonly byte[] data;
+		private readonly string streamId;
+		private readonly bool last;
+		private readonly object state;
 
 		/// <summary>
 		/// Event arguments for HTTPX data responses.

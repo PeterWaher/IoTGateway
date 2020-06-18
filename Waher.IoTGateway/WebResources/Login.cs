@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
-using Waher.IoTGateway;
 
 namespace Waher.IoTGateway.WebResources
 {
 	/// <summary>
 	/// Provides a resource that allows the caller to login to the gateway through a POST method call.
 	/// </summary>
-	public class Login : HttpAsynchronousResource, IHttpPostMethod
+	public class Login : HttpSynchronousResource, IHttpPostMethod
 	{
 		/// <summary>
 		/// Provides a resource that allows the caller to login to the gateway through a POST method call.
@@ -54,89 +54,78 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			try
+			if (!Request.HasData || Request.Session is null)
+				throw new BadRequestException();
+
+			object Obj = Request.DecodeData();
+			string From;
+
+			if (!(Obj is Dictionary<string, string> Form) ||
+				!Form.TryGetValue("UserName", out string UserName) ||
+				!Form.TryGetValue("Password", out string Password))
 			{
-				if (!Request.HasData || Request.Session is null)
-					throw new BadRequestException();
+				throw new BadRequestException();
+			}
 
-				object Obj = Request.DecodeData();
-				string From;
-
-				if (!(Obj is Dictionary<string, string> Form) ||
-					!Form.TryGetValue("UserName", out string UserName) ||
-					!Form.TryGetValue("Password", out string Password))
-				{
-					throw new BadRequestException();
-				}
-
-				if (Request.Session.TryGetVariable("from", out Variable v))
-				{
-					From = v.ValueObject as string;
-					if (string.IsNullOrEmpty(From))
-						From = "/Index.md";
-				}
-				else
+			if (Request.Session.TryGetVariable("from", out Variable v))
+			{
+				From = v.ValueObject as string;
+				if (string.IsNullOrEmpty(From))
 					From = "/Index.md";
+			}
+			else
+				From = "/Index.md";
 
-				DateTime? Next = await Gateway.LoginAuditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "Web");
-				if (Next.HasValue)
+			DateTime? Next = await Gateway.LoginAuditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "Web");
+			if (Next.HasValue)
+			{
+				StringBuilder sb = new StringBuilder();
+				DateTime TP = Next.Value;
+				DateTime Today = DateTime.Today;
+
+				if (Next.Value == DateTime.MaxValue)
 				{
-					StringBuilder sb = new StringBuilder();
-					DateTime TP = Next.Value;
-					DateTime Today = DateTime.Today;
-
-					if (Next.Value == DateTime.MaxValue)
-					{
-						sb.Append("This endpoint (");
-						sb.Append(Request.RemoteEndPoint);
-						sb.Append(") has been blocked from the system.");
-					}
-					else
-					{
-						sb.Append("Too many failed login attempts in a row registered. Try again after ");
-						sb.Append(TP.ToLongTimeString());
-
-						if (TP.Date != Today)
-						{
-							if (TP.Date == Today.AddDays(1))
-								sb.Append(" tomorrow");
-							else
-							{
-								sb.Append(", ");
-								sb.Append(TP.ToShortDateString());
-							}
-						}
-
-						sb.Append('.');
-					}
-
-					Request.Session["LoginError"] = sb.ToString();
-
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					sb.Append("This endpoint (");
+					sb.Append(Request.RemoteEndPoint);
+					sb.Append(") has been blocked from the system.");
 				}
-
-				LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint, "Web");
-				if (LoginResult == LoginResult.Successful)
-					DoLogin(Request, From, false);
 				else
 				{
-					if (LoginResult == LoginResult.InvalidLogin)
-						Request.Session["LoginError"] = "Invalid login credentials provided.";
-					else
-						Request.Session["LoginError"] = "Unable to connect to XMPP server.";
+					sb.Append("Too many failed login attempts in a row registered. Try again after ");
+					sb.Append(TP.ToLongTimeString());
 
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					if (TP.Date != Today)
+					{
+						if (TP.Date == Today.AddDays(1))
+							sb.Append(" tomorrow");
+						else
+						{
+							sb.Append(", ");
+							sb.Append(TP.ToShortDateString());
+						}
+					}
+
+					sb.Append('.');
 				}
+
+				Request.Session["LoginError"] = sb.ToString();
+
+				throw new SeeOtherException(Request.Header.Referer.Value);
 			}
-			catch (Exception ex)
+
+			LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint, "Web");
+			if (LoginResult == LoginResult.Successful)
+				DoLogin(Request, From, false);
+			else
 			{
-				Response.SendResponse(ex);
-			}
-			finally
-			{
-				Response.Dispose();
+				if (LoginResult == LoginResult.InvalidLogin)
+					Request.Session["LoginError"] = "Invalid login credentials provided.";
+				else
+					Request.Session["LoginError"] = "Unable to connect to XMPP server.";
+
+				throw new SeeOtherException(Request.Header.Referer.Value);
 			}
 		}
 

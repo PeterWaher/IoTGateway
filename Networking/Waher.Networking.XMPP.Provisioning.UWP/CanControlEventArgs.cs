@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -13,15 +13,15 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CanControlEventHandler(object Sender, CanControlEventArgs e);
+	public delegate Task CanControlEventHandler(object Sender, CanControlEventArgs e);
 
 	/// <summary>
 	/// Event arguments for CanControl events.
 	/// </summary>
 	public class CanControlEventArgs : NodeQuestionEventArgs
 	{
-		private ProvisioningClient provisioningClient;
-		private string[] parameters;
+		private readonly ProvisioningClient provisioningClient;
+		private readonly string[] parameters;
 
 		/// <summary>
 		/// Event arguments for CanControl events.
@@ -50,6 +50,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
+		/// Provisioning client
+		/// </summary>
+		public ProvisioningClient ProvisioningClient => this.provisioningClient;
+
+		/// <summary>
 		/// Any parameter name specifications of the original request.
 		/// </summary>
 		public string[] Parameters
@@ -63,7 +68,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptAllFromJID(IqResultEventHandler Callback, object State)
+		public bool AcceptAllFromJID(IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, "<fromJid/>", Callback, State);
 		}
@@ -74,7 +79,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptAllFromDomain(IqResultEventHandler Callback, object State)
+		public bool AcceptAllFromDomain(IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, "<fromDomain/>", Callback, State);
 		}
@@ -86,7 +91,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptAllFromService(string ServiceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptAllFromService(string ServiceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, "<fromService token='" +XML.Encode(ServiceToken) + "'/>", Callback, State);
 		}
@@ -98,7 +103,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptAllFromDevice(string DeviceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptAllFromDevice(string DeviceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, "<fromDevice token='" + XML.Encode(DeviceToken) + "'/>", Callback, State);
 		}
@@ -110,7 +115,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptAllFromUser(string UserToken, IqResultEventHandler Callback, object State)
+		public bool AcceptAllFromUser(string UserToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
 		}
@@ -122,7 +127,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromJID(string[] Parameters, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromJID(string[] Parameters, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, this.PartialParameters(Parameters) + "<fromJid/>", Callback, State);
 		}
@@ -134,7 +139,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromDomain(string[] Parameters, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromDomain(string[] Parameters, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, this.PartialParameters(Parameters) + "<fromDomain/>", Callback, State);
 		}
@@ -147,7 +152,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromService(string[] Parameters, string ServiceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromService(string[] Parameters, string ServiceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, this.PartialParameters(Parameters) + "<fromService token='" + XML.Encode(ServiceToken) + "'/>", Callback, State);
 		}
@@ -160,7 +165,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromDevice(string[] Parameters, string DeviceToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromDevice(string[] Parameters, string DeviceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, this.PartialParameters(Parameters) + "<fromDevice token='" + XML.Encode(DeviceToken) + "'/>", Callback, State);
 		}
@@ -173,7 +178,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool AcceptPartialFromUser(string[] Parameters, string UserToken, IqResultEventHandler Callback, object State)
+		public bool AcceptPartialFromUser(string[] Parameters, string UserToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(true, this.PartialParameters(Parameters) + "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
 		}
@@ -202,7 +207,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool RejectAllFromJID(IqResultEventHandler Callback, object State)
+		public bool RejectAllFromJID(IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(false, "<fromJid/>", Callback, State);
 		}
@@ -213,7 +218,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool RejectAllFromDomain(IqResultEventHandler Callback, object State)
+		public bool RejectAllFromDomain(IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(false, "<fromDomain/>", Callback, State);
 		}
@@ -225,7 +230,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool RejectAllFromService(string ServiceToken, IqResultEventHandler Callback, object State)
+		public bool RejectAllFromService(string ServiceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(false, "<fromService token='" + XML.Encode(ServiceToken) + "'/>", Callback, State);
 		}
@@ -237,7 +242,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool RejectAllFromDevice(string DeviceToken, IqResultEventHandler Callback, object State)
+		public bool RejectAllFromDevice(string DeviceToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(false, "<fromDevice token='" + XML.Encode(DeviceToken) + "'/>", Callback, State);
 		}
@@ -249,12 +254,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the response could be sent.</returns>
-		public bool RejectAllFromUser(string UserToken, IqResultEventHandler Callback, object State)
+		public bool RejectAllFromUser(string UserToken, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.Respond(false, "<fromUser token='" + XML.Encode(UserToken) + "'/>", Callback, State);
 		}
 
-		private bool Respond(bool CanControl, string RuleXml, IqResultEventHandler Callback, object State)
+		private bool Respond(bool CanControl, string RuleXml, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 

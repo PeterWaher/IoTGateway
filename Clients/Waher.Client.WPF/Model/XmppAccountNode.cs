@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Threading;
 using System.Windows;
@@ -56,7 +56,7 @@ namespace Waher.Client.WPF.Model
 
 		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
-		private readonly Dictionary<string, List<RosterItemEventHandler>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandler>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, List<RosterItemEventHandlerAsync>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandlerAsync>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Connections connections;
 		private XmppClient client;
 		private PepClient pepClient;
@@ -221,16 +221,16 @@ namespace Waher.Client.WPF.Model
 			this.pepClient.RegisterHandler(typeof(SensorData), PepClient_SensorData);
 		}
 
-		private void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		private async Task ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
 		{
 			if (this.TryGetChild(EventMessage.FromBareJID, out TreeNode Child) &&
 				(Child is XmppConcentrator Concentrator))
 			{
-				Concentrator.ConcentratorClient_OnEvent(Sender, EventMessage);
+				await Concentrator.ConcentratorClient_OnEvent(Sender, EventMessage);
 			}
 		}
 
-		private void Client_OnNormalMessage(object Sender, MessageEventArgs e)
+		private Task Client_OnNormalMessage(object Sender, MessageEventArgs e)
 		{
 			DateTime Now = DateTime.Now;
 			DateTime Limit = Now.AddMinutes(-1);
@@ -242,6 +242,8 @@ namespace Waher.Client.WPF.Model
 				while (this.unhandledMessages.First != null && this.unhandledMessages.First.Value.Key <= Limit)
 					this.unhandledMessages.RemoveFirst();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public IEnumerable<MessageEventArgs> GetUnhandledMessages(string LocalName, string Namespace)
@@ -282,12 +284,13 @@ namespace Waher.Client.WPF.Model
 			return Result;
 		}
 
-		private void Client_OnError(object Sender, Exception Exception)
+		private Task Client_OnError(object _, Exception Exception)
 		{
 			this.lastError = Exception;
+			return Task.CompletedTask;
 		}
 
-		private void Client_OnStateChanged(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -322,6 +325,8 @@ namespace Waher.Client.WPF.Model
 			}
 
 			this.OnUpdated();
+
+			return Task.CompletedTask;
 		}
 
 		public TransportMethod Transport => this.transport;
@@ -644,7 +649,7 @@ namespace Waher.Client.WPF.Model
 			get { return this.connections.Owner.MainView; }
 		}
 
-		private void Client_OnRosterItemUpdated(object Sender, RosterItem Item)
+		private async Task Client_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -676,17 +681,17 @@ namespace Waher.Client.WPF.Model
 				else
 					Contact.OnUpdated();
 
-				this.CheckRosterItemSubscriptions(Item);
+				await this.CheckRosterItemSubscriptions(Item);
 			}
 		}
 
-		private void CheckRosterItemSubscriptions(RosterItem Item)
+		private async Task CheckRosterItemSubscriptions(RosterItem Item)
 		{
-			RosterItemEventHandler[] h;
+			RosterItemEventHandlerAsync[] h;
 
 			lock (this.rosterSubscriptions)
 			{
-				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<RosterItemEventHandler> List))
+				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<RosterItemEventHandlerAsync> List))
 					h = List.ToArray();
 				else
 					h = null;
@@ -694,11 +699,11 @@ namespace Waher.Client.WPF.Model
 
 			if (h != null)
 			{
-				foreach (RosterItemEventHandler h2 in h)
+				foreach (RosterItemEventHandlerAsync h2 in h)
 				{
 					try
 					{
-						h2(this, Item);
+						await h2(this, Item);
 					}
 					catch (Exception ex)
 					{
@@ -708,13 +713,13 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public void RegisterRosterEventHandler(string BareJid, RosterItemEventHandler Callback)
+		public void RegisterRosterEventHandler(string BareJid, RosterItemEventHandlerAsync Callback)
 		{
 			lock (this.rosterSubscriptions)
 			{
-				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandler> h))
+				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandlerAsync> h))
 				{
-					h = new List<RosterItemEventHandler>();
+					h = new List<RosterItemEventHandlerAsync>();
 					this.rosterSubscriptions[BareJid] = h;
 				}
 
@@ -722,16 +727,16 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public void UnregisterRosterEventHandler(string BareJid, RosterItemEventHandler Callback)
+		public void UnregisterRosterEventHandler(string BareJid, RosterItemEventHandlerAsync Callback)
 		{
 			lock (this.rosterSubscriptions)
 			{
-				if (this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandler> h) && h.Remove(Callback) && h.Count == 0)
+				if (this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandlerAsync> h) && h.Remove(Callback) && h.Count == 0)
 					this.rosterSubscriptions.Remove(BareJid);
 			}
 		}
 
-		private void Client_OnRosterItemRemoved(object Sender, RosterItem Item)
+		private Task Client_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -746,9 +751,11 @@ namespace Waher.Client.WPF.Model
 
 				this.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Client_OnPresence(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -776,11 +783,11 @@ namespace Waher.Client.WPF.Model
 
 				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
 				if (Item != null)
-					this.CheckRosterItemSubscriptions(Item);
+					await this.CheckRosterItemSubscriptions(Item);
 			}
 		}
 
-		private void ServiceDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e)
+		private Task ServiceDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e)
 		{
 			if (e.Ok)
 			{
@@ -867,6 +874,8 @@ namespace Waher.Client.WPF.Model
 
 				this.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void AddGroups(XmppContact Contact, params string[] GroupNames)
@@ -894,9 +903,10 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		private Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
 			MainWindow.UpdateGui(this.PresenceSubscribe, e);
+			return Task.CompletedTask;
 		}
 
 		private void PresenceSubscribe(object P)
@@ -927,9 +937,10 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
 			e.Accept();
+			return Task.CompletedTask;
 		}
 
 		public override bool CanRecycle
@@ -1066,8 +1077,14 @@ namespace Waher.Client.WPF.Model
 					{
 						if (e2.Ok)
 							this.supportsSearch = true;
+
+						return Task.CompletedTask;
+
 					}, null, null);
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (sender, e) =>
@@ -1087,7 +1104,7 @@ namespace Waher.Client.WPF.Model
 							lock (this.children)
 							{
 								if (this.children.ContainsKey(Item.JID))
-									return;
+									return Task.CompletedTask;
 							}
 
 							if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
@@ -1112,7 +1129,7 @@ namespace Waher.Client.WPF.Model
 								if (this.children.ContainsKey(Item.JID))
 								{
 									Component.Dispose();
-									return;
+									return Task.CompletedTask;
 								}
 
 								this.children[Item.JID] = Component;
@@ -1132,8 +1149,13 @@ namespace Waher.Client.WPF.Model
 							Log.Critical(ex);
 						}
 
+						return Task.CompletedTask;
+
 					}, null);
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -1196,7 +1218,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void ChangePassword(object Sender, DataForm Form)
+		private Task ChangePassword(object _, DataForm Form)
 		{
 			string NewPassword = Form["Password"].ValueString;
 
@@ -1213,27 +1235,32 @@ namespace Waher.Client.WPF.Model
 				else
 					MainWindow.ErrorBox("Unable to change password.");
 
+				return Task.CompletedTask;
+
 			}, null);
+		
+			return Task.CompletedTask;
 		}
 
-		private void CancelChangePassword(object Sender, DataForm Form)
+		private Task CancelChangePassword(object _, DataForm _2)
 		{
 			// Do nothing.
+			return Task.CompletedTask;
 		}
 
 		public override bool CanReadSensorData => this.IsOnline;
 
 		public override SensorDataClientRequest StartSensorDataFullReadout()
 		{
-			return this.DoReadout(Waher.Things.SensorData.FieldType.All);
+			return this.DoReadout(FieldType.All);
 		}
 
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
-			return this.DoReadout(Waher.Things.SensorData.FieldType.Momentary);
+			return this.DoReadout(FieldType.Momentary);
 		}
 
-		private SensorDataClientRequest DoReadout(Waher.Things.SensorData.FieldType Types)
+		private SensorDataClientRequest DoReadout(FieldType Types)
 		{
 			string Id = Guid.NewGuid().ToString();
 
@@ -1253,19 +1280,19 @@ namespace Waher.Client.WPF.Model
 					foreach (KeyValuePair<string, bool> Feature in e.Features)
 					{
 						Fields.Add(new Waher.Things.SensorData.BooleanField(Waher.Things.ThingReference.Empty, Now,
-							Feature.Key, Feature.Value, Waher.Things.SensorData.FieldType.Momentary, Waher.Things.SensorData.FieldQoS.AutomaticReadout));
+							Feature.Key, Feature.Value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 					}
 
 					bool VersionDone = false;
 
-					if ((Types & Waher.Things.SensorData.FieldType.Identity) != 0)
+					if ((Types & FieldType.Identity) != 0)
 					{
 						foreach (Identity Identity in e.Identities)
 						{
-							Fields.Add(new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now,
+							Fields.Add(new StringField(Waher.Things.ThingReference.Empty, Now,
 								Identity.Type, Identity.Category + (string.IsNullOrEmpty(Identity.Name) ? string.Empty : " (" + Identity.Name + ")"),
-								Waher.Things.SensorData.FieldType.Identity,
-								Waher.Things.SensorData.FieldQoS.AutomaticReadout));
+								FieldType.Identity,
+								FieldQoS.AutomaticReadout));
 						}
 
 						if (e.HasFeature(XmppClient.NamespaceSoftwareVersion))
@@ -1278,12 +1305,12 @@ namespace Waher.Client.WPF.Model
 								{
 									Request.LogFields(new Waher.Things.SensorData.Field[]
 									{
-										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Server, Name", e2.Name,
-											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
-										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Server, OS", e2.OS,
-											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
-										new Waher.Things.SensorData.StringField(Waher.Things.ThingReference.Empty, Now, "Server, Version", e2.Version,
-											Waher.Things.SensorData.FieldType.Identity, Waher.Things.SensorData.FieldQoS.AutomaticReadout),
+										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, Name", e2.Name,
+											FieldType.Identity, FieldQoS.AutomaticReadout),
+										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, OS", e2.OS,
+											FieldType.Identity, FieldQoS.AutomaticReadout),
+										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, Version", e2.Version,
+											FieldType.Identity, FieldQoS.AutomaticReadout),
 									});
 								}
 								else
@@ -1298,6 +1325,8 @@ namespace Waher.Client.WPF.Model
 
 								if (VersionDone)
 									Request.Done();
+
+								return Task.CompletedTask;
 
 							}, null);
 						}
@@ -1314,6 +1343,9 @@ namespace Waher.Client.WPF.Model
 				}
 				else
 					Request.Fail("Unable to perform a service discovery.");
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Request;
@@ -1396,6 +1428,9 @@ namespace Waher.Client.WPF.Model
 					}
 					else
 						MainWindow.ErrorBox("Unable to change password.");
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -1439,7 +1474,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void PepClient_SensorData(object Sender, PersonalEventNotificationEventArgs e)
+		private Task PepClient_SensorData(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is SensorData SensorData &&
 				SensorData.Fields != null &&
@@ -1461,9 +1496,11 @@ namespace Waher.Client.WPF.Model
 				Node.Add(Parameters.ToArray());
 				Node.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void PepClient_OnUserTune(object Sender, UserTuneEventArguments e)
+		private Task PepClient_OnUserTune(object Sender, UserTuneEventArguments e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1478,9 +1515,11 @@ namespace Waher.Client.WPF.Model
 
 				Node.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void PepClient_OnUserMood(object Sender, UserMoodEventArguments e)
+		private Task PepClient_OnUserMood(object Sender, UserMoodEventArguments e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1490,9 +1529,11 @@ namespace Waher.Client.WPF.Model
 
 				Node.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void PepClient_OnUserLocation(object Sender, UserLocationEventArguments e)
+		private Task PepClient_OnUserLocation(object Sender, UserLocationEventArguments e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1523,9 +1564,11 @@ namespace Waher.Client.WPF.Model
 
 				Node.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void PepClient_OnUserActivity(object Sender, UserActivityEventArguments e)
+		private Task PepClient_OnUserActivity(object Sender, UserActivityEventArguments e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1536,11 +1579,14 @@ namespace Waher.Client.WPF.Model
 
 				Node.OnUpdated();
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void PepClient_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		private Task PepClient_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
 		{
 			// TODO: Avatars
+			return Task.CompletedTask;
 		}
 
 	}

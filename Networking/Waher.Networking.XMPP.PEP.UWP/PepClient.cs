@@ -215,7 +215,7 @@ namespace Waher.Networking.XMPP.PEP
 			return Result.Task;
 		}
 
-		private void AsyncCallback(object Sender, ItemResultEventArgs e)
+		private Task AsyncCallback(object Sender, ItemResultEventArgs e)
 		{
 			TaskCompletionSource<string> Result = (TaskCompletionSource<string>)e.State;
 
@@ -223,20 +223,19 @@ namespace Waher.Networking.XMPP.PEP
 				Result.TrySetResult(e.ItemId);
 			else
 				Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to publish event." : e.ErrorText));
+
+			return Task.CompletedTask;
 		}
 
-		private void PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
+		private async Task PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
 		{
+			ItemNotificationEventHandler h;
+
 			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
 			{
-				try
-				{
-					this.NonPepItemNotification?.Invoke(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				h = this.NonPepItemNotification;
+				if (!(h is null))
+					await h(this, e);
 			}
 			else
 			{
@@ -274,7 +273,7 @@ namespace Waher.Networking.XMPP.PEP
 					{
 						try
 						{
-							Handler.Invoke(this, e2);
+							await Handler(this, e2);
 						}
 						catch (Exception ex)
 						{
@@ -285,18 +284,13 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private void PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
+		private async Task PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
 		{
 			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
 			{
-				try
-				{
-					this.NonPepItemRetraction?.Invoke(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				ItemNotificationEventHandler h = this.NonPepItemRetraction;
+				if (!(h is null))
+					await h(this, e);
 			}
 		}
 
@@ -448,18 +442,13 @@ namespace Waher.Networking.XMPP.PEP
 
 		private UserLocationEventHandler onUserLocation = null;
 
-		private void UserLocationEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		private async Task UserLocationEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserLocation UserLocation)
 			{
-				try
-				{
-					this.onUserLocation?.Invoke(this, new UserLocationEventArguments(UserLocation, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				UserLocationEventHandler h = onUserLocation;
+				if (!(h is null))
+					await h(this, new UserLocationEventArguments(UserLocation, e));
 			}
 		}
 
@@ -522,18 +511,14 @@ namespace Waher.Networking.XMPP.PEP
 
 		private UserAvatarMetaDataEventHandler onUserAvatarMetaData = null;
 
-		private void UserAvatarMetaDataEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		private async Task UserAvatarMetaDataEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserAvatarMetaData UserAvatarMetaData)
 			{
-				try
-				{
-					this.onUserAvatarMetaData?.Invoke(this, new UserAvatarMetaDataEventArguments(UserAvatarMetaData, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				UserAvatarMetaDataEventHandler h = this.onUserAvatarMetaData;
+				
+				if (!(h is null))
+					await h(this, new UserAvatarMetaDataEventArguments(UserAvatarMetaData, e));
 			}
 		}
 
@@ -546,7 +531,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, UserAvatarImageEventHandler Callback, object State)
 		{
-			this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, (sender, e) =>
+			this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, async (sender, e) =>
 			{
 				UserAvatarImage Image = null;
 
@@ -576,7 +561,8 @@ namespace Waher.Networking.XMPP.PEP
 					}
 				}
 
-				Callback?.Invoke(this, new UserAvatarImageEventArguments(Image, e));
+				if (!(Callback is null))
+					await Callback(this, new UserAvatarImageEventArguments(Image, e));
 
 			}, State);
 		}
@@ -623,18 +609,14 @@ namespace Waher.Networking.XMPP.PEP
 
 		private UserMoodEventHandler onUserMood = null;
 
-		private void UserMoodEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		private async Task UserMoodEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserMood UserMood)
 			{
-				try
-				{
-					this.onUserMood?.Invoke(this, new UserMoodEventArguments(UserMood, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				UserMoodEventHandler h = this.onUserMood;
+
+				if (!(h is null))
+					await h(this, new UserMoodEventArguments(UserMood, e));
 			}
 		}
 
@@ -682,18 +664,14 @@ namespace Waher.Networking.XMPP.PEP
 
 		private UserActivityEventHandler onUserActivity = null;
 
-		private void UserActivityEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		private async Task UserActivityEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserActivity UserActivity)
 			{
-				try
-				{
-					this.onUserActivity?.Invoke(this, new UserActivityEventArguments(UserActivity, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				UserActivityEventHandler h = this.onUserActivity;
+
+				if (!(h is null))
+					await this.onUserActivity?.Invoke(this, new UserActivityEventArguments(UserActivity, e));
 			}
 		}
 
@@ -734,18 +712,13 @@ namespace Waher.Networking.XMPP.PEP
 
 		private UserTuneEventHandler onUserTune = null;
 
-		private void UserTuneEventHandler(object Sender, PersonalEventNotificationEventArgs e)
+		private async Task UserTuneEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserTune UserTune)
 			{
-				try
-				{
-					this.onUserTune?.Invoke(this, new UserTuneEventArguments(UserTune, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
+				UserTuneEventHandler h = this.onUserTune;
+				if (!(h is null))
+					await h(this, new UserTuneEventArguments(UserTune, e));
 			}
 		}
 

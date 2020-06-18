@@ -129,14 +129,16 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private void UploadBackup(HttpRequest Request, HttpResponse Response)
+		private Task UploadBackup(HttpRequest Request, HttpResponse Response)
 		{
 			Upload(Request, Response, ref this.expectedBlockBackup, this.backupFilePerSession, "backup");
+			return Task.CompletedTask;
 		}
 
-		private void UploadKey(HttpRequest Request, HttpResponse Response)
+		private Task UploadKey(HttpRequest Request, HttpResponse Response)
 		{
 			Upload(Request, Response, ref this.expectedBlockKey, this.keyFilePerSession, "key");
+			return Task.CompletedTask;
 		}
 
 		private static void Upload(HttpRequest Request, HttpResponse Response, ref int ExpectedBlockNr, Dictionary<string, TemporaryFile> Files, string Name)
@@ -215,7 +217,7 @@ namespace Waher.IoTGateway.Setup
 			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Message, false);
 		}
 
-		private void Restore(HttpRequest Request, HttpResponse Response)
+		private Task Restore(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -252,6 +254,8 @@ namespace Waher.IoTGateway.Setup
 				Overwrite, OnlySelectedCollections, SelectedCollections);
 
 			Response.StatusCode = 200;
+		
+			return Task.CompletedTask;
 		}
 
 		private static TemporaryFile GetAndRemoveFile(string SessionID, Dictionary<string, TemporaryFile> Files)

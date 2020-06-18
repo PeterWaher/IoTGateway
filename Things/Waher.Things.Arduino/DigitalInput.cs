@@ -72,7 +72,7 @@ namespace Waher.Things.Arduino
 			return Language.GetStringAsync(typeof(Module), 8, "Digital Input");
 		}
 
-		public void StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -112,6 +112,8 @@ namespace Waher.Things.Arduino
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public override void Pin_ValueChanged(PinState NewState)

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void PeerSynchronizedEventHandler(object Sender, PeerSynchronizedEventArgs e);
+	public delegate Task PeerSynchronizedEventHandler(object Sender, PeerSynchronizedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for peer synchronization events.

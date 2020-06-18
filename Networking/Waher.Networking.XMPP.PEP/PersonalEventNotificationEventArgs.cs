@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.PubSub;
 
 namespace Waher.Networking.XMPP.PEP
@@ -10,7 +9,7 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void PersonalEventNotificationEventHandler(object Sender, PersonalEventNotificationEventArgs e);
+	public delegate Task PersonalEventNotificationEventHandler(object Sender, PersonalEventNotificationEventArgs e);
 
 	/// <summary>
 	/// Event argument for personal event notification events.

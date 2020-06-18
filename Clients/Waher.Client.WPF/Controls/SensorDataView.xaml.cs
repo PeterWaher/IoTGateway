@@ -1,21 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -98,9 +90,10 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Request_OnErrorsReceived(object Sender, IEnumerable<ThingError> NewErrors)
+		private Task Request_OnErrorsReceived(object _, IEnumerable<ThingError> NewErrors)
 		{
 			MainWindow.UpdateGui(this.OnErrorsReceived, NewErrors);
+			return Task.CompletedTask;
 		}
 
 		private void OnErrorsReceived(object P)
@@ -129,9 +122,10 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Request_OnFieldsReceived(object Sender, IEnumerable<Field> NewFields)
+		private Task Request_OnFieldsReceived(object _, IEnumerable<Field> NewFields)
 		{
 			MainWindow.UpdateGui(this.OnFieldsReceived, NewFields);
+			return Task.CompletedTask;
 		}
 
 		private void OnFieldsReceived(object P)
@@ -159,9 +153,10 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Request_OnStateChanged(object Sender, SensorDataReadoutState NewState)
+		private Task Request_OnStateChanged(object _, SensorDataReadoutState NewState)
 		{
 			MainWindow.UpdateGui(this.OnStateChanged, NewState);
+			return Task.CompletedTask;
 		}
 
 		private void OnStateChanged(object P)

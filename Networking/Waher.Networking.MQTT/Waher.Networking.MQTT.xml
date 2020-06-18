@@ -1,0 +1,705 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.MQTT</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.MQTT.BinaryInput">
+            <summary>
+            Class that helps deserialize information stored in a binary packet.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.#ctor(System.Byte[])">
+            <summary>
+            Class that helps deserialize information stored in a binary packet.
+            </summary>
+            <param name="Data">Binary Data</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.#ctor(System.IO.MemoryStream)">
+            <summary>
+            Class that helps deserialize information stored in a binary packet.
+            </summary>
+            <param name="Data">Binary Data</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadByte">
+            <summary>
+            Reads the next byte of the stream.
+            </summary>
+            <returns>Next byte</returns>
+            <exception cref="T:System.IO.EndOfStreamException">If there are no more bytes available.</exception>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadBytes(System.Int32)">
+            <summary>
+            Reads the next set of bytes of the stream.
+            </summary>
+            <param name="Length">Number of bytes to retrieve.</param>
+            <returns>Binary block of data.</returns>
+            <exception cref="T:System.IO.EndOfStreamException">If there is not sufficient bytes available.</exception>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadString">
+            <summary>
+            Reads the next string of the stream.
+            </summary>
+            <returns>String value.</returns>
+            <exception cref="T:System.IO.EndOfStreamException">If there is not sufficient bytes available.</exception>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadUInt">
+            <summary>
+            Reads a variable-length unsigned integer from the stream.
+            </summary>
+            <returns>Unsigned integer.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadInt">
+            <summary>
+            Reads a variable-length signed integer from the stream.
+            </summary>
+            <returns>Signed integer.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadUInt16">
+            <summary>
+            Reads an unsignd 16-bit integer.
+            </summary>
+            <returns>16-bit integer.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadUInt32">
+            <summary>
+            Reads an unsignd 16-bit integer.
+            </summary>
+            <returns>32-bit integer.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadUInt64">
+            <summary>
+            Reads an unsignd 64-bit integer.
+            </summary>
+            <returns>64-bit integer.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadSingle">
+            <summary>
+            Reads a single-precision floating point value.
+            </summary>
+            <returns>Single-precision floating point value</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadDouble">
+            <summary>
+            Reads a double-precision floating point value.
+            </summary>
+            <returns>Double-precision floating point value</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadTimeSpan">
+            <summary>
+            Reads a TimeSpan value.
+            </summary>
+            <returns>TimeSpan.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadDateTime">
+            <summary>
+            Reads a DateTime value.
+            </summary>
+            <returns>DateTime.</returns>
+        </member>
+        <member name="P:Waher.Networking.MQTT.BinaryInput.Position">
+            <summary>
+            Current position in input stream.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.BinaryInput.BytesLeft">
+            <summary>
+            Number of bytes left.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.GetRemainingData">
+            <summary>
+            Gets the remaining bytes.
+            </summary>
+            <returns>Remaining bytes.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadGuid">
+            <summary>
+            Reads a GUID value.
+            </summary>
+            <returns>GUID.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryInput.ReadBool">
+            <summary>
+            Reads a boolean value.
+            </summary>
+            <returns>Boolean value.</returns>
+        </member>
+        <member name="T:Waher.Networking.MQTT.BinaryOutput">
+            <summary>
+            Class that helps serialize information into a a binary packet.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.#ctor">
+            <summary>
+            Class that helps serialize information into a a binary packet.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.#ctor(System.Byte[])">
+            <summary>
+            Class that helps serialize information into a a binary packet.
+            </summary>
+            <param name="Data">Binary Data</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.#ctor(System.IO.MemoryStream)">
+            <summary>
+            Class that helps serialize information into a a binary packet.
+            </summary>
+            <param name="Data">Binary Data</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteByte(System.Byte)">
+            <summary>
+            Writes a byte to the binary output packet.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteBytes(System.Byte[])">
+            <summary>
+            Writes a block of bytes to the binary output packet.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteString(System.String)">
+            <summary>
+            Writes a string to the binary output packet.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.GetPacket">
+            <summary>
+            Gets the binary packet written so far.
+            </summary>
+            <returns>Binary packet.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteUInt(System.UInt64)">
+            <summary>
+            Writes a variable-length unsigned integer.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteInt(System.Int64)">
+            <summary>
+            Writes a variable-length signed integer.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteUInt16(System.UInt16)">
+            <summary>
+            Writes a 16-bit integer to the stream.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteUInt32(System.UInt32)">
+            <summary>
+            Writes a 32-bit integer to the stream.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteUInt64(System.UInt64)">
+            <summary>
+            Writes a 64-bit integer to the stream.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteSingle(System.Single)">
+            <summary>
+            Writes a single-precision floating point to the stream.
+            </summary>
+            <param name="f">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteDouble(System.Double)">
+            <summary>
+            Writes a double-precision floating point to the stream.
+            </summary>
+            <param name="d">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteTimeSpan(System.TimeSpan)">
+            <summary>
+            Writes a TimeSpan to the stream.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteDateTime(System.DateTime)">
+            <summary>
+            Writes a DateTime to the stream.
+            </summary>
+            <param name="Value">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteGuid(System.Guid)">
+            <summary>
+            Writes a GUID to the stream.
+            </summary>
+            <param name="Guid">Value to write.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.BinaryOutput.WriteBool(System.Boolean)">
+            <summary>
+            Writes a boolean value to the stream.
+            </summary>
+            <param name="b">Value to write.</param>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttExceptionEventHandler">
+            <summary>
+            Connection error event handler.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Exception">Information about error received.</param>
+        </member>
+        <member name="T:Waher.Networking.MQTT.StateChangedEventHandler">
+            <summary>
+            Event handler for state change events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="NewState">New state reported.</param>
+        </member>
+        <member name="T:Waher.Networking.MQTT.PacketAcknowledgedEventHandler">
+            <summary>
+            Event handler used for events raised when data has been successfully acknowledged.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="PacketIdentifier">Packet identifier of data successfully published.</param>
+        </member>
+        <member name="T:Waher.Networking.MQTT.ContentReceivedEventHandler">
+            <summary>
+            Event handler for events raised when content has been received.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="Content">Content received.</param>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttClient">
+            <summary>
+            Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.#ctor(System.String,System.Int32,System.Security.Cryptography.X509Certificates.X509Certificate,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+            </summary>
+            <param name="Host">Host name or IP address of MQTT server.</param>
+            <param name="Port">Port to connect to.</param>
+            <param name="ClientCertificate">Client certificate.</param>
+            <param name="Sniffers">Sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.#ctor(System.String,System.Int32,System.Boolean,System.String,System.String,Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+            </summary>
+            <param name="Host">Host name or IP address of MQTT server.</param>
+            <param name="Port">Port to connect to.</param>
+            <param name="Tls">If TLS is used to encrypt communication.</param>
+            <param name="UserName">User Name</param>
+            <param name="Password">Password</param>
+            <param name="Sniffers">Sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.#ctor(System.String,System.Int32,System.Security.Cryptography.X509Certificates.X509Certificate,System.String,Waher.Networking.MQTT.MqttQualityOfService,System.Boolean,System.Byte[],Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+            </summary>
+            <param name="Host">Host name or IP address of MQTT server.</param>
+            <param name="Port">Port to connect to.</param>
+            <param name="ClientCertificate">Client certificate.</param>
+            <param name="WillTopic">Topic to publish the last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="WillQoS">Quality of Service of last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="WillRetain">If last will and testament should be retained, in case the connection drops unexpectedly.</param>
+            <param name="WillData">Data of last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="Sniffers">Sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.#ctor(System.String,System.Int32,System.Boolean,System.String,System.String,System.String,Waher.Networking.MQTT.MqttQualityOfService,System.Boolean,System.Byte[],Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+            </summary>
+            <param name="Host">Host name or IP address of MQTT server.</param>
+            <param name="Port">Port to connect to.</param>
+            <param name="Tls">If TLS is used to encrypt communication.</param>
+            <param name="UserName">User Name</param>
+            <param name="Password">Password</param>
+            <param name="WillTopic">Topic to publish the last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="WillQoS">Quality of Service of last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="WillRetain">If last will and testament should be retained, in case the connection drops unexpectedly.</param>
+            <param name="WillData">Data of last will and testament, in case the connection drops unexpectedly.</param>
+            <param name="Sniffers">Sniffers to use.</param>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.Reconnect">
+            <summary>
+            Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+            saves time.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.PING">
+            <summary>
+            Sends a PING message to the server. This is automatically done to keep the connection alive. Only call this method
+            if you want to send additional PING messages, apart from the ones sent to keep the connection alive.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnConnectionError">
+            <summary>
+            Event raised when a connection to a broker could not be made.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnError">
+            <summary>
+            Event raised when an error was encountered.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnPing">
+            <summary>
+            Event raised whenever a ping message is sent, i.e. when connection is idle.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnPingResponse">
+            <summary>
+            Event raised whenever a ping response is received, i.e. when connection is kept active, while idle.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.Host">
+            <summary>
+            Host or IP address of MQTT server.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.Port">
+            <summary>
+            Port number to connect to.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.Tls">
+            <summary>
+            If encryption is to be used or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.TrustServer">
+            <summary>
+            If server should be trusted, regardless if the operating system could validate its certificate or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.ClientId">
+            <summary>
+            Client ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.ServerCertificate">
+            <summary>
+            Certificate used by the server.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.ServerCertificateValid">
+            <summary>
+            If the server certificate is valid.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttClient.State">
+            <summary>
+            Current state of connection.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnStateChanged">
+            <summary>
+            Event raised whenever the internal state of the connection changes.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.PUBLISH(System.String,Waher.Networking.MQTT.MqttQualityOfService,System.Boolean,System.Byte[])">
+            <summary>
+            Publishes information on a topic.
+            </summary>
+            <param name="Topic">Topic name</param>
+            <param name="QoS">Quality of service</param>
+            <param name="Retain">If topic should retain information.</param>
+            <param name="Data">Binary data to send.</param>
+            <returns>Packet identifier assigned to data.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.PUBLISH(System.String,Waher.Networking.MQTT.MqttQualityOfService,System.Boolean,Waher.Networking.MQTT.BinaryOutput)">
+            <summary>
+            Publishes information on a topic.
+            </summary>
+            <param name="Topic">Topic name</param>
+            <param name="QoS">Quality of service</param>
+            <param name="Retain">If topic should retain information.</param>
+            <param name="Data">Binary data to send.</param>
+            <returns>Packet identifier assigned to data.</returns>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnPublished">
+            <summary>
+            Event raised when data has been successfully published.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnSubscribed">
+            <summary>
+            Event raised when subscription has been successfully received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.SUBSCRIBE(System.String,Waher.Networking.MQTT.MqttQualityOfService)">
+            <summary>
+            Subscribes to information from a topic. Topics can include wildcards.
+            </summary>
+            <param name="Topic">Topic string.</param>
+            <param name="QoS">Quality of Service.</param>
+            <returns>Packet identifier assigned to subscription.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.SUBSCRIBE(System.String[])">
+            <summary>
+            Subscribes to information from a set of topics. Topics can include wildcards.
+            </summary>
+            <param name="Topics">Topics</param>
+            <returns>Packet identifier assigned to subscription.</returns>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.SUBSCRIBE(System.Collections.Generic.KeyValuePair{System.String,Waher.Networking.MQTT.MqttQualityOfService}[])">
+            <summary>
+            Subscribes to information from a set of topics. Topics can include wildcards.
+            </summary>
+            <param name="Topics">Topics together with Quality of Service levels for each topic.</param>
+            <returns>Packet identifier assigned to subscription.</returns>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnContentReceived">
+            <summary>
+            Event raised when new content has been received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.UNSUBSCRIBE(System.String[])">
+            <summary>
+            Unsubscribes from information earlier subscribed to. Topics can include wildcards.
+            </summary>
+            <param name="Topics">Topics</param>
+            <returns>Packet identifier assigned to unsubscription.</returns>
+        </member>
+        <member name="E:Waher.Networking.MQTT.MqttClient.OnUnsubscribed">
+            <summary>
+            Event raised when unsubscription has been successfully received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttClient.Dispose">
+            <summary>
+            Closes the connection and disposes of all resources.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttContent">
+            <summary>
+            Information about content received from the MQTT server.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttContent.#ctor(Waher.Networking.MQTT.MqttHeader,System.String,System.Byte[])">
+            <summary>
+            Information about content received from the MQTT server.
+            </summary>
+            <param name="Header">MQTT Header</param>
+            <param name="Topic">Topic</param>
+            <param name="Data">Binary Data</param>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttContent.Header">
+            <summary>
+            MQTT Header
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttContent.Topic">
+            <summary>
+            Topic
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttContent.Data">
+            <summary>
+            Binary Data
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.MQTT.MqttContent.DataInput">
+            <summary>
+            Data stream that can be used to parse incoming data.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttControlPacketType">
+            <summary>
+            Enumeration of MQTT Control Packet types.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.CONNECT">
+            <summary>
+            Client to Server.
+            Client request to connect to Server
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.CONNACK">
+            <summary>
+            Server to Client
+            Connect acknowledgment
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PUBLISH">
+            <summary>
+            Client to Server or Server to Client
+            Publish message
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PUBACK">
+            <summary>
+            Client to Server or Server to Client 
+            Publish acknowledgment
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PUBREC">
+            <summary>
+            Client to Server or Server to Client 
+            Publish received (assured delivery part 1)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PUBREL">
+            <summary>
+            Client to Server or Server to Client 
+            Publish release (assured delivery part 2)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PUBCOMP">
+            <summary>
+            Client to Server or Server to Client  
+            Publish complete (assured delivery part 3)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.SUBSCRIBE">
+            <summary>
+            Client to Server
+            Client subscribe request
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.SUBACK">
+            <summary>
+            Server to Client
+            Subscribe acknowledgment
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.UNSUBSCRIBE">
+            <summary>
+            Client to Server
+            Unsubscribe request
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.UNSUBACK">
+            <summary>
+            Server to Client
+            Unsubscribe acknowledgment
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PINGREQ">
+            <summary>
+            Client to Server
+            PING request
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.PINGRESP">
+            <summary>
+            Server to Client 
+            PING response
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttControlPacketType.DISCONNECT">
+            <summary>
+            Client to Server
+            Client is disconnecting
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttHeader">
+            <summary>
+            Contains information in the MQTT header.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.ControlPacketType">
+            <summary>
+            Control packet type.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.QualityOfService">
+            <summary>
+            Quality of Service level.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.Retain">
+            <summary>
+            Retain flag.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.Duplicate">
+            <summary>
+            Duplicate delivery flag.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.RemainingLength">
+            <summary>
+            The Remaining Length is the number of bytes remaining within the current packet, including data in the 
+            variable header and the payload. The Remaining Length does not include the bytes used to encode the Remaining Length.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttHeader.PacketIdentifier">
+            <summary>
+            The variable header component of many of the Control Packet types includes a 2 byte Packet Identifier field.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.MQTT.MqttHeader.Parse(Waher.Networking.MQTT.BinaryInput)">
+            <summary>
+            Parses a header.
+            </summary>
+            <param name="Input">Binary input.</param>
+            <returns>Header.</returns>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttQualityOfService">
+            <summary>
+            MQTT Quality of Service level.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttQualityOfService.AtMostOnce">
+            <summary>
+            The message is delivered according to the capabilities of the underlying network. 
+            No response is sent by the receiver and no retry is performed by the sender. 
+            The message arrives at the receiver either once or not at all. 
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttQualityOfService.AtLeastOnce">
+            <summary>
+            This quality of service ensures that the message arrives at the receiver at least once. 
+            A QoS 1 PUBLISH Packet has a Packet Identifier in its variable header and is acknowledged 
+            by a PUBACK Packet. Section 2.3.1 provides more information about Packet Identifiers.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttQualityOfService.ExactlyOnce">
+            <summary>
+            This is the highest quality of service, for use when neither loss nor duplication of messages are acceptable.
+            There is an increased overhead associated with this quality of service.
+            A QoS 2 message has a Packet Identifier in its variable header. Section 2.3.1 provides more information about 
+            Packet Identifiers. The receiver of a QoS 2 PUBLISH Packet acknowledges receipt with a two-step acknowledgement process. 
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.MQTT.MqttState">
+            <summary>
+            State of MQTT connection.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.Offline">
+            <summary>
+            Offline
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.Connecting">
+            <summary>
+            Connecting to broker.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.StartingEncryption">
+            <summary>
+            Switching to encrypted channel
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.Authenticating">
+            <summary>
+            Performing initial handshake.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.Connected">
+            <summary>
+            Connected.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.MQTT.MqttState.Error">
+            <summary>
+            In an error state.
+            </summary>
+        </member>
+    </members>
+</doc>

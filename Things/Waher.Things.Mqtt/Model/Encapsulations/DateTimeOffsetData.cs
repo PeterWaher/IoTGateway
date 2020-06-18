@@ -59,18 +59,20 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new DateTimeControlParameter("Timestamp", "Publish", "Timestamp:", "Date & time portion of topic.", null, null,
-					(n) => this.value.DateTime,
+					(n) => Task.FromResult<DateTime?>(this.value.DateTime),
 					(n, v) =>
 					{
 						this.value = new DateTimeOffset(v, this.value.Offset);
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.EncodeRfc822(this.value)));
+						return Task.CompletedTask;
 					}),
 				new TimeControlParameter("Offset", "Publish", "Time zone:", "Time zone portion of topic.", null, null,
-					(n) => this.value.Offset,
+					(n) => Task.FromResult<TimeSpan?>(this.value.Offset),
 					(n, v) =>
 					{
 						this.value = new DateTimeOffset(this.value.DateTime, v);
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.EncodeRfc822(this.value)));
+						return Task.CompletedTask;
 					})
 			};
 		}

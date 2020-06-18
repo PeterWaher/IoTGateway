@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeInformationEventHandler(object Sender, NodeInformationEventArgs e);
+	public delegate Task NodeInformationEventHandler(object Sender, NodeInformationEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node information responses.

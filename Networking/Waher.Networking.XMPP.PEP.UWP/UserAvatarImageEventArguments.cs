@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.PubSub;
 
 namespace Waher.Networking.XMPP.PEP
@@ -10,7 +9,7 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="AvatarImage"></param>
-	public delegate void UserAvatarImageEventHandler(object Sender, UserAvatarImageEventArguments AvatarImage);
+	public delegate Task UserAvatarImageEventHandler(object Sender, UserAvatarImageEventArguments AvatarImage);
 
 	/// <summary>
 	/// Event arguments for user avatar metadata events.

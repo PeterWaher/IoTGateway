@@ -24,11 +24,16 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking
 {
 	/// <summary>
+	/// Asynchronous version of <see cref="EventArgs"/>.
+	/// </summary>
+	public delegate Task EventHandlerAsync(object Sender, EventArgs e);
+
+	/// <summary>
 	/// Connection error event handler delegate.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Exception">Information about error received.</param>
-	public delegate void ExceptionEventHandler(object Sender, Exception Exception);
+	public delegate Task ExceptionEventHandler(object Sender, Exception Exception);
 
 	/// <summary>
 	/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>

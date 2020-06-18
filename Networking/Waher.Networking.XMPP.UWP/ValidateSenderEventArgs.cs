@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
 
 namespace Waher.Networking.XMPP
 {
@@ -10,7 +9,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ValidateSenderEventHandler(object Sender, ValidateSenderEventArgs e);
+	public delegate Task ValidateSenderEventHandler(object Sender, ValidateSenderEventArgs e);
 
 	/// <summary>
 	/// Event arguments for sender validation events.

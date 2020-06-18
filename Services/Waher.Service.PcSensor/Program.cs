@@ -3,7 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
-using System.Text;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Waher.Content;
@@ -13,7 +13,6 @@ using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
 using Waher.Mock;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
@@ -35,7 +34,7 @@ namespace Waher.Service.PcSensor
 		private static string ownerJid = null;
 		private static bool registered = false;
 
-		public static void Main(string[] args)
+		public static void Main(string[] _)
 		{
 			try
 			{
@@ -71,6 +70,7 @@ namespace Waher.Service.PcSensor
 						{
 							ownerJid = e.JID;
 							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Disowned += (sender, e) =>
@@ -78,11 +78,13 @@ namespace Waher.Service.PcSensor
 							Log.Informational("Thing has been disowned.", ownerJid);
 							ownerJid = string.Empty;
 							Register();
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Removed += (sender, e) =>
 						{
 							Log.Informational("Thing has been removed from the public registry.", ownerJid);
+							return Task.CompletedTask;
 						};
 					}
 
@@ -127,6 +129,8 @@ namespace Waher.Service.PcSensor
 									Client.Reconnect();
 								break;
 						}
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceSubscribe += (sender, e) =>
@@ -138,17 +142,22 @@ namespace Waher.Service.PcSensor
 							Client.RequestPresenceSubscription(e.FromBareJID);
 
 						Client.SetPresence(Availability.Chat);
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>
 					{
 						e.Accept();
+						return Task.CompletedTask;
 					};
 
 					Client.OnRosterItemUpdated += (sender, e) =>
 					{
 						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 							Client.RemoveRosterItem(e.BareJid);
+
+						return Task.CompletedTask;
 					};
 
 					SortedDictionary<string, string[]> CategoryIncluded = new SortedDictionary<string, string[]>();
@@ -306,6 +315,8 @@ namespace Waher.Service.PcSensor
 								}
 							}
 						}
+					
+						return Task.CompletedTask;
 					};
 
 					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
@@ -411,6 +422,9 @@ namespace Waher.Service.PcSensor
 						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 					}
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

@@ -19,6 +19,7 @@ using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Networking.Sniffers;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -185,6 +186,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.OnUpdated();
 								this.DataSource?.NodesAdded(Children.Values, this);
 							}
+
+							return Task.CompletedTask;
+
 						}, null);
 					}
 					else
@@ -354,6 +358,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 								break;
 						}
 					}
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -377,10 +384,15 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Dialog.ShowDialog();
 					});
 
+					return Task.CompletedTask;
+
 				}, (sender, e) =>
 				{
 					if (e.Ok)
 						this.Add(new Node(this, e.NodeInformation));
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -429,6 +441,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 							Log.Critical(ex);
 						}
 					}
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -453,6 +468,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Dialog.ShowDialog();
 					});
 
+					return Task.CompletedTask;
+
 				}, (sender, e) =>
 				{
 					if (e.Ok)
@@ -466,6 +483,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 						if (NewKey != OldKey && Parent != null)
 							Parent.RenameChild(OldKey, NewKey, this);
 					}
+
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -494,6 +514,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 						else
 							MainWindow.ErrorBox(e.ErrorText);
 
+						return Task.CompletedTask;
+
 					}, null);
 			}
 		}
@@ -513,6 +535,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					string.Empty, string.Empty, string.Empty, (sender, e) =>
 					{
 						MainWindow.MouseDefault();
+						return Task.CompletedTask;
 					}, null);
 			}
 			else
@@ -536,6 +559,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 					{
 						if (e.Ok)
 							this.commands = e.Result;
+
+						return Task.CompletedTask;
 
 					}, null);
 				}
@@ -597,6 +622,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 								MainWindow.MouseDefault();
 
 								this.ShowCommandResult(e2, Command);
+
+								return Task.CompletedTask;
+
 							}, null);
 						break;
 
@@ -613,10 +641,13 @@ namespace Waher.Client.WPF.Model.Concentrator
 									ParameterDialog Dialog = new ParameterDialog(Form);
 									Dialog.ShowDialog();
 								});
+
+								return Task.CompletedTask;
 							},
 							(sender2, e2) =>
 							{
 								this.ShowCommandResult(e2, Command);
+								return Task.CompletedTask;
 							}, null);
 						break;
 
@@ -633,6 +664,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 									ParameterDialog Dialog = new ParameterDialog(Form);
 									Dialog.ShowDialog();
 								});
+
+								return Task.CompletedTask;
 							},
 							(sender2, e2) =>
 							{
@@ -649,6 +682,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 								}
 
 								this.ShowCommandResult(e2, Command);
+
+								return Task.CompletedTask;
+
 							}, null);
 						break;
 				}

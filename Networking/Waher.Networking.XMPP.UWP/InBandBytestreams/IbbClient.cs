@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -117,11 +118,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(StreamId);
 			Xml.Append("' stanza='iq'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (e.Ok)
 				{
-					Result.Opened(e);
+					await Result.Opened(e);
 
 					lock (this.output)
 					{
@@ -136,7 +137,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			return Result;
 		}
 
-		private void OpenHandler(object Sender, IqEventArgs e)
+		private async Task OpenHandler(object Sender, IqEventArgs e)
 		{
 			int BlockSize = XML.Attribute(e.Query, "block-size", 0);
 			string StreamId = XML.Attribute(e.Query, "sid");
@@ -160,7 +161,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -185,7 +186,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			e.IqResult(string.Empty);
 		}
 
-		private void CloseHandler(object Sender, IqEventArgs e)
+		private Task CloseHandler(object Sender, IqEventArgs e)
 		{
 			string StreamId = XML.Attribute(e.Query, "sid");
 			string Key = e.From + " " + StreamId;
@@ -226,6 +227,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			}
 
 			e.IqResult(string.Empty);
+		
+			return Task.CompletedTask;
 		}
 
 		private void AssertCacheCreated()
@@ -277,20 +280,20 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// </summary>
 		public event ValidateStreamEventHandler OnOpen = null;
 
-		private void DataHandler(object Sender, IqEventArgs e)
+		private async Task DataHandler(object Sender, IqEventArgs e)
 		{
-			if (this.HandleIncomingData(e.Query, e.From))
+			if (await this.HandleIncomingData(e.Query, e.From))
 				e.IqResult(string.Empty);
 			else
 				throw new ItemNotFoundException("Stream not recognized.", e.Query);
 		}
 
-		private void DataHandler(object Sender, MessageEventArgs e)
+		private Task DataHandler(object Sender, MessageEventArgs e)
 		{
-			this.HandleIncomingData(e.Content, e.From);
+			return this.HandleIncomingData(e.Content, e.From);
 		}
 
-		private bool HandleIncomingData(XmlElement Data, string From)
+		private async Task<bool> HandleIncomingData(XmlElement Data, string From)
 		{
 			if (Data is null)
 				return false;
@@ -350,7 +353,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				return false;
 			}
 
-			Input.DataReceived(Bin, Seq);
+			await Input.DataReceived(Bin, Seq);
 
 			return true;
 		}

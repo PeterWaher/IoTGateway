@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
@@ -13,6 +16,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	{
 		private readonly XmppClient client;
 		private TemporaryFile tempFile;
+		private MultiReadSingleWriteObject syncObject;
 		private readonly IEndToEndEncryption e2e;
 		private readonly string to;
 		private readonly string streamId;
@@ -87,20 +91,20 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		{
 			this.aborted = true;
 
-			if (this.tempFile != null)
-			{
-				this.tempFile.Dispose();
-				this.tempFile = null;
-			}
+			this.tempFile?.Dispose();
+			this.tempFile = null;
+
+			this.syncObject?.Dispose();
+			this.syncObject = null;
 		}
 
 		/// <summary>
 		/// Writes data to the stram.
 		/// </summary>
 		/// <param name="Data">Data</param>
-		public void Write(byte[] Data)
+		public Task Write(byte[] Data)
 		{
-			this.Write(Data, 0, Data.Length);
+			return this.Write(Data, 0, Data.Length);
 		}
 
 		/// <summary>
@@ -109,22 +113,29 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="Data">Data</param>
 		/// <param name="Offset">Offset into array where writing is to start.</param>
 		/// <param name="Count">Number of bytes to start.</param>
-		public void Write(byte[] Data, int Offset, int Count)
+		public async Task Write(byte[] Data, int Offset, int Count)
 		{
 			if (this.tempFile is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
-			lock (this.tempFile)
+			if (!await this.syncObject.TryBeginWrite(10000))
+				throw new TimeoutException();
+
+			try
 			{
 				this.tempFile.Position = this.tempFile.Length;
-				this.tempFile.Write(Data, Offset, Count);
+				await this.tempFile.WriteAsync(Data, Offset, Count);
 
 				if (this.opened && !this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
-					this.WriteBlockLocked();
+					await this.WriteBlockLocked();
+			}
+			finally
+			{
+				await this.syncObject.EndWrite();
 			}
 		}
 
-		private void WriteBlockLocked()
+		private async Task WriteBlockLocked()
 		{
 			int BlockSize;
 
@@ -140,10 +151,10 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				byte[] Block = new byte[BlockSize];
 
 				this.tempFile.Position = this.pos;
-				int NrRead = this.tempFile.Read(Block, 0, BlockSize);
+				int NrRead = await this.tempFile.ReadAsync(Block, 0, BlockSize);
 				if (NrRead <= 0)
 				{
-					this.Close();
+					await this.Close();
 					this.Dispose();
 
 					throw new IOException("Unable to read from temporary file.");
@@ -177,7 +188,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			}
 		}
 
-		private void BlockAck(object Sender, IqResultEventArgs e)
+		private async Task BlockAck(object Sender, IqResultEventArgs e)
 		{
 			if (this.tempFile is null || this.aborted)
 				return;
@@ -188,7 +199,10 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				return;
 			}
 
-			lock (this.tempFile)
+			if (!await this.syncObject.TryBeginWrite(10000))
+				throw new TimeoutException();
+
+			try
 			{
 				int Seq2 = (int)e.State;
 				if (Seq2 <= this.seqAcknowledged)
@@ -199,7 +213,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				long NrLeft = this.tempFile.Length - this.pos;
 
 				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
-					this.WriteBlockLocked();
+					await this.WriteBlockLocked();
 				else
 				{
 					this.isWriting = false;
@@ -211,9 +225,13 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					}
 				}
 			}
+			finally
+			{
+				await this.syncObject.EndWrite();
+			}
 		}
 
-		internal void Opened(IqResultEventArgs e)
+		internal async Task Opened(IqResultEventArgs e)
 		{
 			this.opened = true;
 
@@ -223,7 +241,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				try
 				{
 					OpenStreamEventArgs e2 = new OpenStreamEventArgs(e, this);
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -232,7 +250,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			}
 
 			if (!this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
-				this.WriteBlockLocked();
+				await this.WriteBlockLocked();
 		}
 
 		/// <summary>
@@ -243,14 +261,14 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Closes the session.
 		/// </summary>
-		public void Close()
+		public async Task Close()
 		{
 			this.done = true;
 
 			if (this.opened && !this.isWriting)
 			{
 				if (this.tempFile.Length > this.pos)
-					this.WriteBlockLocked();
+					await this.WriteBlockLocked();
 				else
 					this.SendClose();
 			}

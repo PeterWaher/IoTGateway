@@ -254,6 +254,7 @@
     <Compile Include="TransferEncodings\InternalTransfer.cs" />
     <Compile Include="Vanity\VanityExpression.cs" />
     <Compile Include="Vanity\VanityMap.cs" />
+    <Compile Include="Vanity\VanityResources.cs" />
     <Compile Include="Vanity\VanityStep.cs" />
     <Compile Include="WebSockets\WebSocket.cs" />
     <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />

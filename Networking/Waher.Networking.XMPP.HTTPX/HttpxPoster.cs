@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}, null, TimeoutMs, Timeout.Infinite);
 
 				Rec.HttpxClient.Request(Rec.FullJid, "POST", Rec.LocalUrl,
-					1.1, Headers2, Data, (sender, e) =>
+					1.1, Headers2, Data, async (sender, e) =>
 					{
 						if (e.Ok)
 						{
@@ -167,7 +167,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 								if (!(e.Data is null))
 								{
-									State.Data.Write(e.Data, 0, e.Data.Length);
+									await State.Data.WriteAsync(e.Data, 0, e.Data.Length);
 									State.Done.TrySetResult(true);
 								}
 							}
@@ -177,9 +177,9 @@ namespace Waher.Networking.XMPP.HTTPX
 						else
 							State.Done.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get resource." : e.ErrorText));
 
-					}, (sender, e) =>
+					}, async (sender, e) =>
 					{
-						State.Data.Write(e.Data, 0, e.Data.Length);
+						await State.Data.WriteAsync(e.Data, 0, e.Data.Length);
 						if (e.Last)
 							State.Done.TrySetResult(true);
 

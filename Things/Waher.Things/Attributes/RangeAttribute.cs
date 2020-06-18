@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -12,8 +8,8 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class RangeAttribute : Attribute
 	{
-		private string min;
-		private string max;
+		private readonly string min;
+		private readonly string max;
 
 		/// <summary>
 		/// Defines a valid input range for the property.

@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		}
 
 		/// <summary>
-		/// Any additional parameters avalable. If no parameters are available, null is returned.
+		/// Any additional parameters available. If no parameters are available, null is returned.
 		/// </summary>
 		public KeyValuePair<string, string>[] Parameters
 		{

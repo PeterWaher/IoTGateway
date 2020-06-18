@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void BooleanResponseEventHandler(object Sender, BooleanResponseEventArgs e);
+	public delegate Task BooleanResponseEventHandler(object Sender, BooleanResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for boolean response responses.

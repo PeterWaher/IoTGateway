@@ -1,22 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Emoji;
-using Waher.Content.Emoji.Emoji1;
-using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Script;
-using Waher.Security;
-using Waher.Persistence;
-using Waher.Networking.XMPP;
-using Waher.IoTGateway;
 using Waher.IoTGateway.WebResources.ExportFormats;
 
 namespace Waher.IoTGateway.WebResources
@@ -67,7 +53,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -100,6 +86,8 @@ namespace Waher.IoTGateway.WebResources
 			Response.Write("1");
 
 			ExportFormat.UpdateClientsFileDeleted(FileName);
+
+			return Task.CompletedTask;
 		}
 
 	}

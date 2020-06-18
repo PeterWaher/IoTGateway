@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
@@ -373,13 +371,15 @@ namespace Waher.Client.WPF.Controls.Questions
 			base.Dispose();
 		}
 
-		private void RosterItemUpdated(object Sender, RosterItem Item)
+		private Task RosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if ((Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To) && Item.HasLastPresence && Item.LastPresence.IsOnline)
 			{
 				this.questionView.Owner.UnregisterRosterEventHandler(this.JID, this.RosterItemUpdated);
 				this.DoRequest(Item);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void DoRequest(RosterItem Item)
@@ -398,66 +398,61 @@ namespace Waher.Client.WPF.Controls.Questions
 			Request.OnFieldsReceived += Request_OnFieldsReceived;
 		}
 
-		private async void Request_OnStateChanged(object Sender, SensorDataReadoutState NewState)
+		private async Task Request_OnStateChanged(object Sender, SensorDataReadoutState NewState)
 		{
-			try
+			if (NewState == SensorDataReadoutState.Done)
 			{
-				if (NewState == SensorDataReadoutState.Done)
-				{
-					string[] Fields;
+				string[] Fields;
 
-					lock (this.fieldsSorted)
+				lock (this.fieldsSorted)
+				{
+					Fields = new string[this.fieldsSorted.Count];
+					this.fieldsSorted.Keys.CopyTo(Fields, 0);
+				}
+
+				this.availableFieldNames = Fields;
+				await Database.Update(this);
+
+				MainWindow.UpdateGui(() =>
+				{
+					SortedDictionary<string, bool> Selected = null;
+					bool AllSelected = this.fieldNames is null;
+
+					if (!AllSelected)
 					{
-						Fields = new string[this.fieldsSorted.Count];
-						this.fieldsSorted.Keys.CopyTo(Fields, 0);
+						Selected = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
+
+						foreach (ListBoxItem Item in this.fieldsListBox.Items)
+						{
+							if (Item.IsSelected)
+								Selected[(string)Item.Tag] = true;
+						}
 					}
 
-					this.availableFieldNames = Fields;
-					await Database.Update(this);
+					this.fieldsListBox.Items.Clear();
 
-					MainWindow.UpdateGui(() =>
+					foreach (string FieldName in this.availableFieldNames)
 					{
-						SortedDictionary<string, bool> Selected = null;
-						bool AllSelected = this.fieldNames is null;
-
-						if (!AllSelected)
+						this.fieldsListBox.Items.Add(new ListBoxItem()
 						{
-							Selected = new SortedDictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
-
-							foreach (ListBoxItem Item in this.fieldsListBox.Items)
-							{
-								if (Item.IsSelected)
-									Selected[(string)Item.Tag] = true;
-							}
-						}
-
-						this.fieldsListBox.Items.Clear();
-
-						foreach (string FieldName in this.availableFieldNames)
-						{
-							this.fieldsListBox.Items.Add(new ListBoxItem()
-							{
-								Content = FieldName,
-								IsSelected = AllSelected || Selected.ContainsKey(FieldName),
-								Tag = FieldName
-							});
-						}
-					});
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+							Content = FieldName,
+							IsSelected = AllSelected || Selected.ContainsKey(FieldName),
+							Tag = FieldName
+						});
+					}
+				});
 			}
 		}
 
-		private void Request_OnFieldsReceived(object Sender, IEnumerable<Field> NewFields)
+		private Task Request_OnFieldsReceived(object _, IEnumerable<Field> NewFields)
 		{
 			lock (this.fieldsSorted)
 			{
 				foreach (Field F in NewFields)
 					this.fieldsSorted[F.Name] = true;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private FieldType GetFieldType()
@@ -492,7 +487,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				return null;
 		}
 
-		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		private async Task RuleCallback(object Sender, IqResultEventArgs e)
 		{
 			try
 			{

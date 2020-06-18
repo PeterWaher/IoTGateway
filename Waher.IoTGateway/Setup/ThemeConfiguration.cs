@@ -182,7 +182,7 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private void SetTheme(HttpRequest Request, HttpResponse Response)
+		private Task SetTheme(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -202,9 +202,11 @@ namespace Waher.IoTGateway.Setup
 			else
 				throw new NotFoundException("Theme not found: " + ThemeId);
 
+			this.UpdateTheme(Def, TabID);
+		
 			Response.StatusCode = 200;
 
-			this.UpdateTheme(Def, TabID);
+			return Task.CompletedTask;
 		}
 
 		private async void UpdateTheme(ThemeDefinition Def, string TabID)

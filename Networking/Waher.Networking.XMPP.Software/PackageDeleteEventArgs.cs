@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Xml;
-using Waher.Networking.XMPP;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Software
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.Software
     /// </summary>
     /// <param name="Sender">Sender of event.</param>
     /// <param name="e">Event arguments.</param>
-    public delegate void PackageDeletedEventHandler(object Sender, PackageDeletedEventArgs e);
+    public delegate Task PackageDeletedEventHandler(object Sender, PackageDeletedEventArgs e);
 
     /// <summary>
     /// Event arguments for software package deletion events.

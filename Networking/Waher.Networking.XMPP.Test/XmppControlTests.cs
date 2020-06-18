@@ -10,6 +10,8 @@ using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.ControlParameters;
+using System.Threading.Tasks;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -31,13 +33,13 @@ namespace Waher.Networking.XMPP.Test
 		private TimeSpan t = TimeSpan.Zero;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(XmppClient).Assembly,
 				typeof(BOSH.HttpBinding).Assembly,
 				typeof(WebSocket.WebSocketBinding).Assembly,
-                typeof(P2P.EndpointSecurity).Assembly);
+				typeof(P2P.EndpointSecurity).Assembly);
 		}
 
 		public override void ConnectClients()
@@ -49,17 +51,39 @@ namespace Waher.Networking.XMPP.Test
 
 			this.controlClient = new ControlClient(this.client1);
 			this.controlServer = new ControlServer(this.client2,
-				new BooleanControlParameter("Bool", "Page1", "Bool:", "Boolean value", (sender) => this.b, (sender, value) => this.b = value),
-				new ColorControlParameter("Color", "Page1", "Color:", "Color value", (sender) => this.cl, (sender, value) => this.cl = value),
-				new DateControlParameter("Date", "Page1", "Date:", "Date value", DateTime.MinValue, DateTime.MaxValue, (sender) => this.d, (sender, value) => this.d = value),
-				new DateTimeControlParameter("DateTime", "Page1", "DateTime:", "DateTime value", DateTime.MinValue, DateTime.MaxValue, (sender) => this.dt, (sender, value) => this.dt = value),
-				new DoubleControlParameter("Double", "Page1", "Double:", "Double value", (sender) => this.db, (sender, value) => this.db = value),
-				new DurationControlParameter("Duration", "Page1", "Duration:", "Duration value", (sender) => this.dr, (sender, value) => this.dr = value),
-				new EnumControlParameter("Enum", "Page1", "Enum:", "Enum value", typeof(TypeCode), (sender) => this.e, (sender, value) => this.e = (TypeCode)value),
-				new Int32ControlParameter("Int32", "Page1", "Int32:", "Int32 value", (sender) => this.i, (sender, value) => this.i = value),
-				new Int64ControlParameter("Int64", "Page1", "Int64:", "Int64 value", (sender) => this.l, (sender, value) => this.l = value),
-				new StringControlParameter("String", "Page1", "String:", "String value", (sender) => this.s, (sender, value) => this.s = value),
-				new TimeControlParameter("Time", "Page1", "Time:", "Time value", (sender) => this.t, (sender, value) => this.t = value));
+				new BooleanControlParameter("Bool", "Page1", "Bool:", "Boolean value",
+					(sender) => Task.FromResult<bool?>(this.b),
+					(sender, value) => { this.b = value; return Task.CompletedTask; }),
+				new ColorControlParameter("Color", "Page1", "Color:", "Color value",
+					(sender) => Task.FromResult<ColorReference>(this.cl),
+					(sender, value) => { this.cl = value; return Task.CompletedTask; }),
+				new DateControlParameter("Date", "Page1", "Date:", "Date value", DateTime.MinValue, DateTime.MaxValue,
+					(sender) => Task.FromResult<DateTime?>(this.d),
+					(sender, value) => { this.d = value; return Task.CompletedTask; }),
+				new DateTimeControlParameter("DateTime", "Page1", "DateTime:", "DateTime value", DateTime.MinValue, DateTime.MaxValue,
+					(sender) => Task.FromResult<DateTime?>(this.dt),
+					(sender, value) => { this.dt = value; return Task.CompletedTask; }),
+				new DoubleControlParameter("Double", "Page1", "Double:", "Double value",
+					(sender) => Task.FromResult<double?>(this.db),
+					(sender, value) => { this.db = value; return Task.CompletedTask; }),
+				new DurationControlParameter("Duration", "Page1", "Duration:", "Duration value",
+					(sender) => Task.FromResult<Duration>(this.dr),
+					(sender, value) => { this.dr = value; return Task.CompletedTask; }),
+				new EnumControlParameter("Enum", "Page1", "Enum:", "Enum value", typeof(TypeCode),
+					(sender) => Task.FromResult<Enum>(this.e),
+					(sender, value) => { this.e = (TypeCode)value; return Task.CompletedTask; }),
+				new Int32ControlParameter("Int32", "Page1", "Int32:", "Int32 value",
+					(sender) => Task.FromResult<int?>(this.i),
+					(sender, value) => { this.i = value; return Task.CompletedTask; }),
+				new Int64ControlParameter("Int64", "Page1", "Int64:", "Int64 value",
+					(sender) => Task.FromResult<long?>(this.l),
+					(sender, value) => { this.l = value; return Task.CompletedTask; }),
+				new StringControlParameter("String", "Page1", "String:", "String value",
+					(sender) => Task.FromResult<string>(this.s),
+					(sender, value) => { this.s = value; return Task.CompletedTask; }),
+				new TimeControlParameter("Time", "Page1", "Time:", "Time value",
+					(sender) => Task.FromResult<TimeSpan?>(this.t),
+					(sender, value) => { this.t = value; return Task.CompletedTask; }));
 		}
 
 		public override void DisposeClients()
@@ -96,6 +120,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -124,6 +150,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -154,6 +182,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -185,6 +215,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -213,6 +245,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -241,6 +275,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -269,6 +305,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -297,6 +335,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -325,6 +365,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -353,6 +395,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
@@ -382,6 +426,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");

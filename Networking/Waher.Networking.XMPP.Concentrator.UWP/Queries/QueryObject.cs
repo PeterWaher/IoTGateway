@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Things.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator.Queries
 {

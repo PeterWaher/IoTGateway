@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.ControlParameters;
@@ -12,9 +10,9 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 	/// </summary>
 	public abstract class ControlOperation
 	{
-		private IThingReference node;
-		private IqEventArgs request;
-		private string parameterName;
+		private readonly IThingReference node;
+		private readonly IqEventArgs request;
+		private readonly string parameterName;
 
 		/// <summary>
 		/// Abstract base class for control operations.
@@ -57,6 +55,6 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// Performs the control operation.
 		/// </summary>
 		/// <returns>If the operation was successful or not.</returns>
-		public abstract bool Set();
+		public abstract Task<bool> Set();
 	}
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
-using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
@@ -13,9 +12,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.ServiceDiscovery;
-using Waher.Things;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using System.Windows.Controls;
 
@@ -156,10 +153,14 @@ namespace Waher.Client.WPF.Model.PubSub
 							{
 								if (!e2.Ok)
 									MainWindow.ErrorBox("Unable to subscribe to new items: " + e.ErrorText);
+
+								return Task.CompletedTask;
 							}, null);
 						}
 						else
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get latest items." : e.ErrorText);
+
+						return Task.CompletedTask;
 
 					}, null);
 				}
@@ -222,12 +223,17 @@ namespace Waher.Client.WPF.Model.PubSub
 													else
 														MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get item." : e3.ErrorText);
 
+													return Task.CompletedTask;
+
 												}, Item);
 											}
 										}
 									}
 									else
 										MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get items." : e2.ErrorText);
+
+									return Task.CompletedTask;
+
 								}, null);
 							}
 							else
@@ -269,12 +275,18 @@ namespace Waher.Client.WPF.Model.PubSub
 										}
 										else
 											MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get information." : e2.ErrorText);
+
+										return Task.CompletedTask;
+
 									}, Item);
 								}
 							}
 						}
 						else
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get information." : e.ErrorText);
+
+						return Task.CompletedTask;
+
 					}, null);
 				}
 			}
@@ -328,7 +340,7 @@ namespace Waher.Client.WPF.Model.PubSub
 							Dialog.ShowDialog();
 						});
 
-						return;
+						return Task.CompletedTask;
 					}
 
 					Mouse.OverrideCursor = Cursors.Wait;
@@ -339,11 +351,16 @@ namespace Waher.Client.WPF.Model.PubSub
 
 						if (!e3.Ok)
 							MainWindow.ErrorBox("Unable to add item: " + e3.ErrorText);
+
+						return Task.CompletedTask;
 					}, null);
+
+					return Task.CompletedTask;
 				},
 				(sender2, e2) =>
 				{
 					// Do nothing.
+					return Task.CompletedTask;
 				}, string.Empty, string.Empty,
 				new TextSingleField(null, "ItemId", "Item ID:", false, new string[] { string.Empty }, null, "ID of item to create. If not provided, one will be generated for you.",
 					StringDataType.Instance, null, string.Empty, false, false, false),
@@ -454,6 +471,8 @@ namespace Waher.Client.WPF.Model.PubSub
 						if (!e2.Ok)
 							MainWindow.ErrorBox("Unable to purge the node: " + e2.ErrorText);
 
+						return Task.CompletedTask;
+
 					}, null);
 				}
 				catch (Exception ex)
@@ -496,11 +515,16 @@ namespace Waher.Client.WPF.Model.PubSub
 								}
 								else
 									MainWindow.ErrorBox("Unable to update node: " + e3.ErrorText);
+
+								return Task.CompletedTask;
 							}, null);
+
+							return Task.CompletedTask;
 						},
 						(sender2, e2) =>
 						{
 							// Do nothing.
+							return Task.CompletedTask;
 						}, string.Empty, string.Empty, e.Form.Fields);
 
 					ParameterDialog Dialog = new ParameterDialog(Form);
@@ -509,9 +533,13 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Dialog.ShowDialog();
 					});
+
+					return Task.CompletedTask;
 				}
 				else
 					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}
@@ -537,6 +565,8 @@ namespace Waher.Client.WPF.Model.PubSub
 				}
 				else
 					MainWindow.ErrorBox("Unable to delete node: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

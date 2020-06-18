@@ -10,8 +10,8 @@ namespace Waher.Things
 	/// </summary>
 	public class ThingError : ThingReference
 	{
-		private DateTime timestamp;
-		private string errorMessage;
+		private readonly DateTime timestamp;
+		private readonly string errorMessage;
 
 		/// <summary>
 		/// Contains information about an error on a thing

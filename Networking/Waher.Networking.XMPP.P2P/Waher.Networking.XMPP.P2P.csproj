@@ -32,9 +32,9 @@ Poly1305</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp socks5 serverless peer-to-peer p2p e2e End-to-End ECDH ECDSA EdDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks AES ChaCha20 Poly1305</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.24</AssemblyVersion>
-    <FileVersion>1.0.24</FileVersion>
-    <Version>1.0.24</Version>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.P2P\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

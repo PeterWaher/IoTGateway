@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -96,7 +95,7 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitConnected(10000);
 		}
 
-		private void Client_OnStateChanged(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -113,9 +112,11 @@ namespace Waher.Networking.XMPP.Test
 					this.clientOffline.Set();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Component_OnStateChanged(object Sender, XmppState NewState)
+		private Task Component_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -131,26 +132,32 @@ namespace Waher.Networking.XMPP.Test
 					this.componentOffline.Set();
 					break;
 			}
+		
+			return Task.CompletedTask;
 		}
 
-		void Client_OnError(object Sender, Exception Exception)
+		Task Client_OnError(object Sender, Exception Exception)
 		{
 			this.clientEx = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Component_OnError(object Sender, Exception Exception)
+		Task Component_OnError(object Sender, Exception Exception)
 		{
 			this.componentEx = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnConnectionError(object Sender, Exception Exception)
+		Task Client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.clientEx = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Component_OnConnectionError(object Sender, Exception Exception)
+		Task Component_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.componentEx = Exception;
+			return Task.CompletedTask;
 		}
 
 		private int WaitClient(int Timeout)

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Content;
 using Waher.Things;
@@ -46,6 +44,8 @@ namespace Waher.Networking.XMPP.Test
 					new Int64Field(ThingReference.Empty, Now, "Int64", long.MinValue, FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new StringField(ThingReference.Empty, Now, "String", "Hello world.", FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new TimeField(ThingReference.Empty, Now, "Time", Now.TimeOfDay, FieldType.Momentary, FieldQoS.AutomaticReadout));
+
+				return Task.CompletedTask;
 			};
 		}
 
@@ -77,12 +77,21 @@ namespace Waher.Networking.XMPP.Test
 				IEnumerable<Field> Fields = null;
 
 				SensorDataClientRequest Request = this.sensorClient.RequestReadout(this.client2.FullJID, FieldType.All);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+				return Task.CompletedTask;
 				};
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000), "Readout not performed correctly");
@@ -108,12 +117,21 @@ namespace Waher.Networking.XMPP.Test
 
 				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
@@ -146,12 +164,21 @@ namespace Waher.Networking.XMPP.Test
 						new FieldSubscriptionRule("Temperature", this.temp, 1)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				this.temp += 0.5;
@@ -202,12 +229,21 @@ namespace Waher.Networking.XMPP.Test
 						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				this.temp -= 1;
@@ -247,12 +283,21 @@ namespace Waher.Networking.XMPP.Test
 						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				this.temp += 1;
@@ -292,12 +337,21 @@ namespace Waher.Networking.XMPP.Test
 						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				int Count = 6;
@@ -347,12 +401,21 @@ namespace Waher.Networking.XMPP.Test
 
 				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
-				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
-				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnStateChanged += (sender, NewState) =>
+				{
+					Console.Out.WriteLine(NewState.ToString());
+					return Task.CompletedTask;
+				};
+				Request.OnErrorsReceived += (sender, Errors) =>
+				{
+					Error.Set();
+					return Task.CompletedTask;
+				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",

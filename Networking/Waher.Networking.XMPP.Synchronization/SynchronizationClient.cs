@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			}
 		}
 
-		private void Clock(object Sender, IqEventArgs e)
+		private Task Clock(object Sender, IqEventArgs e)
 		{
 			DateTimeHF Now = SynchronizationClient.Now;
 			StringBuilder Xml = new StringBuilder();
@@ -195,6 +195,8 @@ namespace Waher.Networking.XMPP.Synchronization
 			Xml.Append("</resp>");
 
 			e.IqResult(Xml.ToString());
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -289,6 +291,8 @@ namespace Waher.Networking.XMPP.Synchronization
 				{
 					Log.Critical(ex);
 				}
+				
+				return Task.CompletedTask;
 
 			}, State);
 		}
@@ -873,7 +877,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			public int NrDifferenceHf;
 		}
 
-		private void SourceReq(object Sender, IqEventArgs e)
+		private Task SourceReq(object Sender, IqEventArgs e)
 		{
 			if (!string.IsNullOrEmpty(this.clockSourceJID))
 			{
@@ -889,6 +893,8 @@ namespace Waher.Networking.XMPP.Synchronization
 			}
 			else
 				e.IqError(new StanzaErrors.ItemNotFoundException("Clock source not used.", e.IQ));
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -915,6 +921,8 @@ namespace Waher.Networking.XMPP.Synchronization
 				{
 					Log.Critical(ex);
 				}
+
+				return Task.CompletedTask;
 
 			}, State);
 		}

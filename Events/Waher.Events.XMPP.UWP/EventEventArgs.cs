@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 
 namespace Waher.Events.XMPP
@@ -10,14 +9,14 @@ namespace Waher.Events.XMPP
 	/// </summary>
 	/// <param name="Sender"></param>
 	/// <param name="e"></param>
-	public delegate void EventEventHandler(object Sender, EventEventArgs e);
+	public delegate Task EventEventHandlerAsync(object Sender, EventEventArgs e);
 
 	/// <summary>
 	/// Event arguments for <see cref="XmppEventReceptor.OnEvent"/> events.
 	/// </summary>
 	public class EventEventArgs : MessageEventArgs
 	{
-		private Event ev;
+		private readonly Event ev;
 
 		internal EventEventArgs(MessageEventArgs e, Event Event)
 			: base(e)

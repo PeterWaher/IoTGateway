@@ -53,11 +53,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new TimeControlParameter("Value", "Publish", "Value:", "Time span value of topic.",
-					(n) => this.value,
+					(n) => Task.FromResult<TimeSpan?>(this.value),
 					(n, v) =>
 					{
 						this.value = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v.ToString()));
+						return Task.CompletedTask;
 					})
 			};
 		}

@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void StreamEventHandler(object Sender, StreamEventArgs e);
+	public delegate Task StreamEventHandler(object Sender, StreamEventArgs e);
 
 	/// <summary>
 	/// Event arguments for stream callbacks.

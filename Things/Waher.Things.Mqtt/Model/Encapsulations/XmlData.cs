@@ -153,7 +153,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new MultiLineTextControlParameter("Value", "Publish", "Value:", "XML value of topic.",
-					(n) => this.xml,
+					(n) => Task.FromResult<string>(this.xml),
 					(n, v) =>
 					{
 						XmlDocument Doc = new XmlDocument();
@@ -161,6 +161,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 						this.value = Doc;
 						this.xml = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						return Task.CompletedTask;
 					})
 			};
 		}

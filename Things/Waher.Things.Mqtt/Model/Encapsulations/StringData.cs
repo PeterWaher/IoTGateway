@@ -54,11 +54,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new StringControlParameter("Value", "Publish", "Value:", "String value of topic.",
-					(n) => this.value,
+					(n) => Task.FromResult<string>(this.value),
 					(n, v) =>
 					{
 						this.value = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						return Task.CompletedTask;
 					})
 			};
 		}

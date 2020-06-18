@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 using Waher.Events;
 using Waher.Events.XMPP;
 
@@ -61,6 +58,7 @@ namespace Waher.Networking.XMPP.Test
 				{
 					Event = e.Event;
 					Done.Set();
+					return Task.CompletedTask;
 				};
 
 				Log.Debug("Debug message", "Test Object", "Test Actor", "Test Event ID", EventLevel.Medium, "Test Facility", "Test Module", "Test Stack Trace",

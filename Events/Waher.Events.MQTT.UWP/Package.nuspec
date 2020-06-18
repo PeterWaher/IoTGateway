@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Events.MQTT.UWP</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>Waher.Events.MQTT.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -19,7 +19,7 @@
       <dependency id="Waher.Content.Xml" version="1.0.8"/>
       <dependency id="Waher.Events" version="1.0.11"/>
       <dependency id="Waher.Networking.UWP" version="1.0.15"/>
-      <dependency id="Waher.Networking.MQTT.UWP" version="1.0.12"/>
+      <dependency id="Waher.Networking.MQTT.UWP" version="1.0.13"/>
     </dependencies>
   </metadata>
   <files>

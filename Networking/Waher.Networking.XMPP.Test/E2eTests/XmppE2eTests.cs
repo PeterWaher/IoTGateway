@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.P2P;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
@@ -59,6 +56,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                         e.Decline();
                         Error2.Set();
                     }
+
+                    return Task.CompletedTask;
                 };
 
                 From.RequestPresenceSubscription(To.BareJID);
@@ -110,6 +109,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                         Done.Set();
                     else
                         Error.Set();
+                
+						return Task.CompletedTask;
                 };
 
                 this.endpointSecurity1.SendMessage(this.client1, E2ETransmission.AssertE2E,
@@ -181,6 +182,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                     }
                     else
                         throw new StanzaErrors.BadRequestException("Bad request", e.IQ);
+                
+					return Task.CompletedTask;
                 }, true);
 
                 this.endpointSecurity1.SendIqGet(this.client1, E2ETransmission.AssertE2E,
@@ -200,6 +203,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                         }
                         else
                             Error.Set();
+                    
+						return Task.CompletedTask;
                     }, null);
 
                 Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 2000));
@@ -260,6 +265,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                     }
                     else
                         throw new StanzaErrors.BadRequestException("Bad request", e.IQ);
+                
+					return Task.CompletedTask;
                 }, true);
 
                 this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
@@ -278,6 +285,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                         }
                         else
                             Error.Set();
+            
+						return Task.CompletedTask;
                     }, null);
 
                 Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 2000));

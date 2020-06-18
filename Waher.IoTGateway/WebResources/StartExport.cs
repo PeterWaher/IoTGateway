@@ -10,8 +10,6 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP;
-using Waher.IoTGateway;
 using Waher.IoTGateway.WebResources.ExportFormats;
 
 namespace Waher.IoTGateway.WebResources
@@ -19,7 +17,7 @@ namespace Waher.IoTGateway.WebResources
 	/// <summary>
 	/// Starts data export
 	/// </summary>
-	public class StartExport : HttpAsynchronousResource, IHttpPostMethod
+	public class StartExport : HttpSynchronousResource, IHttpPostMethod
 	{
 		internal static RNGCryptoServiceProvider rnd = new RNGCryptoServiceProvider();
 		internal static AesCryptoServiceProvider aes = GetCryptoProvider();
@@ -78,7 +76,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			try
 			{
@@ -132,11 +130,11 @@ namespace Waher.IoTGateway.WebResources
 
 				Response.StatusCode = 200;
 				Response.ContentType = "text/plain";
-				Response.Write(Exporter.Key);
+				await Response.Write(Exporter.Key);
 			}
 			catch (Exception ex)
 			{
-				Response.SendResponse(ex);
+				await Response.SendResponse(ex);
 			}
 		}
 

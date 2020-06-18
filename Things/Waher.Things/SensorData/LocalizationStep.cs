@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData

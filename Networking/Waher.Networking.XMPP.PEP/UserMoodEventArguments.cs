@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PEP
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Mood"></param>
-	public delegate void UserMoodEventHandler(object Sender, UserMoodEventArguments Mood);
+	public delegate Task UserMoodEventHandler(object Sender, UserMoodEventArguments Mood);
 
 	/// <summary>
 	/// Event arguments for user mood events.
 	/// </summary>
 	public class UserMoodEventArguments : PersonalEventNotificationEventArgs
 	{
-		private UserMood mood;
+		private readonly UserMood mood;
 
 		internal UserMoodEventArguments(UserMood Mood, PersonalEventNotificationEventArgs e):
 			base(e)

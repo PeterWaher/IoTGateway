@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
 using Waher.Persistence.Attributes;
@@ -72,7 +70,7 @@ namespace Waher.Things.Gpio
 			return Language.GetStringAsync(typeof(Controller), 5, "Digital Input");
 		}
 
-		public void StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -86,7 +84,7 @@ namespace Waher.Things.Gpio
 						this.LogErrorAsync(Id, s);
 
 						Request.ReportErrors(true, new ThingError(this, s));
-						return;
+						return Task.CompletedTask;
 					}
 
 					this.pin.ValueChanged += Pin_ValueChanged;
@@ -129,6 +127,8 @@ namespace Waher.Things.Gpio
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void Pin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)

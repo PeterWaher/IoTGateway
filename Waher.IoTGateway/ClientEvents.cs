@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html.Elements;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Security;
 
@@ -85,7 +88,7 @@ namespace Waher.IoTGateway
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
 				throw new BadRequestException();
@@ -103,7 +106,10 @@ namespace Waher.IoTGateway
 
 			Response.ContentType = "application/json";
 
-			lock (Queue)
+			if (!await Queue.SyncObj.TryBeginWrite(10000))
+				throw new InternalServerErrorException("Unable to get access to queue.");
+
+			try
 			{
 				if (!(Queue.Queue.First is null))
 				{
@@ -123,14 +129,18 @@ namespace Waher.IoTGateway
 				else
 					Queue.Response = Response;
 			}
+			finally
+			{
+				await Queue.SyncObj.EndWrite();
+			}
 
 			if (!(Json is null))
 			{
 				timeoutByTabID.Remove(TabID);
 
 				Json.Append(']');
-				Response.Write(Json.ToString());
-				Response.SendResponse();
+				await Response.Write(Json.ToString());
+				await Response.SendResponse();
 				Response.Dispose();
 			}
 			else
@@ -269,12 +279,15 @@ namespace Waher.IoTGateway
 				return User;
 		}
 
-		internal static void RegisterWebSocket(WebSocket Socket, string Location, string TabID)
+		internal static async Task RegisterWebSocket(WebSocket Socket, string Location, string TabID)
 		{
 			TabQueue Queue = Register(Socket.HttpRequest, Socket, Location, TabID);
 			LinkedList<string> ToSend = null;
 
-			lock (Queue)
+			if (!await Queue.SyncObj.TryBeginWrite(10000))
+				throw new InternalServerErrorException("Unable to get access to queue.");
+
+			try
 			{
 				if (!(Queue.Queue.First is null))
 				{
@@ -285,6 +298,10 @@ namespace Waher.IoTGateway
 
 					Queue.Queue.Clear();
 				}
+			}
+			finally
+			{
+				await Queue.SyncObj.EndWrite();
 			}
 
 			if (!(ToSend is null))
@@ -300,13 +317,20 @@ namespace Waher.IoTGateway
 				Gateway.HttpServer?.GetSession(TabQueue.SessionID, false);
 		}
 
-		internal static void UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
+		internal static async Task UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
 		{
 			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && Queue.WebSocket == Socket)
 			{
-				lock (Queue)
+				if (!await Queue.SyncObj.TryBeginWrite(10000))
+					throw new InternalServerErrorException("Unable to get access to queue.");
+
+				try
 				{
 					Queue.WebSocket = null;
+				}
+				finally
+				{
+					await Queue.SyncObj.EndWrite();
 				}
 			}
 
@@ -331,7 +355,7 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
-		private static void TimeoutCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
+		private static async void TimeoutCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
 		{
 			if (e.Reason == RemovedReason.NotUsed)
 			{
@@ -343,8 +367,8 @@ namespace Waher.IoTGateway
 					{
 						e.Value.Response = null;
 
-						Response.Write("[{\"type\":\"NOP\"}]");
-						Response.SendResponse();
+						await Response.Write("[{\"type\":\"NOP\"}]");
+						await Response.SendResponse();
 					}
 					catch (Exception)
 					{
@@ -370,12 +394,8 @@ namespace Waher.IoTGateway
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
 
-			lock (Queue)
-			{
-				Queue.Queue.Clear();
-			}
-
 			Remove(TabID, null);
+			Queue.Dispose();
 		}
 
 		private static void Remove(string TabID, string Resource)
@@ -929,11 +949,12 @@ namespace Waher.IoTGateway
 			return Result2;
 		}
 
-		private class TabQueue
+		private class TabQueue : IDisposable
 		{
 			public string TabID;
 			public string SessionID;
 			public Variables Session;
+			public MultiReadSingleWriteObject SyncObj = new MultiReadSingleWriteObject();
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
@@ -943,6 +964,14 @@ namespace Waher.IoTGateway
 				this.TabID = ID;
 				this.SessionID = SessionID;
 				this.Session = Session;
+			}
+
+			public void Dispose()
+			{
+				this.SyncObj?.Dispose();
+				this.SyncObj = null;
+
+				this.Queue?.Clear();
 			}
 		}
 
@@ -997,84 +1026,98 @@ namespace Waher.IoTGateway
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Optional privileges. If provided, event is only pushed to clients with a user variable having
 		/// the following set of privileges.</param>
-		public static void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson, string UserVariable, params string[] Privileges)
+		public static async void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson, string UserVariable, params string[] Privileges)
 		{
-			StringBuilder Json = new StringBuilder();
-
-			Json.Append("{\"type\":\"");
-			Json.Append(Type);
-			Json.Append("\",\"data\":");
-
-			if (DataIsJson)
-				Json.Append(Data);
-			else
+			try
 			{
-				Json.Append('"');
-				Json.Append(JSON.Encode(Data));
-				Json.Append('"');
-			}
+				StringBuilder Json = new StringBuilder();
 
-			Json.Append('}');
+				Json.Append("{\"type\":\"");
+				Json.Append(Type);
+				Json.Append("\",\"data\":");
 
-			string s = Json.ToString();
-
-			if (TabIDs is null)
-				TabIDs = eventsByTabID.GetKeys();
-
-			foreach (string TabID in TabIDs)
-			{
-				if (!(TabID is null) && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+				if (DataIsJson)
+					Json.Append(Data);
+				else
 				{
-					if (!string.IsNullOrEmpty(UserVariable))
+					Json.Append('"');
+					Json.Append(JSON.Encode(Data));
+					Json.Append('"');
+				}
+
+				Json.Append('}');
+
+				string s = Json.ToString();
+
+				if (TabIDs is null)
+					TabIDs = eventsByTabID.GetKeys();
+
+				foreach (string TabID in TabIDs)
+				{
+					if (!(TabID is null) && eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 					{
-						if (!Queue.Session.TryGetVariable(UserVariable, out Variable v) ||
-							!(v.ValueObject is IUser User))
+						if (!string.IsNullOrEmpty(UserVariable))
 						{
-							continue;
-						}
-
-						if (!(Privileges is null))
-						{
-							bool HasPrivileges = true;
-
-							foreach (string Privilege in Privileges)
+							if (!Queue.Session.TryGetVariable(UserVariable, out Variable v) ||
+								!(v.ValueObject is IUser User))
 							{
-								if (!User.HasPrivilege(Privilege))
-								{
-									HasPrivileges = false;
-									break;
-								}
+								continue;
 							}
 
-							if (!HasPrivileges)
-								continue;
-						}
-					}
+							if (!(Privileges is null))
+							{
+								bool HasPrivileges = true;
 
-					lock (Queue)
-					{
-						if (!(Queue.WebSocket is null))
-							Queue.WebSocket.Send(Json.ToString(), 4096);
-						else if (!(Queue.Response is null))
+								foreach (string Privilege in Privileges)
+								{
+									if (!User.HasPrivilege(Privilege))
+									{
+										HasPrivileges = false;
+										break;
+									}
+								}
+
+								if (!HasPrivileges)
+									continue;
+							}
+						}
+
+						if (await Queue.SyncObj.TryBeginWrite(10000))
 						{
 							try
 							{
-								Queue.Response.Write("[" + Json.ToString() + "]");
-								Queue.Response.SendResponse();
-								Queue.Response.Dispose();
-								Queue.Response = null;
+								if (!(Queue.WebSocket is null))
+									Queue.WebSocket.Send(Json.ToString(), 4096);
+								else if (!(Queue.Response is null))
+								{
+									try
+									{
+										await Queue.Response.Write("[" + Json.ToString() + "]");
+										await Queue.Response.SendResponse();
+										Queue.Response.Dispose();
+										Queue.Response = null;
+									}
+									catch (Exception)
+									{
+										// Ignore
+									}
+								}
+								else
+									Queue.Queue.AddLast(s);
 							}
-							catch (Exception)
+							finally
 							{
-								// Ignore
+								await Queue.SyncObj.EndWrite();
 							}
 						}
-						else
-							Queue.Queue.AddLast(s);
-					}
 
-					timeoutByTabID.Remove(TabID);
+						timeoutByTabID.Remove(TabID);
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

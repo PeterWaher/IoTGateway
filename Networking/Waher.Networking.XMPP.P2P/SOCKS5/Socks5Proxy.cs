@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -109,11 +110,12 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, this.SearchResponse, Callback);
 		}
 
-		private void SearchResponse(object Sender, ServiceItemsDiscoveryEventArgs e)
+		private Task SearchResponse(object Sender, ServiceItemsDiscoveryEventArgs e)
 		{
 			EventHandler Callback = (EventHandler)e.State;
 			SearchState State = new SearchState(this, e.Items, Callback);
 			State.DoQuery();
+			return Task.CompletedTask;
 		}
 
 		private class SearchState
@@ -142,14 +144,12 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			public void DoQuery()
 			{
 				if (this.Pos < this.NrItems)
-				{
 					this.Proxy.client.SendServiceDiscoveryRequest(this.Items[this.Pos].JID, this.ItemDiscoveryResponse, null);
-				}
 				else
 					this.SearchDone();
 			}
 
-			private void ItemDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e2)
+			private Task ItemDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e2)
 			{
 				if (e2.Features.ContainsKey(Namespace))
 				{
@@ -158,9 +158,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				else
 					this.Advance();
+
+				return Task.CompletedTask;
 			}
 
-			private void SocksQueryResponse(object Sender, IqResultEventArgs e3)
+			private Task SocksQueryResponse(object Sender, IqResultEventArgs e3)
 			{
 				if (e3.Ok)
 				{
@@ -192,6 +194,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				else
 					this.Advance();
+			
+				return Task.CompletedTask;
 			}
 
 			private void SearchDone()
@@ -231,9 +235,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationJid">JID of destination.</param>
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void InitiateSession(string DestinationJid, StreamEventHandler Callback, object State)
+		public Task InitiateSession(string DestinationJid, StreamEventHandler Callback, object State)
 		{
-			this.InitiateSession(DestinationJid, null, Callback, State);
+			return this.InitiateSession(DestinationJid, null, Callback, State);
 		}
 
 		/// <summary>
@@ -243,11 +247,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="StreamId">Stream ID to use.</param>
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
+		public async Task InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
 		{
 			if (!this.hasProxy)
 			{
-				this.Callback(Callback, State, false, null, null);
+				await this.Callback(Callback, State, false, null, null);
 				return;
 			}
 
@@ -270,7 +274,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			if (StreamId is null)
 			{
-				this.Callback(Callback, State, false, null, null);
+				await this.Callback(Callback, State, false, null, null);
 				return;
 			}
 
@@ -312,7 +316,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			public Socks5Client stream = null;
 			public Socks5Proxy proxy;
 
-			internal void StateChanged(object Sender, EventArgs e)
+			internal async Task StateChanged(object Sender, EventArgs e)
 			{
 				switch (this.stream.State)
 				{
@@ -343,14 +347,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					case Socks5State.Error:
 					case Socks5State.Offline:
 						this.stream?.Dispose();
-						this.proxy.Callback(this.callback, this.state, false, null, this.streamId);
+						await this.proxy.Callback(this.callback, this.state, false, null, this.streamId);
 						this.callback = null;
 						break;
 				}
 			}
 		}
 
-		private void InitiationResponse(object Sender, IqResultEventArgs e)
+		private async Task InitiationResponse(object Sender, IqResultEventArgs e)
 		{
 			InitiationRec Rec = (InitiationRec)e.State;
 
@@ -384,31 +388,31 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 					}
 					else
-						this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+						await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 				}
 				else
-					this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+					await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 			}
 			else
-				this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+				await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 		}
 
-		private void ActivationResponse(object Sender, IqResultEventArgs e)
+		private async Task ActivationResponse(object Sender, IqResultEventArgs e)
 		{
 			InitiationRec Rec = (InitiationRec)e.State;
 
 			if (e.Ok)
-				this.Callback(Rec.callback, Rec.state, true, Rec.stream, Rec.streamId);
+				await this.Callback(Rec.callback, Rec.state, true, Rec.stream, Rec.streamId);
 			else
 			{
 				Rec.stream.Dispose();
-				this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+				await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 			}
 
 			Rec.callback = null;
 		}
 
-		private void Callback(StreamEventHandler Callback, object State, bool Ok, Socks5Client Stream, string StreamId)
+		private async Task Callback(StreamEventHandler Callback, object State, bool Ok, Socks5Client Stream, string StreamId)
 		{
 			if (!Ok && !string.IsNullOrEmpty(StreamId))
 			{
@@ -422,7 +426,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				try
 				{
-					Callback(this, new StreamEventArgs(Ok, Stream, State));
+					await Callback(this, new StreamEventArgs(Ok, Stream, State));
 				}
 				catch (Exception ex)
 				{
@@ -431,7 +435,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
-		private void QueryHandler(object Sender, IqEventArgs e)
+		private async Task QueryHandler(object Sender, IqEventArgs e)
 		{
 			string StreamId = XML.Attribute(e.Query, "sid");
 			XmlElement E;
@@ -468,7 +472,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -512,7 +516,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			public ValidateStreamEventArgs eventargs2;
 		}
 
-		private void ClientStateChanged(object Sender, EventArgs e3)
+		private async Task ClientStateChanged(object Sender, EventArgs e3)
 		{
 			Socks5Client Client = (Socks5Client)Sender;
 			Socks5QueryState State = (Socks5QueryState)Client.Tag;
@@ -553,7 +557,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					{
 						try
 						{
-							State.eventargs2.CloseCallback(this, new StreamEventArgs(false, Client, State.eventargs2.State));
+							await State.eventargs2.CloseCallback(this, new StreamEventArgs(false, Client, State.eventargs2.State));
 						}
 						catch (Exception ex)
 						{

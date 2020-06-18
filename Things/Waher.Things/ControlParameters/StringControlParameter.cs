@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Waher.Events;
-using Waher.Things;
 
 namespace Waher.Things.ControlParameters
 {
@@ -13,26 +11,26 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void StringSetHandler(IThingReference Node, string Value);
+	public delegate Task StringSetHandler(IThingReference Node, string Value);
 
 	/// <summary>
 	/// Get handler delegate for string control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate string StringGetHandler(IThingReference Node);
+	public delegate Task<string> StringGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// String control parameter.
 	/// </summary>
 	public class StringControlParameter : ControlParameter
 	{
-		private StringGetHandler getHandler;
-		private StringSetHandler setHandler;
-		private Regex regex;
-		private string regexString;
-		private string[] options;
-		private string[] labels;
+		private readonly StringGetHandler getHandler;
+		private readonly StringSetHandler setHandler;
+		private readonly Regex regex;
+		private readonly string regexString;
+		private readonly string[] options;
+		private readonly string[] labels;
 
 		/// <summary>
 		/// String control parameter.
@@ -122,7 +120,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(IThingReference Node, string Value)
+		public async Task<bool> Set(IThingReference Node, string Value)
 		{
 			try
 			{
@@ -132,7 +130,7 @@ namespace Waher.Things.ControlParameters
 				if (this.options != null && Array.IndexOf<string>(this.options, Value) < 0)
 					return false;
 
-				this.setHandler(Node, Value);
+				await this.setHandler(Node, Value);
 				return true;
 			}
 			catch (Exception ex)
@@ -148,7 +146,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(IThingReference Node, string StringValue)
+		public override async Task<bool> SetStringValue(IThingReference Node, string StringValue)
 		{
 			if (this.regex != null && !this.regex.IsMatch(StringValue))
 				return false;
@@ -158,7 +156,7 @@ namespace Waher.Things.ControlParameters
 
 			try
 			{
-				this.setHandler(Node, StringValue);
+				await this.setHandler(Node, StringValue);
 			}
 			catch (Exception ex)
 			{
@@ -173,11 +171,11 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public string Get(IThingReference Node)
+		public async Task<string> Get(IThingReference Node)
 		{
 			try
 			{
-				return this.getHandler(Node);
+				return await this.getHandler(Node);
 			}
 			catch (Exception ex)
 			{
@@ -191,7 +189,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(IThingReference Node)
+		public override Task<string> GetStringValue(IThingReference Node)
 		{
 			return this.Get(Node);
 		}
@@ -215,7 +213,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
+		public override Task ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			if (this.options != null)
 			{
@@ -245,6 +243,8 @@ namespace Waher.Things.ControlParameters
 
 				Output.WriteEndElement();
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

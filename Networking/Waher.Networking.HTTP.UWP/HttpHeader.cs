@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.Vanity;
 
 namespace Waher.Networking.HTTP
 {
@@ -29,7 +30,8 @@ namespace Waher.Networking.HTTP
 		/// Contains information about all fields in an HTTP header.
 		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
-		public HttpHeader(string Header)
+		/// <param name="VanityResources">Registered vanity resources.</param>
+		public HttpHeader(string Header, VanityResources VanityResources)
 		{
 			HttpField Field;
 			string Key;
@@ -43,7 +45,7 @@ namespace Waher.Networking.HTTP
 				if (First)
 				{
 					First = false;
-					this.ParseFirstRow(Row);
+					this.ParseFirstRow(Row, VanityResources);
 				}
 				else
 				{
@@ -64,13 +66,14 @@ namespace Waher.Networking.HTTP
 		/// Contains information about all fields in an HTTP header.
 		/// </summary>
 		/// <param name="FirstRow">First row.</param>
+		/// <param name="VanityResources">Registered vanity resources.</param>
 		///	<param name="Headers">Headers.</param>
-		public HttpHeader(string FirstRow, params KeyValuePair<string, string>[] Headers)
+		public HttpHeader(string FirstRow, VanityResources VanityResources, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpField Field;
 			string KeyLower;
 
-			this.ParseFirstRow(FirstRow);
+			this.ParseFirstRow(FirstRow, VanityResources);
 			foreach (KeyValuePair<string, string> P in Headers)
 			{
 				Field = this.ParseField(KeyLower = P.Key.ToLower(), P.Key, P.Value);
@@ -82,7 +85,8 @@ namespace Waher.Networking.HTTP
 		/// Parses the first row of an HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>
-		protected abstract void ParseFirstRow(string Row);
+		/// <param name="VanityResources">Registered vanity resources.</param>
+		protected abstract void ParseFirstRow(string Row, VanityResources VanityResources);
 
 		/// <summary>
 		/// Access to individual fields.

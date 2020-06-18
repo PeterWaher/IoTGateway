@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Avatar
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.Avatar
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void AvatarEventHandler(object Sender, AvatarEventArgs e);
+	public delegate Task AvatarEventHandler(object Sender, AvatarEventArgs e);
 
 	/// <summary>
 	/// Event arguments for avatar events.
@@ -38,6 +37,6 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <summary>
 		/// Avatar, or null if removed.
 		/// </summary>
-		private Avatar Avatar => this.avatar;
+		public Avatar Avatar => this.avatar;
 	}
 }

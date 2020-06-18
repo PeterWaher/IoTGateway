@@ -531,12 +531,13 @@ namespace Waher.Client.WPF
 			View.Input.Focus();
 		}
 
-		public void OnChatMessage(object Sender, MessageEventArgs e)
+		public Task OnChatMessage(object Sender, MessageEventArgs e)
 		{
 			UpdateGui(this.ChatMessageReceived, e);
+			return Task.CompletedTask;
 		}
 
-		public void OnStateChange(object _, XmppState _2)
+		public Task OnStateChange(object _, XmppState _2)
 		{
 			try
 			{
@@ -588,6 +589,8 @@ namespace Waher.Client.WPF
 			{
 				Log.Critical(ex);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private static string StateToString(XmppState State)
@@ -821,6 +824,8 @@ namespace Waher.Client.WPF
 					UpdateGui(this.ShowForm, e2.Form);
 				else
 					UpdateGui(this.ShowError, e2);
+
+				return Task.CompletedTask;
 			}, null);
 		}
 

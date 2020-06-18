@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.Concentrator.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator
@@ -10,7 +9,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeQuerySectionEventHandler(object Sender, NodeQuerySectionEventArgs e);
+	public delegate Task NodeQuerySectionEventHandler(object Sender, NodeQuerySectionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node query section events.

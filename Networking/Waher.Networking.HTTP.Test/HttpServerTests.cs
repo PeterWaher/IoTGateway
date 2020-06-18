@@ -93,13 +93,13 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public void Test_02_GET_HTTP_Chunked()
 		{
-			server.Register("/test02.txt", (req, resp) =>
+			server.Register("/test02.txt", async (req, resp) =>
 			{
 				int i;
 
 				resp.ContentType = "text/plain";
 				for (i = 0; i < 1000; i++)
-					resp.Write(new string('a', 100));
+					await resp.Write(new string('a', 100));
 			});
 
 			using (CookieWebClient Client = new CookieWebClient())
@@ -114,9 +114,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public void Test_03_GET_HTTP_Encoding()
 		{
-			server.Register("/test03.png", (req, resp) =>
+			server.Register("/test03.png", async (req, resp) =>
 			{
-				resp.Return(new SKBitmap(320, 200));
+				await resp.Return(new SKBitmap(320, 200));
 			});
 
 			using (CookieWebClient Client = new CookieWebClient())
@@ -425,9 +425,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public void Test_20_HEAD()
 		{
-			server.Register("/test20.png", (req, resp) =>
+			server.Register("/test20.png", async (req, resp) =>
 			{
-				resp.Return(new SKBitmap(320, 200));
+				await resp.Return(new SKBitmap(320, 200));
 			});
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/test20.png");
@@ -445,18 +445,18 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public void Test_21_Cookies()
 		{
-			server.Register("/test21_1.txt", (req, resp) =>
+			server.Register("/test21_1.txt", async (req, resp) =>
 			{
 				resp.SetCookie(new Cookie("word1", "hej", "localhost", "/"));
 				resp.SetCookie(new Cookie("word2", "på", "localhost", "/"));
 				resp.SetCookie(new Cookie("word3", "dej", "localhost", "/"));
 
-				resp.Return("hejsan");
+				await resp.Return("hejsan");
 			});
 
-			server.Register("/test21_2.txt", (req, resp) =>
+			server.Register("/test21_2.txt", async (req, resp) =>
 			{
-				resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
+				await resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
 			});
 
 			using (CookieWebClient Client = new CookieWebClient())

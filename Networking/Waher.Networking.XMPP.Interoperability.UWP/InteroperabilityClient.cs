@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
@@ -45,7 +46,7 @@ namespace Waher.Networking.XMPP.Interoperability
 				this.GetInterfacesResult, new object[] { Callback, State });
 		}
 
-		private void GetInterfacesResult(object Sender, IqResultEventArgs e)
+		private async Task GetInterfacesResult(object Sender, IqResultEventArgs e)
 		{
 			List<string> Interfaces = new List<string>();
 			object[] P = (object[])e.State;
@@ -72,7 +73,7 @@ namespace Waher.Networking.XMPP.Interoperability
 			{
 				try
 				{
-					Callback(this, e2);
+					await Callback(this, e2);
 				}
 				catch (Exception ex)
 				{
@@ -100,6 +101,9 @@ namespace Waher.Networking.XMPP.Interoperability
 				{
 					e = e2;
 					Done.Set();
+
+					return Task.CompletedTask;
+
 				}, null);
 
 				if (!Done.WaitOne(Timeout))

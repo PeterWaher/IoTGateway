@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Input;
@@ -127,6 +126,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.OnUpdated();
 								this.Concentrator?.NodesAdded(Children.Values, this);
 							}
+
+							return Task.CompletedTask;
 						}, null);
 					}
 					else
@@ -150,6 +151,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.OnUpdated();
 								this.NodesAdded(Children.Values, this);
 							}
+
+							return Task.CompletedTask;
 						}, null);
 					}
 				}
@@ -226,6 +229,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 							this.SubscribeToEvents();
 						}, null, 300000, 300000);
 					}
+
+					return Task.CompletedTask;
 				}, null);
 		}
 
@@ -274,7 +279,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
-		internal void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		internal Task ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
 		{
 			SourceEvent Event = EventMessage.Event;
 			string Key, ParentKey;
@@ -292,10 +297,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (this.nodes.ContainsKey(Key))
-								return; // Already added
+								return Task.CompletedTask; // Already added
 
 							if (!this.nodes.TryGetValue(ParentKey, out Parent))
-								return; // Parent not loaded.
+								return Task.CompletedTask; // Parent not loaded.
 
 							Node = new Node(Parent, new NodeInformation(NodeAdded.NodeId, NodeAdded.SourceId, NodeAdded.Partition,
 								NodeAdded.NodeType, NodeAdded.DisplayName, NodeAdded.State, NodeAdded.LocalId, NodeAdded.LogId,
@@ -320,11 +325,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 							if (!this.nodes.TryGetValue(Key, out Node))
 							{
 								if (string.IsNullOrEmpty(NodeUpdated.OldId))
-									return; // Parent not loaded.
+									return Task.CompletedTask; // Parent not loaded.
 
 								string OldKey = NodeUpdated.Partition + " " + NodeUpdated.OldId;
 								if (!this.nodes.TryGetValue(OldKey, out Node))
-									return; // Parent not loaded.
+									return Task.CompletedTask; // Parent not loaded.
 
 								this.nodes.Remove(OldKey);
 								this.nodes[Key] = Node;
@@ -349,7 +354,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (!this.nodes.TryGetValue(Key, out Node))
-								return; // Parent not loaded.
+								return Task.CompletedTask; // Parent not loaded.
 
 							this.nodes.Remove(Key);
 						}
@@ -367,7 +372,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (!this.nodes.TryGetValue(Key, out Node))
-								return; // Parent not loaded.
+								return Task.CompletedTask; // Parent not loaded.
 						}
 
 						Node.NodeInformation = new NodeInformation(NodeStatusChanged.NodeId, NodeStatusChanged.SourceId, NodeStatusChanged.Partition,
@@ -388,7 +393,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (!this.nodes.TryGetValue(Key, out Node))
-								return; // Parent not loaded.
+								return Task.CompletedTask; // Parent not loaded.
 						}
 
 						// TODO: Node.Parent?.MoveUp(Node);
@@ -403,13 +408,15 @@ namespace Waher.Client.WPF.Model.Concentrator
 						lock (this.nodes)
 						{
 							if (!this.nodes.TryGetValue(Key, out Node))
-								return; // Parent not loaded.
+								return Task.CompletedTask; // Parent not loaded.
 						}
 
 						// TODO: Node.Parent?.MoveDown(Node);
 					}
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 	}

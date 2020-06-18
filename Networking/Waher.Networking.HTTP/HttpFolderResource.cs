@@ -181,7 +181,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			string FullPath = this.GetFullPath(Request);
 			if (File.Exists(FullPath))
@@ -198,13 +198,13 @@ namespace Waher.Networking.HTTP
 				if (Response.ResponseSent)
 					return;
 
-				SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
+				await SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
 			}
 			else
-				this.RaiseFileNotFound(FullPath, Request, Response);
+				await this.RaiseFileNotFound(FullPath, Request, Response);
 		}
 
-		private void RaiseFileNotFound(string FullPath, HttpRequest Request, HttpResponse Response)
+		private async Task RaiseFileNotFound(string FullPath, HttpRequest Request, HttpResponse Response)
 		{
 			NotFoundException ex = new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 			FileNotFoundEventHandler h = this.FileNotFound;
@@ -229,7 +229,7 @@ namespace Waher.Networking.HTTP
 
 			Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 
-			Response.SendResponse(ex);
+			await Response.SendResponse(ex);
 			Response.Dispose();
 		}
 
@@ -246,10 +246,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="ETag">ETag of resource.</param>
 		/// <param name="LastModified">When resource was last modified.</param>
 		/// <param name="Response">HTTP response object.</param>
-		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
 			HttpResponse Response)
 		{
-			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null);
 		}
 
 		/// <summary>
@@ -261,13 +261,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="LastModified">When resource was last modified.</param>
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Request">HTTP request object.</param>
-		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
 			HttpResponse Response, HttpRequest Request)
 		{
-			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request);
 		}
 
-		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
+		private static async Task SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
 			DateTime LastModified, HttpResponse Response, HttpRequest Request)
 		{
 			ReadProgress Progress = new ReadProgress()
@@ -294,8 +294,8 @@ namespace Waher.Networking.HTTP
 
 			if (Response.OnlyHeader || Progress.TotalLength == 0)
 			{
-				Response.SendResponse();
-				Progress.Dispose();
+				await Response.SendResponse();
+				await Progress.Dispose();
 			}
 			else
 			{
@@ -566,7 +566,7 @@ namespace Waher.Networking.HTTP
 			return null;
 		}
 
-		private class ReadProgress : IDisposable
+		private class ReadProgress
 		{
 			public ByteRangeInterval Next;
 			public HttpResponse Response;
@@ -593,12 +593,12 @@ namespace Waher.Networking.HTTP
 
 							if (NrRead <= 0)
 							{
-								this.Dispose();
+								await this.Dispose();
 								return;
 							}
 							else
 							{
-								this.Response.Write(this.Buffer, 0, NrRead);
+								await this.Response.Write(this.Buffer, 0, NrRead);
 								this.BytesLeft -= NrRead;
 							}
 						}
@@ -615,11 +615,11 @@ namespace Waher.Networking.HTTP
 							this.f.Position = First;
 							this.BytesLeft = this.Next.GetIntervalLength(this.TotalLength);
 
-							Response.WriteLine();
-							Response.WriteLine("--" + this.Boundary);
-							Response.WriteLine("Content-Type: " + this.ContentType);
-							Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
-							Response.WriteLine();
+							await Response.WriteLine();
+							await Response.WriteLine("--" + this.Boundary);
+							await Response.WriteLine("Content-Type: " + this.ContentType);
+							await Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
+							await Response.WriteLine();
 
 							this.Next = this.Next.Next;
 						}
@@ -628,8 +628,8 @@ namespace Waher.Networking.HTTP
 
 					if (!string.IsNullOrEmpty(this.Boundary))
 					{
-						Response.WriteLine();
-						Response.WriteLine("--" + this.Boundary + "--");
+						await Response.WriteLine();
+						await Response.WriteLine("--" + this.Boundary + "--");
 					}
 
 					Variables Session;
@@ -644,21 +644,21 @@ namespace Waher.Networking.HTTP
 						Session.Remove(" LastPostReferer ");
 					}
 
-					this.Dispose();
+					await this.Dispose();
 				}
 				catch (Exception ex)
 				{
 					try
 					{
 						if (!this.Response.HeaderSent)
-							this.Response.SendResponse(ex);
+							await this.Response.SendResponse(ex);
 						else
-							this.Response.Flush();
+							await this.Response.Flush();
 
 						this.Response.Dispose();
 						this.Response = null;
 
-						this.Dispose();
+						await this.Dispose();
 					}
 					catch (Exception)
 					{
@@ -667,18 +667,18 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			public void Dispose()
+			public async Task Dispose()
 			{
 				if (this.f != null)
 				{
-					this.f.Flush();
+					await this.f.FlushAsync();
 					this.f.Dispose();
 					this.f = null;
 				}
 
 				if (this.Response != null)
 				{
-					this.Response.SendResponse();
+					await this.Response.SendResponse();
 					this.Response.Dispose();
 					this.Response = null;
 				}
@@ -692,7 +692,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="FirstInterval">First byte range interval.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
+		public async Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
 			string FullPath = this.GetFullPath(Request);
 			if (File.Exists(FullPath))
@@ -706,7 +706,7 @@ namespace Waher.Networking.HTTP
 					!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 				{
 					Response.StatusCode = 200;
-					this.GET(Request, Response);    // No ranged request.
+					await this.GET(Request, Response);    // No ranged request.
 					return;
 				}
 
@@ -780,25 +780,25 @@ namespace Waher.Networking.HTTP
 
 				if (Response.OnlyHeader || Progress.BytesLeft == 0)
 				{
-					Response.SendResponse();
-					Progress.Dispose();
+					await Response.SendResponse();
+					await Progress.Dispose();
 				}
 				else
 				{
 					if (FirstInterval.Next != null)
 					{
-						Response.WriteLine();
-						Response.WriteLine("--" + Progress.Boundary);
-						Response.WriteLine("Content-Type: " + Progress.ContentType);
-						Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
-						Response.WriteLine();
+						await Response.WriteLine();
+						await Response.WriteLine("--" + Progress.Boundary);
+						await Response.WriteLine("Content-Type: " + Progress.ContentType);
+						await Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
+						await Response.WriteLine();
 					}
 
 					Task _ = Progress.BeginRead();
 				}
 			}
 			else
-				this.RaiseFileNotFound(FullPath, Request, Response);
+				await this.RaiseFileNotFound(FullPath, Request, Response);
 		}
 
 		/// <summary>
@@ -807,7 +807,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void PUT(HttpRequest Request, HttpResponse Response)
+		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
 			string FullPath = this.GetFullPath(Request);
 
@@ -824,7 +824,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			Response.StatusCode = 201;
-			Response.SendResponse();
+			await Response.SendResponse();
 			Response.Dispose();
 		}
 
@@ -835,7 +835,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		public async Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
 			string FullPath = this.GetFullPath(Request);
 
@@ -872,7 +872,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			Response.StatusCode = 201;
-			Response.SendResponse();
+			await Response.SendResponse();
 			Response.Dispose();
 		}
 
@@ -882,7 +882,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void DELETE(HttpRequest Request, HttpResponse Response)
+		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
 			string FullPath = this.GetFullPath(Request);
 
@@ -893,7 +893,7 @@ namespace Waher.Networking.HTTP
 			else
 				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
 
-			Response.SendResponse();
+			await Response.SendResponse();
 			Response.Dispose();
 		}
 
@@ -954,7 +954,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			Variables Session = Request.Session;
 			if (Session is null)
@@ -973,7 +973,7 @@ namespace Waher.Networking.HTTP
 				throw new SeeOtherException(Referer);  // PRG pattern.
 			}
 			else
-				this.GET(Request, Response);
+				await this.GET(Request, Response);
 		}
 	}
 }

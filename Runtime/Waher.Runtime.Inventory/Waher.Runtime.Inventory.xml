@@ -307,5 +307,14 @@
             <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
             <returns>Best interface, if found, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Runtime.Inventory.Types.TryParseEnum(System.String,System.String,System.Enum@)">
+            <summary>
+            Tries to parse an enumeration value in string form, given the full name of the enumeration type.
+            </summary>
+            <param name="TypeName">Full name of the enumeration type.</param>
+            <param name="StringValue">String representation of enumeration value.</param>
+            <param name="Value">Value, if parsed.</param>
+            <returns>If the string value could be parsed to an enumeration value of the given type.</returns>
+        </member>
     </members>
 </doc>

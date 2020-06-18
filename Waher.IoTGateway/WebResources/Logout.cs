@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -49,7 +50,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.Session is null)
 				throw new BadRequestException();
@@ -71,9 +72,10 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			this.GET(Request, Response);
+			return Task.CompletedTask;
 		}
 
 	}

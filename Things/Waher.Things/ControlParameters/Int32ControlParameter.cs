@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Things;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Things.ControlParameters
 {
@@ -12,23 +11,23 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void Int32SetHandler(IThingReference Node, int Value);
+	public delegate Task Int32SetHandler(IThingReference Node, int Value);
 
 	/// <summary>
 	/// Get handler delegate for 32-bit integer control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate int? Int32GetHandler(IThingReference Node);
+	public delegate Task<int?> Int32GetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Int32 control parameter.
 	/// </summary>
 	public class Int32ControlParameter : ControlParameter
 	{
-		private Int32GetHandler getHandler;
-		private Int32SetHandler setHandler;
-		int? min, max;
+		private readonly Int32GetHandler getHandler;
+		private readonly Int32SetHandler setHandler;
+		private readonly int? min, max;
 
 		/// <summary>
 		/// Int32 control parameter.
@@ -74,14 +73,14 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(IThingReference Node, int Value)
+		public async Task<bool> Set(IThingReference Node, int Value)
 		{
 			try
 			{
 				if ((this.min.HasValue && Value < this.min.Value) || (this.max.HasValue && Value > this.max.Value))
 					return false;
 
-				this.setHandler(Node, Value);
+				await this.setHandler(Node, Value);
 				return true;
 			}
 			catch (Exception ex)
@@ -97,12 +96,12 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(IThingReference Node, string StringValue)
+		public override async Task<bool> SetStringValue(IThingReference Node, string StringValue)
 		{
 			if (!int.TryParse(StringValue, out int Value) || (this.min.HasValue && Value < this.min.Value) || (this.max.HasValue && Value > this.max.Value))
 				return false;
 
-			this.Set(Node, Value);
+			await this.Set(Node, Value);
 
 			return true;
 		}
@@ -111,11 +110,11 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public int? Get(IThingReference Node)
+		public async Task<int?> Get(IThingReference Node)
 		{
 			try
 			{
-				return this.getHandler(Node);
+				return await this.getHandler(Node);
 			}
 			catch (Exception ex)
 			{
@@ -129,9 +128,9 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(IThingReference Node)
+		public override async Task<string> GetStringValue(IThingReference Node)
 		{
-			int? Value = this.Get(Node);
+			int? Value = await this.Get(Node);
 
 			if (Value.HasValue)
 				return Value.Value.ToString();
@@ -144,7 +143,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
+		public override Task ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("datatype", "xs:int");
@@ -163,6 +162,8 @@ namespace Waher.Things.ControlParameters
 			}
 
 			Output.WriteEndElement();
+
+			return Task.CompletedTask;
 		}
 	}
 }

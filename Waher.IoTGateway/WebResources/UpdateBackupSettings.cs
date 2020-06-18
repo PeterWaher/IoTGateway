@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Content;
-using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -51,7 +51,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -76,8 +76,8 @@ namespace Waher.IoTGateway.WebResources
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
 				Response.ContentType = "text/plain";
-				Response.Write("Backup time invalid.");
-				Response.SendResponse();
+				await Response.Write("Backup time invalid.");
+				await Response.SendResponse();
 				return;
 			}
 
@@ -86,8 +86,8 @@ namespace Waher.IoTGateway.WebResources
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
 				Response.ContentType = "text/plain";
-				Response.Write("Invalid number of days specified.");
-				Response.SendResponse();
+				await Response.Write("Invalid number of days specified.");
+				await Response.SendResponse();
 				return;
 			}
 
@@ -96,8 +96,8 @@ namespace Waher.IoTGateway.WebResources
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
 				Response.ContentType = "text/plain";
-				Response.Write("Invalid number of months specified.");
-				Response.SendResponse();
+				await Response.Write("Invalid number of months specified.");
+				await Response.SendResponse();
 				return;
 			}
 
@@ -106,8 +106,8 @@ namespace Waher.IoTGateway.WebResources
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
 				Response.ContentType = "text/plain";
-				Response.Write("Invalid number of years specified.");
-				Response.SendResponse();
+				await Response.Write("Invalid number of years specified.");
+				await Response.SendResponse();
 				return;
 			}
 
@@ -119,7 +119,7 @@ namespace Waher.IoTGateway.WebResources
 
 			Response.StatusCode = 200;
 			Response.StatusMessage = "OK";
-			Response.SendResponse();
+			await Response.SendResponse();
 		}
 	}
 }

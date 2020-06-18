@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SourceEvents
@@ -10,7 +9,7 @@ namespace Waher.Things.SourceEvents
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Event">Event object.</param>
-	public delegate void SourceEventEventHandler(object Sender, SourceEvent Event);
+	public delegate Task SourceEventEventHandler(object Sender, SourceEvent Event);
 
 	/// <summary>
 	/// Abstract base class for all data source events.

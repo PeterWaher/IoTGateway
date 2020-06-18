@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -12,9 +8,9 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 	public class OptionAttribute : Attribute
 	{
-		private int stringId;
-		private string label;
-		private object option;
+		private readonly int stringId;
+		private readonly string label;
+		private readonly object option;
 
 		/// <summary>
 		/// Defines an option to display when editing the parameter.

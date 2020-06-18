@@ -45,7 +45,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
-		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public TextTcpClient(StreamSocket Client, Encoding Encoding, params ISniffer[] Sniffers)
@@ -56,7 +56,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
-		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
 		/// <param name="Sniffers">Sniffers.</param>

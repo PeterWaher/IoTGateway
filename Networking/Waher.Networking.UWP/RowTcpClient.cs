@@ -11,8 +11,8 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking
 {
 	/// <summary>
-	/// Implements a text row-based TCP Client, by using the thread-safe full-duplex <see cref="RowTcpClient"/>. Commands are
-	/// sent as rows, and responses are returned as rows.
+	/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+	/// Commands are sent as rows, and responses are returned as rows.
 	/// </summary>
 	public class RowTcpClient : TextTcpClient
 	{
@@ -23,9 +23,8 @@ namespace Waher.Networking
 		private int len = 0;
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
@@ -37,9 +36,8 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
@@ -53,11 +51,10 @@ namespace Waher.Networking
 
 #if WINDOWS_UWP
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
-		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="Sniffers">Sniffers.</param>
@@ -68,11 +65,10 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
-		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
@@ -84,9 +80,8 @@ namespace Waher.Networking
 		}
 #else
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
@@ -99,9 +94,8 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Implements a text TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-		/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-		/// permitted pace.
+		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
+		/// Commands are sent as rows, and responses are returned as rows.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>

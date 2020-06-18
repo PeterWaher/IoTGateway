@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Client.WPF.Model;
@@ -193,7 +183,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.client.Connect();
 		}
 
-		private void Client_OnRegistrationForm(object Sender, DataForm Form)
+		private Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
 			if (FormType != null && FormType.ValueString == "urn:xmpp:captcha")
@@ -204,11 +194,14 @@ namespace Waher.Client.WPF.Dialogs
 			}
 			else
 				Form.Submit();
+
+			return Task.CompletedTask;
 		}
 
-		private void Client_OnStateChanged(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			MainWindow.UpdateGui(this.XmppStateChanged, NewState);
+			return Task.CompletedTask;
 		}
 
 		private void XmppStateChanged(object P)
@@ -304,9 +297,10 @@ namespace Waher.Client.WPF.Dialogs
 			this.RetypePassword.IsEnabled = (this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value);
 		}
 
-		private void Client_OnConnectionError(object Sender, Exception Exception)
+		private Task Client_OnConnectionError(object _, Exception Exception)
 		{
 			MainWindow.UpdateGui(this.ShowError, Exception);
+			return Task.CompletedTask;
 		}
 
 		private void ShowError(object P)

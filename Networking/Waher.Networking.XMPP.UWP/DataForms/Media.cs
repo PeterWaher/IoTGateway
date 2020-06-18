@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private readonly KeyValuePair<string, Uri>[] uris;
 		private readonly int? width;
 		private readonly int? height;
+		private string contentType;
 		private byte[] bin = null;
 		private string url = null;
 
@@ -56,6 +57,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			this.uris = URIs.ToArray();
+			this.contentType = null;
 		}
 
 		/// <summary>
@@ -80,6 +82,15 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			get { return this.bin; }
 			internal set { this.bin = value; }
+		}
+
+		/// <summary>
+		/// Content-Type of data, if available.
+		/// </summary>
+		public string ContentType
+		{
+			get { return this.contentType; }
+			internal set { this.contentType = value; }
 		}
 
 		/// <summary>

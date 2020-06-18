@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PEP
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Tune"></param>
-	public delegate void UserTuneEventHandler(object Sender, UserTuneEventArguments Tune);
+	public delegate Task UserTuneEventHandler(object Sender, UserTuneEventArguments Tune);
 
 	/// <summary>
 	/// Event arguments for user tune events.
 	/// </summary>
 	public class UserTuneEventArguments : PersonalEventNotificationEventArgs
 	{
-		private UserTune tune;
+		private readonly UserTune tune;
 
 		internal UserTuneEventArguments(UserTune Tune, PersonalEventNotificationEventArgs e):
 			base(e)

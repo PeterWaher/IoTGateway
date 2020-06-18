@@ -92,7 +92,7 @@ namespace Waher.IoTGateway.Setup
 		private bool handlersAdded = false;
 		private XmppClient prevClient = null;
 
-		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		private Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
 			if (NewState == XmppState.Offline || NewState == XmppState.Error || NewState == XmppState.Connected)
 			{
@@ -107,9 +107,11 @@ namespace Waher.IoTGateway.Setup
 					ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		private Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -130,16 +132,20 @@ namespace Waher.IoTGateway.Setup
 
 				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void XmppClient_OnPresence(object Sender, PresenceEventArgs e)
+		private Task XmppClient_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			RosterItem Item = Gateway.XmppClient?.GetRosterItem(e.FromBareJID);
 			if (!(Item is null))
 				this.XmppClient_OnRosterItemUpdated(Sender, Item);
+
+			return Task.CompletedTask;
 		}
 
-		private void XmppClient_OnRosterItemUpdated(object Sender, RosterItem Item)
+		private Task XmppClient_OnRosterItemUpdated(object _, RosterItem Item)
 		{
 			string[] TabIDs = this.GetTabIDs();
 			if (TabIDs.Length > 0)
@@ -152,11 +158,14 @@ namespace Waher.IoTGateway.Setup
 
 				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void XmppClient_OnRosterItemRemoved(object Sender, RosterItem Item)
+		private Task XmppClient_OnRosterItemRemoved(object _, RosterItem Item)
 		{
 			this.RosterItemRemoved(Item.BareJid);
+			return Task.CompletedTask;
 		}
 
 		private void RosterItemRemoved(string BareJid)
@@ -173,9 +182,9 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private void XmppClient_OnRosterItemAdded(object Sender, RosterItem Item)
+		private Task XmppClient_OnRosterItemAdded(object Sender, RosterItem Item)
 		{
-			this.XmppClient_OnRosterItemUpdated(Sender, Item);
+			return this.XmppClient_OnRosterItemUpdated(Sender, Item);
 		}
 
 		private string[] GetTabIDs()
@@ -264,7 +273,7 @@ namespace Waher.IoTGateway.Setup
 			return base.SetupConfiguration(WebServer);
 		}
 
-		private void ConnectToJID(HttpRequest Request, HttpResponse Response)
+		private Task ConnectToJID(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -278,7 +287,7 @@ namespace Waher.IoTGateway.Setup
 			Response.ContentType = "text/plain";
 
 			if (!XmppClient.BareJidRegEx.IsMatch(JID))
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				RosterItem Item = Gateway.XmppClient.GetRosterItem(JID);
@@ -286,16 +295,16 @@ namespace Waher.IoTGateway.Setup
 				{
 					Gateway.XmppClient.RequestPresenceSubscription(JID, this.NickName());
 					Log.Informational("Requesting presence subscription.", JID);
-					Response.Write("1");
+					return Response.Write("1");
 				}
 				else if (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To)
 				{
 					Gateway.XmppClient.RequestPresenceSubscription(JID, this.NickName());
 					Log.Informational("Requesting presence subscription.", JID);
-					Response.Write("2");
+					return Response.Write("2");
 				}
 				else
-					Response.Write("3");
+					return Response.Write("3");
 			}
 		}
 
@@ -317,7 +326,7 @@ namespace Waher.IoTGateway.Setup
 			return XmppClient.EmbedNickName(NickName);
 		}
 
-		private void RemoveContact(HttpRequest Request, HttpResponse Response)
+		private Task RemoveContact(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -333,16 +342,16 @@ namespace Waher.IoTGateway.Setup
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
 			if (Contact is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				Client.RemoveRosterItem(Contact.BareJid);
 				Log.Informational("Contact removed.", Contact.BareJid);
-				Response.Write("1");
+				return Response.Write("1");
 			}
 		}
 
-		private void UnsubscribeContact(HttpRequest Request, HttpResponse Response)
+		private Task UnsubscribeContact(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -358,16 +367,16 @@ namespace Waher.IoTGateway.Setup
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
 			if (Contact is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				Client.RequestPresenceUnsubscription(Contact.BareJid);
 				Log.Informational("Unsubscribing from presence.", Contact.BareJid);
-				Response.Write("1");
+				return Response.Write("1");
 			}
 		}
 
-		private void SubscribeToContact(HttpRequest Request, HttpResponse Response)
+		private Task SubscribeToContact(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -383,16 +392,16 @@ namespace Waher.IoTGateway.Setup
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
 			if (Contact is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				Client.RequestPresenceSubscription(Contact.BareJid, this.NickName());
 				Log.Informational("Requesting presence subscription.", Contact.BareJid);
-				Response.Write("1");
+				return Response.Write("1");
 			}
 		}
 
-		private void RenameContact(HttpRequest Request, HttpResponse Response)
+		private Task RenameContact(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -410,149 +419,126 @@ namespace Waher.IoTGateway.Setup
 			XmppClient Client = Gateway.XmppClient;
 			RosterItem Contact = Client.GetRosterItem(JID);
 			if (Contact is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				Client.UpdateRosterItem(Contact.BareJid, NewName, Contact.Groups);
 				Log.Informational("Contact renamed.", Contact.BareJid, new KeyValuePair<string, object>("Name", NewName));
-				Response.Write("1");
+				return Response.Write("1");
 			}
 		}
 
-		private void UpdateContactGroups(HttpRequest Request, HttpResponse Response)
+		private Task UpdateContactGroups(HttpRequest Request, HttpResponse Response)
 		{
-			try
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = Request.DecodeData();
+			string BareJid = Obj as string;
+			if (string.IsNullOrEmpty(BareJid))
+				throw new BadRequestException();
+
+			XmppClient Client = Gateway.XmppClient;
+			RosterItem Contact = Client.GetRosterItem(BareJid);
+			if (Contact is null)
+				throw new NotFoundException();
+
+			SortedDictionary<string, bool> Groups = new SortedDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+			string[] GroupsArray;
+			int i = 0;
+			string s;
+
+			while (!string.IsNullOrEmpty(s = System.Web.HttpUtility.UrlDecode(Request.Header["X-Group-" + (++i).ToString()])))
+				Groups[s] = true;
+
+			if (Groups.Count > 0)
 			{
-				Gateway.AssertUserAuthenticated(Request);
-
-				if (!Request.HasData)
-					throw new BadRequestException();
-
-				object Obj = Request.DecodeData();
-				string BareJid = Obj as string;
-				if (string.IsNullOrEmpty(BareJid))
-					throw new BadRequestException();
-
-				XmppClient Client = Gateway.XmppClient;
-				RosterItem Contact = Client.GetRosterItem(BareJid);
-				if (Contact is null)
-					throw new NotFoundException();
-
-				SortedDictionary<string, bool> Groups = new SortedDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
-				string[] GroupsArray;
-				int i = 0;
-				string s;
-
-				while (!string.IsNullOrEmpty(s = System.Web.HttpUtility.UrlDecode(Request.Header["X-Group-" + (++i).ToString()])))
-					Groups[s] = true;
-
-				if (Groups.Count > 0)
-				{
-					GroupsArray = new string[Groups.Count];
-					Groups.Keys.CopyTo(GroupsArray, 0);
-				}
-				else
-					GroupsArray = new string[0];
-
-				StringBuilder sb = new StringBuilder();
-				bool First = true;
-
-				if (Groups != null)
-				{
-					foreach (string Group in GroupsArray)
-					{
-						if (First)
-							First = false;
-						else
-							sb.Append(", ");
-
-						sb.Append(Group);
-					}
-				}
-
-				Client.UpdateRosterItem(Contact.BareJid, Contact.Name, GroupsArray);
-				Log.Informational("Contact groups updated.", Contact.BareJid, new KeyValuePair<string, object>("Groups", sb.ToString()));
-
-				Response.ContentType = "text/plain";
-				Response.Write("1");
+				GroupsArray = new string[Groups.Count];
+				Groups.Keys.CopyTo(GroupsArray, 0);
 			}
-			catch (Exception ex)
+			else
+				GroupsArray = new string[0];
+
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			if (Groups != null)
 			{
-				Response.SendResponse(ex);
-			}
-			finally
-			{
-				Response.Dispose();
-			}
-		}
-
-		private void GetGroups(HttpRequest Request, HttpResponse Response)
-		{
-			try
-			{
-				Gateway.AssertUserAuthenticated(Request);
-
-				if (!Request.HasData)
-					throw new BadRequestException();
-
-				string StartsWith = Request.DecodeData() as string;
-				if (string.IsNullOrEmpty(StartsWith))
-					throw new BadRequestException();
-
-				SuggestionEventArgs e = new SuggestionEventArgs(StartsWith.Trim());
-
-				foreach (RosterItem Item in Gateway.XmppClient.Roster)
-				{
-					foreach (string Group in Item.Groups)
-						e.AddSuggestion(Group);
-				}
-
-				try
-				{
-					OnGetGroupSuggestions?.Invoke(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
-				StringBuilder sb = new StringBuilder();
-				string[] Groups = e.ToArray();
-				bool First = true;
-				int Nr = 0;
-
-				sb.Append("{\"groups\":[");
-
-				foreach (string Group in Groups)
+				foreach (string Group in GroupsArray)
 				{
 					if (First)
 						First = false;
 					else
-						sb.Append(',');
+						sb.Append(", ");
 
-					sb.Append('"');
-					sb.Append(CommonTypes.JsonStringEncode(Group));
-					sb.Append('"');
-
-					Nr++;
+					sb.Append(Group);
 				}
+			}
 
-				sb.Append("],\"count\":");
-				sb.Append(Nr.ToString());
-				sb.Append("}");
+			Client.UpdateRosterItem(Contact.BareJid, Contact.Name, GroupsArray);
+			Log.Informational("Contact groups updated.", Contact.BareJid, new KeyValuePair<string, object>("Groups", sb.ToString()));
 
-				Response.ContentType = "application/json";
-				Response.Write(sb.ToString());
-				Response.SendResponse();
+			Response.ContentType = "text/plain";
+			return Response.Write("1");
+		}
+
+		private Task GetGroups(HttpRequest Request, HttpResponse Response)
+		{
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			string StartsWith = Request.DecodeData() as string;
+			if (string.IsNullOrEmpty(StartsWith))
+				throw new BadRequestException();
+
+			SuggestionEventArgs e = new SuggestionEventArgs(StartsWith.Trim());
+
+			foreach (RosterItem Item in Gateway.XmppClient.Roster)
+			{
+				foreach (string Group in Item.Groups)
+					e.AddSuggestion(Group);
+			}
+
+			try
+			{
+				OnGetGroupSuggestions?.Invoke(this, e);
 			}
 			catch (Exception ex)
 			{
-				Response.SendResponse(ex);
+				Log.Critical(ex);
 			}
-			finally
+
+			StringBuilder sb = new StringBuilder();
+			string[] Groups = e.ToArray();
+			bool First = true;
+			int Nr = 0;
+
+			sb.Append("{\"groups\":[");
+
+			foreach (string Group in Groups)
 			{
-				Response.Dispose();
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append('"');
+				sb.Append(CommonTypes.JsonStringEncode(Group));
+				sb.Append('"');
+
+				Nr++;
 			}
+
+			sb.Append("],\"count\":");
+			sb.Append(Nr.ToString());
+			sb.Append("}");
+
+			Response.ContentType = "application/json";
+			return Response.Write(sb.ToString());
 		}
 
 		/// <summary>
@@ -565,7 +551,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public static event SuggesstionsEventHandler OnGetNickNameSuggestions = null;
 
-		private void AcceptRequest(HttpRequest Request, HttpResponse Response)
+		private Task AcceptRequest(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -582,23 +568,24 @@ namespace Waher.IoTGateway.Setup
 
 			PresenceEventArgs SubscriptionRequest = Client.GetSubscriptionRequest(JID);
 			if (SubscriptionRequest is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				SubscriptionRequest.Accept();
 				Log.Informational("Accepting presence subscription request.", SubscriptionRequest.FromBareJID);
-				Response.Write("1");
 
 				if (Gateway.XmppClient.LastSetPresenceAvailability != Availability.Offline)
 				{
 					Gateway.XmppClient.SetPresence(
-						Gateway.XmppClient.LastSetPresenceAvailability, 
+						Gateway.XmppClient.LastSetPresenceAvailability,
 						Gateway.XmppClient.LastSetPresenceCustomStatus);
 				}
+
+				return Response.Write("1");
 			}
 		}
 
-		private void DeclineRequest(HttpRequest Request, HttpResponse Response)
+		private Task DeclineRequest(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -615,14 +602,15 @@ namespace Waher.IoTGateway.Setup
 
 			PresenceEventArgs SubscriptionRequest = Client.GetSubscriptionRequest(JID);
 			if (SubscriptionRequest is null)
-				Response.Write("0");
+				return Response.Write("0");
 			else
 			{
 				SubscriptionRequest.Decline();
 				Log.Informational("Declining presence subscription request.", SubscriptionRequest.FromBareJID);
-				Response.Write("1");
 
 				this.RosterItemRemoved(JID);
+			
+				return Response.Write("1");
 			}
 		}
 

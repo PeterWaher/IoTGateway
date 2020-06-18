@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
-using Waher.Things.ControlParameters;
 
 namespace Waher.Client.WPF.Controls.Questions
 {
@@ -244,13 +240,15 @@ namespace Waher.Client.WPF.Controls.Questions
 			base.Dispose();
 		}
 
-		private void RosterItemUpdated(object Sender, RosterItem Item)
+		private Task RosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if ((Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To) && Item.HasLastPresence && Item.LastPresence.IsOnline)
 			{
 				this.questionView.Owner.UnregisterRosterEventHandler(this.JID, this.RosterItemUpdated);
 				this.DoRequest(Item);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void DoRequest(RosterItem Item)
@@ -266,7 +264,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				this.questionView.Owner.ControlClient.GetForm(Item.LastPresenceFullJid, "en", this.ControlFormResponse, null);
 		}
 
-		private async void ControlFormResponse(object Sender, DataFormEventArgs e)
+		private async Task ControlFormResponse(object Sender, DataFormEventArgs e)
 		{
 			try
 			{
@@ -347,7 +345,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				return null;
 		}
 
-		private async void RuleCallback(object Sender, IqResultEventArgs e)
+		private async Task RuleCallback(object Sender, IqResultEventArgs e)
 		{
 			try
 			{

@@ -1,32 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Xsl;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using Waher.Content.Emoji.Emoji1;
-using Waher.Content.Markdown;
-using Waher.Content.Xml;
-using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things.Queries;
-using Waher.Client.WPF.Controls.Chat;
-using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Model.Concentrator;
 
 namespace Waher.Client.WPF.Controls
@@ -118,40 +101,47 @@ namespace Waher.Client.WPF.Controls
 			}));
 		}
 
-		private void Query_Started(object Sender, NodeQueryEventArgs e)
+		private Task Query_Started(object Sender, NodeQueryEventArgs e)
 		{
 			this.StatusMessage("Execution started.");
+			return Task.CompletedTask;
 		}
 
-		private void Query_Done(object Sender, NodeQueryEventArgs e)
+		private Task Query_Done(object Sender, NodeQueryEventArgs e)
 		{
 			this.StatusMessage("Execution completed.");
+			return Task.CompletedTask;
 		}
 
-		private void Query_Aborted(object Sender, NodeQueryEventArgs e)
+		private Task Query_Aborted(object Sender, NodeQueryEventArgs e)
 		{
 			this.StatusMessage("Execution aborted.");
+			return Task.CompletedTask;
 		}
 
-		private void Query_StatusMessageReceived(object Sender, NodeQueryStatusMessageEventArgs e)
+		private Task Query_StatusMessageReceived(object Sender, NodeQueryStatusMessageEventArgs e)
 		{
 			this.StatusMessage(e.StatusMessage);
+			return Task.CompletedTask;
 		}
 
-		private void Query_EventMessageReceived(object Sender, NodeQueryEventMessageEventArgs e)
+		private Task Query_EventMessageReceived(object Sender, NodeQueryEventMessageEventArgs e)
 		{
 			this.StatusMessage(e.EventMessage);
+			return Task.CompletedTask;
 		}
 
-		private void Query_NewTitle(object Sender, NodeQueryEventArgs e)
+		private Task Query_NewTitle(object Sender, NodeQueryEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.headerLabel.Text = this.query.Title;
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
+		private Task Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -171,9 +161,11 @@ namespace Waher.Client.WPF.Controls
 					Margin = new Thickness(0, 0, 0, 12)
 				});
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
+		private Task Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -181,9 +173,11 @@ namespace Waher.Client.WPF.Controls
 				if (this.currentPanel is null)
 					this.currentPanel = this.ReportPanel;
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
+		private Task Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -223,9 +217,11 @@ namespace Waher.Client.WPF.Controls
 					this.StatusMessage(ex.Message);
 				}
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
+		private Task Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -278,17 +274,21 @@ namespace Waher.Client.WPF.Controls
 					//Table.AcceptChanges();
 				}
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
+		private Task Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.tables.Remove(e.Table.TableDefinition.TableId);
 			}));
+
+			return Task.CompletedTask;
 		}
 
-		private void Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
+		private Task Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
 		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -304,6 +304,8 @@ namespace Waher.Client.WPF.Controls
 					Margin = new Thickness(0, 0, 0, 6)
 				});
 			}));
+
+			return Task.CompletedTask;
 		}
 
 		public void Dispose()

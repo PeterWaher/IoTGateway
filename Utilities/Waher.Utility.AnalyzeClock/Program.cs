@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -280,6 +281,8 @@ namespace Waher.Utility.AnalyzeClock
 								Error.Set();
 								break;
 						}
+
+						return Task.CompletedTask;
 					};
 
 					Client.Connect();
@@ -299,12 +302,16 @@ namespace Waher.Utility.AnalyzeClock
 							{
 								if (string.Compare(e.FromBareJID, Jid, true) == 0)
 									Done.Set();
+
+								return Task.CompletedTask;
 							};
 
 							Client.OnPresenceUnsubscribed += (sender, e) =>
 							{
 								if (string.Compare(e.FromBareJID, Jid, true) == 0)
 									Error.Set();
+
+								return Task.CompletedTask;
 							};
 
 							Console.WriteLine("Requesting presence subscription to " + Jid);

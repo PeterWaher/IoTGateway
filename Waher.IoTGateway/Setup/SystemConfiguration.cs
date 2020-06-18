@@ -135,7 +135,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			this.completionSource = new TaskCompletionSource<bool>();
 
-			this.configResource = WebServer.Register("/Settings/ConfigComplete", null, this.ConfigComplete, false, false, true);
+			this.configResource = WebServer.Register("/Settings/ConfigComplete", null, this.ConfigComplete, true, false, true);
 
 			return this.completionSource.Task;
 		}
@@ -160,21 +160,13 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
-		protected virtual async void ConfigComplete(HttpRequest Request, HttpResponse Response)
+		protected virtual async Task ConfigComplete(HttpRequest Request, HttpResponse Response)
 		{
-			try
-			{
-				Gateway.AssertUserAuthenticated(Request);
-
-				Response.StatusCode = 200;
-				await this.MakeCompleted();
-
-				Response.SendResponse();
-			}
-			catch (Exception ex)
-			{
-				Response.SendResponse(ex);
-			}
+			Gateway.AssertUserAuthenticated(Request);
+			
+			await this.MakeCompleted();
+			
+			Response.StatusCode = 200;
 		}
 
 		/// <summary>

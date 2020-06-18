@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
@@ -13,8 +15,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	{
 		private Socks5Client client;
 		private TemporaryFile tempFile;
+		private MultiReadSingleWriteObject syncObject;
 		private readonly IEndToEndEncryption e2e;
-		private readonly string e2eReference;
 		private readonly string sid;
 		private readonly string from;
 		private readonly string to;
@@ -34,8 +36,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="To">To</param>
 		/// <param name="BlockSize">Block size</param>
 		/// <param name="E2E">End-to-end encryption, if used.</param>
-		/// <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
-		public OutgoingStream(string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E, string EndpointReference)
+		public OutgoingStream(string StreamId, string From, string To, int BlockSize, IEndToEndEncryption E2E)
 		{
 			this.client = null;
 			this.sid = StreamId;
@@ -43,7 +44,6 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.to = To;
 			this.blockSize = BlockSize;
 			this.e2e = E2E;
-			this.e2eReference = EndpointReference;
 			this.isWriting = false;
 			this.done = false;
 			this.tempFile = new TemporaryFile();
@@ -107,15 +107,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			this.tempFile?.Dispose();
 			this.tempFile = null;
+
+			this.syncObject?.Dispose();
+			this.syncObject = null;
 		}
 
 		/// <summary>
 		/// Writes data to the stram.
 		/// </summary>
 		/// <param name="Data">Data</param>
-		public void Write(byte[] Data)
+		public Task Write(byte[] Data)
 		{
-			this.Write(Data, 0, Data.Length);
+			return this.Write(Data, 0, Data.Length);
 		}
 
 		/// <summary>
@@ -124,27 +127,34 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Data">Data</param>
 		/// <param name="Offset">Offset into array where writing is to start.</param>
 		/// <param name="Count">Number of bytes to start.</param>
-		public void Write(byte[] Data, int Offset, int Count)
+		public async Task Write(byte[] Data, int Offset, int Count)
 		{
-			lock (this.tempFile)
-			{
-				if (this.tempFile is null || this.aborted || this.done)
-					throw new IOException("Stream not open");
+			if (this.tempFile is null || this.aborted || this.done)
+				throw new IOException("Stream not open");
 
+			if (!await this.syncObject.TryBeginWrite(10000))
+				throw new TimeoutException();
+
+			try
+			{
 				this.tempFile.Position = this.tempFile.Length;
-				this.tempFile.Write(Data, Offset, Count);
+				await this.tempFile.WriteAsync(Data, Offset, Count);
 
 				if (this.client != null && !this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
-					this.WriteBlockLocked();
+					await this.WriteBlockLocked();
+			}
+			finally
+			{
+				await this.syncObject.EndWrite();
 			}
 		}
 
-		private void WriteBlockLocked()
+		private async Task WriteBlockLocked()
 		{
 			int BlockSize = (int)Math.Min(this.tempFile.Length - this.pos, this.blockSize);
 
 			if (BlockSize == 0)
-				this.SendClose();
+				await this.SendClose();
 			else
 			{
 				byte[] Block;
@@ -168,7 +178,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				int NrRead = this.tempFile.Read(Block, i, BlockSize);
 				if (NrRead < BlockSize)
 				{
-					this.Close();
+					await this.Close();
 					this.Dispose();
 
 					throw new IOException("Unable to read from temporary file.");
@@ -196,16 +206,19 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 
 				this.isWriting = true;
-				this.client.Send(Block);
+				await this.client.Send(Block);
 			}
 		}
 
-		private void WriteQueueEmpty(object Sender, EventArgs e)
+		private async void WriteQueueEmpty(object Sender, EventArgs e)
 		{
 			if (this.tempFile is null)
 				return;
 
-			lock (this.tempFile)
+			if (!await this.syncObject.TryBeginWrite(10000))
+				throw new TimeoutException();
+
+			try
 			{
 				if (this.aborted)
 					return;
@@ -213,14 +226,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				long NrLeft = this.tempFile.Length - this.pos;
 
 				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
-					this.WriteBlockLocked();
+					await this.WriteBlockLocked();
 				else
 				{
 					this.isWriting = false;
 
 					if (this.done)
-						this.SendClose();
+						await this.SendClose();
 				}
+			}
+			finally
+			{
+				await this.syncObject.EndWrite();
 			}
 		}
 
@@ -228,20 +245,27 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// Opens the output.
 		/// </summary>
 		/// <param name="Client">SOCKS5 client with established connection.</param>
-		public void Opened(Socks5Client Client)
+		public async Task Opened(Socks5Client Client)
 		{
 			Client.OnWriteQueueEmpty += this.WriteQueueEmpty;
 			this.client = Client;
 
 			if (!(this.tempFile is null))
 			{
-				lock (this.tempFile)
+				if (!await this.syncObject.TryBeginWrite(10000))
+					throw new TimeoutException();
+
+				try
 				{
 					if (!this.isWriting && (this.tempFile.Length - this.pos >= this.blockSize ||
 						(this.done && this.tempFile.Length > this.pos)))
 					{
-						this.WriteBlockLocked();
+						await this.WriteBlockLocked();
 					}
+				}
+				finally
+				{
+					await this.syncObject.EndWrite();
 				}
 			}
 		}
@@ -249,29 +273,36 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Closes the session.
 		/// </summary>
-		public void Close()
+		public async Task Close()
 		{
 			this.done = true;
 
 			if (!(this.tempFile is null))
 			{
-				lock (this.tempFile)
+				if (!await this.syncObject.TryBeginWrite(10000))
+					throw new TimeoutException();
+
+				try
 				{
 					if (this.client != null && !this.isWriting)
 					{
 						if (this.tempFile.Length > this.pos)
-							this.WriteBlockLocked();
+							await this.WriteBlockLocked();
 						else
-							this.SendClose();
+							await this.SendClose();
 					}
+				}
+				finally
+				{
+					await this.syncObject.EndWrite();
 				}
 			}
 		}
 
-		private void SendClose()
+		private async Task SendClose()
 		{
 			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
-			this.client.Send(new byte[] { 0, 0 });
+			await this.client.Send(new byte[] { 0, 0 });
 			this.client.CloseWhenDone();
 			this.Dispose();
 		}

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -60,7 +60,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -79,8 +79,7 @@ namespace Waher.IoTGateway.WebResources
 				Response.StatusCode = 409;
 				Response.StatusMessage = "Conflict";
 				Response.ContentType = "text/plain";
-				Response.Write("Analysis is underway.");
-				return;
+				await Response.Write("Analysis is underway.");
 			}
 
 			string BasePath = Export.FullExportFolder;
@@ -100,12 +99,12 @@ namespace Waher.IoTGateway.WebResources
 				XmlWriter XmlOutput = XmlWriter.Create(fs, XML.WriterSettings(true, false));
 				string FileName = FullFileName.Substring(BasePath.Length);
 
-				Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
+				Task _ = Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
 
 				Response.StatusCode = 200;
 				Response.ContentType = "text/plain";
-				Response.Write(FileName);
-				Response.SendResponse();
+				await Response.Write(FileName);
+				await Response.SendResponse();
 			}
 			catch (Exception ex)
 			{
@@ -115,7 +114,7 @@ namespace Waher.IoTGateway.WebResources
 					File.Delete(FullFileName);
 				}
 
-				Response.SendResponse(ex);
+				await Response.SendResponse(ex);
 			}
 		}
 

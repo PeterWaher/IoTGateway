@@ -62,11 +62,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new DoubleControlParameter("Value", "Publish", "Value:", "Floating-point value of topic.",
-					(n) => this.value,
+					(n) => Task.FromResult<double?>(this.value),
 					(n, v) =>
 					{
 						this.value = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v, this.nrDecimals)));
+						return Task.CompletedTask;
 					})
 			};
 		}

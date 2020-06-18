@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Things;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
@@ -10,14 +8,14 @@ namespace Waher.Networking.XMPP.Interoperability
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void InteroperabilityInterfacesClientEventHandler(object Sender, InteroperabilityClientEventArgs e);
+	public delegate Task InteroperabilityInterfacesClientEventHandler(object Sender, InteroperabilityClientEventArgs e);
 
 	/// <summary>
 	/// Event arguments for interoperability interface requests.
 	/// </summary>
 	public class InteroperabilityClientEventArgs : IqResultEventArgs
 	{
-		private string[] interfaces;
+		private readonly string[] interfaces;
 
 		/// <summary>
 		/// Event arguments for interoperability interface requests.

@@ -110,7 +110,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			this.testAddresses = WebServer.Register("/Settings/TestNotificationAddresses", null, this.TestNotificationAddresses, false, false, true);
+			this.testAddresses = WebServer.Register("/Settings/TestNotificationAddresses", null, this.TestNotificationAddresses, true, false, true);
 
 			return base.InitSetup(WebServer);
 		}
@@ -126,63 +126,52 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private async void TestNotificationAddresses(HttpRequest Request, HttpResponse Response)
+		private async Task TestNotificationAddresses(HttpRequest Request, HttpResponse Response)
 		{
+			Gateway.AssertUserAuthenticated(Request);
+
+			if (!Request.HasData)
+				throw new BadRequestException();
+
+			object Obj = Request.DecodeData();
+			if (!(Obj is string Address))
+				throw new BadRequestException();
+
+			string TabID = Request.Header["X-TabID"];
+			if (string.IsNullOrEmpty(TabID))
+				throw new BadRequestException();
+
+			List<CaseInsensitiveString> Addresses = new List<CaseInsensitiveString>();
+
+			Response.StatusCode = 200;
+
 			try
 			{
-				Gateway.AssertUserAuthenticated(Request);
-
-				if (!Request.HasData)
-					throw new BadRequestException();
-
-				object Obj = Request.DecodeData();
-				if (!(Obj is string Address))
-					throw new BadRequestException();
-
-				string TabID = Request.Header["X-TabID"];
-				if (string.IsNullOrEmpty(TabID))
-					throw new BadRequestException();
-
-				List<CaseInsensitiveString> Addresses = new List<CaseInsensitiveString>();
-
-				Response.StatusCode = 200;
-
-				try
+				foreach (string Part in Address.Split(';'))
 				{
-					foreach (string Part in Address.Split(';'))
-					{
-						string s = Part.Trim();
-						if (string.IsNullOrEmpty(s))
-							continue;
+					string s = Part.Trim();
+					if (string.IsNullOrEmpty(s))
+						continue;
 
-						MailAddress Addr = new MailAddress(s);
-						Addresses.Add(Addr.Address);
-					}
-
-					this.addresses = Addresses.ToArray();
-
-					await Database.Update(this);
-
-					if (this.addresses.Length > 0)
-						Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
-
-					Response.Write(1);
-				}
-				catch (Exception)
-				{
-					Response.Write(0);
+					MailAddress Addr = new MailAddress(s);
+					Addresses.Add(Addr.Address);
 				}
 
-				Response.SendResponse();
+				this.addresses = Addresses.ToArray();
+
+				await Database.Update(this);
+
+				if (this.addresses.Length > 0)
+					Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
+
+				await Response.Write(1);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Response.SendResponse(ex);
+				await Response.Write(0);
 			}
-			finally
-			{
-				Response.Dispose();
-			}
+
+			await Response.SendResponse();
 		}
 
 		/// <summary>

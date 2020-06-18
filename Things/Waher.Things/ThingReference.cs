@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things
@@ -156,11 +154,10 @@ namespace Waher.Things
 		/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
-			IThingReference Ref = obj as IThingReference;
-			if (Ref is null)
-				return false;
-			else
+			if (obj is IThingReference Ref)
 				return this.SameThing(Ref);
+			else
+				return false;
 		}
 
 		/// <summary>

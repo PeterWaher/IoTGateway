@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
 
 namespace Waher.Networking.XMPP.Test
@@ -62,6 +60,8 @@ namespace Waher.Networking.XMPP.Test
 						Done.Set();
 					else
 						Error.Set();
+				
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
@@ -96,6 +96,8 @@ namespace Waher.Networking.XMPP.Test
 					}
 					else
 						Error.Set();
+
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));

@@ -60,6 +60,11 @@
             <param name="Callback">Method to call when packet has been sent.</param>
             <returns>If data was sent.</returns>
         </member>
+        <member name="T:Waher.Networking.EventHandlerAsync">
+            <summary>
+            Asynchronous version of <see cref="T:System.EventArgs"/>.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.ExceptionEventHandler">
             <summary>
             Connection error event handler delegate.

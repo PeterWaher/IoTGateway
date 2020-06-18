@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Script;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -15,6 +15,14 @@ namespace Waher.Networking.HTTP
 	/// <param name="Response">HTTP Response</param>
 	/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 	public delegate void HttpMethodHandler(HttpRequest Request, HttpResponse Response);
+
+	/// <summary>
+	/// Delegate for HTTP method handlers.
+	/// </summary>
+	/// <param name="Request">HTTP Request</param>
+	/// <param name="Response">HTTP Response</param>
+	/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+	public delegate Task HttpMethodHandlerAsync(HttpRequest Request, HttpResponse Response);
 
 	/// <summary>
 	/// Base class for all HTTP resources.
@@ -220,7 +228,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public virtual void Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
+		public virtual async Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
 		{
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
@@ -258,7 +266,7 @@ namespace Waher.Networking.HTTP
 								Response.StatusCode = 206;
 								Response.StatusMessage = "Partial Content";
 
-								this.getRanges.GET(Request, Response, FirstInterval);
+								await this.getRanges.GET(Request, Response, FirstInterval);
 							}
 						}
 						else
@@ -266,15 +274,15 @@ namespace Waher.Networking.HTTP
 							Response.OnlyHeader = Method == "HEAD";
 
 							if (this.get != null)
-								this.get.GET(Request, Response);
+								await this.get.GET(Request, Response);
 							else
-								this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
+								await this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
 						}
 					}
 					else if (this.get != null)
 					{
 						Response.OnlyHeader = Method == "HEAD";
-						this.get.GET(Request, Response);
+						await this.get.GET(Request, Response);
 					}
 					else
 						throw new MethodNotAllowedException(this.allowedMethods);
@@ -289,12 +297,12 @@ namespace Waher.Networking.HTTP
 							if (Interval is null)
 								throw new RangeNotSatisfiableException();
 							else
-								this.postRanges.POST(Request, Response, Interval);
+								await this.postRanges.POST(Request, Response, Interval);
 						}
 						else
 						{
 							if (this.post != null)
-								this.post.POST(Request, Response);
+								await this.post.POST(Request, Response);
 							else
 							{
 								long Total;
@@ -306,12 +314,12 @@ namespace Waher.Networking.HTTP
 								else
 									Total = 0;
 
-								this.postRanges.POST(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+								await this.postRanges.POST(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
 							}
 						}
 					}
 					else if (this.post != null)
-						this.post.POST(Request, Response);
+						await this.post.POST(Request, Response);
 					else
 						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
@@ -325,12 +333,12 @@ namespace Waher.Networking.HTTP
 							if (Interval is null)
 								throw new RangeNotSatisfiableException();
 							else
-								this.putRanges.PUT(Request, Response, Interval);
+								await this.putRanges.PUT(Request, Response, Interval);
 						}
 						else
 						{
 							if (this.put != null)
-								this.put.PUT(Request, Response);
+								await this.put.PUT(Request, Response);
 							else
 							{
 								long Total;
@@ -342,12 +350,12 @@ namespace Waher.Networking.HTTP
 								else
 									Total = 0;
 
-								this.putRanges.PUT(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+								await this.putRanges.PUT(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
 							}
 						}
 					}
 					else if (this.put != null)
-						this.put.PUT(Request, Response);
+						await this.put.PUT(Request, Response);
 					else
 						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
@@ -356,21 +364,21 @@ namespace Waher.Networking.HTTP
 					if (this.delete is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
-						this.delete.DELETE(Request, Response);
+						await this.delete.DELETE(Request, Response);
 					break;
 
 				case "OPTIONS":
 					if (this.options is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
-						this.options.OPTIONS(Request, Response);
+						await this.options.OPTIONS(Request, Response);
 					break;
 
 				case "TRACE":
 					if (this.trace is null)
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
-						this.trace.TRACE(Request, Response);
+						await this.trace.TRACE(Request, Response);
 					break;
 
 				default:
@@ -379,7 +387,7 @@ namespace Waher.Networking.HTTP
 
 			if (this.Synchronous)
 			{
-				Response.SendResponse();
+				await Response.SendResponse();
 				Response.Dispose();
 			}
 		}

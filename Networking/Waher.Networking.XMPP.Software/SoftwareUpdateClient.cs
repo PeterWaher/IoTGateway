@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Networking.XMPP.Software
 {
@@ -102,7 +103,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				Package PackageInfo = null;
@@ -117,7 +118,7 @@ namespace Waher.Networking.XMPP.Software
 					try
 					{
 						PackageEventArgs e2 = new PackageEventArgs(PackageInfo, e);
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -144,6 +145,9 @@ namespace Waher.Networking.XMPP.Software
 					Result.TrySetResult(e.Package);
 				else
 					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get package information." : e.ErrorText));
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
@@ -162,7 +166,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(NamespaceSoftwareUpdates);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				Package[] PackagesInfo = null;
@@ -187,7 +191,7 @@ namespace Waher.Networking.XMPP.Software
 					try
 					{
 						PackagesEventArgs e2 = new PackagesEventArgs(PackagesInfo, e);
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -213,6 +217,9 @@ namespace Waher.Networking.XMPP.Software
 					Result.TrySetResult(e.Packages);
 				else
 					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get packages." : e.ErrorText));
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
@@ -225,7 +232,7 @@ namespace Waher.Networking.XMPP.Software
 		/// events will be received when any software package is updated.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Subscribe(string FileName, IqResultEventHandler Callback, object State)
+		public void Subscribe(string FileName, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -257,6 +264,9 @@ namespace Waher.Networking.XMPP.Software
 					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to subscribe to software updates for " +
 						FileName + "." : e.ErrorText));
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
@@ -269,7 +279,7 @@ namespace Waher.Networking.XMPP.Software
 		/// events will be received when any software package is updated.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Unsubscribe(string FileName, IqResultEventHandler Callback, object State)
+		public void Unsubscribe(string FileName, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -301,6 +311,9 @@ namespace Waher.Networking.XMPP.Software
 					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to unsubscribe from software updates for " +
 						FileName + "." : e.ErrorText));
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
@@ -319,7 +332,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(NamespaceSoftwareUpdates);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(this.componentAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				string[] FileNames = null;
@@ -344,7 +357,7 @@ namespace Waher.Networking.XMPP.Software
 					try
 					{
 						SubscriptionsEventArgs e2 = new SubscriptionsEventArgs(FileNames, e);
-						Callback(this, e2);
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -369,62 +382,64 @@ namespace Waher.Networking.XMPP.Software
 					Result.TrySetResult(e.FileNames);
 				else
 					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get list of current subscriptions." : e.ErrorText));
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
 		}
 
-		private async void PackageNotificationHandler(object Sender, MessageEventArgs e)
+		private async Task PackageNotificationHandler(object Sender, MessageEventArgs e)
 		{
 			if (string.Compare(e.From, this.componentAddress, true) != 0)
 				return;
 
 			Package PackageInfo = Package.Parse(e.Content);
 			PackageUpdatedEventArgs e2 = new PackageUpdatedEventArgs(PackageInfo, e);
-			try
-			{
-				this.OnSoftwareUpdated?.Invoke(this, e2);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
 
-			if (e2.Download)
+			PackageUpdatedEventHandler h = this.OnSoftwareUpdated;
+			if (!(h is null))
 			{
 				try
 				{
-					string FileName = await this.DownloadPackageAsync(PackageInfo);
-
-					await Task.Run(() =>
-					{
-						try
-						{
-							PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
-
-							try
-							{
-								this.OnSoftwareValidation?.Invoke(this, e3);
-							}
-							catch (Exception ex)
-							{
-								File.Delete(FileName);
-								Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message, FileName);
-								return;
-							}
-
-							this.OnSoftwareDownloaded?.Invoke(this, e3);
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					});
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
+			}
+
+			if (e2.Download)
+			{
+				Task _ = this.Download(PackageInfo, e);
+			}
+		}
+
+		private async Task Download(Package PackageInfo, MessageEventArgs e)
+		{
+			try
+			{
+				string FileName = await this.DownloadPackageAsync(PackageInfo);
+				PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
+
+				try
+				{
+					this.OnSoftwareValidation?.Invoke(this, e3);
+				}
+				catch (Exception ex)
+				{
+					File.Delete(FileName);
+					Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message, FileName);
+					return;
+				}
+
+				this.OnSoftwareDownloaded?.Invoke(this, e3);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -515,20 +530,24 @@ namespace Waher.Networking.XMPP.Software
 		/// </summary>
 		public event PackageFileEventHandler OnSoftwareDownloaded = null;
 
-		private void PackageDeletedNotificationHandler(object Sender, MessageEventArgs e)
+		private async Task PackageDeletedNotificationHandler(object Sender, MessageEventArgs e)
 		{
 			if (string.Compare(e.From, this.componentAddress, true) != 0)
 				return;
 
 			Package PackageInfo = Package.Parse(e.Content);
 			PackageDeletedEventArgs e2 = new PackageDeletedEventArgs(PackageInfo, e);
-			try
+			PackageDeletedEventHandler h = this.OnSoftwareDeleted;
+			if (!(h is null))
 			{
-				this.OnSoftwareDeleted?.Invoke(this, e2);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				try
+				{
+					await h(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 
 			if (e2.Delete)
@@ -540,7 +559,10 @@ namespace Waher.Networking.XMPP.Software
 					if (File.Exists(FileName))
 					{
 						File.Delete(FileName);
-						this.OnDownloadedSoftwareDeleted?.Invoke(this, new PackageFileEventArgs(PackageInfo, FileName, e));
+
+						PackageFileEventHandler h2 = this.OnDownloadedSoftwareDeleted;
+						if (!(h2 is null))
+							await h2(this, new PackageFileEventArgs(PackageInfo, FileName, e));
 					}
 				}
 				catch (Exception ex)

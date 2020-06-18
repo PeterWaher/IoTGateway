@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.ServiceDiscovery
@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ServiceDiscoveryEventHandler(object Sender, ServiceDiscoveryEventArgs e);
+	public delegate Task ServiceDiscoveryEventHandler(object Sender, ServiceDiscoveryEventArgs e);
 
 	/// <summary>
 	/// Event arguments for service discovery responses.

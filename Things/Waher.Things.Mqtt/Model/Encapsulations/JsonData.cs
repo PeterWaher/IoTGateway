@@ -145,12 +145,13 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new MultiLineTextControlParameter("Value", "Publish", "Value:", "JSON value of topic.",
-					(n) => this.json,
+					(n) => Task.FromResult<string>(this.json),
 					(n, v) =>
 					{
 						this.value = JSON.Parse(v);
 						this.json = v;
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						return Task.CompletedTask;
 					})
 			};
 		}

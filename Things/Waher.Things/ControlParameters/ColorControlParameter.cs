@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Things;
 using Waher.Content;
 
 namespace Waher.Things.ControlParameters
@@ -14,22 +12,22 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
-	public delegate void ColorSetHandler(IThingReference Node, ColorReference Value);
+	public delegate Task ColorSetHandler(IThingReference Node, ColorReference Value);
 
 	/// <summary>
 	/// Get handler delegate for color control parameters.
 	/// </summary>
 	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
-	public delegate ColorReference ColorGetHandler(IThingReference Node);
+	public delegate Task<ColorReference> ColorGetHandler(IThingReference Node);
 
 	/// <summary>
 	/// Color control parameter.
 	/// </summary>
 	public class ColorControlParameter : ControlParameter
 	{
-		private ColorGetHandler getHandler;
-		private ColorSetHandler setHandler;
+		private readonly ColorGetHandler getHandler;
+		private readonly ColorSetHandler setHandler;
 
 		/// <summary>
 		/// Color control parameter.
@@ -53,11 +51,11 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value was invalid (false).</returns>
-		public bool Set(IThingReference Node, ColorReference Value)
+		public async Task<bool> Set(IThingReference Node, ColorReference Value)
 		{
 			try
 			{
-				this.setHandler(Node, Value);
+				await this.setHandler(Node, Value);
 				return true;
 			}
 			catch (Exception ex)
@@ -73,7 +71,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public override bool SetStringValue(IThingReference Node, string StringValue)
+		public override async Task<bool> SetStringValue(IThingReference Node, string StringValue)
 		{
 			byte R, G, B;
 
@@ -83,7 +81,7 @@ namespace Waher.Things.ControlParameters
 					byte.TryParse(StringValue.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
 					byte.TryParse(StringValue.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
 				{
-					this.Set(Node, new ColorReference(R, G, B));
+					await this.Set(Node, new ColorReference(R, G, B));
 				}
 				else
 					return false;
@@ -95,7 +93,7 @@ namespace Waher.Things.ControlParameters
 					byte.TryParse(StringValue.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B) &&
 					byte.TryParse(StringValue.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A))
 				{
-					this.Set(Node, new ColorReference(R, G, B, A));
+					await this.Set(Node, new ColorReference(R, G, B, A));
 				}
 				else
 					return false;
@@ -110,11 +108,11 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public ColorReference Get(IThingReference Node)
+		public async Task<ColorReference> Get(IThingReference Node)
 		{
 			try
 			{
-				return this.getHandler(Node);
+				return await this.getHandler(Node);
 			}
 			catch (Exception ex)
 			{
@@ -128,9 +126,9 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public override string GetStringValue(IThingReference Node)
+		public override async Task<string> GetStringValue(IThingReference Node)
 		{
-			ColorReference Value = this.Get(Node);
+			ColorReference Value = await this.Get(Node);
 
 			if (Value != null)
 				return Value.ToString();
@@ -143,9 +141,9 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public override void ExportValidationRules(XmlWriter Output, IThingReference Node)
+		public override async Task ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
-			ColorReference Value = this.Get(Node);
+			ColorReference Value = await this.Get(Node);
 
 			Output.WriteStartElement("xdv", "validate", null);
 			Output.WriteAttributeString("xmlns", "xdc", null, "urn:xmpp:xdata:color");

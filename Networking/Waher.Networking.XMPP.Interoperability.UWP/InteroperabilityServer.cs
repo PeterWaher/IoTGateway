@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// </summary>
 		public override string[] Extensions => new string[0];
 
-		private void GetInterfacesHandler(object Sender, IqEventArgs e)
+		private async Task GetInterfacesHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string NodeId = XML.Attribute(E, "id");
@@ -59,11 +59,11 @@ namespace Waher.Networking.XMPP.Interoperability
 
 			InteroperabilityServerInterfacesEventHandler h = this.OnGetInterfaces;
 			InteroperabilityServerEventArgs e2 = new InteroperabilityServerEventArgs(NodeId, SourceId, Partition, ServiceToken, DeviceToken, UserToken);
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
-					h(this, e2);
+					await h(this, e2);
 				}
 				catch (Exception ex)
 				{

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Queries
 {
@@ -10,7 +7,7 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class Record
 	{
-		private object[] elements;
+		private readonly object[] elements;
 
 		/// <summary>
 		/// Defines a record in a table.

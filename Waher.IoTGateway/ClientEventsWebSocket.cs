@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
@@ -51,13 +51,13 @@ namespace Waher.IoTGateway
 								TabID = TabID
 							};
 
-							ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
+							Task _ = ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
 							ClientEvents.PushEvent(new string[] { TabID }, "CheckServerInstance", serverId, false);
 						}
 						break;
 
 					case "Unregister":
-						this.Close(e.Socket);
+						Task _2 = this.Close(e.Socket);
 						break;
 
 					case "Ping":
@@ -77,19 +77,21 @@ namespace Waher.IoTGateway
 		private void Socket_Disposed(object sender, EventArgs e)
 		{
 			if (sender is WebSocket WebSocket)
-				this.Close(WebSocket);
+			{
+				Task _ = this.Close(WebSocket);
+			}
 		}
 
 		private void Socket_Closed(object Sender, WebSocketClosedEventArgs e)
 		{
-			this.Close(e.Socket);
+			Task _ = this.Close(e.Socket);
 		}
 
-		private void Close(WebSocket Socket)
+		private async Task Close(WebSocket Socket)
 		{
 			if (Socket.Tag is Info Info)
 			{
-				ClientEvents.UnregisterWebSocket(Socket, Info.Location, Info.TabID);
+				await ClientEvents.UnregisterWebSocket(Socket, Info.Location, Info.TabID);
 				Socket.Tag = null;
 			}
 		}

@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	/// <param name="Sender">Caller.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void DataReceivedEventHandler(object Sender, DataReceivedEventArgs e);
+	public delegate Task DataReceivedEventHandler(object Sender, DataReceivedEventArgs e);
 
 	/// <summary>
 	/// Event arguments containing received binary data.

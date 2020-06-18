@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SearchFormEventHandler(object Sender, SearchFormEventArgs e);
+	public delegate Task SearchFormEventHandler(object Sender, SearchFormEventArgs e);
 
 	/// <summary>
 	/// Event arguments for search form responses.
@@ -247,7 +247,7 @@ namespace Waher.Networking.XMPP.Search
 			}
 		}
 
-		private void OldSearchResult(object Sender, IqResultEventArgs e)
+		private Task OldSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
@@ -322,10 +322,10 @@ namespace Waher.Networking.XMPP.Search
 				}
 			}
 
-			this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
+			return this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
-		private void CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records,
+		private async Task CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records,
 			Field[] Headers, IqResultEventArgs e)
 		{
 			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), Headers, e)
@@ -337,7 +337,7 @@ namespace Waher.Networking.XMPP.Search
 			{
 				try
 				{
-					Callback(this.client, e2);
+					await Callback(this.client, e2);
 				}
 				catch (Exception ex)
 				{
@@ -346,7 +346,7 @@ namespace Waher.Networking.XMPP.Search
 			}
 		}
 
-		private void FormSearchResult(object Sender, IqResultEventArgs e)
+		private Task FormSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
@@ -408,7 +408,7 @@ namespace Waher.Networking.XMPP.Search
 				}
 			}
 
-			this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
+			return this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
 		/// <summary>
@@ -440,6 +440,8 @@ namespace Waher.Networking.XMPP.Search
 					Result.SetResult(e);
 				else
 					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform search operation."));
+
+				return Task.CompletedTask;
 			}, null);
 
 			return Result.Task;

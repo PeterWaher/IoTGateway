@@ -1808,7 +1808,7 @@ namespace Waher.IoTGateway
 
 		#region XMPP
 
-		private static void XmppClient_OnValidateSender(object Sender, ValidateSenderEventArgs e)
+		private static Task XmppClient_OnValidateSender(object Sender, ValidateSenderEventArgs e)
 		{
 			RosterItem Item;
 			string BareJid = e.FromBareJID.ToLower();
@@ -1828,11 +1828,13 @@ namespace Waher.IoTGateway
 				foreach (XmlNode N in e.Stanza.ChildNodes)
 				{
 					if (N.LocalName == "query" && N.NamespaceURI == XmppClient.NamespaceServiceDiscoveryInfo)
-						return;
+						return Task.CompletedTask;
 				}
 
 				e.Reject();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private static async void CheckConnection(object State)
@@ -1883,7 +1885,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static event EventHandler MinuteTick = null;
 
-		private static void XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		private static Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -1907,6 +1909,8 @@ namespace Waher.IoTGateway
 						xmppClient.Reconnect();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -1956,6 +1960,8 @@ namespace Waher.IoTGateway
 							Result.TrySetResult(false);
 							break;
 					}
+
+					return Task.CompletedTask;
 				};
 
 				scheduler.Add(DateTime.Now.AddSeconds(10), (P) => Result.TrySetResult(false), null);
@@ -1974,7 +1980,7 @@ namespace Waher.IoTGateway
 						PasswordHash = Client.PasswordHash;
 						PasswordHashMethod = Client.PasswordHashMethod;
 					}
-			
+
 					LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
 				}
 				else
@@ -2271,16 +2277,18 @@ namespace Waher.IoTGateway
 
 		#region Thing Registry
 
-		private static void ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
+		private static Task ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 			{
 				ownerJid = e.JID;
 				Log.Informational("Gateway has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private static void ThingRegistryClient_Disowned(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
+		private static Task ThingRegistryClient_Disowned(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 			{
@@ -2288,12 +2296,16 @@ namespace Waher.IoTGateway
 				ownerJid = string.Empty;
 				Task.Run(Register);
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private static void ThingRegistryClient_Removed(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
+		private static Task ThingRegistryClient_Removed(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 				Log.Informational("Gateway has been removed from the public registry.", ownerJid);
+
+			return Task.CompletedTask;
 		}
 
 		private static async Task Register()
@@ -2314,7 +2326,7 @@ namespace Waher.IoTGateway
 			if (GetMetaData != null)
 				MetaData = await GetMetaData(MetaData);
 
-			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			thingRegistryClient.RegisterThing(MetaData, async (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{
@@ -2325,7 +2337,9 @@ namespace Waher.IoTGateway
 					else
 						ownerJid = string.Empty;
 
-					RegistrationSuccessful?.Invoke(MetaData, e2);
+					RegistrationEventHandler h = RegistrationSuccessful;
+					if (!(h is null))
+						await h(MetaData, e2);
 				}
 			}, null);
 		}
@@ -2882,9 +2896,11 @@ namespace Waher.IoTGateway
 
 		#region Notifications
 
-		private static void MailClient_MailReceived(object Sender, MailEventArgs e)
+		private static async Task MailClient_MailReceived(object Sender, MailEventArgs e)
 		{
-			MailReceived?.Invoke(Sender, e);
+			MailEventHandler h = MailReceived;
+			if (!(h is null))
+				await h(Sender, e);
 		}
 
 		/// <summary>

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -28,9 +24,9 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 	public class TextAttribute : Attribute
 	{
-		private TextPosition position;
-		private int stringId;
-		private string label;
+		private readonly TextPosition position;
+		private readonly int stringId;
+		private readonly string label;
 
 		/// <summary>
 		/// Shows a text segment associated with the parameter.

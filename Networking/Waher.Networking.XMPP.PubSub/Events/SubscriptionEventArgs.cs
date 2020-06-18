@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.PubSub
@@ -10,17 +9,17 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SubscriptionEventHandler(object Sender, SubscriptionEventArgs e);
+	public delegate Task SubscriptionEventHandler(object Sender, SubscriptionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node subscription callback events.
 	/// </summary>
     public class SubscriptionEventArgs : SubscriptionOptionsEventArgs
 	{
-		private OptionsAvailability availability;
-		private DateTime expires;
-		private string subscriptionId;
-		private NodeSubscriptionStatus status;
+		private readonly OptionsAvailability availability;
+		private readonly DateTime expires;
+		private readonly string subscriptionId;
+		private readonly NodeSubscriptionStatus status;
 
 		/// <summary>
 		/// Event arguments for node subscription callback events.

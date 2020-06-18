@@ -9,8 +9,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	internal class PendingRequest
 	{
-		private readonly IqResultEventHandler iqCallback;
-		private readonly PresenceEventHandler presenceCallback;
+		private readonly IqResultEventHandlerAsync iqCallback;
+		private readonly PresenceEventHandlerAsync presenceCallback;
 		private DateTime timeout;
 		private readonly string to;
 		private string xml;
@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP
 		private readonly uint seqNr;
 		private readonly bool dropOff;
 
-		internal PendingRequest(uint SeqNr, IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, 
+		internal PendingRequest(uint SeqNr, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, 
 			string To)
 		{
 			this.seqNr = SeqNr;
@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP
 			this.timeout = DateTime.Now.AddMilliseconds(RetryTimeout);
 		}
 
-		internal PendingRequest(uint SeqNr, PresenceEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout,
+		internal PendingRequest(uint SeqNr, PresenceEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout,
 			string To)
 		{
 			this.seqNr = SeqNr;
@@ -75,12 +75,12 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Callback method (for IQ stanzas) to call when a result or error is returned.
 		/// </summary>
-		public IqResultEventHandler IqCallback { get { return this.iqCallback; } }
+		public IqResultEventHandlerAsync IqCallback { get { return this.iqCallback; } }
 
 		/// <summary>
 		/// Callback method (for Presence stanzas) to call when a result or error is returned.
 		/// </summary>
-		public PresenceEventHandler PresenceCallback { get { return this.presenceCallback; } }
+		public PresenceEventHandlerAsync PresenceCallback { get { return this.presenceCallback; } }
 
 		/// <summary>
 		/// State object passed in the original request.

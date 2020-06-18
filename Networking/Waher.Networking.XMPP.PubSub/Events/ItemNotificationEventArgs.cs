@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.XMPP.PubSub
@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void ItemNotificationEventHandler(object Sender, ItemNotificationEventArgs e);
+	public delegate Task ItemNotificationEventHandler(object Sender, ItemNotificationEventArgs e);
 
 	/// <summary>
 	/// Event argument for item notification events.

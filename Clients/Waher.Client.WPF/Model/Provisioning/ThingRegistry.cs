@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
@@ -20,6 +19,7 @@ using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Client.WPF.Model.Provisioning
 {
@@ -49,20 +49,25 @@ namespace Waher.Client.WPF.Model.Provisioning
 				this.provisioningClient.CanReadQuestion += this.ProvisioningClient_CanReadQuestion;
 				this.provisioningClient.CanControlQuestion += this.ProvisioningClient_CanControlQuestion;
 
-				foreach (MessageEventArgs Message in Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
-				{
-					try
-					{
-						this.ProvisioningClient_IsFriendQuestion(this, new IsFriendEventArgs(this.provisioningClient, Message));
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+				this.ProcessUnhandled();
 			}
 			else
 				this.provisioningClient = null;
+		}
+
+		private async void ProcessUnhandled()
+		{
+			foreach (MessageEventArgs Message in Account.GetUnhandledMessages("isFriend", ProvisioningClient.NamespaceProvisioningOwner))
+			{
+				try
+				{
+					await this.ProvisioningClient_IsFriendQuestion(this, new IsFriendEventArgs(this.provisioningClient, Message));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 		public bool SupportsProvisioning
@@ -80,127 +85,100 @@ namespace Waher.Client.WPF.Model.Provisioning
 			get { return this.provisioningClient; }
 		}
 
-		private async void ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
+		private async Task ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
 		{
-			try
-			{
-				IsFriendQuestion Question = await Database.FindFirstDeleteRest<IsFriendQuestion>(new FilterAnd(
-					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+			IsFriendQuestion Question = await Database.FindFirstDeleteRest<IsFriendQuestion>(new FilterAnd(
+				new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question is null)
+			if (Question is null)
+			{
+				Question = new IsFriendQuestion()
 				{
-					Question = new IsFriendQuestion()
-					{
-						Created = DateTime.Now,
-						Key = e.Key,
-						JID = e.JID,
-						RemoteJID = e.RemoteJID,
-						OwnerJID = XmppClient.GetBareJID(e.To),
-						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress
-					};
+					Created = DateTime.Now,
+					Key = e.Key,
+					JID = e.JID,
+					RemoteJID = e.RemoteJID,
+					OwnerJID = XmppClient.GetBareJID(e.To),
+					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress
+				};
 
-					await Database.Insert(Question);
+				await Database.Insert(Question);
 
-					MainWindow.UpdateGui(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				MainWindow.UpdateGui(() =>
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 			}
 		}
 
-		private async void ProvisioningClient_CanReadQuestion(object Sender, CanReadEventArgs e)
+		private async Task ProvisioningClient_CanReadQuestion(object Sender, CanReadEventArgs e)
 		{
-			try
-			{
-				CanReadQuestion Question = await Database.FindFirstDeleteRest<CanReadQuestion>(new FilterAnd(
-					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+			CanReadQuestion Question = await Database.FindFirstDeleteRest<CanReadQuestion>(new FilterAnd(
+				new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question is null)
+			if (Question is null)
+			{
+				Question = new CanReadQuestion()
 				{
-					Question = new CanReadQuestion()
-					{
-						Created = DateTime.Now,
-						Key = e.Key,
-						JID = e.JID,
-						RemoteJID = e.RemoteJID,
-						OwnerJID = XmppClient.GetBareJID(e.To),
-						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
-						ServiceTokens = e.ServiceTokens,
-						DeviceTokens = e.DeviceTokens,
-						UserTokens = e.UserTokens,
-						FieldNames = e.Fields,
-						Categories = e.FieldTypes,
-						NodeId = e.NodeId,
-						SourceId = e.SourceId,
-						Partition = e.Partition
-					};
+					Created = DateTime.Now,
+					Key = e.Key,
+					JID = e.JID,
+					RemoteJID = e.RemoteJID,
+					OwnerJID = XmppClient.GetBareJID(e.To),
+					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					ServiceTokens = e.ServiceTokens,
+					DeviceTokens = e.DeviceTokens,
+					UserTokens = e.UserTokens,
+					FieldNames = e.Fields,
+					Categories = e.FieldTypes,
+					NodeId = e.NodeId,
+					SourceId = e.SourceId,
+					Partition = e.Partition
+				};
 
-					await Database.Insert(Question);
+				await Database.Insert(Question);
 
-					MainWindow.UpdateGui(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				MainWindow.UpdateGui(() =>
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 			}
 		}
 
-		private async void ProvisioningClient_CanControlQuestion(object Sender, CanControlEventArgs e)
+		private async Task ProvisioningClient_CanControlQuestion(object Sender, CanControlEventArgs e)
 		{
-			try
-			{
-				CanControlQuestion Question = await Database.FindFirstDeleteRest<CanControlQuestion>(new FilterAnd(
-					new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
+			CanControlQuestion Question = await Database.FindFirstDeleteRest<CanControlQuestion>(new FilterAnd(
+				new FilterFieldEqualTo("Key", e.Key), new FilterFieldEqualTo("JID", e.JID)));
 
-				if (Question is null)
+			if (Question is null)
+			{
+				Question = new CanControlQuestion()
 				{
-					Question = new CanControlQuestion()
-					{
-						Created = DateTime.Now,
-						Key = e.Key,
-						JID = e.JID,
-						RemoteJID = e.RemoteJID,
-						OwnerJID = XmppClient.GetBareJID(e.To),
-						ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
-						ServiceTokens = e.ServiceTokens,
-						DeviceTokens = e.DeviceTokens,
-						UserTokens = e.UserTokens,
-						ParameterNames = e.Parameters,
-						NodeId = e.NodeId,
-						SourceId = e.SourceId,
-						Partition = e.Partition
-					};
+					Created = DateTime.Now,
+					Key = e.Key,
+					JID = e.JID,
+					RemoteJID = e.RemoteJID,
+					OwnerJID = XmppClient.GetBareJID(e.To),
+					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					ServiceTokens = e.ServiceTokens,
+					DeviceTokens = e.DeviceTokens,
+					UserTokens = e.UserTokens,
+					ParameterNames = e.Parameters,
+					NodeId = e.NodeId,
+					SourceId = e.SourceId,
+					Partition = e.Partition
+				};
 
-					await Database.Insert(Question);
+				await Database.Insert(Question);
 
-					MainWindow.UpdateGui(() =>
-						MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				MainWindow.UpdateGui(() =>
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
 			}
 		}
 
 		public override void Dispose()
 		{
-			if (this.registryClient != null)
-			{
-				this.registryClient.Dispose();
-				this.registryClient = null;
-			}
+			this.registryClient?.Dispose();
+			this.registryClient = null;
 
-			if (this.provisioningClient != null)
-			{
-				this.provisioningClient.Dispose();
-				this.provisioningClient = null;
-			}
+			this.provisioningClient?.Dispose();
+			this.provisioningClient = null;
 
 			base.Dispose();
 		}
@@ -314,6 +292,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				this.registryClient.Search(0, 100, Operators.ToArray(), (sender, e) =>
 				{
 					this.ShowResult(e);
+					return Task.CompletedTask;
 				}, null);
 			}
 		}
@@ -482,6 +461,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 					else
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to claim device." : e.ErrorText);
 
+					return Task.CompletedTask;
+
 				}, null);
 			}
 		}
@@ -531,6 +512,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			this.provisioningClient.GetDevices(0, 100, (sender2, e2) =>
 			{
 				this.ShowResult(e2);
+				return Task.CompletedTask;
 			}, null);
 		}
 
@@ -542,6 +524,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 					MainWindow.SuccessBox("The rule caches in your connected devices have been cleared.");
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear rule caches in your connected devices." : e2.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -662,6 +647,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText);
 
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -676,6 +663,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 					MainWindow.SuccessBox("The rules in " + Contact.BareJID + " have been deleted.");
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}
@@ -692,6 +681,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText);
 
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -707,6 +698,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText);
 
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -721,6 +714,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 					MainWindow.SuccessBox(Node.Header + " has been disowned.");
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText);
+			
+				return Task.CompletedTask;
+			
 			}, null);
 		}
 

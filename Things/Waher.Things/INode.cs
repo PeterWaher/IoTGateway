@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Things;
 using Waher.Runtime.Language;
 using Waher.Things.DisplayableParameters;
 

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Xml;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
-using Waher.Things.SourceEvents;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -55,6 +52,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							this.capabilities = Capabilities;
 						}
+
+						return Task.CompletedTask;
 					}, null);
 				}
 			}
@@ -120,6 +119,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 							this.OnUpdated();
 							this.NodesAdded(Children.Values, this);
 						}
+
+						return Task.CompletedTask;
 					}, null);
 				}
 			}
@@ -200,17 +201,17 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
-		internal void ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
+		internal Task ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
 		{
 			DataSource Source;
 
-			lock(this.dataSources)
+			lock (this.dataSources)
 			{
 				if (!this.dataSources.TryGetValue(EventMessage.Event.SourceId, out Source))
-					return;
+					return Task.CompletedTask;
 			}
 
-			Source.ConcentratorClient_OnEvent(Sender, EventMessage);
+			return Source.ConcentratorClient_OnEvent(Sender, EventMessage);
 		}
 
 	}

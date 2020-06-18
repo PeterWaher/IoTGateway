@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Represets a response of an HTTP client request.
 	/// </summary>
-	public class HttpResponse : TextWriter
+	public class HttpResponse : IDisposable
 	{
 		private const int DefaultChunkSize = 32768;
 
@@ -48,7 +48,6 @@ namespace Waher.Networking.HTTP
 		/// Represets a response of an HTTP client request.
 		/// </summary>
 		public HttpResponse()
-			: base()
 		{
 			this.responseStream = null;
 			this.clientConnection = null;
@@ -63,7 +62,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpServer">HTTP Server serving the request.</param>
 		/// <param name="Request">Request being served.</param>
 		public HttpResponse(TransferEncoding TransferEncoding, HttpServer HttpServer, HttpRequest Request)
-			: base()
 		{
 			this.responseStream = null;
 			this.clientConnection = null;
@@ -86,7 +84,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpServer">HTTP Server serving the request.</param>
 		/// <param name="Request">Request being served.</param>
 		internal HttpResponse(IBinaryTransmission ResponseStream, HttpClientConnection ClientConnection, HttpServer HttpServer, HttpRequest Request)
-			: base()
 		{
 			this.responseStream = ResponseStream;
 			this.clientConnection = ClientConnection;
@@ -399,7 +396,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Gets the System.Text.Encoding in which the output is written.
 		/// </summary>
-		public override Encoding Encoding
+		public Encoding Encoding
 		{
 			get { return this.encoding; }
 		}
@@ -416,9 +413,8 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Releases the unmanaged resources used by the System.IO.StreamWriter and optionally releases the managed resources.
 		/// </summary>
-		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
-		protected override void Dispose(bool disposing)
+		public void Dispose()
 		{
 			this.disposed = true;
 
@@ -448,10 +444,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.ObjectDisposedException">The current writer is closed.</exception>
 		/// <exception cref="System.IO.IOException">An I/O error has occurred.</exception>
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
-		public override void Flush()
+		public Task Flush()
 		{
-			this.transferEncoding?.FlushAsync();
-			base.Flush();
+			return this.transferEncoding?.FlushAsync() ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -460,10 +455,10 @@ namespace Waher.Networking.HTTP
 		/// <returns>A task that represents the asynchronous flush operation.</returns>
 		/// <exception cref="System.ObjectDisposedException">The text writer is disposed.</exception>
 		/// <exception cref="System.InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
-		public override async Task FlushAsync()
+		[Obsolete("Use Flush() method instead.")]
+		public Task FlushAsync()
 		{
-			await this.transferEncoding?.FlushAsync();
-			await base.FlushAsync();
+			return Flush();
 		}
 
 		/// <summary>
@@ -502,7 +497,7 @@ namespace Waher.Networking.HTTP
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
 		/// resources need to call this method explicitly.
 		/// </summary>
-		public void SendResponse()
+		public async Task SendResponse()
 		{
 			if (!this.responseSent)
 			{
@@ -514,7 +509,7 @@ namespace Waher.Networking.HTTP
 				if (this.transferEncoding is null)
 					this.StartSendResponse(false);
 				else
-					this.transferEncoding.ContentSentAsync();
+					await this.transferEncoding.ContentSentAsync();
 
 				EventHandler h = this.OnResponseSent;
 				if (!(h is null))
@@ -535,7 +530,7 @@ namespace Waher.Networking.HTTP
 		/// Sends an error response back to the client.
 		/// </summary>
 		/// <param name="ex">Exception</param>
-		public void SendResponse(Exception ex)
+		public async Task SendResponse(Exception ex)
 		{
 			if (this.HeaderSent)
 				Log.Critical(ex);
@@ -639,9 +634,9 @@ namespace Waher.Networking.HTTP
 					//this.SetHeader("Connection", "close");
 
 					if (!(Content is null))
-						this.Write(Content);
+						await this.Write(Content);
 
-					this.SendResponse();
+					await this.SendResponse();
 				}
 				catch (Exception)
 				{
@@ -775,14 +770,14 @@ namespace Waher.Networking.HTTP
 		/// to the client.
 		/// </summary>
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
-		public void Return(object Object)
+		public Task Return(object Object)
 		{
 			if (this.TryEncode(Object, out byte[] Data, out string ContentType))
 			{
 				this.ContentType = ContentType;
 				this.ContentLength = Data.Length;
 
-				this.Write(Data);
+				Task _ = this.Write(Data);
 			}
 			else
 			{
@@ -790,20 +785,20 @@ namespace Waher.Networking.HTTP
 				this.statusMessage = "Not Acceptable";
 			}
 
-			this.SendResponse();
+			return this.SendResponse();
 		}
 
 		/// <summary>
 		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
 		/// that returns a response to the client.
 		/// </summary>
-		public void Return(string ContentType, byte[] Data)
+		public async Task Return(string ContentType, byte[] Data)
 		{
 			this.ContentType = ContentType;
 			this.ContentLength = Data.Length;
 
-			this.Write(Data);
-			this.SendResponse();
+			await this.Write(Data);
+			await this.SendResponse();
 		}
 
 		private bool TryEncode(object Object, out byte[] Data, out string ContentType)
@@ -871,14 +866,14 @@ namespace Waher.Networking.HTTP
 		/// Returns binary data in the response.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
-		public void Write(byte[] Data)
+		public async Task Write(byte[] Data)
 		{
 			DateTime TP;
 
 			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
-			this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
+			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
 			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
@@ -910,14 +905,14 @@ namespace Waher.Networking.HTTP
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset into <paramref name="Data"/>.</param>
 		/// <param name="Count">Number of bytes to return.</param>
-		public void Write(byte[] Data, int Offset, int Count)
+		public async Task Write(byte[] Data, int Offset, int Count)
 		{
 			DateTime TP;
 
 			if (this.transferEncoding is null)
 				this.StartSendResponse(true);
 
-			this.transferEncoding.EncodeAsync(Data, Offset, Count);
+			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
 
 			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
@@ -936,9 +931,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
-		public override void Write(char value)
+		public Task Write(char value)
 		{
-			this.Write(this.encoding.GetBytes(new char[] { value }));
+			return this.Write(this.encoding.GetBytes(new char[] { value }));
 		}
 
 		/// <summary>
@@ -951,9 +946,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
-		public override void Write(char[] buffer)
+		public Task Write(char[] buffer)
 		{
-			this.Write(this.encoding.GetBytes(buffer));
+			return this.Write(this.encoding.GetBytes(buffer));
 		}
 
 		/// <summary>
@@ -966,9 +961,9 @@ namespace Waher.Networking.HTTP
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
 		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
-		public override void Write(string value)
+		public Task Write(string value)
 		{
-			this.Write(this.encoding.GetBytes(value));
+			return this.Write(this.encoding.GetBytes(value));
 		}
 
 		/// <summary>
@@ -986,9 +981,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.NotSupportedException">System.IO.StreamWriter.AutoFlush is true or the System.IO.StreamWriter buffer
 		/// is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the System.IO.StreamWriter 
 		/// is at the end the stream.</exception>
-		public override void Write(char[] buffer, int index, int count)
+		public Task Write(char[] buffer, int index, int count)
 		{
-			this.Write(this.encoding.GetBytes(buffer, index, count));
+			return this.Write(this.encoding.GetBytes(buffer, index, count));
 		}
 
 		/// <summary>
@@ -1020,5 +1015,416 @@ namespace Waher.Networking.HTTP
 		/// Event raised when the response has been sent.
 		/// </summary>
 		public EventHandler OnResponseSent = null;
+
+		#region TextWriter analogies
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(ulong value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(uint value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a formatted string to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg">Arguments</param>
+		public Task Write(string format, params object[] arg)
+		{
+			return this.Write(string.Format(format, arg));
+		}
+
+		/// <summary>
+		/// Writes a formatted string to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		public Task Write(string format, object arg0)
+		{
+			return this.Write(string.Format(format, arg0));
+		}
+
+		/// <summary>
+		/// Writes a formatted string to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		/// <param name="arg1">Second argument</param>
+		public Task Write(string format, object arg0, object arg1)
+		{
+			return this.Write(string.Format(format, arg0, arg1));
+		}
+
+		/// <summary>
+		/// Writes a formatted string to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		/// <param name="arg1">Second argument</param>
+		/// <param name="arg2">Third argument</param>
+		public Task Write(string format, object arg0, object arg1, object arg2)
+		{
+			return this.Write(string.Format(format, arg0, arg1, arg2));
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(float value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(long value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(int value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(double value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(decimal value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(bool value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Task Write(object value)
+		{
+			return this.Write(value.ToString());
+		}
+
+		/// <summary>
+		/// Writes a value to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		[Obsolete("Use Write() instead.")]
+		public Task WriteAsync(string value)
+		{
+			return this.Write(value);
+		}
+
+		/// <summary>
+		/// Writes characters to the stream.
+		/// </summary>
+		/// <param name="buffer">Character buffer</param>
+		/// <param name="index">Index to first character</param>
+		/// <param name="count">Number of characters to output</param>
+		/// <returns></returns>
+		[Obsolete("Use Write() instead.")]
+		public Task WriteAsync(char[] buffer, int index, int count)
+		{
+			return this.Write(buffer, index, count);
+		}
+
+		/// <summary>
+		/// Writes characters to the stream.
+		/// </summary>
+		/// <param name="buffer">Character buffer</param>
+		[Obsolete("Use Write() instead.")]
+		public Task WriteAsync(char[] buffer)
+		{
+			return this.Write(buffer);
+		}
+
+		/// <summary>
+		/// Writes a character to the stream.
+		/// </summary>
+		/// <param name="value">Character</param>
+		[Obsolete("Use Write() instead.")]
+		public Task WriteAsync(char value)
+		{
+			return this.Write(value);
+		}
+
+		/// <summary>
+		/// Writes a new line character sequence (CRLF).
+		/// </summary>
+		public Task WriteLine()
+		{
+			return this.Write(CRLF);
+		}
+
+		private static readonly byte[] CRLF = new byte[] { (byte)'\r', (byte)'\n' };
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(ulong value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(uint value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a formatted string, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg">Arguments</param>
+		public async Task WriteLine(string format, params object[] arg)
+		{
+			await this.Write(format, arg);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a formatted string, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		public async Task WriteLine(string format, object arg0)
+		{
+			await this.Write(format, arg0);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a formatted string, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		/// <param name="arg1">Sceond argument</param>
+		public async Task WriteLine(string format, object arg0, object arg1)
+		{
+			await this.Write(format, arg0, arg1);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a formatted string, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="format">Format</param>
+		/// <param name="arg0">First argument</param>
+		/// <param name="arg1">Sceond argument</param>
+		/// <param name="arg2">Third argument</param>
+		public async Task WriteLine(string format, object arg0, object arg1, object arg2)
+		{
+			await this.Write(format, arg0, arg1, arg2);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(string value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(float value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(long value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(int value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(double value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(decimal value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a sequence of characters, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="buffer">Characters</param>
+		/// <param name="index">Index to the first character to write</param>
+		/// <param name="count">Number of characters to write</param>
+		public async Task WriteLine(char[] buffer, int index, int count)
+		{
+			await this.Write(buffer, index, count);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a sequence of characters, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="buffer">Characters</param>
+		public async Task WriteLine(char[] buffer)
+		{
+			await this.Write(buffer);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a character, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Character</param>
+		public async Task WriteLine(char value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(object value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public async Task WriteLine(bool value)
+		{
+			await this.Write(value);
+			await this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a new line character sequence (CRLF).
+		/// </summary>
+		[Obsolete("Use WriteLine() instead.")]
+		public Task WriteLineAsync()
+		{
+			return this.WriteLine();
+		}
+
+		/// <summary>
+		/// Writes a character, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Character</param>
+		[Obsolete("Use WriteLine() instead.")]
+		public Task WriteLineAsync(char value)
+		{
+			return this.WriteLine(value);
+		}
+
+		/// <summary>
+		/// Writes a sequence of characters, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="buffer">Characters</param>
+		[Obsolete("Use WriteLine() instead.")]
+		public Task WriteLineAsync(char[] buffer)
+		{
+			return this.WriteLine(buffer);
+		}
+
+		/// <summary>
+		/// Writes a sequence of characters, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="buffer">Characters</param>
+		/// <param name="index">Index to the first character to write</param>
+		/// <param name="count">Number of characters to write</param>
+		[Obsolete("Use WriteLine() instead.")]
+		public Task WriteLineAsync(char[] buffer, int index, int count)
+		{
+			return this.WriteLine(buffer, index, count);
+		}
+
+		/// <summary>
+		/// Writes a value, followed by a carriage return and linefeed, to the stream.
+		/// </summary>
+		/// <param name="value">Value</param>
+		[Obsolete("Use WriteLine() instead.")]
+		public Task WriteLineAsync(string value)
+		{
+			return this.WriteLine(value);
+		}
+
+		#endregion
 	}
 }

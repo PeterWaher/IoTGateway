@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -33,7 +29,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void IsFriendEventHandler(object Sender, IsFriendEventArgs e);
+	public delegate Task IsFriendEventHandler(object Sender, IsFriendEventArgs e);
 
 	/// <summary>
 	/// Event arguments for IsFriend events.
@@ -55,7 +51,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Accept(IqResultEventHandler Callback, object State)
+		public void Accept(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(true, RuleRange.Caller, Callback, State);
 		}
@@ -63,7 +59,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Rejects the friendship.
 		/// </summary>
-		public void Reject(IqResultEventHandler Callback, object State)
+		public void Reject(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(false, RuleRange.Caller, Callback, State);
 		}
@@ -73,7 +69,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void AcceptForEntireDomain(IqResultEventHandler Callback, object State)
+		public void AcceptForEntireDomain(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(true, RuleRange.Domain, Callback, State);
 		}
@@ -81,7 +77,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Rejects the friendship, and similar future requests from the entire remote domain.
 		/// </summary>
-		public void RejectForEntireDomain(IqResultEventHandler Callback, object State)
+		public void RejectForEntireDomain(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(false, RuleRange.Domain, Callback, State);
 		}
@@ -91,7 +87,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void AcceptForAll(IqResultEventHandler Callback, object State)
+		public void AcceptForAll(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(true, RuleRange.All, Callback, State);
 		}
@@ -99,12 +95,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Rejects the friendship, and all future requests.
 		/// </summary>
-		public void RejectForAll(IqResultEventHandler Callback, object State)
+		public void RejectForAll(IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Respond(false, RuleRange.All, Callback, State);
 		}
 
-		private void Respond(bool IsFriend, RuleRange Range, IqResultEventHandler Callback, object State)
+		private void Respond(bool IsFriend, RuleRange Range, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, IsFriend, Range, Callback, State);
 		}

@@ -80,7 +80,7 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
 		public override Task<bool> SetupConfiguration(HttpServer WebServer)
 		{
-			this.simplified = WebServer.Register("/Settings/Simplified", null, this.Simplified, false, false, true);
+			this.simplified = WebServer.Register("/Settings/Simplified", null, this.Simplified, true, false, true);
 
 			return base.SetupConfiguration(WebServer);
 		}
@@ -96,23 +96,16 @@ namespace Waher.IoTGateway.Setup
 			return base.CleanupAfterConfiguration(WebServer);
 		}
 
-		private async void Simplified(HttpRequest Request, HttpResponse Response)
+		private async Task Simplified(HttpRequest Request, HttpResponse Response)
 		{
-			try
-			{
-				Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request);
 
-				await Gateway.SimplifiedConfiguration();
+			await Gateway.SimplifiedConfiguration();
 
-				Response.StatusCode = 200;
-				await this.MakeCompleted();
+			Response.StatusCode = 200;
+			await this.MakeCompleted();
 
-				Response.SendResponse();
-			}
-			catch (Exception ex)
-			{
-				Response.SendResponse(ex);
-			}
+			await Response.SendResponse();
 		}
 
 	}

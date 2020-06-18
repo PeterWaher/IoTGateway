@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.symmetricCipher = SymmetricCipher;
 		}
 
-		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override async Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
@@ -52,7 +52,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					try
 					{
-						this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state));
+						await this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state));
 					}
 					catch (Exception)
 					{
@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								{
 									try
 									{
-										this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state));
+										await this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state));
 									}
 									catch (Exception)
 									{
@@ -127,14 +127,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		internal override void Fail(string Message)
+		internal override async Task Fail(string Message)
 		{
 			if (this.response is null)
 				return;
 
 			try
 			{
-				this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state));
+				await this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state));
 			}
 			catch (Exception)
 			{
@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			if (!this.response.HeaderSent)
-				this.response.SendResponse(new InternalServerErrorException(Message));
+				await this.response.SendResponse(new InternalServerErrorException(Message));
 
 			this.client.CancelTransfer(this.e.From, this.streamId);
 

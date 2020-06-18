@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -15,7 +15,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		void OPTIONS(HttpRequest Request, HttpResponse Response);
+		Task OPTIONS(HttpRequest Request, HttpResponse Response);
 
 		/// <summary>
 		/// If the OPTIONS method is allowed.

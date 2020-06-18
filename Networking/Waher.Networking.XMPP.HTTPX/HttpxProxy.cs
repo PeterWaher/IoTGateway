@@ -172,7 +172,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private async void Request(string Method, HttpRequest Request, HttpResponse Response)
+		private async Task Request(string Method, HttpRequest Request, HttpResponse Response)
 		{
 			try
 			{
@@ -212,7 +212,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							}
 						}
 
-						HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
+						await HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
 							CachedResource.LastModified.UtcDateTime, Response, Request);
 
 						return;
@@ -258,7 +258,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (Exception ex)
 			{
-				Response.SendResponse(ex);
+				await Response.SendResponse(ex);
 			}
 		}
 
@@ -371,7 +371,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			catch (Exception ex)
 			{
-				Rec.response.SendResponse(ex);
+				Task _ = Rec.response.SendResponse(ex);
 			}
 		}
 
@@ -442,7 +442,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.RequestResponse, this.ResponseData, State);
 		}
 
-		private void RequestResponse(object Sender, HttpxResponseEventArgs e)
+		private async Task RequestResponse(object Sender, HttpxResponseEventArgs e)
 		{
 			ReadoutState State2 = (ReadoutState)e.State;
 
@@ -501,7 +501,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			if (!e.HasData)
-				State2.Response.SendResponse();
+				await State2.Response.SendResponse();
 			else
 			{
 				if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
@@ -511,22 +511,22 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 
 				if (e.Data != null)
-					this.BinaryDataReceived(State2, true, e.Data);
+					await this.BinaryDataReceived(State2, true, e.Data);
 			}
 		}
 
-		private void ResponseData(object Sender, HttpxResponseDataEventArgs e)
+		private Task ResponseData(object Sender, HttpxResponseDataEventArgs e)
 		{
 			ReadoutState State2 = (ReadoutState)e.State;
 
-			this.BinaryDataReceived(State2, e.Last, e.Data);
+			return this.BinaryDataReceived(State2, e.Last, e.Data);
 		}
 
-		private void BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
+		private async Task BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
 		{
 			try
 			{
-				State2.Response.Write(Data);
+				await State2.Response.Write(Data);
 			}
 			catch (Exception)
 			{
@@ -539,7 +539,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (Last)
 			{
-				State2.Response.SendResponse();
+				await State2.Response.SendResponse();
 				this.AddToCacheAsync(State2);
 			}
 		}
@@ -657,9 +657,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("GET", Request, Response);
+			return this.Request("GET", Request, Response);
 		}
 
 		/// <summary>
@@ -669,9 +669,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="FirstInterval">First byte range interval.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
+		public Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			this.Request("GET", Request, Response);
+			return this.Request("GET", Request, Response);
 		}
 
 		/// <summary>
@@ -688,9 +688,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void OPTIONS(HttpRequest Request, HttpResponse Response)
+		public Task OPTIONS(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("OPTIONS", Request, Response);
+			return this.Request("OPTIONS", Request, Response);
 		}
 
 		/// <summary>
@@ -707,9 +707,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("POST", Request, Response);
+			return this.Request("POST", Request, Response);
 		}
 
 		/// <summary>
@@ -719,9 +719,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		public Task POST(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			this.Request("POST", Request, Response);
+			return this.Request("POST", Request, Response);
 		}
 
 		/// <summary>
@@ -738,9 +738,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void PUT(HttpRequest Request, HttpResponse Response)
+		public Task PUT(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("PUT", Request, Response);
+			return this.Request("PUT", Request, Response);
 		}
 
 		/// <summary>
@@ -750,9 +750,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
+		public Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			this.Request("PUT", Request, Response);
+			return this.Request("PUT", Request, Response);
 		}
 
 		/// <summary>
@@ -769,9 +769,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void TRACE(HttpRequest Request, HttpResponse Response)
+		public Task TRACE(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("TRACE", Request, Response);
+			return this.Request("TRACE", Request, Response);
 		}
 
 		/// <summary>
@@ -788,9 +788,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void DELETE(HttpRequest Request, HttpResponse Response)
+		public Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			this.Request("DELETE", Request, Response);
+			return this.Request("DELETE", Request, Response);
 		}
 	}
 }

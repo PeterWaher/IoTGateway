@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// </summary>
 		public override string[] Extensions => new string[] { };
 
-		private void MailHandler(object Sender, MessageEventArgs e)
+		private async Task MailHandler(object Sender, MessageEventArgs e)
 		{
 			string ContentType = XML.Attribute(e.Content, "contentType");
 			string MessageId = XML.Attribute(e.Content, "id");
@@ -165,15 +165,19 @@ namespace Waher.Networking.XMPP.Mail
 				}
 			}
 
-			try
+			MailEventHandler h = this.MailReceived;
+			if (!(h is null))
 			{
-				this.MailReceived?.Invoke(this, new MailEventArgs(this, e, ContentType, MessageId, (Mail.Priority)Priority,
-					Date, FromMail, FromHeader, Sender2, Size, MailObjectId, Headers.ToArray(), Attachments?.ToArray(),
-					Inline?.ToArray(), PlainText, Html, Markdown));
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				try
+				{
+					await h(this, new MailEventArgs(this, e, ContentType, MessageId, (Mail.Priority)Priority,
+						Date, FromMail, FromHeader, Sender2, Size, MailObjectId, Headers.ToArray(), Attachments?.ToArray(),
+						Inline?.ToArray(), PlainText, Html, Markdown));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -217,7 +221,7 @@ namespace Waher.Networking.XMPP.Mail
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(this.client.Domain, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(this.client.Domain, Xml.ToString(), async (sender, e) =>
 				{
 					XmlElement E;
 					string ResponseContentType = null;
@@ -238,15 +242,17 @@ namespace Waher.Networking.XMPP.Mail
 					else
 						e.Ok = false;
 
-					try
+					if (!(Callback is null))
 					{
-						Callback?.Invoke(this, new MessageObjectEventArgs(e, ResponseContentType, Data));
+						try
+						{
+							await Callback(this, new MessageObjectEventArgs(e, ResponseContentType, Data));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-
 				}, State);
 		}
 
@@ -274,6 +280,9 @@ namespace Waher.Networking.XMPP.Mail
 					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));
 				else
 					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get message object." : e.ErrorText));
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;
@@ -285,7 +294,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ObjectId">ID of the message object to delete.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Delete(string ObjectId, IqResultEventHandler Callback, object State)
+		public void Delete(string ObjectId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.client.SendIqSet(this.client.Domain, "<delete xmlns='" + NamespaceMail + "' cid='" + XML.Encode(ObjectId) + "'/>",
 				Callback, State);
@@ -305,6 +314,9 @@ namespace Waher.Networking.XMPP.Mail
 					Result.TrySetResult(true);
 				else
 					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to delete message object." : e.ErrorText));
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Result.Task;

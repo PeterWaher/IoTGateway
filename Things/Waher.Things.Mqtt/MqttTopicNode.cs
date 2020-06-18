@@ -115,12 +115,12 @@ namespace Waher.Things.Mqtt
 			return await base.RemoveAsync(Child);
 		}
 
-		public ControlParameter[] GetControlParameters()
+		public Task<ControlParameter[]> GetControlParameters()
 		{
-			return this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0];
+			return Task.FromResult<ControlParameter[]>(this.GetTopic()?.Result?.GetControlParameters() ?? new ControlParameter[0]);
 		}
 
-		public async void StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -129,7 +129,7 @@ namespace Waher.Things.Mqtt
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 	}

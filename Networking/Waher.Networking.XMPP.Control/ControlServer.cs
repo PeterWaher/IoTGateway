@@ -32,9 +32,9 @@ namespace Waher.Networking.XMPP.Control
 	/// </summary>
 	public class ControlServer : XmppExtension
 	{
+		private readonly Dictionary<string, ControlParameter> controlParametersByName = new Dictionary<string, ControlParameter>();
+		private readonly ProvisioningClient provisioningClient;
 		private ControlParameter[] controlParameters;
-		private Dictionary<string, ControlParameter> controlParametersByName = new Dictionary<string, ControlParameter>();
-		private ProvisioningClient provisioningClient;
 
 		/// <summary>
 		/// Implements an XMPP control server interface.
@@ -184,454 +184,447 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		public event GetThingReferenceMethod OnGetNode = null;
 
-		private async void SetHandler(object Sender, IqEventArgs e)
+		private async Task SetHandler(object Sender, IqEventArgs e)
 		{
-			try
+			string ServiceToken = XML.Attribute(e.Query, "st");
+			string DeviceToken = XML.Attribute(e.Query, "dt");
+			string UserToken = XML.Attribute(e.Query, "ut");
+
+			LinkedList<IThingReference> Nodes = null;
+			SortedDictionary<string, bool> ParameterNames = this.provisioningClient is null ? null : new SortedDictionary<string, bool>();
+			LinkedList<ControlOperation> Operations = new LinkedList<ControlOperation>();
+			ControlParameter Parameter;
+			DataForm Form = null;
+			XmlElement E;
+			string Name;
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				string ServiceToken = XML.Attribute(e.Query, "st");
-				string DeviceToken = XML.Attribute(e.Query, "dt");
-				string UserToken = XML.Attribute(e.Query, "ut");
+				E = N as XmlElement;
+				if (E is null)
+					continue;
 
-				LinkedList<IThingReference> Nodes = null;
-				SortedDictionary<string, bool> ParameterNames = this.provisioningClient is null ? null : new SortedDictionary<string, bool>();
-				LinkedList<ControlOperation> Operations = new LinkedList<ControlOperation>();
-				ControlParameter Parameter;
-				DataForm Form = null;
-				XmlElement E;
-				string Name;
-
-				foreach (XmlNode N in e.Query.ChildNodes)
+				switch (E.LocalName)
 				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
+					case "nd":
+						if (Nodes is null)
+							Nodes = new LinkedList<IThingReference>();
 
-					switch (E.LocalName)
-					{
-						case "nd":
-							if (Nodes is null)
-								Nodes = new LinkedList<IThingReference>();
+						string NodeId = XML.Attribute(E, "id");
+						string SourceId = XML.Attribute(E, "src");
+						string Partition = XML.Attribute(E, "pt");
 
-							string NodeId = XML.Attribute(E, "id");
-							string SourceId = XML.Attribute(E, "src");
-							string Partition = XML.Attribute(E, "pt");
+						if (this.OnGetNode is null)
+							Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
+						else
+						{
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+							if (Ref is null)
+								throw new ItemNotFoundException("Node not found.", e.IQ);
 
-							if (this.OnGetNode is null)
-								Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
-							else
+							Nodes.AddLast(Ref);
+						}
+						break;
+
+					case "b":
+					case "cl":
+					case "d":
+					case "dt":
+					case "db":
+					case "dr":
+					case "e":
+					case "i":
+					case "l":
+					case "s":
+					case "t":
+						if (ParameterNames != null)
+							ParameterNames[XML.Attribute(E, "n")] = true;
+						break;
+
+					case "x":
+						Form = new DataForm(this.client, E, null, null, e.From, e.To);
+						if (Form.Type != FormType.Submit)
+						{
+							ParameterBadRequest(e);
+							return;
+						}
+
+						if (ParameterNames != null)
+						{
+							foreach (Field Field in Form.Fields)
+								ParameterNames[Field.Var] = true;
+						}
+						break;
+
+					default:
+						ParameterBadRequest(e);
+						return;
+				}
+			}
+
+			foreach (XmlNode N in e.Query.ChildNodes)
+			{
+				E = N as XmlElement;
+				if (E is null)
+					continue;
+
+				switch (E.LocalName)
+				{
+					case "b":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							BooleanControlParameter BooleanControlParameter = Parameter as BooleanControlParameter;
+							if (BooleanControlParameter is null)
 							{
-								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref is null)
-									throw new ItemNotFoundException("Node not found.", e.IQ);
-
-								Nodes.AddLast(Ref);
-							}
-							break;
-
-						case "b":
-						case "cl":
-						case "d":
-						case "dt":
-						case "db":
-						case "dr":
-						case "e":
-						case "i":
-						case "l":
-						case "s":
-						case "t":
-							if (ParameterNames != null)
-								ParameterNames[XML.Attribute(E, "n")] = true;
-							break;
-
-						case "x":
-							Form = new DataForm(this.client, E, null, null, e.From, e.To);
-							if (Form.Type != FormType.Submit)
-							{
-								ParameterBadRequest(e);
+								ParameterWrongType(Name, e);
 								return;
 							}
 
-							if (ParameterNames != null)
-							{
-								foreach (Field Field in Form.Fields)
-									ParameterNames[Field.Var] = true;
-							}
-							break;
+							Operations.AddLast(new BooleanControlOperation(Node, BooleanControlParameter, XML.Attribute(E, "v", false), e));
+						}
+						break;
 
-						default:
-							ParameterBadRequest(e);
-							return;
-					}
-				}
-
-				foreach (XmlNode N in e.Query.ChildNodes)
-				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
-
-					switch (E.LocalName)
-					{
-						case "b":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								BooleanControlParameter BooleanControlParameter = Parameter as BooleanControlParameter;
-								if (BooleanControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new BooleanControlOperation(Node, BooleanControlParameter, XML.Attribute(E, "v", false), e));
-							}
-							break;
-
-						case "cl":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								ColorControlParameter ColorControlParameter = Parameter as ColorControlParameter;
-								if (ColorControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new ColorControlOperation(Node, ColorControlParameter, XML.Attribute(E, "v"), e));
-							}
-							break;
-
-						case "d":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								DateControlParameter DateControlParameter = Parameter as DateControlParameter;
-								if (DateControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new DateControlOperation(Node, DateControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
-							}
-							break;
-
-						case "dt":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								DateTimeControlParameter DateTimeControlParameter = Parameter as DateTimeControlParameter;
-								if (DateTimeControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new DateTimeControlOperation(Node, DateTimeControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
-							}
-							break;
-
-						case "db":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								DoubleControlParameter DoubleControlParameter = Parameter as DoubleControlParameter;
-								if (DoubleControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new DoubleControlOperation(Node, DoubleControlParameter, XML.Attribute(E, "v", 0.0), e));
-							}
-							break;
-
-						case "dr":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								DurationControlParameter DurationControlParameter = Parameter as DurationControlParameter;
-								if (DurationControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new DurationControlOperation(Node, DurationControlParameter, XML.Attribute(E, "v", Duration.Zero), e));
-							}
-							break;
-
-						case "e":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								string StringValue = XML.Attribute(E, "v");
-
-								if (Parameter is EnumControlParameter EnumControlParameter)
-								{
-									Type T = Types.GetType(XML.Attribute(E, "t"));
-									if (T is null)
-									{
-										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
-										return;
-									}
-
-									if (!T.GetTypeInfo().IsEnum)
-									{
-										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
-										return;
-									}
-
-									Enum Value;
-
-									try
-									{
-										Value = (Enum)Enum.Parse(T, StringValue);
-									}
-									catch (Exception)
-									{
-										e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-											ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
-										return;
-									}
-
-									Operations.AddLast(new EnumControlOperation(Node, EnumControlParameter, Value, e));
-								}
-								else if (Parameter is StringControlParameter StringControlParameter)
-									Operations.AddLast(new StringControlOperation(Node, StringControlParameter, StringValue, e));
-								else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
-									Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, StringValue, e));
-								else
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-							}
-							break;
-
-						case "i":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								Int32ControlParameter Int32ControlParameter = Parameter as Int32ControlParameter;
-								if (Int32ControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new Int32ControlOperation(Node, Int32ControlParameter, XML.Attribute(E, "v", 0), e));
-							}
-							break;
-
-						case "l":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								Int64ControlParameter Int64ControlParameter = Parameter as Int64ControlParameter;
-								if (Int64ControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new Int64ControlOperation(Node, Int64ControlParameter, XML.Attribute(E, "v", 0L), e));
-							}
-							break;
-
-						case "s":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								if (Parameter is StringControlParameter StringControlParameter)
-									Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "v"), e));
-								else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
-									Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, XML.Attribute(E, "v"), e));
-								else
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-							}
-							break;
-
-						case "t":
-							Name = XML.Attribute(E, "n");
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameter = await this.GetParameter(Node, Name, e);
-								if (Parameter is null)
-									return;
-
-								TimeControlParameter TimeControlParameter = Parameter as TimeControlParameter;
-								if (TimeControlParameter is null)
-								{
-									ParameterWrongType(Name, e);
-									return;
-								}
-
-								Operations.AddLast(new TimeControlOperation(Node, TimeControlParameter, XML.Attribute(E, "v", TimeSpan.Zero), e));
-							}
-							break;
-
-						case "x":
-							Dictionary<string, ControlParameter> Parameters;
-
-							foreach (IThingReference Node in Nodes ?? NoNodes)
-							{
-								Parameters = await this.GetControlParametersByName(Node);
-								if (Parameters is null)
-								{
-									NotFound(e);
-									return;
-								}
-
-								foreach (Field Field in Form.Fields)
-								{
-									if (!Parameters.TryGetValue(Field.Var, out Parameter))
-									{
-										ParameterNotFound(Field.Var, e);
-										return;
-									}
-
-									Operations.AddLast(new FormControlOperation(Node, Parameter, Field.ValueString, e));
-								}
-							}
-							break;
-					}
-				}
-
-				if (this.provisioningClient != null)
-				{
-					string[] ParameterNames2 = new string[ParameterNames.Count];
-					ParameterNames.Keys.CopyTo(ParameterNames2, 0);
-
-					this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames2,
-						ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						(sender2, e2) =>
+					case "cl":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
 						{
-							if (e2.Ok && e2.CanControl)
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							ColorControlParameter ColorControlParameter = Parameter as ColorControlParameter;
+							if (ColorControlParameter is null)
 							{
-								LinkedList<ControlOperation> Operations2 = null;
-								bool Restricted;
-
-								if (e2.Nodes != null || e2.ParameterNames != null)
-								{
-									Dictionary<IThingReference, bool> AllowedNodes = null;
-									Dictionary<string, bool> AllowedParameterNames = null;
-
-									Operations2 = new LinkedList<ControlOperation>();
-									Restricted = false;
-
-									if (e2.Nodes != null)
-									{
-										AllowedNodes = new Dictionary<IThingReference, bool>();
-										foreach (IThingReference Node in e2.Nodes)
-											AllowedNodes[Node] = true;
-									}
-
-									if (e2.ParameterNames != null)
-									{
-										AllowedParameterNames = new Dictionary<string, bool>();
-										foreach (string ParameterName in e2.ParameterNames)
-											AllowedParameterNames[ParameterName] = true;
-									}
-
-									foreach (ControlOperation Operation in Operations)
-									{
-										if (AllowedNodes != null && !AllowedNodes.ContainsKey(Operation.Node ?? ThingReference.Empty))
-										{
-											Restricted = true;
-											continue;
-										}
-
-										if (AllowedParameterNames != null && !AllowedParameterNames.ContainsKey(Operation.ParameterName))
-										{
-											Restricted = true;
-											continue;
-										}
-
-										Operations2.AddLast(Operation);
-									}
-								}
-								else
-									Restricted = false;
-
-								if (Restricted)
-									this.PerformOperations(Operations2, e, e2.Nodes, e2.ParameterNames);
-								else
-									this.PerformOperations(Operations, e, null, null);
+								ParameterWrongType(Name, e);
+								return;
 							}
+
+							Operations.AddLast(new ColorControlOperation(Node, ColorControlParameter, XML.Attribute(E, "v"), e));
+						}
+						break;
+
+					case "d":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							DateControlParameter DateControlParameter = Parameter as DateControlParameter;
+							if (DateControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new DateControlOperation(Node, DateControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
+						}
+						break;
+
+					case "dt":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							DateTimeControlParameter DateTimeControlParameter = Parameter as DateTimeControlParameter;
+							if (DateTimeControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new DateTimeControlOperation(Node, DateTimeControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
+						}
+						break;
+
+					case "db":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							DoubleControlParameter DoubleControlParameter = Parameter as DoubleControlParameter;
+							if (DoubleControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new DoubleControlOperation(Node, DoubleControlParameter, XML.Attribute(E, "v", 0.0), e));
+						}
+						break;
+
+					case "dr":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							DurationControlParameter DurationControlParameter = Parameter as DurationControlParameter;
+							if (DurationControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new DurationControlOperation(Node, DurationControlParameter, XML.Attribute(E, "v", Duration.Zero), e));
+						}
+						break;
+
+					case "e":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							string StringValue = XML.Attribute(E, "v");
+
+							if (Parameter is EnumControlParameter EnumControlParameter)
+							{
+								Type T = Types.GetType(XML.Attribute(E, "t"));
+								if (T is null)
+								{
+									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
+									return;
+								}
+
+								if (!T.GetTypeInfo().IsEnum)
+								{
+									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
+									return;
+								}
+
+								Enum Value;
+
+								try
+								{
+									Value = (Enum)Enum.Parse(T, StringValue);
+								}
+								catch (Exception)
+								{
+									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+										ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
+									return;
+								}
+
+								Operations.AddLast(new EnumControlOperation(Node, EnumControlParameter, Value, e));
+							}
+							else if (Parameter is StringControlParameter StringControlParameter)
+								Operations.AddLast(new StringControlOperation(Node, StringControlParameter, StringValue, e));
+							else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
+								Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, StringValue, e));
 							else
 							{
-								e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-									"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+								ParameterWrongType(Name, e);
+								return;
+							}
+						}
+						break;
+
+					case "i":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							Int32ControlParameter Int32ControlParameter = Parameter as Int32ControlParameter;
+							if (Int32ControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
 							}
 
-						}, null);
+							Operations.AddLast(new Int32ControlOperation(Node, Int32ControlParameter, XML.Attribute(E, "v", 0), e));
+						}
+						break;
+
+					case "l":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							Int64ControlParameter Int64ControlParameter = Parameter as Int64ControlParameter;
+							if (Int64ControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new Int64ControlOperation(Node, Int64ControlParameter, XML.Attribute(E, "v", 0L), e));
+						}
+						break;
+
+					case "s":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							if (Parameter is StringControlParameter StringControlParameter)
+								Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "v"), e));
+							else if (Parameter is MultiLineTextControlParameter MultiLineTextControlParameter)
+								Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, XML.Attribute(E, "v"), e));
+							else
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+						}
+						break;
+
+					case "t":
+						Name = XML.Attribute(E, "n");
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameter = await this.GetParameter(Node, Name, e);
+							if (Parameter is null)
+								return;
+
+							TimeControlParameter TimeControlParameter = Parameter as TimeControlParameter;
+							if (TimeControlParameter is null)
+							{
+								ParameterWrongType(Name, e);
+								return;
+							}
+
+							Operations.AddLast(new TimeControlOperation(Node, TimeControlParameter, XML.Attribute(E, "v", TimeSpan.Zero), e));
+						}
+						break;
+
+					case "x":
+						Dictionary<string, ControlParameter> Parameters;
+
+						foreach (IThingReference Node in Nodes ?? NoNodes)
+						{
+							Parameters = await this.GetControlParametersByName(Node);
+							if (Parameters is null)
+							{
+								NotFound(e);
+								return;
+							}
+
+							foreach (Field Field in Form.Fields)
+							{
+								if (!Parameters.TryGetValue(Field.Var, out Parameter))
+								{
+									ParameterNotFound(Field.Var, e);
+									return;
+								}
+
+								Operations.AddLast(new FormControlOperation(Node, Parameter, Field.ValueString, e));
+							}
+						}
+						break;
 				}
-				else
-					this.PerformOperations(Operations, e, null, null);
 			}
-			catch (Exception ex)
+
+			if (this.provisioningClient != null)
 			{
-				e.IqError(ex);
+				string[] ParameterNames2 = new string[ParameterNames.Count];
+				ParameterNames.Keys.CopyTo(ParameterNames2, 0);
+
+				this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames2,
+					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					async (sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanControl)
+						{
+							LinkedList<ControlOperation> Operations2 = null;
+							bool Restricted;
+
+							if (e2.Nodes != null || e2.ParameterNames != null)
+							{
+								Dictionary<IThingReference, bool> AllowedNodes = null;
+								Dictionary<string, bool> AllowedParameterNames = null;
+
+								Operations2 = new LinkedList<ControlOperation>();
+								Restricted = false;
+
+								if (e2.Nodes != null)
+								{
+									AllowedNodes = new Dictionary<IThingReference, bool>();
+									foreach (IThingReference Node in e2.Nodes)
+										AllowedNodes[Node] = true;
+								}
+
+								if (e2.ParameterNames != null)
+								{
+									AllowedParameterNames = new Dictionary<string, bool>();
+									foreach (string ParameterName in e2.ParameterNames)
+										AllowedParameterNames[ParameterName] = true;
+								}
+
+								foreach (ControlOperation Operation in Operations)
+								{
+									if (AllowedNodes != null && !AllowedNodes.ContainsKey(Operation.Node ?? ThingReference.Empty))
+									{
+										Restricted = true;
+										continue;
+									}
+
+									if (AllowedParameterNames != null && !AllowedParameterNames.ContainsKey(Operation.ParameterName))
+									{
+										Restricted = true;
+										continue;
+									}
+
+									Operations2.AddLast(Operation);
+								}
+							}
+							else
+								Restricted = false;
+
+							if (Restricted)
+								await this.PerformOperations(Operations2, e, e2.Nodes, e2.ParameterNames);
+							else
+								await this.PerformOperations(Operations, e, null, null);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+					}, null);
 			}
+			else
+				await this.PerformOperations(Operations, e, null, null);
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
 
-		private void PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<IThingReference> Nodes,
+		private async Task PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<IThingReference> Nodes,
 			IEnumerable<string> ParameterNames)
 		{
 			foreach (ControlOperation Operation in Operations)
 			{
-				if (!Operation.Set())
+				if (!await Operation.Set())
 					break;
 			}
 
@@ -704,176 +697,169 @@ namespace Waher.Networking.XMPP.Control
 			return Parameter;
 		}
 
-		private async void GetFormHandler(object Sender, IqEventArgs e)
+		private async Task GetFormHandler(object Sender, IqEventArgs e)
 		{
-			try
+			LinkedList<IThingReference> Nodes = null;
+			XmlElement E;
+			string ServiceToken = XML.Attribute(e.Query, "st");
+			string DeviceToken = XML.Attribute(e.Query, "dt");
+			string UserToken = XML.Attribute(e.Query, "ut");
+
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				LinkedList<IThingReference> Nodes = null;
-				XmlElement E;
-				string ServiceToken = XML.Attribute(e.Query, "st");
-				string DeviceToken = XML.Attribute(e.Query, "dt");
-				string UserToken = XML.Attribute(e.Query, "ut");
+				E = N as XmlElement;
+				if (E is null)
+					continue;
 
-				foreach (XmlNode N in e.Query.ChildNodes)
+				if (E.LocalName == "nd")
 				{
-					E = N as XmlElement;
-					if (E is null)
-						continue;
+					if (Nodes is null)
+						Nodes = new LinkedList<IThingReference>();
 
-					if (E.LocalName == "nd")
+					string NodeId = XML.Attribute(E, "id");
+					string SourceId = XML.Attribute(E, "src");
+					string Partition = XML.Attribute(E, "pt");
+
+					if (this.OnGetNode is null)
+						Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
+					else
 					{
-						if (Nodes is null)
-							Nodes = new LinkedList<IThingReference>();
+						IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+						if (Ref is null)
+							throw new ItemNotFoundException("Node not found.", e.IQ);
 
-						string NodeId = XML.Attribute(E, "id");
-						string SourceId = XML.Attribute(E, "src");
-						string Partition = XML.Attribute(E, "pt");
+						Nodes.AddLast(Ref);
+					}
+				}
+			}
 
-						if (this.OnGetNode is null)
-							Nodes.AddLast(new ThingReference(NodeId, SourceId, Partition));
-						else
+			ControlParameter[] Parameters;
+
+			if (Nodes is null)
+			{
+				Parameters = await this.GetControlParameters(null);
+				if (Parameters is null)
+				{
+					NotFound(e);
+					return;
+				}
+			}
+			else
+			{
+				Dictionary<string, ControlParameter> Parameters1;
+				Dictionary<string, ControlParameter> Parameters2;
+				LinkedList<string> ToRemove = null;
+
+				Parameters = null;
+				Parameters1 = null;
+
+				foreach (IThingReference Node in Nodes)
+				{
+					if (Parameters1 is null)
+					{
+						Parameters = await this.GetControlParameters(Node);
+						if (Parameters is null)
 						{
-							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-							if (Ref is null)
-								throw new ItemNotFoundException("Node not found.", e.IQ);
+							NotFound(e);
+							return;
+						}
 
-							Nodes.AddLast(Ref);
+						Parameters1 = new Dictionary<string, ControlParameter>();
+
+						foreach (ControlParameter P in Parameters)
+							Parameters1[P.Name] = P;
+					}
+					else
+					{
+						Parameters2 = await this.GetControlParametersByName(Node);
+						if (Parameters2 is null)
+						{
+							NotFound(e);
+							return;
+						}
+
+						foreach (KeyValuePair<string, ControlParameter> P in Parameters1)
+						{
+							if (!Parameters2.TryGetValue(P.Key, out ControlParameter P2) || !P.Value.Equals(P2))
+							{
+								if (ToRemove is null)
+									ToRemove = new LinkedList<string>();
+
+								ToRemove.AddLast(P.Key);
+							}
+						}
+
+						if (ToRemove != null)
+						{
+							foreach (string Key in ToRemove)
+								Parameters1.Remove(Key);
+
+							ToRemove = null;
 						}
 					}
 				}
 
-				ControlParameter[] Parameters;
+				List<ControlParameter> Left = new List<ControlParameter>();
 
-				if (Nodes is null)
+				foreach (ControlParameter P in Parameters)
 				{
-					Parameters = await this.GetControlParameters(null);
-					if (Parameters is null)
-					{
-						NotFound(e);
-						return;
-					}
+					if (Parameters1.ContainsKey(P.Name))
+						Left.Add(P);
 				}
-				else
-				{
-					Dictionary<string, ControlParameter> Parameters1;
-					Dictionary<string, ControlParameter> Parameters2;
-					LinkedList<string> ToRemove = null;
 
-					Parameters = null;
-					Parameters1 = null;
+				Parameters = Left.ToArray();
+			}
 
-					foreach (IThingReference Node in Nodes)
+			if (this.provisioningClient != null)
+			{
+				int i, c = Parameters.Length;
+				string[] ParameterNames = new string[c];
+
+				for (i = 0; i < c; i++)
+					ParameterNames[i] = Parameters[i].Name;
+
+				this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames,
+					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					async (sender2, e2) =>
 					{
-						if (Parameters1 is null)
+						if (e2.Ok && e2.CanControl)
 						{
-							Parameters = await this.GetControlParameters(Node);
-							if (Parameters is null)
+							if (e2.ParameterNames != null)
 							{
-								NotFound(e);
-								return;
-							}
+								List<ControlParameter> Parameters2 = new List<ControlParameter>();
 
-							Parameters1 = new Dictionary<string, ControlParameter>();
-
-							foreach (ControlParameter P in Parameters)
-								Parameters1[P.Name] = P;
-						}
-						else
-						{
-							Parameters2 = await this.GetControlParametersByName(Node);
-							if (Parameters2 is null)
-							{
-								NotFound(e);
-								return;
-							}
-
-							foreach (KeyValuePair<string, ControlParameter> P in Parameters1)
-							{
-								if (!Parameters2.TryGetValue(P.Key, out ControlParameter P2) || !P.Value.Equals(P2))
+								foreach (ControlParameter P in Parameters)
 								{
-									if (ToRemove is null)
-										ToRemove = new LinkedList<string>();
+									if (Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
+										Parameters2.Add(P);
+								}
 
-									ToRemove.AddLast(P.Key);
+								Parameters = Parameters2.ToArray();
+
+								if (Parameters.Length == 0)
+								{
+									e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+										"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+									return;
 								}
 							}
 
-							if (ToRemove != null)
-							{
-								foreach (string Key in ToRemove)
-									Parameters1.Remove(Key);
-
-								ToRemove = null;
-							}
+							await this.ReturnForm(e, Parameters, Nodes);
 						}
-					}
-
-					List<ControlParameter> Left = new List<ControlParameter>();
-
-					foreach (ControlParameter P in Parameters)
-					{
-						if (Parameters1.ContainsKey(P.Name))
-							Left.Add(P);
-					}
-
-					Parameters = Left.ToArray();
-				}
-
-				if (this.provisioningClient != null)
-				{
-					int i, c = Parameters.Length;
-					string[] ParameterNames = new string[c];
-
-					for (i = 0; i < c; i++)
-						ParameterNames[i] = Parameters[i].Name;
-
-					this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames,
-						ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						(sender2, e2) =>
+						else
 						{
-							if (e2.Ok && e2.CanControl)
-							{
-								if (e2.ParameterNames != null)
-								{
-									List<ControlParameter> Parameters2 = new List<ControlParameter>();
-
-									foreach (ControlParameter P in Parameters)
-									{
-										if (Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
-											Parameters2.Add(P);
-									}
-
-									Parameters = Parameters2.ToArray();
-
-									if (Parameters.Length == 0)
-									{
-										e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-											"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
-										return;
-									}
-								}
-
-								this.ReturnForm(e, Parameters, Nodes);
-							}
-							else
-							{
-								e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-									"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
-							}
-						}, null);
-				}
-				else
-					this.ReturnForm(e, Parameters, Nodes);
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+					}, null);
 			}
-			catch (Exception ex)
-			{
-				e.IqError(ex);
-			}
+			else
+				await this.ReturnForm(e, Parameters, Nodes);
 		}
 
-		private void ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
+		private async Task ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
 		{
 			StringBuilder Xml = new StringBuilder();
 			XmlWriter Output = XmlWriter.Create(Xml, XML.WriterSettings(false, true));
@@ -930,7 +916,7 @@ namespace Waher.Networking.XMPP.Control
 			}
 
 			foreach (ControlParameter P in Parameters)
-				P.ExportToForm(Output, FirstNode);
+				await P.ExportToForm(Output, FirstNode);
 
 			Output.WriteEndElement();
 			Output.Flush();

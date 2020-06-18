@@ -305,7 +305,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			}
 			catch (Exception ex)
 			{
-				this.bindingInterface.ConnectionError(ex);
+				await this.bindingInterface.ConnectionError(ex);
 			}
 		}
 
@@ -328,7 +328,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			}
 			catch (Exception ex)
 			{
-				this.bindingInterface.ConnectionError(ex);
+				await this.bindingInterface.ConnectionError(ex);
 			}
 			finally
 			{
@@ -546,7 +546,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					this.queue.Clear();
 				}
 
-				this.bindingInterface.ConnectionError(ex);
+				await this.bindingInterface.ConnectionError(ex);
 			}
 
 			return true;

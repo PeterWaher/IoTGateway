@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.PEP
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.XMPP.PEP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Activity"></param>
-	public delegate void UserActivityEventHandler(object Sender, UserActivityEventArguments Activity);
+	public delegate Task UserActivityEventHandler(object Sender, UserActivityEventArguments Activity);
 
 	/// <summary>
 	/// Event arguments for user activity events.
 	/// </summary>
 	public class UserActivityEventArguments : PersonalEventNotificationEventArgs
 	{
-		private UserActivity activity;
+		private readonly UserActivity activity;
 
 		internal UserActivityEventArguments(UserActivity Activity, PersonalEventNotificationEventArgs e):
 			base(e)

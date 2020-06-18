@@ -17,6 +17,7 @@ using Waher.Things.ControlParameters;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Provisioning;
+using System.Threading.Tasks;
 
 namespace Waher.Mock.Lamp
 {
@@ -30,7 +31,7 @@ namespace Waher.Mock.Lamp
 		private static string ownerJid = null;
 		private static bool registered = false;
 
-		static void Main(string[] args)
+		static void Main(string[] _)
 		{
 			try
 			{
@@ -67,6 +68,7 @@ namespace Waher.Mock.Lamp
 						{
 							ownerJid = e.JID;
 							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Disowned += (sender, e) =>
@@ -74,11 +76,13 @@ namespace Waher.Mock.Lamp
 							Log.Informational("Thing has been disowned.", ownerJid);
 							ownerJid = string.Empty;
 							Register();
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Removed += (sender, e) =>
 						{
 							Log.Informational("Thing has been removed from the public registry.", ownerJid);
+							return Task.CompletedTask;
 						};
 					}
 
@@ -123,6 +127,8 @@ namespace Waher.Mock.Lamp
 									Client.Reconnect();
 								break;
 						}
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceSubscribe += (sender, e) =>
@@ -134,17 +140,22 @@ namespace Waher.Mock.Lamp
 							Client.RequestPresenceSubscription(e.FromBareJID);
 
 						Client.SetPresence(Availability.Chat);
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>
 					{
 						e.Accept();
+						return Task.CompletedTask;
 					};
 
 					Client.OnRosterItemUpdated += (sender, e) =>
 					{
 						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 							Client.RemoveRosterItem(e.BareJid);
+
+						return Task.CompletedTask;
 					};
 
 					bool SwitchOn = false;
@@ -157,15 +168,18 @@ namespace Waher.Mock.Lamp
 						Log.Informational("Readout requested", string.Empty, Request.Actor);
 
 						Request.ReportFields(true, new BooleanField(ThingReference.Empty, Now, "Lamp", SwitchOn, FieldType.Momentary, FieldQoS.AutomaticReadout));
+
+						return Task.CompletedTask;
 					};
 
 					ControlServer ControlServer = new ControlServer(Client,
 						new BooleanControlParameter("Lamp", "Control", "Lamp switch on.", "If checked, lamp is turned on.",
-							(Node) => SwitchOn,
+							(Node) => Task.FromResult<bool?>(SwitchOn),
 							(Node, Value) =>
 							{
 								SwitchOn = Value;
 								Log.Informational(Environment.NewLine + Environment.NewLine + "Lamp turned " + (SwitchOn ? "ON" : "OFF") + Environment.NewLine + Environment.NewLine);
+								return Task.CompletedTask;
 							}));
 
 					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
@@ -175,6 +189,7 @@ namespace Waher.Mock.Lamp
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>
 					{
 						e.Add("XMPP.IoT.Actuator.Lamp");
+						return Task.CompletedTask;
 					};
 
 					Client.Connect();
@@ -223,6 +238,9 @@ namespace Waher.Mock.Lamp
 						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 					}
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

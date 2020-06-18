@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Language;
@@ -13,67 +10,67 @@ namespace Waher.Things.Queries
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query event arguments.</param>
-	public delegate void QueryEventHandler(object Sender, QueryEventArgs e);
+	public delegate Task QueryEventHandler(object Sender, QueryEventArgs e);
 
 	/// <summary>
 	/// Delegate for query table event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query table event arguments.</param>
-	public delegate void QueryTableEventHandler(object Sender, QueryTableEventArgs e);
+	public delegate Task QueryTableEventHandler(object Sender, QueryTableEventArgs e);
 
 	/// <summary>
 	/// Delegate for query new table event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query new table event arguments.</param>
-	public delegate void QueryNewTableEventHandler(object Sender, QueryNewTableEventArgs e);
+	public delegate Task QueryNewTableEventHandler(object Sender, QueryNewTableEventArgs e);
 
 	/// <summary>
 	/// Delegate for query new records event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query new records event arguments.</param>
-	public delegate void QueryNewRecordsEventHandler(object Sender, QueryNewRecordsEventArgs e);
+	public delegate Task QueryNewRecordsEventHandler(object Sender, QueryNewRecordsEventArgs e);
 
 	/// <summary>
 	/// Delegate for query object event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query object arguments.</param>
-	public delegate void QueryObjectEventHandler(object Sender, QueryObjectEventArgs e);
+	public delegate Task QueryObjectEventHandler(object Sender, QueryObjectEventArgs e);
 
 	/// <summary>
 	/// Delegate for query message event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query message arguments.</param>
-	public delegate void QueryMessageEventHandler(object Sender, QueryMessageEventArgs e);
+	public delegate Task QueryMessageEventHandler(object Sender, QueryMessageEventArgs e);
 
 	/// <summary>
 	/// Delegate for query title event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query title arguments.</param>
-	public delegate void QueryTitleEventHandler(object Sender, QueryTitleEventArgs e);
+	public delegate Task QueryTitleEventHandler(object Sender, QueryTitleEventArgs e);
 
 	/// <summary>
 	/// Delegate for query status event handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Query status arguments.</param>
-	public delegate void QueryStatusEventHandler(object Sender, QueryStatusEventArgs e);
+	public delegate Task QueryStatusEventHandler(object Sender, QueryStatusEventArgs e);
 
 	/// <summary>
 	/// Class handling the reception of data from a query.
 	/// </summary>
 	public class Query
 	{
-		private INode nodeReference;
-		private Language language;
-		private string commandId;
-		private string queryId;
-		private object state;
+		private readonly INode nodeReference;
+		private readonly Language language;
+		private readonly string commandId;
+		private readonly string queryId;
+		private readonly object state;
 		private bool isAborted = false;
 		private bool isDone = false;
 		private int seqNr = 0;
@@ -171,24 +168,24 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Aborts the query.
 		/// </summary>
-		public virtual void Abort()
+		public virtual async Task Abort()
 		{
-			this.Raise(this.OnAborted, new QueryEventArgs(this));
+			await this.Raise(this.OnAborted, new QueryEventArgs(this));
 			this.isAborted = true;
 		}
 
-		internal void Abort(QueryEventArgs e)
+		internal Task Abort(QueryEventArgs e)
 		{
-			this.Raise(this.OnAborted, e);
+			return this.Raise(this.OnAborted, e);
 		}
 
-		private void Raise(QueryEventHandler Callback, QueryEventArgs e)
+		private async Task Raise(QueryEventHandler Callback, QueryEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -205,14 +202,14 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Starts query execution.
 		/// </summary>
-		public void Start()
+		public Task Start()
 		{
-			this.Raise(this.OnStarted, new QueryEventArgs(this));
+			return this.Raise(this.OnStarted, new QueryEventArgs(this));
 		}
 
-		internal void Start(QueryEventArgs e)
+		internal Task Start(QueryEventArgs e)
 		{
-			this.Raise(this.OnStarted, e);
+			return this.Raise(this.OnStarted, e);
 		}
 
 		/// <summary>
@@ -223,15 +220,15 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Query execution completed.
 		/// </summary>
-		public void Done()
+		public async Task Done()
 		{
-			this.Raise(this.OnDone, new QueryEventArgs(this));
+			await this.Raise(this.OnDone, new QueryEventArgs(this));
 			this.isDone = true;
 		}
 
-		internal void Done(QueryEventArgs e)
+		internal Task Done(QueryEventArgs e)
 		{
-			this.Raise(this.OnDone, e);
+			return this.Raise(this.OnDone, e);
 		}
 
 		/// <summary>
@@ -245,23 +242,23 @@ namespace Waher.Things.Queries
 		/// <param name="TableId">ID of table.</param>
 		/// <param name="TableName">Localized name of table.</param>
 		/// <param name="Columns">Columns.</param>
-		public void NewTable(string TableId, string TableName, params Column[] Columns)
+		public Task NewTable(string TableId, string TableName, params Column[] Columns)
 		{
-			this.Raise(this.OnNewTable, new QueryNewTableEventArgs(this, TableId, TableName, Columns));
+			return this.Raise(this.OnNewTable, new QueryNewTableEventArgs(this, TableId, TableName, Columns));
 		}
 
-		internal void NewTable(QueryNewTableEventArgs e)
+		internal Task NewTable(QueryNewTableEventArgs e)
 		{
-			this.Raise(this.OnNewTable, e);
+			return this.Raise(this.OnNewTable, e);
 		}
 
-		private void Raise(QueryNewTableEventHandler Callback, QueryNewTableEventArgs e)
+		private async Task Raise(QueryNewTableEventHandler Callback, QueryNewTableEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -280,23 +277,23 @@ namespace Waher.Things.Queries
 		/// </summary>
 		/// <param name="TableId">Table ID</param>
 		/// <param name="Records">New records.</param>
-		public void NewRecords(string TableId, params Record[] Records)
+		public Task NewRecords(string TableId, params Record[] Records)
 		{
-			this.Raise(this.OnNewRecords, new QueryNewRecordsEventArgs(this, TableId, Records));
+			return this.Raise(this.OnNewRecords, new QueryNewRecordsEventArgs(this, TableId, Records));
 		}
 
-		internal void NewRecords(QueryNewRecordsEventArgs e)
+		internal Task NewRecords(QueryNewRecordsEventArgs e)
 		{
-			this.Raise(this.OnNewRecords, e);
+			return this.Raise(this.OnNewRecords, e);
 		}
 
-		private void Raise(QueryNewRecordsEventHandler Callback, QueryNewRecordsEventArgs e)
+		private async Task Raise(QueryNewRecordsEventHandler Callback, QueryNewRecordsEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -314,23 +311,23 @@ namespace Waher.Things.Queries
 		/// Reports a table as being complete.
 		/// </summary>
 		/// <param name="TableId">ID of table.</param>
-		public void TableDone(string TableId)
+		public Task TableDone(string TableId)
 		{
-			this.Raise(this.OnTableDone, new QueryTableEventArgs(this, TableId));
+			return this.Raise(this.OnTableDone, new QueryTableEventArgs(this, TableId));
 		}
 
-		internal void TableDone(QueryTableEventArgs e)
+		internal Task TableDone(QueryTableEventArgs e)
 		{
-			this.Raise(this.OnTableDone, e);
+			return this.Raise(this.OnTableDone, e);
 		}
 
-		private void Raise(QueryTableEventHandler Callback, QueryTableEventArgs e)
+		private async Task Raise(QueryTableEventHandler Callback, QueryTableEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -348,23 +345,23 @@ namespace Waher.Things.Queries
 		/// Reports a new object.
 		/// </summary>
 		/// <param name="Object">Object</param>
-		public void NewObject(object Object)
+		public Task NewObject(object Object)
 		{
-			this.Raise(this.OnNewObject, new QueryObjectEventArgs(this, Object));
+			return this.Raise(this.OnNewObject, new QueryObjectEventArgs(this, Object));
 		}
 
-		internal void NewObject(QueryObjectEventArgs e)
+		internal Task NewObject(QueryObjectEventArgs e)
 		{
-			this.Raise(this.OnNewObject, e);
+			return this.Raise(this.OnNewObject, e);
 		}
 
-		private void Raise(QueryObjectEventHandler Callback, QueryObjectEventArgs e)
+		private async Task Raise(QueryObjectEventHandler Callback, QueryObjectEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -384,23 +381,23 @@ namespace Waher.Things.Queries
 		/// <param name="Type">Event type.</param>
 		/// <param name="Level">Event level.</param>
 		/// <param name="Body">Event message body.</param>
-		public void LogMessage(QueryEventType Type, QueryEventLevel Level, string Body)
+		public Task LogMessage(QueryEventType Type, QueryEventLevel Level, string Body)
 		{
-			this.Raise(this.OnMessage, new QueryMessageEventArgs(this, Type, Level, Body));
+			return this.Raise(this.OnMessage, new QueryMessageEventArgs(this, Type, Level, Body));
 		}
 
-		internal void LogMessage(QueryMessageEventArgs e)
+		internal Task LogMessage(QueryMessageEventArgs e)
 		{
-			this.Raise(this.OnMessage, e);
+			return this.Raise(this.OnMessage, e);
 		}
 
-		private void Raise(QueryMessageEventHandler Callback, QueryMessageEventArgs e)
+		private async Task Raise(QueryMessageEventHandler Callback, QueryMessageEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -418,23 +415,23 @@ namespace Waher.Things.Queries
 		/// Sets the title of the report.
 		/// </summary>
 		/// <param name="Title">Title.</param>
-		public void SetTitle(string Title)
+		public Task SetTitle(string Title)
 		{
-			this.Raise(this.OnTitle, new QueryTitleEventArgs(this, Title));
+			return this.Raise(this.OnTitle, new QueryTitleEventArgs(this, Title));
 		}
 
-		internal void SetTitle(QueryTitleEventArgs e)
+		internal Task SetTitle(QueryTitleEventArgs e)
 		{
-			this.Raise(this.OnTitle, e);
+			return this.Raise(this.OnTitle, e);
 		}
 
-		private void Raise(QueryTitleEventHandler Callback, QueryTitleEventArgs e)
+		private async Task Raise(QueryTitleEventHandler Callback, QueryTitleEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, e);
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -452,23 +449,23 @@ namespace Waher.Things.Queries
 		/// Sets the current status of the query execution.
 		/// </summary>
 		/// <param name="Status">Status message.</param>
-		public void SetStatus(string Status)
+		public Task SetStatus(string Status)
 		{
-			this.Raise(this.OnStatus, new QueryStatusEventArgs(this, Status));
+			return this.Raise(this.OnStatus, new QueryStatusEventArgs(this, Status));
 		}
 
-		internal void SetStatus(QueryStatusEventArgs e)
+		internal Task SetStatus(QueryStatusEventArgs e)
 		{
-			this.Raise(this.OnStatus, e);
+			return this.Raise(this.OnStatus, e);
 		}
 
-		private void Raise(QueryStatusEventHandler h, QueryStatusEventArgs e)
+		private async Task Raise(QueryStatusEventHandler h, QueryStatusEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && h != null)
 			{
 				try
 				{
-					h(this, e);
+					await h(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -487,14 +484,14 @@ namespace Waher.Things.Queries
 		/// Each call to <see cref="BeginSection(string)"/> must be followed by a call to <see cref="EndSection()"/>.
 		/// </summary>
 		/// <param name="Header">Section Title.</param>
-		public void BeginSection(string Header)
+		public Task BeginSection(string Header)
 		{
-			this.Raise(this.OnBeginSection, new QueryTitleEventArgs(this, Header));
+			return this.Raise(this.OnBeginSection, new QueryTitleEventArgs(this, Header));
 		}
 
-		internal void BeginSection(QueryTitleEventArgs e)
+		internal Task BeginSection(QueryTitleEventArgs e)
 		{
-			this.Raise(this.OnBeginSection, e);
+			return this.Raise(this.OnBeginSection, e);
 		}
 
 		/// <summary>
@@ -506,14 +503,14 @@ namespace Waher.Things.Queries
 		/// Ends a section.
 		/// Each call to <see cref="BeginSection(string)"/> must be followed by a call to <see cref="EndSection()"/>.
 		/// </summary>
-		public void EndSection()
+		public Task EndSection()
 		{
-			this.Raise(this.OnEndSection, new QueryEventArgs(this));
+			return this.Raise(this.OnEndSection, new QueryEventArgs(this));
 		}
 
-		internal void EndSection(QueryEventArgs e)
+		internal Task EndSection(QueryEventArgs e)
 		{
-			this.Raise(this.OnEndSection, e);
+			return this.Raise(this.OnEndSection, e);
 		}
 
 		/// <summary>

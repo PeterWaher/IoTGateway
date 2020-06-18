@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Request">Readout request to process.</param>
-	public delegate void SensorDataReadoutEventHandler(object Sender, SensorDataServerRequest Request);
+	public delegate Task SensorDataReadoutEventHandler(object Sender, SensorDataServerRequest Request);
 
 	/// <summary>
 	/// Implements an XMPP sensor server interface.
@@ -85,14 +85,14 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		private void Client_OnPresence(object Sender, PresenceEventArgs e)
+		private Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			Dictionary<string, Subscription> Subscriptions;
 
 			lock (this.subscriptionsByThing)
 			{
 				if (!this.subscriptionsByJID.TryGetValue(e.From, out Subscriptions))
-					return;
+					return Task.CompletedTask;
 			}
 
 			foreach (Subscription Subscription in Subscriptions.Values)
@@ -106,14 +106,16 @@ namespace Waher.Networking.XMPP.Sensor
 					this.TriggerSubscription(Subscription);
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
+		private Task Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
 		{
 			lock (this.subscriptionsByThing)
 			{
 				if (!this.subscriptionsByJID.TryGetValue(e.From, out Dictionary<string, Subscription> Subscriptions))
-					return;
+					return Task.CompletedTask;
 
 				this.subscriptionsByJID.Remove(e.From);
 
@@ -134,6 +136,8 @@ namespace Waher.Networking.XMPP.Sensor
 					}
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -166,166 +170,161 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public event GetThingReferenceMethod OnGetNode = null;
 
-		private async void ReqHandler(object Sender, IqEventArgs e)
+		private async Task ReqHandler(object Sender, IqEventArgs e)
 		{
-			try
+			List<IThingReference> Nodes = null;
+			List<string> Fields = null;
+			XmlElement E = e.Query;
+			FieldType FieldTypes = (FieldType)0;
+			DateTime From = DateTime.MinValue;
+			DateTime To = DateTime.MaxValue;
+			DateTime When = DateTime.MinValue;
+			string ServiceToken = string.Empty;
+			string DeviceToken = string.Empty;
+			string UserToken = string.Empty;
+			string NodeId;
+			string SourceId;
+			string Partition;
+			string Id = string.Empty;
+			bool b;
+
+			foreach (XmlAttribute Attr in E.Attributes)
 			{
-				List<IThingReference> Nodes = null;
-				List<string> Fields = null;
-				XmlElement E = e.Query;
-				FieldType FieldTypes = (FieldType)0;
-				DateTime From = DateTime.MinValue;
-				DateTime To = DateTime.MaxValue;
-				DateTime When = DateTime.MinValue;
-				string ServiceToken = string.Empty;
-				string DeviceToken = string.Empty;
-				string UserToken = string.Empty;
-				string NodeId;
-				string SourceId;
-				string Partition;
-				string Id = string.Empty;
-				bool b;
-
-				foreach (XmlAttribute Attr in E.Attributes)
+				switch (Attr.Name)
 				{
-					switch (Attr.Name)
-					{
-						case "id":
-							Id = Attr.Value;
-							break;
+					case "id":
+						Id = Attr.Value;
+						break;
 
-						case "from":
-							if (!XML.TryParse(Attr.Value, out From))
-								From = DateTime.MinValue;
-							break;
+					case "from":
+						if (!XML.TryParse(Attr.Value, out From))
+							From = DateTime.MinValue;
+						break;
 
-						case "to":
-							if (!XML.TryParse(Attr.Value, out To))
-								To = DateTime.MaxValue;
-							break;
+					case "to":
+						if (!XML.TryParse(Attr.Value, out To))
+							To = DateTime.MaxValue;
+						break;
 
-						case "when":
-							if (!XML.TryParse(Attr.Value, out When))
-								When = DateTime.MinValue;
-							break;
+					case "when":
+						if (!XML.TryParse(Attr.Value, out When))
+							When = DateTime.MinValue;
+						break;
 
-						case "st":
-							ServiceToken = Attr.Value;
-							break;
+					case "st":
+						ServiceToken = Attr.Value;
+						break;
 
-						case "dt":
-							DeviceToken = Attr.Value;
-							break;
+					case "dt":
+						DeviceToken = Attr.Value;
+						break;
 
-						case "ut":
-							UserToken = Attr.Value;
-							break;
+					case "ut":
+						UserToken = Attr.Value;
+						break;
 
-						case "all":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.All;
-							break;
+					case "all":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.All;
+						break;
 
-						case "h":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Historical;
-							break;
+					case "h":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Historical;
+						break;
 
-						case "m":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Momentary;
-							break;
+					case "m":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Momentary;
+						break;
 
-						case "p":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Peak;
-							break;
+					case "p":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Peak;
+						break;
 
-						case "s":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Status;
-							break;
+					case "s":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Status;
+						break;
 
-						case "c":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Computed;
-							break;
+					case "c":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Computed;
+						break;
 
-						case "i":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Identity;
-							break;
-					}
+					case "i":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Identity;
+						break;
 				}
+			}
 
-				foreach (XmlNode N in E.ChildNodes)
+			foreach (XmlNode N in E.ChildNodes)
+			{
+				switch (N.LocalName)
 				{
-					switch (N.LocalName)
-					{
-						case "nd":
-							if (Nodes is null)
-								Nodes = new List<IThingReference>();
+					case "nd":
+						if (Nodes is null)
+							Nodes = new List<IThingReference>();
 
-							E = (XmlElement)N;
-							NodeId = XML.Attribute(E, "id");
-							SourceId = XML.Attribute(E, "src");
-							Partition = XML.Attribute(E, "pt");
+						E = (XmlElement)N;
+						NodeId = XML.Attribute(E, "id");
+						SourceId = XML.Attribute(E, "src");
+						Partition = XML.Attribute(E, "pt");
 
-							if (this.OnGetNode is null)
-								Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
-							else
-							{
-								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref is null)
-									throw new ItemNotFoundException("Node not found.", e.IQ);
-
-								Nodes.Add(Ref);
-							}
-							break;
-
-						case "f":
-							if (Fields is null)
-								Fields = new List<string>();
-
-							Fields.Add(XML.Attribute((XmlElement)N, "n"));
-							break;
-					}
-				}
-
-				SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
-					Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
-
-				if (this.provisioningClient != null)
-				{
-					this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
-						Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						(sender2, e2) =>
+						if (this.OnGetNode is null)
+							Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
+						else
 						{
-							if (e2.Ok && e2.CanRead)
-							{
-								Request.Nodes = e2.Nodes;
-								Request.FieldNames = e2.FieldsNames;
-								Request.Types = e2.FieldTypes;
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+							if (Ref is null)
+								throw new ItemNotFoundException("Node not found.", e.IQ);
 
-								this.AcceptRequest(Request, e, Id);
-							}
-							else
-							{
-								e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-									"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
-							}
+							Nodes.Add(Ref);
+						}
+						break;
 
-						}, null);
+					case "f":
+						if (Fields is null)
+							Fields = new List<string>();
+
+						Fields.Add(XML.Attribute((XmlElement)N, "n"));
+						break;
 				}
-				else
-					this.AcceptRequest(Request, e, Id);
 			}
-			catch (Exception ex)
+
+			SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
+				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
+
+			if (this.provisioningClient != null)
 			{
-				e.IqError(ex);
+				this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
+					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+						{
+							Request.Nodes = e2.Nodes;
+							Request.FieldNames = e2.FieldsNames;
+							Request.Types = e2.FieldTypes;
+
+							this.AcceptRequest(Request, e, Id);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+						return Task.CompletedTask;
+
+					}, null);
 			}
+			else
+				this.AcceptRequest(Request, e, Id);
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
@@ -427,7 +426,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public event SensorDataReadoutEventHandler OnExecuteReadoutRequest = null;
 
-		private void CancelHandler(object Sender, IqEventArgs e)
+		private Task CancelHandler(object Sender, IqEventArgs e)
 		{
 			SensorDataServerRequest Request;
 			string Id = XML.Attribute(e.Query, "id");
@@ -445,253 +444,250 @@ namespace Waher.Networking.XMPP.Sensor
 				this.scheduler.Remove(Request.When);
 
 			e.IqResult(string.Empty);
+
+			return Task.CompletedTask;
 		}
 
-		private async void SubscribeHandler(object Sender, IqEventArgs e)
+		private async Task SubscribeHandler(object Sender, IqEventArgs e)
 		{
-			try
+			List<IThingReference> Nodes = null;
+			Dictionary<string, FieldSubscriptionRule> Fields = null;
+			XmlElement E = e.Query;
+			FieldType FieldTypes = (FieldType)0;
+			Duration MaxAge = null;
+			Duration MinInterval = null;
+			Duration MaxInterval = null;
+			string ServiceToken = string.Empty;
+			string DeviceToken = string.Empty;
+			string UserToken = string.Empty;
+			string NodeId;
+			string SourceId;
+			string Partition;
+			string Id = string.Empty;
+			bool Req = false;
+			bool b;
+
+			foreach (XmlAttribute Attr in E.Attributes)
 			{
-				List<IThingReference> Nodes = null;
-				Dictionary<string, FieldSubscriptionRule> Fields = null;
-				XmlElement E = e.Query;
-				FieldType FieldTypes = (FieldType)0;
-				Duration MaxAge = null;
-				Duration MinInterval = null;
-				Duration MaxInterval = null;
-				string ServiceToken = string.Empty;
-				string DeviceToken = string.Empty;
-				string UserToken = string.Empty;
-				string NodeId;
-				string SourceId;
-				string Partition;
-				string Id = string.Empty;
-				bool Req = false;
-				bool b;
-
-				foreach (XmlAttribute Attr in E.Attributes)
+				switch (Attr.Name)
 				{
-					switch (Attr.Name)
-					{
-						case "id":
-							Id = Attr.Value;
-							break;
+					case "id":
+						Id = Attr.Value;
+						break;
 
-						case "maxAge":
-							if (!Duration.TryParse(Attr.Value, out MaxAge))
-								MaxAge = null;
-							break;
+					case "maxAge":
+						if (!Duration.TryParse(Attr.Value, out MaxAge))
+							MaxAge = null;
+						break;
 
-						case "minInt":
-							if (!Duration.TryParse(Attr.Value, out MinInterval))
-								MinInterval = null;
-							break;
+					case "minInt":
+						if (!Duration.TryParse(Attr.Value, out MinInterval))
+							MinInterval = null;
+						break;
 
-						case "maxInt":
-							if (!Duration.TryParse(Attr.Value, out MaxInterval))
-								MaxInterval = null;
-							break;
+					case "maxInt":
+						if (!Duration.TryParse(Attr.Value, out MaxInterval))
+							MaxInterval = null;
+						break;
 
-						case "st":
-							ServiceToken = Attr.Value;
-							break;
+					case "st":
+						ServiceToken = Attr.Value;
+						break;
 
-						case "dt":
-							DeviceToken = Attr.Value;
-							break;
+					case "dt":
+						DeviceToken = Attr.Value;
+						break;
 
-						case "ut":
-							UserToken = Attr.Value;
-							break;
+					case "ut":
+						UserToken = Attr.Value;
+						break;
 
-						case "all":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.All;
-							break;
+					case "all":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.All;
+						break;
 
-						case "h":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Historical;
-							break;
+					case "h":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Historical;
+						break;
 
-						case "m":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Momentary;
-							break;
+					case "m":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Momentary;
+						break;
 
-						case "p":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Peak;
-							break;
+					case "p":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Peak;
+						break;
 
-						case "s":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Status;
-							break;
+					case "s":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Status;
+						break;
 
-						case "c":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Computed;
-							break;
+					case "c":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Computed;
+						break;
 
-						case "i":
-							if (CommonTypes.TryParse(Attr.Value, out b) && b)
-								FieldTypes |= FieldType.Identity;
-							break;
+					case "i":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Identity;
+						break;
 
-						case "req":
-							if (!CommonTypes.TryParse(Attr.Value, out Req))
-								Req = false;
-							break;
-					}
-				}
-
-				foreach (XmlNode N in E.ChildNodes)
-				{
-					switch (N.LocalName)
-					{
-						case "nd":
-							if (Nodes is null)
-								Nodes = new List<IThingReference>();
-
-							E = (XmlElement)N;
-							NodeId = XML.Attribute(E, "id");
-							SourceId = XML.Attribute(E, "src");
-							Partition = XML.Attribute(E, "pt");
-
-							if (this.OnGetNode is null)
-								Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
-							else
-							{
-								IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
-								if (Ref is null)
-									throw new ItemNotFoundException("Node not found.", e.IQ);
-
-								Nodes.Add(Ref);
-							}
-							break;
-
-						case "f":
-							if (Fields is null)
-								Fields = new Dictionary<string, FieldSubscriptionRule>();
-
-							string FieldName = null;
-							double? CurrentValue = null;
-							double? ChangedBy = null;
-							double? ChangedUp = null;
-							double? ChangedDown = null;
-							double d;
-
-							foreach (XmlAttribute Attr in N.Attributes)
-							{
-								switch (Attr.Name)
-								{
-									case "n":
-										FieldName = Attr.Value;
-										break;
-
-									case "v":
-										if (CommonTypes.TryParse(Attr.Value, out d))
-											CurrentValue = d;
-										break;
-
-									case "by":
-										if (CommonTypes.TryParse(Attr.Value, out d))
-											ChangedBy = d;
-										break;
-
-									case "up":
-										if (CommonTypes.TryParse(Attr.Value, out d))
-											ChangedUp = d;
-										break;
-
-									case "dn":
-										if (CommonTypes.TryParse(Attr.Value, out d))
-											ChangedDown = d;
-										break;
-								}
-							}
-
-							if (!string.IsNullOrEmpty(FieldName))
-								Fields[FieldName] = new FieldSubscriptionRule(FieldName, CurrentValue, ChangedBy, ChangedUp, ChangedDown);
-
-							break;
-					}
-				}
-
-				if (this.provisioningClient != null)
-				{
-					this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
-						ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-						(sender2, e2) =>
-						{
-							if (e2.Ok && e2.CanRead)
-							{
-								if (e2.FieldsNames != null)
-								{
-									if (Fields is null)
-									{
-										Fields = new Dictionary<string, FieldSubscriptionRule>();
-
-										foreach (string FieldName in e2.FieldsNames)
-											Fields[FieldName] = new FieldSubscriptionRule(FieldName);
-									}
-									else
-									{
-										Dictionary<string, bool> FieldNames = new Dictionary<string, bool>();
-
-										foreach (string FieldName in e2.FieldsNames)
-											FieldNames[FieldName] = true;
-
-										LinkedList<string> ToRemove = null;
-
-										foreach (string FieldName in Fields.Keys)
-										{
-											if (!FieldNames.ContainsKey(FieldName))
-											{
-												if (ToRemove is null)
-													ToRemove = new LinkedList<string>();
-
-												ToRemove.AddLast(FieldName);
-											}
-										}
-
-										if (ToRemove != null)
-										{
-											foreach (string FieldName in ToRemove)
-												Fields.Remove(FieldName);
-										}
-									}
-								}
-
-								this.PerformSubscription(Req, e, Id, Fields, e2.Nodes, e2.FieldTypes,
-									ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
-							}
-							else
-							{
-								e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-									"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
-							}
-
-						}, null);
-				}
-				else
-				{
-					this.PerformSubscription(Req, e, Id, Fields, Nodes?.ToArray(), FieldTypes,
-						ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
+					case "req":
+						if (!CommonTypes.TryParse(Attr.Value, out Req))
+							Req = false;
+						break;
 				}
 			}
-			catch (Exception ex)
+
+			foreach (XmlNode N in E.ChildNodes)
 			{
-				e.IqError(ex);
+				switch (N.LocalName)
+				{
+					case "nd":
+						if (Nodes is null)
+							Nodes = new List<IThingReference>();
+
+						E = (XmlElement)N;
+						NodeId = XML.Attribute(E, "id");
+						SourceId = XML.Attribute(E, "src");
+						Partition = XML.Attribute(E, "pt");
+
+						if (this.OnGetNode is null)
+							Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
+						else
+						{
+							IThingReference Ref = await this.OnGetNode(NodeId, SourceId, Partition);
+							if (Ref is null)
+								throw new ItemNotFoundException("Node not found.", e.IQ);
+
+							Nodes.Add(Ref);
+						}
+						break;
+
+					case "f":
+						if (Fields is null)
+							Fields = new Dictionary<string, FieldSubscriptionRule>();
+
+						string FieldName = null;
+						double? CurrentValue = null;
+						double? ChangedBy = null;
+						double? ChangedUp = null;
+						double? ChangedDown = null;
+						double d;
+
+						foreach (XmlAttribute Attr in N.Attributes)
+						{
+							switch (Attr.Name)
+							{
+								case "n":
+									FieldName = Attr.Value;
+									break;
+
+								case "v":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										CurrentValue = d;
+									break;
+
+								case "by":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedBy = d;
+									break;
+
+								case "up":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedUp = d;
+									break;
+
+								case "dn":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedDown = d;
+									break;
+							}
+						}
+
+						if (!string.IsNullOrEmpty(FieldName))
+							Fields[FieldName] = new FieldSubscriptionRule(FieldName, CurrentValue, ChangedBy, ChangedUp, ChangedDown);
+
+						break;
+				}
+			}
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
+					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+						{
+							if (e2.FieldsNames != null)
+							{
+								if (Fields is null)
+								{
+									Fields = new Dictionary<string, FieldSubscriptionRule>();
+
+									foreach (string FieldName in e2.FieldsNames)
+										Fields[FieldName] = new FieldSubscriptionRule(FieldName);
+								}
+								else
+								{
+									Dictionary<string, bool> FieldNames = new Dictionary<string, bool>();
+
+									foreach (string FieldName in e2.FieldsNames)
+										FieldNames[FieldName] = true;
+
+									LinkedList<string> ToRemove = null;
+
+									foreach (string FieldName in Fields.Keys)
+									{
+										if (!FieldNames.ContainsKey(FieldName))
+										{
+											if (ToRemove is null)
+												ToRemove = new LinkedList<string>();
+
+											ToRemove.AddLast(FieldName);
+										}
+									}
+
+									if (ToRemove != null)
+									{
+										foreach (string FieldName in ToRemove)
+											Fields.Remove(FieldName);
+									}
+								}
+							}
+
+							this.PerformSubscription(Req, e, Id, Fields, e2.Nodes, e2.FieldTypes,
+								ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+						return Task.CompletedTask;
+
+					}, null);
+			}
+			else
+			{
+				this.PerformSubscription(Req, e, Id, Fields, Nodes?.ToArray(), FieldTypes,
+					ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 			}
 		}
 
 		private void PerformSubscription(bool Req, IqEventArgs e, string Id, Dictionary<string, FieldSubscriptionRule> FieldNames,
 			IThingReference[] Nodes, FieldType FieldTypes, string ServiceToken, string DeviceToken, string UserToken,
 			Duration MaxAge, Duration MinInterval, Duration MaxInterval)
-		{ 
+		{
 			DateTime Now = DateTime.Now;
 			Subscription Subscription;
 
@@ -767,7 +763,7 @@ namespace Waher.Networking.XMPP.Sensor
 					Subscriptions.AddLast(Subscription);
 				}
 
-				if (!subscriptionsByJID.TryGetValue(e.From, out Dictionary<string,Subscription> Subscriptions2))
+				if (!subscriptionsByJID.TryGetValue(e.From, out Dictionary<string, Subscription> Subscriptions2))
 				{
 					Subscriptions2 = new Dictionary<string, Subscription>();
 					subscriptionsByJID[e.From] = Subscriptions2;
@@ -800,7 +796,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (Subscription.Active && Subscription.SupressedTrigger)
 			{
 				Subscription.SupressedTrigger = false;
-				Subscription.LastTrigger = Subscription.LastTrigger + Subscription.MinInterval;
+				Subscription.LastTrigger += Subscription.MinInterval;
 				this.TriggerSubscription(Subscription);
 			}
 		}
@@ -854,7 +850,7 @@ namespace Waher.Networking.XMPP.Sensor
 			return true;
 		}
 
-		private void UnsubscribeHandler(object Sender, IqEventArgs e)
+		private Task UnsubscribeHandler(object Sender, IqEventArgs e)
 		{
 			string Id = XML.Attribute(e.Query, "id");
 			bool Found;
@@ -868,10 +864,12 @@ namespace Waher.Networking.XMPP.Sensor
 				e.IqResult(string.Empty);
 			else
 				e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
+
+			return Task.CompletedTask;
 		}
 
-		private Dictionary<IThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<IThingReference, LinkedList<Subscription>>();
-		private Dictionary<string, Dictionary<string, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<string, Subscription>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<IThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<IThingReference, LinkedList<Subscription>>();
+		private readonly Dictionary<string, Dictionary<string, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<string, Subscription>>(StringComparer.CurrentCultureIgnoreCase);
 
 		/// <summary>
 		/// Reports newly measured values.

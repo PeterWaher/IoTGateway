@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -12,8 +8,8 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class ToolTipAttribute : Attribute
 	{
-		private int stringId;
-		private string tooltip;
+		private readonly int stringId;
+		private readonly string tooltip;
 
 		/// <summary>
 		/// Defines a tooltip string for the property.

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.Search
@@ -11,7 +10,7 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SearchResultEventHandler(object Sender, SearchResultEventArgs e);
+	public delegate Task SearchResultEventHandler(object Sender, SearchResultEventArgs e);
 
 	/// <summary>
 	/// Event arguments for search result responses.

@@ -9,6 +9,7 @@ using System.Xml;
 using Waher.Networking.XMPP;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model
 {
@@ -98,6 +99,9 @@ namespace Waher.Client.WPF.Model
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, (sender, e) =>
 			{
 				if (e.Ok)
@@ -115,6 +119,9 @@ namespace Waher.Client.WPF.Model
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to perform search." : e.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

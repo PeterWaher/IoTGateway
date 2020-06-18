@@ -15,10 +15,10 @@ namespace Waher.Things
 		/// </summary>
 		public static readonly RequestOrigin Empty = new RequestOrigin(string.Empty, new string[0], new string[0], new string[0]);
 
-		private string[] deviceTokens;
-		private string[] serviceTokens;
-		private string[] userTokens;
-		private string from;
+		private readonly string[] deviceTokens;
+		private readonly string[] serviceTokens;
+		private readonly string[] userTokens;
+		private readonly string from;
 
 		/// <summary>
 		/// Tokens available in request.

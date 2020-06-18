@@ -187,7 +187,7 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private void Consent(HttpRequest Request, HttpResponse Response)
+		private async Task Consent(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -205,33 +205,20 @@ namespace Waher.IoTGateway.Setup
 			if (string.IsNullOrEmpty(TabID))
 				throw new BadRequestException();
 
-			Response.StatusCode = 200;
-
-			this.Set(TabID, Consent);
-		}
-
-		private async void Set(string TabID, bool Consent)
-		{
-			try
+			if (this.consented != Consent)
 			{
-				if (this.consented != Consent)
+				this.consented = Consent;
+				this.consentedTimestamp = Consent ? DateTime.Now : DateTime.MinValue;
+
+				await Database.Update(this);
+
+				ClientEvents.PushEvent(new string[] { TabID }, "ShowNext", JSON.Encode(new Dictionary<string, object>()
 				{
-					this.consented = Consent;
-					this.consentedTimestamp = Consent ? DateTime.Now : DateTime.MinValue;
-
-					await Database.Update(this);
-
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowNext", JSON.Encode(new Dictionary<string, object>()
-					{
-						{ "consent", Consent }
-					}, false), true, "User");
-
-				}
+					{ "consent", Consent }
+				}, false), true, "User");
 			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
+
+			Response.StatusCode = 200;
 		}
 
 	}

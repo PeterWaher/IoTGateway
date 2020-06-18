@@ -50,11 +50,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new StringControlParameter("Value", "Publish", "Value:", "BASE-64 value of topic.", Base64Data.RegExString,
-					(n) => Convert.ToBase64String(this.value),
+					(n) => Task.FromResult<string>(Convert.ToBase64String(this.value)),
 					(n, v) =>
 					{
 						this.value = Convert.FromBase64String(v);
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, this.value);
+						return Task.CompletedTask;
 					})
 			};
 		}

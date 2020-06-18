@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using System.Windows;
-using System.Windows.Media;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP;
-using Waher.Content.Markdown;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 
@@ -121,6 +117,8 @@ namespace Waher.Client.WPF.Model
 								if (VersionDone)
 									Request.Done();
 
+								return Task.CompletedTask;
+
 							}, null);
 						}
 						else
@@ -136,6 +134,9 @@ namespace Waher.Client.WPF.Model
 				}
 				else
 					Request.Fail("Unable to perform a service discovery.");
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			return Request;

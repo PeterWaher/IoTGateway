@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things.Queries;
 
@@ -11,7 +10,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeQueryTableUpdatedEventHandler(object Sender, NodeQueryTableUpdatedEventArgs e);
+	public delegate Task NodeQueryTableUpdatedEventHandler(object Sender, NodeQueryTableUpdatedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for node query table events.

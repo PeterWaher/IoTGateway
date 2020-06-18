@@ -432,7 +432,7 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 			catch (Exception ex)
 			{
-				this.bindingInterface.ConnectionError(ex);
+				await this.bindingInterface.ConnectionError(ex);
 			}
 		}
 
@@ -709,7 +709,7 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 			catch (Exception ex)
 			{
-				this.bindingInterface?.ConnectionError(ex);
+				await this.bindingInterface?.ConnectionError(ex);
 			}
 
 			return true;

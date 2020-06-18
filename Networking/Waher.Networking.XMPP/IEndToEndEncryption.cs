@@ -120,7 +120,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State);
+			IqResultEventHandlerAsync Callback, object State);
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries);
+			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries);
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -155,7 +155,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
+			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
 			int MaxRetryTimeout);
 
 		/// <summary>
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State);
+			IqResultEventHandlerAsync Callback, object State);
 
 		/// <summary>
 		/// Sends an IQ Set request.
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries);
+			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries);
 
 		/// <summary>
 		/// Sends an IQ Set request.
@@ -205,7 +205,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
 		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
+			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
 			int MaxRetryTimeout);
 
 		/// <summary>

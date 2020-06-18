@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP
 	public class HttpGetDelegateResource : HttpResource, IHttpGetMethod
 	{
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
-		private readonly HttpMethodHandler get;
+		private readonly HttpMethodHandlerAsync get;
 		private readonly bool synchronous;
 		private readonly bool handlesSubPaths;
 		private readonly bool userSessions;
@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpGetDelegateResource(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
+		public HttpGetDelegateResource(string ResourceName, HttpMethodHandlerAsync GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
@@ -68,7 +68,7 @@ namespace Waher.Networking.HTTP
 		{
 			get
 			{
-				return this.get != null;
+				return !(this.get is null);
 			}
 		}
 
@@ -87,12 +87,12 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (this.get is null)
 				throw new MethodNotAllowedException(this.AllowedMethods);
 			else
-				this.get(Request, Response);
+				return this.get(Request, Response);
 		}
 
 	}

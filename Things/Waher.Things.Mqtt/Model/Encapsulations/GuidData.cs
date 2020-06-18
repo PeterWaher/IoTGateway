@@ -53,11 +53,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new StringControlParameter("Value", "Publish", "Value:", "GUID value of topic.", @"^[{(]?[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}[)}]?$",
-					(n) => this.value.ToString(),
+					(n) => Task.FromResult<string>(this.value.ToString()),
 					(n, v) =>
 					{
 						this.value = Guid.Parse(v);
 						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						return Task.CompletedTask;
 					})
 			};
 		}

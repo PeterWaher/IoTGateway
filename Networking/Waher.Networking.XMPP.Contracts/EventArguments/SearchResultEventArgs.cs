@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.XMPP.P2P.E2E;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -10,7 +8,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void SearchResultEventHandler(object Sender, SearchResultEventArgs e);
+	public delegate Task SearchResultEventHandler(object Sender, SearchResultEventArgs e);
 
 	/// <summary>
 	/// Event arguments for Search Result responses

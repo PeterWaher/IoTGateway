@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.jingle = Jingle;
 		}
 
-		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override async Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
@@ -55,7 +55,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.nextChunk++;
 
 				if (Last)
-					this.Done();
+					await this.Done();
 				else
 				{
 					while (this.chunks != null)
@@ -68,13 +68,13 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Chunk.Nr == this.nextChunk)
 								{
-									this.file?.Write(Chunk.Data, 0, Chunk.Data.Length);
+									await this.file?.WriteAsync(Chunk.Data, 0, Chunk.Data.Length);
 									this.nextChunk++;
 									this.chunks.Remove(Chunk.Nr);
 
 									if (Chunk.Last)
 									{
-										this.Done();
+										await this.Done();
 										this.chunks.Clear();
 									}
 
@@ -98,17 +98,19 @@ namespace Waher.Networking.XMPP.HTTPX
 			return true;
 		}
 
-		private void Done()
+		private Task Done()
 		{
-			this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
-				this.sipub, this.ibb, this.s5, this.jingle);
+			return this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
+				this.ibb, this.s5);
 		}
 
-		internal override void Fail(string Message)
+		internal override Task Fail(string Message)
 		{
 			this.file?.Dispose();
 			this.file = null;
 			this.Done();
+
+			return Task.CompletedTask;
 		}
 
 		public override void Dispose()

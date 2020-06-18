@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -127,8 +126,12 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 								}
 							}
 						}
+
+						return Task.CompletedTask;
 					}, Item);
 				}
+
+				return Task.CompletedTask;
 			}, null);
 		}
 
@@ -189,7 +192,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string PutUrl = null;
 			string GetUrl = null;
 
-			this.client.SendIqGet(this.fileUploadJid, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(this.fileUploadJid, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 
@@ -239,7 +242,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				{
 					try
 					{
-						Callback(this, new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders));
+						await Callback(this, new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders));
 					}
 					catch (Exception ex)
 					{

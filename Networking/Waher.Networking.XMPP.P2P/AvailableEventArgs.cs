@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void AvailableEventHandler(object Sender, AvailableEventArgs e);
+	public delegate Task AvailableEventHandler(object Sender, AvailableEventArgs e);
 
 	/// <summary>
 	/// Event arguments for Availability events.

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Things;
 
 namespace Waher.Things.ControlParameters
 {
@@ -11,10 +9,10 @@ namespace Waher.Things.ControlParameters
 	/// </summary>
 	public abstract class ControlParameter
 	{
-		private string name;
-		private string page;
-		private string label;
-		private string description;
+		private readonly string name;
+		private readonly string page;
+		private readonly string label;
+		private readonly string description;
 
 		/// <summary>
 		/// Abstract base class for control parameters.
@@ -69,14 +67,14 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		/// <param name="StringValue">String representation of value to set.</param>
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
-		public abstract bool SetStringValue(IThingReference Node, string StringValue);
+		public abstract Task<bool> SetStringValue(IThingReference Node, string StringValue);
 
 		/// <summary>
 		/// Gets the string value of the control parameter.
 		/// </summary>
 		/// <param name="Node">Node reference, if available.</param>
 		/// <returns>String representation of the value.</returns>
-		public abstract string GetStringValue(IThingReference Node);
+		public abstract Task<string> GetStringValue(IThingReference Node);
 
 		/// <summary>
 		/// <see cref="Object.Equals(object)"/>
@@ -101,9 +99,9 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public virtual void ExportToForm(XmlWriter Output, IThingReference Node)
+		public virtual async Task ExportToForm(XmlWriter Output, IThingReference Node)
 		{
-			string StringValue = this.GetStringValue(Node);
+			string StringValue = await this.GetStringValue(Node);
 
 			Output.WriteStartElement("field");
 			Output.WriteAttributeString("var", this.name);
@@ -113,7 +111,7 @@ namespace Waher.Things.ControlParameters
 			Output.WriteElementString("desc", this.description);
 			Output.WriteElementString("value", StringValue ?? string.Empty);
 
-			this.ExportValidationRules(Output, Node);
+			await this.ExportValidationRules(Output, Node);
 
 			Output.WriteElementString("xdd", "notSame", null, string.Empty);
 			Output.WriteEndElement();
@@ -132,7 +130,7 @@ namespace Waher.Things.ControlParameters
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
-		public abstract void ExportValidationRules(XmlWriter Output, IThingReference Node);
+		public abstract Task ExportValidationRules(XmlWriter Output, IThingReference Node);
 
 	}
 }

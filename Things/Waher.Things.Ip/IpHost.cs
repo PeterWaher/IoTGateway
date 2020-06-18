@@ -65,7 +65,7 @@ namespace Waher.Things.Ip
 		/// </summary>
 		public override bool IsReadable => true;
 
-		public async void StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -203,7 +203,7 @@ namespace Waher.Things.Ip
 		}
 
 		private static readonly byte[] data = Encoding.ASCII.GetBytes("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		private static PingOptions options = new PingOptions(64, true);
+		private static readonly PingOptions options = new PingOptions(64, true);
 
 		/// <summary>
 		/// Gets displayable parameters.

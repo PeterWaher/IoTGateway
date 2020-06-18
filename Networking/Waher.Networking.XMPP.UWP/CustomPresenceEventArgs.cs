@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP
 {
@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CustomPresenceEventHandler(object Sender, CustomPresenceEventArgs e);
+	public delegate Task CustomPresenceEventHandler(object Sender, CustomPresenceEventArgs e);
 
 	/// <summary>
 	/// Event Argument for custom presence XML events.

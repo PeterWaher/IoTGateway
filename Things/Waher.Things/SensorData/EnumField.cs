@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Things.SensorData
 {
@@ -156,9 +154,11 @@ namespace Waher.Things.SensorData
 		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, bool Writable, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIdSteps)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
 
 		/// <summary>
@@ -178,10 +178,14 @@ namespace Waher.Things.SensorData
 			string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIds)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
+
+
 
 		/// <summary>
 		/// Represents a enum value.
@@ -198,9 +202,11 @@ namespace Waher.Things.SensorData
 		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIdSteps)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
 
 		/// <summary>
@@ -219,9 +225,11 @@ namespace Waher.Things.SensorData
 			string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIds)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
 
 		/// <summary>
@@ -238,9 +246,11 @@ namespace Waher.Things.SensorData
 		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, bool Writable)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
 
 		/// <summary>
@@ -256,9 +266,11 @@ namespace Waher.Things.SensorData
 		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS)
 			: base(Thing, Timestamp, Name, Type, QoS)
 		{
-			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
 			this.valueString = ValueString;
 			this.type = EnumerationType;
+
+			if (!Types.TryParseEnum(this.type, this.valueString, out this.value))
+				this.value = null;
 		}
 
 		/// <summary>
@@ -279,7 +291,12 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Enumeration Type.
 		/// </summary>
-		public string EnumerationType { get { return this.type; } }
+		[ShortName("et")]
+		public string EnumerationType 
+		{
+			get { return this.type; }
+			set { this.type = value; }
+		}
 
 		/// <summary>
 		/// String representation of field value.

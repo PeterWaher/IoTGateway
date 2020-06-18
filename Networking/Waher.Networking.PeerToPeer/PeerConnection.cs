@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Networking.PeerToPeer
@@ -139,9 +139,10 @@ namespace Waher.Networking.PeerToPeer
 			return true;
 		}
 
-		private void TcpConnection_OnError(object Sender, Exception Exception)
+		private Task TcpConnection_OnError(object _, Exception _2)
 		{
 			this.Closed();
+			return Task.CompletedTask;
 		}
 
 		private void TcpConnection_OnDisconnected(object sender, EventArgs e)

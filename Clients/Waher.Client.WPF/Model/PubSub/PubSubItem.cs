@@ -17,6 +17,7 @@ using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model.PubSub
 {
@@ -126,6 +127,10 @@ namespace Waher.Client.WPF.Model.PubSub
 		public override string ToolTip => "Item ID " + this.itemId;
 		public override bool CanRecycle => false;
 
+		public string Summary => this.summary;
+		public string Link => this.link;
+		public string Payload => this.payload;
+
 		public override string TypeName
 		{
 			get
@@ -205,7 +210,7 @@ namespace Waher.Client.WPF.Model.PubSub
 										Dialog.ShowDialog();
 									});
 
-									return;
+									return Task.CompletedTask;
 								}
 
 								Mouse.OverrideCursor = Cursors.Wait;
@@ -221,11 +226,18 @@ namespace Waher.Client.WPF.Model.PubSub
 									}
 									else
 										MainWindow.ErrorBox("Unable to update item: " + e3.ErrorText);
+
+									return Task.CompletedTask;
+
 								}, null);
+
+								return Task.CompletedTask;
+
 							},
 							(sender2, e2) =>
 							{
 								// Do nothing.
+								return Task.CompletedTask;
 							}, e.From, e.To,
 							new JidSingleField(null, "Publisher", "Publisher:", false, new string[] { Item.Publisher }, null, "JID of publisher.",
 								null, null, string.Empty, false, true, false),
@@ -242,6 +254,9 @@ namespace Waher.Client.WPF.Model.PubSub
 				}
 				else
 					MainWindow.ErrorBox("Unable to get item from server: " + e.ErrorText);
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 
@@ -266,6 +281,8 @@ namespace Waher.Client.WPF.Model.PubSub
 				}
 				else
 					MainWindow.ErrorBox("Unable to delete item: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

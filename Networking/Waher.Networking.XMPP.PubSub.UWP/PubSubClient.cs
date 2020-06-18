@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
@@ -343,8 +343,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Configuration">Node configuration.</param>
 		/// <param name="Callback">Method to call when request has been processed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CreateNode(string ServiceAddress, string Name, DataForm Configuration,
-			NodeEventHandler Callback, object State)
+		public void CreateNode(string ServiceAddress, string Name, DataForm Configuration, NodeEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -363,15 +362,18 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new NodeEventArgs(Name, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new NodeEventArgs(Name, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -398,8 +400,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Name">Name of node.</param>
 		/// <param name="Callback">Method to call when request has been processed.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNodeConfiguration(string ServiceAddress, string Name,
-			ConfigurationEventHandler Callback, object State)
+		public void GetNodeConfiguration(string ServiceAddress, string Name, ConfigurationEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -410,7 +411,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'/>");
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -443,29 +444,32 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					Configuration = new NodeConfiguration(Form);
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new ConfigurationEventArgs(Name, Configuration,
-						new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new ConfigurationEventArgs(Name, Configuration, new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
-		private void ConfigureNode(object Sender, DataForm Form)
+		private Task ConfigureNode(object Sender, DataForm Form)
 		{
 			string Name = (string)Form.State;
 			this.ConfigureNode(Name, Form, null, null);
+			return Task.CompletedTask;
 		}
 
-		private void CancelConfiguration(object Sender, DataForm Form)
+		private Task CancelConfiguration(object Sender, DataForm Form)
 		{
 			string Name = (string)Form.State;
 			this.CancelNodeConfiguration(Name, null, null);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -476,7 +480,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void ConfigureNode(string Name, NodeConfiguration Configuration,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			this.ConfigureNode(this.componentAddress, Name, Configuration.ToForm(this), Callback, State);
 		}
@@ -488,8 +492,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Configuration">Configuration</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
-		public void ConfigureNode(string Name, DataForm Configuration,
-			IqResultEventHandler Callback, object State)
+		public void ConfigureNode(string Name, DataForm Configuration, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.ConfigureNode(this.componentAddress, Name, Configuration, Callback, State);
 		}
@@ -503,7 +506,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void ConfigureNode(string ServiceAddress, string Name, NodeConfiguration Configuration,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			this.ConfigureNode(ServiceAddress, Name, Configuration.ToForm(this), Callback, State);
 		}
@@ -517,7 +520,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
 		public void ConfigureNode(string ServiceAddress, string Name, DataForm Configuration,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -531,15 +534,18 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</configure></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new NodeEventArgs(Name, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new NodeEventArgs(Name, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -550,7 +556,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Name">Name of node.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
-		public void CancelNodeConfiguration(string Name, IqResultEventHandler Callback, object State)
+		public void CancelNodeConfiguration(string Name, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.CancelNodeConfiguration(this.componentAddress, Name, Callback, State);
 		}
@@ -562,7 +568,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Name">Name of node.</param>
 		/// <param name="Callback">Method to call when operation has completed.</param>
 		/// <param name="State">State parameter to send to the callback method.</param>
-		public void CancelNodeConfiguration(string ServiceAddress, string Name, IqResultEventHandler Callback, object State)
+		public void CancelNodeConfiguration(string ServiceAddress, string Name, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -574,15 +580,18 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='cancel'/></configure></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new NodeEventArgs(Name, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new NodeEventArgs(Name, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -612,7 +621,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'><default/>");
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -639,16 +648,17 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					Configuration = new NodeConfiguration(Form);
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new ConfigurationEventArgs(string.Empty, Configuration,
-						new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new ConfigurationEventArgs(string.Empty, Configuration, new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -706,15 +716,18 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</delete></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new NodeEventArgs(Name, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new NodeEventArgs(Name, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -843,7 +856,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				SubscriptionOptions Options2 = null;
 				OptionsAvailability Availability = OptionsAvailability.Unknown;
@@ -933,20 +946,22 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					e.Ok = false;
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
-						Options2, Availability, Expires, Status, new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
+							Options2, Availability, Expires, Status, new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
-		private void SubmitSubscribeOptions(object Sender, DataForm Form)
+		private Task SubmitSubscribeOptions(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
 			string NodeName = (string)P[0];
@@ -954,11 +969,14 @@ namespace Waher.Networking.XMPP.PubSub
 			string SubscrriptionId = (string)P[2];
 
 			this.SetSubscriptionOptions(NodeName, Jid, SubscrriptionId, Form, null, null);
+		
+			return Task.CompletedTask;
 		}
 
-		private void CancelSubscribeOptions(object Sender, DataForm Form)
+		private Task CancelSubscribeOptions(object Sender, DataForm Form)
 		{
 			// Do nothing.
+			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -1037,7 +1055,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -1071,16 +1089,18 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					Options = new SubscriptionOptions(Form);
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionOptionsEventArgs(NodeName, Jid, Options,
-						new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new SubscriptionOptionsEventArgs(NodeName, Jid, Options,
+							new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -1165,8 +1185,7 @@ namespace Waher.Networking.XMPP.PubSub
 		public void SetSubscriptionOptions(string NodeName, string Jid, string SubscriptionId,
 			DataForm Options, SubscriptionOptionsEventHandler Callback, object State)
 		{
-			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, SubscriptionId,
-				Options, Callback, State);
+			this.SetSubscriptionOptions(this.componentAddress, NodeName, Jid, SubscriptionId, Options, Callback, State);
 		}
 
 		/// <summary>
@@ -1204,18 +1223,20 @@ namespace Waher.Networking.XMPP.PubSub
 			Options.SerializeSubmit(Xml);
 			Xml.Append("</options></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionOptionsEventArgs(NodeName, Jid,
-						new SubscriptionOptions(Options), new DataFormEventArgs(Options, e)));
+					try
+					{
+						await Callback(this, new SubscriptionOptionsEventArgs(NodeName, Jid,
+							new SubscriptionOptions(Options), new DataFormEventArgs(Options, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -1264,7 +1285,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("/></pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -1292,16 +1313,18 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					Options = new SubscriptionOptions(Form);
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionOptionsEventArgs(NodeName, null, Options,
-						new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new SubscriptionOptionsEventArgs(NodeName, null, Options,
+							new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -1378,7 +1401,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				NodeSubscriptionStatus Status = NodeSubscriptionStatus.none;
 				DateTime Expires = DateTime.MaxValue;
@@ -1424,16 +1447,18 @@ namespace Waher.Networking.XMPP.PubSub
 				else
 					e.Ok = false;
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
-						null, OptionsAvailability.Unknown, Expires, Status, new DataFormEventArgs(Form, e)));
+					try
+					{
+						await Callback(this, new SubscriptionEventArgs(NodeName, Jid, SubscriptionId,
+							null, OptionsAvailability.Unknown, Expires, Status, new DataFormEventArgs(Form, e)));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -1524,7 +1549,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				string NodeName = string.Empty;
 				XmlElement E;
@@ -1550,18 +1575,21 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new ItemResultEventArgs(NodeName, ItemId, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new ItemResultEventArgs(NodeName, ItemId, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
 
-		private void EventNotificationHandler(object Sender, MessageEventArgs e)
+		private async Task EventNotificationHandler(object Sender, MessageEventArgs e)
 		{
 			string SubscriptionId = string.Empty;
 			string ReplyTo = e.From;
@@ -1638,13 +1666,17 @@ namespace Waher.Networking.XMPP.PubSub
 											string Publisher = XML.Attribute(E2, "publisher");
 											ItemNotificationEventArgs e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, Publisher, ReplyTo, E2, Delay, e);
 
-											try
+											ItemNotificationEventHandler h = this.ItemNotification;
+											if (!(h is null))
 											{
-												this.ItemNotification?.Invoke(this, e2);
-											}
-											catch (Exception ex)
-											{
-												Log.Critical(ex);
+												try
+												{
+													await h(this, e2);
+												}
+												catch (Exception ex)
+												{
+													Log.Critical(ex);
+												}
 											}
 											break;
 
@@ -1652,13 +1684,17 @@ namespace Waher.Networking.XMPP.PubSub
 											ItemId = XML.Attribute(E2, "id");
 											e2 = new ItemNotificationEventArgs(NodeName, ItemId, SubscriptionId, string.Empty, ReplyTo, E2, Delay, e);
 
-											try
+											h = this.ItemRetracted;
+											if (!(h is null))
 											{
-												this.ItemRetracted?.Invoke(this, e2);
-											}
-											catch (Exception ex)
-											{
-												Log.Critical(ex);
+												try
+												{
+													await h(this, e2);
+												}
+												catch (Exception ex)
+												{
+													Log.Critical(ex);
+												}
 											}
 											break;
 									}
@@ -1670,13 +1706,17 @@ namespace Waher.Networking.XMPP.PubSub
 							NodeName = XML.Attribute(E, "node");
 							NodeNotificationEventArgs e3 = new NodeNotificationEventArgs(NodeName, SubscriptionId, e);
 
-							try
+							NodeNotificationEventHandler h2 = this.NodePurged;
+							if (!(h2 is null))
 							{
-								this.NodePurged?.Invoke(this, e3);
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
+								try
+								{
+									await h2(this, e3);
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
 							}
 							break;
 
@@ -1685,14 +1725,17 @@ namespace Waher.Networking.XMPP.PubSub
 							string Jid = XML.Attribute(E, "jid");
 							NodeSubscriptionStatus Status = (NodeSubscriptionStatus)XML.Attribute(E, "subscription", NodeSubscriptionStatus.none);
 
-							try
+							SubscriptionNotificationEventHandler h3 = this.SubscriptionStatusChanged;
+							if (!(h3 is null))
 							{
-								this.SubscriptionStatusChanged?.Invoke(this,
-									new SubscriptionNotificationEventArgs(NodeName, Jid, Status, e));
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
+								try
+								{
+									await h3(this, new SubscriptionNotificationEventArgs(NodeName, Jid, Status, e));
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
 							}
 							break;
 
@@ -1711,14 +1754,17 @@ namespace Waher.Networking.XMPP.PubSub
 											if (!TryParse(s, out AffiliationStatus Affiliation))
 												break;
 
-											try
+											AffiliationNotificationEventHandler h4 = this.AffiliationNotification;
+											if (!(h4 is null))
 											{
-												this.AffiliationNotification?.Invoke(this,
-													new AffiliationNotificationEventArgs(NodeName, Jid, Affiliation, e));
-											}
-											catch (Exception ex)
-											{
-												Log.Critical(ex);
+												try
+												{
+													await h4(this, new AffiliationNotificationEventArgs(NodeName, Jid, Affiliation, e));
+												}
+												catch (Exception ex)
+												{
+													Log.Critical(ex);
+												}
 											}
 											break;
 									}
@@ -1764,7 +1810,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="ItemId">Item identity.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Retract(string Node, string ItemId, IqResultEventHandler Callback, object State)
+		public void Retract(string Node, string ItemId, IqResultEventHandlerAsync Callback, object State)
 		{
 			this.Retract(this.componentAddress, Node, ItemId, Callback, State);
 		}
@@ -1777,7 +1823,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="ItemId">Item identity.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Retract(string ServiceAddress, string Node, string ItemId, IqResultEventHandler Callback, object State)
+		public void Retract(string ServiceAddress, string Node, string ItemId, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1921,7 +1967,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<PubSubItem> Items = new List<PubSubItem>();
 				ResultPage ResultPage = null;
@@ -1955,13 +2001,16 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new ItemsEventArgs(NodeName, Items.ToArray(), ResultPage, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new ItemsEventArgs(NodeName, Items.ToArray(), ResultPage, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -2023,15 +2072,18 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(Name));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqSet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new NodeEventArgs(Name, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						await Callback(this, new NodeEventArgs(Name, e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}, State);
 		}
@@ -2045,7 +2097,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 		#region Subscription requests
 
-		private void SubscriptionAuthorizationHandler(object Sender, MessageFormEventArgs e)
+		private async Task SubscriptionAuthorizationHandler(object Sender, MessageFormEventArgs e)
 		{
 			if (e.From != this.componentAddress)
 				return;
@@ -2055,13 +2107,17 @@ namespace Waher.Networking.XMPP.PubSub
 			string NodeName = Form["pubsub#node"]?.ValueString ?? string.Empty;
 			string Jid = Form["pubsub#subscriber_jid"]?.ValueString ?? string.Empty;
 
-			try
+			SubscriptionRequestEventHandler h = this.SubscriptionRequest;
+			if (!(h is null))
 			{
-				this.SubscriptionRequest?.Invoke(this, new SubscriptionRequestEventArgs(NodeName, Jid, SubscriptionId, e));
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				try
+				{
+					await h(this, new SubscriptionRequestEventArgs(NodeName, Jid, SubscriptionId, e));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -2108,7 +2164,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -2133,15 +2189,17 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
+					try
+					{
+						await Callback(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -2153,7 +2211,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void UpdateSubscriptions(string NodeName, IEnumerable<KeyValuePair<string, NodeSubscriptionStatus>> Subscriptions,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			this.UpdateSubscriptions(this.componentAddress, NodeName, Subscriptions, Callback, State);
 		}
@@ -2167,7 +2225,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void UpdateSubscriptions(string ServiceAddress, string NodeName, IEnumerable<KeyValuePair<string, NodeSubscriptionStatus>> Subscriptions,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2223,7 +2281,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<Affiliation> Affiliations = null;
 				XmlElement E;
@@ -2251,15 +2309,17 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new AffiliationsEventArgs(NodeName, Affiliations?.ToArray(), e));
+					try
+					{
+						await Callback(this, new AffiliationsEventArgs(NodeName, Affiliations?.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -2271,7 +2331,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void UpdateAffiliations(string NodeName, IEnumerable<KeyValuePair<string, AffiliationStatus>> Affiliations,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			this.UpdateAffiliations(this.componentAddress, NodeName, Affiliations, Callback, State);
 		}
@@ -2285,7 +2345,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void UpdateAffiliations(string ServiceAddress, string NodeName, IEnumerable<KeyValuePair<string, AffiliationStatus>> Affiliations,
-			IqResultEventHandler Callback, object State)
+			IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2367,7 +2427,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -2393,15 +2453,17 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
+					try
+					{
+						await Callback(this, new SubscriptionsEventArgs(NodeName, Subscriptions.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 
@@ -2453,7 +2515,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<Affiliation> Affiliations = new List<Affiliation>();
 				XmlElement E;
@@ -2481,15 +2543,17 @@ namespace Waher.Networking.XMPP.PubSub
 					}
 				}
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new AffiliationsEventArgs(NodeName, Affiliations.ToArray(), e));
+					try
+					{
+						await Callback(this, new AffiliationsEventArgs(NodeName, Affiliations.ToArray(), e));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-
 			}, State);
 		}
 

@@ -5,6 +5,7 @@ using System.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.BitsOfBinary
 {
@@ -138,7 +139,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Directory.Delete(this.folder, true);
 		}
 
-		private void GetData(object Sender, IqEventArgs e)
+		private async Task GetData(object Sender, IqEventArgs e)
 		{
 			string ContentId = XML.Attribute(e.Query, "cid");
 			string FileName = this.GetFileName(ContentId);
@@ -146,9 +147,13 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			if (!File.Exists(FileName))
 				throw new ItemNotFoundException("Content not found.", e.Query);
 
-			string Xml = File.ReadAllText(FileName, Encoding.ASCII);
-
-			e.IqResult(Xml);
+			using (FileStream f = File.OpenRead(FileName))
+			{
+				StreamReader r = new StreamReader(f, Encoding.ASCII);
+				string Xml = await r.ReadToEndAsync();
+			
+				e.IqResult(Xml);
+			}
 		}
 
 		/// <summary>
@@ -168,13 +173,13 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Xml.Append(ContentId);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (Callback != null)
 				{
 					try
 					{
-						Callback(this, new BitsOfBinaryEventArgs(e));
+						await Callback(this, new BitsOfBinaryEventArgs(e));
 					}
 					catch (Exception ex)
 					{

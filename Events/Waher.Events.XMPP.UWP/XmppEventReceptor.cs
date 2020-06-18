@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Events;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
@@ -18,7 +17,7 @@ namespace Waher.Events.XMPP
 	/// </summary>
 	public class XmppEventReceptor : IDisposable
 	{
-		private XmppClient client;
+		private readonly XmppClient client;
 
 		/// <summary>
 		/// This class handles incoming events from the XMPP network. The default behaviour is to log incoming events to <see cref="Log"/>. 
@@ -43,7 +42,7 @@ namespace Waher.Events.XMPP
 			this.client.UnregisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
 		}
 
-		private void EventMessageHandler(object Sender, MessageEventArgs e)
+		private async Task EventMessageHandler(object Sender, MessageEventArgs e)
 		{
 			XmlElement E = e.Content;
 			XmlElement E2;
@@ -186,7 +185,7 @@ namespace Waher.Events.XMPP
 				Facility = e.FromBareJID;
 
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
-			EventEventHandler h = this.OnEvent;
+			EventEventHandlerAsync h = this.OnEvent;
 			
 			if (h is null)
 				Log.Event(Event);
@@ -194,7 +193,7 @@ namespace Waher.Events.XMPP
 			{
 				try
 				{
-					h(this, new EventEventArgs(e, Event));
+					await h(this, new EventEventArgs(e, Event));
 				}
 				catch (Exception ex)
 				{
@@ -207,7 +206,7 @@ namespace Waher.Events.XMPP
 		/// Event raised whenever an event has been received. If no event handler is defined, the default action is to log the event
 		/// to <see cref="Log"/>.
 		/// </summary>
-		public event EventEventHandler OnEvent = null;
+		public event EventEventHandlerAsync OnEvent = null;
 
 	}
 }

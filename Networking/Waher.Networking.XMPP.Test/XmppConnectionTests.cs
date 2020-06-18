@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Threading;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -79,7 +77,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
-		private void Client_OnStateChanged(object Sender, XmppState NewState)
+		private Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -95,16 +93,20 @@ namespace Waher.Networking.XMPP.Test
 					this.offline.Set();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		void Client_OnError(object Sender, Exception Exception)
+		Task Client_OnError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
+			return Task.CompletedTask;
 		}
 
-		void Client_OnConnectionError(object Sender, Exception Exception)
+		Task Client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
+			return Task.CompletedTask;
 		}
 
 		private int Wait(int Timeout)

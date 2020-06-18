@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		void PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval);
+		Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval);
 
 		/// <summary>
 		/// If the PUT method is allowed.

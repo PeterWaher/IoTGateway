@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Things.Attributes
 {
@@ -12,7 +8,7 @@ namespace Waher.Things.Attributes
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 	public class DefaultLanguageAttribute : Attribute
 	{
-		private string languageCode;
+		private readonly string languageCode;
 
 		/// <summary>
 		/// Defines the default language for the class.

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Language;
 
@@ -12,7 +10,7 @@ namespace Waher.Things.Queries
 	/// </summary>
 	public class CompoundQuery : Query
 	{
-		private IEnumerable<Query> queries;
+		private readonly IEnumerable<Query> queries;
 
 		/// <summary>
 		/// Class handling the reception of data from a query on multiple nodes.
@@ -44,64 +42,64 @@ namespace Waher.Things.Queries
 			}
 		}
 
-		private void Query_OnTitle(object Sender, QueryTitleEventArgs e)
+		private Task Query_OnTitle(object Sender, QueryTitleEventArgs e)
 		{
-			this.SetTitle(e);
+			return this.SetTitle(e);
 		}
 
-		private void Query_OnTableDone(object Sender, QueryTableEventArgs e)
+		private Task Query_OnTableDone(object Sender, QueryTableEventArgs e)
 		{
-			this.TableDone(e);
+			return this.TableDone(e);
 		}
 
-		private void Query_OnStatus(object Sender, QueryStatusEventArgs e)
+		private Task Query_OnStatus(object Sender, QueryStatusEventArgs e)
 		{
-			this.SetStatus(e);
+			return this.SetStatus(e);
 		}
 
-		private void Query_OnStarted(object Sender, QueryEventArgs e)
+		private Task Query_OnStarted(object Sender, QueryEventArgs e)
 		{
-			this.Start(e);
+			return this.Start(e);
 		}
 
-		private void Query_OnNewTable(object Sender, QueryNewTableEventArgs e)
+		private Task Query_OnNewTable(object Sender, QueryNewTableEventArgs e)
 		{
-			this.NewTable(e);
+			return this.NewTable(e);
 		}
 
-		private void Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
+		private Task Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
 		{
-			this.NewRecords(e);
+			return this.NewRecords(e);
 		}
 
-		private void Query_OnNewObject(object Sender, QueryObjectEventArgs e)
+		private Task Query_OnNewObject(object Sender, QueryObjectEventArgs e)
 		{
-			this.NewObject(e);
+			return this.NewObject(e);
 		}
 
-		private void Query_OnMessage(object Sender, QueryMessageEventArgs e)
+		private Task Query_OnMessage(object Sender, QueryMessageEventArgs e)
 		{
-			this.LogMessage(e);
+			return this.LogMessage(e);
 		}
 
-		private void Query_OnEndSection(object Sender, QueryEventArgs e)
+		private Task Query_OnEndSection(object Sender, QueryEventArgs e)
 		{
-			this.EndSection(e);
+			return this.EndSection(e);
 		}
 
-		private void Query_OnDone(object Sender, QueryEventArgs e)
+		private Task Query_OnDone(object Sender, QueryEventArgs e)
 		{
-			this.Done(e);
+			return this.Done(e);
 		}
 
-		private void Query_OnBeginSection(object Sender, QueryTitleEventArgs e)
+		private Task Query_OnBeginSection(object Sender, QueryTitleEventArgs e)
 		{
-			this.BeginSection(e);
+			return this.BeginSection(e);
 		}
 
-		private void Query_OnAborted(object Sender, QueryEventArgs e)
+		private Task Query_OnAborted(object Sender, QueryEventArgs e)
 		{
-			this.Abort(e);
+			return this.Abort(e);
 		}
 
 		/// <summary>
@@ -115,12 +113,12 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Aborts the query.
 		/// </summary>
-		public override void Abort()
+		public override async Task Abort()
 		{
-			base.Abort();
+			await base.Abort();
 
 			foreach (Query Query in this.queries)
-				Query.Abort();
+				await Query.Abort();
 		}
 	}
 }

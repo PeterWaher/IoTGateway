@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -63,7 +64,7 @@ namespace Waher.WebService.Script
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || !(v.ValueObject is IUser User))
 				throw new ForbiddenException("Access denied.");
@@ -99,8 +100,8 @@ namespace Waher.WebService.Script
 					s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
 
 					Response.ContentType = "text/plain";
-					Response.Write(s);
-					Response.SendResponse();
+					await Response.Write(s);
+					await Response.SendResponse();
 				}
 				else
 				{

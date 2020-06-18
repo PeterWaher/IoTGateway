@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Provisioning
@@ -10,14 +8,14 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void IsFriendCallback(object Sender, IsFriendResponseEventArgs e);
+	public delegate Task IsFriendCallback(object Sender, IsFriendResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for IsFriend callbacks.
 	/// </summary>
 	public class IsFriendResponseEventArgs : JidEventArgs
 	{
-		private bool friend;
+		private readonly bool friend;
 
 		internal IsFriendResponseEventArgs(IqResultEventArgs e, object State, string JID, bool Friend)
 			: base(e, State, JID)

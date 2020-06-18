@@ -12,19 +12,19 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void HttpxResponseEventHandler(object Sender, HttpxResponseEventArgs e);
+	public delegate Task HttpxResponseEventHandler(object Sender, HttpxResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for HTTPX responses.
 	/// </summary>
 	public class HttpxResponseEventArgs : IqResultEventArgs
 	{
-		private HttpResponse response;
-		private string statusMessage;
-		private double version;
-		private int statusCode;
-		private bool hasData;
-		private byte[] data;
+		private readonly HttpResponse response;
+		private readonly string statusMessage;
+		private readonly double version;
+		private readonly int statusCode;
+		private readonly bool hasData;
+		private readonly byte[] data;
 
 		/// <summary>
 		/// Event arguments for HTTPX responses.

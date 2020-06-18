@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Text;
-using Waher.Events;
+using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.WebSockets
@@ -94,7 +93,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public void GET(HttpRequest Request, HttpResponse Response)
+		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.Header.TryGetHeaderField("Upgrade", out HttpField Upgrade) ||
 				Upgrade.Value != "websocket")
@@ -167,7 +166,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			Request.clientConnection.Upgrade(Socket);
 
-			Response.SendResponse();
+			await Response.SendResponse();
 
 			this.Connected?.Invoke(this, new WebSocketEventArgs(Socket));
 		}

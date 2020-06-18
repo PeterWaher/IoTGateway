@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
@@ -57,6 +58,8 @@ namespace Waher.Networking.XMPP.Test
 						Error.Set();
 						break;
 				}
+
+				return Task.CompletedTask;
 			};
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
@@ -88,6 +91,8 @@ namespace Waher.Networking.XMPP.Test
 						Error.Set();
 						break;
 				}
+
+				return Task.CompletedTask;
 			};
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
@@ -119,6 +124,8 @@ namespace Waher.Networking.XMPP.Test
 						Error1.Set();
 						break;
 				}
+
+				return Task.CompletedTask;
 			};
 
 			ManualResetEvent Error2 = new ManualResetEvent(false);
@@ -143,6 +150,8 @@ namespace Waher.Networking.XMPP.Test
 						Error2.Set();
 						break;
 				}
+
+				return Task.CompletedTask;
 			};
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Unable to connect.");
@@ -163,6 +172,8 @@ namespace Waher.Networking.XMPP.Test
 					Done1.Set();
 				else
 					Error1.Set();
+
+				return Task.CompletedTask;
 			};
 
 			Client2.OnDataReceived += (sender, e) =>
@@ -171,6 +182,8 @@ namespace Waher.Networking.XMPP.Test
 					Done2.Set();
 				else
 					Error2.Set();
+
+				return Task.CompletedTask;
 			};
 
 			this.client1.SendIqSet("socks5.waher.se", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
@@ -185,6 +198,9 @@ namespace Waher.Networking.XMPP.Test
 				}
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
+
 			}, null);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to activate stream.");
@@ -247,10 +263,16 @@ namespace Waher.Networking.XMPP.Test
 					}
 					else
 						Error2.Set();
+
+					return Task.CompletedTask;
+
 				}, (sender2, e2) =>
 				{
 					Closed2.Set();
+					return Task.CompletedTask;
 				}, null);
+
+				return Task.CompletedTask;
 			};
 
 			Proxy1.InitiateSession(this.client2.FullJID, (sender, e) =>
@@ -263,16 +285,21 @@ namespace Waher.Networking.XMPP.Test
 							Done1.Set();
 						else
 							Error1.Set();
+
+						return Task.CompletedTask;
 					};
 
 					e.Stream.OnStateChange += (sender2, e2) =>
 					{
 						if (e.Stream.State == Socks5State.Offline)
 							Closed1.Set();
+
+						return Task.CompletedTask;
 					};
 
 					e.Stream.Send(Encoding.ASCII.GetBytes("Hello1"));
 				}
+				return Task.CompletedTask;
 			}, null);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Did not receive message 1.");

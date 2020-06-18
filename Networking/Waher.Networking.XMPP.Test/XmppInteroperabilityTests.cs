@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Interoperability;
 
 namespace Waher.Networking.XMPP.Test
@@ -28,6 +25,7 @@ namespace Waher.Networking.XMPP.Test
 			this.interopServer.OnGetInterfaces += (sender, e) =>
 			{
 				e.Add("Interface A", "Interface B", "Interface C", "Interface D");
+				return Task.CompletedTask;
 			};
 		}
 
@@ -48,8 +46,6 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
 				string[] Interfaces = this.interopClient.GetInterfaces(this.client2.FullJID, 10000);
 
 				Assert.AreEqual(4, Interfaces.Length);

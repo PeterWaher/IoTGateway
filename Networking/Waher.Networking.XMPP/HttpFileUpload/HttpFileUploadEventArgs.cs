@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {
@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 	/// </summary>
 	/// <param name="Sender">Sender.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void HttpFileUploadEventHandler(object Sender, HttpFileUploadEventArgs e);
+	public delegate Task HttpFileUploadEventHandler(object Sender, HttpFileUploadEventArgs e);
 	
 	/// <summary>
 	/// Event arguments for HTTP File Upload callback methods.

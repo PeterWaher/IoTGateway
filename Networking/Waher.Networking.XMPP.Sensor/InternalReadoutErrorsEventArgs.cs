@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Things.SensorData;
+using System.Threading.Tasks;
 using Waher.Things;
 
 namespace Waher.Networking.XMPP.Sensor
@@ -11,14 +10,14 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void InternalReadoutErrorsEventHandler(object Sender, InternalReadoutErrorsEventArgs e);
+	public delegate Task InternalReadoutErrorsEventHandler(object Sender, InternalReadoutErrorsEventArgs e);
 
 	/// <summary>
 	/// Event arguments for internal readout error events.
 	/// </summary>
 	public class InternalReadoutErrorsEventArgs : InternalReadoutEventArgs
 	{
-		private IEnumerable<ThingError> errors;
+		private readonly IEnumerable<ThingError> errors;
 
 		/// <summary>
 		/// Event arguments for internal readout error events.

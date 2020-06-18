@@ -439,7 +439,7 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private void ConnectToHost(HttpRequest Request, HttpResponse Response)
+		private Task ConnectToHost(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -522,18 +522,20 @@ namespace Waher.IoTGateway.Setup
 				this.client = null;
 			}
 
+			this.Connect(TabID);
+		
 			Response.StatusCode = 200;
 
-			this.Connect(TabID);
+			return Task.CompletedTask;
 		}
 
-		private void RandomizePassword(HttpRequest Request, HttpResponse Response)
+		private Task RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
-			Response.Write(Hashes.BinaryToString(Gateway.NextBytes(32)));
+			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));
 		}
 
 		/// <summary>
@@ -610,7 +612,7 @@ namespace Waher.IoTGateway.Setup
 			this.client.Connect();
 		}
 
-		private async void Client_OnStateChanged(object Sender, XmppState NewState)
+		private async Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (!(Sender is XmppClient Client))
 				return;

@@ -22,7 +22,6 @@ namespace Waher.Networking.XMPP.HTTPX
 		private readonly string id;
 		private readonly string to;
 		private readonly string from;
-        private readonly string e2eReference;
 		private readonly int maxChunkSize;
 		private bool? chunked = null;
 		private int nr = 0;
@@ -33,12 +32,11 @@ namespace Waher.Networking.XMPP.HTTPX
 		private int pos;
 		private bool cancelled = false;
 
-		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, string From, int MaxChunkSize,
+		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From, int MaxChunkSize,
 			InBandBytestreams.IbbClient IbbClient, P2P.SOCKS5.Socks5Proxy Socks5Proxy) : base()
 		{
 			this.client = Client;
 			this.e2e = E2e;
-            this.e2eReference = EndpointReference;
             this.ibbClient = IbbClient;
 			this.socks5Proxy = Socks5Proxy;
 			this.id = Id;
@@ -53,7 +51,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				throw new IOException("Stream cancelled.");
 		}
 
-		public override Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
+		public override async Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
 		{
 			this.response.Append("<resp xmlns='");
 			this.response.Append(HttpxClient.Namespace);
@@ -101,10 +99,10 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.response.Append("'/></data>");
 						this.ReturnResponse();
                         
-						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e, this.e2eReference);
+						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e);
 						this.socks5Output.OnAbort += this.OnAbort;
 
-						this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
+						await this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
 					}
 					else if (this.ibbClient != null)
 					{
@@ -136,14 +134,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else
 				this.ReturnResponse();
-
-			return Task.CompletedTask;
 		}
 
-		private void InitiationCallback(object Sender, P2P.SOCKS5.StreamEventArgs e)
+		private async Task InitiationCallback(object Sender, P2P.SOCKS5.StreamEventArgs e)
 		{
 			if (e.Ok)
-				this.socks5Output.Opened(e.Stream);
+				await this.socks5Output.Opened(e.Stream);
 			else
 				this.OnAbort(null, new EventArgs());
 		}
@@ -153,7 +149,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.Cancel();
 		}
 
-		public override Task<bool> ContentSentAsync()
+		public override async Task<bool> ContentSentAsync()
 		{
 			this.ReturnResponse();
 
@@ -165,14 +161,14 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 
 				if (this.socks5Output != null)
-					this.socks5Output.Close();
+					await this.socks5Output.Close();
 				else if (this.ibbOutput != null)
-					this.ibbOutput.Close();
+					await this.ibbOutput.Close();
 				else
-					this.SendChunk(true);
+					await this.SendChunk(true);
 			}
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
 		private void ReturnResponse()
@@ -201,16 +197,16 @@ namespace Waher.Networking.XMPP.HTTPX
 			throw new InternalServerErrorException();   // Will not be called.
 		}
 
-		public override Task<bool> EncodeAsync(byte[] Buffer, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(byte[] Buffer, int Offset, int NrBytes)
 		{
 			this.AssertNotCancelled();
 
 			if (this.chunked.Value)
 			{
 				if (this.socks5Output != null)
-					this.socks5Output.Write(Buffer, Offset, NrBytes);
+					await this.socks5Output.Write(Buffer, Offset, NrBytes);
 				else if (this.ibbOutput != null)
-					this.ibbOutput.Write(Buffer, Offset, NrBytes);
+					await this.ibbOutput.Write(Buffer, Offset, NrBytes);
 				else
 				{
 					int NrLeft = this.maxChunkSize - this.pos;
@@ -224,7 +220,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							NrBytes = 0;
 
 							if (this.pos >= this.maxChunkSize)
-								this.SendChunk(false);
+								await this.SendChunk(false);
 						}
 						else
 						{
@@ -232,7 +228,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							this.pos += NrLeft;
 							Offset += NrLeft;
 							NrBytes -= NrLeft;
-							this.SendChunk(false);
+							await this.SendChunk(false);
 							NrLeft = this.maxChunkSize;
 						}
 					}
@@ -241,10 +237,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			else
 				this.response.Append(Convert.ToBase64String(Buffer, Offset, NrBytes));
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
-		private void SendChunk(bool Last)
+		private async Task SendChunk(bool Last)
 		{
 			if (this.client.State != XmppState.Connected)
 				this.Cancel();
@@ -277,40 +273,29 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</chunk>");
 
-			ManualResetEvent ChunkSent = new ManualResetEvent(false);
+			TaskCompletionSource<bool> ChunkSent = new TaskCompletionSource<bool>();
 
 			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
-				string.Empty, string.Empty, this.ChunkSentCallback, ChunkSent);
+				string.Empty, string.Empty, (sender,e) =>
+				{
+					ChunkSent.TrySetResult(true);
+					return Task.CompletedTask;
+				}, null);
 
-			ChunkSent.WaitOne(1000);    // Limit read speed to rate at which messages can be sent to the network.
-			ChunkSent.Dispose();
+			await Task.WhenAny(ChunkSent.Task, Task.Delay(1000));    // Limit read speed to rate at which messages can be sent to the network.
 
 			this.nr++;
 			this.pos = 0;
 		}
 
-		private void ChunkSentCallback(object Sender, DeliveryEventArgs e)
-		{
-			ManualResetEvent ChunkSent = (ManualResetEvent)e.State;
-
-			try
-			{
-				ChunkSent.Set();
-			}
-			catch (Exception)
-			{
-				// Ignore.
-			}
-		}
-
-		public override Task<bool> FlushAsync()
+		public override async Task<bool> FlushAsync()
 		{
 			this.ReturnResponse();
 
 			if (this.pos > 0)
-				this.SendChunk(false);
+				await this.SendChunk(false);
 
-			return Task.FromResult<bool>(true);
+			return true;
 		}
 
 		public void Cancel()

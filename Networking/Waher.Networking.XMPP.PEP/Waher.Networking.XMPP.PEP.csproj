@@ -14,8 +14,8 @@ XEP-0084: User Avatar
 XEP-0107: User Mood
 XEP-0108: User Activity
 XEP-0118: User Tune</Description>
-    <AssemblyVersion>1.0.10</AssemblyVersion>
-    <FileVersion>1.0.10</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
     <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Pep</PackageProjectUrl>
@@ -24,7 +24,7 @@ XEP-0118: User Tune</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <Version>1.0.10</Version>
+    <Version>1.1.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

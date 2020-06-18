@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	/// <param name="Sender">Caller.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void StreamClosedEventHandler(object Sender, StreamClosedEventArgs e);
+	public delegate Task StreamClosedEventHandler(object Sender, StreamClosedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for stream close callbacks.

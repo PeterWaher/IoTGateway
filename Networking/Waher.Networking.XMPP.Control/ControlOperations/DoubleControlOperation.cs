@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Things.ControlParameters;
 using Waher.Things;
@@ -12,8 +10,8 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 	/// </summary>
 	public class DoubleControlOperation : ControlOperation
 	{
-		private DoubleControlParameter parameter;
-		private double value;
+		private readonly DoubleControlParameter parameter;
+		private readonly double value;
 
 		/// <summary>
 		/// Double control operation.
@@ -49,9 +47,9 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// Performs the control operation.
 		/// </summary>
 		/// <returns>If the operation was successful or not.</returns>
-		public override bool Set()
+		public override async Task<bool> Set()
 		{
-			bool Result = this.parameter.Set(this.Node, this.value);
+			bool Result = await this.parameter.Set(this.Node, this.value);
 
 			if (!Result)
 				ControlServer.ParameterValueInvalid(this.parameter.Name, this.Request);

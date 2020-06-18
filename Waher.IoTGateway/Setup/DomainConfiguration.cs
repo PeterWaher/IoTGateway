@@ -344,7 +344,7 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private void TestDomainNames(HttpRequest Request, HttpResponse Response)
+		private Task TestDomainNames(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -397,13 +397,15 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 
 			this.Test(TabID);
+
+			return Task.CompletedTask;
 		}
 
-		private void TestDomainName(HttpRequest Request, HttpResponse Response)
+		private Task TestDomainName(HttpRequest Request, HttpResponse Response)
 		{
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
-			Response.Write(this.token);
+			return Response.Write(this.token);
 		}
 
 		private async void Test(string TabID)
@@ -609,7 +611,7 @@ namespace Waher.IoTGateway.Setup
 			return true;
 		}
 
-		private void TestCA(HttpRequest Request, HttpResponse Response)
+		private Task TestCA(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
 
@@ -684,6 +686,8 @@ namespace Waher.IoTGateway.Setup
 				this.inProgress = true;
 				Task _ = this.CreateCertificate(TabID);
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		private bool inProgress = false;
@@ -1120,14 +1124,14 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private void AcmeChallenge(HttpRequest Request, HttpResponse Response)
+		private Task AcmeChallenge(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.SubPath != this.challenge)
 				throw new NotFoundException("ACME Challenge not found.");
 
 			Response.StatusCode = 200;
 			Response.ContentType = "application/octet-stream";
-			Response.Write(Encoding.ASCII.GetBytes(this.token));
+			return Response.Write(Encoding.ASCII.GetBytes(this.token));
 		}
 
 		/// <summary>

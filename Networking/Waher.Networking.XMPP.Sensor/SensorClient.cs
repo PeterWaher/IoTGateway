@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -355,7 +356,7 @@ namespace Waher.Networking.XMPP.Sensor
 			return Request;
 		}
 
-		private void RequestResponse(object Sender, IqResultEventArgs e)
+		private async Task RequestResponse(object Sender, IqResultEventArgs e)
 		{
 			SensorDataClientRequest Request = (SensorDataClientRequest)e.State;
 
@@ -371,9 +372,9 @@ namespace Waher.Networking.XMPP.Sensor
 							bool Queued = XML.Attribute(E, "queued", false);
 
 							if (Id == Request.Id)
-								Request.Accept(Queued);
+								await Request.Accept(Queued);
 							else
-								Request.Fail("Request identity mismatch.");
+								await Request.Fail("Request identity mismatch.");
 
 							return;
 
@@ -383,11 +384,11 @@ namespace Waher.Networking.XMPP.Sensor
 
 							if (Id == Request.Id)
 							{
-								Request.Accept(false);
-								Request.Started();
+								await Request.Accept(false);
+								await Request.Started();
 							}
 							else
-								Request.Fail("Request identity mismatch.");
+								await Request.Fail("Request identity mismatch.");
 
 							return;
 
@@ -396,21 +397,21 @@ namespace Waher.Networking.XMPP.Sensor
 							Id = XML.Attribute(E, "id");
 
 							if (Id == Request.Id)
-								this.ProcessFields(E, Request);
+								await this.ProcessFields(E, Request);
 							else
-								Request.Fail("Request identity mismatch.");
+								await Request.Fail("Request identity mismatch.");
 
 							return;
 					}
 				}
 
-				Request.Fail("Invalid response to request.");
+				await Request.Fail("Invalid response to request.");
 			}
 			else
-				Request.Fail(e.ErrorText);
+				await Request.Fail(e.ErrorText);
 		}
 
-		private void StartedHandler(object Sender, MessageEventArgs e)
+		private async Task StartedHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			string Id = XML.Attribute(e.Content, "id");
@@ -421,10 +422,10 @@ namespace Waher.Networking.XMPP.Sensor
 					return;
 			}
 
-			Request.Started();
+			await Request.Started();
 		}
 
-		private void DoneHandler(object Sender, MessageEventArgs e)
+		private async Task DoneHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			string Id = XML.Attribute(e.Content, "id");
@@ -435,37 +436,37 @@ namespace Waher.Networking.XMPP.Sensor
 					return;
 			}
 
-			Request.Done();
+			await Request.Done();
 		}
 
-		private void AssertReceiving(SensorDataClientRequest Request)
+		private async Task AssertReceiving(SensorDataClientRequest Request)
 		{
 			switch (Request.State)
 			{
 				case SensorDataReadoutState.Requested:
-					Request.State = SensorDataReadoutState.Accepted;
-					Request.State = SensorDataReadoutState.Started;
-					Request.State = SensorDataReadoutState.Receiving;
+					await Request.SetState(SensorDataReadoutState.Accepted);
+					await Request.SetState(SensorDataReadoutState.Started);
+					await Request.SetState(SensorDataReadoutState.Receiving);
 					break;
 
 				case SensorDataReadoutState.Accepted:
-					Request.State = SensorDataReadoutState.Started;
-					Request.State = SensorDataReadoutState.Receiving;
+					await Request.SetState(SensorDataReadoutState.Started);
+					await Request.SetState(SensorDataReadoutState.Receiving);
 					break;
 
 				case SensorDataReadoutState.Started:
-					Request.State = SensorDataReadoutState.Receiving;
+					await Request.SetState(SensorDataReadoutState.Receiving);
 					break;
 
 				case SensorDataReadoutState.Failure:
 				case SensorDataReadoutState.Done:
 					Request.Clear();
-					Request.State = SensorDataReadoutState.Receiving;
+					await Request.SetState(SensorDataReadoutState.Receiving);
 					break;
 			}
 		}
 
-		private void FieldsHandler(object Sender, MessageEventArgs e)
+		private async Task FieldsHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			string Id = XML.Attribute(e.Content, "id");
@@ -476,23 +477,23 @@ namespace Waher.Networking.XMPP.Sensor
 					return;
 			}
 
-			this.ProcessFields(e.Content, Request);
+			await this.ProcessFields(e.Content, Request);
 		}
 
-		private void ProcessFields(XmlElement Content, SensorDataClientRequest Request)
+		private async Task ProcessFields(XmlElement Content, SensorDataClientRequest Request)
 		{
-			this.AssertReceiving(Request);
+			await this.AssertReceiving(Request);
 
 			Tuple<List<Field>, List<ThingError>> Response = ParseFields(Content, out bool Done);
 
 			if (Response.Item1 != null)
-				Request.LogFields(Response.Item1);
+				await Request.LogFields(Response.Item1);
 
 			if (Response.Item2 != null)
-				Request.LogErrors(Response.Item2);
+				await Request.LogErrors(Response.Item2);
 
 			if (Done)
-				Request.Done();
+				await Request.Done();
 		}
 
 		/// <summary>
@@ -521,7 +522,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>Parsed fields.</returns>
 		public static Tuple<List<Field>, List<ThingError>> ParseFields(XmlElement Content, out bool Done)
 		{
-			return ParseFields(Content, out Done, out string Id);
+			return ParseFields(Content, out Done, out string _);
 		}
 
 		/// <summary>
@@ -1202,8 +1203,8 @@ namespace Waher.Networking.XMPP.Sensor
 					{
 						Xml.Append("' v='");
 
-						if (Field.CurrentValue is double)
-							Xml.Append(CommonTypes.Encode((double)Field.CurrentValue));
+						if (Field.CurrentValue is double d)
+							Xml.Append(CommonTypes.Encode(d));
 					}
 
 					if (Field.ChangedBy.HasValue)

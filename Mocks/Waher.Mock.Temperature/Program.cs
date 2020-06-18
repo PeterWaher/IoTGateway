@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
@@ -30,7 +30,7 @@ namespace Waher.Mock.Temperature
 		private static string ownerJid = null;
 		private static bool registered = false;
 
-		public static void Main(string[] args)
+		public static void Main(string[] _)
 		{
 			try
 			{
@@ -67,6 +67,7 @@ namespace Waher.Mock.Temperature
 						{
 							ownerJid = e.JID;
 							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Disowned += (sender, e) =>
@@ -74,11 +75,13 @@ namespace Waher.Mock.Temperature
 							Log.Informational("Thing has been disowned.", ownerJid);
 							ownerJid = string.Empty;
 							Register();
+							return Task.CompletedTask;
 						};
 
 						thingRegistryClient.Removed += (sender, e) =>
 						{
 							Log.Informational("Thing has been removed from the public registry.", ownerJid);
+							return Task.CompletedTask;
 						};
 					}
 
@@ -123,6 +126,8 @@ namespace Waher.Mock.Temperature
 									Client.Reconnect();
 								break;
 						}
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceSubscribe += (sender, e) =>
@@ -134,17 +139,22 @@ namespace Waher.Mock.Temperature
 							Client.RequestPresenceSubscription(e.FromBareJID);
 
 						Client.SetPresence(Availability.Chat);
+
+						return Task.CompletedTask;
 					};
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>
 					{
 						e.Accept();
+						return Task.CompletedTask;
 					};
 
 					Client.OnRosterItemUpdated += (sender, e) =>
 					{
 						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 							Client.RemoveRosterItem(e.BareJid);
+
+						return Task.CompletedTask;
 					};
 
 					LinkedList<DayHistoryRecord> DayHistoricalValues = new LinkedList<DayHistoryRecord>();
@@ -262,6 +272,8 @@ namespace Waher.Mock.Temperature
 						}
 						
 						Request.ReportFields(true, Fields);
+
+						return Task.CompletedTask;
 					};
 
 					Timer SampleTimer = new Timer((P) =>
@@ -345,6 +357,8 @@ namespace Waher.Mock.Temperature
 							"XMPP.IoT.Sensor.Temperature.Min.History",
 							"XMPP.IoT.Sensor.Temperature.Max",
 							"XMPP.IoT.Sensor.Temperature.Max.History");
+
+						return Task.CompletedTask;
 					};
 
 					Client.Connect();
@@ -407,6 +421,9 @@ namespace Waher.Mock.Temperature
 						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
 					}
 				}
+
+				return Task.CompletedTask;
+
 			}, null);
 		}
 

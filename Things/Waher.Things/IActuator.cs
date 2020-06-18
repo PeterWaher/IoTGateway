@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Things;
-using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 
 namespace Waher.Things
@@ -17,6 +13,6 @@ namespace Waher.Things
 		/// Get control parameters for the actuator.
 		/// </summary>
 		/// <returns>Collection of control parameters for actuator.</returns>
-		ControlParameter[] GetControlParameters();
+		Task<ControlParameter[]> GetControlParameters();
 	}
 }

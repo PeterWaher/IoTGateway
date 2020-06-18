@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		internal static void ChunkReceived(object Sender, MessageEventArgs e)
+		internal static async Task ChunkReceived(object Sender, MessageEventArgs e)
 		{
 			string StreamId = XML.Attribute(e.Content, "streamId");
 			string Key = e.From + " " + StreamId;
@@ -78,7 +78,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool Last = XML.Attribute(e.Content, "last", false);
 			byte[] Data = Convert.FromBase64String(e.Content.InnerText);
 
-			if (!Rec.ChunkReceived(Nr, Last, Data))
+			if (!await Rec.ChunkReceived(Nr, Last, Data))
 			{
 				Rec.Dispose();
 				chunkedStreams.Remove(Key);

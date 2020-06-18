@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public abstract class CommunicationTests
 	{
-		private ConsoleEventSink sink = null;
+		private static ConsoleEventSink sink = null;
 		protected ManualResetEvent connected1 = new ManualResetEvent(false);
 		protected ManualResetEvent error1 = new ManualResetEvent(false);
 		protected ManualResetEvent offline1 = new ManualResetEvent(false);
@@ -30,20 +30,20 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassInitialize]
-		public virtual void TestFixtureSetUp()
+		public static void ClassInitialize(TestContext _)
 		{
-			this.sink = new ConsoleEventSink();
-			Log.Register(this.sink);
+			sink = new ConsoleEventSink();
+			Log.Register(sink);
 		}
 
 		[ClassCleanup]
-		public virtual void TestFixtureTearDown()
+		public static void ClassCleanup()
 		{
-			if (this.sink != null)
+			if (sink != null)
 			{
-				Log.Unregister(this.sink);
-				this.sink.Dispose();
-				this.sink = null;
+				Log.Unregister(sink);
+				sink.Dispose();
+				sink = null;
 			}
 		}
 

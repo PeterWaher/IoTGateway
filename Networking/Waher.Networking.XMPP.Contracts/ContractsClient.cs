@@ -251,7 +251,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 					}
 
-					if ((Callback is null))
+					if (!(Callback is null))
 						await Callback(this, e0);
 				}, State);
 			}

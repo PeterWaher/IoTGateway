@@ -719,6 +719,7 @@ namespace Waher.Networking.XMPP
 				this.serverFeatures = null;
 				this.serverComponents = null;
 				this.fragmentLength = 0;
+				this.fragment.Clear();
 				this.upgradeToTls = false;
 
 				if (this.textTransportLayer is null)
@@ -840,7 +841,7 @@ namespace Waher.Networking.XMPP
 		internal async Task ConnectionError(Exception ex)
 		{
 			ExceptionEventHandler h = this.OnConnectionError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -875,7 +876,7 @@ namespace Waher.Networking.XMPP
 				this.Error(Exception.Message);
 
 				ExceptionEventHandler h = this.OnError;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -1036,7 +1037,7 @@ namespace Waher.Networking.XMPP
 					this.Information("State changed to " + value.ToString());
 
 					StateChangedEventHandler h = this.OnStateChanged;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -1170,7 +1171,7 @@ namespace Waher.Networking.XMPP
 				AlternativeTransport.CloseSession();
 
 			EventHandler h = this.OnDisposed;
-			if (h != null)
+			if (!(h is null))
 			{
 				this.OnDisposed = null;
 
@@ -1199,7 +1200,13 @@ namespace Waher.Networking.XMPP
 			if (this.textTransportLayer != null && !(this.textTransportLayer is AlternativeTransport))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 			else
+			{
+				string s = this.fragment.ToString();
+				if (!string.IsNullOrEmpty(s))
+					this.Warning("Input lost:\r\n\r\n" + s);
+
 				this.Connect(this.domain);
+			}
 		}
 
 		/// <summary>
@@ -1243,7 +1250,7 @@ namespace Waher.Networking.XMPP
 		{
 			if (string.IsNullOrEmpty(Xml))
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1814,7 +1821,7 @@ namespace Waher.Networking.XMPP
 								case "get":
 									IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
 									if (this.ValidateSender(E, From, ie.FromBareJid))
-										await this.ProcessIq(this.iqGetHandlers, ie);
+										this.ProcessIq(this.iqGetHandlers, ie);
 									else
 										ie.IqError(new ForbiddenException("Access denied.", E));
 									break;
@@ -1822,7 +1829,7 @@ namespace Waher.Networking.XMPP
 								case "set":
 									ie = new IqEventArgs(this, E, Id, To, From);
 									if (this.ValidateSender(E, From, ie.FromBareJid))
-										await this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 									else
 										ie.IqError(new ForbiddenException("Access denied.", E));
 									break;
@@ -1854,17 +1861,8 @@ namespace Waher.Networking.XMPP
 											}
 										}
 
-										if (Callback != null)
-										{
-											try
-											{
-												await Callback(this, new IqResultEventArgs(E, Id, To, From, Ok, State));
-											}
-											catch (Exception ex)
-											{
-												Exception(ex);
-											}
-										}
+										if (!(Callback is null))
+											this.ProcessResult(Callback, new IqResultEventArgs(E, Id, To, From, Ok, State));
 									}
 									break;
 							}
@@ -1874,7 +1872,7 @@ namespace Waher.Networking.XMPP
 							MessageEventArgs me = new MessageEventArgs(this, E);
 
 							if (this.ValidateSender(E, me.From, me.FromBareJID))
-								await this.ProcessMessage(me);
+								this.ProcessMessage(me);
 							break;
 
 						case "presence":
@@ -2100,111 +2098,125 @@ namespace Waher.Networking.XMPP
 		/// Processes an incoming message.
 		/// </summary>
 		/// <param name="e">Message event arguments.</param>
-		public async Task ProcessMessage(MessageEventArgs e)
+		public async void ProcessMessage(MessageEventArgs e)
 		{
-			MessageFormEventHandlerAsync FormHandler = null;
-			MessageEventHandlerAsync MessageHandler = null;
-			DataForm Form = null;
-			string FormType = null;
-			string Key;
-
-			lock (this.synchObject)
+			try
 			{
-				foreach (XmlElement E in e.Message.ChildNodes)
+				MessageFormEventHandlerAsync FormHandler = null;
+				MessageEventHandlerAsync MessageHandler = null;
+				DataForm Form = null;
+				string FormType = null;
+				string Key;
+
+				lock (this.synchObject)
 				{
-					if (FormHandler is null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
+					foreach (XmlElement E in e.Message.ChildNodes)
 					{
-						Form = new DataForm(this, E, this.MessageFormSubmitted, this.MessageFormCancelled, e.From, e.To)
+						if (FormHandler is null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
 						{
-							State = e
-						};
+							Form = new DataForm(this, E, this.MessageFormSubmitted, this.MessageFormCancelled, e.From, e.To)
+							{
+								State = e
+							};
 
-						Field FormTypeField = Form["FORM_TYPE"];
-						FormType = FormTypeField?.ValueString;
+							Field FormTypeField = Form["FORM_TYPE"];
+							FormType = FormTypeField?.ValueString;
 
-						if (!string.IsNullOrEmpty(FormType) && this.messageFormHandlers.TryGetValue(FormType, out FormHandler))
+							if (!string.IsNullOrEmpty(FormType) && this.messageFormHandlers.TryGetValue(FormType, out FormHandler))
+							{
+								e.Content = E;
+								break;
+							}
+						}
+
+						Key = E.LocalName + " " + E.NamespaceURI;
+						if (this.messageHandlers.TryGetValue(Key, out MessageHandler))
 						{
 							e.Content = E;
 							break;
 						}
-					}
-
-					Key = E.LocalName + " " + E.NamespaceURI;
-					if (this.messageHandlers.TryGetValue(Key, out MessageHandler))
-					{
-						e.Content = E;
-						break;
-					}
-					else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
-					{
-						RosterItem Item = this.GetRosterItem(GetBareJID(e.To));
-						if (Item != null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+						else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
 						{
-							this.SendMessage(MessageType.Normal, e.From, "<received xmlns='" + NamespaceMessageDeliveryReceipts +
-								"' id='" + XML.Encode(e.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+							RosterItem Item = this.GetRosterItem(GetBareJID(e.To));
+							if (Item != null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+							{
+								this.SendMessage(MessageType.Normal, e.From, "<received xmlns='" + NamespaceMessageDeliveryReceipts +
+									"' id='" + XML.Encode(e.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+							}
 						}
+						else
+							MessageHandler = null;
 					}
-					else
-						MessageHandler = null;
 				}
-			}
 
-			if (MessageHandler != null)
-				this.Information(MessageHandler.GetMethodInfo().Name);
-			else if (FormHandler != null)
-				this.Information(FormHandler.GetMethodInfo().Name);
-			else
-			{
-				switch (e.Type)
+				if (MessageHandler != null)
+					this.Information(MessageHandler.GetMethodInfo().Name);
+				else if (FormHandler != null)
+					this.Information(FormHandler.GetMethodInfo().Name);
+				else
 				{
-					case MessageType.Chat:
-						this.Information("OnChatMessage()");
-						MessageHandler = this.OnChatMessage;
-						break;
+					switch (e.Type)
+					{
+						case MessageType.Chat:
+							this.Information("OnChatMessage()");
+							MessageHandler = this.OnChatMessage;
+							break;
 
-					case MessageType.Error:
-						this.Information("OnErrorMessage()");
-						MessageHandler = this.OnErrorMessage;
-						break;
+						case MessageType.Error:
+							this.Information("OnErrorMessage()");
+							MessageHandler = this.OnErrorMessage;
+							break;
 
-					case MessageType.GroupChat:
-						this.Information("OnGroupChatMessage()");
-						MessageHandler = this.OnGroupChatMessage;
-						break;
+						case MessageType.GroupChat:
+							this.Information("OnGroupChatMessage()");
+							MessageHandler = this.OnGroupChatMessage;
+							break;
 
-					case MessageType.Headline:
-						this.Information("OnHeadlineMessage()");
-						MessageHandler = this.OnHeadlineMessage;
-						break;
+						case MessageType.Headline:
+							this.Information("OnHeadlineMessage()");
+							MessageHandler = this.OnHeadlineMessage;
+							break;
 
-					case MessageType.Normal:
-					default:
-						this.Information("OnNormalMessage()");
-						MessageHandler = this.OnNormalMessage;
-						break;
+						case MessageType.Normal:
+						default:
+							this.Information("OnNormalMessage()");
+							MessageHandler = this.OnNormalMessage;
+							break;
+					}
+				}
+
+				if (MessageHandler != null)
+				{
+					try
+					{
+						await MessageHandler(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
+				}
+				else if (FormHandler != null)
+				{
+					try
+					{
+						await FormHandler(this, new MessageFormEventArgs(Form, FormType, e));
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
 				}
 			}
-
-			if (MessageHandler != null)
+			catch (Exception ex)
 			{
 				try
 				{
-					await MessageHandler(this, e);
+					this.Error(ex.Message);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					this.Exception(ex);
-				}
-			}
-			else if (FormHandler != null)
-			{
-				try
-				{
-					await FormHandler(this, new MessageFormEventArgs(Form, FormType, e));
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
+					// Ignore
 				}
 			}
 		}
@@ -2237,18 +2249,18 @@ namespace Waher.Networking.XMPP
 		/// Processes an incoming IQ GET stanza.
 		/// </summary>
 		/// <param name="e">IQ event arguments.</param>
-		public Task ProcessIqGet(IqEventArgs e)
+		public void ProcessIqGet(IqEventArgs e)
 		{
-			return this.ProcessIq(this.iqGetHandlers, e);
+			this.ProcessIq(this.iqGetHandlers, e);
 		}
 
 		/// <summary>
 		/// Processes an incoming IQ SET stanza.
 		/// </summary>
 		/// <param name="e">IQ event arguments.</param>
-		public Task ProcessIqSet(IqEventArgs e)
+		public void ProcessIqSet(IqEventArgs e)
 		{
-			return this.ProcessIq(this.iqSetHandlers, e);
+			this.ProcessIq(this.iqSetHandlers, e);
 		}
 
 		internal void ProcessPresence(PresenceEventArgs e)
@@ -2336,7 +2348,7 @@ namespace Waher.Networking.XMPP
 					break;
 			}
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -2349,47 +2361,83 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async Task ProcessIq(Dictionary<string, IqEventHandlerAsync> Handlers, IqEventArgs e)
+		private async void ProcessIq(Dictionary<string, IqEventHandlerAsync> Handlers, IqEventArgs e)
 		{
-			IqEventHandlerAsync h = null;
-			string Key;
-
-			lock (this.synchObject)
+			try
 			{
-				foreach (XmlElement E in e.IQ.ChildNodes)
+				IqEventHandlerAsync h = null;
+				string Key;
+
+				lock (this.synchObject)
 				{
-					Key = E.LocalName + " " + E.NamespaceURI;
-					if (Handlers.TryGetValue(Key, out h))
+					foreach (XmlElement E in e.IQ.ChildNodes)
 					{
-						e.Query = E;
-						break;
+						Key = E.LocalName + " " + E.NamespaceURI;
+						if (Handlers.TryGetValue(Key, out h))
+						{
+							e.Query = E;
+							break;
+						}
+						else
+							h = null;
 					}
+				}
+
+				if (h is null)
+				{
+					string Xml = "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>";
+
+					if (e.UsesE2eEncryption)
+						e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, Xml);
 					else
-						h = null;
+						this.SendIqError(e.Id, e.From, Xml);
+				}
+				else
+				{
+					try
+					{
+						await h(this, e);
+					}
+					catch (Exception ex)
+					{
+						if (e.UsesE2eEncryption)
+							e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, ExceptionToXmppXml(ex));
+						else
+							this.SendIqError(e.Id, e.From, ex);
+					}
 				}
 			}
-
-			if (h is null)
-			{
-				string Xml = "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>";
-
-				if (e.UsesE2eEncryption)
-					e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, Xml);
-				else
-					this.SendIqError(e.Id, e.From, Xml);
-			}
-			else
+			catch (Exception ex)
 			{
 				try
 				{
-					await h(this, e);
+					this.Error(ex.Message);
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		private async void ProcessResult(IqResultEventHandlerAsync Callback, IqResultEventArgs e)
+		{
+			if (!(Callback is null))
+			{
+				try
+				{
+					await Callback(this, e);
 				}
 				catch (Exception ex)
 				{
-					if (e.UsesE2eEncryption)
-						e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, ExceptionToXmppXml(ex));
-					else
-						this.SendIqError(e.Id, e.From, ex);
+					try
+					{
+						this.Exception(ex);
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 			}
 		}
@@ -3926,7 +3974,7 @@ namespace Waher.Networking.XMPP
 						{
 							this.Information("OnRegistrationForm()");
 							DataFormEventHandler h = this.OnRegistrationForm;
-							if (h != null)
+							if (!(h is null))
 							{
 								try
 								{
@@ -4122,7 +4170,7 @@ namespace Waher.Networking.XMPP
 
 				this.Information("OnPasswordChanged()");
 				EventHandler h = this.OnPasswordChanged;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -4166,7 +4214,7 @@ namespace Waher.Networking.XMPP
 
 									this.Information("OnChangePasswordForm()");
 									DataFormEventHandler h = this.OnChangePasswordForm;
-									if (h != null)
+									if (!(h is null))
 									{
 										try
 										{
@@ -4193,7 +4241,7 @@ namespace Waher.Networking.XMPP
 				await this.Error(this, e.StanzaError);
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -5039,7 +5087,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -5352,7 +5400,7 @@ namespace Waher.Networking.XMPP
 
 		private async Task CallDeliveryCallback(DeliveryEventHandler Callback, object State, bool Ok)
 		{
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -5383,7 +5431,7 @@ namespace Waher.Networking.XMPP
 			if (Form != null)
 			{
 				DynamicDataFormEventHandlerAsync h = this.OnDynamicFormUpdated;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -5647,7 +5695,7 @@ namespace Waher.Networking.XMPP
 						State = State
 					};
 
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						try
 						{
@@ -5731,7 +5779,7 @@ namespace Waher.Networking.XMPP
 				if (e.Ok && CacheResponse)
 					this.serverFeatures = e2;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -5886,7 +5934,7 @@ namespace Waher.Networking.XMPP
 						State = State
 					};
 
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						try
 						{
@@ -5954,7 +6002,7 @@ namespace Waher.Networking.XMPP
 				if (CacheResponse && e.Ok)
 					this.serverComponents = e2;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -6111,7 +6159,7 @@ namespace Waher.Networking.XMPP
 			object State = P[1];
 			List<Item> Items = new List<Item>();
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				string Name = string.Empty;
 				string Version = string.Empty;
@@ -6486,7 +6534,8 @@ namespace Waher.Networking.XMPP
 					};
 
 					this.SendIqResult(e.Id, e.From, string.Empty);
-					return this.ProcessMessage(e2);
+					this.ProcessMessage(e2);
+					return Task.CompletedTask;
 				}
 			}
 
@@ -6660,7 +6709,7 @@ namespace Waher.Networking.XMPP
 				return JID;
 		}
 
-		private async Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
+		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;
 			string MsgId = XML.Attribute(e.Query, "msgId");
@@ -6690,7 +6739,9 @@ namespace Waher.Networking.XMPP
 			this.SendIqResult(e.Id, e.From, string.Empty);
 
 			if (e2 != null)
-				await this.ProcessMessage(e2);
+				this.ProcessMessage(e2);
+
+			return Task.CompletedTask;
 		}
 
 		private void SecondTimerCallback(object State)
@@ -7167,7 +7218,7 @@ namespace Waher.Networking.XMPP
 				if (Result is null)
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -7247,7 +7298,7 @@ namespace Waher.Networking.XMPP
 
 			this.SendIqSet(string.Empty, Xml.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{

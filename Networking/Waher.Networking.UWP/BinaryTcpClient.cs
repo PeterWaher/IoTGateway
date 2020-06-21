@@ -542,7 +542,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						this.Error(ex);
 					}
 				}
 			}
@@ -582,7 +582,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						this.Error(ex);
 					}
 				}
 			}
@@ -604,7 +604,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				this.Error(ex);
 			}
 		}
 
@@ -656,7 +656,7 @@ namespace Waher.Networking
 			}
 			catch (Exception ex2)
 			{
-				Log.Critical(ex2);
+				this.Error(ex2);
 			}
 		}
 
@@ -745,7 +745,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						this.Error(ex);
 					}
 				}
 
@@ -857,7 +857,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						Log.Critical(ex);
+						this.Error(ex);
 					}
 
 					Task.TrySetResult(true);
@@ -870,7 +870,7 @@ namespace Waher.Networking
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							this.Error(ex);
 						}
 					}
 				}
@@ -897,7 +897,7 @@ namespace Waher.Networking
 						}
 						catch (Exception ex)
 						{
-							Log.Critical(ex);
+							this.Error(ex);
 						}
 					}
 				}
@@ -1226,7 +1226,7 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					this.Error(ex);
 					Result = false;
 				}
 			}

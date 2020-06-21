@@ -716,14 +716,14 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eMessageHandler(Sender, e, this.cha);
 		}
 
-		private async Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
+		private Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Xml = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher, out string EndpointReference);
 			if (Xml is null)
 			{
 				Client.Error("Unable to decrypt or verify message.");
-				return;
+				return Task.CompletedTask;
 			}
 
 			XmlDocument Doc = new XmlDocument();
@@ -738,7 +738,9 @@ namespace Waher.Networking.XMPP.P2P
 				E2eReference = EndpointReference
 			};
 
-			await Client.ProcessMessage(e2);
+			Client.ProcessMessage(e2);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -903,7 +905,7 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eIqGetHandler(Sender, e, this.cha);
 		}
 
-		private async Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+		private Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
@@ -911,14 +913,16 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				Client.Error("Unable to decrypt or verify request.");
 				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
-				return;
+				return Task.CompletedTask;
 			}
 
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(this.EmbedIq(e, "get", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
-			await Client.ProcessIqGet(e2);
+			Client.ProcessIqGet(e2);
+		
+			return Task.CompletedTask;
 		}
 
 		private Task AesIqSetHandler(object Sender, IqEventArgs e)
@@ -936,7 +940,7 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eIqSetHandler(Sender, e, this.cha);
 		}
 
-		private async Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+		private Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
 			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
@@ -944,14 +948,16 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				Client.Error("Unable to decrypt or verify request.");
 				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
-				return;
+				return Task.CompletedTask;
 			}
 
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(this.EmbedIq(e, "set", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
-			await Client.ProcessIqSet(e2);
+			Client.ProcessIqSet(e2);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

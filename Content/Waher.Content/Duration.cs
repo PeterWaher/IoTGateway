@@ -11,7 +11,7 @@ namespace Waher.Content
 	/// </summary>
 	public class Duration
 	{
-		private static Regex parser = new Regex(@"(?'Negation'-)?P((?'Years'\d+)Y)?((?'Months'\d+)M)?((?'Days'\d+)D)?(T((?'Hours'\d+)H)?((?'Minutes'\d+)M)?((?'Seconds'\d+([.]\d*)?)S)?)?", RegexOptions.Singleline | RegexOptions.Compiled);
+		private static readonly Regex parser = new Regex(@"(?'Negation'-)?P((?'Years'\d+)Y)?((?'Months'\d+)M)?((?'Days'\d+)D)?(T((?'Hours'\d+)H)?((?'Minutes'\d+)M)?((?'Seconds'\d+([.]\d*)?)S)?)?", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		private int years;
 		private int months;
@@ -395,8 +395,7 @@ namespace Waher.Content
 		/// <returns>If they are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			Duration D = obj as Duration;
-			if (D is null)
+			if (!(obj is Duration D))
 				return false;
 
 			return this == D;

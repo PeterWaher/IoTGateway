@@ -287,7 +287,7 @@
             urn:ieee:iot:leg:sc:1.0
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
             <summary>
             Adds support for legal identities, smart contracts and signatures to an XMPP client.
             
@@ -296,10 +296,23 @@
             </summary>
             <param name="Client">XMPP Client to use.</param>
             <param name="ComponentAddress">Address to the contracts component.</param>
+            <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Create(Waher.Networking.XMPP.XmppClient,System.String)">
             <summary>
-            Adds support for legal identities, smart contracts and signatures to an XMPP client.
+            Creates a <see cref="T:Waher.Networking.XMPP.Contracts.ContractsClient"/> object that adds support for 
+            legal identities, smart contracts and signatures to an XMPP client.
+            
+            The interface is defined in the IEEE XMPP IoT extensions:
+            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+            <param name="ComponentAddress">Address to the contracts component.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Create(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
+            <summary>
+            Creates a <see cref="T:Waher.Networking.XMPP.Contracts.ContractsClient"/> object that adds support for 
+            legal identities, smart contracts and signatures to an XMPP client.
             
             The interface is defined in the IEEE XMPP IoT extensions:
             https://gitlab.com/IEEE-SA/XMPPI/IoT

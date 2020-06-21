@@ -2002,12 +2002,14 @@
             If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
             <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.FindBestIndex(System.Int32@,System.String[])">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.FindBestIndex(System.Int32@,System.Int32,System.Int32,System.String[])">
             <summary>
             Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
             property is mentioned first in <paramref name="Properties"/>.
             </summary>
             <param name="BestNrFields">Number of index fields used in best index.</param>
+            <param name="FirstRequired">Number of field names in index that must exist among properties.</param>
+            <param name="RequiredProperties">Number of properties required field names may choose from.</param>
             <param name="Properties">Properties to search on. By default, sort order is ascending.
             If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
             <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>

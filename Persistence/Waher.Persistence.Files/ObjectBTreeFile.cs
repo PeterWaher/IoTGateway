@@ -4860,7 +4860,7 @@ namespace Waher.Persistence.Files
 			string s, s2;
 
 			if (SortOrder is null || SortOrder.Length == 0)
-				return this.FindBestIndex(out BestNrFields, Property);
+				return this.FindBestIndex(out BestNrFields, 1, 1, Property);
 
 			s = SortOrder[0];
 			if (s.StartsWith("-"))
@@ -4872,14 +4872,14 @@ namespace Waher.Persistence.Files
 				s2 = Property;
 
 			if (s2 == s)
-				return this.FindBestIndex(out BestNrFields, SortOrder);
+				return this.FindBestIndex(out BestNrFields, 1, 1, SortOrder);
 
 			string[] Properties = new string[SortOrder.Length + 1];
 
 			Properties[0] = Property;
 			Array.Copy(SortOrder, 0, Properties, 1, SortOrder.Length);
 
-			return this.FindBestIndex(out BestNrFields, Properties);
+			return this.FindBestIndex(out BestNrFields, 1, 1, Properties);
 		}
 
 		/// <summary>
@@ -4894,12 +4894,13 @@ namespace Waher.Persistence.Files
 		internal IndexBTreeFile FindBestIndex(out int BestNrFields, string[] Properties, string[] SortOrder)
 		{
 			string s2;
+			int NrProperties;
+
+			if (Properties is null || (NrProperties = Properties.Length) == 0)
+				return this.FindBestIndex(out BestNrFields, 0, 0, SortOrder);
 
 			if (SortOrder is null || SortOrder.Length == 0)
-				return this.FindBestIndex(out BestNrFields, Properties);
-
-			if (Properties is null || Properties.Length == 0)
-				return this.FindBestIndex(out BestNrFields, SortOrder);
+				return this.FindBestIndex(out BestNrFields, 1, NrProperties, Properties);
 
 			List<string> Order = new List<string>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
@@ -4916,6 +4917,8 @@ namespace Waher.Persistence.Files
 				Added[s2] = true;
 			}
 
+			int i = 0;
+
 			foreach (string s in Properties)
 			{
 				if (s.StartsWith("-"))
@@ -4926,11 +4929,11 @@ namespace Waher.Persistence.Files
 				if (!Added.ContainsKey(s2))
 				{
 					Added[s2] = true;
-					Order.Insert(0, s);
+					Order.Insert(i++, s);
 				}
 			}
 
-			return this.FindBestIndex(out BestNrFields, Order.ToArray());
+			return this.FindBestIndex(out BestNrFields, 1, i, Order.ToArray());
 		}
 
 		/// <summary>
@@ -4942,7 +4945,9 @@ namespace Waher.Persistence.Files
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
 		internal IndexBTreeFile FindBestIndex(params string[] Properties)
 		{
-			return this.FindBestIndex(out int _, Properties);
+			int c = Properties?.Length ?? 0;
+
+			return this.FindBestIndex(out int _, c > 0 ? 1 : 0, c, Properties);
 		}
 
 		/// <summary>
@@ -4950,16 +4955,19 @@ namespace Waher.Persistence.Files
 		/// property is mentioned first in <paramref name="Properties"/>.
 		/// </summary>
 		/// <param name="BestNrFields">Number of index fields used in best index.</param>
+		/// <param name="FirstRequired">Number of field names in index that must exist among properties.</param>
+		/// <param name="RequiredProperties">Number of properties required field names may choose from.</param>
 		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
-		internal IndexBTreeFile FindBestIndex(out int BestNrFields, params string[] Properties)
+		internal IndexBTreeFile FindBestIndex(out int BestNrFields, int FirstRequired, int RequiredProperties, params string[] Properties)
 		{
 			Dictionary<string, int> PropertyOrder = new Dictionary<string, int>();
 			IndexBTreeFile Best = null;
-			int i, c = Properties.Length;
+			int i, c = Properties?.Length ?? 0;
 			int MinOrdinal, NrFields;
 			int BestMinOrdinal = int.MaxValue;
+			bool RequiredMismatch;
 			string s;
 
 			BestNrFields = int.MinValue;
@@ -4977,10 +4985,18 @@ namespace Waher.Persistence.Files
 			{
 				MinOrdinal = int.MaxValue;
 				NrFields = 0;
+				RequiredMismatch = false;
+
 				foreach (string FieldName in Index.FieldNames)
 				{
 					if (!PropertyOrder.TryGetValue(FieldName, out int PropertyOrdinal))
 						break;
+
+					if (NrFields < FirstRequired && PropertyOrdinal >= RequiredProperties)
+					{
+						RequiredMismatch = true;
+						break;
+					}
 
 					NrFields++;
 
@@ -4988,7 +5004,7 @@ namespace Waher.Persistence.Files
 						MinOrdinal = PropertyOrdinal;
 				}
 
-				if (NrFields == 0)
+				if (NrFields == 0 || RequiredMismatch)
 					continue;
 
 				if (NrFields > BestNrFields || (NrFields == BestNrFields && MinOrdinal < BestMinOrdinal))
@@ -5524,7 +5540,12 @@ namespace Waher.Persistence.Files
 					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
 					bool UntilFirstFail;
 
-					if (Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+					if (Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+					{
+						UntilFirstFail = true;
+						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
+					}
+					else if (Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
 						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(Locked,
@@ -5532,17 +5553,14 @@ namespace Waher.Persistence.Files
 					}
 					else
 					{
+						UntilFirstFail = false;
 						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
-						UntilFirstFail = Index.SameSortOrder(Filter2.ConstantFields, SortOrder);
 
-						if (!UntilFirstFail)
-						{
-							Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-								this.fileName, string.Empty, "DBOpt",
-								new KeyValuePair<string, object>("Collection", this.collectionName),
-								new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-								new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
-						}
+						Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+							this.fileName, string.Empty, "DBOpt",
+							new KeyValuePair<string, object>("Collection", this.collectionName),
+							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 					}
 
 					return new Searching.FilteredCursor<T>(Cursor, Filter2, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);
@@ -5716,7 +5734,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					IndexBTreeFile Index = Properties is null ? null : this.FindBestIndex(out int _, Properties.ToArray());
+					IndexBTreeFile Index = Properties is null ? null : this.FindBestIndex(out int _, 1, Properties.Count, Properties.ToArray());
 					return !(Index is null);
 				}
 				else if (Filter is FilterOr)

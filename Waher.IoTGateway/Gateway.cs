@@ -1129,7 +1129,7 @@ namespace Waher.IoTGateway
 
 		internal static bool ConsoleOutput => consoleOutput;
 
-		internal static Task ConfigureXmpp(XmppConfiguration Configuration)
+		internal static async Task ConfigureXmpp(XmppConfiguration Configuration)
 		{
 			xmppCredentials = Configuration.GetCredentials();
 			xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
@@ -1183,7 +1183,7 @@ namespace Waher.IoTGateway
 			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
 
 			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.LegalIdentities))
-				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
+				contractsClient = await ContractsClient.Create(xmppClient, XmppConfiguration.Instance.LegalIdentities);
 			else
 				contractsClient = null;
 
@@ -1200,8 +1200,6 @@ namespace Waher.IoTGateway
 
 			mailClient = new MailClient(xmppClient);
 			mailClient.MailReceived += MailClient_MailReceived;
-
-			return Task.CompletedTask;
 		}
 
 		internal static async Task ConfigureDomain(DomainConfiguration Configuration)

@@ -12,6 +12,7 @@ using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
+using Waher.Script.Operators.Membership;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
 
@@ -49,13 +50,37 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
-		public ContractsClient(XmppClient Client, string ComponentAddress)
-			: this(Client, ComponentAddress, null)
+		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
+		private ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
+			: base(Client)
 		{
+			this.componentAddress = ComponentAddress;
+			this.approvedSources = ApprovedSources;
+			this.localEndpoint = null;
+
+			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
+			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 		}
 
 		/// <summary>
-		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
+		/// Creates a <see cref="ContractsClient"/> object that adds support for 
+		/// legal identities, smart contracts and signatures to an XMPP client.
+		/// 
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// </summary>
+		/// <param name="Client">XMPP Client to use.</param>
+		/// <param name="ComponentAddress">Address to the contracts component.</param>
+		public static Task<ContractsClient> Create(XmppClient Client, string ComponentAddress)
+		{
+			return Create(Client, ComponentAddress, null);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="ContractsClient"/> object that adds support for 
+		/// legal identities, smart contracts and signatures to an XMPP client.
 		/// 
 		/// The interface is defined in the IEEE XMPP IoT extensions:
 		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
@@ -63,19 +88,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
 		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
-		public ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
-			: base(Client)
+		public static async Task<ContractsClient> Create(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
 		{
-			this.componentAddress = ComponentAddress;
-			this.approvedSources = ApprovedSources;
-			this.localEndpoint = null;
-
-			Task.Run(() => this.LoadKeys());
-
-			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
-			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
-			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
-			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
+			ContractsClient Result = new ContractsClient(Client, ComponentAddress, ApprovedSources);
+			await Result.LoadKeys();
+			return Result;
 		}
 
 		private async Task<EndpointSecurity> LoadKeys()

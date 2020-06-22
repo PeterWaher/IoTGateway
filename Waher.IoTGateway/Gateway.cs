@@ -773,6 +773,30 @@ namespace Waher.IoTGateway
 					}
 				}
 
+				XmlElement VanityResources = Config.DocumentElement["VanityResources"];
+				if (VanityResources != null)
+				{
+					foreach (XmlNode N in VanityResources.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "VanityResource")
+						{
+							string RegEx = XML.Attribute(E, "regex");
+							string Url = XML.Attribute(E, "url");
+
+							try
+							{
+								webServer.RegisterVanityResource(RegEx, Url);
+							}
+							catch (Exception ex)
+							{
+								Log.Error("Unable to register vanity resource: " + ex.Message,
+									new KeyValuePair<string, object>("RegEx", RegEx),
+									new KeyValuePair<string, object>("Url", Url));
+							}
+						}
+					}
+				}
+
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Types.SetModuleParameter("HTTPX", httpxProxy);
 				Types.SetModuleParameter("HTTPXS", httpxServer);

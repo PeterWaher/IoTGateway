@@ -88,7 +88,19 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">
+        <xs:element name="VanityResources" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="VanityResource" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="regex" type="xs:string" use="required"/>
+                  <xs:attribute name="url" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
 						<xs:attribute name="folder" type="xs:string" use="required"/>
 					</xs:complexType>

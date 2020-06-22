@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 
 			this.client1.OnPresenceSubscribed += (sender, e) => { Done.Set(); return Task.CompletedTask; };
-			this.client1.RequestPresenceSubscription("wpfclient@kode.im");
+			this.client1.RequestPresenceSubscription("wpfclient@waher.se");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");
 		}

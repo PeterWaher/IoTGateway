@@ -22,13 +22,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			return new XmppCredentials()
 			{
-				//Host = "waher.se",
-				//UriEndpoint = "https://waher.se/http-bind",
-				Host = "localhost",
-				UriEndpoint = "https://localhost/http-bind",
-				TrustServer = true,
-				Account = "test",
-				Password = "testpwd"
+				Host = "waher.se",
+				UriEndpoint = "https://waher.se/http-bind",
+				Account = "xmppclient.test01",
+				Password = "testpassword"
 			};
 		}
 
@@ -36,13 +33,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			return new XmppCredentials()
 			{
-				//Host = "waher.se",
-				//UriEndpoint = "https://waher.se/http-bind",
-				Host = "localhost",
-				UriEndpoint = "https://localhost/http-bind",
-				TrustServer = true,
-				Account = "test2",
-				Password = "testpwd"
+				Host = "waher.se",
+				UriEndpoint = "https://waher.se/http-bind",
+				Account = "xmppclient.test02",
+				Password = "testpassword"
 			};
 		}
 	}

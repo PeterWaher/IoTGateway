@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.AuthenticationErrors;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -18,6 +19,7 @@ namespace Waher.Networking.XMPP.Test
 		protected AutoResetEvent offline = new AutoResetEvent(false);
 		protected XmppClient client;
 		protected Exception ex = null;
+		protected Type permittedExceptionType = null;
 
 		public XmppConnectionTests()
 		{
@@ -49,6 +51,7 @@ namespace Waher.Networking.XMPP.Test
 			this.offline.Reset();
 
 			this.ex = null;
+			this.permittedExceptionType = null;
 
 			this.client = new XmppClient(this.GetCredentials(), "en", typeof(CommunicationTests).Assembly)
 			{
@@ -70,7 +73,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			return new XmppCredentials()
 			{
-				Host = "kode.im",
+				Host = "waher.se",
 				Port = 5222,
 				Account = "xmppclient.test01",
 				Password = "testpassword"
@@ -155,6 +158,7 @@ namespace Waher.Networking.XMPP.Test
 					break;
 			}
 
+			this.permittedExceptionType = typeof(NotAuthorizedException);
 			this.ex = null;
 		}
 
@@ -182,11 +186,11 @@ namespace Waher.Networking.XMPP.Test
 		[TestCleanup]
 		public void TearDown()
 		{
-			if (this.client != null)
-				this.client.Dispose();
+			this.client?.Dispose();
+			this.client = null;
 
-			if (this.ex != null)
-				throw new TargetInvocationException(this.ex);
+			if (!(this.ex is null) && this.ex.GetType() != this.permittedExceptionType)
+				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(this.ex).Throw();
 		}
 
 		[TestMethod]
@@ -217,7 +221,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.Connection_Test_03_Disconnect();
 
-			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
+			this.client = new XmppClient("waher.se", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
 			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.OnError += this.Client_OnError;
 			this.client.OnStateChanged += this.Client_OnStateChanged;

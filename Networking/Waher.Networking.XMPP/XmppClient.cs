@@ -840,6 +840,8 @@ namespace Waher.Networking.XMPP
 
 		internal async Task ConnectionError(Exception ex)
 		{
+			this.State = XmppState.Error;
+		
 			ExceptionEventHandler h = this.OnConnectionError;
 			if (!(h is null))
 			{
@@ -857,7 +859,6 @@ namespace Waher.Networking.XMPP
 
 			this.inputState = -1;
 			this.DisposeClient();
-			this.State = XmppState.Error;
 		}
 
 		private async Task Error(object _, Exception Exception)

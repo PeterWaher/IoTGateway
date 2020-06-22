@@ -1557,7 +1557,7 @@
             <param name="DeliveryCallback">Method to call when message has been delivered.</param>
             <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Sends an IQ Get stanza
             </summary>
@@ -1569,7 +1569,7 @@
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
             <returns>ID of IQ stanza.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object,System.Int32,System.Int32)">
             <summary>
             Sends an IQ Get stanza
             </summary>
@@ -1583,7 +1583,7 @@
             <param name="NrRetries">Number of retries.</param>
             <returns>ID of IQ stanza.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
             Sends an IQ Get stanza
             </summary>
@@ -1600,7 +1600,7 @@
             <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
             <returns>ID of IQ stanza.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Sends an IQ Set stanza
             </summary>
@@ -1612,7 +1612,7 @@
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
             <returns>ID of IQ stanza.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object,System.Int32,System.Int32)">
             <summary>
             Sends an IQ Set stanza
             </summary>
@@ -1626,7 +1626,7 @@
             <param name="NrRetries">Number of retries.</param>
             <returns>ID of IQ stanza.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
             Sends an IQ Set stanza
             </summary>
@@ -1673,7 +1673,7 @@
             <param name="To">To attribute</param>
             <param name="ex">Exception object</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIq(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32,System.Boolean)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SendIq(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object,System.Int32,System.Int32,System.Boolean,System.Int32,System.Boolean)">
             <summary>
             Sends an IQ stanza
             </summary>
@@ -1700,7 +1700,7 @@
             </summary>
             <param name="Xml">XML Output.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SynchronizeE2e(System.String,Waher.Networking.XMPP.IqResultEventHandler)">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SynchronizeE2e(System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync)">
             <summary>
             Synchronizes End-to-End Encryption and Peer-to-Peer connectivity parameters with a remote entity.
             </summary>
@@ -2049,7 +2049,7 @@
             Class managing the transmission of a SOCKS5 bytestream.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.#ctor(System.String,System.String,System.String,System.Int32,Waher.Networking.XMPP.IEndToEndEncryption,System.String)">
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.#ctor(System.String,System.String,System.String,System.Int32,Waher.Networking.XMPP.IEndToEndEncryption)">
             <summary>
             Class managing the transmission of a SOCKS5 bytestream.
             </summary>
@@ -2058,7 +2058,6 @@
             <param name="To">To</param>
             <param name="BlockSize">Block size</param>
             <param name="E2E">End-to-end encryption, if used.</param>
-            <param name="EndpointReference">Reference to End-to-end encryption endpoint used.</param>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.StreamId">
             <summary>

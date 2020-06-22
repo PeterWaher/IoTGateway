@@ -1091,7 +1091,7 @@ namespace Waher.Client.WPF.Model
 			{
 				foreach (Item Item in e.Items)
 				{
-					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
+					this.client.SendServiceDiscoveryRequest(Item.JID, async (sender2, e2) =>
 					{
 						try
 						{
@@ -1104,7 +1104,7 @@ namespace Waher.Client.WPF.Model
 							lock (this.children)
 							{
 								if (this.children.ContainsKey(Item.JID))
-									return Task.CompletedTask;
+									return;
 							}
 
 							if (e2.HasFeature(ThingRegistryClient.NamespaceDiscovery))
@@ -1118,7 +1118,7 @@ namespace Waher.Client.WPF.Model
 								Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
 							}
 							else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
-								Component = new LegalService(this, Item.JID, Item.Name, Item.Node, e2.Features);
+								Component = await LegalService.Create(this, Item.JID, Item.Name, Item.Node, e2.Features);
 							else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 								Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
 							else
@@ -1129,7 +1129,7 @@ namespace Waher.Client.WPF.Model
 								if (this.children.ContainsKey(Item.JID))
 								{
 									Component.Dispose();
-									return Task.CompletedTask;
+									return;
 								}
 
 								this.children[Item.JID] = Component;
@@ -1148,8 +1148,6 @@ namespace Waher.Client.WPF.Model
 						{
 							Log.Critical(ex);
 						}
-
-						return Task.CompletedTask;
 
 					}, null);
 				}

@@ -17,11 +17,19 @@ namespace Waher.Client.WPF.Model.Legal
 	{
 		private ContractsClient contractsClient;
 
-		public LegalService(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
+		private LegalService(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
-			this.contractsClient = new ContractsClient(this.Account.Client, JID);
-			this.contractsClient.IdentityUpdated += ContractsClient_IdentityUpdated;
+		}
+
+		public static async Task<LegalService> Create(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
+		{
+			LegalService Result = new LegalService(Parent, JID, Name, Node, Features);
+
+			Result.contractsClient = await ContractsClient.Create(Result.Account.Client, JID);
+			Result.contractsClient.IdentityUpdated += Result.ContractsClient_IdentityUpdated;
+
+			return Result;
 		}
 
 		public ContractsClient ContractsClient

@@ -185,7 +185,7 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (this.Encodes(Object, out Grade Grade, AcceptedContentTypes))
+			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
 			{
 				if (Encoding is null)
 				{

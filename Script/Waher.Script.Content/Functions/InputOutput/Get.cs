@@ -89,7 +89,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 				};
 			}
 			else
-				throw new ScriptRuntimeException("Invalid second parameter to Get. Should be either an accept string, or an object with protocol-specific headers or options.", Node);
+				throw new ScriptRuntimeException("Invalid header parameter. Should be either an accept string, or an object with protocol-specific headers or options.", Node);
 
 			return HeaderList;
 		}

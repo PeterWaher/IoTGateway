@@ -102,6 +102,15 @@ namespace Waher.Script.Persistence.SQL
 
 							Item = Obj2;
 						}
+						else if (Item is Dictionary<string, object> ObjExNihilo2)
+						{
+							GenericObject Obj2 = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
+
+							foreach (KeyValuePair<string, object> P in ObjExNihilo2)
+								Obj2[P.Key] = P.Value;
+
+							Item = Obj2;
+						}
 
 						await Source.Insert(Item);
 						Count++;

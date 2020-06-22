@@ -66,7 +66,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			List<KeyValuePair<string, string>> HeaderList = null;
 
 			if (Arguments.Length > 2)
-				HeaderList = Get.GetHeaders(Arguments[1].AssociatedObjectValue, this);
+				HeaderList = Get.GetHeaders(Arguments[2].AssociatedObjectValue, this);
 
 			object Result = InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
 

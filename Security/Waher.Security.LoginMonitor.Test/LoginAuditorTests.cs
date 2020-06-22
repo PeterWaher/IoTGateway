@@ -322,7 +322,7 @@ namespace Waher.Security.LoginMonitor.Test
 
 		private async Task TestFails(params TimeSpan[] Spans)
 		{
-			DateTime TP = new DateTime(2020, 1, 1, 0, 0, 0);
+			DateTime TP = new DateTime(3000, 1, 1, 0, 0, 0);
 			DateTime TP2;
 			int Count = Spans.Length;
 			int i;

@@ -787,14 +787,6 @@ namespace Waher.Networking.XMPP
 			return this.ParseIncoming(Text);
 		}
 
-		/// <summary>
-		/// Closes the connection.
-		/// </summary>
-		public void Close()
-		{
-			this.DisposeClient();
-		}
-
 		private void RegisterDefaultHandlers()
 		{
 			this.RegisterIqSetHandler("query", NamespaceRoster, this.RosterPushHandler, true);
@@ -840,6 +832,8 @@ namespace Waher.Networking.XMPP
 
 		internal async Task ConnectionError(Exception ex)
 		{
+			this.State = XmppState.Error;
+		
 			ExceptionEventHandler h = this.OnConnectionError;
 			if (!(h is null))
 			{
@@ -857,7 +851,6 @@ namespace Waher.Networking.XMPP
 
 			this.inputState = -1;
 			this.DisposeClient();
-			this.State = XmppState.Error;
 		}
 
 		private async Task Error(object _, Exception Exception)
@@ -1133,11 +1126,8 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Offline;
 
-			if (this.authenticationMechanisms != null)
-				this.authenticationMechanisms.Clear();
-
-			if (this.compressionMethods != null)
-				this.compressionMethods.Clear();
+			this.authenticationMechanisms?.Clear();
+			this.compressionMethods?.Clear();
 
 			if (this.pendingRequestsBySeqNr != null)
 			{
@@ -1164,7 +1154,7 @@ namespace Waher.Networking.XMPP
 
 		private void DisposeClient()
 		{
-			this.client?.Dispose();
+			this.client?.DisposeWhenDone();
 			this.client = null;
 
 			if (this.textTransportLayer is IAlternativeTransport AlternativeTransport)

@@ -110,7 +110,7 @@
             <param name="ObjectId">ID of the message object to get.</param>
             <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Delete(System.String,Waher.Networking.XMPP.IqResultEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Mail.MailClient.Delete(System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Deletes a message object from the broker.
             </summary>

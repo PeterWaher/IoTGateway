@@ -563,10 +563,68 @@ namespace Waher.Security
 		public static byte[] ComputeHMACSHA256Hash(byte[] Key, byte[] Data)
 		{
 			byte[] Result;
-
+			
 			using (HMACSHA256 HMACSHA256 = new HMACSHA256(Key))
 			{
 				Result = HMACSHA256.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA384HashString(byte[] Key, byte[] Data)
+		{
+			return BinaryToString(ComputeHMACSHA384Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA384Hash(byte[] Key, byte[] Data)
+		{
+			byte[] Result;
+
+			using (HMACSHA384 HMACSHA384 = new HMACSHA384(Key))
+			{
+				Result = HMACSHA384.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA512HashString(byte[] Key, byte[] Data)
+		{
+			return BinaryToString(ComputeHMACSHA512Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA512Hash(byte[] Key, byte[] Data)
+		{
+			byte[] Result;
+
+			using (HMACSHA512 HMACSHA512 = new HMACSHA512(Key))
+			{
+				Result = HMACSHA512.ComputeHash(Data);
 			}
 
 			return Result;

@@ -58,6 +58,35 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha1HMac">
+            <summary>
+            Sha1HMac(Data)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha1HMac.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sha1HMac(Data)
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="Key">Binary key</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.HashFunctions.Sha1HMac.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha1HMac.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_256">
             <summary>
             Sha2_256(Data)
@@ -82,6 +111,35 @@
             Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_256HMac">
+            <summary>
+            Sha2_256HMac(Data)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_256HMac.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sha2_256HMac(Data)
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="Key">Binary key</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_256HMac.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_256HMac.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
@@ -112,6 +170,35 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_384HMac">
+            <summary>
+            Sha2_384HMac(Data)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_384HMac.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sha2_384HMac(Data)
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="Key">Binary key</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_384HMac.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_384HMac.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_512">
             <summary>
             Sha2_512(Data)
@@ -136,6 +223,35 @@
             Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_512HMac">
+            <summary>
+            Sha2_512HMac(Data)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_512HMac.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sha2_512HMac(Data)
+            </summary>
+            <param name="Data">Binary data</param>
+            <param name="Key">Binary key</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_512HMac.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.HashFunctions.Sha2_512HMac.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>

@@ -1,49 +1,48 @@
 ﻿using System;
 using System.Text;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 
 namespace Waher.IoTGateway.App
 {
-	public class LogSniffer : ISniffer
+	public class LogSniffer : SnifferBase
 	{
-		public void Error(string Error)
+		public override void Error(DateTime _, string Error)
 		{
 			Log.Error(Error);
 		}
 
-		public void Exception(string Exception)
+		public override void Exception(DateTime _, string Exception)
 		{
 			Log.Critical(Exception);
 		}
 
-		public void Information(string Comment)
+		public override void Information(DateTime _, string Comment)
 		{
 			Log.Informational(Comment);
 		}
 
-		public void ReceiveBinary(byte[] Data)
+		public override void ReceiveBinary(DateTime _, byte[] Data)
 		{
 			Log.Informational("Rx: " + ToString(Data));
 		}
 
-		public void ReceiveText(string Text)
+		public override void ReceiveText(DateTime _, string Text)
 		{
 			Log.Informational("Rx: " + Text);
 		}
 
-		public void TransmitBinary(byte[] Data)
+		public override void TransmitBinary(DateTime _, byte[] Data)
 		{
 			Log.Informational("Tx: " + ToString(Data));
 		}
 
-		public void TransmitText(string Text)
+		public override void TransmitText(DateTime _, string Text)
 		{
 			Log.Informational("Tx: " + Text);
 		}
 
-		public void Warning(string Warning)
+		public override void Warning(DateTime _, string Warning)
 		{
 			Log.Warning(Warning);
 		}

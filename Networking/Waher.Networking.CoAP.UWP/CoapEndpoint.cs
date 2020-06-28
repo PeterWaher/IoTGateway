@@ -58,7 +58,7 @@ namespace Waher.Networking.CoAP
 		private readonly Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
 		private readonly Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
 		private readonly Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
-		private Random gen = new Random();
+		private readonly Random gen = new Random();
 		private Scheduler scheduler;
 		private readonly LinkedList<ClientBase> coapOutgoing = new LinkedList<ClientBase>();
 		private readonly LinkedList<ClientBase> coapIncoming = new LinkedList<ClientBase>();
@@ -146,7 +146,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(params ISniffer[] Sniffers)
-			: this(new int[] { DefaultCoapPort }, null, null, null, false, false)
+			: this(new int[] { DefaultCoapPort }, null, null, null, false, false, Sniffers)
 		{
 		}
 
@@ -201,7 +201,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(int[] CoapPorts, int[] CoapsPorts, IUserSource Users, string RequiredPrivilege,
 			bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
-		: base(Sniffers)
+			: base(Sniffers)
 		{
 			LinkedList<KeyValuePair<int, bool>> Ports = new LinkedList<KeyValuePair<int, bool>>();
 			UdpClient Outgoing;
@@ -625,7 +625,7 @@ namespace Waher.Networking.CoAP
 						}
 						catch (Exception ex)
 						{
-							this.Error(ex.Message);
+							this.Exception(ex);
 
 							if (Option.Critical)
 								return;
@@ -892,7 +892,7 @@ namespace Waher.Networking.CoAP
 					{
 						this.Transmit(Client, From, Client.IsEncrypted, IncomingMessage.MessageId,
 							CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, 0, 64,
-							null, null, null, null, null);
+							null, null, null, null, null, null);
 					}
 
 					if (IncomingMessage.Block2 != null)
@@ -1879,37 +1879,6 @@ namespace Waher.Networking.CoAP
 				Payload, 0, BlockSize, null, Callback, State, null, Credentials, Options);
 		}
 
-		private void Request(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong? Token,
-			CoapCode Code, byte[] Payload, int BlockSize, IDtlsCredentials Credentials,
-			params CoapOption[] Options)
-		{
-			this.Transmit(null, Destination, Encrypted, null,
-				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
-				Payload, 0, BlockSize, null, null, null, null, Credentials, Options);
-		}
-
-		private void Respond(ClientBase Client, IPEndPoint Destination, bool Acknowledged,
-			CoapCode Code, ulong Token, byte[] Payload, int BlockSize, params CoapOption[] Options)
-		{
-			this.Transmit(Client, Destination, Client.IsEncrypted, null,
-				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
-				Payload, 0, BlockSize, null, null, null, null, null, Options);
-		}
-
-		private void ACK(ClientBase Client, IPEndPoint Destination, ushort MessageId)
-		{
-			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
-				CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64,
-				null, null, null, null, null, null);
-		}
-
-		private void Reset(ClientBase Client, IPEndPoint Destination, ushort MessageId)
-		{
-			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
-				CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64,
-				null, null, null, null, null, null);
-		}
-
 		/// <summary>
 		/// Tries to get a CoAP Content Format object, that can be used to decode content.
 		/// </summary>
@@ -2018,7 +1987,7 @@ namespace Waher.Networking.CoAP
 				}
 				catch (Exception ex)
 				{
-					this.Error(ex.Message);
+					this.Exception(ex);
 					Log.Critical(ex);
 				}
 			}

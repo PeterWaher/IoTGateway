@@ -334,7 +334,7 @@ namespace Waher.Security.DTLS
 				}
 				catch (Exception ex)
 				{
-					this.Error(ex.Message);
+					this.Exception(ex);
 					Record.fragment = null;
 				}
 

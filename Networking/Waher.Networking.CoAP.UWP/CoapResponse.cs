@@ -21,13 +21,13 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapResponse
 	{
-		private CoapOption[] additionalResponseOptions;
-		private ClientBase client;
-		private CoapEndpoint endpoint;
-		private CoapMessage request;
-		private IPEndPoint remoteEndpoint;
-		private Notifications notifications;
-		private CoapResource resource;
+		private readonly CoapOption[] additionalResponseOptions;
+		private readonly ClientBase client;
+		private readonly CoapEndpoint endpoint;
+		private readonly CoapMessage request;
+		private readonly IPEndPoint remoteEndpoint;
+		private readonly Notifications notifications;
+		private readonly CoapResource resource;
 		private bool responded = false;
 
 		/// <summary>

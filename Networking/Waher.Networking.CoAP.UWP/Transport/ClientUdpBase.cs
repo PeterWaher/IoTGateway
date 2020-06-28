@@ -52,7 +52,7 @@ namespace Waher.Networking.CoAP.Transport
 			}
 			catch (Exception ex)
 			{
-				this.Endpoint.Error(ex.Message);
+				this.Endpoint.Exception(ex);
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace Waher.Networking.CoAP.Transport
 			}
 			catch (Exception ex)
 			{
-				this.Endpoint.Error(ex.Message);
+				this.Endpoint.Exception(ex);
 			}
 		}
 

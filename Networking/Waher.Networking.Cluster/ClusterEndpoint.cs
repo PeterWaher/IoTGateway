@@ -568,7 +568,7 @@ namespace Waher.Networking.Cluster
 									}
 									catch (Exception ex)
 									{
-										this.Error(ex.Message);
+										this.Exception(ex);
 										Log.Critical(ex);
 										Ack = false;
 									}
@@ -748,7 +748,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex.Message);
+				this.Exception(ex);
 				Log.Critical(ex);
 			}
 		}

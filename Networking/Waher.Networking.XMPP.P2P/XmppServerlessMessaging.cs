@@ -471,7 +471,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					this.Error(ex.Message);
+					this.Exception(ex);
 					Connection = null;
 
 					if (ResynchMethod != null)

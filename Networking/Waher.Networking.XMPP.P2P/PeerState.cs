@@ -670,7 +670,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					this.parent.Error(ex.Message);
+					this.parent.Exception(ex);
 
 					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 						"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(ex.Message) +

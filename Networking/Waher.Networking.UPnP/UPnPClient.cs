@@ -31,8 +31,8 @@ namespace Waher.Networking.UPnP
 		private const int ssdpPort = 1900;
 		private const int defaultMaximumSearchTimeSeconds = 10;
 
-		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> ssdpOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
-		private LinkedList<UdpClient> ssdpIncoming = new LinkedList<UdpClient>();
+		private readonly LinkedList<KeyValuePair<UdpClient, IPEndPoint>> ssdpOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
+		private readonly LinkedList<UdpClient> ssdpIncoming = new LinkedList<UdpClient>();
 		private bool disposed = false;
 
 		/// <summary>
@@ -201,7 +201,7 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex.Message);
+				this.Exception(ex);
 			}
 		}
 
@@ -298,7 +298,7 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex.Message);
+				this.Exception(ex);
 			}
 		}
 

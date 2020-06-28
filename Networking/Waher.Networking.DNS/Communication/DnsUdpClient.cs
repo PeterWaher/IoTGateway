@@ -124,7 +124,7 @@ namespace Waher.Networking.DNS.Communication
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex.Message);
+				this.Exception(ex);
 			}
 		}
 

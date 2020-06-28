@@ -113,5 +113,18 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
 		void Exception(DateTime Timestamp, string Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		void Exception(Exception Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		void Exception(DateTime Timestamp, Exception Exception);
 	}
 }

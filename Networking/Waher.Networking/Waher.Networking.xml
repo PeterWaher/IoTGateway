@@ -1009,6 +1009,19 @@
             <param name="Timestamp">Timestamp of event.</param>
             <param name="Exception">Exception.</param>
         </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Exception(System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferBinaryEvent">
             <summary>
             Base class for binary-based sniffer events.
@@ -1477,6 +1490,19 @@
             <param name="Exception">Exception.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.SnifferBase.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Exception(System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferBase.Exception(System.DateTime,System.Exception)">
             <summary>
             Called to inform the viewer of an exception state.
             </summary>

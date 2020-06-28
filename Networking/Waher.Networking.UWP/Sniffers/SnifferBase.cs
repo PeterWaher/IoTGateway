@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Waher.Events;
 using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
 {
-    /// <summary>
-    /// Abstract base class for sniffers. Implements default method overloads.
-    /// </summary>
-    public abstract class SnifferBase : ISniffer
-    {
-        /// <summary>
-        /// Abstract base class for sniffers. Implements default method overloads.
-        /// </summary>
-        public SnifferBase()
-        {
-        }
+	/// <summary>
+	/// Abstract base class for sniffers. Implements default method overloads.
+	/// </summary>
+	public abstract class SnifferBase : ISniffer
+	{
+		/// <summary>
+		/// Abstract base class for sniffers. Implements default method overloads.
+		/// </summary>
+		public SnifferBase()
+		{
+		}
 
 		/// <summary>
 		/// Called when binary data has been received.
@@ -144,6 +145,54 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
 		public abstract void Exception(DateTime Timestamp, string Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public virtual void Exception(Exception Exception)
+		{
+			this.Exception(DateTime.Now, Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public virtual void Exception(DateTime Timestamp, Exception Exception)
+		{
+			LinkedList<Exception> Inner = null;
+
+			while (!(Exception is null))
+			{
+				if (Exception is AggregateException AggregateException)
+				{
+					if (Inner is null)
+						Inner = new LinkedList<Exception>();
+
+					foreach (Exception ex in AggregateException.InnerExceptions)
+						Inner.AddLast(ex);
+				}
+				else if (!(Exception.InnerException is null))
+				{
+					if (Inner is null)
+						Inner = new LinkedList<Exception>();
+
+					Inner.AddLast(Exception.InnerException);
+				}
+
+				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Exception.StackTrace);
+
+				if (Inner is null)
+					Exception = null;
+				else
+				{
+					Exception = Inner.First.Value;
+					Inner.RemoveFirst();
+				}
+			}
+		}
 
 	}
 }

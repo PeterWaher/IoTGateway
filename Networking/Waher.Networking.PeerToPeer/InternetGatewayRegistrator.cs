@@ -419,7 +419,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex.Message);
+				Log.Critical(ex);
 
 				this.exception = ex;
 				this.State = PeerToPeerNetworkState.Error;

@@ -650,7 +650,7 @@ namespace Waher.Networking
 			try
 			{
 				if (this.HasSniffers)
-					this.Error(ex.Message);
+					this.Exception(ex);
 
 				OnError?.Invoke(this, ex);
 			}

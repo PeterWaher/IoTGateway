@@ -43,8 +43,7 @@ namespace Waher.Networking.Cluster
 
 		internal bool IsEndpoint(string AddressString, int Port)
 		{
-			IPEndPoint EndPoint = this.client.Client.LocalEndPoint as IPEndPoint;
-			if (EndPoint is null)
+			if (!(this.client.Client.LocalEndPoint is IPEndPoint EndPoint))
 				return false;
 
 			return (EndPoint.Address.ToString() == AddressString && EndPoint.Port == Port);
@@ -160,7 +159,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
-						this.endpoint.Error(ex.Message);
+						this.endpoint.Exception(ex);
 						Log.Critical(ex);
 					}
 				}
@@ -171,7 +170,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.endpoint.Error(ex.Message);
+				this.endpoint.Exception(ex);
 			}
 		}
 
@@ -263,7 +262,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.endpoint.Error(ex.Message);
+				this.endpoint.Exception(ex);
 
 				lock (this.outputQueue)
 				{

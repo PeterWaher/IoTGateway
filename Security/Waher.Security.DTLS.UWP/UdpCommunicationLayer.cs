@@ -67,7 +67,7 @@ namespace Waher.Security.DTLS
 			catch (Exception ex)
 			{
 				if (!this.disposed)
-					this.Error(ex.Message);
+					this.Exception(ex);
 			}
 		}
 
@@ -113,7 +113,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex.Message);
+				this.Exception(ex);
 			}
 		}
 

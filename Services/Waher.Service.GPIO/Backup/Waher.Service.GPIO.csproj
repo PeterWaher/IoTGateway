@@ -4,24 +4,21 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{A7B22A0A-6A76-43A6-9F14-027B45E64155}</ProjectGuid>
+    <ProjectGuid>{8563B513-6074-4C0F-A7EB-0F2BB81A97D1}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Mock.Lamp.UWP</RootNamespace>
-    <AssemblyName>Waher.Mock.Lamp.UWP</AssemblyName>
+    <RootNamespace>Waher.Service.GPIO</RootNamespace>
+    <AssemblyName>Waher.Service.GPIO</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Waher.Mock.Lamp.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>CAF6DFB6F17FD31A0302583E5FAB6E3A4D583199</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <AppxBundle>Never</AppxBundle>
+    <PackageCertificateKeyFile>Waher.Service.GPIO_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>C61A4585EB9964C190C7D108FE1D0E38A56C17B0</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot</RuntimeIdentifiers>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -97,7 +94,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Waher.Mock.Temperature.UWP_TemporaryKey.pfx" />
+    <None Include="project.json" />
     <Content Include="xmpp.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -115,7 +112,8 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Waher.Mock.Lamp.UWP_TemporaryKey.pfx" />
+    <None Include="Waher.Mock.Temperature.UWP_TemporaryKey.pfx" />
+    <None Include="Waher.Service.GPIO_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />
@@ -154,6 +152,10 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Mocks\Waher.Mock.UWP\Waher.Mock.UWP.csproj">
+      <Project>{cfb44d79-a34a-418b-ae64-ad9930d88975}</Project>
+      <Name>Waher.Mock.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
       <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
       <Name>Waher.Networking.UWP</Name>
@@ -165,10 +167,6 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control.UWP\Waher.Networking.XMPP.Control.UWP.csproj">
       <Project>{c6ba953e-a472-479f-8ba5-82bbaccc7f53}</Project>
       <Name>Waher.Networking.XMPP.Control.UWP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Interoperability.UWP\Waher.Networking.XMPP.Interoperability.UWP.csproj">
-      <Project>{8febe949-d96c-4cbc-aaee-6beee434d3f5}</Project>
-      <Name>Waher.Networking.XMPP.Interoperability.UWP</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PEP.UWP\Waher.Networking.XMPP.PEP.UWP.csproj">
       <Project>{e8115045-7cfb-4fb1-ac25-2ba4ee00485e}</Project>
@@ -190,10 +188,6 @@
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
-      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
-      <Name>Waher.Runtime.Inventory</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
@@ -206,24 +200,11 @@
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Mock.UWP\Waher.Mock.UWP.csproj">
-      <Project>{cfb44d79-a34a-418b-ae64-ad9930d88975}</Project>
-      <Name>Waher.Mock.UWP</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.PersistenceChannel">
-      <Version>1.2.3</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
-      <Version>1.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.DependencyValidation.Analyzers">
-      <Version>0.10.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.10</Version>
-    </PackageReference>
+    <SDKReference Include="WindowsIoT, Version=10.0.10586.0">
+      <Name>Windows IoT Extensions for the UWP</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

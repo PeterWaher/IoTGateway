@@ -1,0 +1,1402 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:ieee:iot:leg:sc:1.0'
+    xmlns='urn:ieee:iot:leg:sc:1.0'
+    xmlns:e2='urn:ieee:iot:e2e:1.0'
+    xmlns:id='urn:ieee:iot:leg:id:1.0'
+    xmlns:xml='http://www.w3.org/XML/1998/namespace'
+    elementFormDefault='qualified'>
+
+	<!--
+Copyright 2017-2018 The Institute of Electrical and Electronics Engineers, 
+Incorporated (IEEE).
+
+This work is licensed to The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) under one or more contributor license
+agreements.
+
+See the LICENSE.md file distributed with this work for additional
+information regarding copyright ownership. Use of this file is
+governed by a BSD-style license, the terms of which are as follows:
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions, the following disclaimer, and the
+NOTICE file.
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions, the following disclaimer in the
+documentation and/or other materials provided with the
+distribution, and the NOTICE file.
+Neither the name of The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SPDX-License-Identifier: BSD-3-Clause
+  
+Disclaimer: This open source repository contains material that may be 
+included-in or referenced by an unapproved draft of a proposed IEEE 
+Standard. All material in this repository is subject to change. The 
+material in this repository is presented "as is" and with all faults. 
+Use of the material is at the sole risk of the user. IEEE specifically 
+disclaims all warranties and representations with respect to all 
+material contained in this repository and shall not be liable, under 
+any theory, for any use of the material. Unapproved drafts of proposed 
+IEEE standards must not be utilized for any conformance/compliance 
+purposes.
+-->
+
+	<xs:import namespace='urn:ieee:iot:e2e:1.0'/>
+	<xs:import namespace='urn:ieee:iot:leg:id:1.0'/>
+	<xs:import namespace='http://www.w3.org/XML/1998/namespace'/>
+
+	<xs:element name='createContract'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza, to create a smart contract in the account of the sender.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+			<xs:documentation>Note: The client is required to have a valid legal identity to create a contract, even if the contract is not signed.</xs:documentation>
+			<xs:documentation>Note: Whenever the state of the contract is changed on the server, a message is sent to the bare JIDs of all parties of the contract, including the creator if not signed, containing the updated contract, in a contract element. Contracts should only be accepted by clients, if the sender corresponds to the provider, and if the server signature is valid, and corresponds to the public key of the server.</xs:documentation>
+			<xs:documentation>If an XML schema is available on the server defining the structure of the machine-readable contents of the contract, based on its qualified name, it will be used to validate the contents of the contract. If that validation fails, an error is returned, and the contract is not created. If validation succeeds, information about this will be made available in the state portion of the contract.</xs:documentation>
+			<xs:documentation>XML Schemas can either be registered with the Trust Provider out-of-band, or downloaded by the Trust Provider automatically, if accessible through the namespace URI, if it's using a downloadable URI scheme. The XML Schema must not contain processing instructions.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs='1' maxOccurs='1'>
+				<xs:element ref='contract'>
+					<xs:annotation>
+						<xs:documentation>The contract the legal identity of the client wants to create.</xs:documentation>
+						<xs:documentation>Note: A contract has to be reviewed and approved by the Trust Provider before the contract can be signed. The review-process is performed out-of-band.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='template'>
+					<xs:annotation>
+						<xs:documentation>By referencing a reviewed and approved contract instead of creating an absolutely new one, the legal identity can skip the review and approval steps otherwise required when creating a new contract.</xs:documentation>
+						<xs:documentation>Note: The client must be authorized to access the referenced contract, in order to be able to create new contracts based on the referenced one.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+								<xs:annotation>
+									<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+								<xs:annotation>
+									<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
+									<xs:documentation>Array must not contain parameters not available in the referenced contract.</xs:documentation>
+									<xs:documentation>Prameters available in the referenced contract will be used as-is, if not available in this sequence, or overwritten by the present parameters, if available.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name='id' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
+								<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete or Rejected must result in a failure.</xs:documentation>
+								<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
+								<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attributeGroup ref='visibilityAndDuration'>
+							<xs:annotation>
+								<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attributeGroup>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='contract'>
+		<xs:annotation>
+			<xs:documentation>Element containing information about a contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs='1' maxOccurs='1' namespace='##any' processContents='lax'>
+					<xs:annotation>
+						<xs:documentation>Contents of the contract. Semantics is defined by qualified name of the element.</xs:documentation>
+						<xs:documentation>If an XML scheme validating the contents is registered with the Trust Provider, it will be used to validate that the contents is well-formed and complete.</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+				<xs:element name='role' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Defines a role that is referenced from the signatures, and that can be referenced from the contract definition.</xs:documentation>
+						<xs:documentation>Note: The selection of role has legal significance.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name='description' type='HumanReadableText' minOccurs='1' maxOccurs='unbounded'>
+								<xs:annotation>
+									<xs:documentation>Human-readable description of the role.</xs:documentation>
+									<xs:documentation>Note: Multiple localized descriptions can be provided.</xs:documentation>
+									<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name='name' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>Machine readable name of the role.</xs:documentation>
+								<xs:documentation>Note: Names are case-insensitive in searches and references.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='minCount' type='xs:nonNegativeInteger' use='required'>
+							<xs:annotation>
+								<xs:documentation>Minimum amount of signatures required for this role, to make the contract legal.</xs:documentation>
+								<xs:documentation>Note: A value of zero (0) defines an optional role.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='maxCount' type='xs:nonNegativeInteger' use='required'>
+							<xs:annotation>
+								<xs:documentation>Maximum amount of signatures allowed for this role.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref='parts' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+						<xs:documentation>Note: If not provided, the same parts as the template will be used.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref='parameters' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Parameters can be referenced from the human and machine readable texts, and provide a mechanism to maintain the text consistent.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='humanReadableText' type='HumanReadableText' minOccurs='1' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Human-readable version of the contract.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='signature' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Signatures of the contract.</xs:documentation>
+						<xs:documentation>The signature is calculated on the contract element excluding the id attribute and the signature, status and serverSignature elements.</xs:documentation>
+						<xs:documentation>All text nodes and attribute values contain XML-encoded normalized Unicode text (in NFC).</xs:documentation>
+						<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed white-space.</xs:documentation>
+						<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty elements, is UTF-8 encoded before being signed.</xs:documentation>
+						<xs:documentation>The contract element never includes the xmlns attribute when calculating the signature.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='legalId' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>The ID of the legal identity used to generate the signature.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='bareJid' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>The Bare JID of the client used to generate the signature.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='role' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>The role the legal identity assumes when signing the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attributeGroup ref='signatureAttributes'/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='status' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
+						<xs:documentation>Authorized clients can get the latest version of the contract by requesting it from the trust provider, given the id of the contract.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='provider' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>JID of Trust Provider validating the correctness of the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='state' type='ContractState' use='required'>
+							<xs:annotation>
+								<xs:documentation>Contains information about the current statue of the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='created' type='xs:dateTime' use='required'>
+							<xs:annotation>
+								<xs:documentation>When the contract was first created.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='updated' type='xs:dateTime' use='optional'>
+							<xs:annotation>
+								<xs:documentation>When the contract was last updated.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='from' type='xs:dateTime' use='optional'>
+							<xs:annotation>
+								<xs:documentation>From when the contract is legally binding.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='to' type='xs:dateTime' use='optional'>
+							<xs:annotation>
+								<xs:documentation>Until when the contract is legally binding.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='templateId' type='NonEmptyString' use='optional'>
+							<xs:annotation>
+								<xs:documentation>Contract ID of template used to create the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='schemaDigest' type='xs:base64Binary' use='optional'>
+							<xs:annotation>
+								<xs:documentation>If the contents element has been validated using a schema, the hash digest of the schema used, base64 encoded, will be made available here.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='schemaHashFunction' type='HashFunction' use='optional'>
+							<xs:annotation>
+								<xs:documentation>The Hash function used to compute the Hash Digest.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='serverSignature' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Server signature of the contract.</xs:documentation>
+						<xs:documentation>The signature is calculated on the contract element excluding the serverSignature element.</xs:documentation>
+						<xs:documentation>All text nodes and attribute values contain XML-encoded normalized Unicode text (in NFC).</xs:documentation>
+						<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
+						<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
+						<xs:documentation>The contract element never includes the xmlns attribute when calculating the signature.</xs:documentation>
+						<xs:documentation>Note: The purpose of the server signature, is to attest to the integrity of the contract.</xs:documentation>
+						<xs:documentation>Note: Server keys may change over time. If a signature does not validate, make sure to get the most recent public key from the server and check signature again.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attributeGroup ref='signatureAttributes'/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attributeGroup ref='visibilityAndDuration'>
+				<xs:annotation>
+					<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attributeGroup>
+			<xs:attribute name='id' type='xs:string' use='optional'>
+				<xs:annotation>
+					<xs:documentation>An identifier assigned to the contract.</xs:documentation>
+					<xs:documentation>The identifier is formed as a JID, but is not a JID. The domain part corresponds to the domain of the Trust Provider.</xs:documentation>
+					<xs:documentation>A client must not include an identifier when it creates a contract on the Trust Provider.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='parameters'>
+		<xs:annotation>
+			<xs:documentation>Defines a set of parameters of a contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs='1' maxOccurs='unbounded'>
+				<xs:element name='stringParameter' type='StringParameter'>
+					<xs:annotation>
+						<xs:documentation>String-valued parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='numericalParameter' type='NumericalParameter'>
+					<xs:annotation>
+						<xs:documentation>Numerical parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name='Parameter' abstract='true'>
+		<xs:annotation>
+			<xs:documentation>Abstract base type of contractual parameters.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='description' type='HumanReadableText' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Human-readable description of the parameter.</xs:documentation>
+					<xs:documentation>Note: Multiple localized descriptions can be provided.</xs:documentation>
+					<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
+					<xs:documentation>Note: Descriptions are not required, if descriptions are available in the template.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='name' type='NonEmptyString' use='required'>
+			<xs:annotation>
+				<xs:documentation>The name of the parameter.</xs:documentation>
+				<xs:documentation>Note: Names are case-insensitive in searches and references.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name='StringParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a string-valued contractual parameter.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='value' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>The value of the parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='NumericalParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a numerical contractual parameter.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='value' type='xs:double' use='required'>
+					<xs:annotation>
+						<xs:documentation>The value of the parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name='parts'>
+		<xs:annotation>
+			<xs:documentation>This element defines the parts of the contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs='1' maxOccurs='1'>
+				<xs:element name='open' minOccurs='1' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The contract is an open contract that anybody can sign.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType/>
+				</xs:element>
+				<xs:element name='templateOnly' minOccurs='1' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The contract is only a template, and cannot be signed.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType/>
+				</xs:element>
+				<xs:element name='part' minOccurs='1' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Defines a part of a contract.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='legalId' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>Refers to a legal identity representing a part of the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='role' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>Refers to one of the roles defined for the contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:attributeGroup name='visibilityAndDuration'>
+		<xs:attribute name='visibility' type='ContractVisibility' use='required'>
+			<xs:annotation>
+				<xs:documentation>What visibility the contract should have, or has.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='canActAsTemplate' type='xs:boolean' use='required'>
+			<xs:annotation>
+				<xs:documentation>If the contract can act as a template for future contracts.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='duration' type='xs:duration' use='required'>
+			<xs:annotation>
+				<xs:documentation>The duration of the contract. The duration is calculated from the time of the last required signature.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='archiveReq' type='xs:duration' use='required'>
+			<xs:annotation>
+				<xs:documentation>After a legally binding contract expires, this attribute specifies for how long the contract is required to be persisted in the archives before it can be manually deleted.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='archiveOpt' type='xs:duration' use='required'>
+			<xs:annotation>
+				<xs:documentation>After a legally binding contract expires, and the archiveReq period has expired, this attribute specifies an additional duration after which it is automatically deleted.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='signAfter' type='xs:dateTime'	use='optional'>
+			<xs:annotation>
+				<xs:documentation>Signatures will only be accepted after this point in time.</xs:documentation>
+				<xs:documentation>Note: signatureAfter (if provided) must occur before signatureBefore (if provided).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='signBefore' type='xs:dateTime'	use='optional'>
+			<xs:annotation>
+				<xs:documentation>Signatures will only be accepted until this point in time.</xs:documentation>
+				<xs:documentation>Note: signatureAfter (if provided) must occur before signatureBefore (if provided).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:simpleType name='ContractState'>
+		<xs:annotation>
+			<xs:documentation>Lists recognized contract states.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Proposed'>
+				<xs:annotation>
+					<xs:documentation>The contract has been proposed as a new contract.</xs:documentation>
+					<xs:documentation>It needs to be reviewed and approved by the Trust Provider before it can be used as a template or be signed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Rejected'>
+				<xs:annotation>
+					<xs:documentation>The contract has been deemed incomplete, inconsistent, or otherwise faulty.</xs:documentation>
+					<xs:documentation>A rejected contract cannot be used as a template or be signed.</xs:documentation>
+					<xs:documentation>A rejected contract can be updated by the creator, and thus be put in a Proposed state again.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Approved'>
+				<xs:annotation>
+					<xs:documentation>The contract has been reviewed and approved. It is still not signed, but can act as a template for other contracts.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='BeingSigned'>
+				<xs:annotation>
+					<xs:documentation>The contract is being signed. Not all required roles have signed however, and the contract is not legally binding.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Signed'>
+				<xs:annotation>
+					<xs:documentation>The contract has been signed by all required parties, and is legally binding.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Obsoleted'>
+				<xs:annotation>
+					<xs:documentation>The contract has been explicitly obsoleted by its owner, or by the Trust Provider.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:attributeGroup name='signatureAttributes'>
+		<xs:attribute name='timestamp' type='xs:dateTime' use='required'>
+			<xs:annotation>
+				<xs:documentation>When the signature was generated.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='s' type='xs:base64Binary' use='required'>
+			<xs:annotation>
+				<xs:documentation>Digital signature generated by the corresponding asymmetric cipher algorithm.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:simpleType name='HashFunction'>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='SHA256'>
+				<xs:annotation>
+					<xs:documentation>SHA-256 Hash function</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='SHA384'>
+				<xs:annotation>
+					<xs:documentation>SHA-384 Hash function</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='SHA512'>
+				<xs:annotation>
+					<xs:documentation>SHA-512 Hash function</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name='ContractVisibility'>
+		<xs:annotation>
+			<xs:documentation>Visibility types for contracts.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='CreatorAndParts'>
+				<xs:annotation>
+					<xs:documentation>Contract is only accessible to the creator, and any parts in the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='DomainAndParts'>
+				<xs:annotation>
+					<xs:documentation>Contract is accessible to the creator of the contract, any parts in the contract, and any account on the Trust Provider server domain.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Public'>
+				<xs:annotation>
+					<xs:documentation>Contract is accessible by everyone requesting it. It is not searchable.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='PublicSearchable'>
+				<xs:annotation>
+					<xs:documentation>Contract is accessible by everyone requesting it. It is also searchable.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name='HumanReadableText'>
+		<xs:annotation>
+			<xs:documentation>Type defining the structure of human-readable text in contracts.</xs:documentation>
+		</xs:annotation>
+		<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'>
+			<xs:annotation>
+				<xs:documentation>Human readable text is first seen as a sequence of block constructs.</xs:documentation>
+			</xs:annotation>
+		</xs:group>
+		<xs:attribute ref='xml:lang' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Language used in the human-readable text.</xs:documentation>
+				<xs:documentation>If no language is specified, the description will be considered the default description.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:group name='BlockElements'>
+		<xs:annotation>
+			<xs:documentation>Block-level constructs of human-readable text.</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name='paragraph'>
+				<xs:annotation>
+					<xs:documentation>Defines a paragraph of human-readable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='section'>
+				<xs:annotation>
+					<xs:documentation>Defines a section having a header and a body of text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='header'>
+							<xs:annotation>
+								<xs:documentation>Defines a header for the section.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name='body'>
+							<xs:annotation>
+								<xs:documentation>Defines the body of the section.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:group ref='BlockElements' minOccurs='1' maxOccurs='unbounded'/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='bulletItems'>
+				<xs:annotation>
+					<xs:documentation>A sequence of bullet items of human-readable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
+							<xs:complexType>
+								<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='numberedItems'>
+				<xs:annotation>
+					<xs:documentation>A sequence of numbered items of human-readable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='item' minOccurs='1' maxOccurs='unbounded'>
+							<xs:complexType>
+								<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:group name='InlineElements'>
+		<xs:annotation>
+			<xs:documentation>Inline-level constructs of human-readable text.</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name='text' type='NonEmptyString'>
+				<xs:annotation>
+					<xs:documentation>Some unformatted human-readable text.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='parameter'>
+				<xs:annotation>
+					<xs:documentation>Is replaced by the value of a referenced parameter.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="name" type="NonEmptyString" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='bold'>
+				<xs:annotation>
+					<xs:documentation>Bold human-readdable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='italic'>
+				<xs:annotation>
+					<xs:documentation>Italic human-readdable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='underline'>
+				<xs:annotation>
+					<xs:documentation>Underline human-readdable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='strikeThrough'>
+				<xs:annotation>
+					<xs:documentation>Human-readdable text that is stricken through.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='super'>
+				<xs:annotation>
+					<xs:documentation>Super-script human-readdable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='sub'>
+				<xs:annotation>
+					<xs:documentation>Sub-script human-readdable text.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:group ref='InlineElements' minOccurs='1' maxOccurs='unbounded'/>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:simpleType name='NonEmptyString'>
+		<xs:restriction base='xs:string'>
+			<xs:minLength value='1'/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name='getCreatedContracts'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to retrieve a list (possibly empty) of contracts created by the legal identity of the client on the provider.</xs:documentation>
+			<xs:documentation>Expected response element: contractReferences</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='signContract'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider hosting a contract that the client wants to sign.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+			<xs:documentation>The signature of the contract using the current approved legal identity of the client.</xs:documentation>
+			<xs:documentation>The signature is calculated on the contract element excluding the id attribute and the signature, status and serverSignature elements.</xs:documentation>
+			<xs:documentation>All text nodes and attribute values contain XML-encoded normalized Unicode text (in NFC).</xs:documentation>
+			<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
+			<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
+			<xs:documentation>The contract element never includes the xmlns attribute when calculating the signature.</xs:documentation>
+      <xs:documentation>Note: A client can choose to sign a contract on the same broker/provider as its legal identity is defined on, or on the broker/provider hosting the contract, if they are different. In the first case, the request is forwarded to the second provider hosting the contract, and the response is likewise forwarded back to the client. The first broker takes the opportunity to record the signature as well, in case the request is successful. In the second case, the first broker hosting the legal identity of a successful signature is simply informed by the  broker hosting the contract of the signature via the contractSigned notification message.</xs:documentation>
+    </xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the contract to sign.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='role' type='NonEmptyString' use='required'>
+				<xs:annotation>
+					<xs:documentation>The role the legal identity assumes when signing the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='transferable' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>A transferable signature, can be transferred to contracts based on the current contract.</xs:documentation>
+					<xs:documentation>This is done however, only if all parameters and attributes remain the same in the new contract.</xs:documentation>
+					<xs:documentation>Changing any of the attributes or parameters of the contract will break the signature, and the signature will not be transferred to the new contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+          <xs:documentation>Digital signature generated by the corresponding asymmetric cipher algorithm.</xs:documentation>
+        </xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='contractSigned'>
+		<xs:annotation>
+			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been signed.</xs:documentation>
+			<xs:documentation>It is sent between Trust Providers if the smart contract and the legal identity are hosted on separate brokers. It is also sent to the creator and parts of a contract, if a new signature has been added.</xs:documentation>
+			<xs:documentation>Note: To validate the signature, the contract, and possibly some keys, have to be retrieved and validated.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract that has received the signature.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='legalId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The legal identity that has signed the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getSignedContracts'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to its Trust Provider, to retrieve a list (possibly empty) of contracts signed by the client.</xs:documentation>
+			<xs:documentation>Expected response element: contractReferences</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='contractReferences'>
+		<xs:annotation>
+			<xs:documentation>Contains a set of contract references.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='ref' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>A contract reference.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='id' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>The identifier of a contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getContract'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to retrieve a specific contract given its ID.</xs:documentation>
+			<xs:documentation>The server only returns contracts registered on itself. It also authorizes all request, only returning contracts the client is authorized to see.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the contract to retrieve.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='isPart'>
+		<xs:annotation>
+			<xs:documentation>Is sent by a Trust Provider to another Trust Provider in an iq get stanza, to check if a bare JID (on the receiving Trust Provider) is related to one or more of a set of legal identities.</xs:documentation>
+			<xs:documentation>If the sender is not a Trust Provider itself, the request must be rejected.</xs:documentation>
+			<xs:documentation>Expected response element: part</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='idRef' minOccurs='1' maxOccurs='unbounded'>
+					<xs:complexType>
+						<xs:attribute name='id' type='NonEmptyString' use='required'>
+							<xs:annotation>
+								<xs:documentation>Legal identity reference.</xs:documentation>
+								<xs:documentation>Must reside on the destination Trust Provider.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='bareJid' type='NonEmptyString' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID to check if it is related to one or more of the provided set of legal identity references.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='part' type='xs:boolean'>
+		<xs:annotation>
+			<xs:documentation>Response to the isPart query.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name='obsoleteContract'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to obsolete one of its contracts.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+			<xs:documentation>Note: A contract that is legally binding cannot be obsoleted.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the contract to obsolete.</xs:documentation>
+					<xs:documentation>Note: Obsoleting a proposed contract that has not been approved, automatically turns it to Rejected.</xs:documentation>
+					<xs:documentation>Note: Trying to obsolete a rejected or legallby binding contract returns a forbidden error.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='deleteContract'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to delete one of its contracts.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+			<xs:documentation>Note: A contract that is legally binding cannot be deleted before its required archive duration has expired.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the contract to delete.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='contractUpdated'>
+		<xs:annotation>
+			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been updated or changed.</xs:documentation>
+			<xs:documentation>It is sent to the creator and parts of a contract.</xs:documentation>
+			<xs:documentation>Note: Only the contract identity is sent, not the contract itself. It is up to each recipient if they are interested in retrieving the latest version of the contract or not.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract that has been updated.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='contractDeleted'>
+		<xs:annotation>
+			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been deleted.</xs:documentation>
+			<xs:documentation>It is sent to the creator and parts of a contract.</xs:documentation>
+			<xs:documentation>Note: Only the contract identity is sent, not the contract itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract that has been deleted.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='updateContract'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza, to update a smart contract in the account of the sender.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+			<xs:documentation>Note: Only contracts that are Proposed, Rejected, Approved (but without signatures) and Obsoleted (but without signatures) can be updated.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='contract'>
+					<xs:annotation>
+						<xs:documentation>The contract the legal identity of the client wants to update.</xs:documentation>
+						<xs:documentation>Note: The contract will be put in a Proposed state after the update.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getSchemas'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stanza to the Trust Provider, to get a list of XML schemas available on the broker.</xs:documentation>
+			<xs:documentation>Expected response element: schemas</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+
+	<xs:element name='schemas'>
+		<xs:annotation>
+			<xs:documentation>Contains an array of schema references.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='schemaRef' minOccurs='0' maxOccurs='unbounded'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='schemaRef'>
+		<xs:annotation>
+			<xs:documentation>Contains a schema reference.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='digest' minOccurs='1' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>An array of Hash Digests representing the different versions of the schema available.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='namespace' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>XML Schema namespace.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='digest'>
+		<xs:annotation>
+			<xs:documentation>Represents a hash digest of something.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='xs:base64Binary'>
+					<xs:annotation>
+						<xs:documentation>Digest is BASE-64 encoded.</xs:documentation>
+					</xs:annotation>
+					<xs:attribute name='function' type='HashFunction' use='required'>
+						<xs:annotation>
+							<xs:documentation>Hash function used when calculating the digest.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getSchema'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stanza to the Trust Provider, to get a specific XML schema.</xs:documentation>
+			<xs:documentation>Expected response element: schema</xs:documentation>
+			<xs:documentation>Note: If a specific digest is not provided, the most recent version of the schema will be returned.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='digest' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Digest references a specific version of the XML schema to be retrieved.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='namespace' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The namespace of the schema to retrieve.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='schema' type='xs:base64Binary'>
+		<xs:annotation>
+			<xs:documentation>Contains the text representation of a specific schema.</xs:documentation>
+			<xs:documentation>Note: Even though the XML Schema is itself XML, it is returned as base-64 encoded binary BLOB, to avoid accidental processing, and to maintain digest integrity.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name='getLegalIdentities'>
+		<xs:annotation>
+			<xs:documentation>
+				<xs:documentation>Sent in an iq get stanza to the Trust Provider to retrieve any legal identities associated with the signatures of the contract.</xs:documentation>
+				<xs:documentation>If the request is sent to the Trust Provider on which the contract is hosted, all legal identities are returned, if authorized.</xs:documentation>
+				<xs:documentation>If the request is sent to a different Trust Provider, only legal identities on that Trust Provider, associated with the contract are returned, if the sender is the same as the domain of the referenced contract.</xs:documentation>
+				<xs:documentation>Expected response element: id:identities</xs:documentation>
+				<xs:documentation>Note: Only clients authorized to view the contract itself, are allowed to view its associated legal identities.</xs:documentation>
+				<xs:documentation>Note: Request is authorized only if (1) the client has access to smart contract, or (2) sender is the same domain hosting the referenced contract.</xs:documentation>
+				<xs:documentation>Both current and historic cannot both be false. Both can be true.</xs:documentation>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract whose legal identities are requested.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='current' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>By default, the legal identities returned correspond to the timestamp of their signatures. This allows the cryptographic signatures to be validated.</xs:documentation>
+					<xs:documentation>If the current legal identities of the corresponding signatures is desired, this attribute should be set to true. If keys have been updated, they cannot be used for validating the corresponding cryptographic signature in the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='historic' type='xs:boolean' use='optional' default='true'>
+				<xs:annotation>
+					<xs:documentation>By default, the legal identities returned correspond to the timestamp of their signatures. This allows the cryptographic signatures to be validated.</xs:documentation>
+					<xs:documentation>If this identity is not desired, this attribute should be set to false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getNetworkIdentities'>
+		<xs:annotation>
+			<xs:documentation>
+				<xs:documentation>Sent in an iq get stanza to the Trust Provider to retrieve any network identities associated with the legal identities that have signed the contract.</xs:documentation>
+				<xs:documentation>If the request is sent to the Trust Provider on which the contract is hosted, all network identities are returned, if authorized.</xs:documentation>
+				<xs:documentation>If the request is sent to a different Trust Provider, only network identities on that Trust Provider, associated with the contract are returned, if the sender is the same as the domain of the referenced contract.</xs:documentation>
+				<xs:documentation>Expected response element: networkIdentities</xs:documentation>
+				<xs:documentation>Note: Only clients authorized to view the contract itself, are allowed to view its associated network identities.</xs:documentation>
+				<xs:documentation>Note: Request is authorized only if (1) the client has access to smart contract, or (2) sender is the same domain hosting the referenced contract.</xs:documentation>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract whose network identities are requested.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='networkIdentities'>
+		<xs:annotation>
+			<xs:documentation>Contains a sequence of network identities, and what legal identities they are related to.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element name='networkIdentity'>
+					<xs:complexType>
+						<xs:attribute name='bareJid' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>A network identity, in the form of a bare JID.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='legalId' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>Corresponding legal identity.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='searchPublicContracts'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stansa to a Trust Provider to perform a search for public contracts.</xs:documentation>
+			<xs:documentation>Expected response element: searchResult</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='localName' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on the local name of the contents of public contracts.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name='eq' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts in which the local name of the contents is equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='like' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts in which the local name of the contents matches this regular expression.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='namespace' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on the namespace of the contents of public contracts.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name='eq' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts in which the namespace of the contents is equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='like' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts in which the namespace of the contents matches this regular expression.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='template' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on the identity of the template used to create the contract.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name='eq' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts based on a template that is equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='like' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts based on a template that matches this regular expression.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='role' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on the roles used in public contracts.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name='eq' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a role equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='like' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a role matching this regular expression.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='parameter' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on parameters used in public contracts.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice minOccurs='1' maxOccurs='unbounded'>
+							<xs:element name='eqStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='neqStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter not equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='gtStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter greater than this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='gteStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter greater than or equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='ltStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter lesser than this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='lteStr' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter lesser than or equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='like' type='xs:string'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named string-valued parameter that matches this regular expression.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='eqNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='neqNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter not equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='gtNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter greater than this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='gteNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter greater than or equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='ltNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter lesser than this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name='lteNum' type='xs:double'>
+								<xs:annotation>
+									<xs:documentation>Return public contracts defining a named numerical parameter lesser than or equal to this value.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+						<xs:attribute name='name' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>Name of the parameter being queried.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='created' type='DateTimeParameter' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on when public contracts were created.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='updated' type='DateTimeParameter' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on when public contracts were last updated.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='from' type='DateTimeParameter' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on when public contracts became legally binding.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='to' type='DateTimeParameter' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on when public contracts cease to be legally binding.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='duration' type='DurationParameter' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Places restrictions on the duration of public contracts.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Result will start with the response at this offset into result set.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='maxCount' type='xs:positiveInteger' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Result will be limited to this number of items.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='searchResult'>
+		<xs:annotation>
+			<xs:documentation>Contains the response to a search of smart contracts.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='ref' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>A contract reference.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='id' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>The identifier of a contract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='more' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If more contracts are available, matching the search parameters.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name='DateTimeParameter'>
+		<xs:choice minOccurs='1' maxOccurs='unbounded'>
+			<xs:element name='eq' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='neq' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter not equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='gt' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter greater than this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='gte' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter greater than or equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='lt' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter lesser than this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='lte' type='xs:dateTime'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named date and time-valued parameter lesser than or equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name='DurationParameter'>
+		<xs:choice minOccurs='1' maxOccurs='unbounded'>
+			<xs:element name='eq' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='neq' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter not equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='gt' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter greater than this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='gte' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter greater than or equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='lt' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter lesser than this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='lte' type='xs:duration'>
+				<xs:annotation>
+					<xs:documentation>Return public contracts defining a named duration-valued parameter lesser than or equal to this value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+
+</xs:schema>

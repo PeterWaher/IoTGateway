@@ -183,6 +183,15 @@
             If the contract can act as a template for other contracts.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlDocument,System.Boolean@)">
+            <summary>
+            Validates a contract XML Document, and returns the contract definition in it.
+            </summary>
+            <param name="Xml">XML representation</param>
+            <param name="HasStatus">If a status element was found.</param>
+            <returns>Parsed contract, or null if it contains errors.</returns>
+            <exception cref="T:System.Exception">If XML is invalid.</exception>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlElement,System.Boolean@)">
             <summary>
             Parses a contract from is XML representation.

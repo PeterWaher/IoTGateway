@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Networking.XMPP.P2P.E2E;
-using Waher.Security;
-using Waher.Security.EllipticCurves;
+using Waher.Content.Xsl;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -300,6 +297,21 @@ namespace Waher.Networking.XMPP.Contracts
 			get { return this.canActAsTemplate; }
 			set { this.canActAsTemplate = value; }
 		}
+
+		/// <summary>
+		/// Validates a contract XML Document, and returns the contract definition in it.
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <param name="HasStatus">If a status element was found.</param>
+		/// <returns>Parsed contract, or null if it contains errors.</returns>
+		/// <exception cref="Exception">If XML is invalid.</exception>
+		public static Contract Parse(XmlDocument Xml, out bool HasStatus)
+		{
+			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, contractSchema);
+			return Parse(Xml.DocumentElement, out HasStatus);
+		}
+
+		private static readonly XmlSchema contractSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.SmartContracts.xsd");
 
 		/// <summary>
 		/// Parses a contract from is XML representation.

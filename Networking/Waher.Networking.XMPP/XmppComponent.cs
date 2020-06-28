@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Error;
 
-			this.Error(ex.Message);
+			this.Exception(ex);
 
 			ExceptionEventHandler h = this.OnError;
 			if (h != null)
@@ -266,21 +266,24 @@ namespace Waher.Networking.XMPP
 				if (this.state != value)
 				{
 					this.state = value;
-
 					this.Information("State changed to " + value.ToString());
+					this.RaiseOnStateChanged(value);
+				}
+			}
+		}
 
-					StateChangedEventHandler h = this.OnStateChanged;
-					if (h != null)
-					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							Exception(ex);
-						}
-					}
+		private async void RaiseOnStateChanged(XmppState State)
+		{
+			StateChangedEventHandler h = this.OnStateChanged;
+			if (h != null)
+			{
+				try
+				{
+					await h(this, State);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
 				}
 			}
 		}
@@ -925,11 +928,11 @@ namespace Waher.Networking.XMPP
 							switch (Type)
 							{
 								case "get":
-									await this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
+									this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "set":
-									await this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+									this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "result":
@@ -976,11 +979,11 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "message":
-							await this.ProcessMessage(new MessageEventArgs(this, E));
+							this.ProcessMessage(new MessageEventArgs(this, E));
 							break;
 
 						case "presence":
-							await this.ProcessPresence(new PresenceEventArgs(this, E));
+							this.ProcessPresence(new PresenceEventArgs(this, E));
 							break;
 
 						case "error":
@@ -1018,198 +1021,240 @@ namespace Waher.Networking.XMPP
 			return true;
 		}
 
-		private async Task ProcessMessage(MessageEventArgs e)
+		private async void ProcessMessage(MessageEventArgs e)
 		{
-			MessageEventHandlerAsync h = null;
-			string Key;
-
-			lock (this.synchObject)
+			try
 			{
-				foreach (XmlElement E in e.Message.ChildNodes)
-				{
-					Key = E.LocalName + " " + E.NamespaceURI;
-					if (this.messageHandlers.TryGetValue(Key, out h))
-					{
-						e.Content = E;
-						break;
-					}
-					else
-						h = null;
-				}
-			}
+				MessageEventHandlerAsync h = null;
+				string Key;
 
-			if (h != null)
-				this.Information(h.GetMethodInfo().Name);
-			else
-			{
-				switch (e.Type)
-				{
-					case MessageType.Chat:
-						this.Information("OnChatMessage()");
-						h = this.OnChatMessage;
-						break;
-
-					case MessageType.Error:
-						this.Information("OnErrorMessage()");
-						h = this.OnErrorMessage;
-						break;
-
-					case MessageType.GroupChat:
-						this.Information("OnGroupChatMessage()");
-						h = this.OnGroupChatMessage;
-						break;
-
-					case MessageType.Headline:
-						this.Information("OnHeadlineMessage()");
-						h = this.OnHeadlineMessage;
-						break;
-
-					case MessageType.Normal:
-					default:
-						this.Information("OnNormalMessage()");
-						h = this.OnNormalMessage;
-						break;
-				}
-			}
-
-			if (h != null)
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
-				}
-			}
-		}
-
-		private async Task ProcessPresence(PresenceEventArgs e)
-		{
-			PresenceEventHandlerAsync Callback;
-			object State;
-			string Id = e.Id;
-			string FromBareJid = e.FromBareJID;
-
-			if (uint.TryParse(Id, out uint SeqNr) ||
-				((e.Type == PresenceType.Error || e.From.Contains("/")) && this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr)))
-			{
 				lock (this.synchObject)
 				{
-					if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
+					foreach (XmlElement E in e.Message.ChildNodes)
 					{
-						Callback = Rec.PresenceCallback;
-						State = Rec.State;
-
-						this.pendingRequestsBySeqNr.Remove(SeqNr);
-						this.pendingRequestsByTimeout.Remove(Rec.Timeout);
-					}
-					else
-					{
-						Callback = null;
-						State = null;
+						Key = E.LocalName + " " + E.NamespaceURI;
+						if (this.messageHandlers.TryGetValue(Key, out h))
+						{
+							e.Content = E;
+							break;
+						}
+						else
+							h = null;
 					}
 				}
 
-				if (string.IsNullOrEmpty(Id))
-					this.pendingPresenceRequests.Remove(FromBareJid);
+				if (h != null)
+					this.Information(h.GetMethodInfo().Name);
 				else
 				{
-					if (this.pendingPresenceRequests.TryGetValue(FromBareJid, out uint SeqNr2) && SeqNr == SeqNr2)
-						this.pendingPresenceRequests.Remove(FromBareJid);
-				}
-			}
-			else
-				Callback = null;
+					switch (e.Type)
+					{
+						case MessageType.Chat:
+							this.Information("OnChatMessage()");
+							h = this.OnChatMessage;
+							break;
 
-			if (Callback is null)
-			{
-				switch (e.Type)
+						case MessageType.Error:
+							this.Information("OnErrorMessage()");
+							h = this.OnErrorMessage;
+							break;
+
+						case MessageType.GroupChat:
+							this.Information("OnGroupChatMessage()");
+							h = this.OnGroupChatMessage;
+							break;
+
+						case MessageType.Headline:
+							this.Information("OnHeadlineMessage()");
+							h = this.OnHeadlineMessage;
+							break;
+
+						case MessageType.Normal:
+						default:
+							this.Information("OnNormalMessage()");
+							h = this.OnNormalMessage;
+							break;
+					}
+				}
+
+				if (h != null)
 				{
-					case PresenceType.Available:
-						this.Information("OnPresence()");
-						Callback = this.OnPresence;
-						break;
-
-					case PresenceType.Unavailable:
-						this.Information("OnPresence()");
-						Callback = this.OnPresence;
-						break;
-
-					case PresenceType.Error:
-					case PresenceType.Probe:
-					default:
-						this.Information("OnPresence()");
-						Callback = this.OnPresence;
-						break;
-
-					case PresenceType.Subscribe:
-						this.Information("OnPresenceSubscribe()");
-						Callback = this.OnPresenceSubscribe;
-						break;
-
-					case PresenceType.Subscribed:
-						this.Information("OnPresenceSubscribed()");
-						Callback = this.OnPresenceSubscribed;
-						break;
-
-					case PresenceType.Unsubscribe:
-						this.Information("OnPresenceUnsubscribe()");
-						Callback = this.OnPresenceUnsubscribe;
-						break;
-
-					case PresenceType.Unsubscribed:
-						this.Information("OnPresenceUnsubscribed()");
-						Callback = this.OnPresenceUnsubscribed;
-						break;
+					try
+					{
+						await h(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
 				}
 			}
-
-			if (Callback != null)
+			catch (Exception ex)
 			{
 				try
 				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
 					this.Exception(ex);
+				}
+				catch (Exception)
+				{
+					// Ignore
 				}
 			}
 		}
 
-		private async Task ProcessIq(Dictionary<string, IqEventHandlerAsync> Handlers, IqEventArgs e)
+		private async void ProcessPresence(PresenceEventArgs e)
 		{
-			IqEventHandlerAsync h = null;
-			string Key;
-
-			lock (this.synchObject)
+			try
 			{
-				foreach (XmlElement E in e.IQ.ChildNodes)
+				PresenceEventHandlerAsync Callback;
+				object State;
+				string Id = e.Id;
+				string FromBareJid = e.FromBareJID;
+
+				if (uint.TryParse(Id, out uint SeqNr) ||
+					((e.Type == PresenceType.Error || e.From.Contains("/")) && this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr)))
 				{
-					Key = E.LocalName + " " + E.NamespaceURI;
-					if (Handlers.TryGetValue(Key, out h))
+					lock (this.synchObject)
 					{
-						e.Query = E;
-						break;
+						if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
+						{
+							Callback = Rec.PresenceCallback;
+							State = Rec.State;
+
+							this.pendingRequestsBySeqNr.Remove(SeqNr);
+							this.pendingRequestsByTimeout.Remove(Rec.Timeout);
+						}
+						else
+						{
+							Callback = null;
+							State = null;
+						}
 					}
+
+					if (string.IsNullOrEmpty(Id))
+						this.pendingPresenceRequests.Remove(FromBareJid);
 					else
-						h = null;
+					{
+						if (this.pendingPresenceRequests.TryGetValue(FromBareJid, out uint SeqNr2) && SeqNr == SeqNr2)
+							this.pendingPresenceRequests.Remove(FromBareJid);
+					}
+				}
+				else
+					Callback = null;
+
+				if (Callback is null)
+				{
+					switch (e.Type)
+					{
+						case PresenceType.Available:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							break;
+
+						case PresenceType.Unavailable:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							break;
+
+						case PresenceType.Error:
+						case PresenceType.Probe:
+						default:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							break;
+
+						case PresenceType.Subscribe:
+							this.Information("OnPresenceSubscribe()");
+							Callback = this.OnPresenceSubscribe;
+							break;
+
+						case PresenceType.Subscribed:
+							this.Information("OnPresenceSubscribed()");
+							Callback = this.OnPresenceSubscribed;
+							break;
+
+						case PresenceType.Unsubscribe:
+							this.Information("OnPresenceUnsubscribe()");
+							Callback = this.OnPresenceUnsubscribe;
+							break;
+
+						case PresenceType.Unsubscribed:
+							this.Information("OnPresenceUnsubscribed()");
+							Callback = this.OnPresenceUnsubscribed;
+							break;
+					}
+				}
+
+				if (Callback != null)
+				{
+					try
+					{
+						await Callback(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
 				}
 			}
-
-			if (h is null)
-				this.SendIqError(e.Id, e.To, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
-			else
+			catch (Exception ex)
 			{
 				try
 				{
-					await h(this, e);
+					this.Exception(ex);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					this.SendIqError(e.Id, e.To, e.From, ex);
+					// Ignore
+				}
+			}
+		}
+
+		private async void ProcessIq(Dictionary<string, IqEventHandlerAsync> Handlers, IqEventArgs e)
+		{
+			try
+			{
+				IqEventHandlerAsync h = null;
+				string Key;
+
+				lock (this.synchObject)
+				{
+					foreach (XmlElement E in e.IQ.ChildNodes)
+					{
+						Key = E.LocalName + " " + E.NamespaceURI;
+						if (Handlers.TryGetValue(Key, out h))
+						{
+							e.Query = E;
+							break;
+						}
+						else
+							h = null;
+					}
+				}
+
+				if (h is null)
+					this.SendIqError(e.Id, e.To, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
+				else
+				{
+					try
+					{
+						await h(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.SendIqError(e.Id, e.To, e.From, ex);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				try
+				{
+					this.Exception(ex);
+				}
+				catch (Exception)
+				{
+					// Ignore
 				}
 			}
 		}
@@ -1238,7 +1283,7 @@ namespace Waher.Networking.XMPP
 			this.RegisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, PublishNamespaceAsClientFeature);
 		}
 
-		private void RegisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace, 
+		private void RegisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace,
 			IqEventHandlerAsync Handler, bool PublishNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
@@ -1281,7 +1326,7 @@ namespace Waher.Networking.XMPP
 			return this.UnregisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, RemoveNamespaceAsClientFeature);
 		}
 
-		private bool UnregisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace, 
+		private bool UnregisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace,
 			IqEventHandlerAsync Handler, bool RemoveNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
@@ -2170,7 +2215,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body, 
+		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body,
 			string Subject, string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
 		{
 			this.SendMessage(QoS, Type, string.Empty, From, To, CustomXml, Body, Subject, Language, ThreadId, ParentThreadId, DeliveryCallback, State);
@@ -2379,7 +2424,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async Task AcknowledgedQoSMessageHandler(object Sender, IqEventArgs e)
+		private Task AcknowledgedQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
@@ -2392,9 +2437,9 @@ namespace Waher.Networking.XMPP
 					};
 
 					this.SendIqResult(e.Id, e.To, e.From, string.Empty);
-					await this.ProcessMessage(e2);
+					this.ProcessMessage(e2);
 
-					return;
+					return Task.CompletedTask;
 				}
 			}
 
@@ -2581,7 +2626,7 @@ namespace Waher.Networking.XMPP
 			throw new BadRequestException(string.Empty, e.Query);
 		}
 
-		private async Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
+		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;
 			string MsgId = XML.Attribute(e.Query, "msgId");
@@ -2611,7 +2656,9 @@ namespace Waher.Networking.XMPP
 			this.SendIqResult(e.Id, e.To, e.From, string.Empty);
 
 			if (e2 != null)
-				await this.ProcessMessage(e2);
+				this.ProcessMessage(e2);
+
+			return Task.CompletedTask;
 		}
 
 		private void SecondTimerCallback(object State)
@@ -2813,7 +2860,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("</query>");
 
 			e.IqResult(Xml.ToString());
-	
+
 			return Task.CompletedTask;
 		}
 

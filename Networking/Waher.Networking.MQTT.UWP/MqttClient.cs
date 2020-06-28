@@ -906,22 +906,24 @@ namespace Waher.Networking.MQTT
 				if (this.state != value)
 				{
 					this.state = value;
-
 					this.Information("Switching state to " + value.ToString());
+					this.RaiseOnStateChanged(value);
+				}
+			}
+		}
 
-					StateChangedEventHandler h = this.OnStateChanged;
-					if (h != null)
-					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							this.Exception(ex);
-							Log.Critical(ex);
-						}
-					}
+		private async void RaiseOnStateChanged(MqttState State)
+		{
+			StateChangedEventHandler h = this.OnStateChanged;
+			if (h != null)
+			{
+				try
+				{
+					await h(this, State);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
 				}
 			}
 		}

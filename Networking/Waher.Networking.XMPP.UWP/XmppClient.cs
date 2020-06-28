@@ -1026,21 +1026,8 @@ namespace Waher.Networking.XMPP
 				if (this.state != value)
 				{
 					this.state = value;
-
 					this.Information("State changed to " + value.ToString());
-
-					StateChangedEventHandler h = this.OnStateChanged;
-					if (!(h is null))
-					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							this.Exception(ex);
-						}
-					}
+					this.RaiseOnStateChanged(value);
 
 					if (value == XmppState.Offline || value == XmppState.Error)
 					{
@@ -1066,6 +1053,22 @@ namespace Waher.Networking.XMPP
 								this.Unavail(e);
 						}
 					}
+				}
+			}
+		}
+
+		private async void RaiseOnStateChanged(XmppState State)
+		{
+			StateChangedEventHandler h = this.OnStateChanged;
+			if (h != null)
+			{
+				try
+				{
+					await h(this, State);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
 				}
 			}
 		}
@@ -2202,7 +2205,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					this.Error(ex.Message);
+					this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -2401,7 +2404,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					this.Error(ex.Message);
+					this.Exception(ex);
 				}
 				catch (Exception)
 				{

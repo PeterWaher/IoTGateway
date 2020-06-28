@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Error;
 
-			this.Error(ex.Message);
+			this.Exception(ex);
 
 			ExceptionEventHandler h = this.OnError;
 			if (h != null)
@@ -266,21 +266,24 @@ namespace Waher.Networking.XMPP
 				if (this.state != value)
 				{
 					this.state = value;
-
 					this.Information("State changed to " + value.ToString());
+					this.RaiseOnStateChanged(value);
+				}
+			}
+		}
 
-					StateChangedEventHandler h = this.OnStateChanged;
-					if (h != null)
-					{
-						try
-						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							Exception(ex);
-						}
-					}
+		private async void RaiseOnStateChanged(XmppState State)
+		{
+			StateChangedEventHandler h = this.OnStateChanged;
+			if (h != null)
+			{
+				try
+				{
+					await h(this, State);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
 				}
 			}
 		}

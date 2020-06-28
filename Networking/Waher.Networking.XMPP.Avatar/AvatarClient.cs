@@ -210,11 +210,13 @@ namespace Waher.Networking.XMPP.Avatar
 		/// If the remote endpoint is not authoized, the corresponding stanza exception
 		/// should be thrown.
 		/// </summary>
-		public event IqEventHandler ValidateAccess = null;
+		public event IqEventHandlerAsync ValidateAccess = null;
 
-		private Task QueryAvatarHandler(object Sender, IqEventArgs e)
+		private async Task QueryAvatarHandler(object Sender, IqEventArgs e)
 		{
-			this.ValidateAccess?.Invoke(this, e);
+			IqEventHandlerAsync h = this.ValidateAccess;
+			if (!(h is null))
+				await h(this, e);
 
 			Avatar Avatar = this.localAvatar;
 
@@ -225,12 +227,10 @@ namespace Waher.Networking.XMPP.Avatar
 			Response.Append("<query xmlns='jabber:iq:avatar'><data mimetype='");
 			Response.Append(XML.Encode(Avatar.ContentType));
 			Response.Append("'>");
-			Response.Append(System.Convert.ToBase64String(Avatar.Binary));
+			Response.Append(Convert.ToBase64String(Avatar.Binary));
 			Response.Append("</data></query>");
 
 			e.IqResult(Response.ToString());
-
-			return Task.CompletedTask;
 		}
 
 		private async Task Client_OnStateChanged(object Sender, XmppState NewState)
@@ -384,7 +384,7 @@ namespace Waher.Networking.XMPP.Avatar
 						ContentType = XML.Attribute(E2, "mimetype");
 						try
 						{
-							Bin = System.Convert.FromBase64String(E2.InnerText.Trim());
+							Bin = Convert.FromBase64String(E2.InnerText.Trim());
 						}
 						catch (Exception)
 						{
@@ -639,7 +639,7 @@ namespace Waher.Networking.XMPP.Avatar
 										break;
 
 									case "BINVAL":
-										Data = System.Convert.FromBase64String(N2.InnerText);
+										Data = Convert.FromBase64String(N2.InnerText);
 										break;
 								}
 							}

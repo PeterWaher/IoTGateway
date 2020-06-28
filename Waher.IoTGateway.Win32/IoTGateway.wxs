@@ -1347,6 +1347,8 @@
               <File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
               <File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
               <File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
+              <File Id='ProposeContract.js' Name='ProposeContract.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\ProposeContract.js' />
+              <File Id='ProposeContract.md' Name='ProposeContract.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\ProposeContract.md' />
               <File Id='RemoteEndpoint.js' Name='RemoteEndpoint.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoint.js'/>
               <File Id='RemoteEndpoint.md' Name='RemoteEndpoint.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpoint.md'/>
               <File Id='RemoteEndpointClear.ws' Name='RemoteEndpointClear.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\RemoteEndpointClear.ws'/>
@@ -1370,6 +1372,8 @@
               <RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
               <RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
+              <RemoveFile Id='RemoveProposeContract.js' Name='ProposeContract.js' On='uninstall'/>
+              <RemoveFile Id='RemoveProposeContract.md' Name='ProposeContract.md' On='uninstall'/>
               <RemoveFile Id='RemoveRemoteEndpoint.js' Name='RemoteEndpoint.js' On='uninstall'/>
               <RemoveFile Id='RemoveRemoteEndpoint.md' Name='RemoteEndpoint.md' On='uninstall'/>
               <RemoveFile Id='RemoveRemoteEndpointClear.ws' Name='RemoteEndpointClear.ws' On='uninstall'/>

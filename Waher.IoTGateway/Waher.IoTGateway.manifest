@@ -5,6 +5,8 @@
     <Content fileName="Copyright.md"/>
     <Content fileName="Events.js"/>
     <Content fileName="Login.md"/>
+    <Content fileName="ProposeContract.js"/>
+    <Content fileName="ProposeContract.md"/>
     <Content fileName="SignatureRequest.js"/>
     <Content fileName="SignatureRequest.md"/>
     <Folder name="Settings">

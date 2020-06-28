@@ -746,6 +746,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());
 				webServer.Register(new Logout());
+				webServer.Register(new ProposeContract());
 
 				if (emoji1_24x24 is null)
 				{

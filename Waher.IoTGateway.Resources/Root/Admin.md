@@ -36,18 +36,32 @@ MenuItem(Text,Url):=
 
 MenuHeader("Communication");
 MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1");
-MenuFooter();
-
-MenuHeader("Configuration Settings");
-foreach Item in Waher.IoTGateway.Gateway.GetSettingsMenu(Request,"User") do
-	MenuItem(MarkdownEncode(Item.Title),Item.Url);
+MenuItem("Domain","/Settings/Domain.md");
+MenuItem("Notification","/Settings/Notification.md");
+MenuItem("Roster","/Settings/Roster.md");
+MenuItem("XMPP","/Settings/XMPP.md");
 MenuFooter();
 
 MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md");
+MenuItem("Database","/Settings/Database.md");
+MenuItem("Prompt","/Prompt.md");
 MenuItem("Restore","/Settings/Restore.md");
 MenuItem("Search Event Log","/EventLog.md");
-MenuItem("Prompt","/Prompt.md");
 MenuFooter();
 
+MenuHeader("Legal");
+MenuItem("Legal Identity","/Settings/LegalIdentity.md");
+MenuItem("Personal Data","/Settings/PersonalData.md");
+MenuItem("Propose Contract","/ProposeContract.md");
+MenuItem("Signature Requests","/SignatureRequests.md");
+MenuFooter();
+
+MenuHeader("Presentation");
+MenuItem("Theme","/Settings/Theme.md");
+MenuFooter();
+
+MenuHeader("Session");
+MenuItem("Logout","/Logout");
+MenuFooter();
 }}

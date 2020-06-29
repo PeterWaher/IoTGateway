@@ -577,7 +577,10 @@ namespace Waher.Persistence.Files
 
 			int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
 			if (this.blockSize != NrRead)
+			{
+				Database.FlagForRepair(this.collectionName);
 				throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+			}
 
 			this.nrBlockLoads++;
 
@@ -867,89 +870,101 @@ namespace Waher.Persistence.Files
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
-			object ObjectId = this.recordHandler.GetKey(Reader);
-			object ObjectId2;
-			int KeySize = Reader.Position - Pos;
-			uint Len = this.recordHandler.GetFullPayloadSize(Reader);
-			int Bookmark = Reader.Position - Pos;
-			uint BlobBlockIndex = Reader.ReadUInt32();
-			uint ExpectedPrev = uint.MaxValue;
-			uint Prev;
-			byte[] Result = new byte[Bookmark + Len];
-			byte[] BlobBlock = new byte[this.blobBlockSize];
-			byte[] DecryptedBlock;
-			long PhysicalPosition;
-			int i = Bookmark;
-			int NrRead;
-			bool ChainError = false;
-
-			Array.Copy(Block, Pos, Result, 0, Bookmark);
-			Len += (uint)Bookmark;
-
-			while (i < Len)
+			try
 			{
-				if (BlobBlockIndex == uint.MaxValue)
-					throw new FileException("BLOB " + ObjectId.ToString() + " ended prematurely.", this.fileName, this.collectionName);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
+				object ObjectId = this.recordHandler.GetKey(Reader);
+				object ObjectId2;
+				int KeySize = Reader.Position - Pos;
+				uint Len = this.recordHandler.GetFullPayloadSize(Reader);
+				int Bookmark = Reader.Position - Pos;
+				uint BlobBlockIndex = Reader.ReadUInt32();
+				uint ExpectedPrev = uint.MaxValue;
+				uint Prev;
+				byte[] Result = new byte[Bookmark + Len];
+				byte[] BlobBlock = new byte[this.blobBlockSize];
+				byte[] DecryptedBlock;
+				long PhysicalPosition;
+				int i = Bookmark;
+				int NrRead;
+				bool ChainError = false;
 
-				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
+				Array.Copy(Block, Pos, Result, 0, Bookmark);
+				Len += (uint)Bookmark;
 
-				if (this.blobFile.Position != PhysicalPosition)
-					this.blobFile.Position = PhysicalPosition;
-
-				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-				if (NrRead != this.blobBlockSize)
-					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-
-				this.nrBlobBlockLoads++;
-
-				if (this.encrypted)
+				while (i < Len)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+					if (BlobBlockIndex == uint.MaxValue)
+						throw new FileException("BLOB " + ObjectId.ToString() + " ended prematurely.", this.fileName, this.collectionName);
+
+					PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
+
+					if (this.blobFile.Position != PhysicalPosition)
+						this.blobFile.Position = PhysicalPosition;
+
+					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
+					if (NrRead != this.blobBlockSize)
 					{
-						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						Database.FlagForRepair(this.collectionName);
+						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
 					}
+
+					this.nrBlobBlockLoads++;
+
+					if (this.encrypted)
+					{
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+						{
+							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						}
+					}
+					else
+						DecryptedBlock = (byte[])BlobBlock.Clone();
+
+					Reader.Restart(DecryptedBlock, 0);
+					ObjectId2 = this.recordHandler.GetKey(Reader);
+					if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+					{
+						throw new FileException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
+							") was actually marked as " + ObjectId2.ToString() + ".", this.fileName, this.collectionName);
+					}
+
+					Prev = Reader.ReadUInt32();
+					if (Prev != ExpectedPrev)
+						ChainError = true;
+
+					ExpectedPrev = BlobBlockIndex;
+
+					if (!(BlobBlocksReferenced is null))
+						BlobBlocksReferenced[(int)BlobBlockIndex] = true;
+
+					BlobBlockIndex = Reader.ReadUInt32();
+
+					NrRead = Math.Min(this.blobBlockSize - KeySize - 8, (int)(Len - i));
+
+					Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
+					i += NrRead;
+
+					if (!(Statistics is null))
+						Statistics.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
 				}
-				else
-					DecryptedBlock = (byte[])BlobBlock.Clone();
 
-				Reader.Restart(DecryptedBlock, 0);
-				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-				{
-					throw new FileException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
-						") was actually marked as " + ObjectId2.ToString() + ".", this.fileName, this.collectionName);
-				}
+				if (BlobBlockIndex != uint.MaxValue)
+					throw new FileException("BLOB " + ObjectId.ToString() + " did not end when expected.", this.fileName, this.collectionName);
 
-				Prev = Reader.ReadUInt32();
-				if (Prev != ExpectedPrev)
-					ChainError = true;
+				if (!(BlobBlocksReferenced is null) && ChainError)
+					throw new FileException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.", this.fileName, this.collectionName);
 
-				ExpectedPrev = BlobBlockIndex;
+				Reader.Restart(Result, Bookmark);
 
-				if (!(BlobBlocksReferenced is null))
-					BlobBlocksReferenced[(int)BlobBlockIndex] = true;
-
-				BlobBlockIndex = Reader.ReadUInt32();
-
-				NrRead = Math.Min(this.blobBlockSize - KeySize - 8, (int)(Len - i));
-
-				Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
-				i += NrRead;
-
-				if (!(Statistics is null))
-					Statistics.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
+				return Reader;
 			}
-
-			if (BlobBlockIndex != uint.MaxValue)
-				throw new FileException("BLOB " + ObjectId.ToString() + " did not end when expected.", this.fileName, this.collectionName);
-
-			if (!(BlobBlocksReferenced is null) && ChainError)
-				throw new FileException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.", this.fileName, this.collectionName);
-
-			Reader.Restart(Result, Bookmark);
-
-			return Reader;
+			catch (OutOfMemoryException ex)
+			{
+				Database.FlagForRepair(this.collectionName);
+				ExceptionDispatchInfo.Capture(ex).Throw();
+				return null;
+			}
 		}
 
 		private async Task DeleteBlobLocked(byte[] Bin, int Offset)
@@ -989,7 +1004,10 @@ namespace Waher.Persistence.Files
 
 				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 				if (NrRead != this.blobBlockSize)
+				{
+					Database.FlagForRepair(this.collectionName);
 					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+				}
 
 				this.nrBlockLoads++;
 
@@ -1032,7 +1050,10 @@ namespace Waher.Persistence.Files
 
 				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 				if (NrRead != this.blobBlockSize)
+				{
+					Database.FlagForRepair(this.collectionName);
 					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+				}
 
 				this.nrBlockLoads++;
 
@@ -1102,7 +1123,10 @@ namespace Waher.Persistence.Files
 
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
+					{
+						Database.FlagForRepair(this.collectionName);
 						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+					}
 
 					this.nrBlockLoads++;
 
@@ -1142,7 +1166,10 @@ namespace Waher.Persistence.Files
 
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
+					{
+						Database.FlagForRepair(this.collectionName);
 						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+					}
 
 					this.nrBlockLoads++;
 
@@ -4080,7 +4107,10 @@ namespace Waher.Persistence.Files
 				{
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
+					{
+						Database.FlagForRepair(this.collectionName);
 						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
+					}
 
 					this.nrBlobBlockLoads++;
 

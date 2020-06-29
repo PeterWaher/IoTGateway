@@ -189,6 +189,13 @@ namespace Waher.Persistence
 		Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair);
 
 		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		Task<string[]> Repair(params string[] CollectionNames);
+
+		/// <summary>
 		/// Adds an index to a collection, if one does not already exist.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>

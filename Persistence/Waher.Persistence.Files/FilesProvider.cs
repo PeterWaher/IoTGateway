@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Cache;
-using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Serialization.ReferenceTypes;
-using Waher.Persistence.Serialization.ValueTypes;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
-using System.Collections.ObjectModel;
 
 namespace Waher.Persistence.Files
 {
@@ -78,6 +70,7 @@ namespace Waher.Persistence.Files
 		private readonly string id;
 		private readonly string defaultCollectionName;
 		private readonly string folder;
+		private string xsltPath = string.Empty;
 		private string autoRepairReportFolder = string.Empty;
 		private readonly int blockSize;
 		private readonly int blobBlockSize;
@@ -557,7 +550,10 @@ namespace Waher.Persistence.Files
 		public async Task<string> GetFieldNameAsync(string Collection, ulong FieldCode)
 		{
 			if (FieldCode > uint.MaxValue)
+			{
+				Database.FlagForRepair(Collection);
 				throw new ArgumentOutOfRangeException("Field code too large.", nameof(FieldCode));
+			}
 
 			if (string.IsNullOrEmpty(Collection))
 				Collection = this.defaultCollectionName;
@@ -2260,7 +2256,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false);
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false, null);
 		}
 
 		/// <summary>
@@ -2273,7 +2269,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true);
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true, null);
 		}
 
 		/// <summary>
@@ -2285,19 +2281,41 @@ namespace Waher.Persistence.Files
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
 		/// <returns>Collections with errors.</returns>
-		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <param name="CollectionNames">If provided, lists collections to be repaired.</param>
+		/// <returns>Collections with errors.</returns>
+		private async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, 
+			string[] CollectionNames)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
 
 			Output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(XsltPath))
+			{
 				Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+				xsltPath = XsltPath;
+			}
 
 			Output.WriteStartElement("DatabaseStatistics", "http://waher.se/Schema/Persistence/Statistics.xsd");
 
 			foreach (ObjectBTreeFile File in this.Files)
 			{
+				if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
+					continue;
+
 				KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
 				FileStatistics Stat = P.Key;
 				Dictionary<Guid, bool> ObjectIds;
@@ -2701,50 +2719,92 @@ namespace Waher.Persistence.Files
 
 			if (!Start.HasValue || !Stop.HasValue || Start.Value > Stop.Value)
 			{
-				if (string.IsNullOrEmpty(this.autoRepairReportFolder))
-					s = this.folder + "AutoRepair";
+				s = this.GetReportFileName();
+
+				if (!Start.HasValue)
+				{
+					Log.Notice("First time checking database for errors.",
+						string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
+				}
 				else
-					s = this.autoRepairReportFolder;
-
-				if (!Directory.Exists(s))
-					Directory.CreateDirectory(s);
-
-				s = Path.Combine(s, "AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
-
-				XmlWriterSettings Settings = new XmlWriterSettings()
 				{
-					Encoding = Encoding.UTF8,
-					Indent = true,
-					IndentChars = "\t",
-					NewLineChars = "\r\n",
-					NewLineHandling = NewLineHandling.Entitize,
-					NewLineOnAttributes = false,
-					OmitXmlDeclaration = false,
-					WriteEndDocumentOnClose = true,
-					CloseOutput = true
-				};
+					Log.Warning("Service not properly terminated. Checking database for errors.",
+						string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
+				}
 
-				using (FileStream fs = File.Create(s))
+				return await this.Repair(s, XsltPath, (string[])null);
+			}
+			else
+				return new string[0];
+		}
+
+		private string GetReportFileName()
+		{
+			string s;
+
+			if (string.IsNullOrEmpty(this.autoRepairReportFolder))
+				s = this.folder + "AutoRepair";
+			else
+				s = this.autoRepairReportFolder;
+
+			if (!Directory.Exists(s))
+				Directory.CreateDirectory(s);
+
+			return Path.Combine(s, "AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public Task<string[]> Repair(params string[] CollectionNames)
+		{
+			string ReportFileName = this.GetReportFileName();
+			return this.Repair(ReportFileName, xsltPath, CollectionNames);
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public Task<string[]> Repair(string XsltPath, params string[] CollectionNames)
+		{
+			string ReportFileName = this.GetReportFileName();
+			return this.Repair(ReportFileName, XsltPath, CollectionNames);
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="ReportFileName">Filename of repair report.</param>
+		/// <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public async Task<string[]> Repair(string ReportFileName, string XsltPath, params string[] CollectionNames)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				Encoding = Encoding.UTF8,
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Entitize,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = false,
+				WriteEndDocumentOnClose = true,
+				CloseOutput = true
+			};
+
+			using (FileStream fs = File.Create(ReportFileName))
+			{
+				using (XmlWriter w = XmlWriter.Create(fs, Settings))
 				{
-					using (XmlWriter w = XmlWriter.Create(fs, Settings))
-					{
-						if (!Start.HasValue)
-						{
-							Log.Notice("First time checking database for errors.",
-								string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
-						}
-						else
-						{
-							Log.Warning("Service not properly terminated. Checking database for errors.",
-								string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
-						}
-
-						return await this.Repair(w, XsltPath, this.folder, false);
-					}
+					return await this.Analyze(w, XsltPath, this.folder, false, true, CollectionNames);
 				}
 			}
-
-			return new string[0];
 		}
 
 		/// <summary>

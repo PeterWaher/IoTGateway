@@ -96,6 +96,11 @@ namespace Waher.Persistence.Files
 		public string CollectionName => this.collectionName;
 
 		/// <summary>
+		/// Files provider.
+		/// </summary>
+		public FilesProvider Provider => this.provider;
+
+		/// <summary>
 		/// Gets the length of the file, in bytes.
 		/// </summary>
 		/// <returns>Length of file.</returns>

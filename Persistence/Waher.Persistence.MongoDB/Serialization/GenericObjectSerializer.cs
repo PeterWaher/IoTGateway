@@ -30,6 +30,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// Provides a generic object serializer.
 		/// </summary>
 		/// <param name="Provider">Database provider.</param>
+		/// <param name="ReturnTypedObjects">If typed objects are to be returned.</param>
 		public GenericObjectSerializer(MongoDBProvider Provider, bool ReturnTypedObjects)
 			: base(typeof(GenericObject), Provider, true)
 		{
@@ -44,19 +45,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
 		public override object Deserialize(IBsonReader Reader, BsonType? DataType, bool Embedded)
-		{
-			return this.Deserialize(Reader, DataType, Embedded, true);
-		}
-
-		/// <summary>
-		/// Deserializes an object from a binary source.
-		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
-		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
-		/// <param name="Embedded">If the object is embedded into another.</param>
-		/// <param name="CheckFieldNames">If field names are to be extended.</param>
-		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IBsonReader Reader, BsonType? DataType, bool Embedded, bool CheckFieldNames)
 		{
 			BsonReaderBookmark Bookmark = Reader.GetBookmark();
 			BsonType? DataTypeBak = DataType;

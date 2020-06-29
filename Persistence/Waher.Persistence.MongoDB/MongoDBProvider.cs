@@ -1369,6 +1369,16 @@ namespace Waher.Persistence.MongoDB
 			return new string[0];
 		}
 
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public Task<string[]> Repair(params string[] CollectionNames)
+		{
+			return Task.FromResult<string[]>(new string[0]);
+		}
+
 		private static string Encode(string s)
 		{
 			return s.

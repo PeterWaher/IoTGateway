@@ -792,6 +792,18 @@
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <returns>Collections with errors.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean,System.String[])">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Repair">If files should be repaired if corruptions are detected.</param>
+            <param name="CollectionNames">If provided, lists collections to be repaired.</param>
+            <returns>Collections with errors.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.RepairIfInproperShutdown(System.String)">
             <summary>
             Checks if the database needs repairing. This is done by checking the last start and stop timetamps to detect
@@ -799,6 +811,30 @@
             </summary>
             <param name="XsltPath">Path to optional XSLT file for the resulting report.</param>
             <returns>Collections with errors.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.String,System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.String,System.String,System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="ReportFileName">Filename of repair report.</param>
+            <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.CreateGuid">
             <summary>
@@ -3515,6 +3551,11 @@
         <member name="P:Waher.Persistence.Files.SerialFile.CollectionName">
             <summary>
             Collection name.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.SerialFile.Provider">
+            <summary>
+            Files provider.
             </summary>
         </member>
         <member name="M:Waher.Persistence.Files.SerialFile.GetLength">

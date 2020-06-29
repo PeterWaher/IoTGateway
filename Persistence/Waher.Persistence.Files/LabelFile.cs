@@ -268,7 +268,10 @@ namespace Waher.Persistence.Files
 				if (this.labelsByCode.TryGetValue(FieldCode, out string Result))
 					return Result;
 				else
-					throw new ArgumentException("Field code unknown: " + FieldCode.ToString() + ", Collection: " + this.CollectionName, nameof(FieldCode));
+				{
+					Database.FlagForRepair(this.CollectionName);
+					throw new ArgumentException("Field code unknown, Collection: " + this.CollectionName, nameof(FieldCode));
+				}
 			}
 			finally
 			{

@@ -12,6 +12,9 @@ namespace Waher.Persistence.MongoDB
 	[Index("Collection", "Key")]
 	public class DictionaryEntry
 	{
+		/// <summary>
+		/// Name of collection: "PersistentDictionary"
+		/// </summary>
 		public const string CollectionName = "PersistentDictionary";
 
 		private string objectId = null;

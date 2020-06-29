@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 
@@ -14,8 +15,10 @@ namespace Waher.Persistence
 	/// </summary>
 	public static class Database
 	{
+		private static readonly Dictionary<string, bool> toRepair = new Dictionary<string, bool>();
 		private static IDatabaseProvider provider = null;
 		private static bool locked = false;
+		private static bool repairing = false;
 
 		/// <summary>
 		/// Registers a database provider for use from the static <see cref="Database"/> class, 
@@ -723,6 +726,62 @@ namespace Waher.Persistence
 				RaiseRepaired(Result);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Flags a collection for repairing.
+		/// </summary>
+		/// <param name="Collection">Collection</param>
+		public static async void FlagForRepair(string Collection)
+		{
+			try
+			{
+				lock (toRepair)
+				{
+					toRepair[Collection] = true;
+
+					if (repairing)
+						return;
+
+					repairing = false;
+				}
+
+				await Task.Delay(1000);
+
+				while (!string.IsNullOrEmpty(Collection))
+				{
+					Log.Alert("Collection flagged for repair: " + Collection, Collection);
+
+					string[] Repaired = await Provider.Repair(Collection);
+
+					if (Repaired.Length > 0)
+						RaiseRepaired(Repaired);
+
+					lock (toRepair)
+					{
+						toRepair.Remove(Collection);
+						Collection = null;
+
+						foreach (string s in toRepair.Keys)
+						{
+							Collection = s;
+							break;
+						}
+
+						if (string.IsNullOrEmpty(Collection))
+							repairing = false;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			
+				lock (toRepair)
+				{
+					repairing = false;
+				}
+			}
 		}
 
 		/// <summary>

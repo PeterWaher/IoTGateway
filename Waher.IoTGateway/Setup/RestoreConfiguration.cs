@@ -1477,6 +1477,7 @@ namespace Waher.IoTGateway.Setup
 					Ticks = r.ReadInt64();
 					DateTime DT = new DateTime(Ticks, Kind);
 					Ticks = r.ReadInt64();
+					Ticks -= Ticks % 600000000;	// Offsets must be in whole minutes.
 					TimeSpan TS = new TimeSpan(Ticks);
 					return new DateTimeOffset(DT, TS);
 

@@ -2256,24 +2256,98 @@ namespace Waher.Networking.XMPP
 			this.ProcessIq(this.iqSetHandlers, e);
 		}
 
-		internal void ProcessPresence(PresenceEventArgs e)
+		internal async void ProcessPresence(PresenceEventArgs e)
 		{
-			PresenceEventHandlerAsync h;
-			RosterItem Item;
-			string Key;
-
-			lock (this.synchObject)
+			try
 			{
-				foreach (XmlElement E in e.Presence.ChildNodes)
+				LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>> Handlers = null;
+				PresenceEventHandlerAsync h;
+				RosterItem Item;
+				string Key;
+
+				lock (this.synchObject)
 				{
-					Key = E.LocalName + " " + E.NamespaceURI;
-					if (this.presenceHandlers.TryGetValue(Key, out h))
+					foreach (XmlElement E in e.Presence.ChildNodes)
 					{
-						e.Content = E;
-						this.Information(h.GetMethodInfo().Name);
+						Key = E.LocalName + " " + E.NamespaceURI;
+						if (this.presenceHandlers.TryGetValue(Key, out h))
+						{
+							if (Handlers is null)
+								Handlers = new LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>>();
+
+							Handlers.AddLast(new KeyValuePair<PresenceEventHandlerAsync, XmlElement>(h, E));
+						}
+					}
+				}
+
+				switch (e.Type)
+				{
+					case PresenceType.Available:
+						this.Information("OnPresence()");
+						h = this.OnPresence;
+						e.UpdateLastPresence = true;
+
+						lock (this.roster)
+						{
+							if (this.roster.TryGetValue(e.FromBareJID, out Item))
+								Item.PresenceReceived(this, e);
+						}
+						break;
+
+					case PresenceType.Unavailable:
+						this.Information("OnPresence()");
+						h = this.OnPresence;
+
+						lock (this.roster)
+						{
+							if (this.roster.TryGetValue(e.FromBareJID, out Item))
+								Item.PresenceReceived(this, e);
+						}
+						break;
+
+					case PresenceType.Error:
+					case PresenceType.Probe:
+					default:
+						this.Information("OnPresence()");
+						h = this.OnPresence;
+						break;
+
+					case PresenceType.Subscribe:
+						lock (this.subscriptionRequests)
+						{
+							this.subscriptionRequests[e.FromBareJID] = e;
+						}
+
+						this.Information("OnPresenceSubscribe()");
+						h = this.OnPresenceSubscribe;
+						break;
+
+					case PresenceType.Subscribed:
+						this.Information("OnPresenceSubscribed()");
+						h = this.OnPresenceSubscribed;
+						break;
+
+					case PresenceType.Unsubscribe:
+						this.Information("OnPresenceUnsubscribe()");
+						h = this.OnPresenceUnsubscribe;
+						break;
+
+					case PresenceType.Unsubscribed:
+						this.Information("OnPresenceUnsubscribed()");
+						h = this.OnPresenceUnsubscribed;
+						break;
+				}
+
+				if (!(Handlers is null))
+				{
+					foreach (KeyValuePair<PresenceEventHandlerAsync, XmlElement> P in Handlers)
+					{
+						e.Content = P.Value;
+						this.Information(P.Key.GetMethodInfo().Name);
+
 						try
 						{
-							h(this, e);
+							await P.Key(this, e);
 						}
 						catch (Exception ex)
 						{
@@ -2281,75 +2355,30 @@ namespace Waher.Networking.XMPP
 						}
 					}
 				}
+
+				if (!(h is null))
+				{
+					e.Content = null;
+
+					try
+					{
+						await h(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
+				}
 			}
-
-			switch (e.Type)
-			{
-				case PresenceType.Available:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-					e.UpdateLastPresence = true;
-
-					lock (this.roster)
-					{
-						if (this.roster.TryGetValue(e.FromBareJID, out Item))
-							Item.PresenceReceived(this, e);
-					}
-					break;
-
-				case PresenceType.Unavailable:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-
-					lock (this.roster)
-					{
-						if (this.roster.TryGetValue(e.FromBareJID, out Item))
-							Item.PresenceReceived(this, e);
-					}
-					break;
-
-				case PresenceType.Error:
-				case PresenceType.Probe:
-				default:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-					break;
-
-				case PresenceType.Subscribe:
-					lock (this.subscriptionRequests)
-					{
-						this.subscriptionRequests[e.FromBareJID] = e;
-					}
-
-					this.Information("OnPresenceSubscribe()");
-					h = this.OnPresenceSubscribe;
-					break;
-
-				case PresenceType.Subscribed:
-					this.Information("OnPresenceSubscribed()");
-					h = this.OnPresenceSubscribed;
-					break;
-
-				case PresenceType.Unsubscribe:
-					this.Information("OnPresenceUnsubscribe()");
-					h = this.OnPresenceUnsubscribe;
-					break;
-
-				case PresenceType.Unsubscribed:
-					this.Information("OnPresenceUnsubscribed()");
-					h = this.OnPresenceUnsubscribed;
-					break;
-			}
-
-			if (!(h is null))
+			catch (Exception ex)
 			{
 				try
 				{
-					h(this, e);
-				}
-				catch (Exception ex)
-				{
 					this.Exception(ex);
+				}
+				catch (Exception)
+				{
+					// Ignore
 				}
 			}
 		}
@@ -5020,10 +5049,10 @@ namespace Waher.Networking.XMPP
 			this.BeginWrite(Xml.ToString(), null);
 		}
 
-		private async Task RosterPushHandler(object Sender, IqEventArgs e)
+		private Task RosterPushHandler(object Sender, IqEventArgs e)
 		{
 			if (!string.IsNullOrEmpty(e.From))
-				return;
+				return Task.CompletedTask;
 
 			RosterItem Item = null;
 
@@ -5081,14 +5110,26 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (!(h is null))
+				this.ProcessRosterHandler(h, Item);
+
+			return Task.CompletedTask;
+		}
+
+		private async void ProcessRosterHandler(RosterItemEventHandlerAsync h, RosterItem Item)
+		{
+			try
+			{
+				await h(this, Item);
+			}
+			catch (Exception ex)
 			{
 				try
 				{
-					await h(this, Item);
-				}
-				catch (Exception ex)
-				{
 					this.Exception(ex);
+				}
+				catch (Exception)
+				{
+					// Ignore
 				}
 			}
 		}

@@ -415,7 +415,7 @@ namespace Waher.IoTGateway
 
 													exceptionFile.WriteLine(ex.Message);
 													exceptionFile.WriteLine();
-													exceptionFile.WriteLine(ex.StackTrace);
+													exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
 													exceptionFile.WriteLine();
 
 													if (ex is AggregateException ex2)

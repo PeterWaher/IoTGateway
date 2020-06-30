@@ -15,7 +15,7 @@
     <copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</copyright>
     <tags>networking communication mqtt uwp</tags>
     <dependencies>
-      <dependency id="Waher.Events" version="1.0.11"/>
+      <dependency id="Waher.Events" version="1.0.12"/>
       <dependency id="Waher.Networking.UWP" version="1.0.16"/>
     </dependencies>
   </metadata>

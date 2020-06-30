@@ -153,7 +153,7 @@ namespace Waher.Events
 						}
 
 						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty, 
-							EventLevel.Major, string.Empty, ex.Source, ex.StackTrace);
+							EventLevel.Major, string.Empty, ex.Source, CleanStackTrace(ex.StackTrace));
 
 						if (Event.ToAvoid != null)
 						{
@@ -171,6 +171,27 @@ namespace Waher.Events
 
 		private readonly static Dictionary<IEventSink, bool> reportedErrors = new Dictionary<IEventSink, bool>();
 		private static bool hasReportedErrors = false;
+		private static readonly char[] crlf = new char[] { '\r', '\n' };
+
+		/// <summary>
+		/// Cleans a Stack Trace string, removing entries from the asynchronous execution model, making the result more readable to developers.
+		/// </summary>
+		/// <param name="StackTrace">Stack Trace</param>
+		/// <returns>Cleaned stack trace</returns>
+		public static string CleanStackTrace(string StackTrace)
+		{
+			StringBuilder Result = new StringBuilder();
+
+			foreach (string Row in StackTrace.Split(crlf, StringSplitOptions.RemoveEmptyEntries))
+			{
+				if (Row.StartsWith("   at System.") || (Row.StartsWith("--- ") && Row.EndsWith(" ---")))
+					continue;
+
+				Result.AppendLine(Row);
+			}
+
+			return Result.ToString();
+		}
 
 		#region Debug
 
@@ -1600,7 +1621,5 @@ namespace Waher.Events
 
 		#endregion
 
-		// TODO: Traverse stack trace until out of mscore
-		// TODO: Include information (messages & stack traces) from inner exceptions
 	}
 }

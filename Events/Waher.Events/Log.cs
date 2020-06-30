@@ -180,17 +180,22 @@ namespace Waher.Events
 		/// <returns>Cleaned stack trace</returns>
 		public static string CleanStackTrace(string StackTrace)
 		{
-			StringBuilder Result = new StringBuilder();
-
-			foreach (string Row in StackTrace.Split(crlf, StringSplitOptions.RemoveEmptyEntries))
+			if (string.IsNullOrEmpty(StackTrace))
+				return StackTrace;
+			else
 			{
-				if (Row.StartsWith("   at System.") || (Row.StartsWith("--- ") && Row.EndsWith(" ---")))
-					continue;
+				StringBuilder Result = new StringBuilder();
 
-				Result.AppendLine(Row);
+				foreach (string Row in StackTrace.Split(crlf, StringSplitOptions.RemoveEmptyEntries))
+				{
+					if (Row.StartsWith("   at System.") || (Row.StartsWith("--- ") && Row.EndsWith(" ---")))
+						continue;
+
+					Result.AppendLine(Row);
+				}
+
+				return Result.ToString();
 			}
-
-			return Result.ToString();
 		}
 
 		#region Debug

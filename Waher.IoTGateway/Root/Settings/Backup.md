@@ -171,7 +171,7 @@ Available backup files
 | File | Size | Created |    |
 |:-----|:----:|:-------:|:--:|
 {{Files:=Export.GetExportFiles();foreach File in Files do
-	]]| [((File.Name.Replace(")","\\)").Replace("_","\\_");))](/((File.IsKey ? "Key" : "Export"))/((UrlEncode(File.Name).Replace(")","%29");))) | ((File.SizeStr)) | ((File.Created)) | <button class='posButtonSm' onclick='DeleteExport("((File.Name.Replace('"','\\"');))")'>Delete</button> |
+	]]| <a href="/((File.IsKey ? "Key" : "Export"))/((UrlEncode(File.Name).Replace(")","%29");))" target="_blank">((File.Name.Replace(")","\\)").Replace("_","\\_");))</a> | ((File.SizeStr)) | ((File.Created)) | <button class='posButtonSm' onclick='DeleteExport("((File.Name.Replace('"','\\"');))")'>Delete</button> |
 [[;}}
 
 </div>

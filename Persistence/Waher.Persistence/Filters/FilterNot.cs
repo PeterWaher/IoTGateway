@@ -23,7 +23,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// Calculates the logical inverse of the filter.
 		/// </summary>
-		/// <returns>Logical inerse of the filter.</returns>
+		/// <returns>Logical inverse of the filter.</returns>
 		public override Filter Negate()
 		{
 			return this.ChildFilter.Copy();

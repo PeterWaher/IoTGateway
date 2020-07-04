@@ -45,9 +45,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			bool Complete = true;
-			object[] FindParameters = new object[] { this.collectionName, Offset, Top, 
-				TypeSource.Convert(Where, Variables, this.Name, ref Complete), TypeSource.Convert(Order) };
+			object[] FindParameters = new object[] { this.collectionName, Offset, Top,
+				TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order) };
 			object Obj = FindMethod.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
@@ -62,12 +61,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-			IResultSetEnumerator Result = new SynchEnumerator(Enumerable.GetEnumerator());
-
-			if (!Complete)
-				Result = new ConditionalEnumerator(Result, Variables, Where);
-
-			return Result;
+			return new SynchEnumerator(Enumerable.GetEnumerator());
 		}
 
 		private static MethodInfo findMethod = null;
@@ -120,44 +114,24 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			bool Complete = true;
-			Filter Filter = TypeSource.Convert(Where, Variables, this.Name, ref Complete);
+			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
 
-			if (Complete)
-			{
-				object[] FindParameters = new object[] { this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order) };
-				object Obj = FindDeleteMethod.Invoke(null, FindParameters);
-				if (!(Obj is Task Task))
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			object[] FindParameters = new object[] { this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order) };
+			object Obj = FindDeleteMethod.Invoke(null, FindParameters);
+			if (!(Obj is Task Task))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				await Task;
+			await Task;
 
-				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				if (PI is null)
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+			if (PI is null)
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				Obj = PI.GetValue(Task);
-				if (!(Obj is int Count))
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			Obj = PI.GetValue(Task);
+			if (!(Obj is int Count))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				return Count;
-			}
-			else
-			{
-				IResultSetEnumerator e = await this.Find(Offset, Top, Where, Variables, Order, Node);
-				LinkedList<object> ToDelete = new LinkedList<object>();
-				int Count = 0;
-
-				while (await e.MoveNextAsync())
-				{
-					ToDelete.AddLast(e.Current);
-					Count++;
-				}
-
-				await Database.Delete(ToDelete);
-
-				return Count;
-			}
+			return Count;
 		}
 
 		private static MethodInfo findDeleteMethod = null;

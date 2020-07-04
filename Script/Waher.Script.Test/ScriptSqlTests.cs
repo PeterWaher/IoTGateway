@@ -751,6 +751,28 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		public void SELECT_Test_57_Custom_Filters()
+		{
+			this.Test("Select OrderID, CustomerID, OrderDate from Orders where (OrderID & 1)=1",
+				new object[][]
+				{
+					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
+					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
+				});
+		}
+
+		[TestMethod]
+		public void SELECT_Test_58_Custom_Filters_Typed()
+		{
+			this.Test("Select OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order where (OrderID & 1)=1",
+				new object[][]
+				{
+					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
+					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
+				});
+		}
+
+		[TestMethod]
 		public void INSERT_Test_01_INSERT_VALUES()
 		{
 			this.Test(

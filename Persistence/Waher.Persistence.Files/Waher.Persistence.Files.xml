@@ -2586,6 +2586,55 @@
             Gets an array of constant fields. Can return null, if there are no constant fields.
             </summary>
         </member>
+        <member name="T:Waher.Persistence.Files.Searching.FilterCustom">
+            <summary>
+            Custom filter used to filter objects using an external expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.#ctor(Waher.Persistence.Filters.ICustomFilter)">
+            <summary>
+            Custom filter used to filter objects using an external expression.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.FilterCustom.ConstantFields">
+            <summary>
+            Gets an array of constant fields. Can return null, if there are no constant fields.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.AppliesTo(System.Object,Waher.Persistence.Serialization.IObjectSerializer,Waher.Persistence.Files.FilesProvider)">
+            <summary>
+            Checks if the filter applies to the object.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Serializer">Corresponding object serializer.</param>
+            <param name="Provider">Files provider.</param>
+            <returns>If the filter can be applied.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.Copy">
+            <summary>
+            Creates a copy of the filter.
+            </summary>
+            <returns>Copy of filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.Negate">
+            <summary>
+            Calculates the logical inverse of the filter.
+            </summary>
+            <returns>Logical inverse of the filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.Normalize">
+            <summary>
+            Returns a normalized filter.
+            </summary>
+            <returns>Normalized filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.FilterCustom.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
+        </member>
         <member name="T:Waher.Persistence.Files.Searching.FilteredCursor`1">
             <summary>
             Provides a filtered cursor. It only returns objects that matches a given filter.

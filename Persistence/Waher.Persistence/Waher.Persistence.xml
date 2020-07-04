@@ -3098,7 +3098,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.Filter.Copy">
             <summary>
@@ -3127,7 +3127,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterAnd.Copy">
             <summary>
@@ -3194,6 +3194,46 @@
             <param name="State">State object passed on to the callback method.</param>
             <returns>If all nodes were processed (true), or if the process was broken by the callback method (false).</returns>
         </member>
+        <member name="T:Waher.Persistence.Filters.FilterCustom`1">
+            <summary>
+            Custom filter used to filter objects using an external expression.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.#ctor(Waher.Persistence.Filters.PassTest{`0})">
+            <summary>
+            Custom filter used to filter objects using an external expression.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Filters.FilterCustom`1.Test">
+            <summary>
+            Test to apply to objects.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.Copy">
+            <summary>
+            Creates a copy of the filter.
+            </summary>
+            <returns>Copy of filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.Negate">
+            <summary>
+            Calculates the logical inverse of the filter.
+            </summary>
+            <returns>Logical inverse of the filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.Normalize">
+            <summary>
+            Returns a normalized filter.
+            </summary>
+            <returns>Normalized filter.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterField">
             <summary>
             Abstract base class for all field filters.
@@ -3226,7 +3266,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.Copy">
             <summary>
@@ -3255,7 +3295,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.Copy">
             <summary>
@@ -3284,7 +3324,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.Copy">
             <summary>
@@ -3313,7 +3353,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.Copy">
             <summary>
@@ -3342,7 +3382,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.Copy">
             <summary>
@@ -3376,7 +3416,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLikeRegEx.Copy">
             <summary>
@@ -3411,7 +3451,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.Copy">
             <summary>
@@ -3462,7 +3502,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterNot.Copy">
             <summary>
@@ -3496,7 +3536,7 @@
             <summary>
             Calculates the logical inverse of the filter.
             </summary>
-            <returns>Logical inerse of the filter.</returns>
+            <returns>Logical inverse of the filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterOr.Copy">
             <summary>
@@ -3514,6 +3554,26 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="T:Waher.Persistence.Filters.PassTest`1">
+            <summary>
+            Delegate for custom filters.
+            </summary>
+            <typeparam name="T">Type of object</typeparam>
+            <param name="Object">Object</param>
+            <returns>If object passes test.</returns>
+        </member>
+        <member name="T:Waher.Persistence.Filters.ICustomFilter">
+            <summary>
+            Interface for custom filters.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.ICustomFilter.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
         </member>
         <member name="T:Waher.Persistence.IAsyncEnumerator">
             <summary>

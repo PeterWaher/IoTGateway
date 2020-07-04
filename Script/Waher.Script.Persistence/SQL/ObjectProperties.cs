@@ -54,7 +54,14 @@ namespace Waher.Script.Persistence.SQL
 			{
 				this.obj = value;
 				this.dictionary = value as IDictionary<string, object>;
-				this.type = value.GetType();
+				
+				Type T = value.GetType();
+
+				if (this.type != T)
+				{
+					this.type = T;
+					this.properties?.Clear();
+				}
 			}
 		}
 

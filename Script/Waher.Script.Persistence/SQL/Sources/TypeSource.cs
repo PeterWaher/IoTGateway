@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
@@ -49,8 +51,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			bool Complete = true;
-			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name, ref Complete), Convert(Order) };
+			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
 			object Obj = FindMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
@@ -65,12 +66,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-			IResultSetEnumerator Result = new SynchEnumerator(Enumerable.GetEnumerator());
-
-			if (!Complete)
-				Result = new ConditionalEnumerator(Result, Variables, Where);
-
-			return Result;
+			return new SynchEnumerator(Enumerable.GetEnumerator());
 		}
 
 		private static MethodInfo findMethod = null;
@@ -122,44 +118,24 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			bool Complete = true;
-			Filter Filter = TypeSource.Convert(Where, Variables, this.Name, ref Complete);
+			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
 
-			if (Complete)
-			{
-				object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
-				object Obj = FindDeleteMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
-				if (!(Obj is Task Task))
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
+			object Obj = FindDeleteMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
+			if (!(Obj is Task Task))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				await Task;
+			await Task;
 
-				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				if (PI is null)
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+			if (PI is null)
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				Obj = PI.GetValue(Task);
-				if (!(Obj is int Count))
-					throw new ScriptRuntimeException("Unexpected response.", Node);
+			Obj = PI.GetValue(Task);
+			if (!(Obj is int Count))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
 
-				return Count;
-			}
-			else
-			{
-				IResultSetEnumerator e = await this.Find(Offset, Top, Where, Variables, Order, Node);
-				LinkedList<object> ToDelete = new LinkedList<object>();
-				int Count = 0;
-
-				while (await e.MoveNextAsync())
-				{
-					ToDelete.AddLast(e.Current);
-					Count++;
-				}
-
-				await Database.Delete(ToDelete);
-
-				return Count;
-			}
+			return Count;
 		}
 
 		private static MethodInfo findDeleteMethod = null;
@@ -218,7 +194,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Result;
 		}
 
-		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name, ref bool Complete)
+		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name)
 		{
 			if (Conditions is null)
 				return null;
@@ -228,64 +204,44 @@ namespace Waher.Script.Persistence.SQL.Sources
 				ScriptNode LO = Reduce(Bin.LeftOperand, Name);
 				ScriptNode RO = Reduce(Bin.RightOperand, Name);
 
-				Operators.Logical.And And = Conditions as Operators.Logical.And;
-				Operators.Dual.And And2 = And is null ? Conditions as Operators.Dual.And : null;
-
-				if (And != null || And2 != null)
+				if (Conditions is Operators.Logical.And || Conditions is Operators.Dual.And)
 				{
-					Filter L = Convert(LO, Variables, Name, ref Complete);
-					Filter R = Convert(RO, Variables, Name, ref Complete);
+					Filter L = Convert(LO, Variables, Name);
+					Filter R = Convert(RO, Variables, Name);
 
-					if (L is null && R is null)
-						return null;
-					else if (L is null)
-						return R;
-					else if (R is null)
-						return L;
+					List<Filter> Filters = new List<Filter>();
+
+					if (L is FilterAnd L2)
+						Filters.AddRange(L2.ChildFilters);
 					else
-					{
-						List<Filter> Filters = new List<Filter>();
+						Filters.Add(L);
 
-						if (L is FilterAnd L2)
-							Filters.AddRange(L2.ChildFilters);
-						else
-							Filters.Add(L);
+					if (R is FilterAnd R2)
+						Filters.AddRange(R2.ChildFilters);
+					else
+						Filters.Add(R);
 
-						if (R is FilterAnd R2)
-							Filters.AddRange(R2.ChildFilters);
-						else
-							Filters.Add(R);
-
-						return new FilterAnd(Filters.ToArray());
-					}
+					return new FilterAnd(Filters.ToArray());
 				}
 
-				Operators.Logical.Or Or = Conditions as Operators.Logical.Or;
-				Operators.Dual.Or Or2 = Or is null ? Conditions as Operators.Dual.Or : null;
-
-				if (Or != null || Or2 != null)
+				if (Conditions is Operators.Logical.Or || Conditions is Operators.Dual.Or)
 				{
-					Filter L = Convert(LO, Variables, Name, ref Complete);
-					Filter R = Convert(RO, Variables, Name, ref Complete);
+					Filter L = Convert(LO, Variables, Name);
+					Filter R = Convert(RO, Variables, Name);
 
-					if (L is null || R is null)
-						return null;
+					List<Filter> Filters = new List<Filter>();
+
+					if (L is FilterOr L2)
+						Filters.AddRange(L2.ChildFilters);
 					else
-					{
-						List<Filter> Filters = new List<Filter>();
+						Filters.Add(L);
 
-						if (L is FilterOr L2)
-							Filters.AddRange(L2.ChildFilters);
-						else
-							Filters.Add(L);
+					if (R is FilterOr R2)
+						Filters.AddRange(R2.ChildFilters);
+					else
+						Filters.Add(R);
 
-						if (R is FilterOr R2)
-							Filters.AddRange(R2.ChildFilters);
-						else
-							Filters.Add(R);
-
-						return new FilterOr(Filters.ToArray());
-					}
+					return new FilterOr(Filters.ToArray());
 				}
 
 				if (LO is VariableReference LVar)
@@ -325,8 +281,6 @@ namespace Waher.Script.Persistence.SQL.Sources
 						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
-					else
-						Complete = false;
 				}
 				else if (RO is VariableReference RVar)
 				{
@@ -365,33 +319,55 @@ namespace Waher.Script.Persistence.SQL.Sources
 						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
-					else
-						Complete = false;
 				}
-				else
-					Complete = false;
 			}
 			else if (Conditions is UnaryOperator UnOp)
 			{
 				if (Conditions is Operators.Logical.Not Not)
 				{
-					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name, ref Complete);
-					if (F is null)
-						return null;
-					else if (F is FilterNot Not2)
+					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name);
+					if (F is FilterNot Not2)
 						return Not2.ChildFilter;
 					else
 						return new FilterNot(F);
 				}
-				else
-					Complete = false;
 			}
 			else if (Conditions is VariableReference Ref)
 				return new FilterFieldEqualTo(Ref.VariableName, true);
-			else
-				Complete = false;
 
-			return null;
+			return new FilterCustom<object>(new ScriptNodeFilter(Conditions, Variables).Passes);
+		}
+
+		private class ScriptNodeFilter
+		{
+			private readonly ScriptNode node;
+			private readonly Variables variables;
+			private ObjectProperties properties;
+
+			public ScriptNodeFilter(ScriptNode Node, Variables Variables)
+			{
+				this.node = Node;
+				this.variables = Variables;
+				this.properties = null;
+			}
+
+			public bool Passes(object Object)
+			{
+				if (this.properties is null)
+					this.properties = new ObjectProperties(Object, this.variables, true);
+				else
+					this.properties.Object = Object;
+
+				try
+				{
+					IElement Result = this.node.Evaluate(this.properties);
+					return Result is BooleanValue bv && bv.Value;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
 		}
 
 		private static ScriptNode Reduce(ScriptNode Node, string Name)

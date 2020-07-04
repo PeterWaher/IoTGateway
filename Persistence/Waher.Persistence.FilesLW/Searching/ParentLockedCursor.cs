@@ -103,7 +103,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MoveNextAsync()
 		{
-			return this.cursor.MovePreviousAsync();
+			return this.cursor.MoveNextAsync();
 		}
 
 		/// <summary>
@@ -114,7 +114,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MovePreviousAsync()
 		{
-			return this.cursor.MoveNextAsync();
+			return this.cursor.MovePreviousAsync();
 		}
 
 		public IEnumerator<T> GetEnumerator()
@@ -136,7 +136,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return this.cursor.ReverseSortOrder(ConstantFields, SortOrder);
+			return this.cursor.SameSortOrder(ConstantFields, SortOrder);
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return this.cursor.SameSortOrder(ConstantFields, SortOrder);
+			return this.cursor.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 	}
 }

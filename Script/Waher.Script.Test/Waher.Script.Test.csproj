@@ -80,9 +80,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
-      <Project>{c349595e-6578-4ffd-9456-4a5a3e52636f}</Project>
-      <Name>Waher.Persistence.Files</Name>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
+      <Project>{8b1029cc-299f-4325-baf7-782b06f53c94}</Project>
+      <Name>Waher.Persistence.FilesLW</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
       <Project>{d096df31-9837-4267-bd65-7c48f1d788d2}</Project>

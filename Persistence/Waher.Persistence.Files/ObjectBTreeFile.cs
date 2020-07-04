@@ -5235,7 +5235,7 @@ namespace Waher.Persistence.Files
 					if (Result is null)
 					{
 						this.nrFullFileScans++;
-						Result = await this.GetTypedEnumeratorAsync<T>(LockType);
+						Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
 
 						if (!(SortOrder is null) && SortOrder.Length > 0)
 							Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);

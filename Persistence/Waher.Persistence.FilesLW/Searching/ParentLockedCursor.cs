@@ -7,23 +7,29 @@ using Waher.Persistence.Serialization;
 namespace Waher.Persistence.Files.Searching
 {
 	/// <summary>
-	/// Reverses the direction of a given cursor.
+	/// Makes sure to unlock the parent when enumeration is done.
 	/// </summary>
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-	internal class ReversedCursor<T> : ICursor<T>
+	internal class ParentLockedCursor<T> : ICursor<T>
 	{
 		private readonly ICursor<T> cursor;
 		private readonly int timeoutMilliseconds;
+		private readonly ObjectBTreeFile file;
+		private LockType lockType;
 
 		/// <summary>
-		/// Reverses the direction of a given cursor.
+		/// Makes sure to unlock the parent when enumeration is done.
 		/// </summary>
 		/// <param name="Cursor">Cursor to underlying result set.</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		internal ReversedCursor(ICursor<T> Cursor, int TimeoutMilliseconds)
+		/// <param name="File">Parent file.</param>
+		/// <param name="LockType">Type of lock to release.</param>
+		internal ParentLockedCursor(ICursor<T> Cursor, int TimeoutMilliseconds, ObjectBTreeFile File, LockType LockType)
 		{
 			this.cursor = Cursor;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.file = File;
+			this.lockType = LockType;
 		}
 
 		/// <summary>
@@ -81,6 +87,12 @@ namespace Waher.Persistence.Files.Searching
 		public void Dispose()
 		{
 			this.cursor.Dispose();
+
+			if (this.lockType != LockType.None)
+			{
+				this.file.EndLock(this.lockType);
+				this.lockType = LockType.None;
+			}
 		}
 
 		/// <summary>

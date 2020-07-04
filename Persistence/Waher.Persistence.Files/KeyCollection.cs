@@ -48,7 +48,7 @@ namespace Waher.Persistence.Files
 
 		public void CopyTo(string[] array, int arrayIndex)
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.dictionary.GetEnumerator(true);
+			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.dictionary.GetEnumerator(LockType.Read);
 			FilesProvider.Wait(Task, this.dictionary.DictionaryFile.TimeoutMilliseconds);
 
 			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)

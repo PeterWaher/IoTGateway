@@ -10,6 +10,27 @@ using Waher.Runtime.Inventory;
 namespace Waher.Persistence.Files
 {
 	/// <summary>
+	/// Type of lock requested.
+	/// </summary>
+	public enum LockType
+	{
+		/// <summary>
+		/// No lock
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// Lock for reading
+		/// </summary>
+		Read,
+
+		/// <summary>
+		/// Lock for writing
+		/// </summary>
+		Write
+	}
+
+	/// <summary>
 	/// Enumerates object in a <see cref="ObjectBTreeFile"/> in GUID order. You can use the enumerator to enumerate objects
 	/// forwards and backwards, as well as skip a given number of objects.
 	/// </summary>
@@ -30,7 +51,7 @@ namespace Waher.Persistence.Files
 		private uint currentBlockIndex;
 		private int currentObjPos;
 		private readonly int timeoutMilliseconds;
-		private bool locked;
+		private LockType lockType;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
@@ -47,7 +68,7 @@ namespace Waher.Persistence.Files
 			this.currentReader = null;
 			this.currentHeader = null;
 			this.blockUpdateCounter = File.BlockUpdateCounter;
-			this.locked = false;
+			this.lockType = LockType.None;
 			this.recordHandler = RecordHandler;
 			this.startingPoint = null;
 			this.defaultSerializer = DefaultSerializer;
@@ -67,15 +88,26 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Locks the underlying file (if not locked).
 		/// </summary>
-		/// <returns></returns>
-		internal async Task LockRead()
+		internal async Task Lock(LockType LockType)
 		{
-			if (!this.locked)
+			if (this.lockType == LockType.None)
 			{
-				await this.file.LockRead();
-				this.locked = true;
+				switch (LockType)
+				{
+					case LockType.Read:
+						await this.file.LockRead();
+						break;
+
+					case LockType.Write:
+						await this.file.LockWrite();
+						break;
+				}
+
+				this.lockType = LockType;
 				this.blockUpdateCounter = this.file.BlockUpdateCounter;
 			}
+			else if (this.lockType != LockType)
+				throw new InvalidOperationException("Already locked.");
 		}
 
 		/// <summary>
@@ -83,7 +115,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
+			//FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
+			Task _ = this.DisposeAsync();
 		}
 
 		/// <summary>
@@ -91,13 +124,20 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public Task DisposeAsync()
 		{
-			if (this.locked)
+			LockType Temp = this.lockType;
+			this.lockType = LockType.None;
+
+			switch (Temp)
 			{
-				this.locked = false;
-				return this.file.EndRead();
+				case LockType.Read:
+					return this.file.EndRead();
+
+				case LockType.Write:
+					return this.file.EndWrite();
+
+				default:
+					return Task.CompletedTask;
 			}
-			else
-				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -215,7 +255,7 @@ namespace Waher.Persistence.Files
 			{
 				if (!this.currentRank.HasValue)
 				{
-					if (this.locked)
+					if (this.lockType != LockType.None)
 						this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
 					else
 					{
@@ -797,7 +837,7 @@ namespace Waher.Persistence.Files
 			long PhysicalPosition = BlockIndex;
 			PhysicalPosition *= this.file.BlockSize;
 
-			if (this.locked)
+			if (this.lockType != LockType.None)
 				return await this.file.LoadBlockLocked(PhysicalPosition, true);
 			else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");

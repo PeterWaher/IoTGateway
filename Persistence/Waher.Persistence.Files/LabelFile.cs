@@ -180,7 +180,7 @@ namespace Waher.Persistence.Files
 				{
 					Result = (uint)this.labelsByCode.Count;
 					if (Result == int.MaxValue)
-						throw new FileException("Too many labels in " + this.FileName, this.FileName, this.CollectionName);
+						throw Database.FlagForRepair(this.CollectionName, "Too many labels in " + this.FileName);
 
 					await this.WriteLabelLocked(FieldName);
 
@@ -268,10 +268,7 @@ namespace Waher.Persistence.Files
 				if (this.labelsByCode.TryGetValue(FieldCode, out string Result))
 					return Result;
 				else
-				{
-					Database.FlagForRepair(this.CollectionName);
-					throw new ArgumentException("Field code unknown, Collection: " + this.CollectionName, nameof(FieldCode));
-				}
+					throw Database.FlagForRepair(this.CollectionName, "Field code unknown, Collection: " + this.CollectionName);
 			}
 			finally
 			{

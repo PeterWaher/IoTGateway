@@ -24,7 +24,8 @@ namespace Waher.Persistence.Files.Searching
 		private readonly FilesProvider provider;
 		private readonly int nrRanges;
 		private int limitsUpdatedAt;
-		private readonly bool locked;
+		private readonly LockType lockType;
+		private readonly bool lockParent;
 		private readonly bool firstAscending;
 		private readonly bool[] ascending;
 
@@ -35,15 +36,17 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Index">Index.</param>
 		/// <param name="Ranges">Ranges to enumerate.</param>
 		/// <param name="AdditionalFilters">Additional filters.</param>
-		/// <param name="Locked">If locked access is desired.</param>
+		/// <param name="LockType">If locked access is desired.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Provider">Files provider.</param>
-		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters, 
-			bool Locked, FilesProvider Provider)
+		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters,
+			LockType LockType, bool LockParent, FilesProvider Provider)
 		{
 			this.index = Index;
 			this.ranges = Ranges;
 			this.additionalfilters = AdditionalFilters;
-			this.locked = Locked;
+			this.lockType = LockType;
+			this.lockParent = LockParent;
 			this.currentRange = null;
 			this.ascending = Index.Ascending;
 			this.firstAscending = this.ascending[0];
@@ -123,11 +126,8 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			if (!(this.currentRange is null))
-			{
-				this.currentRange.Dispose();
-				this.currentRange = null;
-			}
+			this.currentRange?.Dispose();
+			this.currentRange = null;
 		}
 
 		/// <summary>
@@ -233,9 +233,9 @@ namespace Waher.Persistence.Files.Searching
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.locked, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
 					else
-						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.locked, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
 
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
@@ -452,10 +452,10 @@ namespace Waher.Persistence.Files.Searching
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.locked, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
 					else
-						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.locked, SearchParameters.ToArray());
-					
+						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
+
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
 					this.limitsUpdatedAt = this.nrRanges;

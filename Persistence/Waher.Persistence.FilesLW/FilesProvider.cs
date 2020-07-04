@@ -550,10 +550,7 @@ namespace Waher.Persistence.Files
 		public async Task<string> GetFieldNameAsync(string Collection, ulong FieldCode)
 		{
 			if (FieldCode > uint.MaxValue)
-			{
-				Database.FlagForRepair(Collection);
-				throw new ArgumentOutOfRangeException("Field code too large.", nameof(FieldCode));
-			}
+				throw Database.FlagForRepair(Collection, "Field code too large.");
 
 			if (string.IsNullOrEmpty(Collection))
 				Collection = this.defaultCollectionName;
@@ -1724,7 +1721,7 @@ namespace Waher.Persistence.Files
 			}
 			else
 			{
-				Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+				Tuple<Guid, BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
 
 				ObjectId = Rec.Item1;
 				File.QueueForSave(Value, Serializer);
@@ -1836,7 +1833,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
-			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder))
+			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, LockType.Read, SortOrder))
 			{
 				return await this.LoadAll<T>(ResultSet);
 			}
@@ -1882,9 +1879,107 @@ namespace Waher.Persistence.Files
 		public async Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection);
-			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, true, SortOrder))
+			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, LockType.Read, SortOrder))
 			{
 				return await this.LoadAll<object>(ResultSet);
+			}
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return this.FindDelete<T>(Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName(null));
+			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, LockType.Write, SortOrder))
+			{
+				IEnumerable<T> Result = await this.LoadAll<T>(ResultSet);
+
+				foreach (T Object in Result)
+				{
+					Guid ObjectId = await Serializer.GetObjectId(Object, false);
+					if (ObjectId != Guid.Empty)
+						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return this.FindDelete(Collection, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection);
+			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, LockType.Write, SortOrder))
+			{
+				IEnumerable<object> Result = await this.LoadAll<object>(ResultSet);
+				ObjectSerializer Serializer = null;
+				Type LastType = null;
+				Type Type;
+
+				foreach (object Object in Result)
+				{
+					Type = Object.GetType();
+
+					if (Serializer is null || Type != LastType)
+					{
+						Serializer = this.GetObjectSerializerEx(Type);
+						LastType = Type;
+					}
+
+					Guid ObjectId = await Serializer.GetObjectId(Object, false);
+					if (ObjectId != Guid.Empty)
+						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
+				}
+
+				return Result;
 			}
 		}
 
@@ -2168,7 +2263,7 @@ namespace Waher.Persistence.Files
 							}
 						}
 
-						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(true))
+						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(LockType.Read))
 						{
 							GenericObject Obj;
 
@@ -2316,289 +2411,298 @@ namespace Waher.Persistence.Files
 				if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
 					continue;
 
-				KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
-				FileStatistics Stat = P.Key;
-				Dictionary<Guid, bool> ObjectIds;
-
-				if (Stat.IsCorrupt)
-					CollectionsWithErrors[File.CollectionName] = true;
-
-				if (Repair && Stat.IsCorrupt)
+				Database.BeginRepair(File.CollectionName);
+				try
 				{
-					LinkedList<Exception> Exceptions = null;
-					string TempFileName = Path.GetTempFileName();
-					string TempBtreeFileName = TempFileName + ".btree";
-					string TempBlobFileName = TempFileName + ".blob";
+					KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
+					FileStatistics FileStat = P.Key;
+					Dictionary<Guid, bool> ObjectIds;
+					FileStatistics IndexStat;
 
-					using (ObjectBTreeFile TempFile = new ObjectBTreeFile(TempBtreeFileName, File.CollectionName, TempBlobFileName,
-						File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
+					if (FileStat.IsCorrupt)
+						CollectionsWithErrors[File.CollectionName] = true;
+
+					if (Repair && FileStat.IsCorrupt)
 					{
-						int c = 0;
+						LinkedList<Exception> Exceptions = null;
+						string TempFileName = Path.GetTempFileName();
+						string TempBtreeFileName = TempFileName + ".btree";
+						string TempBlobFileName = TempFileName + ".blob";
 
-						ObjectIds = new Dictionary<Guid, bool>();
-
-						await this.StartBulk();
-						try
+						using (ObjectBTreeFile TempFile = new ObjectBTreeFile(TempBtreeFileName, File.CollectionName, TempBlobFileName,
+							File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
 						{
-							for (uint BlockIndex = 0; BlockIndex < Stat.NrBlocks; BlockIndex++)
+							int c = 0;
+
+							ObjectIds = new Dictionary<Guid, bool>();
+
+							await this.StartBulk();
+							try
 							{
-								long PhysicalPosition = BlockIndex;
-								PhysicalPosition *= File.BlockSize;
-
-								byte[] Block = await File.LoadBlockLocked(PhysicalPosition, false);
-								BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
-								BinaryDeserializer Reader2;
-								BlockHeader Header = new BlockHeader(Reader);
-								int Pos = 14;
-
-								while (Reader.BytesLeft >= 4)
+								for (uint BlockIndex = 0; BlockIndex < FileStat.NrBlocks; BlockIndex++)
 								{
-									Reader.SkipBlockLink();
-									object ObjectId = File.RecordHandler.GetKey(Reader);
-									if (ObjectId is null)
-										break;
+									long PhysicalPosition = BlockIndex;
+									PhysicalPosition *= File.BlockSize;
 
-									uint Len = File.RecordHandler.GetFullPayloadSize(Reader);
+									byte[] Block = await File.LoadBlockLocked(PhysicalPosition, false);
+									BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
+									BinaryDeserializer Reader2;
+									BlockHeader Header = new BlockHeader(Reader);
+									int Pos = 14;
 
-									if (Len > 0)
+									while (Reader.BytesLeft >= 4)
 									{
-										int Pos2 = 0;
+										Reader.SkipBlockLink();
+										object ObjectId = File.RecordHandler.GetKey(Reader);
+										if (ObjectId is null)
+											break;
 
-										if (Reader.Position - Pos - 4 + Len > File.InlineObjectSizeLimit)
+										uint Len = File.RecordHandler.GetFullPayloadSize(Reader);
+
+										if (Len > 0)
 										{
-											Reader2 = null;
+											int Pos2 = 0;
 
-											try
-											{
-												Reader2 = await File.LoadBlobLocked(Block, Pos + 4, null, null);
-												Reader2.Position = 0;
-												Pos2 = Reader2.Data.Length;
-											}
-											catch (Exception)
+											if (Reader.Position - Pos - 4 + Len > File.InlineObjectSizeLimit)
 											{
 												Reader2 = null;
-											}
 
-											Len = 4;
-											Reader.Position += (int)Len;
-										}
-										else
-										{
-											if (Len > Reader.BytesLeft)
-												break;
+												try
+												{
+													Reader2 = await File.LoadBlobLocked(Block, Pos + 4, null, null);
+													Reader2.Position = 0;
+													Pos2 = Reader2.Data.Length;
+												}
+												catch (Exception)
+												{
+													Reader2 = null;
+												}
+
+												Len = 4;
+												Reader.Position += (int)Len;
+											}
 											else
 											{
-												Reader.Position += (int)Len;
-												Pos2 = Reader.Position;
-
-												Reader2 = Reader;
-												Reader2.Position = Pos + 4;
-											}
-										}
-
-										if (!(Reader2 is null))
-										{
-											object Obj;
-											int Len2;
-
-											try
-											{
-												Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
-												Len2 = Pos2 - Reader2.Position;
-											}
-											catch (Exception)
-											{
-												Len2 = 0;
-												Obj = null;
-											}
-
-											if (Len2 != 0)
-												break;
-
-											if (ObjectId is Guid Guid && !(Obj is null))
-											{
-												if (ObjectIds.ContainsKey(Guid))
-													Stat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
+												if (Len > Reader.BytesLeft)
+													break;
 												else
 												{
-													try
-													{
-														await TempFile.SaveNewObject(Obj);
-														ObjectIds[Guid] = true;
-													}
-													catch (Exception ex)
-													{
-														if (Exceptions is null)
-															Exceptions = new LinkedList<Exception>();
+													Reader.Position += (int)Len;
+													Pos2 = Reader.Position;
 
-														Exceptions.AddLast(ex);
-														continue;
-													}
+													Reader2 = Reader;
+													Reader2.Position = Pos + 4;
+												}
+											}
 
+											if (!(Reader2 is null))
+											{
+												object Obj;
+												int Len2;
 
-													c++;
-													if (c >= 1000)
+												try
+												{
+													Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
+													Len2 = Pos2 - Reader2.Position;
+												}
+												catch (Exception)
+												{
+													Len2 = 0;
+													Obj = null;
+												}
+
+												if (Len2 != 0)
+													break;
+
+												if (ObjectId is Guid Guid && !(Obj is null))
+												{
+													if (ObjectIds.ContainsKey(Guid))
+														FileStat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
+													else
 													{
-														await this.EndBulk();
-														await this.StartBulk();
-														c = 0;
+														try
+														{
+															await TempFile.SaveNewObject(Obj);
+															ObjectIds[Guid] = true;
+														}
+														catch (Exception ex)
+														{
+															if (Exceptions is null)
+																Exceptions = new LinkedList<Exception>();
+
+															Exceptions.AddLast(ex);
+															continue;
+														}
+
+
+														c++;
+														if (c >= 1000)
+														{
+															await this.EndBulk();
+															await this.StartBulk();
+															c = 0;
+														}
 													}
 												}
 											}
 										}
+
+										Pos = Reader.Position;
 									}
-
-									Pos = Reader.Position;
 								}
-							}
 
-							await this.EndBulk();
-							await File.ClearAsync();
-							await this.StartBulk();
-							c = 0;
+								await this.EndBulk();
+								await File.ClearAsync();
+								await this.StartBulk();
+								c = 0;
 
-							using (ObjectBTreeFileEnumerator<object> e = await TempFile.GetTypedEnumeratorAsync<object>(true))
-							{
-								while (await e.MoveNextAsync())
+								using (ObjectBTreeFileEnumerator<object> e = await TempFile.GetTypedEnumeratorAsync<object>(LockType.Read))
 								{
-									if (e.CurrentTypeCompatible)
+									while (await e.MoveNextAsync())
 									{
-										await File.SaveNewObject(e.Current);
-
-										c++;
-										if (c >= 1000)
+										if (e.CurrentTypeCompatible)
 										{
-											await this.EndBulk();
-											await this.StartBulk();
-											c = 0;
+											await File.SaveNewObject(e.Current);
+
+											c++;
+											if (c >= 1000)
+											{
+												await this.EndBulk();
+												await this.StartBulk();
+												c = 0;
+											}
 										}
 									}
 								}
 							}
-						}
-						finally
-						{
-							await this.EndBulk();
-						}
+							finally
+							{
+								await this.EndBulk();
+							}
 
-						foreach (Guid Guid in P.Value.Keys)
-						{
-							if (!ObjectIds.ContainsKey(Guid))
-								Stat.LogError("Unable to recover object with Object ID " + Guid.ToString());
+							foreach (Guid Guid in P.Value.Keys)
+							{
+								if (!ObjectIds.ContainsKey(Guid))
+									FileStat.LogError("Unable to recover object with Object ID " + Guid.ToString());
+							}
 						}
-					}
 
 #if NETSTANDARD1_5
-					if (File.Encrypted && this.customKeyMethod is null)
-					{
-						try
+						if (File.Encrypted && this.customKeyMethod is null)
 						{
-							CspParameters Csp = new CspParameters()
+							try
 							{
-								KeyContainerName = TempBtreeFileName,
-								Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.UseExistingKey
-							};
+								CspParameters Csp = new CspParameters()
+								{
+									KeyContainerName = TempBtreeFileName,
+									Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.UseExistingKey
+								};
 
-							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
-							{
-								RSA.PersistKeyInCsp = false;    // Deletes key.
+								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+								{
+									RSA.PersistKeyInCsp = false;    // Deletes key.
+								}
+
+								Csp.KeyContainerName = TempBlobFileName;
+
+								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+								{
+									RSA.PersistKeyInCsp = false;    // Deletes key.
+								}
 							}
-
-							Csp.KeyContainerName = TempBlobFileName;
-
-							using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+							catch (Exception)
 							{
-								RSA.PersistKeyInCsp = false;    // Deletes key.
+								// Ignore
 							}
 						}
-						catch (Exception)
-						{
-							// Ignore
-						}
-					}
 #endif
-					P = await File.ComputeStatistics();
-					Stat = P.Key;
-					ObjectIds = P.Value;
+						P = await File.ComputeStatistics();
+						FileStat = P.Key;
+						ObjectIds = P.Value;
 
-					Stat.LogComment("File was regenerated due to errors found.");
+						FileStat.LogComment("File was regenerated due to errors found.");
 
-					if (!(Exceptions is null))
-					{
-						foreach (Exception ex in Exceptions)
-							Stat.LogError(ex.Message);
-					}
-
-					string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
-
-					foreach (string FileName in Files)
-					{
-						try
+						if (!(Exceptions is null))
 						{
-							System.IO.File.Delete(FileName);
+							foreach (Exception ex in Exceptions)
+								FileStat.LogError(ex.Message);
 						}
-						catch (Exception)
+
+						string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
+
+						foreach (string FileName in Files)
 						{
-							// Ignore
+							try
+							{
+								System.IO.File.Delete(FileName);
+							}
+							catch (Exception)
+							{
+								// Ignore
+							}
 						}
 					}
-				}
-				else
-					ObjectIds = P.Value;
+					else
+						ObjectIds = P.Value;
 
-				Output.WriteStartElement("File");
-				Output.WriteAttributeString("id", File.Id.ToString());
-				Output.WriteAttributeString("collectionName", File.CollectionName);
-				Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, File.FileName));
-				Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
-				Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
-				Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-				Output.WriteAttributeString("count", File.Count.ToString());
-				Output.WriteAttributeString("encoding", File.Encoding.WebName);
-				Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
-				Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
-				Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
-				Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
+					Output.WriteStartElement("File");
+					Output.WriteAttributeString("id", File.Id.ToString());
+					Output.WriteAttributeString("collectionName", File.CollectionName);
+					Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, File.FileName));
+					Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
+					Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
+					Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
+					Output.WriteAttributeString("count", File.Count.ToString());
+					Output.WriteAttributeString("encoding", File.Encoding.WebName);
+					Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
+					Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
+					Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
+					Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
 
-				WriteStat(Output, Stat);
+					WriteStat(Output, FileStat);
 
-				foreach (IndexBTreeFile Index in File.Indices)
-				{
-					Output.WriteStartElement("Index");
-					Output.WriteAttributeString("id", Index.IndexFile.Id.ToString());
-					Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
-					Output.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
-					Output.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
-					Output.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
-					Output.WriteAttributeString("count", Index.IndexFile.Count.ToString());
-					Output.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
-					Output.WriteAttributeString("encrypted", Encode(Index.IndexFile.Encrypted));
-					Output.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
-					Output.WriteAttributeString("isReadOnly", Encode(Index.IndexFile.IsReadOnly));
-					Output.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
-
-					foreach (string Field in Index.FieldNames)
-						Output.WriteElementString("Field", Field);
-
-					Stat = await Index.ComputeStatistics(ObjectIds);
-
-					if (Repair && Stat.IsCorrupt)
+					foreach (IndexBTreeFile Index in File.Indices)
 					{
-						await Index.Regenerate();
+						Output.WriteStartElement("Index");
+						Output.WriteAttributeString("id", Index.IndexFile.Id.ToString());
+						Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
+						Output.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
+						Output.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
+						Output.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
+						Output.WriteAttributeString("count", Index.IndexFile.Count.ToString());
+						Output.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
+						Output.WriteAttributeString("encrypted", Encode(Index.IndexFile.Encrypted));
+						Output.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
+						Output.WriteAttributeString("isReadOnly", Encode(Index.IndexFile.IsReadOnly));
+						Output.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
 
-						Stat = await Index.ComputeStatistics(ObjectIds);
-						Stat.LogComment("Index was regenerated due to errors found.");
+						foreach (string Field in Index.FieldNames)
+							Output.WriteElementString("Field", Field);
+
+						IndexStat = await Index.ComputeStatistics(ObjectIds);
+
+						if (Repair && (IndexStat.IsCorrupt || FileStat.IsCorrupt))
+						{
+							await Index.Regenerate();
+
+							IndexStat = await Index.ComputeStatistics(ObjectIds);
+							IndexStat.LogComment("Index was regenerated due to errors found.");
+						}
+
+						WriteStat(Output, IndexStat);
+
+						Output.WriteEndElement();
 					}
 
-					WriteStat(Output, Stat);
+					if (ExportData)
+						await File.ExportGraphXML(Output, true);
 
 					Output.WriteEndElement();
 				}
-
-				if (ExportData)
-					await File.ExportGraphXML(Output, true);
-
-				Output.WriteEndElement();
+				finally
+				{
+					Database.EndRepair(File.CollectionName);
+				}
 			}
 
 			Output.WriteEndElement();

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Inventory;
+using System.Runtime.ExceptionServices;
 
 namespace Waher.Persistence.Files
 {
@@ -23,14 +24,14 @@ namespace Waher.Persistence.Files
 		private Guid currentObjectId;
 		private T current;
 		private readonly int timeoutMilliseconds;
-		private bool locked;
+		private LockType lockType = LockType.None;
+		private bool lockParent = false;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
 		internal IndexBTreeFileEnumerator(IndexBTreeFile File, IndexRecords RecordHandler)
 		{
 			this.file = File;
-			this.locked = false;
 			this.recordHandler = RecordHandler;
 			this.provider = this.file.ObjectFile.Provider;
 			this.hasCurrent = false;
@@ -50,13 +51,43 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Locks the underlying file (if not locked).
 		/// </summary>
-		/// <returns></returns>
-		internal async Task LockRead()
+		/// <param name="LockType">
+		/// If locked access to the file is requested, and of what type.
+		/// 
+		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
+		/// 
+		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+		/// 
+		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
+		/// the database lock after use.
+		/// </param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
+		internal async Task Lock(LockType LockType, bool LockParent)
 		{
-			if (!this.locked)
+			if (LockType != LockType.None)
 			{
-				await this.e.LockRead();
-				this.locked = true;
+				if (LockParent)
+					await this.file.ObjectFile.Lock(LockType);
+
+				this.lockType = LockType;
+				this.lockParent = LockParent;
+
+				try
+				{
+					await this.e.Lock(LockType);
+				}
+				catch (Exception ex)
+				{
+					if (LockParent)
+						await this.file.ObjectFile.EndLock(LockType);
+
+					this.lockType = LockType.None;
+					this.lockParent = false;
+
+					ExceptionDispatchInfo.Capture(ex).Throw();
+				}
 			}
 		}
 
@@ -65,7 +96,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
+			//FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
+			Task _ = this.DisposeAsync();
 		}
 
 		/// <summary>
@@ -73,9 +105,14 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task DisposeAsync()
 		{
-			await this.e.DisposeAsync();
-			this.e = null;
-			this.locked = false;
+			if (!(this.e is null))
+			{
+				await this.e.DisposeAsync();
+				this.e = null;
+			}
+
+			if (this.lockType != LockType.None && this.lockParent)
+				await this.file.ObjectFile.EndLock(this.lockType);
 		}
 
 		/// <summary>

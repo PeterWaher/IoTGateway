@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -139,6 +138,5 @@ namespace Waher.Persistence.Files.Searching
 		{
 			return this.cursor.SameSortOrder(ConstantFields, SortOrder);
 		}
-
 	}
 }

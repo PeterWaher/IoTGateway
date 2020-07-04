@@ -218,7 +218,7 @@ namespace Waher.Runtime.Threading
 
 			return Task.CompletedTask;
 		}
-
+		
 		/// <summary>
 		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for writing.
 		/// Each successful call to <see cref="TryBeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.

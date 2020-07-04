@@ -152,7 +152,7 @@ namespace Waher.Persistence.Files
 
 				int NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
 				if (NrRead < NrBytes)
-					throw new FileException("Unexpected end of file " + this.fileName + ".", this.fileName, this.collectionName);
+					throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
 			}
 			finally
 			{
@@ -191,12 +191,12 @@ namespace Waher.Persistence.Files
 				Offset += 7;
 
 				if (Offset > 31)
-					throw new FileException("Invalid block length. Possible corruption of file: " + this.fileName, this.fileName, this.collectionName);
+					throw Database.FlagForRepair(this.collectionName, "Invalid block length. Possible corruption of file: " + this.fileName);
 			}
 			while ((b & 0x80) != 0);
 
 			if (c <= 0 || c > int.MaxValue)
-				throw new FileException("Invalid length. Possible corruption of file: " + this.fileName, this.fileName, this.collectionName);
+				throw Database.FlagForRepair(this.collectionName, "Invalid length. Possible corruption of file: " + this.fileName);
 
 			int BlockSize = c + Pos;
 			int Tail = BlockSize % MinBlockSize;

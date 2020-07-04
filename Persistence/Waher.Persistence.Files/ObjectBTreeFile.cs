@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define DEBUG_LOCKS
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -58,7 +60,6 @@ namespace Waher.Persistence.Files
 		private readonly int id;
 		private uint blockLimit;
 		private uint blobBlockLimit;
-		private bool isCorrupt = false;
 		private bool emptyRoot = false;
 		private readonly Aes aes;
 		private readonly byte[] aesKey;
@@ -313,14 +314,6 @@ namespace Waher.Persistence.Files
 			get { return this.encrypted; }
 		}
 
-		/// <summary>
-		/// If the file has been detected to contain corruptions.
-		/// </summary>
-		public bool IsCorrupt
-		{
-			get { return this.isCorrupt; }
-		}
-
 		internal GenericObjectSerializer GenericObjectSerializer
 		{
 			get { return this.genericSerializer; }
@@ -353,17 +346,120 @@ namespace Waher.Persistence.Files
 
 		#region Locks
 
+		internal Task Lock(LockType LockType)
+		{
+			switch (LockType)
+			{
+				case LockType.Read:
+					return this.LockRead();
+
+				case LockType.Write:
+					return this.LockWrite();
+
+				case LockType.None:
+				default:
+					return Task.CompletedTask;
+			}
+		}
+
+		internal Task EndLock(LockType LockType)
+		{
+			switch (LockType)
+			{
+				case LockType.Read:
+					return this.EndRead();
+
+				case LockType.Write:
+					return this.EndWrite();
+
+				case LockType.None:
+				default:
+					return Task.CompletedTask;
+			}
+		}
+
 		internal async Task LockRead()
 		{
+#if DEBUG_LOCKS
+			string StackTrace = Environment.StackTrace;
+
 			if (!await this.TryBeginRead(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get read access to database.");
+			{
+				throw new TimeoutException("Unable to get read access to collection " + this.collectionName + ". Locked from:\r\n\r\n" + this.LockedFrom() +
+					"\r\n\r\nCurrent attempt:\r\n\r\n" + Log.CleanStackTrace(StackTrace));
+			}
+
+			lock (this.synchObject)
+			{
+				if (this.readLocks.TryGetValue(StackTrace, out int i))
+					this.readLocks[StackTrace] = ++i;
+				else
+					this.readLocks[StackTrace] = 1;
+
+				this.nrReaders++;
+			}
+#else
+			if (!await this.TryBeginRead(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get read access to collection " + this.collectionName + ".");
+#endif
 		}
 
 		internal async Task LockWrite()
 		{
+#if DEBUG_LOCKS
+			string StackTrace = Environment.StackTrace;
+
 			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get write access to database.");
+			{
+				throw new TimeoutException("Unable to get write access to collection " + this.collectionName + ". Locked from:\r\n\r\n" + this.LockedFrom() +
+					"\r\n\r\nCurrent attempt:\r\n\r\n" + Log.CleanStackTrace(StackTrace));
+			}
+
+			writeLock = StackTrace;
+#else
+			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get write access to collection " + this.collectionName + ".");
+#endif
 		}
+
+#if DEBUG_LOCKS
+		private string LockedFrom()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			lock (this.synchObject)
+			{
+				foreach (KeyValuePair<string, int> P in readLocks)
+				{
+					sb.Append("Read lock:");
+					if (P.Value > 1)
+					{
+						sb.Append(" (");
+						sb.Append(P.Value.ToString());
+						sb.Append(" times)");
+					}
+
+					sb.AppendLine();
+					sb.AppendLine();
+					sb.AppendLine(Log.CleanStackTrace(P.Key));
+					sb.AppendLine();
+				}
+
+				if (!string.IsNullOrEmpty(writeLock))
+				{
+					sb.AppendLine("Write lock:");
+					sb.AppendLine();
+					sb.AppendLine(Log.CleanStackTrace(writeLock));
+				}
+			}
+
+			return sb.ToString();
+		}
+
+		private int nrReaders = 0;
+		private readonly Dictionary<string, int> readLocks = new Dictionary<string, int>();
+		private string writeLock = string.Empty;
+#endif
 
 		/// <summary>
 		/// Ends a reading session of the object.
@@ -372,6 +468,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public override async Task EndRead()
 		{
+#if DEBUG_LOCKS
+			lock (this.synchObject)
+			{
+				if (--this.nrReaders == 0)
+					readLocks.Clear();
+			}
+#endif
 			await base.EndRead();
 
 			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
@@ -396,37 +499,58 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public override async Task EndWrite()
 		{
-			if (this.emptyRoot)
+			bool EmptyBlocks = !(this.emptyBlocks is null);
+			bool SaveBlocks = !(this.blocksToSave is null) && this.blocksToSave.Count > 0 && !this.provider.InBulkMode(this);
+
+			if (this.emptyRoot || EmptyBlocks || SaveBlocks)
 			{
-				this.emptyRoot = false;
-
-				byte[] Block = await this.LoadBlockLocked(0, true);
-				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
-				BlockHeader Header = new BlockHeader(Reader);
-				uint BlockIndex;
-
-				while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
+				try
 				{
-					Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
-					Reader.Restart(Block, 0);
-					Header = new BlockHeader(Reader);
+					if (this.emptyRoot)
+					{
+						this.emptyRoot = false;
 
-					this.RegisterEmptyBlockLocked(BlockIndex);
+						byte[] Block = await this.LoadBlockLocked(0, true);
+						BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
+						BlockHeader Header = new BlockHeader(Reader);
+						uint BlockIndex;
+
+						while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
+						{
+							Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
+							Reader.Restart(Block, 0);
+							Header = new BlockHeader(Reader);
+
+							this.RegisterEmptyBlockLocked(BlockIndex);
+						}
+
+						Array.Clear(Block, 10, 4);
+						this.QueueSaveBlockLocked(0, Block);
+
+						await this.UpdateParentLinksLocked(0, Block);
+					}
+
+					if (EmptyBlocks)
+						await this.RemoveEmptyBlocksLocked();
+
+					if (SaveBlocks)
+						await this.SaveUnsaved();
 				}
-
-				Array.Clear(Block, 10, 4);
-				this.QueueSaveBlockLocked(0, Block);
-
-				await this.UpdateParentLinksLocked(0, Block);
+				finally
+				{
+#if DEBUG_LOCKS
+					writeLock = string.Empty;
+#endif
+					await base.EndWrite();
+				}
 			}
-
-			if (!(this.emptyBlocks is null))
-				await this.RemoveEmptyBlocksLocked();
-
-			if (!(this.blocksToSave is null) && this.blocksToSave.Count > 0 && !this.provider.InBulkMode(this))
-				await this.SaveUnsaved();
-
-			await base.EndWrite();
+			else
+			{
+#if DEBUG_LOCKS
+				writeLock = string.Empty;
+#endif
+				await base.EndWrite();
+			}
 
 			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
 			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
@@ -474,9 +598,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Blocks
+#region Blocks
 
 		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
@@ -556,7 +680,7 @@ namespace Waher.Persistence.Files
 		internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
 		{
 			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", nameof(PhysicalPosition));
+				throw Database.FlagForRepair(this.collectionName, "Block positions must be multiples of the block size.");
 
 			if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out byte[] Block))
 			{
@@ -571,16 +695,13 @@ namespace Waher.Persistence.Files
 			}
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentOutOfRangeException("Invalid file position.", nameof(PhysicalPosition));
+				throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
 			Block = new byte[this.blockSize];
 
 			int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
 			if (this.blockSize != NrRead)
-			{
-				Database.FlagForRepair(this.collectionName);
-				throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-			}
+				throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 			this.nrBlockLoads++;
 
@@ -620,10 +741,10 @@ namespace Waher.Persistence.Files
 		internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
 		{
 			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", nameof(PhysicalPosition));
+				throw Database.FlagForRepair(this.collectionName, "Block positions must be multiples of the block size.");
 
 			if (Block is null || Block.Length != this.blockSize)
-				throw new ArgumentException("Block not of the correct block size.", nameof(Block));
+				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
 
 			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
 
@@ -668,7 +789,7 @@ namespace Waher.Persistence.Files
 				EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
+				throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
 			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
 
@@ -791,9 +912,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region BLOBs
+#region BLOBs
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
@@ -807,7 +928,7 @@ namespace Waher.Persistence.Files
 			int HeaderSize = Reader.Position;
 
 			if (Len != Bin.Length - Reader.Position)
-				throw new ArgumentException("Invalid serialization of object", nameof(Bin));
+				throw Database.FlagForRepair(this.collectionName, "Invalid serialization of object");
 
 			this.blobBlockLimit = (uint)(this.blobFile.Length / this.blobBlockSize);
 
@@ -895,7 +1016,7 @@ namespace Waher.Persistence.Files
 				while (i < Len)
 				{
 					if (BlobBlockIndex == uint.MaxValue)
-						throw new FileException("BLOB " + ObjectId.ToString() + " ended prematurely.", this.fileName, this.collectionName);
+						throw Database.FlagForRepair(this.collectionName, "BLOB " + ObjectId.ToString() + " ended prematurely.");
 
 					PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
@@ -904,10 +1025,7 @@ namespace Waher.Persistence.Files
 
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
-					{
-						Database.FlagForRepair(this.collectionName);
-						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-					}
+						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 					this.nrBlobBlockLoads++;
 
@@ -925,8 +1043,8 @@ namespace Waher.Persistence.Files
 					ObjectId2 = this.recordHandler.GetKey(Reader);
 					if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
 					{
-						throw new FileException("Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
-							") was actually marked as " + ObjectId2.ToString() + ".", this.fileName, this.collectionName);
+						throw Database.FlagForRepair(this.collectionName, "Block linked to by BLOB " + ObjectId.ToString() + " (" + this.collectionName +
+							") was actually marked as " + ObjectId2.ToString() + ".");
 					}
 
 					Prev = Reader.ReadUInt32();
@@ -950,10 +1068,10 @@ namespace Waher.Persistence.Files
 				}
 
 				if (BlobBlockIndex != uint.MaxValue)
-					throw new FileException("BLOB " + ObjectId.ToString() + " did not end when expected.", this.fileName, this.collectionName);
+					throw Database.FlagForRepair(this.collectionName, "BLOB " + ObjectId.ToString() + " did not end when expected.");
 
 				if (!(BlobBlocksReferenced is null) && ChainError)
-					throw new FileException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.", this.fileName, this.collectionName);
+					throw Database.FlagForRepair(this.collectionName, "Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.");
 
 				Reader.Restart(Result, Bookmark);
 
@@ -961,9 +1079,7 @@ namespace Waher.Persistence.Files
 			}
 			catch (OutOfMemoryException ex)
 			{
-				Database.FlagForRepair(this.collectionName);
-				ExceptionDispatchInfo.Capture(ex).Throw();
-				return null;
+				throw Database.FlagForRepair(this.collectionName, ex.Message);
 			}
 		}
 
@@ -1004,10 +1120,7 @@ namespace Waher.Persistence.Files
 
 				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 				if (NrRead != this.blobBlockSize)
-				{
-					Database.FlagForRepair(this.collectionName);
-					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-				}
+					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 				this.nrBlockLoads++;
 
@@ -1050,10 +1163,7 @@ namespace Waher.Persistence.Files
 
 				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 				if (NrRead != this.blobBlockSize)
-				{
-					Database.FlagForRepair(this.collectionName);
-					throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-				}
+					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 				this.nrBlockLoads++;
 
@@ -1123,10 +1233,7 @@ namespace Waher.Persistence.Files
 
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
-					{
-						Database.FlagForRepair(this.collectionName);
-						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-					}
+						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 					this.nrBlockLoads++;
 
@@ -1166,10 +1273,7 @@ namespace Waher.Persistence.Files
 
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
-					{
-						Database.FlagForRepair(this.collectionName);
-						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-					}
+						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 					this.nrBlockLoads++;
 
@@ -1219,9 +1323,9 @@ namespace Waher.Persistence.Files
 			this.blobBlockLimit = (uint)(this.blobFile.Length / this.blobBlockSize);
 		}
 
-		#endregion
+#endregion
 
-		#region Save new objects
+#region Save new objects
 
 		/// <summary>
 		/// Saves a new object to the file.
@@ -1565,10 +1669,8 @@ namespace Waher.Persistence.Files
 
 						if (ParentBlockIndex != LeftLink)
 						{
-							this.isCorrupt = true;
-
-							throw new FileException("Parent link points to parent block (" + ParentLink.ToString() +
-								") with no reference to child block (" + LeftLink.ToString() + ").", this.fileName, this.collectionName);
+							throw Database.FlagForRepair(this.collectionName, "Parent link points to parent block (" + ParentLink.ToString() +
+								") with no reference to child block (" + LeftLink.ToString() + ").");
 						}
 					}
 
@@ -1700,9 +1802,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Load Object
+#region Load Object
 
 		/// <summary>
 		/// Loads an object from the file.
@@ -1890,9 +1992,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Update Object
+#region Update Object
 
 		/// <summary>
 		/// Updates an object in the database, using the object serializer corresponding to the type of object being updated.
@@ -2183,10 +2285,8 @@ namespace Waher.Persistence.Files
 
 						if (ParentBlockIndex != LeftLink)
 						{
-							this.isCorrupt = true;
-
-							throw new FileException("Parent link points to parent block (" + ParentLink.ToString() +
-								") with no reference to child block (" + LeftLink.ToString() + ").", this.fileName, this.collectionName);
+							throw Database.FlagForRepair(this.collectionName, "Parent link points to parent block (" + ParentLink.ToString() +
+								") with no reference to child block (" + LeftLink.ToString() + ").");
 						}
 					}
 
@@ -2205,9 +2305,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Delete Object
+#region Delete Object
 
 		/// <summary>
 		/// Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
@@ -3589,9 +3689,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Statistics
+#region Statistics
 
 		/// <summary>
 		/// Provides a report on the current state of the file.
@@ -3712,9 +3812,7 @@ namespace Waher.Persistence.Files
 				for (i = 0; i < NrBlobBlocks; i++)
 				{
 					if (!BlobBlocksReferenced[i])
-					{
 						Statistics.LogError("BLOB Block " + i.ToString() + " is not referenced.");
-					}
 				}
 
 				Statistics.UnreferencedBlobBlocks = Blocks.ToArray();
@@ -3749,8 +3847,8 @@ namespace Waher.Persistence.Files
 					Statistics.LogError("Block referenced multiple times: " + BlockIndex.ToString());
 					return 0;
 				}
-
-				BlocksReferenced[(int)BlockIndex] = true;
+				else
+					BlocksReferenced[(int)BlockIndex] = true;
 			}
 
 			long PhysicalPosition = BlockIndex;
@@ -3967,9 +4065,9 @@ namespace Waher.Persistence.Files
 			return NrObjects;
 		}
 
-		#endregion
+#endregion
 
-		#region Graphs
+#region Graphs
 
 		/// <summary>
 		/// Exports the structure of the file to XML.
@@ -4107,10 +4205,7 @@ namespace Waher.Persistence.Files
 				{
 					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
 					if (NrRead != this.blobBlockSize)
-					{
-						Database.FlagForRepair(this.collectionName);
-						throw new FileException("Read past end of file " + this.fileName + ".", this.fileName, this.collectionName);
-					}
+						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
 					this.nrBlobBlockLoads++;
 
@@ -4420,9 +4515,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Order Statistic Tree
+#region Order Statistic Tree
 
 		/// <summary>
 		/// Get number of objects in subtree spanned by <paramref name="BlockIndex">BlockIndex</paramref>.
@@ -4594,9 +4689,9 @@ namespace Waher.Persistence.Files
 			throw new KeyNotFoundException("Object not found.");
 		}
 
-		#endregion
+#endregion
 
-		#region ICollection<object>
+#region ICollection<object>
 
 		/// <summary>
 		/// <see cref="ICollection{Object}.Add(Object)"/>
@@ -4765,7 +4860,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Returns an untyped enumerator that iterates through the collection.
 		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(bool)"/> method.
+		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
@@ -4776,7 +4871,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Returns an untyped enumerator that iterates through the collection.
 		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(bool)"/> method.
+		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
@@ -4788,20 +4883,24 @@ namespace Waher.Persistence.Files
 		/// Returns an typed enumerator that iterates through the collection. The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.
 		/// </summary>
-		/// <param name="Locked">If locked access to the file is requested.
+		/// <param name="LockType">
+		/// If locked access to the file is requested, and of what type.
 		/// 
 		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
 		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
 		/// 
-		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-		/// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
-		/// after use.</param>
+		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+		/// 
+		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
+		/// the database lock after use.
+		/// </param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public async Task<ObjectBTreeFileEnumerator<T>> GetTypedEnumeratorAsync<T>(bool Locked)
+		public async Task<ObjectBTreeFileEnumerator<T>> GetTypedEnumeratorAsync<T>(LockType LockType)
 		{
 			ObjectBTreeFileEnumerator<T> e = new ObjectBTreeFileEnumerator<T>(this, this.recordHandler, null);
-			if (Locked)
-				await e.LockRead();
+			if (LockType != LockType.None)
+				await e.Lock(LockType);
 
 			return e;
 		}
@@ -4827,9 +4926,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Indices
+#region Indices
 
 		/// <summary>
 		/// Adds an index to the file. When objects are added, updated or deleted from the file, the corresponding references in the
@@ -4932,12 +5031,12 @@ namespace Waher.Persistence.Files
 			if (SortOrder is null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, 1, NrProperties, Properties);
 
-			List<string> Order = new List<string>();
+			List<string> TotProperties = new List<string>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
 
-			Order.AddRange(SortOrder);
+			TotProperties.AddRange(Properties);
 
-			foreach (string s in SortOrder)
+			foreach (string s in Properties)
 			{
 				if (s.StartsWith("-"))
 					s2 = s.Substring(1);
@@ -4947,9 +5046,7 @@ namespace Waher.Persistence.Files
 				Added[s2] = true;
 			}
 
-			int i = 0;
-
-			foreach (string s in Properties)
+			foreach (string s in SortOrder)
 			{
 				if (s.StartsWith("-"))
 					s2 = s.Substring(1);
@@ -4959,11 +5056,11 @@ namespace Waher.Persistence.Files
 				if (!Added.ContainsKey(s2))
 				{
 					Added[s2] = true;
-					Order.Insert(i++, s);
+					TotProperties.Add(s);
 				}
 			}
 
-			return this.FindBestIndex(out BestNrFields, 1, i, Order.ToArray());
+			return this.FindBestIndex(out BestNrFields, 1, Properties.Length, TotProperties.ToArray());
 		}
 
 		/// <summary>
@@ -4986,7 +5083,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="BestNrFields">Number of index fields used in best index.</param>
 		/// <param name="FirstRequired">Number of field names in index that must exist among properties.</param>
-		/// <param name="RequiredProperties">Number of properties required field names may choose from.</param>
+		/// <param name="RequiredProperties">Number of properties that required field names may choose from.</param>
 		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
@@ -5048,9 +5145,9 @@ namespace Waher.Persistence.Files
 			return Best;
 		}
 
-		#endregion
+#endregion
 
-		#region Searching
+#region Searching
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
@@ -5059,18 +5156,22 @@ namespace Waher.Persistence.Files
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Filter">Optional filter. Can be null.</param>
-		/// <param name="Locked">If locked access to the file is requested.
+		/// <param name="LockType">
+		/// If locked access to the file is requested, and of what type.
 		/// 
 		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
 		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
 		/// 
-		/// If locked access is desired, the database cannot be updated, until the enumerator has been disposed. Make sure to call
-		/// the <see cref="IDisposable.Dispose"/> method when done with the enumerator, to release the database
-		/// after use.</param>
+		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+		/// 
+		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
+		/// the database lock after use.
+		/// </param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
+		public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, LockType LockType, params string[] SortOrder)
 		{
 			this.nrSearches++;
 
@@ -5090,6 +5191,9 @@ namespace Waher.Persistence.Files
 
 			ICursor<T> Result = null;
 
+			if (LockType != LockType.None)
+				await this.Lock(LockType);
+
 			try
 			{
 				if (Filter is null)
@@ -5108,12 +5212,12 @@ namespace Waher.Persistence.Files
 							{
 								if (SortOrder[0] == Serializer.ObjectIdMemberName)
 								{
-									Result = await this.GetTypedEnumeratorAsync<T>(Locked);
+									Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
 									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
 								}
 								else if (SortOrder[0] == "-" + Serializer.ObjectIdMemberName)
 								{
-									Result = await this.GetTypedEnumeratorAsync<T>(Locked);
+									Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
 									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
 									Result = new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
 								}
@@ -5122,16 +5226,16 @@ namespace Waher.Persistence.Files
 						else
 						{
 							if (Index.SameSortOrder(null, SortOrder))
-								Result = await Index.GetTypedEnumerator<T>(Locked);
+								Result = await Index.GetTypedEnumerator<T>(LockType, false);
 							else if (Index.ReverseSortOrder(null, SortOrder))
-								Result = new Searching.ReversedCursor<T>(await Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
+								Result = new Searching.ReversedCursor<T>(await Index.GetTypedEnumerator<T>(LockType, false), this.timeoutMilliseconds);
 						}
 					}
 
 					if (Result is null)
 					{
 						this.nrFullFileScans++;
-						Result = await this.GetTypedEnumeratorAsync<T>(Locked);
+						Result = await this.GetTypedEnumeratorAsync<T>(LockType);
 
 						if (!(SortOrder is null) && SortOrder.Length > 0)
 							Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);
@@ -5142,7 +5246,7 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked, SortOrder);
+					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), LockType, false, SortOrder);
 
 					if (!(SortOrder is null) && SortOrder.Length > 0)
 						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);   // false);
@@ -5155,10 +5259,16 @@ namespace Waher.Persistence.Files
 			{
 				Result?.Dispose();
 
+				if (LockType != LockType.None)
+					await this.EndLock(LockType);
+
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
-			return Result;
+			if (LockType != LockType.None)
+				return new Searching.ParentLockedCursor<T>(Result, this.timeoutMilliseconds, this, LockType);
+			else
+				return Result;
 		}
 
 		private async Task<ICursor<T>> Sort<T>(ICursor<T> Result, string[] ConstantFields, string[] SortOrder, bool CanReverse)
@@ -5169,18 +5279,19 @@ namespace Waher.Persistence.Files
 			if (CanReverse && Result.ReverseSortOrder(ConstantFields, SortOrder))
 				return new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
 
-			Log.Notice("Sort order in search result did not match index.",
-				this.fileName, string.Empty, "DBOpt",
-				new KeyValuePair<string, object>("Collection", this.collectionName),
-				new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
-				new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
-
-			SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
-			IndexRecords Records;
-			byte[] Key;
-
 			try
 			{
+				Log.Notice("Sort order in search result did not match index.",
+					this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty, 
+					string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+					new KeyValuePair<string, object>("Collection", this.collectionName),
+					new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
+					new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
+				SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
+				IndexRecords Records;
+				byte[] Key;
+
 				Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
 				SortedObjects = new SortedDictionary<Searching.SortedReference<T>, bool>();
 
@@ -5192,13 +5303,13 @@ namespace Waher.Persistence.Files
 					Key = Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
 					SortedObjects[new Searching.SortedReference<T>(Key, Records, Result.Current, Result.CurrentSerializer, Result.CurrentObjectId)] = true;
 				}
+		
+				return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);
 			}
 			finally
 			{
 				Result.Dispose();
 			}
-
-			return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);
 		}
 
 		private string ToString(string[] SortOrder)
@@ -5224,8 +5335,10 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, bool Locked, string[] SortOrder)
+		internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, LockType LockType, bool LockParent, string[] SortOrder)
 		{
+			Searching.IApplicableFilter ApplicableFilter;
+
 			if (Filter is FilterChildren FilterChildren)
 			{
 				Filter[] ChildFilters = FilterChildren.ChildFilters;
@@ -5236,9 +5349,9 @@ namespace Waher.Persistence.Files
 					LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
 					string FieldName;
 
-					foreach (Filter Filter2 in ChildFilters)
+					foreach (Filter ChildFilter in ChildFilters)
 					{
-						if (Filter2 is FilterFieldValue FilterFieldValue)
+						if (ChildFilter is FilterFieldValue FilterFieldValue)
 						{
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
@@ -5250,9 +5363,9 @@ namespace Waher.Persistence.Files
 									Properties.Add(FieldName);
 							}
 						}
-						else if (Filter2 is FilterFieldLikeRegEx FilterFieldLikeRegEx)
+						else if (ChildFilter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 						{
-							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
+							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(ChildFilter);
 							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 							if (RegExFields is null)
@@ -5292,13 +5405,15 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 							new KeyValuePair<string, object>("Collection", this.collectionName),
 							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
-							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+						ApplicableFilter = this.ConvertFilter(Filter);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
+							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
 					}
 
 					Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
@@ -5318,11 +5433,11 @@ namespace Waher.Persistence.Files
 					bool Consistent = true;
 					bool Smaller;
 
-					foreach (Filter Filter2 in ChildFilters)
+					foreach (Filter ChildFilter in ChildFilters)
 					{
-						if (Filter2 is FilterFieldValue FilterFieldValue)
+						if (ChildFilter is FilterFieldValue FilterFieldValue)
 						{
-							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || Filter2 is FilterFieldNotEqualTo)
+							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || ChildFilter is FilterFieldNotEqualTo)
 							{
 								if (AdditionalFields is null)
 								{
@@ -5378,7 +5493,7 @@ namespace Waher.Persistence.Files
 							else
 								throw this.UnknownFilterType(Filter);
 						}
-						else if (Filter2 is FilterFieldLikeRegEx FilterFieldLikeRegEx)
+						else if (ChildFilter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 						{
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = RegExFields.First.Value.Key;
 							string ConstantPrefix = RegExFields.First.Value.Value;
@@ -5408,12 +5523,12 @@ namespace Waher.Persistence.Files
 					if (Consistent)
 					{
 						if (AdditionalFields is null)
-							return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked, this.provider);
+							return new Searching.RangesCursor<T>(Index, RangeInfo, null, LockType, LockParent, this.provider);
 						else
-							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked, this.provider);
+							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), LockType, LockParent, this.provider);
 					}
 					else
-						return new Searching.UnionCursor<T>(new Filter[0], this, Locked);   // Empty result set.
+						return new Searching.UnionCursor<T>(new Filter[0], this, LockType, LockParent);   // Empty result set.
 				}
 				else if (Filter is FilterOr)
 				{
@@ -5432,16 +5547,18 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 							new KeyValuePair<string, object>("Collection", this.collectionName),
 							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
-							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+						ApplicableFilter = this.ConvertFilter(Filter);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
+							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
 					}
 					else
-						return new Searching.UnionCursor<T>(ChildFilters, this, Locked);
+						return new Searching.UnionCursor<T>(ChildFilters, this, LockType, LockParent);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -5456,16 +5573,18 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 							new KeyValuePair<string, object>("Collection", this.collectionName),
 							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
-							this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+						ApplicableFilter = this.ConvertFilter(Filter);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
+							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
 					}
 					else
-						return await this.ConvertFilterToCursor<T>(NegatedFilter, Locked, SortOrder);
+						return await this.ConvertFilterToCursor<T>(NegatedFilter, LockType, LockParent, SortOrder);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -5501,7 +5620,7 @@ namespace Waher.Persistence.Files
 
 								T Obj = await this.LoadObject<T>(ObjectId);
 								return new Searching.ObjectIdCursor<T>(
-									new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId), 
+									new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId),
 									FilterFieldValue.FieldName);
 							}
 							catch (Exception)
@@ -5513,9 +5632,8 @@ namespace Waher.Persistence.Files
 						{
 							if (Searching.Comparison.Increment(ref ObjectId))
 							{
-								BlockInfo Info = (await this.FindNodeLocked(ObjectId))
-									?? await this.FindLeafNodeLocked(ObjectId);
-								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+								BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
 								e.SetStartingPoint(Info);
 
 								return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
@@ -5523,18 +5641,16 @@ namespace Waher.Persistence.Files
 						}
 						else if (Filter is FilterFieldGreaterOrEqualTo)
 						{
-							BlockInfo Info = (await this.FindNodeLocked(ObjectId))
-								?? await this.FindLeafNodeLocked(ObjectId);
-							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+							BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
 							e.SetStartingPoint(Info);
 
 							return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
 						}
 						else if (Filter is FilterFieldLesserThan)
 						{
-							BlockInfo Info = (await this.FindNodeLocked(ObjectId))
-								?? await this.FindLeafNodeLocked(ObjectId);
-							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+							BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+							ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
 							e.SetStartingPoint(Info);
 
 							return new Searching.ReversedCursor<T>(
@@ -5544,9 +5660,8 @@ namespace Waher.Persistence.Files
 						{
 							if (Searching.Comparison.Increment(ref ObjectId))
 							{
-								BlockInfo Info = (await this.FindNodeLocked(ObjectId))
-								?? await this.FindLeafNodeLocked(ObjectId);
-								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(Locked);
+								BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+								ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
 								e.SetStartingPoint(Info);
 
 								return new Searching.ReversedCursor<T>(
@@ -5557,118 +5672,125 @@ namespace Waher.Persistence.Files
 
 					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-						this.fileName, string.Empty, "DBOpt",
+						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 						new KeyValuePair<string, object>("Collection", this.collectionName),
 						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
-						this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+					ApplicableFilter = this.ConvertFilter(Filter);
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
+						ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
 				}
 				else if (Filter is FilterFieldEqualTo)
 				{
-					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
 					bool UntilFirstFail;
 
-					if (Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+					ApplicableFilter = this.ConvertFilter(Filter);
+
+					if (Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
-						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
+						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
 					}
-					else if (Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+					else if (Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
-						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(Locked,
+						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(LockType, LockParent,
 							new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)), this.timeoutMilliseconds);
 					}
 					else
 					{
-						UntilFirstFail = false;
-						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
-
 						Log.Notice("Search resulted in large part of the file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 							new KeyValuePair<string, object>("Collection", this.collectionName),
 							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
+						UntilFirstFail = false;
+						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
 					}
 
-					return new Searching.FilteredCursor<T>(Cursor, Filter2, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
 					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-						this.fileName, string.Empty, "DBOpt",
+						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 						new KeyValuePair<string, object>("Collection", this.collectionName),
 						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked),
-						this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds, this.provider);
+					ApplicableFilter = this.ConvertFilter(Filter);
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
+						ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
 				}
 				else
 				{
-					Searching.IApplicableFilter Filter2 = this.ConvertFilter(Filter);
 					bool IsSorted = (!(SortOrder is null) && SortOrder.Length > 0);
+
+					ApplicableFilter = this.ConvertFilter(Filter);
 
 					if (Filter is FilterFieldGreaterOrEqualTo)
 					{
-						if (IsSorted && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+						if (IsSorted && Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(Locked),
-								Filter2, true, false, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumerator<T>(LockType, LockParent),
+								ApplicableFilter, true, false, this.timeoutMilliseconds, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
 								null, false, true, this.timeoutMilliseconds, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldLesserOrEqualTo)
 					{
-						if (IsSorted && Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+						if (IsSorted && Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(Locked),
-								Filter2, true, true, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumerator<T>(LockType, LockParent),
+								ApplicableFilter, true, true, this.timeoutMilliseconds, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindLastLesserOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								await Index.FindLastLesserOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
 								null, false, false, this.timeoutMilliseconds, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldGreaterThan)
 					{
-						if (IsSorted && Index.ReverseSortOrder(Filter2.ConstantFields, SortOrder))
+						if (IsSorted && Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(Locked),
-								Filter2, true, false, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumerator<T>(LockType, LockParent),
+								ApplicableFilter, true, false, this.timeoutMilliseconds, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindFirstGreaterThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								await Index.FindFirstGreaterThan<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
 								null, false, true, this.timeoutMilliseconds, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldLesserThan)
 					{
-						if (IsSorted && Index.SameSortOrder(Filter2.ConstantFields, SortOrder))
+						if (IsSorted && Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(Locked),
-								Filter2, true, true, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumerator<T>(LockType, LockParent),
+								ApplicableFilter, true, true, this.timeoutMilliseconds, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-							await Index.FindLastLesserThan<T>(Locked, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+							await Index.FindLastLesserThan<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
 							null, false, false, this.timeoutMilliseconds, this.provider);
 						}
 					}
@@ -5689,24 +5811,27 @@ namespace Waher.Persistence.Files
 					{
 						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
 							new KeyValuePair<string, object>("Collection", this.collectionName),
 							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(Locked), FilterFieldLikeRegEx2,
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None), FilterFieldLikeRegEx2,
 							false, true, this.timeoutMilliseconds, this.provider);
 					}
 					else
 					{
-						ICursor<T> Cursor = await Index.FindFirstGreaterOrEqualTo<T>(Locked,
+						ICursor<T> Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent,
 							new KeyValuePair<string, object>(FilterFieldLikeRegEx.FieldName, ConstantPrefix));
+
 						int c = ConstantPrefix.Length - 1;
 						char LastChar = ConstantPrefix[c];
 
 						if (LastChar < char.MaxValue)
 						{
 							string ConstantPrefix2 = ConstantPrefix.Substring(0, c) + new string((char)(LastChar + 1), 1);
+
 							Cursor = new Searching.FilteredCursor<T>(Cursor,
 								new Searching.FilterFieldLesserThan(FilterFieldLikeRegEx.FieldName, ConstantPrefix2),
 								true, true, this.timeoutMilliseconds, Provider);
@@ -5732,9 +5857,9 @@ namespace Waher.Persistence.Files
 					List<string> Properties = null;
 					LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
 
-					foreach (Filter Filter2 in ChildFilters)
+					foreach (Filter ChildFilter in ChildFilters)
 					{
-						if (Filter2 is FilterFieldValue FilterFieldValue)
+						if (ChildFilter is FilterFieldValue FilterFieldValue)
 						{
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
@@ -5744,9 +5869,9 @@ namespace Waher.Persistence.Files
 								Properties.Add(FilterFieldValue.FieldName);
 							}
 						}
-						else if (Filter2 is FilterFieldLikeRegEx FilterFieldLikeRegEx)
+						else if (ChildFilter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 						{
-							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
+							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(ChildFilter);
 							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 							if (RegExFields is null)
@@ -6027,7 +6152,7 @@ namespace Waher.Persistence.Files
 			return new NotSupportedException("Filters of type " + Filter.GetType().FullName + " not supported.");
 		}
 
-		#endregion
+#endregion
 
 	}
 }

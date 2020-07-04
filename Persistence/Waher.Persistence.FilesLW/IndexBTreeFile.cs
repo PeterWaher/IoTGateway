@@ -41,7 +41,7 @@ namespace Waher.Persistence.Files
 			this.recordHandler = new IndexRecords(this.collectionName, this.encoding, this.objectFile.InlineObjectSizeLimit, FieldNames);
 			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
 
-			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
+			this.indexFile = new ObjectBTreeFile(FileName, this.collectionName, string.Empty, this.objectFile.BlockSize,
 				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds,
 				this.objectFile.Encrypted, this.recordHandler);
 			this.recordHandler.Index = this;
@@ -399,7 +399,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Returns an untyped enumerator that iterates through the collection in the order specified by the index.
 		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(LockType, bool)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
@@ -410,7 +410,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Returns an untyped enumerator that iterates through the collection in the order specified by the index.
 		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(LockType, bool)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
@@ -422,20 +422,25 @@ namespace Waher.Persistence.Files
 		/// Returns an typed enumerator that iterates through the collection in the order specified by the index. The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.
 		/// </summary>
-		/// <param name="Locked">If locked access to the file is requested.
+		/// <param name="LockType">
+		/// If locked access to the file is requested, and of what type.
 		/// 
 		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
 		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
 		/// 
-		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-		/// the <see cref="IndexBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
-		/// after use.</param>
+		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+		/// 
+		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
+		/// the database lock after use.
+		/// </param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public async Task<IndexBTreeFileEnumerator<T>> GetTypedEnumerator<T>(bool Locked)
+		public async Task<IndexBTreeFileEnumerator<T>> GetTypedEnumerator<T>(LockType LockType, bool LockParent)
 		{
 			IndexBTreeFileEnumerator<T> e = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
-			if (Locked)
-				await e.LockRead();
+			if (LockType != LockType.None)
+				await e.Lock(LockType, LockParent);
 
 			return e;
 		}
@@ -483,7 +488,7 @@ namespace Waher.Persistence.Files
 
 			await this.ClearAsync();
 
-			using (ObjectBTreeFileEnumerator<object> e = await this.objectFile.GetTypedEnumeratorAsync<object>(true))
+			using (ObjectBTreeFileEnumerator<object> e = await this.objectFile.GetTypedEnumeratorAsync<object>(LockType.Write))
 			{
 				while (await e.MoveNextAsync())
 				{
@@ -542,7 +547,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindFirstGreaterOrEqualTo<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindFirstGreaterOrEqualTo<T>(LockType.None, false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -550,14 +555,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Properties">Limit properties to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is greater than or equal to the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(LockType LockType, bool LockParent,
+			params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindFirstGreaterOrEqualTo<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -565,12 +572,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Object">Limit object to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is greater than or equal to the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(bool Locked, GenericObject Object)
+		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
 			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
@@ -581,16 +589,19 @@ namespace Waher.Persistence.Files
 			try
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
-				if (Locked)
-					await Result.LockRead();
+				if (LockType != LockType.None)
+					await Result.Lock(LockType, LockParent);
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
-				Result?.Dispose();
-				Result = null;
+				if (!(Result is null))
+				{
+					await Result.DisposeAsync();
+					Result = null;
+				}
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -609,7 +620,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindLastLesserOrEqualTo<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindLastLesserOrEqualTo<T>(LockType.None, false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -617,14 +628,15 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Properties">Limit properties to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is lesser than or equal to the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(LockType LockType, bool LockParent, params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindLastLesserOrEqualTo<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindLastLesserOrEqualTo<T>(LockType, LockParent, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -632,12 +644,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Object">Limit object to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is lesser than or equal to the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(bool Locked, GenericObject Object)
+		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
 			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
@@ -648,16 +661,19 @@ namespace Waher.Persistence.Files
 			try
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
-				if (Locked)
-					await Result.LockRead();
+				if (LockType != LockType.None)
+					await Result.Lock(LockType, LockParent);
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
-				Result?.Dispose();
-				Result = null;
+				if (!(Result is null))
+				{
+					await Result.DisposeAsync();
+					Result = null;
+				}
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -678,7 +694,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindFirstGreaterThan<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindFirstGreaterThan<T>(LockType.None, false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -686,14 +702,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Properties">Limit properties to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is greater than the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(LockType LockType, bool LockParent,
+			params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindFirstGreaterThan<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindFirstGreaterThan<T>(LockType, LockParent, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -701,12 +719,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Object">Limit object to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is greater than the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(bool Locked, GenericObject Object)
+		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
 			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
@@ -717,16 +736,19 @@ namespace Waher.Persistence.Files
 			try
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
-				if (Locked)
-					await Result.LockRead();
+				if (LockType != LockType.None)
+					await Result.Lock(LockType, LockParent);
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
-				Result?.Dispose();
-				Result = null;
+				if (!(Result is null))
+				{
+					await Result.DisposeAsync();
+					Result = null;
+				}
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -745,7 +767,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindLastLesserThan<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindLastLesserThan<T>(LockType.None, false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -753,14 +775,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Properties">Limit properties to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is lesser than the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(LockType LockType, bool LockParent,
+			params KeyValuePair<string, object>[] Properties)
 		{
-			return this.FindLastLesserThan<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+			return this.FindLastLesserThan<T>(LockType, LockParent, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>
@@ -768,12 +792,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Object">Limit object to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
 		/// object that is lesser than the limit object. If null is returned, the search operation could
 		/// not be performed.</returns>
-		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(bool Locked, GenericObject Object)
+		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
 			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
@@ -784,16 +809,19 @@ namespace Waher.Persistence.Files
 			try
 			{
 				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
-				if (Locked)
-					await Result.LockRead();
+				if (LockType != LockType.None)
+					await Result.Lock(LockType, LockParent);
 
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
 				Result.SetStartingPoint(Leaf);
 			}
 			catch (Exception ex)
 			{
-				Result?.Dispose();
-				Result = null;
+				if (!(Result is null))
+				{
+					await Result.DisposeAsync();
+					Result = null;
+				}
 
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}

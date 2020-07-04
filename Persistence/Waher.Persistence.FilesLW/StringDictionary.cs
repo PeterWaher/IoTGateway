@@ -370,7 +370,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(true);
+			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.Read);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 
 			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
@@ -398,7 +398,7 @@ namespace Waher.Persistence.Files
 		public async Task<KeyValuePair<string, object>[]> ToArrayAsync()
 		{
 			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = await this.GetEnumerator(true))
+			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = await this.GetEnumerator(LockType.Read))
 			{
 				while (await e.MoveNextAsync())
 					Result.Add(e.Current);
@@ -423,7 +423,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
+			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.None);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
@@ -433,7 +433,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
+			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.None);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
@@ -441,17 +441,28 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets an enumerator for all entries in the dictionary.
 		/// </summary>
-		/// <param name="Locked">If the file should be locked.</param>
+		/// <param name="LockType">
+		/// If locked access to the file is requested, and of what type.
+		/// 
+		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
+		/// 
+		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+		/// 
+		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
+		/// the database lock after use.
+		/// </param>
 		/// <returns>Enumerator</returns>
-		public async Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> GetEnumerator(bool Locked)
+		public async Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> GetEnumerator(LockType LockType)
 		{
 			ObjectBTreeFileEnumerator<KeyValuePair<string, object>> Result = null;
 
 			try
 			{
 				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
-				if (Locked)
-					await Result.LockRead();
+				if (LockType != LockType.None)
+					await Result.Lock(LockType);
 			}
 			catch (Exception ex)
 			{

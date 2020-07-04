@@ -21,7 +21,8 @@ namespace Waher.Persistence.Files.Searching
 		private readonly ObjectBTreeFile file;
 		private int currentCursorPosition = 0;
 		private readonly int nrCursors;
-		private readonly bool locked;
+		private readonly LockType lockType;
+		private readonly bool lockParent;
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
@@ -29,14 +30,16 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="ChildFilters">Child filters.</param>
 		/// <param name="File">File being searched.</param>
-		/// <param name="Locked">If locked access is desired.</param>
-		public UnionCursor(Filter[] ChildFilters, ObjectBTreeFile File, bool Locked)
+		/// <param name="LockType">If locked access is desired.</param>
+		/// <param name="LockParent">If parent file is to be locked as well.</param>
+		public UnionCursor(Filter[] ChildFilters, ObjectBTreeFile File, LockType LockType, bool LockParent)
 		{
 			this.childFilters = ChildFilters;
 			this.nrCursors = this.childFilters.Length;
 			this.file = File;
 			this.currentCursor = null;
-			this.locked = Locked;
+			this.lockType = LockType;
+			this.lockParent = LockParent;
 		}
 
 		/// <summary>
@@ -125,7 +128,7 @@ namespace Waher.Persistence.Files.Searching
 					if (this.currentCursorPosition >= this.nrCursors)
 						return false;
 
-					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.locked, null);
+					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.lockType, this.lockParent, null);
 				}
 
 				if (!await this.currentCursor.MoveNextAsync())

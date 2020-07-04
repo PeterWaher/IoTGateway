@@ -278,7 +278,7 @@ namespace Waher.Networking.Sniffers
 			}
 			else
 			{
-				string Msg = Exception.Message + "\r\n\r\n" + Exception.StackTrace;
+				string Msg = Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace);
 
 				if (this.hasSniffers)
 				{

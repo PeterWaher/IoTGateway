@@ -114,7 +114,7 @@ namespace Waher.IoTGateway.Console
 								{
 									w.WriteLine(ex.Message);
 									w.WriteLine();
-									w.WriteLine(ex.StackTrace);
+									w.WriteLine(Log.CleanStackTrace(ex.StackTrace));
 									w.WriteLine();
 
 									ex = ex.InnerException;
@@ -126,7 +126,7 @@ namespace Waher.IoTGateway.Console
 									w.WriteLine(e.ExceptionObject.ToString());
 
 								w.WriteLine();
-								w.WriteLine(Environment.StackTrace);
+								w.WriteLine(Log.CleanStackTrace(Environment.StackTrace));
 							}
 
 							w.Flush();

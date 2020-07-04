@@ -1248,6 +1248,13 @@
             </summary>
             <param name="Event">Event to log.</param>
         </member>
+        <member name="M:Waher.Events.Log.CleanStackTrace(System.String)">
+            <summary>
+            Cleans a Stack Trace string, removing entries from the asynchronous execution model, making the result more readable to developers.
+            </summary>
+            <param name="StackTrace">Stack Trace</param>
+            <returns>Cleaned stack trace</returns>
+        </member>
         <member name="M:Waher.Events.Log.Debug(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Logs a debug event.

@@ -505,7 +505,7 @@ namespace Waher.IoTGateway
 				catch (Exception ex)
 				{
 					Event Event = new Event(DateTime.Now, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
-						EventLevel.Major, string.Empty, ex.Source, ex.StackTrace);
+						EventLevel.Major, string.Empty, ex.Source, Log.CleanStackTrace(ex.StackTrace));
 
 					Event.Avoid(PersistedEventLog);
 

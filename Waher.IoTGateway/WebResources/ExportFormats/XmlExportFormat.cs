@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 
@@ -494,11 +495,11 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			{
 				await this.output.WriteStartElementAsync(string.Empty, "Exception", Export.ExportNamepace);
 				await this.output.WriteAttributeStringAsync(string.Empty, "message", string.Empty, Exception.Message);
-				this.output.WriteElementString("StackTrace", Exception.StackTrace);
+				this.output.WriteElementString("StackTrace", Log.CleanStackTrace(Exception.StackTrace));
 
-				if (Exception is AggregateException)
+				if (Exception is AggregateException AggregateException)
 				{
-					foreach (Exception ex in ((AggregateException)Exception).InnerExceptions)
+					foreach (Exception ex in AggregateException.InnerExceptions)
 						await this.ReportException(ex);
 				}
 				else if (Exception.InnerException != null)

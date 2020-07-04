@@ -66,7 +66,7 @@ namespace Waher.IoTGateway.App
 			}
 		}
 
-		private void Page_Unloaded(object sender, RoutedEventArgs e)
+		private void Page_Unloaded(object _, RoutedEventArgs _2)
 		{
 			Log.Unregister(this.events);
 			this.events = null;

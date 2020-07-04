@@ -182,7 +182,7 @@ namespace Waher.Networking.Sniffers
 					Inner.AddLast(Exception.InnerException);
 				}
 
-				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Exception.StackTrace);
+				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace));
 
 				if (Inner is null)
 					Exception = null;

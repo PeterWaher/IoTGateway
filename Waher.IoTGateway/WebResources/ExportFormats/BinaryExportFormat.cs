@@ -5,9 +5,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content;
-using Waher.Networking.XMPP;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 
@@ -301,11 +299,11 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		private Task OutputException(Exception Exception)
 		{
 			this.w.Write(Exception.Message);
-			this.w.Write(Exception.StackTrace);
+			this.w.Write(Log.CleanStackTrace(Exception.StackTrace));
 
-			if (Exception is AggregateException)
+			if (Exception is AggregateException AggregateException)
 			{
-				foreach (Exception ex in ((AggregateException)Exception).InnerExceptions)
+				foreach (Exception ex in AggregateException.InnerExceptions)
 					this.OutputException(ex);
 			}
 			else if (Exception.InnerException != null)

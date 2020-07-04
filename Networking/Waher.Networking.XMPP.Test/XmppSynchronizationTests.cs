@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Script;
 
@@ -162,7 +163,7 @@ namespace Waher.Networking.XMPP.Test
 					catch (Exception ex)
 					{
 						Console.Out.WriteLine(ex.Message);
-						Console.Out.WriteLine(ex.StackTrace);
+						Console.Out.WriteLine(Log.CleanStackTrace(ex.StackTrace));
 						Error.Set();
 					}
 				};

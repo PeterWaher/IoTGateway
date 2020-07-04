@@ -4277,62 +4277,55 @@ namespace Waher.Script
 		/// <returns>Double value.</returns>
 		public static double ToDouble(object Object)
 		{
-			if (Object is double)
-				return (double)Object;
-			else if (Object is int)
-				return (int)Object;
+			if (Object is double db)
+				return db;
+			else if (Object is int i)
+				return i;
+			else if (Object is bool b)
+				return b ? 1 : 0;
+			else if (Object is byte bt)
+				return bt;
+			else if (Object is char ch)
+				return ch;
+			else if (Object is decimal dc)
+				return (double)dc;
+			else if (Object is short sh)
+				return sh;
+			else if (Object is long l)
+				return l;
+			else if (Object is sbyte sb)
+				return sb;
+			else if (Object is float f)
+				return f;
+			else if (Object is ushort us)
+				return us;
+			else if (Object is uint ui)
+				return ui;
+			else if (Object is ulong ul)
+				return ul;
+			else if (Object is BigInteger i2)
+				return (double)i2;
+			else if (Object is Complex z)
+			{
+				if (z.Imaginary == 0)
+					return z.Real;
+				else
+					throw new ScriptException("Expected a double value.");
+			}
 			else
 			{
-				if (Object is bool b)
-					return b ? 1 : 0;
-				else if (Object is byte bt)
-					return bt;
-				else if (Object is char ch)
-					return ch;
-				else if (Object is decimal dc)
-					return (double)dc;
-				else if (Object is double db)
-					return db;
-				else if (Object is short sh)
-					return sh;
-				else if (Object is int i)
-					return i;
-				else if (Object is long l)
-					return l;
-				else if (Object is sbyte sb)
-					return sb;
-				else if (Object is float f)
-					return f;
-				else if (Object is ushort us)
-					return us;
-				else if (Object is uint ui)
-					return ui;
-				else if (Object is ulong ul)
-					return ul;
-				else if (Object is BigInteger i2)
-					return (double)i2;
-				else if (Object is Complex z)
+				string s = Object.ToString();
+
+				if (double.TryParse(s, out double d))
+					return d;
+
+				if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
+					double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
 				{
-					if (z.Imaginary == 0)
-						return z.Real;
-					else
-						throw new ScriptException("Expected a double value.");
+					return d;
 				}
-				else
-				{
-					string s = Object.ToString();
 
-					if (double.TryParse(s, out double d))
-						return d;
-
-					if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
-						double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
-					{
-						return d;
-					}
-
-					throw new ScriptException("Expected a double value.");
-				}
+				throw new ScriptException("Expected a double value.");
 			}
 		}
 
@@ -4343,8 +4336,8 @@ namespace Waher.Script
 		/// <returns>Complex value.</returns>
 		public static Complex ToComplex(object Object)
 		{
-			if (Object is Complex)
-				return (Complex)Object;
+			if (Object is Complex z)
+				return z;
 			else
 				return new Complex(ToDouble(Object), 0);
 		}
@@ -4526,7 +4519,7 @@ namespace Waher.Script
 		/// <returns>Converted value.</returns>
 		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
 		{
-			return Convert.ChangeType(Value.AssociatedObjectValue, DesiredType);	// TODO: Implement .NET type conversion.
+			return Convert.ChangeType(Value.AssociatedObjectValue, DesiredType);    // TODO: Implement .NET type conversion.
 		}
 
 		/// <summary>

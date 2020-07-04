@@ -1218,6 +1218,74 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			IEnumerable<T> Result = await this.Find<T>(Offset, MaxCount, SortOrder);
+			await this.Delete(Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			IEnumerable<T> Result = await this.Find<T>(Offset, MaxCount, Filter, SortOrder);
+			await this.Delete(Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			IEnumerable<object> Result = await this.Find(Collection, Offset, MaxCount, SortOrder);
+			await this.Delete(Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			IEnumerable<object> Result = await this.Find(Collection, Offset, MaxCount, Filter, SortOrder);
+			await this.Delete(Result);
+			return Result;
+		}
+
+		/// <summary>
 		/// Clears a collection of all objects.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection to clear.</param>

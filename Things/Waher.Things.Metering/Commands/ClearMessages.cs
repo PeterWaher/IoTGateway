@@ -70,8 +70,7 @@ namespace Waher.Things.Metering.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			foreach (MeteringMessage Msg in await Database.Find<MeteringMessage>(new FilterFieldEqualTo("NodeId", this.node.NodeId)))
-				await Database.Delete(Msg);
+			await Database.FindDelete<MeteringMessage>(new FilterFieldEqualTo("NodeId", this.node.NodeId));
 
 			if (this.node.State != NodeState.None)
 				this.node.State = NodeState.None;

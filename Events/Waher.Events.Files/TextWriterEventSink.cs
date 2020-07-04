@@ -14,8 +14,8 @@ namespace Waher.Events.Files
 		/// Text writer object.
 		/// </summary>
 		protected TextWriter output;
-		private object synchObject = new object();
-
+		
+		private readonly object synchObject = new object();
 		private bool disposed = false;
 
 		/// <summary>

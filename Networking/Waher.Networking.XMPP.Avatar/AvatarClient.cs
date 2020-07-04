@@ -570,10 +570,7 @@ namespace Waher.Networking.XMPP.Avatar
 			if (Avatar != null && !string.IsNullOrEmpty(Avatar.ObjectId))
 				await Database.Delete(Avatar);
 			else
-			{
-				IEnumerable<Avatar> Avatars = await Database.Find<Avatar>(new FilterFieldEqualTo("BareJid", BareJid.ToLower()));
-				await Database.Delete(Avatars);
-			}
+				await Database.FindDelete<Avatar>(new FilterFieldEqualTo("BareJid", BareJid.ToLower()));
 		}
 
 		/// <summary>

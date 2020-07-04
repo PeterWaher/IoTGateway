@@ -606,6 +606,52 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.FindDelete``1(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.FindDelete(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.FindDelete(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Update(System.Object)">
             <summary>
             Updates an object in the database.
@@ -1003,7 +1049,7 @@
             <summary>
             Returns an untyped enumerator that iterates through the collection in the order specified by the index.
             
-            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(System.Boolean)"/> method.
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(Waher.Persistence.Files.LockType,System.Boolean)"/> method.
             </summary>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
@@ -1011,23 +1057,28 @@
             <summary>
             Returns an untyped enumerator that iterates through the collection in the order specified by the index.
             
-            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(System.Boolean)"/> method.
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(Waher.Persistence.Files.LockType,System.Boolean)"/> method.
             </summary>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(System.Boolean)">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(Waher.Persistence.Files.LockType,System.Boolean)">
             <summary>
             Returns an typed enumerator that iterates through the collection in the order specified by the index. The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.
             </summary>
-            <param name="Locked">If locked access to the file is requested.
+            <param name="LockType">
+            If locked access to the file is requested, and of what type.
             
             If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
             enumerator will cause an <see cref="T:System.InvalidOperationException"/> to be thrown.
             
-            If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-            the <see cref="M:Waher.Persistence.Files.IndexBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release the database
-            after use.</param>
+            If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+            If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+            
+            Make sure to call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release 
+            the database lock after use.
+            </param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.IndexBTreeFile.GetRank(System.Guid)">
@@ -1055,25 +1106,27 @@
             object that is greater than or equal to the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterOrEqualTo``1(System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterOrEqualTo``1(Waher.Persistence.Files.LockType,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Searches for the first object that is greater than or equal to a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Properties">Limit properties to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is greater than or equal to the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterOrEqualTo``1(System.Boolean,Waher.Persistence.Serialization.GenericObject)">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterOrEqualTo``1(Waher.Persistence.Files.LockType,System.Boolean,Waher.Persistence.Serialization.GenericObject)">
             <summary>
             Searches for the first object that is greater than or equal to a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Object">Limit object to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is greater than or equal to the limit object. If null is returned, the search operation could
@@ -1090,25 +1143,27 @@
             object that is lesser than or equal to the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserOrEqualTo``1(System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserOrEqualTo``1(Waher.Persistence.Files.LockType,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Searches for the first object that is lasser than or equal to a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Properties">Limit properties to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is lesser than or equal to the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserOrEqualTo``1(System.Boolean,Waher.Persistence.Serialization.GenericObject)">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserOrEqualTo``1(Waher.Persistence.Files.LockType,System.Boolean,Waher.Persistence.Serialization.GenericObject)">
             <summary>
             Searches for the first object that is lasser than or equal to a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Object">Limit object to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is lesser than or equal to the limit object. If null is returned, the search operation could
@@ -1125,25 +1180,27 @@
             object that is greater than the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterThan``1(System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterThan``1(Waher.Persistence.Files.LockType,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Searches for the first object that is greater than a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Properties">Limit properties to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is greater than the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterThan``1(System.Boolean,Waher.Persistence.Serialization.GenericObject)">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindFirstGreaterThan``1(Waher.Persistence.Files.LockType,System.Boolean,Waher.Persistence.Serialization.GenericObject)">
             <summary>
             Searches for the first object that is greater than a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Object">Limit object to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is greater than the limit object. If null is returned, the search operation could
@@ -1160,25 +1217,27 @@
             object that is lesser than the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserThan``1(System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserThan``1(Waher.Persistence.Files.LockType,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Searches for the first object that is lasser than a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Properties">Limit properties to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is lesser than the limit object. If null is returned, the search operation could
             not be performed.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserThan``1(System.Boolean,Waher.Persistence.Serialization.GenericObject)">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.FindLastLesserThan``1(Waher.Persistence.Files.LockType,System.Boolean,Waher.Persistence.Serialization.GenericObject)">
             <summary>
             Searches for the first object that is lasser than a hypothetical limit object.
             </summary>
             <typeparam name="T">The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
-            <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+            <param name="LockType">If the resulting enumerator should be opened in locked mode, and what lock mode.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Object">Limit object to search for.</param>
             <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
             object that is lesser than the limit object. If null is returned, the search operation could
@@ -1197,11 +1256,23 @@
             forwards and backwards, as well as skip a given number of objects.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFileEnumerator`1.LockRead">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFileEnumerator`1.Lock(Waher.Persistence.Files.LockType,System.Boolean)">
             <summary>
             Locks the underlying file (if not locked).
             </summary>
-            <returns></returns>
+            <param name="LockType">
+            If locked access to the file is requested, and of what type.
+            
+            If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+            enumerator will cause an <see cref="T:System.InvalidOperationException"/> to be thrown.
+            
+            If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+            If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+            
+            Make sure to call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release 
+            the database lock after use.
+            </param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
         </member>
         <member name="M:Waher.Persistence.Files.IndexBTreeFileEnumerator`1.Dispose">
             <summary>
@@ -1551,11 +1622,6 @@
             If the files should be encrypted or not.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.Files.ObjectBTreeFile.IsCorrupt">
-            <summary>
-            If the file has been detected to contain corruptions.
-            </summary>
-        </member>
         <member name="P:Waher.Persistence.Files.ObjectBTreeFile.BlockLimit">
             <summary>
             Block limit
@@ -1883,7 +1949,7 @@
             <summary>
             Returns an untyped enumerator that iterates through the collection.
             
-            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(System.Boolean)"/> method.
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(Waher.Persistence.Files.LockType)"/> method.
             </summary>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
@@ -1891,23 +1957,27 @@
             <summary>
             Returns an untyped enumerator that iterates through the collection.
             
-            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(System.Boolean)"/> method.
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(Waher.Persistence.Files.LockType)"/> method.
             </summary>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(System.Boolean)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(Waher.Persistence.Files.LockType)">
             <summary>
             Returns an typed enumerator that iterates through the collection. The typed enumerator uses
             the object serializer of <typeparamref name="T"/> to deserialize objects by default.
             </summary>
-            <param name="Locked">If locked access to the file is requested.
+            <param name="LockType">
+            If locked access to the file is requested, and of what type.
             
             If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
             enumerator will cause an <see cref="T:System.InvalidOperationException"/> to be thrown.
             
-            If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
-            the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release the database
-            after use.</param>
+            If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+            If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+            
+            Make sure to call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release 
+            the database lock after use.
+            </param>
             <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Remove(System.Object)">
@@ -1976,12 +2046,12 @@
             </summary>
             <param name="BestNrFields">Number of index fields used in best index.</param>
             <param name="FirstRequired">Number of field names in index that must exist among properties.</param>
-            <param name="RequiredProperties">Number of properties required field names may choose from.</param>
+            <param name="RequiredProperties">Number of properties that required field names may choose from.</param>
             <param name="Properties">Properties to search on. By default, sort order is ascending.
             If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
             <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.Boolean,System.String[])">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,Waher.Persistence.Files.LockType,System.String[])">
             <summary>
             Finds objects of a given class <typeparamref name="T"/>.
             </summary>
@@ -1989,17 +2059,41 @@
             <param name="Offset">Result offset.</param>
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="Filter">Optional filter. Can be null.</param>
-            <param name="Locked">If locked access to the file is requested.
+            <param name="LockType">
+            If locked access to the file is requested, and of what type.
             
             If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
             enumerator will cause an <see cref="T:System.InvalidOperationException"/> to be thrown.
             
-            If locked access is desired, the database cannot be updated, until the enumerator has been disposed. Make sure to call
-            the <see cref="M:System.IDisposable.Dispose"/> method when done with the enumerator, to release the database
-            after use.</param>
+            If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+            If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+            
+            Make sure to call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release 
+            the database lock after use.
+            </param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
+        </member>
+        <member name="T:Waher.Persistence.Files.LockType">
+            <summary>
+            Type of lock requested.
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.Files.LockType.None">
+            <summary>
+            No lock
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.Files.LockType.Read">
+            <summary>
+            Lock for reading
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.Files.LockType.Write">
+            <summary>
+            Lock for writing
+            </summary>
         </member>
         <member name="T:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1">
             <summary>
@@ -2007,11 +2101,10 @@
             forwards and backwards, as well as skip a given number of objects.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.LockRead">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Lock(Waher.Persistence.Files.LockType)">
             <summary>
             Locks the underlying file (if not locked).
             </summary>
-            <returns></returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose">
             <summary>
@@ -2913,6 +3006,85 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
         </member>
+        <member name="T:Waher.Persistence.Files.Searching.ParentLockedCursor`1">
+            <summary>
+            Makes sure to unlock the parent when enumeration is done.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.#ctor(Waher.Persistence.Files.ICursor{`0},System.Int32,Waher.Persistence.Files.ObjectBTreeFile,Waher.Persistence.Files.LockType)">
+            <summary>
+            Makes sure to unlock the parent when enumeration is done.
+            </summary>
+            <param name="Cursor">Cursor to underlying result set.</param>
+            <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
+            <param name="File">Parent file.</param>
+            <param name="LockType">Type of lock to release.</param>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.Current">
+            <summary>
+            Gets the element in the collection at the current position of the enumerator.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">If the enumeration has not started. 
+            Call <see cref="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.MoveNextAsync"/> to start the enumeration after creating or resetting it.</exception>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.CurrentSerializer">
+            <summary>
+            Serializer used to deserialize <see cref="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.Current"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.CurrentTypeCompatible">
+            <summary>
+            If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.Current"/> 
+            will be null, even if there exists an object at the current position.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.Searching.ParentLockedCursor`1.CurrentObjectId">
+            <summary>
+            Gets the Object ID of the current object.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">If the enumeration has not started. 
+            Call <see cref="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.MoveNextAsync"/> to start the enumeration after creating or resetting it.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.MovePreviousAsync">
+            <summary>
+            Advances the enumerator to the previous element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the previous element; false if
+            the enumerator has passed the beginning of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.SameSortOrder(System.String[],System.String[])">
+            <summary>
+            If the index ordering corresponds to a given sort order.
+            </summary>
+            <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Searching.ParentLockedCursor`1.ReverseSortOrder(System.String[],System.String[])">
+            <summary>
+            If the index ordering is a reversion of a given sort order.
+            </summary>
+            <param name="ConstantFields">Optional array of names of fields that will be constant during the enumeration.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+        </member>
         <member name="T:Waher.Persistence.Files.Searching.RangeInfo">
             <summary>
             Contains information about a range in a search operation.
@@ -3022,7 +3194,7 @@
             </summary>
             <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
         </member>
-        <member name="M:Waher.Persistence.Files.Searching.RangesCursor`1.#ctor(Waher.Persistence.Files.IndexBTreeFile,Waher.Persistence.Files.Searching.RangeInfo[],Waher.Persistence.Files.Searching.IApplicableFilter[],System.Boolean,Waher.Persistence.Files.FilesProvider)">
+        <member name="M:Waher.Persistence.Files.Searching.RangesCursor`1.#ctor(Waher.Persistence.Files.IndexBTreeFile,Waher.Persistence.Files.Searching.RangeInfo[],Waher.Persistence.Files.Searching.IApplicableFilter[],Waher.Persistence.Files.LockType,System.Boolean,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
             it appears in the different child cursors.
@@ -3030,7 +3202,8 @@
             <param name="Index">Index.</param>
             <param name="Ranges">Ranges to enumerate.</param>
             <param name="AdditionalFilters">Additional filters.</param>
-            <param name="Locked">If locked access is desired.</param>
+            <param name="LockType">If locked access is desired.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
             <param name="Provider">Files provider.</param>
         </member>
         <member name="P:Waher.Persistence.Files.Searching.RangesCursor`1.Current">
@@ -3373,14 +3546,15 @@
             </summary>
             <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
         </member>
-        <member name="M:Waher.Persistence.Files.Searching.UnionCursor`1.#ctor(Waher.Persistence.Filters.Filter[],Waher.Persistence.Files.ObjectBTreeFile,System.Boolean)">
+        <member name="M:Waher.Persistence.Files.Searching.UnionCursor`1.#ctor(Waher.Persistence.Filters.Filter[],Waher.Persistence.Files.ObjectBTreeFile,Waher.Persistence.Files.LockType,System.Boolean)">
             <summary>
             Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
             it appears in the different child cursors.
             </summary>
             <param name="ChildFilters">Child filters.</param>
             <param name="File">File being searched.</param>
-            <param name="Locked">If locked access is desired.</param>
+            <param name="LockType">If locked access is desired.</param>
+            <param name="LockParent">If parent file is to be locked as well.</param>
         </member>
         <member name="P:Waher.Persistence.Files.Searching.UnionCursor`1.Current">
             <summary>
@@ -4327,11 +4501,22 @@
             <see cref="M:System.Collections.IEnumerable.GetEnumerator"/>
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.StringDictionary.GetEnumerator(System.Boolean)">
+        <member name="M:Waher.Persistence.Files.StringDictionary.GetEnumerator(Waher.Persistence.Files.LockType)">
             <summary>
             Gets an enumerator for all entries in the dictionary.
             </summary>
-            <param name="Locked">If the file should be locked.</param>
+            <param name="LockType">
+            If locked access to the file is requested, and of what type.
+            
+            If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+            enumerator will cause an <see cref="T:System.InvalidOperationException"/> to be thrown.
+            
+            If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
+            If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
+            
+            Make sure to call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFileEnumerator`1.Dispose"/> method when done with the enumerator, to release 
+            the database lock after use.
+            </param>
             <returns>Enumerator</returns>
         </member>
         <member name="P:Waher.Persistence.Files.StringDictionary.DictionaryFile">

@@ -46,18 +46,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			return Find(this.type, Offset, Top, Where, Variables, Order, Node, this.Name);
-		}
-
-		internal static async Task<IResultSetEnumerator> Find(Type T, int Offset, int Top, ScriptNode Where, Variables Variables,
-			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node, string Name)
-		{
 			bool Complete = true;
-			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, Name, ref Complete), Convert(Order) };
-			object Obj = FindMethod.MakeGenericMethod(T).Invoke(null, FindParameters);
+			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name, ref Complete), Convert(Order) };
+			object Obj = FindMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
@@ -113,6 +107,95 @@ namespace Waher.Script.Persistence.SQL.Sources
 				}
 
 				return findMethod;
+			}
+		}
+
+		/// <summary>
+		/// Finds and Deletes a set of objects.
+		/// </summary>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		public async Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
+			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
+		{
+			bool Complete = true;
+			Filter Filter = TypeSource.Convert(Where, Variables, this.Name, ref Complete);
+
+			if (Complete)
+			{
+				object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
+				object Obj = FindDeleteMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
+				if (!(Obj is Task Task))
+					throw new ScriptRuntimeException("Unexpected response.", Node);
+
+				await Task;
+
+				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+				if (PI is null)
+					throw new ScriptRuntimeException("Unexpected response.", Node);
+
+				Obj = PI.GetValue(Task);
+				if (!(Obj is int Count))
+					throw new ScriptRuntimeException("Unexpected response.", Node);
+
+				return Count;
+			}
+			else
+			{
+				IResultSetEnumerator e = await this.Find(Offset, Top, Where, Variables, Order, Node);
+				LinkedList<object> ToDelete = new LinkedList<object>();
+				int Count = 0;
+
+				while (await e.MoveNextAsync())
+				{
+					ToDelete.AddLast(e.Current);
+					Count++;
+				}
+
+				await Database.Delete(ToDelete);
+
+				return Count;
+			}
+		}
+
+		private static MethodInfo findDeleteMethod = null;
+
+		/// <summary>
+		/// Generic object database Find method: <see cref="Database.FindDelete{T}(int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo FindDeleteMethod
+		{
+			get
+			{
+				if (findDeleteMethod is null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("FindDelete"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 4 ||
+							Parameters[0].ParameterType != typeof(int) ||
+							Parameters[1].ParameterType != typeof(int) ||
+							Parameters[2].ParameterType != typeof(Filter) ||
+							Parameters[3].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						findDeleteMethod = MI;
+					}
+
+					if (findDeleteMethod is null)
+						throw new InvalidOperationException("Appropriate Database.FindDelete method not found.");
+				}
+
+				return findDeleteMethod;
 			}
 		}
 
@@ -378,15 +461,6 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public Task Update(IEnumerable<object> Objects)
 		{
 			return Database.Update(Objects);
-		}
-
-		/// <summary>
-		/// Deletes a set of objects.
-		/// </summary>
-		/// <param name="Objects">Objects to delete</param>
-		public Task Delete(IEnumerable<object> Objects)
-		{
-			return Database.Delete(Objects);
 		}
 
 		/// <summary>

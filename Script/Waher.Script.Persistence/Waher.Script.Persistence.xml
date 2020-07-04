@@ -519,17 +519,22 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds and Deletes a set of objects.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.IDataSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
             <param name="Objects">Objects to update</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
-            <summary>
-            Deletes a set of objects.
-            </summary>
-            <param name="Objects">Objects to delete</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.IDataSource.Insert(System.Object)">
             <summary>
@@ -1501,17 +1506,27 @@
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds and Deletes a set of objects.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDeleteMethod">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
             <param name="Objects">Objects to update</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
-            <summary>
-            Deletes a set of objects.
-            </summary>
-            <param name="Objects">Objects to delete</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Insert(System.Object)">
             <summary>
@@ -1699,11 +1714,16 @@
             </summary>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Deletes a set of objects.
+            Finds and Deletes a set of objects.
             </summary>
-            <param name="Objects">Objects to delete</param>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Insert(System.Object)">
             <summary>
@@ -1884,6 +1904,22 @@
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds and Deletes a set of objects.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDeleteMethod">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.WildcardToRegex(System.String,System.String)">
             <summary>
             Converts a wildcard string to a regular expression string.
@@ -1897,12 +1933,6 @@
             Updates a set of objects.
             </summary>
             <param name="Objects">Objects to update</param>
-        </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
-            <summary>
-            Deletes a set of objects.
-            </summary>
-            <param name="Objects">Objects to delete</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Insert(System.Object)">
             <summary>
@@ -1995,11 +2025,16 @@
             </summary>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
-            Deletes a set of objects.
+            Finds and Deletes a set of objects.
             </summary>
-            <param name="Objects">Objects to delete</param>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Insert(System.Object)">
             <summary>

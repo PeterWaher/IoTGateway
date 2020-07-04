@@ -24,16 +24,22 @@ namespace Waher.Script.Persistence.SQL
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
 
 		/// <summary>
+		/// Finds and Deletes a set of objects.
+		/// </summary>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
+			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
+
+		/// <summary>
 		/// Updates a set of objects.
 		/// </summary>
 		/// <param name="Objects">Objects to update</param>
 		Task Update(IEnumerable<object> Objects);
-
-		/// <summary>
-		/// Deletes a set of objects.
-		/// </summary>
-		/// <param name="Objects">Objects to delete</param>
-		Task Delete(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Inserts an object.

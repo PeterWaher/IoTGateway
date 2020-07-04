@@ -1168,8 +1168,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			DateTime Limit = Now - this.cacheUnusedLifetime;
 
-			foreach (CachedQuery Query in await Database.Find<CachedQuery>(new FilterFieldLesserOrEqualTo("LastUsed", Limit)))
-				await Database.Delete(Query);
+			await Database.FindDelete<CachedQuery>(new FilterFieldLesserOrEqualTo("LastUsed", Limit));
 		}
 
 		/// <summary>

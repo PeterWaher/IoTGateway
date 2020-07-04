@@ -86,7 +86,11 @@ namespace Waher.Persistence
 		public async static Task Insert(object Object)
 		{
 			await Provider.Insert(Object);
+			RaiseInserted(Object);
+		}
 
+		private static void RaiseInserted(object Object)
+		{
 			ObjectEventHandler h = ObjectInserted;
 			if (!(h is null))
 			{
@@ -114,21 +118,8 @@ namespace Waher.Persistence
 		{
 			await Provider.Insert(Objects);
 
-			ObjectEventHandler h = ObjectInserted;
-			if (!(h is null))
-			{
-				foreach (object Object in Objects)
-				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			foreach (object Object in Objects)
+				RaiseInserted(Object);
 		}
 
 		/// <summary>
@@ -139,21 +130,8 @@ namespace Waher.Persistence
 		{
 			await Provider.Insert(Objects);
 
-			ObjectEventHandler h = ObjectInserted;
-			if (!(h is null))
-			{
-				foreach (object Object in Objects)
-				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			foreach (object Object in Objects)
+				RaiseInserted(Object);
 		}
 
 		/// <summary>
@@ -371,7 +349,11 @@ namespace Waher.Persistence
 		public async static Task Update(object Object)
 		{
 			await Provider.Update(Object);
+			RaiseUpdated(Object);
+		}
 
+		private static void RaiseUpdated(object Object)
+		{
 			ObjectEventHandler h = ObjectUpdated;
 			if (!(h is null))
 			{
@@ -399,21 +381,8 @@ namespace Waher.Persistence
 		{
 			await Provider.Update(Objects);
 
-			ObjectEventHandler h = ObjectUpdated;
-			if (!(h is null))
-			{
-				foreach (object Object in Objects)
-				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			foreach (object Object in Objects)
+				RaiseUpdated(Object);
 		}
 
 		/// <summary>
@@ -424,21 +393,8 @@ namespace Waher.Persistence
 		{
 			await Provider.Update(Objects);
 
-			ObjectEventHandler h = ObjectUpdated;
-			if (!(h is null))
-			{
-				foreach (object Object in Objects)
-				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			foreach (object Object in Objects)
+				RaiseUpdated(Object);
 		}
 
 		/// <summary>
@@ -448,19 +404,7 @@ namespace Waher.Persistence
 		public async static Task Delete(object Object)
 		{
 			await Provider.Delete(Object);
-
-			ObjectEventHandler h = ObjectDeleted;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			RaiseDeleted(Object);
 		}
 
 		/// <summary>
@@ -479,21 +423,8 @@ namespace Waher.Persistence
 			else
 				await Provider.Delete(Objects);
 
-			ObjectEventHandler h = ObjectDeleted;
-			if (!(h is null))
-			{
-				foreach (object Object in Objects)
-				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			foreach (object Object in Objects)
+				RaiseDeleted(Object);
 		}
 
 		/// <summary>
@@ -504,21 +435,156 @@ namespace Waher.Persistence
 		{
 			await Provider.Delete(Objects);
 
+			foreach (object Object in Objects)
+				RaiseDeleted(Object);
+		}
+
+		private static void RaiseDeleted(object Object)
+		{
 			ObjectEventHandler h = ObjectDeleted;
 			if (!(h is null))
 			{
-				foreach (object Object in Objects)
+				try
 				{
-					try
-					{
-						h(Provider, new ObjectEventArgs(Object));
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
 				}
 			}
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<T>> FindDelete<T>(params string[] SortOrder)
+			where T : class
+		{
+			return FindDelete<T>(0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			IEnumerable<T> Result = await Provider.FindDelete<T>(Offset, MaxCount, SortOrder);
+
+			foreach (T Object in Result)
+				RaiseDeleted(Object);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<T>> FindDelete<T>(Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return FindDelete<T>(0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			IEnumerable<T> Result = await Provider.FindDelete<T>(Offset, MaxCount, Filter, SortOrder);
+
+			foreach (T Object in Result)
+				RaiseDeleted(Object);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<object>> FindDelete(string Collection, params string[] SortOrder)
+		{
+			return FindDelete(Collection, 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount, SortOrder);
+
+			foreach (object Object in Result)
+				RaiseDeleted(Object);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<object>> FindDelete(string Collection, Filter Filter, params string[] SortOrder)
+		{
+			return FindDelete(Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
+
+			foreach (object Object in Result)
+				RaiseDeleted(Object);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -729,28 +795,70 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Is called when reparation of a collection is begin.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		public static void BeginRepair(string Collection)
+		{
+			lock (toRepair)
+			{
+				toRepair[Collection] = false;
+			}
+		}
+
+		/// <summary>
+		/// Is called when reparation of a collection is ended.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		public static void EndRepair(string Collection)
+		{
+			lock (toRepair)
+			{
+				toRepair.Remove(Collection);
+			}
+		}
+
+		/// <summary>
 		/// Flags a collection for repairing.
 		/// </summary>
 		/// <param name="Collection">Collection</param>
-		public static async void FlagForRepair(string Collection)
+		/// <param name="Reason">Reason for flagging collection.</param>
+		public static Exception FlagForRepair(string Collection, string Reason)
+		{
+			InconsistencyException Result = new InconsistencyException(Collection, Reason);
+			FlagForRepair(Collection, Reason, Log.CleanStackTrace(Environment.StackTrace));
+			return Result;
+		}
+
+		private static async void FlagForRepair(string Collection, string Reason, string StackTrace)
 		{
 			try
 			{
+				bool Return = false;
+
 				lock (toRepair)
 				{
+					if (toRepair.ContainsKey(Collection))
+						return;
+
 					toRepair[Collection] = true;
 
 					if (repairing)
-						return;
-
-					repairing = false;
+						Return = true;
+					else
+						repairing = true;
 				}
 
-				await Task.Delay(1000);
+				Log.Alert("Collection flagged for repair: " + Collection +
+					"\r\n\r\nReason: " + Reason.Replace("\\", "\\\\").Replace(":", "\\:").Replace(".", "\\.") +
+					"\r\n\r\nStack Trace:\r\n\r\n```\r\n" + StackTrace + "\r\n```", Collection);
+
+				if (Return)
+					return;
 
 				while (!string.IsNullOrEmpty(Collection))
 				{
-					Log.Alert("Collection flagged for repair: " + Collection, Collection);
+					await Task.Delay(1000);
 
 					string[] Repaired = await Provider.Repair(Collection);
 
@@ -776,7 +884,7 @@ namespace Waher.Persistence
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-			
+
 				lock (toRepair)
 				{
 					repairing = false;

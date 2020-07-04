@@ -2746,6 +2746,90 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.Database.FindDelete``1(System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete``1(Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete(System.String,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete(System.String,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.FindDelete(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
         <member name="M:Waher.Persistence.Database.TryLoadObject``1(System.Object)">
             <summary>
             Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
@@ -2858,6 +2942,25 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.BeginRepair(System.String)">
+            <summary>
+            Is called when reparation of a collection is begin.
+            </summary>
+            <param name="Collection">Name of collection.</param>
+        </member>
+        <member name="M:Waher.Persistence.Database.EndRepair(System.String)">
+            <summary>
+            Is called when reparation of a collection is ended.
+            </summary>
+            <param name="Collection">Name of collection.</param>
+        </member>
+        <member name="M:Waher.Persistence.Database.FlagForRepair(System.String,System.String)">
+            <summary>
+            Flags a collection for repairing.
+            </summary>
+            <param name="Collection">Collection</param>
+            <param name="Reason">Reason for flagging collection.</param>
         </member>
         <member name="M:Waher.Persistence.Database.AddIndex(System.String,System.String[])">
             <summary>
@@ -3530,6 +3633,52 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.FindDelete``1(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.FindDelete(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.FindDelete(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.TryLoadObject``1(System.Object)">
             <summary>
             Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
@@ -3600,6 +3749,13 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.Repair(System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.AddIndex(System.String,System.String[])">
             <summary>
@@ -3812,6 +3968,21 @@
             Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
+        </member>
+        <member name="T:Waher.Persistence.InconsistencyException">
+            <summary>
+            Database inconsistency exception. Raised when an inconsistency in the database has been found.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.InconsistencyException.#ctor(System.String,System.String)">
+            <summary>
+            Database inconsistency exception. Raised when an inconsistency in the database has been found.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.InconsistencyException.Object">
+            <summary>
+            Object identifier related to the object. (Collection)
+            </summary>
         </member>
         <member name="T:Waher.Persistence.IPersistentDictionary">
             <summary>

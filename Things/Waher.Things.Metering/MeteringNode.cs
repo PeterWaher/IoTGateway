@@ -412,12 +412,11 @@ namespace Waher.Things.Metering
 
 			bool Removed = false;
 
-			foreach (MeteringMessage Message in await Database.Find<MeteringMessage>(new FilterAnd(
+			foreach (MeteringMessage Message in await Database.FindDelete<MeteringMessage>(new FilterAnd(
 				new FilterFieldEqualTo("NodeId", this.objectId),
 				new FilterFieldEqualTo("Type", Type),
 				new FilterFieldEqualTo("EventId", EventId))))
 			{
-				await Database.Delete(Message);
 				Removed = true;
 
 				switch (Type)

@@ -50,17 +50,7 @@ namespace Waher.Script.Persistence.SQL
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = this.source.GetSource(Variables);
-			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
-			LinkedList<object> ToDelete = new LinkedList<object>();
-			int Count = 0;
-
-			while (await e.MoveNextAsync())
-			{
-				ToDelete.AddLast(e.Current);
-				Count++;
-			}
-
-			await Source.Delete(ToDelete);
+			int Count = await Source.FindDelete(0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
 
 			return new DoubleNumber(Count);
 		}

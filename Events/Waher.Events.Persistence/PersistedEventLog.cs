@@ -137,9 +137,8 @@ namespace Waher.Events.Persistence
 			{
 				Deleted = false;
 
-				foreach (PersistedEvent Event in await Database.Find<PersistedEvent>(0, 100, new FilterFieldLesserOrEqualTo("Timestamp", Limit)))
+				foreach (PersistedEvent Event in await Database.FindDelete<PersistedEvent>(0, 100, new FilterFieldLesserOrEqualTo("Timestamp", Limit)))
 				{
-					await Database.Delete(Event);
 					NrEvents++;
 					Deleted = true;
 				}

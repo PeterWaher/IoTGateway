@@ -283,10 +283,9 @@ namespace Waher.Things.Metering
 			{
 				Deleted = false;
 
-				foreach (SourceEvent Event in await Database.Find<SourceEvent>(0, 100, new FilterAnd(
+				foreach (SourceEvent Event in await Database.FindDelete<SourceEvent>(0, 100, new FilterAnd(
 					new FilterFieldEqualTo("SourceId", SourceID), new FilterFieldLesserOrEqualTo("Timestamp", Limit))))
 				{
-					await Database.Delete(Event);
 					NrEvents++;
 					Deleted = true;
 				}

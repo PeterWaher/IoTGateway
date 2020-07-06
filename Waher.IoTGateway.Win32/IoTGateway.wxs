@@ -39,7 +39,6 @@
               </CreateFolder>
             </Component>
             <Component Id='NetCore' Guid='F8A15022-C2F1-4F00-8649-D23FDD89DA1D'>
-              <File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes' KeyPath='yes'/>
               <File Id='api_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-console-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_datetime_l1_1_0.dll' Name='api-ms-win-core-datetime-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-datetime-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_debug_l1_1_0.dll' Name='api-ms-win-core-debug-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-debug-l1-1-0.dll' Vital='yes'/>
@@ -65,6 +64,7 @@
               <File Id='api_ms_win_core_sysinfo_l1_1_0.dll' Name='api-ms-win-core-sysinfo-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-sysinfo-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_timezone_l1_1_0.dll' Name='api-ms-win-core-timezone-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-timezone-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_util_l1_1_0.dll' Name='api-ms-win-core-util-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-util-l1-1-0.dll' Vital='yes'/>
+              <File Id='API_MS_Win_core_xstate_l2_1_0.dll' Name='API-MS-Win-core-xstate-l2-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\API-MS-Win-core-xstate-l2-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_crt_conio_l1_1_0.dll' Name='api-ms-win-crt-conio-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-conio-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_crt_convert_l1_1_0.dll' Name='api-ms-win-crt-convert-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-convert-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_crt_environment_l1_1_0.dll' Name='api-ms-win-crt-environment-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-environment-l1-1-0.dll' Vital='yes'/>
@@ -79,7 +79,7 @@
               <File Id='api_ms_win_crt_stdio_l1_1_0.dll' Name='api-ms-win-crt-stdio-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-stdio-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_crt_string_l1_1_0.dll' Name='api-ms-win-crt-string-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-string-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_crt_time_l1_1_0.dll' Name='api-ms-win-crt-time-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-time-l1-1-0.dll' Vital='yes'/>
-              <RemoveFile Id='Removeapi_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' On='uninstall'/>
+              <File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='Removeapi_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_core_datetime_l1_1_0.dll' Name='api-ms-win-core-datetime-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_core_debug_l1_1_0.dll' Name='api-ms-win-core-debug-l1-1-0.dll' On='uninstall'/>
@@ -105,6 +105,7 @@
               <RemoveFile Id='Removeapi_ms_win_core_sysinfo_l1_1_0.dll' Name='api-ms-win-core-sysinfo-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_core_timezone_l1_1_0.dll' Name='api-ms-win-core-timezone-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_core_util_l1_1_0.dll' Name='api-ms-win-core-util-l1-1-0.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveAPI_MS_Win_core_xstate_l2_1_0.dll' Name='API-MS-Win-core-xstate-l2-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_crt_conio_l1_1_0.dll' Name='api-ms-win-crt-conio-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_crt_convert_l1_1_0.dll' Name='api-ms-win-crt-convert-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_crt_environment_l1_1_0.dll' Name='api-ms-win-crt-environment-l1-1-0.dll' On='uninstall'/>
@@ -119,6 +120,7 @@
               <RemoveFile Id='Removeapi_ms_win_crt_stdio_l1_1_0.dll' Name='api-ms-win-crt-stdio-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_crt_string_l1_1_0.dll' Name='api-ms-win-crt-string-l1-1-0.dll' On='uninstall'/>
               <RemoveFile Id='Removeapi_ms_win_crt_time_l1_1_0.dll' Name='api-ms-win-crt-time-l1-1-0.dll' On='uninstall'/>
+              <RemoveFile Id='Removeapi_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' On='uninstall'/>
             </Component>
             <Component Id='SystemLibraries' Guid='E4B153DB-DAB9-4D36-BF64-636475E07922'>
               <File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.AppContext.dll' Vital='yes'/>
@@ -129,7 +131,6 @@
               <File Id='System.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Collections.NonGeneric.dll' Vital='yes'/>
               <File Id='System.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Collections.Specialized.dll' Vital='yes'/>
               <File Id='System.ComponentModel.Annotations.dll' Name='System.ComponentModel.Annotations.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.Annotations.dll' Vital='yes'/>
-              <File Id='System.ComponentModel.Composition.dll' Name='System.ComponentModel.Composition.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.Composition.dll' Vital='yes'/>
               <File Id='System.ComponentModel.DataAnnotations.dll' Name='System.ComponentModel.DataAnnotations.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.DataAnnotations.dll' Vital='yes'/>
               <File Id='System.ComponentModel.dll' Name='System.ComponentModel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.dll' Vital='yes'/>
               <File Id='System.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.EventBasedAsync.dll' Vital='yes'/>
@@ -159,6 +160,7 @@
               <File Id='System.Globalization.dll' Name='System.Globalization.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.dll' Vital='yes'/>
               <File Id='System.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.Extensions.dll' Vital='yes'/>
               <File Id='System.IO.Compression.dll' Name='System.IO.Compression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Compression.dll' Vital='yes'/>
+              <File Id='System.IO.Compression.Brotli.dll' Name='System.IO.Compression.Brotli.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Compression.Brotli.dll' Vital='yes'/>
               <File Id='System.IO.Compression.FileSystem.dll' Name='System.IO.Compression.FileSystem.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Compression.FileSystem.dll' Vital='yes'/>
               <File Id='System.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Compression.ZipFile.dll' Vital='yes'/>
               <File Id='System.IO.dll' Name='System.IO.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.dll' Vital='yes'/>
@@ -170,6 +172,7 @@
               <File Id='System.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.IsolatedStorage.dll' Vital='yes'/>
               <File Id='System.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.MemoryMappedFiles.dll' Vital='yes'/>
               <File Id='System.IO.Pipes.dll' Name='System.IO.Pipes.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Pipes.dll' Vital='yes'/>
+              <File Id='System.IO.Pipes.AccessControl.dll' Name='System.IO.Pipes.AccessControl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.Pipes.AccessControl.dll' Vital='yes'/>
               <File Id='System.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.IO.UnmanagedMemoryStream.dll' Vital='yes'/>
               <File Id='System.Linq.dll' Name='System.Linq.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Linq.dll' Vital='yes'/>
               <File Id='System.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Linq.Expressions.dll' Vital='yes'/>
@@ -282,7 +285,6 @@
               <RemoveFile Id='RemoveSystem.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Collections.Specialized.dll' Name='System.Collections.Specialized.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.ComponentModel.Annotations.dll' Name='System.ComponentModel.Annotations.dll'  On='uninstall' />
-              <RemoveFile Id='RemoveSystem.ComponentModel.Composition.dll' Name='System.ComponentModel.Composition.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.ComponentModel.DataAnnotations.dll' Name='System.ComponentModel.DataAnnotations.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.ComponentModel.dll' Name='System.ComponentModel.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll'  On='uninstall' />
@@ -312,6 +314,7 @@
               <RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.Compression.dll' Name='System.IO.Compression.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.IO.Compression.Brotli.dll' Name='System.IO.Compression.Brotli.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.Compression.FileSystem.dll' Name='System.IO.Compression.FileSystem.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.dll' Name='System.IO.dll'  On='uninstall' />
@@ -323,6 +326,7 @@
               <RemoveFile Id='RemoveSystem.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.Pipes.dll' Name='System.IO.Pipes.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.IO.Pipes.AccessControl.dll' Name='System.IO.Pipes.AccessControl.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Linq.dll' Name='System.Linq.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Linq.Expressions.dll' Name='System.Linq.Expressions.dll'  On='uninstall' />
@@ -440,7 +444,7 @@
               <File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Registry.dll' Vital='yes' />
               <File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
               <File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore.dll' Vital='yes' />
-              <File Id='mscordaccore_x86_x86_4.6.26614.01.dll' Name='mscordaccore_x86_x86_4.6.26614.01.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.26614.01.dll' Vital='yes' />
+              <File Id='mscordaccore_x86_x86_4.6.28207.03.dll' Name='mscordaccore_x86_x86_4.6.28207.03.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.28207.03.dll' Vital='yes' />
               <File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordbi.dll' Vital='yes' />
               <File Id='mscorlib.dll' Name='mscorlib.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorlib.dll' Vital='yes' />
               <File Id='mscorrc.debug.dll' Name='mscorrc.debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.debug.dll' Vital='yes' />
@@ -448,7 +452,7 @@
               <File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\netstandard.dll' Vital='yes' />
               <File Id='sos.dll' Name='sos.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos.dll' Vital='yes' />
               <File Id='SOS.NETCore.dll' Name='SOS.NETCore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SOS.NETCore.dll' Vital='yes' />
-              <File Id='sos_x86_x86_4.6.26614.01.dll' Name='sos_x86_x86_4.6.26614.01.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.26614.01.dll' Vital='yes' />
+              <File Id='sos_x86_x86_4.6.28207.03.dll' Name='sos_x86_x86_4.6.28207.03.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.28207.03.dll' Vital='yes' />
               <File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
               <File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
               <RemoveFile Id='Removeclrcompression.dll' Name='clrcompression.dll' On='uninstall'/>
@@ -466,7 +470,7 @@
               <RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
               <RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
               <RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
-              <RemoveFile Id='Removemscordaccore_x86_x86_4.6.26614.01.dll' Name='mscordaccore_x86_x86_4.6.26614.01.dll' On='uninstall'/>
+              <RemoveFile Id='Removemscordaccore_x86_x86_4.6.28207.03.dll' Name='mscordaccore_x86_x86_4.6.28207.03.dll' On='uninstall'/>
               <RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
               <RemoveFile Id='Removemscorlib.dll' Name='mscorlib.dll' On='uninstall'/>
               <RemoveFile Id='Removemscorrc.debug.dll' Name='mscorrc.debug.dll' On='uninstall'/>
@@ -474,7 +478,7 @@
               <RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
               <RemoveFile Id='Removesos.dll' Name='sos.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSOS.NETCore.dll' Name='SOS.NETCore.dll' On='uninstall'/>
-              <RemoveFile Id='Removesos_x86_x86_4.6.26614.01.dll' Name='sos_x86_x86_4.6.26614.01.dll' On='uninstall'/>
+              <RemoveFile Id='Removesos_x86_x86_4.6.28207.03.dll' Name='sos_x86_x86_4.6.28207.03.dll' On='uninstall'/>
               <RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
             </Component>
@@ -703,7 +707,7 @@
               <File Id='Waher.Events.Statistics.pdb' Name='Waher.Events.Statistics.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Statistics.pdb' Vital='yes'/>
               <File Id='Waher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.XMPP.pdb' Vital='yes'/>
               <File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.pdb' Vital='yes'/>
-              <File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\netcoreapp2.0\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
               <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.pdb' Vital='yes'/>
               <File Id='Waher.Networking.Cluster.pdb' Name='Waher.Networking.Cluster.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.Cluster.pdb' Vital='yes'/>
@@ -867,7 +871,7 @@
               <RemoveFile Id='RemoveWaher.Utility.Install.runtimeconfig.json' Name='Waher.Utility.Install.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityInstallDebugFiles' Guid='1DC3539C-A6C7-4351-B899-761A3A506B4A'>
-              <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityRegEx' Guid='5CB528A1-A1BC-4F38-B36C-40C22820467B'>
@@ -881,7 +885,7 @@
               <RemoveFile Id='RemoveWaher.Utility.RegEx.runtimeconfig.json' Name='Waher.Utility.RegEx.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityRegExDebugFiles' Guid='B6358806-B8C0-494F-9C82-26A9899340D6'>
-              <File Id='Waher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.RegEx.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.RegEx.pdb' Name='Waher.Utility.RegEx.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilitySign' Guid='BDCBEC7E-CC62-46D0-8652-16AB8C0C4009'>
@@ -895,7 +899,7 @@
               <RemoveFile Id='RemoveWaher.Utility.Sign.runtimeconfig.json' Name='Waher.Utility.Sign.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilitySignDebugFiles' Guid='53B02B7E-98F0-491D-8951-59C1F59EF4EF'>
-              <File Id='Waher.Utility.Sign.pdb' Name='Waher.Utility.Sign.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Sign.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Sign.pdb' Name='Waher.Utility.Sign.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Sign.pdb' Name='Waher.Utility.Sign.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityAnalyzeClock' Guid='807AB87A-C605-4CCE-9992-D61DC009F780'>
@@ -909,7 +913,7 @@
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.runtimeconfig.json' Name='Waher.Utility.AnalyzeClock.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityAnalyzeClockDebugFiles' Guid='131BA401-4C7D-4FE1-96F5-34D873D5BB54'>
-              <File Id='Waher.Utility.AnalyzeClock.pdb' Name='Waher.Utility.AnalyzeClock.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeClock.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.AnalyzeClock.pdb' Name='Waher.Utility.AnalyzeClock.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeClock.pdb' Name='Waher.Utility.AnalyzeClock.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityAnalyzeDB' Guid='A79F4EAD-DCF3-40A8-A807-76DD5A9145E5'>
@@ -923,7 +927,7 @@
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.runtimeconfig.json' Name='Waher.Utility.AnalyzeDB.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityAnalyzeDBDebugFiles' Guid='69D1CC1C-7F9A-4712-B8E0-44C56D1886D4'>
-              <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.AnalyzeDB.pdb' Name='Waher.Utility.AnalyzeDB.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityAsn1ToCSharp' Guid='17B26FD3-DB71-4FB4-86BC-DF8DED4DDC18'>
@@ -937,7 +941,7 @@
               <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.runtimeconfig.json' Name='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityAsn1ToCSharpDebugFiles' Guid='F40DE9B1-B431-4B9C-8E9B-954C6E5B054A'>
-              <File Id='Waher.Utility.Asn1ToCSharp.pdb' Name='Waher.Utility.Asn1ToCSharp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Asn1ToCSharp.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Asn1ToCSharp.pdb' Name='Waher.Utility.Asn1ToCSharp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Asn1ToCSharp.pdb' Name='Waher.Utility.Asn1ToCSharp.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityCsp' Guid='B423EE8C-0A9D-4F54-8633-8F6F2271F388'>
@@ -951,7 +955,7 @@
               <RemoveFile Id='RemoveWaher.Utility.Csp.runtimeconfig.json' Name='Waher.Utility.Csp.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityCspDebugFiles' Guid='82EF62F9-E2E4-4A51-8C79-6DA184081ABE'>
-              <File Id='Waher.Utility.Csp.pdb' Name='Waher.Utility.Csp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Csp.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Csp.pdb' Name='Waher.Utility.Csp.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Csp.pdb' Name='Waher.Utility.Csp.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityDeleteDB' Guid='EE9EA509-978C-45A5-939A-C98ECC2D1C6A'>
@@ -965,7 +969,7 @@
               <RemoveFile Id='RemoveWaher.Utility.DeleteDB.runtimeconfig.json' Name='Waher.Utility.DeleteDB.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityDeleteDBDebugFiles' Guid='6AEF8EB3-9713-49D1-8CF7-89A2FCB58E4A'>
-              <File Id='Waher.Utility.DeleteDB.pdb' Name='Waher.Utility.DeleteDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.DeleteDB.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.DeleteDB.pdb' Name='Waher.Utility.DeleteDB.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.DeleteDB.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.DeleteDB.pdb' Name='Waher.Utility.DeleteDB.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityTransform' Guid='04CA1141-4A22-4EA3-B11C-E316ED0DAA38'>
@@ -979,7 +983,7 @@
               <RemoveFile Id='RemoveWaher.Utility.Transform.runtimeconfig.json' Name='Waher.Utility.Transform.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityTransformDebugFiles' Guid='C5BC42B0-E372-41BB-9D7E-F02DA9C38B4F'>
-              <File Id='Waher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.Transform.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.Transform.pdb' Name='Waher.Utility.Transform.pdb' On='uninstall'/>
             </Component>
             <Component Id='UtilityExStat' Guid='AB60319A-BD68-4D51-AA67-4788815C6B28'>
@@ -993,7 +997,7 @@
               <RemoveFile Id='RemoveWaher.Utility.ExStat.runtimeconfig.json' Name='Waher.Utility.ExStat.runtimeconfig.json' On='uninstall'/>
             </Component>
             <Component Id='UtilityExStatDebugFiles' Guid='CD1F82EC-9ADF-4C76-BBA9-971EE0B32EE2'>
-              <File Id='Waher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\netcoreapp2.0\Waher.Utility.ExStat.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' On='uninstall'/>
             </Component>
             <Directory Id='Graphics' Name='Graphics'>

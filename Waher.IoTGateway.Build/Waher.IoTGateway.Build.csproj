@@ -10,9 +10,11 @@
   
   <Target Name="Test">
   </Target>
-  
+
   <Target Name="BuildSetup">
-    <MSBuild Projects="..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+    <MSBuild Projects="..\Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+
+    <MSBuild Projects="..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
     <Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput&quot; -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
 
     <MSBuild Projects="..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
@@ -36,13 +38,13 @@
     <MSBuild Projects="..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
 
-    <MSBuild Projects="..\Waher.IoTGateway.Win32\Waher.IoTGateway.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory).."/>
-    <MSBuild Projects="..\Waher.IoTGateway.Setup\Waher.IoTGateway.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory).."/>
+    <MSBuild Projects="..\Waher.IoTGateway.Win32\Waher.IoTGateway.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+    <MSBuild Projects="..\Waher.IoTGateway.Setup\Waher.IoTGateway.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
     
     <MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 
-    <MSBuild Projects="..\Waher.IoTClient.Win32\Waher.IoTClient.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory).."/>
-    <MSBuild Projects="..\Waher.IoTClient.Setup\Waher.IoTClient.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory).."/>
+    <MSBuild Projects="..\Waher.IoTClient.Win32\Waher.IoTClient.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+    <MSBuild Projects="..\Waher.IoTClient.Setup\Waher.IoTClient.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
   </Target>
 
 </Project>

@@ -12,14 +12,14 @@ namespace Waher.Persistence
 	public delegate void CollectionEventHandler(object Sender, CollectionEventArgs e);
 
 	/// <summary>
-	/// Event arguments for database object events.
+	/// Event arguments for collection events.
 	/// </summary>
 	public class CollectionEventArgs : EventArgs
 	{
 		private readonly string collection;
 
 		/// <summary>
-		/// Event handler for collection events.
+		/// Event arguments for collection events.
 		/// </summary>
 		/// <param name="Collection">Collection</param>
 		public CollectionEventArgs(string Collection)

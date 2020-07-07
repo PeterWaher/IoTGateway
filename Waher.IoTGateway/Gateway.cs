@@ -480,6 +480,8 @@ namespace Waher.IoTGateway
 				if (DatabaseProvider is null)
 					throw new Exception("Database provider not defined in Gateway.config.");
 
+				Database.CollectionRepaired += Database_CollectionRepaired;
+
 				Type ProviderType = DatabaseProvider.GetType();
 				PropertyInfo AutoRepairReportFolder = ProviderType.GetProperty("AutoRepairReportFolder");
 				if (!(AutoRepairReportFolder is null))
@@ -1537,6 +1539,8 @@ namespace Waher.IoTGateway
 			try
 			{
 				await Types.StopAllModules();
+
+				Database.CollectionRepaired -= Database_CollectionRepaired;
 
 				if (!(internalProvider is null) && Database.Provider != internalProvider)
 					await internalProvider.Stop();
@@ -2789,7 +2793,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Export
+		#region Backups
 
 		private static async Task<bool> CheckBackup()
 		{
@@ -2913,6 +2917,41 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private static void Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
+		{
+			StringBuilder Msg = new StringBuilder();
+
+			Msg.Append("Collection repaired: ");
+			Msg.AppendLine(e.Collection);
+
+			if (!(e.Flagged is null))
+			{
+				foreach (FlagSource Source in e.Flagged)
+				{
+					Msg.AppendLine();
+					Msg.Append("Reason: ");
+					Msg.Append(MarkdownDocument.Encode(Source.Reason));
+
+					if (Source.Count > 1)
+					{
+						Msg.Append(" (");
+						Msg.Append(Source.Count.ToString());
+						Msg.Append(" times)");
+					}
+
+					Msg.AppendLine();
+					Msg.AppendLine();
+					Msg.AppendLine("StackTrace:");
+					Msg.AppendLine();
+					Msg.AppendLine("```");
+					Msg.AppendLine(Source.StackTrace);
+					Msg.AppendLine("```");
+				}
+			}
+
+			Log.Alert(Msg.ToString(), e.Collection);
 		}
 
 		#endregion

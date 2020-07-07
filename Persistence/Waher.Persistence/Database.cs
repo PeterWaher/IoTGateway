@@ -15,10 +15,9 @@ namespace Waher.Persistence
 	/// </summary>
 	public static class Database
 	{
-		private static readonly Dictionary<string, bool> toRepair = new Dictionary<string, bool>();
+		private static readonly Dictionary<string, Dictionary<string, FlagSource>> toRepair = new Dictionary<string, Dictionary<string, FlagSource>>();
 		private static IDatabaseProvider provider = null;
 		private static bool locked = false;
-		private static bool repairing = false;
 
 		/// <summary>
 		/// Registers a database provider for use from the static <see cref="Database"/> class, 
@@ -743,24 +742,43 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public async static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
+			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlagged();
+
 			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData);
 
 			if (Result.Length > 0)
-				RaiseRepaired(Result);
+				RaiseRepaired(Result, Flagged);
 
 			return Result;
 		}
 
-		private static void RaiseRepaired(string[] Collections)
+		private static void RaiseRepaired(string[] Collections, KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged)
 		{
-			CollectionEventHandler h = CollectionRepaired;
+			FlagSource[] FlaggedCollection;
+			CollectionRepairedEventHandler h = CollectionRepaired;
+
 			if (!(h is null))
 			{
 				foreach (string Collection in Collections)
 				{
+					FlaggedCollection = null;
+
+					if (!(Flagged is null))
+					{
+						foreach (KeyValuePair<string, Dictionary<string, FlagSource>> Rec in Flagged)
+						{
+							if (Rec.Key == Collection)
+							{
+								FlaggedCollection = new FlagSource[Rec.Value.Count];
+								Rec.Value.Values.CopyTo(FlaggedCollection, 0);
+								break;
+							}
+						}
+					}
+
 					try
 					{
-						h(Provider, new CollectionEventArgs(Collection));
+						h(Provider, new CollectionRepairedEventArgs(Collection, FlaggedCollection));
 					}
 					catch (Exception)
 					{
@@ -773,7 +791,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Event raised when a collection has been repaired.
 		/// </summary>
-		public static event CollectionEventHandler CollectionRepaired = null;
+		public static event CollectionRepairedEventHandler CollectionRepaired = null;
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -786,12 +804,33 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public async static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
+			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlagged();
+
 			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair);
 
 			if (Repair && Result.Length > 0)
-				RaiseRepaired(Result);
+				RaiseRepaired(Result, Flagged);
 
 			return Result;
+		}
+
+		private static KeyValuePair<string, Dictionary<string, FlagSource>>[] GetFlagged()
+		{
+			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged;
+			int i;
+
+			lock (toRepair)
+			{
+				Flagged = new KeyValuePair<string, Dictionary<string, FlagSource>>[toRepair.Count];
+				i = 0;
+
+				foreach (KeyValuePair<string, Dictionary<string, FlagSource>> P in toRepair)
+					Flagged[i++] = P;
+
+				toRepair.Clear();
+			}
+
+			return Flagged;
 		}
 
 		/// <summary>
@@ -802,7 +841,7 @@ namespace Waher.Persistence
 		{
 			lock (toRepair)
 			{
-				toRepair[Collection] = false;
+				toRepair[Collection] = null;
 			}
 		}
 
@@ -826,70 +865,26 @@ namespace Waher.Persistence
 		public static Exception FlagForRepair(string Collection, string Reason)
 		{
 			InconsistencyException Result = new InconsistencyException(Collection, Reason);
-			FlagForRepair(Collection, Reason, Log.CleanStackTrace(Environment.StackTrace));
-			return Result;
-		}
+			string StackTrace = Log.CleanStackTrace(Environment.StackTrace);
+			string Key = Reason + " | " + StackTrace;
 
-		private static async void FlagForRepair(string Collection, string Reason, string StackTrace)
-		{
-			try
+			lock (toRepair)
 			{
-				bool Return = false;
-
-				lock (toRepair)
+				if (toRepair.TryGetValue(Collection, out Dictionary<string, FlagSource> PerStackTrace))
 				{
-					if (toRepair.ContainsKey(Collection))
-						return;
-
-					toRepair[Collection] = true;
-
-					if (repairing)
-						Return = true;
-					else
-						repairing = true;
-				}
-
-				Log.Alert("Collection flagged for repair: " + Collection +
-					"\r\n\r\nReason: " + Reason.Replace("\\", "\\\\").Replace(":", "\\:").Replace(".", "\\.") +
-					"\r\n\r\nStack Trace:\r\n\r\n```\r\n" + StackTrace + "\r\n```", Collection);
-
-				if (Return)
-					return;
-
-				while (!string.IsNullOrEmpty(Collection))
-				{
-					await Task.Delay(1000);
-
-					string[] Repaired = await Provider.Repair(Collection);
-
-					if (Repaired.Length > 0)
-						RaiseRepaired(Repaired);
-
-					lock (toRepair)
+					if (!(PerStackTrace is null))
 					{
-						toRepair.Remove(Collection);
-						Collection = null;
-
-						foreach (string s in toRepair.Keys)
-						{
-							Collection = s;
-							break;
-						}
-
-						if (string.IsNullOrEmpty(Collection))
-							repairing = false;
+						if (PerStackTrace.TryGetValue(Key, out FlagSource FlagSource))
+							FlagSource.Count++;
+						else
+							PerStackTrace[Key] = new FlagSource(Reason, StackTrace, 1);
 					}
 				}
+				else
+					toRepair[Collection] = new Dictionary<string, FlagSource>() { { Key, new FlagSource(Reason, StackTrace, 1) } };
 			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
 
-				lock (toRepair)
-				{
-					repairing = false;
-				}
-			}
+			return Result;
 		}
 
 		/// <summary>

@@ -2497,18 +2497,42 @@
         </member>
         <member name="T:Waher.Persistence.CollectionEventArgs">
             <summary>
-            Event arguments for database object events.
+            Event arguments for collection events.
             </summary>
         </member>
         <member name="M:Waher.Persistence.CollectionEventArgs.#ctor(System.String)">
             <summary>
-            Event handler for collection events.
+            Event arguments for collection events.
             </summary>
             <param name="Collection">Collection</param>
         </member>
         <member name="P:Waher.Persistence.CollectionEventArgs.Collection">
             <summary>
             Collection
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.CollectionRepairedEventHandler">
+            <summary>
+            Event handler for collection repaired events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Persistence.CollectionRepairedEventArgs">
+            <summary>
+            Event arguments for collection repaired events.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.CollectionRepairedEventArgs.#ctor(System.String,Waher.Persistence.FlagSource[])">
+            <summary>
+            Event arguments for collection repaired events.
+            </summary>
+            <param name="Collection">Collection</param>
+            <param name="Flagged">If the collection have been flagged as corrupt, and from what stack traces. Is null, if collection not flagged.</param>
+        </member>
+        <member name="P:Waher.Persistence.CollectionRepairedEventArgs.Flagged">
+            <summary>
+            If the collection have been flagged as corrupt, and from what stack traces. Is null, if collection not flagged.
             </summary>
         </member>
         <member name="T:Waher.Persistence.Database">
@@ -3574,6 +3598,44 @@
             </summary>
             <param name="Object">Untyped object</param>
             <returns>If the object passes the test.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FlagSource">
+            <summary>
+            Source of code flagging a collection for repair.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FlagSource.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Source of code flagging a collection for repair.
+            </summary>
+            <param name="Reason">Reason for flagging collection.</param>
+            <param name="StackTrace">Stack trace of source flagging the collection.</param>
+            <param name="Count">Number of times the collection has been flagged from this source.</param>
+        </member>
+        <member name="P:Waher.Persistence.FlagSource.Reason">
+            <summary>
+            Reason for flagging collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FlagSource.StackTrace">
+            <summary>
+            Stack trace of source flagging the collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FlagSource.Count">
+            <summary>
+            Number of times the collection has been flagged from this source.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FlagSource.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FlagSource.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
         </member>
         <member name="T:Waher.Persistence.IAsyncEnumerator">
             <summary>

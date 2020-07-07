@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Waher.Utility.Install": {
-      "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)Waher.IoTGateway.Svc\\bin\\Release\\PublishOutput"
+      "commandName": "Project"
     }
   }
 }

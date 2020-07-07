@@ -1,45 +1,46 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
-  <Assembly fileName='api-ms-win-crt-utility-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-console-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-datetime-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-debug-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-errorhandling-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-file-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-file-l1-2-0.dll'/>
-  <Assembly fileName='api-ms-win-core-file-l2-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-handle-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-heap-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-interlocked-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-libraryloader-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-localization-l1-2-0.dll'/>
-  <Assembly fileName='api-ms-win-core-memory-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-namedpipe-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-processenvironment-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-processthreads-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-processthreads-l1-1-1.dll'/>
-  <Assembly fileName='api-ms-win-core-profile-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-rtlsupport-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-string-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-synch-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-synch-l1-2-0.dll'/>
-  <Assembly fileName='api-ms-win-core-sysinfo-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-timezone-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-core-util-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-conio-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-convert-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-environment-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-filesystem-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-heap-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-locale-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-math-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-multibyte-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-private-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-process-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-runtime-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-stdio-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-string-l1-1-0.dll'/>
-  <Assembly fileName='api-ms-win-crt-time-l1-1-0.dll'/>
+  <Assembly fileName='api_ms_win_core_console_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_datetime_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_debug_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_errorhandling_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_file_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_file_l1_2_0.dll'/>
+  <Assembly fileName='api_ms_win_core_file_l2_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_handle_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_heap_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_interlocked_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_libraryloader_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_localization_l1_2_0.dll'/>
+  <Assembly fileName='api_ms_win_core_memory_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_namedpipe_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_processenvironment_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_processthreads_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_processthreads_l1_1_1.dll'/>
+  <Assembly fileName='api_ms_win_core_profile_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_rtlsupport_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_string_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_synch_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_synch_l1_2_0.dll'/>
+  <Assembly fileName='api_ms_win_core_sysinfo_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_timezone_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_core_util_l1_1_0.dll'/>
+  <Assembly fileName='API_MS_Win_core_xstate_l2_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_conio_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_convert_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_environment_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_filesystem_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_heap_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_locale_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_math_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_multibyte_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_private_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_process_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_runtime_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_stdio_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_string_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_time_l1_1_0.dll'/>
+  <Assembly fileName='api_ms_win_crt_utility_l1_1_0.dll'/>
   <Assembly fileName='System.AppContext.dll'/>
   <Assembly fileName='System.Buffers.dll'/>
   <Assembly fileName='System.Collections.Concurrent.dll'/>
@@ -48,7 +49,6 @@
   <Assembly fileName='System.Collections.NonGeneric.dll'/>
   <Assembly fileName='System.Collections.Specialized.dll'/>
   <Assembly fileName='System.ComponentModel.Annotations.dll'/>
-  <Assembly fileName='System.ComponentModel.Composition.dll'/>
   <Assembly fileName='System.ComponentModel.DataAnnotations.dll'/>
   <Assembly fileName='System.ComponentModel.dll'/>
   <Assembly fileName='System.ComponentModel.EventBasedAsync.dll'/>
@@ -62,6 +62,7 @@
   <Assembly fileName='System.Diagnostics.Contracts.dll'/>
   <Assembly fileName='System.Diagnostics.Debug.dll'/>
   <Assembly fileName='System.Diagnostics.DiagnosticSource.dll'/>
+  <Assembly fileName='System.Diagnostics.EventLog.dll'/>
   <Assembly fileName='System.Diagnostics.FileVersionInfo.dll'/>
   <Assembly fileName='System.Diagnostics.Process.dll'/>
   <Assembly fileName='System.Diagnostics.StackTrace.dll'/>
@@ -77,6 +78,7 @@
   <Assembly fileName='System.Globalization.dll'/>
   <Assembly fileName='System.Globalization.Extensions.dll'/>
   <Assembly fileName='System.IO.Compression.dll'/>
+  <Assembly fileName='System.IO.Compression.Brotli.dll'/>
   <Assembly fileName='System.IO.Compression.FileSystem.dll'/>
   <Assembly fileName='System.IO.Compression.ZipFile.dll'/>
   <Assembly fileName='System.IO.dll'/>
@@ -88,6 +90,7 @@
   <Assembly fileName='System.IO.IsolatedStorage.dll'/>
   <Assembly fileName='System.IO.MemoryMappedFiles.dll'/>
   <Assembly fileName='System.IO.Pipes.dll'/>
+  <Assembly fileName='System.IO.Pipes.AccessControl.dll'/>
   <Assembly fileName='System.IO.UnmanagedMemoryStream.dll'/>
   <Assembly fileName='System.Linq.dll'/>
   <Assembly fileName='System.Linq.Expressions.dll'/>
@@ -161,6 +164,7 @@
   <Assembly fileName='System.Security.SecureString.dll'/>
   <Assembly fileName='System.ServiceModel.Web.dll'/>
   <Assembly fileName='System.ServiceProcess.dll'/>
+  <Assembly fileName='System.ServiceProcess.ServiceController.dll'/>
   <Assembly fileName='System.Text.Encoding.CodePages.dll'/>
   <Assembly fileName='System.Text.Encoding.dll'/>
   <Assembly fileName='System.Text.Encoding.Extensions.dll'/>
@@ -190,44 +194,45 @@
   <Assembly fileName='System.Xml.XPath.dll'/>
   <Assembly fileName='System.Xml.XPath.XDocument.dll'/>
   <Assembly fileName='clrcompression.dll' />
-  <Assembly fileName='clretwrc.dll' />
-  <Assembly fileName='clrjit.dll' />
-  <Assembly fileName='coreclr.dll' />
-  <Assembly fileName='dbgshim.dll' />
+  <Assembly fileName='clrcompression.dll'/>
+  <Assembly fileName='clretwrc.dll'/>
+  <Assembly fileName='clrjit.dll'/>
+  <Assembly fileName='coreclr.dll'/>
+  <Assembly fileName='dbgshim.dll'/>
+  <Assembly fileName='hostfxr.dll'/>
+  <Assembly fileName='hostpolicy.dll'/>
+  <Assembly fileName='Microsoft.CodeAnalysis.CSharp.dll'/>
+  <Assembly fileName='Microsoft.CodeAnalysis.dll'/>
+  <Assembly fileName='Microsoft.CSharp.dll'/>
+  <Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll'/>
+  <Assembly fileName='Microsoft.Win32.Primitives.dll'/>
+  <Assembly fileName='Microsoft.Win32.Registry.dll'/>
+  <Assembly fileName='Microsoft.VisualBasic.dll'/>
+  <Assembly fileName='mscordaccore.dll'/>
+  <Assembly fileName='mscordaccore_x86_x86_4.6.28207.03.dll'/>
+  <Assembly fileName='mscordbi.dll'/>
+  <Assembly fileName='mscorlib.dll'/>
+  <Assembly fileName='mscorrc.debug.dll'/>
+  <Assembly fileName='mscorrc.dll'/>
+  <Assembly fileName='netstandard.dll'/>
+  <Assembly fileName='sos.dll'/>
+  <Assembly fileName='SOS.NETCore.dll'/>
+  <Assembly fileName='sos_x86_x86_4.6.28207.03.dll'/>
+  <Assembly fileName='ucrtbase.dll'/>
+  <Assembly fileName='WindowsBase.dll'/>
   <Assembly fileName='DnsClient.dll'/>
-  <Assembly fileName='hostfxr.dll' />
-  <Assembly fileName='hostpolicy.dll' />
   <Assembly fileName='libSkiaSharp.dll'/>
-  <Assembly fileName='Microsoft.CodeAnalysis.CSharp.dll' />
-  <Assembly fileName='Microsoft.CodeAnalysis.dll' />
-  <Assembly fileName='Microsoft.CSharp.dll' />
-  <Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll' />
-  <Assembly fileName='Microsoft.Win32.Primitives.dll' />
-  <Assembly fileName='Microsoft.Win32.Registry.dll' />
-  <Assembly fileName='Microsoft.VisualBasic.dll' />
   <Assembly fileName='MongoDB.Bson.dll'/>
-  <Assembly fileName='MongoDB.Driver.Core.dll'/>
   <Assembly fileName='MongoDB.Driver.dll'/>
+  <Assembly fileName='MongoDB.Driver.Core.dll'/>
   <Assembly fileName='MongoDB.Libmongocrypt.dll'/>
-  <Assembly fileName='mscordaccore.dll' />
-  <Assembly fileName='mscordaccore_x86_x86_4.6.26614.01.dll' />
-  <Assembly fileName='mscordbi.dll' />
-  <Assembly fileName='mscorlib.dll' />
-  <Assembly fileName='mscorrc.debug.dll' />
-  <Assembly fileName='mscorrc.dll' />
-  <Assembly fileName='netstandard.dll' />
   <Assembly fileName='SharpCompress.dll'/>
   <Assembly fileName='SkiaSharp.dll'/>
-  <Assembly fileName='sos.dll' />
-  <Assembly fileName='SOS.NETCore.dll' />
-  <Assembly fileName='sos_x86_x86_4.6.26614.01.dll' />
-  <Assembly fileName='ucrtbase.dll' />
-  <Assembly fileName='WindowsBase.dll' />
   <Assembly fileName='Waher.Content.dll'/>
-  <Assembly fileName='Waher.Content.Emoji.dll'/>
-  <Assembly fileName='Waher.Content.Emoji.Emoji1.dll'/>
   <Assembly fileName='Waher.Content.Asn1.dll'/>
   <Assembly fileName='Waher.Content.Dsn.dll'/>
+  <Assembly fileName='Waher.Content.Emoji.dll'/>
+  <Assembly fileName='Waher.Content.Emoji.Emoji1.dll'/>
   <Assembly fileName='Waher.Content.Html.dll'/>
   <Assembly fileName='Waher.Content.Images.dll'/>
   <Assembly fileName='Waher.Content.Markdown.dll'/>
@@ -243,9 +248,9 @@
   <Assembly fileName='Waher.IoTGateway.dll'/>
   <Assembly fileName='Waher.IoTGateway.Resources.dll'/>
   <Assembly fileName='Waher.IoTGateway.Svc.exe'/>
-  <Assembly fileName='Waher.IoTGateway.Svc.dll' />
-  <Assembly fileName='Waher.IoTGateway.Svc.deps.json' />
-  <Assembly fileName='Waher.IoTGateway.Svc.runtimeconfig.json' />
+  <Assembly fileName='Waher.IoTGateway.Svc.dll'/>
+  <Assembly fileName='Waher.IoTGateway.Svc.deps.json'/>
+  <Assembly fileName='Waher.IoTGateway.Svc.runtimeconfig.json'/>
   <Assembly fileName='Waher.Events.WindowsEventLog.dll'/>
   <Assembly fileName='Waher.Networking.dll'/>
   <Assembly fileName='Waher.Networking.Cluster.dll'/>
@@ -313,19 +318,6 @@
   <Assembly fileName='Waher.Things.Mqtt.dll'/>
   <Assembly fileName='Waher.Things.Snmp.dll'/>
   <Assembly fileName='Gateway.config'/>
-  <Assembly fileName='Waher.WebService.Script.dll'/>
-  <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RegEx.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RegEx.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Sign.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.AnalyzeClock.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.AnalyzeClock.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
@@ -354,6 +346,18 @@
   <Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
   <Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RegEx.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RegEx.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Sign.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
   <!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
   <Folder name="Default">
     <Content fileName="400.md"/>

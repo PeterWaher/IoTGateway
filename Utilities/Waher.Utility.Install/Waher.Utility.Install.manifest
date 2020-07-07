@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
-  <Assembly fileName='api-ms-win-crt-utility-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-core-console-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-core-datetime-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-core-debug-l1-1-0.dll'/>
@@ -26,6 +25,7 @@
   <Assembly fileName='api-ms-win-core-sysinfo-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-core-timezone-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-core-util-l1-1-0.dll'/>
+  <Assembly fileName='API-MS-Win-core-xstate-l2-1-0.dll'/>
   <Assembly fileName='api-ms-win-crt-conio-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-crt-convert-l1-1-0.dll'/>
   <Assembly fileName='api-ms-win-crt-environment-l1-1-0.dll'/>
@@ -50,11 +50,11 @@
   <Assembly fileName='hostpolicy.dll'/>
   <Assembly fileName='Microsoft.CSharp.dll'/>
   <Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll'/>
+  <Assembly fileName='Microsoft.VisualBasic.dll'/>
   <Assembly fileName='Microsoft.Win32.Primitives.dll'/>
   <Assembly fileName='Microsoft.Win32.Registry.dll'/>
-  <Assembly fileName='Microsoft.VisualBasic.dll'/>
   <Assembly fileName='mscordaccore.dll'/>
-  <Assembly fileName='mscordaccore_x86_x86_4.6.26614.01.dll'/>
+  <Assembly fileName='mscordaccore_x86_x86_4.6.28207.03.dll'/>
   <Assembly fileName='mscordbi.dll'/>
   <Assembly fileName='mscorlib.dll'/>
   <Assembly fileName='mscorrc.debug.dll'/>
@@ -62,7 +62,7 @@
   <Assembly fileName='netstandard.dll'/>
   <Assembly fileName='sos.dll'/>
   <Assembly fileName='SOS.NETCore.dll'/>
-  <Assembly fileName='sos_x86_x86_4.6.26614.01.dll'/>
+  <Assembly fileName='sos_x86_x86_4.6.28207.03.dll'/>
   <Assembly fileName='System.AppContext.dll'/>
   <Assembly fileName='System.Buffers.dll'/>
   <Assembly fileName='System.Collections.Concurrent.dll'/>
@@ -71,7 +71,6 @@
   <Assembly fileName='System.Collections.NonGeneric.dll'/>
   <Assembly fileName='System.Collections.Specialized.dll'/>
   <Assembly fileName='System.ComponentModel.Annotations.dll'/>
-  <Assembly fileName='System.ComponentModel.Composition.dll'/>
   <Assembly fileName='System.ComponentModel.DataAnnotations.dll'/>
   <Assembly fileName='System.ComponentModel.dll'/>
   <Assembly fileName='System.ComponentModel.EventBasedAsync.dll'/>
@@ -99,6 +98,7 @@
   <Assembly fileName='System.Globalization.Calendars.dll'/>
   <Assembly fileName='System.Globalization.dll'/>
   <Assembly fileName='System.Globalization.Extensions.dll'/>
+  <Assembly fileName='System.IO.Compression.Brotli.dll'/>
   <Assembly fileName='System.IO.Compression.dll'/>
   <Assembly fileName='System.IO.Compression.FileSystem.dll'/>
   <Assembly fileName='System.IO.Compression.ZipFile.dll'/>
@@ -110,12 +110,14 @@
   <Assembly fileName='System.IO.FileSystem.Watcher.dll'/>
   <Assembly fileName='System.IO.IsolatedStorage.dll'/>
   <Assembly fileName='System.IO.MemoryMappedFiles.dll'/>
+  <Assembly fileName='System.IO.Pipes.AccessControl.dll'/>
   <Assembly fileName='System.IO.Pipes.dll'/>
   <Assembly fileName='System.IO.UnmanagedMemoryStream.dll'/>
   <Assembly fileName='System.Linq.dll'/>
   <Assembly fileName='System.Linq.Expressions.dll'/>
   <Assembly fileName='System.Linq.Parallel.dll'/>
   <Assembly fileName='System.Linq.Queryable.dll'/>
+  <Assembly fileName='System.Memory.dll'/>
   <Assembly fileName='System.Net.dll'/>
   <Assembly fileName='System.Net.Http.dll'/>
   <Assembly fileName='System.Net.HttpListener.dll'/>
@@ -210,6 +212,7 @@
   <Assembly fileName='System.Xml.XPath.dll'/>
   <Assembly fileName='System.Xml.XPath.XDocument.dll'/>
   <Assembly fileName='ucrtbase.dll'/>
+  <Assembly fileName='WindowsBase.dll'/>
   <Assembly fileName='Waher.Content.dll'/>
   <Assembly fileName='Waher.Content.pdb'/>
   <Assembly fileName='Waher.Content.Xml.dll'/>
@@ -231,5 +234,4 @@
   <Assembly fileName='Waher.Utility.Install.exe'/>
   <Assembly fileName='Waher.Utility.Install.pdb'/>
   <Assembly fileName='Waher.Utility.Install.runtimeconfig.json'/>
-  <Assembly fileName='WindowsBase.dll'/>
 </Module>

@@ -166,7 +166,10 @@ namespace Waher.WebService.Script
 				finally
 				{
 					this.watch.Stop();
-					this.watchdog?.Dispose();
+
+					Timer Temp = this.watchdog;
+					this.watchdog = null;
+					Temp?.Dispose();
 
 					KeyValuePair<string, object>[] Tags = await LoginAuditor.Annotate(this.request.RemoteEndPoint,
 						new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
@@ -213,63 +216,70 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		private void WatchdogTimer(object State)
+		private async void WatchdogTimer(object State)
 		{
-			double ms = this.Milliseconds;
-
-			this.counter++;
-
-			if (!this.response.HeaderSent && !this.previewing)
+			try
 			{
-				this.response.SetHeader("X-More", "1");
-				this.response.ContentType = "text/html";
-				this.response.Write("<p><font style=\"color:green\"><code>" + new string('.', this.counter) + "</code></font></p>");
-				this.response.SendResponse();
-				this.response.Dispose();
-			}
+				double ms = this.Milliseconds;
 
-			if (ms >= this.timeout)
-			{
-				MethodInfo AbortInternal = null;
+				this.counter++;
 
-				foreach (MethodInfo MI in this.thread.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+				if (!this.response.HeaderSent && !this.previewing)
 				{
-					if (MI.Name == "AbortInternal" && MI.GetParameters().Length == 0)
-					{
-						AbortInternal = MI;
-						break;
-					}
+					this.response.SetHeader("X-More", "1");
+					this.response.ContentType = "text/html";
+					await this.response.Write("<p><font style=\"color:green\"><code>" + new string('.', this.counter) + "</code></font></p>");
+					await this.response.SendResponse();
+					this.response.Dispose();
 				}
 
-				if (AbortInternal is null)
-					this.variables?.Abort();
-				else
+				if (ms >= this.timeout)
 				{
-					try
+					Timer Temp = this.watchdog;
+					this.watchdog = null;
+					Temp?.Dispose();
+
+					MethodInfo AbortInternal = null;
+
+					foreach (MethodInfo MI in this.thread.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
 					{
-						AbortInternal.Invoke(this.thread, new object[0]);
+						if (MI.Name == "AbortInternal" && MI.GetParameters().Length == 0)
+						{
+							AbortInternal = MI;
+							break;
+						}
 					}
-					catch (Exception)
-					{
+
+					if (AbortInternal is null)
 						this.variables?.Abort();
+					else
+					{
+						try
+						{
+							AbortInternal.Invoke(this.thread, new object[0]);
+						}
+						catch (Exception)
+						{
+							this.variables?.Abort();
+						}
 					}
+
+					Log.Warning("Long-running script forcefully terminated.", this.request.Resource.ResourceName, this.user.UserName, "ScriptAbort",
+						new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
+						new KeyValuePair<string, object>("Script", this.expression.Script),
+						new KeyValuePair<string, object>("Milliseconds", ms));
 				}
-
-				Timer Temp = this.watchdog;
-				this.watchdog = null;
-				Temp?.Dispose();
-
-				Log.Warning("Long-running script forcefully terminated.", this.request.Resource.ResourceName, this.user.UserName, "ScriptAbort",
-					new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
-					new KeyValuePair<string, object>("Script", this.expression.Script),
-					new KeyValuePair<string, object>("Milliseconds", ms));
+				else if (this.counter == 5)     // 5 sceonds
+				{
+					Log.Notice("Long-running script.", this.request.Resource.ResourceName, this.user.UserName, "ScriptLong",
+						new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
+						new KeyValuePair<string, object>("Script", this.expression.Script),
+						new KeyValuePair<string, object>("Milliseconds", ms));
+				}
 			}
-			else if (this.counter == 5)     // 5 sceonds
+			catch (Exception)
 			{
-				Log.Notice("Long-running script.", this.request.Resource.ResourceName, this.user.UserName, "ScriptLong",
-					new KeyValuePair<string, object>("RemoteEndPoint", this.request.RemoteEndPoint),
-					new KeyValuePair<string, object>("Script", this.expression.Script),
-					new KeyValuePair<string, object>("Milliseconds", ms));
+				// Ignore
 			}
 		}
 

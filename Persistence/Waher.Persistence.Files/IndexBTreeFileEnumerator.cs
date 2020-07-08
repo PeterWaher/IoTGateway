@@ -246,13 +246,17 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key, this.file.IndexFile.BlockLimit);
 			this.recordHandler.SkipKey(Reader, true);
 			this.currentObjectId = this.recordHandler.ObjectId;
+			object Obj;
 
 			try
 			{
 				if (this.currentSerializer is null)
 					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
 
-				object Obj = await this.file.ObjectFile.TryLoadObject(this.currentObjectId, this.currentSerializer);
+				if (this.lockType == LockType.None)
+					Obj = await this.file.ObjectFile.TryLoadObject(this.currentObjectId, this.currentSerializer);
+				else
+					Obj = await this.file.ObjectFile.TryLoadObjectLocked(this.currentObjectId, this.currentSerializer);
 
 				if (Obj is null)
 				{

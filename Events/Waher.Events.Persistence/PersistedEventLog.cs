@@ -128,7 +128,19 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		/// <param name="Limit">Events older than this time stamp (or equal to it) will be deleted.</param>
 		/// <returns>Number of events deleted.</returns>
-		public async Task<int> DeleteOld(DateTime Limit)
+		public Task<int> DeleteOld(DateTime Limit)
+		{
+			return DeleteOld(this.ObjectID, Limit);
+		}
+
+		/// <summary>
+		/// Deletes old events. This method is called once a day automatically. It can also be called manually to delete events at other intervals
+		/// or used other time limits.
+		/// </summary>
+		/// <param name="ObjectId">Log Object ID</param>
+		/// <param name="Limit">Events older than this time stamp (or equal to it) will be deleted.</param>
+		/// <returns>Number of events deleted.</returns>
+		public static async Task<int> DeleteOld(string ObjectId, DateTime Limit)
 		{
 			int NrEvents = 0;
 			bool Deleted;
@@ -154,9 +166,9 @@ namespace Waher.Events.Persistence
 				};
 
 				if (NrEvents == 1)
-					Log.Informational("Deleting 1 event from the database.", this.ObjectID, Tags);
+					Log.Informational("Deleting 1 event from the database.", ObjectId, Tags);
 				else
-					Log.Informational("Deleting " + NrEvents.ToString() + " events from the database.", this.ObjectID, Tags);
+					Log.Informational("Deleting " + NrEvents.ToString() + " events from the database.", ObjectId, Tags);
 			}
 
 			return NrEvents;

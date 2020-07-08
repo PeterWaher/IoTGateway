@@ -15,12 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution web service</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1</FileVersion>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\WebServices\Waher.WebService.Script\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

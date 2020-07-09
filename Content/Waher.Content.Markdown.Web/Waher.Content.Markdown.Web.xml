@@ -187,6 +187,16 @@
             Page-local variables.
             </summary>
         </member>
+        <member name="F:Waher.Networking.HTTP.ScriptExtensions.Page.VariableName">
+            <summary>
+            Page internal variable name.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.HTTP.ScriptExtensions.Page.LastPageVariableName">
+            <summary>
+            Last Page internal variable name.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.#ctor">
             <summary>
             Page-local variables.
@@ -207,6 +217,21 @@
             Gets the constant value element.
             </summary>
             <param name="Variables">Current set of variables.</param>
+        </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.GetPageVariables(Waher.Networking.HTTP.HttpRequest)">
+            <summary>
+            Gets the variable collection for the current page.
+            </summary>
+            <param name="Request">HTTP Request</param>
+            <returns>Page variables.</returns>
+        </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.GetPageVariables(Waher.Script.Variables,System.String)">
+            <summary>
+            Gets the variable collection for the current page.
+            </summary>
+            <param name="Session">Session</param>
+            <param name="Resource">Resource part of the URL of the page.</param>
+            <returns>Page variables.</returns>
         </member>
     </members>
 </doc>

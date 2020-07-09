@@ -2,10 +2,9 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Content;
-using Waher.Content.Markdown;
 using Waher.Content.Emoji;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
@@ -124,21 +123,7 @@ namespace Waher.Content.Markdown.Web
 
 				if (!(Request is null))
 				{
-					string Url = Request.Header.ResourcePart;
-
-					if (!Session.TryGetVariable(" PageVariables ", out v) ||
-						!(v.ValueObject is Variables PageVariables))
-					{
-						Session[" LastPage "] = Url;
-						Session[" PageVariables "] = new Variables();
-					}
-					else if (!Session.TryGetVariable(" LastPage ", out v) ||
-						!(v.ValueObject is string LastPageUrl) ||
-						LastPageUrl != Url)
-					{
-						Session[" LastPage "] = Url;
-						PageVariables.Clear();
-					}
+					Page.GetPageVariables(Session, Request.Header.ResourcePart);
 
 					int i = Markdown.IndexOf("\r\n\r\n");
 					if (i < 0)

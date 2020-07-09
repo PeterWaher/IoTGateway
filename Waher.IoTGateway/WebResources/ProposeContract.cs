@@ -99,8 +99,6 @@ namespace Waher.IoTGateway.WebResources
 				}
 				else
 					throw new BadRequestException("Invalid type of posted data.");
-
-				await Response.SendResponse(new SeeOtherException("/ProposeContract.md"));
 			}
 			catch (Exception ex)
 			{

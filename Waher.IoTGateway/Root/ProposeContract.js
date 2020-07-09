@@ -20,10 +20,7 @@
 			if (xhttp.readyState === 4)
 			{
 				if (xhttp.status === 200)
-				{
-					ContractFileSelector.value = "";
-					window.alert("Contract uploaded.");
-				}
+					Reload(null);
 				else
 					ShowError(xhttp);
 			}
@@ -54,12 +51,14 @@ function ContractCommand(Command)
 	{
 		if (xhttp.readyState === 4)
 		{
-			if (xhttp.status !== 200)
+			if (xhttp.status === 200)
+				Reload(null);
+			else
 				ShowError(xhttp);
 		}
 	};
 
 	xhttp.open("POST", "/ProposeContract", true);
 	xhttp.setRequestHeader("Content-Type", "application/json");
-	xhttp.send(JSON.stringify(true));
+	xhttp.send(JSON.stringify(Command));
 }

@@ -1365,6 +1365,22 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Saves a new object to the file (which is locked).
+		/// </summary>
+		/// <param name="Object">Object to persist.</param>
+		internal async Task<Guid> SaveNewObjectLocked(object Object)
+		{
+			Type ObjectType = Object.GetType();
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.SaveNewObject(ObjectId, Object, Serializer);
+
+			return ObjectId;
+		}
+
+		/// <summary>
 		/// Saves a new set of objects to the file.
 		/// </summary>
 		/// <param name="Objects">Objects to persist.</param>
@@ -3761,14 +3777,23 @@ namespace Waher.Persistence.Files
 			await this.LockWrite();
 			try
 			{
-				Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
-				FileStatistics Result = await this.ComputeStatisticsLocked(ObjectIds, null);
-				return new KeyValuePair<FileStatistics, Dictionary<Guid, bool>>(Result, ObjectIds);
+				return await this.ComputeStatisticsLocked();
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
+		}
+
+		/// <summary>
+		/// Goes through the entire file and computes statistics abouts its composition.
+		/// </summary>
+		/// <returns>File statistics and found Object IDs.</returns>
+		internal virtual async Task<KeyValuePair<FileStatistics, Dictionary<Guid, bool>>> ComputeStatisticsLocked()
+		{
+			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
+			FileStatistics Result = await this.ComputeStatisticsLocked(ObjectIds, null);
+			return new KeyValuePair<FileStatistics, Dictionary<Guid, bool>>(Result, ObjectIds);
 		}
 
 		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)

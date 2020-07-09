@@ -1690,6 +1690,12 @@
             <param name="Object">Object to persist.</param>
             <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjectLocked(System.Object)">
+            <summary>
+            Saves a new object to the file (which is locked).
+            </summary>
+            <param name="Object">Object to persist.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer)">
             <summary>
             Saves a new set of objects to the file.
@@ -1835,6 +1841,12 @@
             <returns>Report</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ComputeStatistics">
+            <summary>
+            Goes through the entire file and computes statistics abouts its composition.
+            </summary>
+            <returns>File statistics and found Object IDs.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ComputeStatisticsLocked">
             <summary>
             Goes through the entire file and computes statistics abouts its composition.
             </summary>

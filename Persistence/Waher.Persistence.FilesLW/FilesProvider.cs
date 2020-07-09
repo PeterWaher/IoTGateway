@@ -2395,6 +2395,7 @@ namespace Waher.Persistence.Files
 			string[] CollectionNames)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
+			bool IsLocked;
 
 			Output.WriteStartDocument();
 
@@ -2411,10 +2412,13 @@ namespace Waher.Persistence.Files
 				if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
 					continue;
 
-				Database.BeginRepair(File.CollectionName);
+				await File.BeginWrite();
+				IsLocked = true;
 				try
 				{
-					KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
+					Database.BeginRepair(File.CollectionName);
+
+					KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatisticsLocked();
 					FileStatistics FileStat = P.Key;
 					Dictionary<Guid, bool> ObjectIds;
 					FileStatistics IndexStat;
@@ -2562,7 +2566,7 @@ namespace Waher.Persistence.Files
 									{
 										if (e.CurrentTypeCompatible)
 										{
-											await File.SaveNewObject(e.Current);
+											await File.SaveNewObjectLocked(e.Current);
 
 											c++;
 											if (c >= 1000)
@@ -2616,7 +2620,7 @@ namespace Waher.Persistence.Files
 							}
 						}
 #endif
-						P = await File.ComputeStatistics();
+						P = await File.ComputeStatisticsLocked();
 						FileStat = P.Key;
 						ObjectIds = P.Value;
 
@@ -2644,6 +2648,9 @@ namespace Waher.Persistence.Files
 					}
 					else
 						ObjectIds = P.Value;
+
+					await File.EndWrite();
+					IsLocked = false;
 
 					Output.WriteStartElement("File");
 					Output.WriteAttributeString("id", File.Id.ToString());
@@ -2702,6 +2709,9 @@ namespace Waher.Persistence.Files
 				finally
 				{
 					Database.EndRepair(File.CollectionName);
+
+					if (IsLocked)
+						await File.EndWrite();
 				}
 			}
 

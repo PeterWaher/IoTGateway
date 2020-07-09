@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Xml;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Web.WebScript;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Script;
+using Waher.Networking.HTTP.ScriptExtensions;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -62,21 +65,42 @@ namespace Waher.IoTGateway.WebResources
 					throw new NotSupportedException("Proposing new contracts not permitted. Broker does not support smart contracts.");
 
 				if (!Request.HasData)
-					throw new BadRequestException("No contract posted.");
+					throw new BadRequestException("No data in post.");
 
-				if (!(Request.DecodeData() is XmlDocument Doc))
-					throw new BadRequestException("Expected an XML Document.");
+				Variables PageVariables = Page.GetPageVariables(Request.Session, "/ProposeContract.md");
+				object Posted = Request.DecodeData();
 
-				Contract Contract = Contract.Parse(Doc, out bool HasStatus);
-				if (HasStatus)
-					throw new ForbiddenException("Contract must not have a status section.");
+				if (Posted is XmlDocument Doc)
+				{
+					Contract Contract = Contract.Parse(Doc, out bool HasStatus);
+					if (HasStatus)
+						throw new ForbiddenException("Contract must not have a status section.");
 
-				Contract UploadedContract = await Gateway.ContractsClient.CreateContractAsync(Contract.ForMachines, Contract.ForHumans,
-					Contract.Roles, Contract.Parts, Contract.Parameters, Contract.Visibility, Contract.PartsMode, Contract.Duration, 
-					Contract.ArchiveRequired, Contract.ArchiveOptional, Contract.SignAfter, Contract.SignBefore, Contract.CanActAsTemplate);
+					PageVariables["Contract"] = Contract;
+				}
+				else if (Posted is bool Command)
+				{
+					if (!PageVariables.TryGetVariable("Contract", out Variable v) ||
+						!(v.ValueObject is Contract Contract))
+					{
+						throw new BadRequestException("No smart contract uploaded.");
+					}
 
-				Response.StatusCode = 200;
-				Response.ContentType = "text/plain";
+					if (Command)
+					{
+						Contract = await Gateway.ContractsClient.CreateContractAsync(Contract.ForMachines, Contract.ForHumans,
+							Contract.Roles, Contract.Parts, Contract.Parameters, Contract.Visibility, Contract.PartsMode, Contract.Duration,
+							Contract.ArchiveRequired, Contract.ArchiveOptional, Contract.SignAfter, Contract.SignBefore, Contract.CanActAsTemplate);
+
+						PageVariables["Contract"] = Contract;
+					}
+					else
+						PageVariables.Remove("Contract");
+				}
+				else
+					throw new BadRequestException("Invalid type of posted data.");
+
+				await Response.SendResponse(new SeeOtherException("/ProposeContract.md"));
 			}
 			catch (Exception ex)
 			{

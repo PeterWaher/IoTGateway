@@ -31,9 +31,35 @@
 
 		xhttp.open("POST", "/ProposeContract", true);
 		xhttp.setRequestHeader("Content-Type", "application/xml");
-		xhttp.setRequestHeader("X-TabID", TabID);
 		xhttp.send(event.target.result);
 	});
 
 	Reader.readAsText(File);
+}
+
+function ProposeContract()
+{
+	ContractCommand(true);
+}
+
+function CancelContract()
+{
+	ContractCommand(false);
+}
+
+function ContractCommand(Command)
+{
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState === 4)
+		{
+			if (xhttp.status !== 200)
+				ShowError(xhttp);
+		}
+	};
+
+	xhttp.open("POST", "/ProposeContract", true);
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.send(JSON.stringify(true));
 }

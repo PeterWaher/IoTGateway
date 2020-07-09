@@ -97,17 +97,32 @@ Legal Text
 
 ((Contract.ToMarkdown(Language) ))
 
+</fieldset>
+[[
+);
+
+]]
+
+Machine-Readable Information
+-------------------------------
+
+```xml
+
+((Contract.ForMachines?.OuterXml))
+
+```
+
 Client Signatures
 --------------------
 
 | Legal ID | Bare JID | Role | Transferable | Date | Time | Signature |
 |:---------|:---------|:-----|:------------:|:-----|:-----|:----------|[[;
 
-	foreach S in (Contract.ClientSignatures ?? []) do
-		]]
+foreach S in (Contract.ClientSignatures ?? []) do
+	]]
 | `((S.LegalId))` | `((S.BareJid))` | ((MarkdownEncode(S.Role) )) | ((S.Transferable ? "✔" : "✗")) | ((MarkdownEncode(S.Timestamp.ToShortDateString() ) )) | ((MarkdownEncode(S.Timestamp.ToLongTimeString() ) )) | ((SignatureStyle(S.DigitalSignature) )) |[[;
 
-	]]
+]]
 
 Server Signature
 ------------------
@@ -115,14 +130,10 @@ Server Signature
 | Date | Time | Signature |
 |:-----|:-----|:----------|[[;
 
-	if exists(S:=Contract.ServerSignature) then
-		]]
-| ((MarkdownEncode(S.Timestamp.ToShortDateString() ) )) | ((MarkdownEncode(S.Timestamp.ToLongTimeString() ) )) | ((SignatureStyle(S.DigitalSignature) )) |[[;
-
+if exists(S:=Contract.ServerSignature) then
 	]]
-	
-</fieldset>[[
-)}}
+| ((MarkdownEncode(S.Timestamp.ToShortDateString() ) )) | ((MarkdownEncode(S.Timestamp.ToLongTimeString() ) )) | ((SignatureStyle(S.DigitalSignature) )) |[[
+}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

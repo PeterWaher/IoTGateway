@@ -689,7 +689,7 @@
               <RemoveFile Id='RemoveWaher.Things.Snmp.dll' Name='Waher.Things.Snmp.dll' On='uninstall'/>
             </Component>
             <Component Id='MainDebugFiles' Guid='C4322EF9-99EE-44E1-9CD3-B310719D3661'>
-              <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.pdb' Vital='yes'/>
+              <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.pdb' Vital='yes' KeyPath='yes'/>
               <File Id='Waher.Content.Asn1.pdb' Name='Waher.Content.Asn1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.pdb' Vital='yes'/>
               <File Id='Waher.Content.Dsn.pdb' Name='Waher.Content.Dsn.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.pdb' Vital='yes'/>
               <File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Html.pdb' Vital='yes'/>
@@ -707,7 +707,7 @@
               <File Id='Waher.Events.Statistics.pdb' Name='Waher.Events.Statistics.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Statistics.pdb' Vital='yes'/>
               <File Id='Waher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.XMPP.pdb' Vital='yes'/>
               <File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.pdb' Vital='yes'/>
-              <File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.pdb' Vital='yes'/>
               <File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
               <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.pdb' Vital='yes'/>
               <File Id='Waher.Networking.Cluster.pdb' Name='Waher.Networking.Cluster.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.Cluster.pdb' Vital='yes'/>
@@ -1621,7 +1621,7 @@
               </CreateFolder>
               <RemoveFolder Id='RemoveEnglish' On='uninstall' />
               <File Id='Waher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng' Vital='yes' KeyPath='yes'/>
-              <File Id='Waher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.es.lng' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.es.lng' Vital='yes'/>
               <File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng'/>
               <File Id='Waher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng'/>
               <File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng'/>

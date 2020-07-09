@@ -17,7 +17,7 @@
     <dependencies>
       <dependency id="Waher.Content" version="1.0.25"/>
       <dependency id="Waher.Events" version="1.0.12"/>
-      <dependency id="Waher.IoTGateway" version="1.1.1"/>
+      <dependency id="Waher.IoTGateway" version="1.1.2"/>
       <dependency id="Waher.Networking.XMPP" version="1.1.1"/>
       <dependency id="Waher.Persistence" version="1.0.17"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.13"/>

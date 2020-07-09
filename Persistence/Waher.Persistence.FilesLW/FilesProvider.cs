@@ -2556,7 +2556,11 @@ namespace Waher.Persistence.Files
 								}
 
 								await this.EndBulk();
-								await File.ClearAsync();
+								await File.ClearAsyncLocked();
+
+								foreach (IndexBTreeFile Index in File.Indices)
+									await Index.ClearAsync();
+
 								await this.StartBulk();
 								c = 0;
 

@@ -9,9 +9,9 @@
 		return;
 	}
 
+	var File = Files[0];
 	var Reader = new FileReader();
 
-	Reader.readAsText(File);
 	Reader.addEventListener('load', (event) =>
 	{
 		var xhttp = new XMLHttpRequest();
@@ -34,5 +34,6 @@
 		xhttp.setRequestHeader("X-TabID", TabID);
 		xhttp.send(event.target.result);
 	});
-	reader.readAsText(file);
+
+	Reader.readAsText(File);
 }

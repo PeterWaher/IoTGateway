@@ -617,10 +617,10 @@ namespace Waher.Networking.HTTP
 
 					if (this.statusCode >= 400 && !(this.httpServer is null) &&
 						this.httpServer.HasCustomErrors &&
-						(this.httpRequest.Header.Method != "POST" ||
-						this.httpRequest.Header.ContentType is null ||
-						!(this.httpRequest.Header.ContentType.Type.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
-						string.Compare(this.httpRequest.Header.ContentType.Type, "application/json", true) == 0)))
+						!(this.httpRequest.Header.Method == "POST" &&
+						!(this.httpRequest.Header.ContentType is null) &&
+						(this.httpRequest.Header.ContentType.Type.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
+						this.httpRequest.Header.ContentType.Type.StartsWith("application/", StringComparison.OrdinalIgnoreCase))))
 					{
 						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content,
 							this.httpRequest, this);

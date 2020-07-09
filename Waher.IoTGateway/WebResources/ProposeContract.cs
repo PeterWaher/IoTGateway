@@ -65,7 +65,7 @@ namespace Waher.IoTGateway.WebResources
 					throw new BadRequestException("No contract posted.");
 
 				if (!(Request.DecodeData() is XmlDocument Doc))
-					throw new BadRequestException("Invalid contract.");
+					throw new BadRequestException("Expected an XML Document.");
 
 				Contract Contract = Contract.Parse(Doc, out bool HasStatus);
 				if (HasStatus)

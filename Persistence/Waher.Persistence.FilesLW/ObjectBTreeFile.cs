@@ -4845,33 +4845,7 @@ namespace Waher.Persistence.Files
 			await this.LockWrite();
 			try
 			{
-				this.file.Dispose();
-				this.file = null;
-
-				File.Delete(this.fileName);
-				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-
-				if (!(this.blobFile is null))
-				{
-					this.blobFile.Dispose();
-					this.blobFile = null;
-
-					File.Delete(this.blobFileName);
-
-					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-				}
-
-				this.provider.RemoveBlocks(this.id);
-
-				this.emptyBlocks?.Clear();
-				this.blocksToSave?.Clear();
-				this.objectsToSave?.Clear();
-				this.objectsToLoad?.Clear();
-				this.bytesAdded = 0;
-				this.blockLimit = 0;
-				this.blobBlockLimit = 0;
-
-				await this.CreateNewBlockLocked();
+				await this.ClearAsyncLocked();
 			}
 			finally
 			{
@@ -4880,6 +4854,37 @@ namespace Waher.Persistence.Files
 
 			foreach (IndexBTreeFile Index in this.indices)
 				await Index.ClearAsync();
+		}
+
+		internal async Task ClearAsyncLocked()
+		{
+			this.file.Dispose();
+			this.file = null;
+
+			File.Delete(this.fileName);
+			this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+
+			if (!(this.blobFile is null))
+			{
+				this.blobFile.Dispose();
+				this.blobFile = null;
+
+				File.Delete(this.blobFileName);
+
+				this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			}
+
+			this.provider.RemoveBlocks(this.id);
+
+			this.emptyBlocks?.Clear();
+			this.blocksToSave?.Clear();
+			this.objectsToSave?.Clear();
+			this.objectsToLoad?.Clear();
+			this.bytesAdded = 0;
+			this.blockLimit = 0;
+			this.blobBlockLimit = 0;
+
+			await this.CreateNewBlockLocked();
 		}
 
 		/// <summary>

@@ -307,11 +307,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="Exception">If XML is invalid.</exception>
 		public static Contract Parse(XmlDocument Xml, out bool HasStatus)
 		{
-			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, contractSchema);
+			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, contractSchema, xmlSchema);
 			return Parse(Xml.DocumentElement, out HasStatus);
 		}
 
 		private static readonly XmlSchema contractSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.SmartContracts.xsd");
+		private static readonly XmlSchema xmlSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.Xml.xsd");
 
 		/// <summary>
 		/// Parses a contract from is XML representation.

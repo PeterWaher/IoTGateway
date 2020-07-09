@@ -33,9 +33,13 @@
 
   <ItemGroup>
     <None Remove="Schema\SmartContracts.xsd" />
+    <None Remove="Schema\Xml.xsd" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Schema\Xml.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Schema\SmartContracts.xsd" />
   </ItemGroup>
 

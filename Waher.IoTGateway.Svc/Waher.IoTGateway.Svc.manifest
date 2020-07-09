@@ -603,6 +603,7 @@
   </Folder>
   <Folder name='Language'>
     <Content fileName="Waher.IoTGateway.en.lng"/>
+    <Content fileName="Waher.IoTGateway.es.lng"/>
     <Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
     <Content fileName='Waher.Things.IP.en.lng'/>
     <Content fileName='Waher.Things.Metering.en.lng'/>

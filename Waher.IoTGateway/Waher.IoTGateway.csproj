@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Language\Waher.IoTGateway.en.lng" />
+    <None Remove="Language\Waher.IoTGateway.es.lng" />
     <None Remove="Root\Backup.js" />
     <None Remove="Root\Backup.md" />
     <None Remove="Root\Copyright.md" />
@@ -86,6 +87,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Language\Waher.IoTGateway.es.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Language\Waher.IoTGateway.en.lng">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

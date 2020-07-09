@@ -50,5 +50,6 @@
   </Folder>
   <Folder name="Language">
     <Content fileName="Waher.IoTGateway.en.lng"/>
+    <Content fileName="Waher.IoTGateway.es.lng"/>
   </Folder>
 </Module>

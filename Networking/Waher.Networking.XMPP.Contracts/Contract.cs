@@ -1324,13 +1324,23 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Creates a human-readable XAML document for the contract.
+		/// Creates a human-readable WPF XAML document for the contract.
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
 		public string ToXAML(string Language)
 		{
 			return this.ToXAML(this.forHumans, Language);
+		}
+
+		/// <summary>
+		/// Creates a human-readable Xamarin.Forms XAML document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <returns>Markdown</returns>
+		public string ToXamarinForms(string Language)
+		{
+			return this.ToXamarinForms(this.forHumans, Language);
 		}
 
 		internal string ToMarkdown(HumanReadableText[] Text, string Language)
@@ -1351,6 +1361,11 @@ namespace Waher.Networking.XMPP.Contracts
 		internal string ToXAML(HumanReadableText[] Text, string Language)
 		{
 			return Select(Text, Language)?.GenerateXAML(this);
+		}
+
+		internal string ToXamarinForms(HumanReadableText[] Text, string Language)
+		{
+			return Select(Text, Language)?.GenerateXamarinForms(this);
 		}
 
 		internal HumanReadableText Select(HumanReadableText[] Text, string Language)

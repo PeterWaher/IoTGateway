@@ -4977,19 +4977,19 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
-		/// <returns>XAML</returns>
+		/// <returns>WPF XAML</returns>
 		public string GenerateXAML()
 		{
 			return this.GenerateXAML(XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
 		/// <param name="XmlSettings">XML settings.</param>
-		/// <returns>XAML</returns>
+		/// <returns>WPF XAML</returns>
 		public string GenerateXAML(XmlWriterSettings XmlSettings)
 		{
 			StringBuilder Output = new StringBuilder();
@@ -4998,18 +4998,18 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Output">WPF XAML will be output here.</param>
 		public void GenerateXAML(StringBuilder Output)
 		{
 			this.GenerateXAML(Output, XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Output">WPF XAML will be output here.</param>
 		/// <param name="XmlSettings">XML settings.</param>
 		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
 		{
@@ -5020,19 +5020,19 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Output">WPF XAML will be output here.</param>
 		public void GenerateXAML(XmlWriter Output)
 		{
 			this.GenerateXAML(Output, false);
 		}
 
 		/// <summary>
-		/// Generates XAML from the markdown text.
+		/// Generates WPF XAML from the markdown text.
 		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
+		/// <param name="Output">Widows XAML will be output here.</param>
+		/// <param name="Inclusion">If the XAML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal void GenerateXAML(XmlWriter Output, bool Inclusion)
 		{
 			if (this.settings.XamlSettings is null)
@@ -5123,6 +5123,173 @@ namespace Waher.Content.Markdown
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
 
 						Footnote.GenerateXAML(Output, TextAlignment.Left);
+						Output.WriteEndElement();
+
+						Row++;
+					}
+				}
+
+				Output.WriteEndElement();
+			}
+
+			if (!Inclusion)
+			{
+				Output.WriteEndElement();
+				Output.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <returns>Xamarin.Forms XAML</returns>
+		public string GenerateXamarinForms()
+		{
+			return this.GenerateXamarinForms(XML.WriterSettings(false, true));
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <param name="XmlSettings">XML settings.</param>
+		/// <returns>Xamarin.Forms XAML</returns>
+		public string GenerateXamarinForms(XmlWriterSettings XmlSettings)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.GenerateXamarinForms(Output, XmlSettings);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
+		public void GenerateXamarinForms(StringBuilder Output)
+		{
+			this.GenerateXamarinForms(Output, XML.WriterSettings(false, true));
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
+		/// <param name="XmlSettings">XML settings.</param>
+		public void GenerateXamarinForms(StringBuilder Output, XmlWriterSettings XmlSettings)
+		{
+			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
+			{
+				this.GenerateXamarinForms(w, false);
+			}
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
+		public void GenerateXamarinForms(XmlWriter Output)
+		{
+			this.GenerateXamarinForms(Output, false);
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">Widows XamarinForms will be output here.</param>
+		/// <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
+		internal void GenerateXamarinForms(XmlWriter Output, bool Inclusion)
+		{
+			if (this.settings.XamlSettings is null)
+				this.settings.XamlSettings = new XamlSettings();
+
+			if (!Inclusion)
+			{
+				Output.WriteStartElement("StackLayout", "http://xamarin.com/schemas/2014/forms");
+				Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2009/xaml");
+				Output.WriteAttributeString("Spacing", "0");
+			}
+
+			foreach (MarkdownElement E in this.elements)
+				E.GenerateXamarinForms(Output, TextAlignment.Left);
+
+			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
+			{
+				Footnote Footnote;
+				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
+					settings.XamlSettings.FootnoteSeparator.ToString() + "," + settings.XamlSettings.ParagraphMarginBottom.ToString();
+				string Scale = CommonTypes.Encode(settings.XamlSettings.SuperscriptScale);
+				string Offset = settings.XamlSettings.SuperscriptOffset.ToString();
+				int Nr;
+				int Row = 0;
+
+				Output.WriteElementString("Separator", string.Empty);
+
+				Output.WriteStartElement("Grid");
+				Output.WriteAttributeString("RowSpacing", "0");
+				Output.WriteAttributeString("ColumnSpacing", "0");
+
+				Output.WriteStartElement("Grid.ColumnDefinitions");
+
+				Output.WriteStartElement("ColumnDefinition");
+				Output.WriteAttributeString("Width", "Auto");
+				Output.WriteEndElement();
+
+				Output.WriteStartElement("ColumnDefinition");
+				Output.WriteAttributeString("Width", "*");
+				Output.WriteEndElement();
+
+				Output.WriteEndElement();
+				Output.WriteStartElement("Grid.RowDefinitions");
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.WriteStartElement("RowDefinition");
+						Output.WriteAttributeString("Height", "Auto");
+						Output.WriteEndElement();
+					}
+				}
+
+				Output.WriteEndElement();
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.WriteStartElement("TextBlock");
+						Output.WriteAttributeString("Text", Nr.ToString());
+						Output.WriteAttributeString("Margin", FootnoteMargin);
+						Output.WriteAttributeString("Grid.Column", "0");
+						Output.WriteAttributeString("Grid.Row", Row.ToString());
+
+						Output.WriteStartElement("TextBlock.LayoutTransform");
+						Output.WriteStartElement("TransformGroup");
+
+						Output.WriteStartElement("ScaleTransform");
+						Output.WriteAttributeString("ScaleX", Scale);
+						Output.WriteAttributeString("ScaleY", Scale);
+						Output.WriteEndElement();
+
+						Output.WriteStartElement("TranslateTransform");
+						Output.WriteAttributeString("Y", Offset);
+						Output.WriteEndElement();
+
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+
+						if (Footnote.InlineSpanElement && !Footnote.OutsideParagraph)
+						{
+							Output.WriteStartElement("TextBlock");
+							Output.WriteAttributeString("TextWrapping", "Wrap");
+						}
+						else
+							Output.WriteStartElement("StackPanel");
+
+						Output.WriteAttributeString("Grid.Column", "1");
+						Output.WriteAttributeString("Grid.Row", Row.ToString());
+
+						Footnote.GenerateXamarinForms(Output, TextAlignment.Left);
 						Output.WriteEndElement();
 
 						Row++;

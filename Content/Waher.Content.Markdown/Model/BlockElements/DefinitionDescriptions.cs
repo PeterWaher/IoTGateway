@@ -69,7 +69,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -96,6 +96,51 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				Description.GenerateXAML(Output, TextAlignment);
 				Output.WriteEndElement();
+			}
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			MarkdownElement Last = null;
+
+			foreach (MarkdownElement Description in this.Children)
+				Last = Description;
+
+			foreach (MarkdownElement Description in this.Children)
+			{
+				if (Description.InlineSpanElement && !Description.OutsideParagraph)
+				{
+					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+
+					Output.WriteStartElement("Label");
+					Output.WriteAttributeString("LineBreakMode", "WordWrap");
+					Output.WriteAttributeString("TextType", "Html");
+
+					StringBuilder Html = new StringBuilder();
+					Description.GenerateHTML(Html);
+					Output.WriteCData(Html.ToString());
+
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+				}
+				else
+				{
+					Output.WriteStartElement("ContentView");
+					Output.WriteAttributeString("Padding", Settings.DefinitionMargin.ToString() + ",0,0," +
+						(Description == Last ? Settings.DefinitionSeparator : 0).ToString());
+
+					Output.WriteStartElement("StackLayout");
+					Description.GenerateXamarinForms(Output, TextAlignment);
+					Output.WriteEndElement();
+
+					Output.WriteEndElement();
+				}
 			}
 		}
 

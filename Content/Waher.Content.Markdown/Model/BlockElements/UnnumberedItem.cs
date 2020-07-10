@@ -53,14 +53,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			if (this.Document.Detail != null)
 			{
-				if (this.Child is Link)
+				if (this.Child is Link Link)
 				{
-					if (string.Compare(this.Document.Detail.ResourceName, ((Link)this.Child).Url, true) == 0)
+					if (string.Compare(this.Document.Detail.ResourceName, Link.Url, true) == 0)
 						Output.Append(" class=\"active\"");
 				}
-				else if (this.Child is LinkReference)
+				else if (this.Child is LinkReference LinkReference)
 				{
-					string Label = ((LinkReference)this.Child).Label;
+					string Label = LinkReference.Label;
 					SpanElements.Multimedia Multimedia = this.Document.GetReference(Label);
 
 					if (Multimedia != null && Multimedia.Items.Length == 1 && string.Compare(Multimedia.Items[0].Url, this.Document.Detail.ResourceName, true) == 0)
@@ -93,13 +93,23 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			this.Child.GenerateXAML(Output, TextAlignment);
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			this.Child.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>

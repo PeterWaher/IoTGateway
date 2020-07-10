@@ -96,7 +96,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -106,6 +106,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.WriteAttributeString("NavigateUri", "mailto:" + this.eMail);
 			Output.WriteValue(this.eMail);
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			// Do nothing. Elements output as HTML at this point.
 		}
 
 		/// <summary>

@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -99,6 +99,56 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				if (SpanOpen)
 					Output.WriteEndElement();
+			}
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			if (this.HasOneChild)
+				this.FirstChild.GenerateXamarinForms(Output, TextAlignment);
+			else
+			{
+				StringBuilder Html = null;
+
+				foreach (MarkdownElement E in this.Children)
+				{
+					if (E.InlineSpanElement)
+					{
+						if (Html is null)
+							Html = new StringBuilder();
+
+						E.GenerateHTML(Html);
+					}
+					else
+					{
+						if (!(Html is null))
+						{
+							Output.WriteStartElement("Label");
+							Output.WriteAttributeString("LineBreakMode", "WordWrap");
+							Output.WriteAttributeString("TextType", "Html");
+							Output.WriteCData(Html.ToString());
+							Output.WriteEndElement();
+
+							Html = null;
+						}
+				
+						E.GenerateXamarinForms(Output, TextAlignment);
+					}
+				}
+
+				if (!(Html is null))
+				{
+					Output.WriteStartElement("Label");
+					Output.WriteAttributeString("LineBreakMode", "WordWrap");
+					Output.WriteAttributeString("TextType", "Html");
+					Output.WriteCData(Html.ToString());
+					Output.WriteEndElement();
+				}
 			}
 		}
 

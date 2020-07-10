@@ -109,7 +109,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -117,6 +117,17 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateXAML(Output, TextAlignment);
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -137,8 +148,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (MarkdownElement E in NewChildren)
 			{
-				if ((Last = this.LastChild) != null && Last is MarkdownElementChildren && Last.GetType() == E.GetType())
-					((MarkdownElementChildren)Last).AddChildren(((MarkdownElementChildren)E).Children);
+				if ((Last = this.LastChild) != null && Last is MarkdownElementChildren MarkdownElementChildren && Last.GetType() == E.GetType())
+					MarkdownElementChildren.AddChildren(((MarkdownElementChildren)E).Children);
 				else
 					base.AddChildren((IEnumerable<MarkdownElement>)new MarkdownElement[] { E });
 			}

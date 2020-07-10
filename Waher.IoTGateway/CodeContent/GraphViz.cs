@@ -444,7 +444,7 @@ namespace Waher.IoTGateway.CodeContent
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -465,6 +465,29 @@ namespace Waher.IoTGateway.CodeContent
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);
 
+			Output.WriteEndElement();
+
+			return true;
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		{
+			string FileName = this.GetFileName(Language, Rows, out string _, out string _, out string _);
+			if (FileName is null)
+				return false;
+
+			Output.WriteStartElement("Image");
+			Output.WriteAttributeString("Source", FileName);
 			Output.WriteEndElement();
 
 			return true;

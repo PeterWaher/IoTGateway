@@ -159,7 +159,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -182,6 +182,38 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateXAML(Output, TextAlignment);
 
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+
+			Output.WriteStartElement("Label");
+			Output.WriteAttributeString("LineBreakMode", "WordWrap");
+
+			if (this.level > 0 && this.level <= Settings.HeaderFontSize.Length)
+			{
+				Output.WriteAttributeString("FontSize", Settings.HeaderFontSize[this.level - 1].ToString());
+				Output.WriteAttributeString("TextColor", Settings.HeaderForegroundColor[this.level - 1].ToString());
+			}
+
+			Output.WriteAttributeString("TextType", "Html");
+
+			StringBuilder Html = new StringBuilder();
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateHTML(Html);
+
+			Output.WriteCData(Html.ToString());
+
+			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}
 

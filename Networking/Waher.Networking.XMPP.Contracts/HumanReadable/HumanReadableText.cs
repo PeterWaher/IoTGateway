@@ -124,15 +124,27 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		}
 
 		/// <summary>
-		/// Generates XAML for the human-readable text.
+		/// Generates WPF XAML for the human-readable text.
 		/// </summary>
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		/// <returns>XAML</returns>
+		/// <returns>WPF XAML</returns>
 		public string GenerateXAML(Contract Contract)
 		{
 			string Markdown = this.GenerateMarkdown(Contract);
 			MarkdownDocument Doc = new MarkdownDocument(Markdown);
 			return Doc.GenerateXAML();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the human-readable text.
+		/// </summary>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		/// <returns>Xamarin.Forms XAML</returns>
+		public string GenerateXamarinForms(Contract Contract)
+		{
+			string Markdown = this.GenerateMarkdown(Contract);
+			MarkdownDocument Doc = new MarkdownDocument(Markdown);
+			return Doc.GenerateXamarinForms();
 		}
 
 	}

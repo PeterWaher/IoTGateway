@@ -68,7 +68,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -87,6 +87,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateXAML(Output, TextAlignment);
 
+			Output.WriteEndElement();
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+
+			Output.WriteStartElement("ContentView");
+			Output.WriteAttributeString("Padding", Settings.BlockQuoteMargin.ToString() + "," + Settings.ParagraphMarginTop.ToString() + ",0," +
+				Settings.ParagraphMarginBottom.ToString());
+
+			Output.WriteStartElement("Frame");
+			Output.WriteAttributeString("Padding", Settings.BlockQuotePadding.ToString() + ",0,0,0");
+			Output.WriteAttributeString("BorderColor", Settings.InsertedBlockQuoteBorderColor);
+			// TODO: Border thickness
+
+			Output.WriteStartElement("StackLayout");
+			Output.WriteAttributeString("Orientation", "Vertical");
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateXamarinForms(Output, TextAlignment);
+
+			Output.WriteEndElement();
 			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}

@@ -6,7 +6,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Can be used to parse Markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. The library can also compare Markdown documents, and provide Markdown-based difference documents, showing how one version of a document is edited to produce a second version.
+    <Description>Can be used to parse Markdown documents and transforms them to other formats, such as HTML, Plain text and XAML (both WPF and Xamarin.Forms support). The library can also compare Markdown documents, and provide Markdown-based difference documents, showing how one version of a document is edited to produce a second version.
 
 For a description of the Markdown flavour supported by the parser, see:
 https://waher.se/Markdown.md</Description>
@@ -15,7 +15,7 @@ https://waher.se/Markdown.md</Description>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Markdown Parser Text HTML XAML XML Difference History</PackageTags>
+    <PackageTags>Markdown Parser Text HTML XAML WPF Xamarin Forms XML Difference History</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.40</AssemblyVersion>
     <FileVersion>1.0.40</FileVersion>

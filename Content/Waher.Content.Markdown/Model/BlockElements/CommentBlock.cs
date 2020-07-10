@@ -16,7 +16,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	{
 		private readonly string[] rows;
 
-
 		/// <summary>
 		/// Represents a comment block in a markdown document.
 		/// </summary>
@@ -53,11 +52,20 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		{
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 		}
 

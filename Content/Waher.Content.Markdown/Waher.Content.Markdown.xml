@@ -336,42 +336,81 @@
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
-            <returns>XAML</returns>
+            <returns>WPF XAML</returns>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML(System.Xml.XmlWriterSettings)">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
             <param name="XmlSettings">XML settings.</param>
-            <returns>XAML</returns>
+            <returns>WPF XAML</returns>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML(System.Text.StringBuilder)">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
-            <param name="Output">XAML will be output here.</param>
+            <param name="Output">WPF XAML will be output here.</param>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML(System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
-            <param name="Output">XAML will be output here.</param>
+            <param name="Output">WPF XAML will be output here.</param>
             <param name="XmlSettings">XML settings.</param>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML(System.Xml.XmlWriter)">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
-            <param name="Output">XAML will be output here.</param>
+            <param name="Output">WPF XAML will be output here.</param>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXAML(System.Xml.XmlWriter,System.Boolean)">
             <summary>
-            Generates XAML from the markdown text.
+            Generates WPF XAML from the markdown text.
             </summary>
-            <param name="Output">XAML will be output here.</param>
-            <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
+            <param name="Output">Widows XAML will be output here.</param>
+            <param name="Inclusion">If the XAML is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <returns>Xamarin.Forms XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms(System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="XmlSettings">XML settings.</param>
+            <returns>Xamarin.Forms XAML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms(System.Text.StringBuilder)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms(System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms(System.Xml.XmlWriter)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateXamarinForms(System.Xml.XmlWriter,System.Boolean)">
+            <summary>
+            Generates Xamarin.Forms XAML from the markdown text.
+            </summary>
+            <param name="Output">Widows XamarinForms will be output here.</param>
+            <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.ExportXml">
             <summary>
@@ -832,7 +871,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -969,7 +1015,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.BlockQuote.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BlockQuote.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1033,7 +1086,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1104,7 +1164,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1178,7 +1245,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1254,7 +1328,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1328,7 +1409,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionList.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionList.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1398,7 +1486,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1455,7 +1550,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1531,7 +1633,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1622,7 +1731,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1700,7 +1816,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.HorizontalRule.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HorizontalRule.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1769,7 +1892,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1826,7 +1956,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.InsertBlocks.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InsertBlocks.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1883,7 +2020,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -1959,7 +2103,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.NestedBlock.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NestedBlock.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2029,7 +2180,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2121,7 +2279,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2178,7 +2343,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2242,7 +2414,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Sections.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Sections.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2332,7 +2511,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.SectionSeparator.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.SectionSeparator.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2432,7 +2618,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2521,7 +2714,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskItem.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskItem.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2613,7 +2813,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskList.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskList.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2676,7 +2883,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2780,7 +2994,19 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2849,7 +3075,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -2920,9 +3146,16 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.MarkdownElement.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">Xamarin.Forms XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.MarkdownElement.OutsideParagraph">
@@ -3232,7 +3465,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3345,7 +3578,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3389,7 +3622,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3450,7 +3683,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3504,7 +3737,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3548,7 +3781,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3592,7 +3825,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3636,7 +3869,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3687,7 +3920,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3758,7 +3998,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3813,7 +4060,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Delete.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Delete.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3870,7 +4124,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.DetailsReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.DetailsReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3940,7 +4201,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.EmojiReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.EmojiReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4000,7 +4268,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Emphasize.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Emphasize.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4067,7 +4342,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4138,7 +4420,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.HashTag.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HashTag.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4209,7 +4498,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntity.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntity.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4280,7 +4576,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4346,7 +4649,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineCode.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineCode.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4431,7 +4741,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineHTML.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineHTML.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4539,7 +4856,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4635,7 +4959,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4704,7 +5035,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Insert.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Insert.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4760,7 +5098,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.LineBreak.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LineBreak.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4829,7 +5174,7 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Link.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -4844,6 +5189,13 @@
             <param name="Title">Optional title.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="Document">Markdown document.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Link.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Link.InlineSpanElement">
             <summary>
@@ -4923,7 +5275,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.LinkReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LinkReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5011,7 +5370,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.MetaReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MetaReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5108,7 +5474,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Multimedia.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Multimedia.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5198,7 +5571,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.MultimediaReference.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MultimediaReference.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5252,7 +5632,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5303,7 +5690,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Strong.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Strong.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5361,7 +5755,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5425,7 +5826,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -5482,7 +5890,14 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.Underline.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
-            Generates XAML for the markdown element.
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Underline.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>

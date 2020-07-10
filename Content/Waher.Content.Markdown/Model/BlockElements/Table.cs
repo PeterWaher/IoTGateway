@@ -376,7 +376,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -486,6 +486,134 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				E.GenerateXAML(Output, TextAlignment);
 				Output.WriteEndElement();
 				Output.WriteEndElement();
+			}
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			int Column;
+			int Row, NrRows;
+			int RowNr = 0;
+
+			Output.WriteStartElement("ContentView");
+			Output.WriteAttributeString("Padding", Settings.ParagraphMargins);
+
+			Output.WriteStartElement("Grid");
+			Output.WriteAttributeString("RowSpacing", "0");
+			Output.WriteAttributeString("ColumnSpacing", "0");
+
+			// TODO: Tooltip/caption
+
+			Output.WriteStartElement("Grid.ColumnDefinitions");
+
+			for (Column = 0; Column < this.columns; Column++)
+			{
+				Output.WriteStartElement("ColumnDefinition");
+				Output.WriteAttributeString("Width", "Auto");
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+			Output.WriteStartElement("Grid.RowDefinitions");
+
+			for (Row = 0, NrRows = this.rows.Length + this.headers.Length; Row < NrRows; Row++)
+			{
+				Output.WriteStartElement("RowDefinition");
+				Output.WriteAttributeString("Height", "Auto");
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+
+			for (Row = 0, NrRows = this.headers.Length; Row < NrRows; Row++, RowNr++)
+				this.GenerateXamarinForms(Output, this.headers[Row], RowNr, true);
+
+			for (Row = 0, NrRows = this.rows.Length; Row < NrRows; Row++, RowNr++)
+				this.GenerateXamarinForms(Output, this.rows[Row], RowNr, false);
+
+			Output.WriteEndElement();
+			Output.WriteEndElement();
+		}
+
+		private void GenerateXamarinForms(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			MarkdownElement E;
+			TextAlignment TextAlignment;
+			int Column;
+			int NrColumns;
+			int ColSpan;
+
+			for (Column = 0, NrColumns = CurrentRow.Length; Column < NrColumns; Column++)
+			{
+				E = CurrentRow[Column];
+				if (E is null)
+					continue;
+
+				TextAlignment = this.alignments[Column];
+				ColSpan = Column + 1;
+				while (ColSpan < NrColumns && CurrentRow[ColSpan] is null)
+					ColSpan++;
+
+				ColSpan -= Column;
+
+				Output.WriteStartElement("Frame");
+				Output.WriteAttributeString("Padding", "0,0,0,0");
+				Output.WriteAttributeString("BorderColor", Settings.TableCellBorderColor);
+				// TODO: Table-cell border thickness
+
+				if ((RowNr & 1) == 0)
+				{
+					if (!string.IsNullOrEmpty(Settings.TableCellRowBackgroundColor1))
+						Output.WriteAttributeString("BackgroundColor", Settings.TableCellRowBackgroundColor1);
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(Settings.TableCellRowBackgroundColor2))
+						Output.WriteAttributeString("BackgroundColor", Settings.TableCellRowBackgroundColor2);
+				}
+
+				Output.WriteAttributeString("Grid.Column", Column.ToString());
+				Output.WriteAttributeString("Grid.Row", RowNr.ToString());
+
+				if (ColSpan > 1)
+					Output.WriteAttributeString("Grid.ColumnSpan", ColSpan.ToString());
+
+				if (E.InlineSpanElement)
+				{
+					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings.TableCellPadding);
+
+					Output.WriteStartElement("Label");
+					Output.WriteAttributeString("LineBreakMode", "WordWrap");
+					Output.WriteAttributeString("TextType", "Html");
+
+					if (Bold)
+						Output.WriteAttributeString("FontAttributes", "Bold");
+
+					StringBuilder Html = new StringBuilder();
+					E.GenerateHTML(Html);
+					Output.WriteCData(Html.ToString());
+
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+				}
+				else
+				{
+					Output.WriteStartElement("ContentView");
+					Output.WriteAttributeString("Padding", Settings.TableCellPadding);
+
+					Output.WriteStartElement("StackLayout");
+					E.GenerateXamarinForms(Output, TextAlignment);
+					Output.WriteEndElement();
+					
+					Output.WriteEndElement();
+				}
 			}
 		}
 

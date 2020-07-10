@@ -20,7 +20,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private readonly string language;
 		private readonly int start, end, indent;
 
-
 		/// <summary>
 		/// Represents a code block in a markdown document.
 		/// </summary>
@@ -252,7 +251,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -322,6 +321,74 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteValue(Row);
 			}
 
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+
+			if (this.handler != null && this.handler.HandlesXAML)
+			{
+				try
+				{
+					if (this.handler.GenerateXamarinForms(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
+						return;
+				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
+
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+							Output.WriteStartElement("Label");
+							Output.WriteAttributeString("LineBreakMode", "WordWrap");
+							Output.WriteAttributeString("TextColor", "Red");
+							Output.WriteValue(ex3.Message);
+							Output.WriteEndElement();
+							Output.WriteEndElement();
+						}
+					}
+					else
+					{
+						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+						Output.WriteStartElement("Label");
+						Output.WriteAttributeString("LineBreakMode", "WordWrap");
+						Output.WriteAttributeString("TextColor", "Red");
+						Output.WriteValue(ex.Message);
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+					}
+				}
+			}
+
+			StringBuilder Text = new StringBuilder();
+			bool First = true;
+
+			foreach (string Row in this.rows)
+			{
+				if (First)
+					First = false;
+				else
+					Text.AppendLine();
+
+				Text.Append(Row);
+			}
+
+			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+			Output.WriteStartElement("Label");
+			Output.WriteAttributeString("LineBreakMode", "NoWrap");
+			Output.WriteAttributeString("FontFamily", "Courier New");
+			Output.WriteAttributeString("Text", Text.ToString());
+			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}
 

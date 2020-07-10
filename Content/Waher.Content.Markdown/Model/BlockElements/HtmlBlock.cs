@@ -77,7 +77,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
@@ -94,6 +94,30 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateXAML(Output, TextAlignment);
 
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, this.Document.Settings.XamlSettings);
+
+			Output.WriteStartElement("Label");
+			Output.WriteAttributeString("LineBreakMode", "WordWrap");
+			Output.WriteAttributeString("TextType", "Html");
+
+			StringBuilder Html = new StringBuilder();
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateHTML(Html);
+
+			Output.WriteCData(Html.ToString());
+
+			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}
 

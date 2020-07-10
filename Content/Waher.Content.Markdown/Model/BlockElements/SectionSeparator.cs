@@ -96,13 +96,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
-		/// Generates XAML for the markdown element.
+		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteElementString("Separator", string.Empty);
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		{
+			Output.WriteStartElement("BoxView");
+			Output.WriteAttributeString("HeightRequest", "1");
+			Output.WriteAttributeString("BackgroundColor", this.Document.Settings.XamlSettings.TableCellBorderColor);
+			Output.WriteAttributeString("HorizontalOptions", "FillAndExpand");
+			Output.WriteEndElement();
 		}
 
 		/// <summary>

@@ -584,13 +584,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			DateTime Now = DateTime.Now;
 
-			if (Now < Identity.From)
+			if (Now.Date.AddDays(1) < Identity.From)	// To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State);
 				return;
 			}
 
-			if (Now.Date > Identity.To)
+			if (Now.Date.AddDays(1) > Identity.To)      // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State);
 				return;

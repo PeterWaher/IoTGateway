@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -12,7 +13,6 @@ using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
-using Waher.Script.Operators.Membership;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
 
@@ -41,6 +41,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private EndpointSecurity localEndpoint;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
+		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		/// <summary>
 		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
@@ -59,9 +60,14 @@ namespace Waher.Networking.XMPP.Contracts
 			this.localEndpoint = null;
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.RegisterMessageHandler("petitionIdentity", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionIdentityResponse", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContract", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractResponse", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
 		}
 
 		/// <summary>
@@ -175,6 +181,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;
+
+			this.rnd?.Dispose();
+			this.rnd = null;
 
 			base.Dispose();
 		}
@@ -584,7 +593,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			DateTime Now = DateTime.Now;
 
-			if (Now.Date.AddDays(1) < Identity.From)	// To avoid Time-zone problems
+			if (Now.Date.AddDays(1) < Identity.From)    // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State);
 				return;
@@ -3041,6 +3050,397 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Identity petitions
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public Task PetitionIdentityAsync(string LegalId, string PetitionId, string Purpose)
+		{
+			return this.PetitionIdentityAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, Purpose);
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public async Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose)
+		{
+			StringBuilder Xml = new StringBuilder();
+			byte[] Nonce = new byte[32];
+			this.rnd.GetBytes(Nonce);
+
+			string NonceStr = Convert.ToBase64String(Nonce);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + Nonce + ":" + this.client.BareJID);
+			byte[] Signature = await this.SignAsync(Data);
+
+			Xml.Append("<petitionIdentity xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' purpose='");
+			Xml.Append(XML.Encode(Purpose));
+			Xml.Append("' nonce='");
+			Xml.Append(NonceStr);
+			Xml.Append("' s='");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("'/>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public Task PetitionIdentityResponseAsync(string LegalId, string PetitionId, string RequestorBareJid, bool Response)
+		{
+			return this.PetitionIdentityResponseAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, RequestorBareJid, Response);
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public async Task PetitionIdentityResponseAsync(string Address, string LegalId, string PetitionId, string RequestorBareJid, bool Response)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<petitionIdentityResponse xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RequestorBareJid));
+			Xml.Append("' response='");
+			Xml.Append(CommonTypes.Encode(Response));
+			Xml.Append("'/>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		private async Task PetitionIdentityMessageHandler(object Sender, MessageEventArgs e)
+		{
+			LegalIdentityPetitionEventHandler h = this.PetitionedIdentityReceived;
+
+			if (h != null)
+			{
+				string LegalId = XML.Attribute(e.Content, "id");
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				string Purpose = XML.Attribute(e.Content, "purpose");
+				string From = XML.Attribute(e.Content, "from");
+				LegalIdentity Identity = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					{
+						Identity = LegalIdentity.Parse(E);
+						break;
+					}
+				}
+
+				if (Identity is null)
+					return;
+
+				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
+				{
+					await this.Validate(Identity, false, async (sender2, e2) =>
+					{
+						if (e2.Status != IdentityStatus.Valid)
+						{
+							Client.Error("Invalid legal identity received and discarded.");
+
+							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+								new KeyValuePair<string, object>("Status", e2.Status));
+							return;
+						}
+
+						try
+						{
+							await h(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}, null);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// </summary>
+		public event LegalIdentityPetitionEventHandler PetitionedIdentityReceived = null;
+
+		private async Task PetitionIdentityResponseMessageHandler(object Sender, MessageEventArgs e)
+		{
+			LegalIdentityPetitionResponseEventHandler h = this.PetitionedIdentityResponseReceived;
+
+			if (h != null)
+			{
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				bool Response = XML.Attribute(e.Content, "response", false);
+				LegalIdentity Identity = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					{
+						Identity = LegalIdentity.Parse(E);
+						break;
+					}
+				}
+
+				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
+				{
+					try
+					{
+						await h(this, new LegalIdentityPetitionResponseEventArgs(e, Identity, PetitionId, Response));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// </summary>
+		public event LegalIdentityPetitionResponseEventHandler PetitionedIdentityResponseReceived = null;
+
+		#endregion
+
+		#region Contract petitions
+
+		/// <summary>
+		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// </summary>
+		/// <param name="ContractId">Smart Contract to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public Task PetitionContractAsync(string ContractId, string PetitionId, string Purpose)
+		{
+			return this.PetitionContractAsync(this.GetTrustProvider(ContractId), ContractId, PetitionId, Purpose);
+		}
+
+		/// <summary>
+		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Smart Contract to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public async Task PetitionContractAsync(string Address, string ContractId, string PetitionId, string Purpose)
+		{
+			StringBuilder Xml = new StringBuilder();
+			byte[] Nonce = new byte[32];
+			this.rnd.GetBytes(Nonce);
+
+			string NonceStr = Convert.ToBase64String(Nonce);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + ContractId + ":" + Purpose + ":" + Nonce + ":" + this.client.BareJID);
+			byte[] Signature = await this.SignAsync(Data);
+
+			Xml.Append("<petitionContract xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' purpose='");
+			Xml.Append(XML.Encode(Purpose));
+			Xml.Append("' nonce='");
+			Xml.Append(NonceStr);
+			Xml.Append("' s='");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("'/>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		/// <summary>
+		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="ContractId">Smart Contract to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public Task PetitionContractResponseAsync(string ContractId, string PetitionId, string RequestorBareJid, bool Response)
+		{
+			return this.PetitionContractResponseAsync(this.GetTrustProvider(ContractId), ContractId, PetitionId, RequestorBareJid, Response);
+		}
+
+		/// <summary>
+		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
+		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
+		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">Smart Contract to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public async Task PetitionContractResponseAsync(string Address, string ContractId, string PetitionId, string RequestorBareJid, bool Response)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<petitionContractResponse xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RequestorBareJid));
+			Xml.Append("' response='");
+			Xml.Append(CommonTypes.Encode(Response));
+			Xml.Append("'/>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		private async Task PetitionContractMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractPetitionEventHandler h = this.PetitionedContractReceived;
+
+			if (h != null)
+			{
+				string ContractId = XML.Attribute(e.Content, "id");
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				string Purpose = XML.Attribute(e.Content, "purpose");
+				string From = XML.Attribute(e.Content, "from");
+				int i = ContractId.IndexOf('@');
+				LegalIdentity Identity = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					{
+						Identity = LegalIdentity.Parse(E);
+						break;
+					}
+				}
+
+				if (Identity is null)
+					return;
+
+				if (!this.IsFromTrustProvider(ContractId, e.FromBareJID))
+					return;
+
+				await this.Validate(Identity, false, async (sender2, e2) =>
+				{
+					if (e2.Status != IdentityStatus.Valid)
+					{
+						Client.Error("Invalid identity received and discarded.");
+
+						Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+						return;
+					}
+
+					try
+					{
+						await h(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}, null);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// </summary>
+		public event ContractPetitionEventHandler PetitionedContractReceived = null;
+
+		private async Task PetitionContractResponseMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractPetitionResponseEventHandler h = this.PetitionedContractResponseReceived;
+
+			if (h != null)
+			{
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				bool Response = XML.Attribute(e.Content, "response", false);
+				Contract Contract = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+					{
+						Contract = Contract.Parse(E, out bool _);
+						break;
+					}
+				}
+
+				if (string.Compare(e.FromBareJID, Contract.Provider, true) == 0)
+				{
+					try
+					{
+						await h(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// </summary>
+		public event ContractPetitionResponseEventHandler PetitionedContractResponseReceived = null;
 
 		#endregion
 	}

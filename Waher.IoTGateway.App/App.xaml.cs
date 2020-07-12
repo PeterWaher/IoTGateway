@@ -173,19 +173,19 @@ namespace Waher.IoTGateway.App
 			Window.Current.Close();
 		}
 
-		private static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
+		private static async Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted) && Encrypted)
 				throw new Exception("Encrypted database storage not supported on this platform.");
 
-			FilesProvider Result = new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+			FilesProvider Result = await FilesProvider.CreateAsync(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
 				DatabaseConfig.Attributes["defaultCollectionName"].Value,
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
 				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value));
 
-			return Task.FromResult<IDatabaseProvider>(Result);
+			return Result;
 		}
 
 		private async Task<MetaDataTag[]> GetMetaData(MetaDataTag[] MetaData)

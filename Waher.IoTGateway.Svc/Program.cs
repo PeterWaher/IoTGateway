@@ -399,12 +399,12 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		internal static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
+		internal async static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
 			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
 				Encrypted = true;
 
-			FilesProvider Result = new FilesProvider(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
+			FilesProvider Result = await FilesProvider.CreateAsync(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
 				DatabaseConfig.Attributes["defaultCollectionName"].Value,
 				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
 				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
@@ -412,7 +412,7 @@ namespace Waher.IoTGateway.Svc
 				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
 				Encrypted, true);
 
-			return Task.FromResult<IDatabaseProvider>(Result);
+			return Result;
 		}
 
 		internal static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

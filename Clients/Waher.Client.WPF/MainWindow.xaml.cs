@@ -111,7 +111,7 @@ namespace Waher.Client.WPF
 			{
 				this.MainView.ShowStatus("Initializing");
 
-				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
+				databaseProvider = await FilesProvider.CreateAsync(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 3600000);
 				await databaseProvider.RepairIfInproperShutdown(appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt");
 				await databaseProvider.Start();
 				Database.Register(databaseProvider);

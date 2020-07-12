@@ -521,6 +521,13 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetTrustProvider(System.String)">
+            <summary>
+            Gets the trust provider hosting an entity with a given ID, in the form of LocalId@Provider.
+            </summary>
+            <param name="EntityId">ID, in the form of LocalId@Provider.</param>
+            <returns>Provider</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLegalIdentity(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
             <summary>
             Gets information about a legal identity given its ID.

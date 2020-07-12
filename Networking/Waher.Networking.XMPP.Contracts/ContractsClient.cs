@@ -920,7 +920,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void GetLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
 		{
-			this.GetLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+			this.GetLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the trust provider hosting an entity with a given ID, in the form of LocalId@Provider.
+		/// </summary>
+		/// <param name="EntityId">ID, in the form of LocalId@Provider.</param>
+		/// <returns>Provider</returns>
+		public string GetTrustProvider(string EntityId)
+		{
+			int i = EntityId.IndexOf('@');
+			if (i < 0)
+				return this.componentAddress;
+			else
+				return EntityId.Substring(i + 1);
 		}
 
 		/// <summary>
@@ -955,7 +969,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
 		public Task<LegalIdentity> GetLegalIdentityAsync(string LegalIdentityId)
 		{
-			return this.GetLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+			return this.GetLegalIdentityAsync(this.GetTrustProvider(LegalIdentityId), LegalIdentityId);
 		}
 
 		/// <summary>
@@ -997,7 +1011,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void ObsoleteLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
 		{
-			this.ObsoleteLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+			this.ObsoleteLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -1034,7 +1048,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
 		public Task<LegalIdentity> ObsoleteLegalIdentityAsync(string LegalIdentityId)
 		{
-			return this.ObsoleteLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+			return this.ObsoleteLegalIdentityAsync(this.GetTrustProvider(LegalIdentityId), LegalIdentityId);
 		}
 
 		/// <summary>
@@ -1076,7 +1090,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void CompromisedLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
 		{
-			this.CompromisedLegalIdentity(this.componentAddress, LegalIdentityId, Callback, State);
+			this.CompromisedLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -1113,7 +1127,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
 		public Task<LegalIdentity> CompromisedLegalIdentityAsync(string LegalIdentityId)
 		{
-			return this.CompromisedLegalIdentityAsync(this.componentAddress, LegalIdentityId);
+			return this.CompromisedLegalIdentityAsync(this.GetTrustProvider(LegalIdentityId), LegalIdentityId);
 		}
 
 		/// <summary>
@@ -1299,7 +1313,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void ValidateSignature(string LegalId, byte[] Data, byte[] Signature, LegalIdentityEventHandler Callback, object State)
 		{
-			this.ValidateSignature(this.componentAddress, LegalId, Data, Signature, Callback, State);
+			this.ValidateSignature(this.GetTrustProvider(LegalId), LegalId, Data, Signature, Callback, State);
 		}
 
 		/// <summary>
@@ -1355,7 +1369,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identity object.</returns>
 		public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] Signature)
 		{
-			return this.ValidateSignatureAsync(this.componentAddress, LegalId, Data, Signature);
+			return this.ValidateSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Data, Signature);
 		}
 
 		/// <summary>
@@ -1856,7 +1870,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void SignContract(Contract Contract, string Role, bool Transferable, SmartContractEventHandler Callback, object State)
 		{
-			this.SignContract(this.componentAddress, Contract, Role, Transferable, Callback, State);
+			this.SignContract(this.GetTrustProvider(Contract.ContractId), Contract, Role, Transferable, Callback, State);
 		}
 
 		/// <summary>
@@ -1914,7 +1928,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Contract</returns>
 		public Task<Contract> SignContractAsync(Contract Contract, string Role, bool Transferable)
 		{
-			return this.SignContractAsync(this.componentAddress, Contract, Role, Transferable);
+			return this.SignContractAsync(this.GetTrustProvider(Contract.ContractId), Contract, Role, Transferable);
 		}
 
 		/// <summary>
@@ -2043,7 +2057,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetContract(string ContractId, SmartContractEventHandler Callback, object State)
 		{
-			this.GetContract(this.componentAddress, ContractId, Callback, State);
+			this.GetContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -2053,8 +2067,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContract(string Address, string ContractId,
-			SmartContractEventHandler Callback, object State)
+		public void GetContract(string Address, string ContractId, SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2074,7 +2087,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Contract</returns>
 		public Task<Contract> GetContractAsync(string ContractId)
 		{
-			return this.GetContractAsync(this.componentAddress, ContractId);
+			return this.GetContractAsync(this.GetTrustProvider(ContractId), ContractId);
 		}
 
 		/// <summary>
@@ -2116,7 +2129,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void ObsoleteContract(string ContractId, SmartContractEventHandler Callback, object State)
 		{
-			this.ObsoleteContract(this.componentAddress, ContractId, Callback, State);
+			this.ObsoleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -2147,7 +2160,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Contract</returns>
 		public Task<Contract> ObsoleteContractAsync(string ContractId)
 		{
-			return this.ObsoleteContractAsync(this.componentAddress, ContractId);
+			return this.ObsoleteContractAsync(this.GetTrustProvider(ContractId), ContractId);
 		}
 
 		/// <summary>
@@ -2189,7 +2202,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void DeleteContract(string ContractId, SmartContractEventHandler Callback, object State)
 		{
-			this.DeleteContract(this.componentAddress, ContractId, Callback, State);
+			this.DeleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -2220,7 +2233,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Contract</returns>
 		public Task<Contract> DeleteContractAsync(string ContractId)
 		{
-			return this.DeleteContractAsync(this.componentAddress, ContractId);
+			return this.DeleteContractAsync(this.GetTrustProvider(ContractId), ContractId);
 		}
 
 		/// <summary>
@@ -2310,7 +2323,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void UpdateContract(Contract Contract, SmartContractEventHandler Callback, object State)
 		{
-			this.UpdateContract(this.componentAddress, Contract, Callback, State);
+			this.UpdateContract(this.GetTrustProvider(Contract.ContractId), Contract, Callback, State);
 		}
 
 		/// <summary>
@@ -2343,7 +2356,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Contract</returns>
 		public Task<Contract> UpdateContractAsync(Contract Contract)
 		{
-			return this.UpdateContractAsync(this.componentAddress, Contract);
+			return this.UpdateContractAsync(this.GetTrustProvider(Contract.ContractId), Contract);
 		}
 
 		/// <summary>
@@ -2627,7 +2640,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetContractLegalIdentities(string ContractId, LegalIdentitiesEventHandler Callback, object State)
 		{
-			this.GetContractLegalIdentities(this.componentAddress, ContractId, false, true, Callback, State);
+			this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, false, true, Callback, State);
 		}
 
 		/// <summary>
@@ -2640,7 +2653,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetContractLegalIdentities(string ContractId, bool Current, bool Historic, LegalIdentitiesEventHandler Callback, object State)
 		{
-			this.GetContractLegalIdentities(this.componentAddress, ContractId, Current, Historic, Callback, State);
+			this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, Current, Historic, Callback, State);
 		}
 
 		/// <summary>
@@ -2688,7 +2701,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identities.</returns>
 		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string ContractId)
 		{
-			return this.GetContractLegalIdentitiesAsync(this.componentAddress, ContractId, false, true);
+			return this.GetContractLegalIdentitiesAsync(this.GetTrustProvider(ContractId), ContractId, false, true);
 		}
 
 		/// <summary>
@@ -2700,7 +2713,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Legal identities.</returns>
 		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string ContractId, bool Current, bool Historic)
 		{
-			return this.GetContractLegalIdentitiesAsync(this.componentAddress, ContractId, Current, Historic);
+			return this.GetContractLegalIdentitiesAsync(this.GetTrustProvider(ContractId), ContractId, Current, Historic);
 		}
 
 		/// <summary>
@@ -2755,7 +2768,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetContractNetworkIdentities(string ContractId, NetworkIdentitiesEventHandler Callback, object State)
 		{
-			this.GetContractNetworkIdentities(this.componentAddress, ContractId, Callback, State);
+			this.GetContractNetworkIdentities(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -2814,7 +2827,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Network identities.</returns>
 		public Task<NetworkIdentity[]> GetContractNetworkIdentitiesAsync(string ContractId)
 		{
-			return this.GetContractNetworkIdentitiesAsync(this.componentAddress, ContractId);
+			return this.GetContractNetworkIdentitiesAsync(this.GetTrustProvider(ContractId), ContractId);
 		}
 
 		/// <summary>

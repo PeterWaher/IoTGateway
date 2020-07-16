@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
@@ -297,20 +297,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				using (SKImage Bmp = G.CreateBitmap(this.variables))
 				{
-					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-					byte[] Bin = Data.ToArray();
+					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
+					{
+						byte[] Bin = Data.ToArray();
 
-					s = "data:image/png;base64," + System.Convert.ToBase64String(Bin, 0, Bin.Length);
+						s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-					// TODO: WPF does not support data URI scheme. Change to local temporary file.
-
-					Output.WriteStartElement("Image");
-					Output.WriteAttributeString("Source", s);
-					Output.WriteAttributeString("Width", Bmp.Width.ToString());
-					Output.WriteAttributeString("Height", Bmp.Height.ToString());
-					Output.WriteEndElement();
-
-					Data.Dispose();
+						ImageContent.OutputWpf(Output, s, Bmp.Width, Bmp.Height, string.Empty);
+					}
 				}
 			}
 			else if (Result is SKImage Img)
@@ -319,15 +313,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				{
 					byte[] Bin = Data.ToArray();
 
-					s = "data:image/png;base64," + System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-					// TODO: WPF does not support data URI scheme. Change to local temporary file.
-
-					Output.WriteStartElement("Image");
-					Output.WriteAttributeString("Source", s);
-					Output.WriteAttributeString("Width", Img.Width.ToString());
-					Output.WriteAttributeString("Height", Img.Height.ToString());
-					Output.WriteEndElement();
+					ImageContent.OutputWpf(Output, s, Img.Width, Img.Height, string.Empty);
 				}
 			}
 			else if (Result is Exception ex)
@@ -399,7 +387,83 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			// Do nothing. Elements output as HTML at this point.
+			object Result = this.EvaluateExpression();
+			if (Result is null)
+				return;
+
+			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			string s;
+
+			if (Result is Graph G)
+			{
+				using (SKImage Bmp = G.CreateBitmap(this.variables))
+				{
+					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
+					{
+						byte[] Bin = Data.ToArray();
+
+						s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
+
+						ImageContent.OutputXamarinForms(Output, s, Bmp.Width, Bmp.Height);
+					}
+				}
+			}
+			else if (Result is SKImage Img)
+			{
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
+
+					s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
+
+					ImageContent.OutputXamarinForms(Output, s, Img.Width, Img.Height);
+				}
+			}
+			else if (Result is Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+						Output.WriteStartElement("Label");
+						Output.WriteAttributeString("LineBreakMode", "WordWrap");
+						Output.WriteAttributeString("TextColor", "Red");
+						Output.WriteValue(ex3.Message);
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+					}
+				}
+				else
+				{
+					if (this.aloneInParagraph)
+						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+
+					Output.WriteStartElement("Label");
+					Output.WriteAttributeString("LineBreakMode", "WordWrap");
+					Output.WriteAttributeString("TextColor", "Red");
+					Output.WriteValue(ex.Message);
+					Output.WriteEndElement();
+
+					if (this.aloneInParagraph)
+						Output.WriteEndElement();
+				}
+			}
+			else
+			{
+				if (this.aloneInParagraph)
+					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+
+				Output.WriteStartElement("Label");
+				Output.WriteAttributeString("LineBreakMode", "WordWrap");
+				Output.WriteValue(Result.ToString());
+				Output.WriteEndElement();
+
+				if (this.aloneInParagraph)
+					Output.WriteEndElement();
+			}
 		}
 
 		/// <summary>

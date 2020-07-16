@@ -245,7 +245,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			// Do nothing. Elements output as HTML at this point.
+			this.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>

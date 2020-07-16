@@ -1,0 +1,142 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="-2" ColumnSpacing="-2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="0">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[First Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="0">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Second Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="0">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Third Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[First row]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Data]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Very long data entry]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second row]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<strong>Cell</strong>]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<em>Cell</em>]]></Label>
+				</ContentView>
+			</Frame>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="-2" ColumnSpacing="-2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="0">
+				<ContentView Padding="5,2,5,2">
+					<StackLayout />
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Grouping]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[First Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Second Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="1">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Third Header]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Content]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<em>Long Cell</em>]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="3">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Content]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="3">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<strong>Cell</strong>]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="3">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Cell]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="0" Grid.Row="4">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[New section]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="1" Grid.Row="4">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="Center">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[More]]></Label>
+				</ContentView>
+			</Frame>
+			<Frame Padding="0,0,0,0" BorderColor="Gray" Grid.Column="2" Grid.Row="4">
+				<ContentView Padding="5,2,5,2" HorizontalOptions="End">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Data]]></Label>
+				</ContentView>
+			</Frame>
+		</Grid>
+	</ContentView>
+</StackLayout>

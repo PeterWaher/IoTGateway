@@ -136,6 +136,32 @@
     <None Remove="XAML\Test_24_Subscript.xml" />
     <None Remove="XAML\Test_25_HashTags.xml" />
     <None Remove="XAML\Test_26_Comments.xml" />
+    <None Remove="XF\Test_01_Paragraphs.xml" />
+    <None Remove="XF\Test_02_Links.xml" />
+    <None Remove="XF\Test_03_TextFormatting.xml" />
+    <None Remove="XF\Test_04_Multimedia.xml" />
+    <None Remove="XF\Test_05_HTML.xml" />
+    <None Remove="XF\Test_06_CodeBlocks.xml" />
+    <None Remove="XF\Test_07_BlockQuotes.xml" />
+    <None Remove="XF\Test_08_Headers.xml" />
+    <None Remove="XF\Test_09_UnorderedLists.xml" />
+    <None Remove="XF\Test_10_LazyOrderedLists.xml" />
+    <None Remove="XF\Test_11_OrderedLists.xml" />
+    <None Remove="XF\Test_12_Typography.xml" />
+    <None Remove="XF\Test_13_Tables.xml" />
+    <None Remove="XF\Test_14_HorizontalRules.xml" />
+    <None Remove="XF\Test_15_DefinitionLists.xml" />
+    <None Remove="XF\Test_16_MetaData.xml" />
+    <None Remove="XF\Test_17_Footnotes.xml" />
+    <None Remove="XF\Test_18_Emojis.xml" />
+    <None Remove="XF\Test_19_Sections.xml" />
+    <None Remove="XF\Test_20_Script.xml" />
+    <None Remove="XF\Test_21_Httpx.xml" />
+    <None Remove="XF\Test_22_TaskLists.xml" />
+    <None Remove="XF\Test_23_Superscript.xml" />
+    <None Remove="XF\Test_24_Subscript.xml" />
+    <None Remove="XF\Test_25_HashTags.xml" />
+    <None Remove="XF\Test_26_Comments.xml" />
     <None Remove="XML\Test_01_Paragraphs.xml" />
     <None Remove="XML\Test_02_Links.xml" />
     <None Remove="XML\Test_03_TextFormatting.xml" />
@@ -502,6 +528,84 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XAML\Test_24_Subscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_01_Paragraphs.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_02_Links.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_03_TextFormatting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_04_Multimedia.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_05_HTML.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_06_CodeBlocks.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_07_BlockQuotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_08_Headers.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_09_UnorderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_10_LazyOrderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_11_OrderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_12_Typography.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_13_Tables.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_14_HorizontalRules.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_15_DefinitionLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_16_MetaData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_17_Footnotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_18_Emojis.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_19_Sections.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_20_Script.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_21_Httpx.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_22_TaskLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_23_Superscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_24_Subscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_25_HashTags.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XF\Test_26_Comments.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML\Test_26_Comments.xml">

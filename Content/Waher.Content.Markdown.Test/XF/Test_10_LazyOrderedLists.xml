@@ -1,0 +1,496 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Lazy numbering can be accomplished by prefixing items with <code>#.</code>:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Bird]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[McHale]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>3.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Parish]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[To make lists look nice, you can wrap items with hanging indents:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[But if you want to be lazy, you don’t have to:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[On separate lines:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Bird]]></Label>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Magic]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a list item with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus. Donec sit amet nisl. Aliquam semper ipsum sit amet velit.]]></Label>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Suspendisse id sem consectetuer libero luctus adipiscing.]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[It looks nice if you indent every line of the subsequent paragraphs, but here again, Markdown will allow you to be lazy:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a list item with two paragraphs.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the second paragraph in the list item. You&rsquo;re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.]]></Label>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Another item in the same list.]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[To put a blockquote within a list item, the blockquote’s &gt; delimiters need to be indented:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[A list item with a blockquote:]]></Label>
+				</ContentView>
+				<ContentView Padding="20,5,0,5">
+					<Frame Padding="10,0,10,0" BorderColor="Black">
+						<StackLayout Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a blockquote inside a list item.]]></Label>
+							</ContentView>
+						</StackLayout>
+					</Frame>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[To put a code block within a list item, the code block needs to be indented twice — 8 spaces or two tabs:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[A list item with a code block:]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<StackLayout Orientation="Vertical">
+						<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="&lt;code goes here&gt;" />
+					</StackLayout>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Nested lists:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 1]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>•</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2a]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>•</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2b]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Nested lists 2:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 1]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2a]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2b]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Nested lists 3:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 1]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2a]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>3.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2b]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Three levels:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+				<Label>1.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 1]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>2.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2 ]]></Label>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2a]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2b ]]></Label>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+										<Label>1.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2bi]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>2.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2bii]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+										<Label>3.</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2biii]]></Label>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+							<Label>3.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 2c]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>3.</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Item 3]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+</StackLayout>

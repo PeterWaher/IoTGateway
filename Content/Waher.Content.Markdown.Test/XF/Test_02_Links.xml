@@ -1,0 +1,45 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Title" target="_blank">an example</a> inline link.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="http://example.net/" target="_blank">This link</a> has no title attribute.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[See my <a href="/about/">About</a> page for details.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Visit <a href="http://daringfireball.net/" target="_blank">Daring Fireball</a> for more information.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[You can also write links, such as <a href="http://littlesister.se/" target="_blank">http://littlesister.se/</a> inline.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Or on separate paragraphs:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="http://littlesister.se/" target="_blank">http://littlesister.se/</a>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Recognized multi-media content put on separate rows are automatically handled as multi-media:]]></Label>
+	</ContentView>
+	<WebView Source="https://www.youtube.com/embed/whBPLc8m4SU" />
+</StackLayout>

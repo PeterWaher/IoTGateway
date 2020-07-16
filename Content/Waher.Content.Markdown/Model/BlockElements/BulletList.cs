@@ -204,38 +204,41 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (MarkdownElement E in this.Children)
 			{
-				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				E.GetMargins(out int TopMargin, out int BottomMargin);
-
-				Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, "0," + TopMargin.ToString() + "," +
-					Settings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
-				Output.WriteAttributeString("Grid.Column", "0");
-				Output.WriteAttributeString("Grid.Row", Row.ToString());
-
-				Output.WriteElementString("Label", "•");
-				Output.WriteEndElement();
-
-				Output.WriteStartElement("StackLayout");
-				Output.WriteAttributeString("Grid.Column", "1");
-				Output.WriteAttributeString("Grid.Row", Row.ToString());
-				Output.WriteAttributeString("Orientation", "Vertical");
-
-				if (ParagraphBullet)
-					E.GenerateXamarinForms(Output, TextAlignment);
-				else
+				if (E is UnnumberedItem Item)
 				{
-					Output.WriteStartElement("Label");
-					Output.WriteAttributeString("LineBreakMode", "WordWrap");
-					Output.WriteAttributeString("TextType", "Html");
+					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
+					E.GetMargins(out int TopMargin, out int BottomMargin);
 
-					StringBuilder Html = new StringBuilder();
-					E.GenerateHTML(Html);
-					Output.WriteCData(Html.ToString());
-					
+					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, "0," + TopMargin.ToString() + "," +
+						Settings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
+					Output.WriteAttributeString("Grid.Column", "0");
+					Output.WriteAttributeString("Grid.Row", Row.ToString());
+
+					Output.WriteElementString("Label", "•");
+					Output.WriteEndElement();
+
+					Output.WriteStartElement("StackLayout");
+					Output.WriteAttributeString("Grid.Column", "1");
+					Output.WriteAttributeString("Grid.Row", Row.ToString());
+					Output.WriteAttributeString("Orientation", "Vertical");
+
+					if (ParagraphBullet)
+						E.GenerateXamarinForms(Output, TextAlignment);
+					else
+					{
+						Output.WriteStartElement("Label");
+						Output.WriteAttributeString("LineBreakMode", "WordWrap");
+						Output.WriteAttributeString("TextType", "Html");
+
+						StringBuilder Html = new StringBuilder();
+						Item.Child.GenerateHTML(Html);
+						Output.WriteCData(Html.ToString());
+
+						Output.WriteEndElement();
+					}
+
 					Output.WriteEndElement();
 				}
-
-				Output.WriteEndElement();
 
 				Row++;
 			}

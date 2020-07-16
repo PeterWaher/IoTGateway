@@ -1,0 +1,56 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<em>single asterisks</em>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<u>single underscores</u>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<s>single tildes</s>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<strong>double asterisks</strong>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<ins>double underscores</ins>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<del>double tildes</del>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[un<em>frigging</em>believable]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This * will not be formatted, nor this * asterisk.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This _ will not be formatted, nor this _ underscore.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This ~ will not be formatted, nor this ~ tilde.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[*this text is surrounded by literal asterisks*]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Use the <code>printf()</code> function.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<code>There is a literal backtick (`) here.</code>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[A single backtick in a code span: <code>`</code>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[A backtick-delimited string in a code span: <code>`foo`</code>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Please don&rsquo;t use any <code>&lt;blink&gt;</code> tags.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<code>&amp;#8212;</code> is the decimal-encoded equivalent of <code>&amp;mdash;</code>.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[*literal asterisks*]]></Label>
+	</ContentView>
+</StackLayout>

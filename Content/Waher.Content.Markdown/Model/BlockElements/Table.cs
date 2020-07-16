@@ -505,8 +505,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteAttributeString("Padding", Settings.ParagraphMargins);
 
 			Output.WriteStartElement("Grid");
-			Output.WriteAttributeString("RowSpacing", "0");
-			Output.WriteAttributeString("ColumnSpacing", "0");
+			Output.WriteAttributeString("RowSpacing", "-2");
+			Output.WriteAttributeString("ColumnSpacing", "-2");
 
 			// TODO: Tooltip/caption
 
@@ -600,8 +600,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					E.GenerateHTML(Html);
 					Output.WriteCData(Html.ToString());
 
-					Output.WriteEndElement();
-					Output.WriteEndElement();
+					Output.WriteEndElement();	// Label
+					Output.WriteEndElement();	// Paragraph
 				}
 				else
 				{
@@ -610,10 +610,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 					Output.WriteStartElement("StackLayout");
 					E.GenerateXamarinForms(Output, TextAlignment);
-					Output.WriteEndElement();
+					Output.WriteEndElement();	// StackLayout
 					
-					Output.WriteEndElement();
+					Output.WriteEndElement();   // ContentView
 				}
+
+				Output.WriteEndElement();   // Frame
 			}
 		}
 

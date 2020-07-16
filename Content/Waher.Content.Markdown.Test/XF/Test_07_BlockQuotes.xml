@@ -1,0 +1,121 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Markdown uses email-style &gt; characters for blockquoting. If you’re familiar with quoting passages of text in an email message, then you know how to create a blockquote in Markdown. It looks best if you hard wrap the text and put a &gt; before every line:]]></Label>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="Black">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Markdown allows you to be lazy and only put the &gt; before the first line of a hard-wrapped paragraph:]]></Label>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="Black">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Blockquotes can be nested (i.e. a blockquote-in-a-blockquote) by adding additional levels of &gt;:]]></Label>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="Black">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the first level of quoting.]]></Label>
+				</ContentView>
+				<ContentView Padding="20,5,0,5">
+					<Frame Padding="10,0,10,0" BorderColor="Black">
+						<StackLayout Orientation="Vertical">
+							<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+								<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is nested blockquote.]]></Label>
+							</ContentView>
+						</StackLayout>
+					</Frame>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Back to the first level.]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Blockquotes can contain other Markdown elements, including headers, lists, and code blocks:]]></Label>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="Black">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" FontSize="24" TextColor="Navy" TextType="Html"><![CDATA[This is a header.]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+							<Label>1.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the first list item.]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>2.</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the second list item.]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here&rsquo;s some example code:]]></Label>
+				</ContentView>
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<StackLayout Orientation="Vertical">
+						<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="return shell_exec(&quot;echo $input | $markdown_script&quot;);" />
+					</StackLayout>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Blockquotes can also be used do illustrate editing:]]></Label>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="#4000A000">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This paragraph has been inserted]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+	<ContentView Padding="20,5,0,5">
+		<Frame Padding="10,0,10,0" BorderColor="#40A00000">
+			<StackLayout Orientation="Vertical">
+				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[While this paragraph has been deleted]]></Label>
+				</ContentView>
+			</StackLayout>
+		</Frame>
+	</ContentView>
+</StackLayout>

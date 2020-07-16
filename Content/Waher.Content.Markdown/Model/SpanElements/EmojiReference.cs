@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Emoji;
+using Waher.Content.Markdown.Model.Multimedia;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -111,16 +111,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			this.Document.EmojiSource.GetImageSource(this.emoji, this.level, out string Url, out int Width, out int Height);
-
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Url);
-			Output.WriteAttributeString("Width", Width.ToString());
-			Output.WriteAttributeString("Height", Height.ToString());
-
-			if (!string.IsNullOrEmpty(Emoji.Description))
-				Output.WriteAttributeString("ToolTip", Emoji.Description);
-
-			Output.WriteEndElement();
+			ImageContent.OutputWpf(Output, Url, Width, Height, Emoji.Description);
 		}
 
 		/// <summary>
@@ -130,7 +121,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			// Do nothing. Elements output as HTML at this point.
+			this.Document.EmojiSource.GetImageSource(this.emoji, this.level, out string Url, out int Width, out int Height);
+			ImageContent.OutputXamarinForms(Output, Url, Width, Height);
 		}
 
 		/// <summary>

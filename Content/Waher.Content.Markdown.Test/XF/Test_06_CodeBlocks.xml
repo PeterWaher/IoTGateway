@@ -1,0 +1,58 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a normal paragraph:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="This is a code block." />
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here is an example of AppleScript:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="tell application &quot;Foo&quot;" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="    beep" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="end tell" />
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Fenced code block:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="&lt;div class=&quot;footer&quot;&gt;" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="    &amp;copy; 2004 Foo Corporation" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="&lt;/div&gt;" />
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Fenced code block (with syntax highlighting):]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="10 PRINT &quot;*&quot;;" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="20 GOTO 10" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Headers can also be written on a single line, prefixing them with hash signs (<code>#</code>) and a space character. The number of hash signs defines the level of the header:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="# First level header" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="## Second level header" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="### Third level header" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="#### Fourth level header" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="" />
+			<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="..." />
+		</StackLayout>
+	</ContentView>
+</StackLayout>

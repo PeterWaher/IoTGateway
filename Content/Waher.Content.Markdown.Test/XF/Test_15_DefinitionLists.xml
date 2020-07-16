@@ -1,0 +1,149 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Apple]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Pomaceous fruit of plants of the genus Malus in the family Rosaceae.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Orange]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[The fruit of an evergreen tree of the genus Citrus.]]></Label>
+	</ContentView>
+	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Apple]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Pomaceous fruit of plants of the genus Malus in the family Rosaceae.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Orange]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[The fruit of an evergreen tree of the genus Citrus.]]></Label>
+	</ContentView>
+	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Apple]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Pomaceous fruit of plants of the genus Malus in the family Rosaceae.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[An American computer company.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Orange]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[The fruit of an evergreen tree of the genus Citrus.]]></Label>
+	</ContentView>
+	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Term 1]]></Label>
+	</ContentView>
+	<ContentView Padding="0,0,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Term 2]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Definition a]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Term 3]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Definition b]]></Label>
+	</ContentView>
+	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Apple]]></Label>
+	</ContentView>
+	<ContentView Padding="20,0,0,10">
+		<StackLayout>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Pomaceous fruit of plants of the genus Malus in the family Rosaceae.]]></Label>
+			</ContentView>
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Orange]]></Label>
+	</ContentView>
+	<ContentView Padding="20,0,0,10">
+		<StackLayout>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[The fruit of an evergreen tree of the genus Citrus.]]></Label>
+			</ContentView>
+		</StackLayout>
+	</ContentView>
+	<BoxView HeightRequest="1" BackgroundColor="Gray" HorizontalOptions="FillAndExpand" Margin="0,5,0,5" />
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Term 1]]></Label>
+	</ContentView>
+	<ContentView Padding="20,0,0,0">
+		<StackLayout>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a definition with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.]]></Label>
+			</ContentView>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.]]></Label>
+			</ContentView>
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="20,0,0,10">
+		<StackLayout>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second definition for term 1, also wrapped in a paragraph because of the blank line preceding it.]]></Label>
+			</ContentView>
+		</StackLayout>
+	</ContentView>
+	<ContentView Padding="0,5,0,0" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html" FontAttributes="Bold"><![CDATA[Term 2]]></Label>
+	</ContentView>
+	<ContentView Padding="20,0,0,10">
+		<StackLayout>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This definition has a code block, a blockquote and a list.]]></Label>
+			</ContentView>
+			<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+				<StackLayout Orientation="Vertical">
+					<Label LineBreakMode="NoWrap" FontFamily="Courier New" Text="code block." />
+				</StackLayout>
+			</ContentView>
+			<ContentView Padding="20,5,0,5">
+				<Frame Padding="10,0,10,0" BorderColor="Black">
+					<StackLayout Orientation="Vertical">
+						<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[block quote on two lines.]]></Label>
+						</ContentView>
+					</StackLayout>
+				</Frame>
+			</ContentView>
+			<ContentView Padding="0,5,0,5">
+				<Grid RowSpacing="0" ColumnSpacing="0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="0">
+						<Label>1.</Label>
+					</ContentView>
+					<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+						<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[first list item]]></Label>
+					</StackLayout>
+					<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+						<Label>2.</Label>
+					</ContentView>
+					<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+						<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[second list item]]></Label>
+					</StackLayout>
+				</Grid>
+			</ContentView>
+		</StackLayout>
+	</ContentView>
+</StackLayout>

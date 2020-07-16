@@ -104,5 +104,32 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				break;
 			}
 		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+		{
+			foreach (MultimediaItem Item in Items)
+			{
+				Output.WriteStartElement("MediaElement");
+				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url, Document.URL));
+				Output.WriteAttributeString("AutoPlay", "True");
+
+				// TODO: Tooltip
+
+				Output.WriteEndElement();
+
+				break;
+			}
+		}
+
 	}
 }

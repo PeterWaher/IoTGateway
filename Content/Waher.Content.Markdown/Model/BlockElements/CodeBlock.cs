@@ -370,24 +370,19 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				}
 			}
 
-			StringBuilder Text = new StringBuilder();
-			bool First = true;
+			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+			Output.WriteStartElement("StackLayout");
+			Output.WriteAttributeString("Orientation", "Vertical");
 
 			foreach (string Row in this.rows)
 			{
-				if (First)
-					First = false;
-				else
-					Text.AppendLine();
-
-				Text.Append(Row);
+				Output.WriteStartElement("Label");
+				Output.WriteAttributeString("LineBreakMode", "NoWrap");
+				Output.WriteAttributeString("FontFamily", "Courier New");
+				Output.WriteAttributeString("Text", Row);
+				Output.WriteEndElement();
 			}
 
-			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
-			Output.WriteStartElement("Label");
-			Output.WriteAttributeString("LineBreakMode", "NoWrap");
-			Output.WriteAttributeString("FontFamily", "Courier New");
-			Output.WriteAttributeString("Text", Text.ToString());
 			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}

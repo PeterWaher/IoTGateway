@@ -215,5 +215,37 @@ namespace Waher.Content.Markdown.Model.Multimedia
                     Variables.Pop();
             }
         }
+
+        /// <summary>
+        /// Generates Xamarin.Forms XAML for the markdown element.
+        /// </summary>
+        /// <param name="Output">XAML will be output here.</param>
+        /// <param name="TextAlignment">Alignment of text in element.</param>
+        /// <param name="Items">Multimedia items.</param>
+        /// <param name="ChildNodes">Child nodes.</param>
+        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+        /// <param name="Document">Markdown document containing element.</param>
+        public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+            IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+        {
+            Variables Variables = Document.Settings.Variables;
+            if (Variables != null)
+                Variables.Push();
+
+            try
+            {
+                foreach (MultimediaItem Item in Items)
+                {
+                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
+                    Markdown.GenerateXamarinForms(Output, true);
+                }
+            }
+            finally
+            {
+                if (Variables != null)
+                    Variables.Pop();
+            }
+        }
+
     }
 }

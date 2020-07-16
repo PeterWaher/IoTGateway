@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model.Multimedia
@@ -185,44 +185,90 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			string Source;
-			int i;
-			int? Width;
-			int? Height;
-
 			foreach (MultimediaItem Item in Items)
 			{
-				Width = Item.Width;
-				Height = Item.Height;
-
-				if ((Source = Item.Url).StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && (i = Item.Url.IndexOf("base64,")) > 0)
-				{
-					byte[] Data = Convert.FromBase64String(Item.Url.Substring(i + 7));
-					using (SKBitmap Bitmap = SKBitmap.Decode(Data))
-					{
-						Width = Bitmap.Width;
-						Height = Bitmap.Height;
-					}
-
-					Source = GetTemporaryFile(Data);
-				}
-
-				Output.WriteStartElement("Image");
-				Output.WriteAttributeString("Source", Document.CheckURL(Source, null));
-
-				if (Width.HasValue)
-					Output.WriteAttributeString("Width", Width.Value.ToString());
-
-				if (Height.HasValue)
-					Output.WriteAttributeString("Height", Height.Value.ToString());
-
-				if (!string.IsNullOrEmpty(Item.Title))
-					Output.WriteAttributeString("ToolTip", Item.Title);
-
-				Output.WriteEndElement();
+				OutputWpf(Output, Document.CheckURL(Item.Url, null), 
+					Item.Width, Item.Height, Item.Title);
 
 				break;
 			}
+		}
+
+		internal static void OutputWpf(XmlWriter Output, string Source, int? Width, int? Height, string Title)
+		{
+			Source = CheckDataUri(Source, ref Width, ref Height);
+
+			Output.WriteStartElement("Image");
+			Output.WriteAttributeString("Source", Source);
+
+			if (Width.HasValue)
+				Output.WriteAttributeString("Width", Width.Value.ToString());
+
+			if (Height.HasValue)
+				Output.WriteAttributeString("Height", Height.Value.ToString());
+
+			if (!string.IsNullOrEmpty(Title))
+				Output.WriteAttributeString("ToolTip", Title);
+
+			Output.WriteEndElement();
+		}
+
+		internal static string CheckDataUri(string Source, ref int? Width, ref int? Height)
+		{
+			int i;
+			if (Source.StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && 
+				(i = Source.IndexOf("base64,")) > 0)
+			{
+				byte[] Data = Convert.FromBase64String(Source.Substring(i + 7));
+				using (SKBitmap Bitmap = SKBitmap.Decode(Data))
+				{
+					Width = Bitmap.Width;
+					Height = Bitmap.Height;
+				}
+
+				Source = GetTemporaryFile(Data);
+			}
+
+			return Source;
+		}
+
+		/// <summary>
+		/// Generates Xamarin.Forms XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+		{
+			foreach (MultimediaItem Item in Items)
+			{
+				OutputXamarinForms(Output, Document.CheckURL(Item.Url, null), 
+					Item.Width, Item.Height);
+
+				break;
+			}
+		}
+
+		internal static void OutputXamarinForms(XmlWriter Output, string Source, int? Width, int? Height)
+		{
+			Source = CheckDataUri(Source, ref Width, ref Height);
+
+			Output.WriteStartElement("Image");
+			Output.WriteAttributeString("Source", Source);
+
+			if (Width.HasValue)
+				Output.WriteAttributeString("WidthRequest", Width.Value.ToString());
+
+			if (Height.HasValue)
+				Output.WriteAttributeString("HeightRequest", Height.Value.ToString());
+
+			// TODO: Tooltip
+
+			Output.WriteEndElement();
 		}
 
 		/// <summary>
@@ -232,8 +278,15 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>Temporary file name.</returns>
 		public static string GetTemporaryFile(byte[] BinaryImage)
 		{
-			string FileName = Path.GetTempFileName();
-			System.IO.File.WriteAllBytes(FileName, BinaryImage);
+			string FileName;
+
+			using (SHA256 H = SHA256.Create())
+			{
+				byte[] Digest = H.ComputeHash(BinaryImage);
+				FileName = Path.Combine(Path.GetTempPath(), "tmp" + Base64Url.Encode(Digest) + ".tmp");
+			}
+			
+			File.WriteAllBytes(FileName, BinaryImage);
 
 			lock (synchObject)
 			{

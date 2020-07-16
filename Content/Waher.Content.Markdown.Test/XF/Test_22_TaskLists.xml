@@ -1,0 +1,128 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Simple task list:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Unchecked]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>✓</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Checked]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>✓</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Also checked]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Nested task list:]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5">
+		<Grid RowSpacing="0" ColumnSpacing="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Unchecked]]></Label>
+			</StackLayout>
+			<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+				<Label>✓</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Checked ]]></Label>
+				<ContentView Padding="0,5,0,5">
+					<Grid RowSpacing="0" ColumnSpacing="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Unchecked subitem]]></Label>
+						</StackLayout>
+						<ContentView Padding="0,0,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+							<Label>✓</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Checked subitem ]]></Label>
+							<ContentView Padding="0,5,0,5">
+								<Grid RowSpacing="0" ColumnSpacing="0">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+									</Grid.RowDefinitions>
+									<StackLayout Grid.Column="1" Grid.Row="0" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Unchecked subsubitem]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">
+										<Label>✓</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Checked subsubitem]]></Label>
+									</StackLayout>
+									<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+										<Label>✓</Label>
+									</ContentView>
+									<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second checked subsubitem]]></Label>
+									</StackLayout>
+									<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+										<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second unchecked subsubitem]]></Label>
+									</StackLayout>
+								</Grid>
+							</ContentView>
+						</StackLayout>
+						<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+							<Label>✓</Label>
+						</ContentView>
+						<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second checked subitem]]></Label>
+						</StackLayout>
+						<StackLayout Grid.Column="1" Grid.Row="3" Orientation="Vertical">
+							<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Second unchecked subitem]]></Label>
+						</StackLayout>
+					</Grid>
+				</ContentView>
+			</StackLayout>
+			<ContentView Padding="0,0,5,0" HorizontalOptions="Start" Grid.Column="0" Grid.Row="2">
+				<Label>✓</Label>
+			</ContentView>
+			<StackLayout Grid.Column="1" Grid.Row="2" Orientation="Vertical">
+				<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Also checked]]></Label>
+			</StackLayout>
+		</Grid>
+	</ContentView>
+</StackLayout>

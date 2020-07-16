@@ -1,0 +1,11 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" FontSize="28" TextColor="Navy" TextType="Html"><![CDATA[Header]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This <mark>paragraph</mark> contains <mark>3</mark> <mark>hashtags</mark>.]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<mark>Hashtags</mark> at the beginning of a row works, as headers require space after # and the tag.]]></Label>
+	</ContentView>
+</StackLayout>

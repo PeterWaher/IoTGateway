@@ -5221,7 +5221,12 @@ namespace Waher.Content.Markdown
 				int Nr;
 				int Row = 0;
 
-				Output.WriteElementString("Separator", string.Empty);
+				Output.WriteStartElement("BoxView");
+				Output.WriteAttributeString("HeightRequest", "1");
+				Output.WriteAttributeString("BackgroundColor", this.settings.XamlSettings.TableCellBorderColor);
+				Output.WriteAttributeString("HorizontalOptions", "FillAndExpand");
+				Output.WriteAttributeString("Margin", this.settings.XamlSettings.ParagraphMargins);
+				Output.WriteEndElement();
 
 				Output.WriteStartElement("Grid");
 				Output.WriteAttributeString("RowSpacing", "0");
@@ -5256,39 +5261,21 @@ namespace Waher.Content.Markdown
 				{
 					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
 					{
-						Output.WriteStartElement("TextBlock");
-						Output.WriteAttributeString("Text", Nr.ToString());
+						Output.WriteStartElement("ContentView");
 						Output.WriteAttributeString("Margin", FootnoteMargin);
 						Output.WriteAttributeString("Grid.Column", "0");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
+						Output.WriteAttributeString("Scale", Scale);
+						Output.WriteAttributeString("TranslationY", Offset);
 
-						Output.WriteStartElement("TextBlock.LayoutTransform");
-						Output.WriteStartElement("TransformGroup");
-
-						Output.WriteStartElement("ScaleTransform");
-						Output.WriteAttributeString("ScaleX", Scale);
-						Output.WriteAttributeString("ScaleY", Scale);
-						Output.WriteEndElement();
-
-						Output.WriteStartElement("TranslateTransform");
-						Output.WriteAttributeString("Y", Offset);
-						Output.WriteEndElement();
-
-						Output.WriteEndElement();
+						Output.WriteStartElement("Label");
+						Output.WriteAttributeString("Text", Nr.ToString());
 						Output.WriteEndElement();
 						Output.WriteEndElement();
 
-						if (Footnote.InlineSpanElement && !Footnote.OutsideParagraph)
-						{
-							Output.WriteStartElement("TextBlock");
-							Output.WriteAttributeString("TextWrapping", "Wrap");
-						}
-						else
-							Output.WriteStartElement("StackPanel");
-
+						Output.WriteStartElement("ContentView");
 						Output.WriteAttributeString("Grid.Column", "1");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
-
 						Footnote.GenerateXamarinForms(Output, TextAlignment.Left);
 						Output.WriteEndElement();
 

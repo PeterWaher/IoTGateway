@@ -1,0 +1,31 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Image: <img src="/path/to/img.jpg" alt="Alt text 1"/>]]></Label>
+	</ContentView>
+	<Image Source="/path/to/img.jpg" />
+	<Image Source="/path/to/img.jpg" />
+	<Image Source="url/to/image" />
+	<Image Source="url/to/image" />
+	<Image Source="/path/to/img.jpg" WidthRequest="320" HeightRequest="200" />
+	<Image Source="/path/to/img.jpg" WidthRequest="320" HeightRequest="200" />
+	<Image Source="url/to/image" WidthRequest="320" HeightRequest="200" />
+	<Image Source="url/to/image" WidthRequest="320" HeightRequest="200" />
+	<Image Source="url/to/image" WidthRequest="320" HeightRequest="200" />
+	<Image Source="url/to/image" WidthRequest="320" HeightRequest="200" />
+	<MediaElement Source="/local/music.mp3" AutoPlay="True" />
+	<MediaElement Source="/local/video.mp4" WidthRequest="320" HeightRequest="200" />
+	<WebView Source="https://www.youtube.com/embed/whBPLc8m4SU" WidthRequest="800" HeightRequest="600" />
+	<Image Source="img1.svg" />
+	<Image Source="img1.svg" WidthRequest="320" HeightRequest="200" />
+	<Image Source="img1.svg" WidthRequest="320" HeightRequest="200" />
+	<MediaElement Source="audio1.mp3" AutoPlay="True" />
+	<MediaElement Source="video1.mp4" />
+	<MediaElement Source="video1.mp4" WidthRequest="320" HeightRequest="200" />
+	<Image Source="img1.svg" />
+	<Image Source="img1.svg" WidthRequest="320" HeightRequest="200" />
+	<Image Source="img1.svg" WidthRequest="320" HeightRequest="200" />
+	<MediaElement Source="audio1.mp3" AutoPlay="True" />
+	<MediaElement Source="video1.mp4" />
+	<MediaElement Source="video1.mp4" WidthRequest="320" HeightRequest="200" />
+	<WebView Source="http://google.com/" WidthRequest="1200" HeightRequest="300" />
+</StackLayout>

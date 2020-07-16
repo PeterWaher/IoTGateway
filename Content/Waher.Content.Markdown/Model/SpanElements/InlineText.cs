@@ -86,7 +86,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			// Do nothing. Elements output as HTML at this point.
+			GenerateInlineFormattedTextXamarinForms(Output, this);
+		}
+
+		internal static void GenerateInlineFormattedTextXamarinForms(XmlWriter Output, MarkdownElement FormattedText)
+		{
+			Output.WriteStartElement("Label");
+			Output.WriteAttributeString("LineBreakMode", "WordWrap");
+			Output.WriteAttributeString("TextType", "Html");
+
+			StringBuilder Html = new StringBuilder();
+			FormattedText.GenerateHTML(Html);
+			Output.WriteCData(Html.ToString());
+
+			Output.WriteEndElement();
 		}
 
 		/// <summary>

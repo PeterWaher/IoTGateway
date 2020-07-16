@@ -116,6 +116,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteAttributeString("HeightRequest", "1");
 			Output.WriteAttributeString("BackgroundColor", this.Document.Settings.XamlSettings.TableCellBorderColor);
 			Output.WriteAttributeString("HorizontalOptions", "FillAndExpand");
+			Output.WriteAttributeString("Margin", this.Document.Settings.XamlSettings.ParagraphMargins);
 			Output.WriteEndElement();
 		}
 

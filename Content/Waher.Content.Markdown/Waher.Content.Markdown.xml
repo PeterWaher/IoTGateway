@@ -3084,6 +3084,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.MarkdownElement">
             <summary>
             Abstract base class for all markdown elements.
@@ -3474,6 +3485,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.MultimediaItem">
             <summary>
             Multimedia item.
@@ -3587,6 +3609,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.ImageContent">
             <summary>
             Image content.
@@ -3623,6 +3656,17 @@
         <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3692,6 +3736,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.TableOfContents">
             <summary>
             Table of Contents.
@@ -3746,6 +3801,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.VideoContent">
             <summary>
             Video content.
@@ -3782,6 +3848,17 @@
         <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
@@ -3834,6 +3911,17 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.YouTubeContent">
             <summary>
             YouTube content.
@@ -3870,6 +3958,17 @@
         <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>

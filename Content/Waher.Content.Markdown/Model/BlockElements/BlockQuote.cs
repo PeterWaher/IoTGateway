@@ -105,7 +105,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Settings.ParagraphMarginBottom.ToString());
 
 			Output.WriteStartElement("Frame");
-			Output.WriteAttributeString("Padding", Settings.BlockQuotePadding.ToString() + ",0,0,0");
+			Output.WriteAttributeString("Padding", Settings.BlockQuotePadding.ToString() + 
+				",0," + Settings.BlockQuotePadding.ToString() + ",0");
 			Output.WriteAttributeString("BorderColor", Settings.BlockQuoteBorderColor);
 			// TODO: Border thickness
 

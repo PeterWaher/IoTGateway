@@ -1,0 +1,7 @@
+﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Title of document: Test_16_MetaData.md<br/>
+Subtitle of document: Unit tests<br/>
+Author: Peter Waher]]></Label>
+	</ContentView>
+</StackLayout>

@@ -16,6 +16,7 @@ using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Persistence;
@@ -628,39 +629,53 @@ namespace Waher.Client.WPF
 		{
 			MessageEventArgs e = (MessageEventArgs)P;
 
+			DateTime Timestamp = DateTime.Now;
 			string Message = e.Body;
 			bool IsMarkdown = false;
 
 			foreach (XmlNode N in e.Message.ChildNodes)
 			{
-				if (N.LocalName == "content" && N.NamespaceURI == "urn:xmpp:content")
+				if (N is XmlElement E)
 				{
-					string Type = XML.Attribute((XmlElement)N, "type");
-					if (Type == MarkdownCodec.ContentType)
+					switch (E.LocalName)
 					{
-						IsMarkdown = true;
+						case "content":
+							if (E.NamespaceURI == "urn:xmpp:content")
+							{
+								string Type = XML.Attribute(E, "type");
+								if (Type == MarkdownCodec.ContentType)
+								{
+									IsMarkdown = true;
 
-						Type = N.InnerText;
-						if (!string.IsNullOrEmpty(Type))
-							Message = Type;
+									Type = E.InnerText;
+									if (!string.IsNullOrEmpty(Type))
+										Message = Type;
+								}
+							}
+							break;
 
-						break;
+						case "delay":
+							if (E.NamespaceURI == PubSubClient.NamespaceDelayedDelivery &&
+								E.HasAttribute("stamp") &&
+								XML.TryParse(E.GetAttribute("stamp"), out DateTime Timestamp2))
+							{
+								Timestamp = Timestamp2;
+							}
+							break;
 					}
 				}
 			}
 
-			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, IsMarkdown);
+			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp);
 		}
 
-		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, bool IsMarkdown)
+		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp)
 		{
 			XmppAccountNode XmppAccountNode;
-			ChatView ChatView;
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
-				ChatView = TabItem.Content as ChatView;
-				if (ChatView is null)
+				if (!(TabItem.Content is ChatView ChatView))
 					continue;
 
 				if (ChatView.Node is XmppContact XmppContact)
@@ -686,7 +701,7 @@ namespace Waher.Client.WPF
 				if (XmppAccountNode.BareJID != ToBareJid)
 					continue;
 
-				ChatView.ChatMessageReceived(Message, IsMarkdown, this);
+				ChatView.ChatMessageReceived(Message, IsMarkdown, Timestamp, this);
 				return;
 			}
 
@@ -703,10 +718,10 @@ namespace Waher.Client.WPF
 					TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
 					this.Tabs.Items.Add(TabItem2);
 
-					ChatView = new ChatView(ContactNode);
+					ChatView ChatView = new ChatView(ContactNode);
 					TabItem2.Content = ChatView;
 
-					ChatView.ChatMessageReceived(Message, IsMarkdown, this);
+					ChatView.ChatMessageReceived(Message, IsMarkdown, Timestamp, this);
 					return;
 				}
 			}

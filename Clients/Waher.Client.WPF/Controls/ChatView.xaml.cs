@@ -141,7 +141,7 @@ namespace Waher.Client.WPF.Controls
 				Markdown = null;
 			}
 
-			Item = new ChatItem(ChatItemType.Transmitted, Msg, Markdown, Colors.Black, Colors.Honeydew);
+			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Msg, Markdown, Colors.Black, Colors.Honeydew);
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
@@ -155,7 +155,7 @@ namespace Waher.Client.WPF.Controls
 			this.node.SendChatMessage(Msg, Markdown);
 		}
 
-		public void ChatMessageReceived(string Message, bool IsMarkdown, MainWindow MainWindow)
+		public void ChatMessageReceived(string Message, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
 		{
 			MarkdownDocument Markdown;
 			ChatItem Item;
@@ -189,7 +189,7 @@ namespace Waher.Client.WPF.Controls
 			else
 				Markdown = null;
 
-			Item = new ChatItem(ChatItemType.Received, Message, Markdown, Colors.Black, Colors.AliceBlue);
+			Item = new ChatItem(ChatItemType.Received, Timestamp, Message, Markdown, Colors.Black, Colors.AliceBlue);
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
@@ -366,7 +366,7 @@ namespace Waher.Client.WPF.Controls
 					Markdown = null;
 				}
 
-				ChatItem Item = new ChatItem(Type, E.InnerText, Markdown, ForegroundColor, BackgroundColor);
+				ChatItem Item = new ChatItem(Type, Timestamp, E.InnerText, Markdown, ForegroundColor, BackgroundColor);
 				ListViewItem ListViewItem = new ListViewItem()
 				{
 					Content = Item,

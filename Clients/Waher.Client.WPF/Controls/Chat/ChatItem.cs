@@ -46,11 +46,12 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public ChatItem(ChatItemType Type, string Message, MarkdownDocument Markdown, Color ForegroundColor, Color BackgroundColor)
+		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, MarkdownDocument Markdown, 
+			Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
 			this.type = Type;
-			this.timestamp = this.lastUpdated = DateTime.Now;
+			this.timestamp = this.lastUpdated = Timestamp;
 			this.message = Message;
 
 			if (Markdown is null)

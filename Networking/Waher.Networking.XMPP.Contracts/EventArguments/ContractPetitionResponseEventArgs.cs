@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Requested contract, if accepted, null if rejected.
 		/// </summary>
-		public Contract RequestedIdentity => this.requestedContract;
+		public Contract RequestedContract => this.requestedContract;
 
 		/// <summary>
 		/// Petition ID

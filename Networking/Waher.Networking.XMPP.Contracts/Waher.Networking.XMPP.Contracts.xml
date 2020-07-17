@@ -1653,7 +1653,7 @@
             <param name="PetitionId">Petition ID. Identifies the petition.</param>
             <param name="Response">If accepted (true) or rejected (false).</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionResponseEventArgs.RequestedIdentity">
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionResponseEventArgs.RequestedContract">
             <summary>
             Requested contract, if accepted, null if rejected.
             </summary>

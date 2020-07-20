@@ -3227,7 +3227,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 				}
 
-				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
+				if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
 				{
 					try
 					{

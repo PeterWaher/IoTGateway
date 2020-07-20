@@ -14,6 +14,16 @@
             ID of legal identity signing the contract.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ClientSignature.LegalIdUri">
+            <summary>
+            ID of legal identity signing the contract, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ClientSignature.LegalIdUriString">
+            <summary>
+            ID of legal identity signing the contract, as an URI string.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ClientSignature.BareJid">
             <summary>
             Bare JID of the client used to generate the signature.
@@ -49,6 +59,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContractId">
             <summary>
             Contract identity
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContractIdUri">
+            <summary>
+            Contract identity, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.ContractIdUriString">
+            <summary>
+            Contract identity, as an URI string.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.Provider">
@@ -358,6 +378,34 @@
             <summary>
             Component address.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.LegalIdUriString(System.String)">
+            <summary>
+            Legal identity URI, as a string.
+            </summary>
+            <param name="LegalId">Legal ID</param>
+            <returns>URI String</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.LegalIdUri(System.String)">
+            <summary>
+            Legal identity URI.
+            </summary>
+            <param name="LegalId">Legal ID</param>
+            <returns>URI</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ContractIdUriString(System.String)">
+            <summary>
+            Contract identity URI, as a string.
+            </summary>
+            <param name="ContractId">Contract ID</param>
+            <returns>URI String</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ContractIdUri(System.String)">
+            <summary>
+            Contract identity URI.
+            </summary>
+            <param name="ContractId">Contract ID</param>
+            <returns>URI</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetServerPublicKey(Waher.Networking.XMPP.Contracts.KeyEventHandler,System.Object)">
             <summary>
@@ -1453,7 +1501,7 @@
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityResponseReceived">
             <summary>
-            Event raised when someone requests access to one of the legal identities owned by the client.
+            Event raised when a response to an identity petition has been received by the client.
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionContractAsync(System.String,System.String,System.String)">
@@ -1508,12 +1556,12 @@
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived">
             <summary>
-            Event raised when someone requests access to one of the legal identities owned by the client.
+            Event raised when someone requests access to a smart contract to which the client is part.
             </summary>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractResponseReceived">
             <summary>
-            Event raised when someone requests access to one of the legal identities owned by the client.
+            Event raised when a response to a contract petition has been received by the client.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
@@ -1690,6 +1738,16 @@
             ID of contract being signed.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs.ContractIdUri">
+            <summary>
+            ID of contract being signed, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs.ContractIdUriString">
+            <summary>
+            ID of contract being signed, as an URI string.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventHandler">
             <summary>
             Delegate for contract signature event handlers.
@@ -1710,6 +1768,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalId">
             <summary>
             ID of legal identity signing the contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalIdUri">
+            <summary>
+            ID of legal identity signing the contract, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalIdUriString">
+            <summary>
+            ID of legal identity signing the contract, as an URI string.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">
@@ -2703,6 +2771,16 @@
             ID of the legal identity
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.IdUri">
+            <summary>
+            ID of legal identity, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.IdUriString">
+            <summary>
+            ID of legal identity, as an URI string.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentity.Provider">
             <summary>
             Provider where the identity is maintained.
@@ -2900,6 +2978,16 @@
             Legal ID
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentity.LegalIdUri">
+            <summary>
+            Legal ID, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NetworkIdentity.LegalIdUriString">
+            <summary>
+            Legal ID, as an URI string.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.NumericalParameter">
             <summary>
             Numerical contractual parameter
@@ -2970,6 +3058,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Part.LegalId">
             <summary>
             Legal identity of part
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Part.LegalIdUri">
+            <summary>
+            Legal identity of part, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Part.LegalIdUriString">
+            <summary>
+            Legal identity of part, as an URI string.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Part.Role">

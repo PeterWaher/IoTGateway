@@ -3286,7 +3286,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// Event raised when a response to an identity petition has been received by the client.
 		/// </summary>
 		public event LegalIdentityPetitionResponseEventHandler PetitionedIdentityResponseReceived = null;
 
@@ -3444,7 +3444,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// Event raised when someone requests access to a smart contract to which the client is part.
 		/// </summary>
 		public event ContractPetitionEventHandler PetitionedContractReceived = null;
 
@@ -3482,7 +3482,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// Event raised when a response to a contract petition has been received by the client.
 		/// </summary>
 		public event ContractPetitionResponseEventHandler PetitionedContractResponseReceived = null;
 

@@ -60,14 +60,14 @@ namespace Waher.Networking.XMPP.Contracts
 			this.localEndpoint = null;
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
-			this.client.RegisterMessageHandler("petitionIdentity", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionIdentityResponse", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
 
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionContract", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
-			this.client.RegisterMessageHandler("petitionContractResponse", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
 		}
 
 		/// <summary>
@@ -175,9 +175,14 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void Dispose()
 		{
 			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+
 			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
 			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
 
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;

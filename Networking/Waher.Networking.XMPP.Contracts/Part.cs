@@ -44,6 +44,16 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Legal identity of part, as an URI.
+		/// </summary>
+		public Uri LegalIdUri => ContractsClient.LegalIdUri(this.legalId);
+
+		/// <summary>
+		/// Legal identity of part, as an URI string.
+		/// </summary>
+		public string LegalIdUriString => ContractsClient.LegalIdUriString(this.legalId);
+
+		/// <summary>
 		/// Role of the part in the contract
 		/// </summary>
 		public string Role

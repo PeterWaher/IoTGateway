@@ -78,6 +78,16 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// ID of legal identity, as an URI.
+		/// </summary>
+		public Uri IdUri => ContractsClient.LegalIdUri(this.id);
+
+		/// <summary>
+		/// ID of legal identity, as an URI string.
+		/// </summary>
+		public string IdUriString => ContractsClient.LegalIdUriString(this.id);
+
+		/// <summary>
 		/// Provider where the identity is maintained.
 		/// </summary>
 		public string Provider

@@ -60,6 +60,16 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Contract identity, as an URI.
+		/// </summary>
+		public Uri ContractIdUri => ContractsClient.LegalIdUri(this.contractId);
+
+		/// <summary>
+		/// Contract identity, as an URI string.
+		/// </summary>
+		public string ContractIdUriString => ContractsClient.LegalIdUriString(this.contractId);
+
+		/// <summary>
 		/// JID of the Trust Provider hosting the contract
 		/// </summary>
 		public string Provider

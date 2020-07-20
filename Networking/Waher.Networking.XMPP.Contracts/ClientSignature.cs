@@ -25,6 +25,16 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// ID of legal identity signing the contract, as an URI.
+		/// </summary>
+		public Uri LegalIdUri => ContractsClient.LegalIdUri(this.legalId);
+
+		/// <summary>
+		/// ID of legal identity signing the contract, as an URI string.
+		/// </summary>
+		public string LegalIdUriString => ContractsClient.LegalIdUriString(this.legalId);
+
+		/// <summary>
 		/// Bare JID of the client used to generate the signature.
 		/// </summary>
 		public string BareJid

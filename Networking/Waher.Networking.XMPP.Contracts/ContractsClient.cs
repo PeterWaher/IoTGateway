@@ -198,6 +198,50 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string ComponentAddress => this.componentAddress;
 
+		#region URIs
+
+		/// <summary>
+		/// Legal identity URI, as a string.
+		/// </summary>
+		/// <param name="LegalId">Legal ID</param>
+		/// <returns>URI String</returns>
+		public static string LegalIdUriString(string LegalId)
+		{
+			return "iotid:" + LegalId;
+		}
+
+		/// <summary>
+		/// Legal identity URI.
+		/// </summary>
+		/// <param name="LegalId">Legal ID</param>
+		/// <returns>URI</returns>
+		public static Uri LegalIdUri(string LegalId)
+		{
+			return new Uri(LegalIdUriString(LegalId));
+		}
+
+		/// <summary>
+		/// Contract identity URI, as a string.
+		/// </summary>
+		/// <param name="ContractId">Contract ID</param>
+		/// <returns>URI String</returns>
+		public static string ContractIdUriString(string ContractId)
+		{
+			return "iotsc:" + ContractId;
+		}
+
+		/// <summary>
+		/// Contract identity URI.
+		/// </summary>
+		/// <param name="ContractId">Contract ID</param>
+		/// <returns>URI</returns>
+		public static Uri ContractIdUri(string ContractId)
+		{
+			return new Uri(ContractIdUriString(ContractId));
+		}
+
+		#endregion
+
 		#region Server Public Keys
 
 		/// <summary>

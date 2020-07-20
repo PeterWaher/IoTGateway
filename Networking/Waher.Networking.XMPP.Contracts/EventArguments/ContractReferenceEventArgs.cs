@@ -30,5 +30,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// ID of contract being signed.
 		/// </summary>
 		public string ContractId => this.contractId;
+
+		/// <summary>
+		/// ID of contract being signed, as an URI.
+		/// </summary>
+		public Uri ContractIdUri => ContractsClient.LegalIdUri(this.contractId);
+
+		/// <summary>
+		/// ID of contract being signed, as an URI string.
+		/// </summary>
+		public string ContractIdUriString => ContractsClient.LegalIdUriString(this.contractId);
 	}
 }

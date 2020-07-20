@@ -43,5 +43,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Legal ID
 		/// </summary>
 		public string LegalId => this.legalId;
+
+		/// <summary>
+		/// Legal ID, as an URI.
+		/// </summary>
+		public Uri LegalIdUri => ContractsClient.LegalIdUri(this.legalId);
+
+		/// <summary>
+		/// Legal ID, as an URI string.
+		/// </summary>
+		public string LegalIdUriString => ContractsClient.LegalIdUriString(this.legalId);
 	}
 }

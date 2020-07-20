@@ -1399,7 +1399,7 @@ purposes.
 		</xs:choice>
 	</xs:complexType>
 
-  <xs:element name='petitionIdentity'>
+  <xs:element name='petitionContract'>
     <xs:annotation>
       <xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a smart contract managed by the Trust Provider.</xs:documentation>
       <xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
@@ -1501,7 +1501,7 @@ purposes.
     </xs:complexType>
   </xs:element>
 
-  <xs:element name='petitionIdentityResponseMsg'>
+  <xs:element name='petitionContractResponseMsg'>
     <xs:annotation>
       <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a smart contract.</xs:documentation>
     </xs:annotation>

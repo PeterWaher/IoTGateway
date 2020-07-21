@@ -3806,18 +3806,19 @@ namespace Waher.Persistence.Files
 			int NrBlobBlocks = (int)(BlobFileSize / this.blobBlockSize);
 			this.blobBlockLimit = (uint)NrBlobBlocks;
 
-			byte[] Block = await this.LoadBlockLocked(0, false);
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves,
 				this.nrBlobBlockLoads, this.nrBlobBlockSaves, this.nrFullFileScans, this.nrSearches);
 			BitArray BlocksReferenced = new BitArray(NrBlocks);
 			BitArray BlobBlocksReferenced = new BitArray(NrBlobBlocks);
 			int i;
 
-			BlockHeader.SkipHeader(Reader);
-
 			try
 			{
+				byte[] Block = await this.LoadBlockLocked(0, false);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
+				
+				BlockHeader.SkipHeader(Reader);
+
 				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, null, null);
 
 				List<int> Blocks = new List<int>();

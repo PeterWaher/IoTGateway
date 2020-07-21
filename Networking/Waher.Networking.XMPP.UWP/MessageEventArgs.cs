@@ -88,29 +88,29 @@ namespace Waher.Networking.XMPP
 		/// <param name="e">Values are taken from this object.</param>
 		public MessageEventArgs(MessageEventArgs e)
 		{
-			this.bodies = e.bodies;
-			this.subjects = e.subjects;
-			this.message = e.message;
-			this.content = e.content;
-			this.errorElement = e.errorElement;
-			this.errorType = e.errorType;
-			this.stanzaError = e.stanzaError;
-			this.errorText = e.errorText;
-			this.client = e.client;
-			this.component = e.component;
-			this.type = e.type;
-			this.threadId = e.threadId;
-			this.parentThreadId = e.parentThreadId;
-			this.from = e.from;
-			this.fromBareJid = e.fromBareJid;
-			this.to = e.to;
-			this.id = e.id;
-			this.body = e.body;
-			this.subject = e.subject;
-			this.errorCode = e.errorCode;
-			this.ok = e.ok;
-            this.e2eEncryption = e.e2eEncryption;
-            this.e2eReference = e.e2eReference;
+			this.bodies = e?.bodies;
+			this.subjects = e?.subjects;
+			this.message = e?.message;
+			this.content = e?.content;
+			this.errorElement = e?.errorElement;
+			this.errorType = e?.errorType ?? ErrorType.Undefined;
+			this.stanzaError = e?.stanzaError;
+			this.errorText = e?.errorText;
+			this.client = e?.client;
+			this.component = e?.component;
+			this.type = e?.type ?? MessageType.Normal;
+			this.threadId = e?.threadId;
+			this.parentThreadId = e?.parentThreadId;
+			this.from = e?.from;
+			this.fromBareJid = e?.fromBareJid;
+			this.to = e?.to;
+			this.id = e?.id;
+			this.body = e?.body;
+			this.subject = e?.subject;
+			this.errorCode = e?.errorCode ?? 0;
+			this.ok = e?.ok ?? false;
+            this.e2eEncryption = e?.e2eEncryption;
+            this.e2eReference = e?.e2eReference;
         }
 
         /// <summary>

@@ -3226,7 +3226,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Identity is null)
 					return;
 
-				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
+				if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
 				{
 					await this.Validate(Identity, false, async (sender2, e2) =>
 					{

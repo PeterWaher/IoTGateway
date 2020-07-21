@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -306,6 +307,9 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.ContractSigned += ContractsClient_ContractSigned;
 				Gateway.ContractsClient.ContractUpdated += ContractsClient_ContractUpdated;
 				Gateway.ContractsClient.IdentityUpdated += ContractsClient_IdentityUpdated;
+				Gateway.ContractsClient.PetitionedContractResponseReceived += ContractsClient_PetitionedContractResponseReceived;
+				Gateway.ContractsClient.PetitionedIdentityResponseReceived += ContractsClient_PetitionedIdentityResponseReceived;
+				
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
@@ -716,25 +720,6 @@ namespace Waher.IoTGateway.Setup
 			return Properties.ToArray();
 		}
 
-		private static LegalIdentity GetApproved(string LegalId)
-		{
-			if (approvedIdentities is null)
-				return null;
-
-			foreach (LegalIdentity ID in approvedIdentities)
-			{
-				if (ID.Id == LegalId)
-				{
-					if (ID.State == IdentityState.Approved)
-						return ID;
-					else
-						return null;
-				}
-			}
-
-			return null;
-		}
-
 		private async Task ContractAction(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request);
@@ -773,30 +758,10 @@ namespace Waher.IoTGateway.Setup
 
 			if (Protect)
 			{
-				if (approvedIdentities is null || approvedIdentities.Length == 0)
+				if (!HasApprovedLegalIdentities)
 					throw new BadRequestException("No approved legal identity found with which to sign the contract.");
 
-				string Id = null;
-
-				foreach (LegalIdentity ID in approvedIdentities)
-				{
-					string H = this.CalcPasswordhash(ID, Password);
-
-					foreach (AlternativeField F in passwordHashes)
-					{
-						if (F.Key == ID.Id)
-						{
-							if (F.Value == H)
-								Id = F.Key;
-
-							break;
-						}
-					}
-
-					if (!string.IsNullOrEmpty(Id))
-						break;
-				}
-
+				string Id = this.GetPasswordLegalId(Password);
 				if (string.IsNullOrEmpty(Id))
 					throw new BadRequestException("Invalid password.");
 			}
@@ -818,6 +783,146 @@ namespace Waher.IoTGateway.Setup
 			await Response.SendResponse();
 		}
 
+		/// <summary>
+		/// If there are approved legal identities configured.
+		/// </summary>
+		public static bool HasApprovedLegalIdentities
+		{
+			get => !(approvedIdentities is null) && approvedIdentities.Length > 0;
+		}
+
+		/// <summary>
+		/// Gets the legal identity that corresponds to a given password, from the corresponding hash digests.
+		/// </summary>
+		/// <param name="Password">Password</param>
+		/// <returns>Legal Identity ID, if found, or null otherwise</returns>
+		public string GetPasswordLegalId(string Password)
+		{
+			if (approvedIdentities is null || approvedIdentities.Length == 0)
+				return null;
+
+			foreach (LegalIdentity ID in approvedIdentities)
+			{
+				string H = this.CalcPasswordhash(ID, Password);
+
+				foreach (AlternativeField F in passwordHashes)
+				{
+					if (F.Key == ID.Id)
+					{
+						if (F.Value == H)
+							return F.Key;
+
+						break;
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Petitions information about a legal identity from its owner.
+		/// </summary>
+		/// <param name="LegalId">ID of petitioned legal identity.</param>
+		/// <param name="PetitionId">A petition ID string used to identity request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
+		public Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
+			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			if (this.protectWithPassword)
+				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+
+			return this.PetitionLegalIdentity(LegalId, PetitionId, Purpose, string.Empty, Callback, Timeout);
+		}
+
+		/// <summary>
+		/// Petitions information about a legal identity from its owner.
+		/// </summary>
+		/// <param name="LegalId">ID of petitioned legal identity.</param>
+		/// <param name="PetitionId">A petition ID string used to identity request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
+		/// <param name="Password">Password of legal identity on the current machine used to sign the petition.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a legal identity was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
+		public async Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose, string Password,
+			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			if (!HasApprovedLegalIdentities)
+				return false;
+
+			if (this.protectWithPassword)
+			{
+				string Id = this.GetPasswordLegalId(Password);
+				if (string.IsNullOrEmpty(Id))
+					return false;
+			}
+
+			lock (this.identityPetitionCallbackMethods)
+			{
+				if (this.identityPetitionCallbackMethods.ContainsKey(PetitionId))
+					throw new ArgumentException("Petition ID already used.", nameof(PetitionId));
+
+				this.identityPetitionCallbackMethods[PetitionId] = Callback;
+			}
+
+			try
+			{
+				await Gateway.ContractsClient.PetitionIdentityAsync(LegalId, PetitionId, Purpose);
+
+				Gateway.ScheduleEvent((P) =>
+				{
+					LegalIdentityPetitionResponseEventArgs e = new LegalIdentityPetitionResponseEventArgs(null, null, (string)P, false);
+					this.ContractsClient_PetitionedIdentityResponseReceived(Gateway.ContractsClient, e);
+				}, DateTime.Now.Add(Timeout), PetitionId);
+			}
+			catch (Exception ex)
+			{
+				lock (this.identityPetitionCallbackMethods)
+				{
+					this.identityPetitionCallbackMethods.Remove(PetitionId);
+				}
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return true;
+		}
+
+		private readonly Dictionary<string, LegalIdentityPetitionResponseEventHandler> identityPetitionCallbackMethods = new Dictionary<string, LegalIdentityPetitionResponseEventHandler>();
+
+		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
+		{
+			LegalIdentityPetitionResponseEventHandler Callback;
+			string PetitionId = e.PetitionId;
+
+			lock (this.identityPetitionCallbackMethods)
+			{
+				if (!this.identityPetitionCallbackMethods.TryGetValue(PetitionId, out Callback))
+					return Task.CompletedTask;
+				else
+					this.identityPetitionCallbackMethods.Remove(PetitionId);
+			}
+
+			try
+			{
+				Callback(Sender, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
+		{
+			return Task.CompletedTask;
+		}
 
 	}
 }

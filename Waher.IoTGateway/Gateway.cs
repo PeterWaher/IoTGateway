@@ -1004,7 +1004,7 @@ namespace Waher.IoTGateway
 			Markdown.AppendLine("Stack Trace:");
 			Markdown.AppendLine();
 			Markdown.AppendLine("```");
-			Markdown.AppendLine(e.Trace.ToString().TrimEnd());
+			Markdown.AppendLine(Log.CleanStackTrace(e.Trace.ToString()));
 			Markdown.AppendLine("```");
 
 			Gateway.SendNotification(Markdown.ToString());
@@ -1605,6 +1605,12 @@ namespace Waher.IoTGateway
 
 				mailClient?.Dispose();
 				mailClient = null;
+
+				contractsClient?.Dispose();
+				contractsClient = null;
+
+				softwareUpdateClient?.Dispose();
+				softwareUpdateClient = null;
 
 				if (!(xmppClient is null))
 				{
@@ -3442,6 +3448,37 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Petitions information about a legal identity from its owner.
+		/// </summary>
+		/// <param name="LegalId">ID of petitioned legal identity.</param>
+		/// <param name="PetitionId">A petition ID string used to identity request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
+		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
+			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout);
+		}
+
+		/// <summary>
+		/// Petitions information about a legal identity from its owner.
+		/// </summary>
+		/// <param name="LegalId">ID of petitioned legal identity.</param>
+		/// <param name="PetitionId">A petition ID string used to identity request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
+		/// <param name="Password">Password of legal identity on the current machine used to sign the petition.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a legal identity was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
+		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose, string Password,
+			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Password, Callback, Timeout);
 		}
 
 		#endregion

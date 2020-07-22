@@ -81,6 +81,16 @@
             Contract identity of template, if one was used to create the contract.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.TemplateIdUri">
+            <summary>
+            Contract identity of template, if one was used to create the contract, as an URI.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.TemplateIdUriString">
+            <summary>
+            Contract identity of template, if one was used to create the contract, as an URI string.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.State">
             <summary>
             Contract state
@@ -357,13 +367,6 @@
             <param name="ComponentAddress">Address to the contracts component.</param>
             <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetAllowedSources(System.Object[])">
-            <summary>
-            If access to sensitive methods is only accessible from a set of approved sources.
-            </summary>
-            <param name="ApprovedSources">Approved sources.</param>
-            <exception cref="T:System.NotSupportedException">If trying to change previously set sources.</exception>
-        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Dispose">
             <summary>
             Disposes of the extension.
@@ -378,6 +381,13 @@
             <summary>
             Component address.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetAllowedSources(System.Object[])">
+            <summary>
+            If access to sensitive methods is only accessible from a set of approved sources.
+            </summary>
+            <param name="ApprovedSources">Approved sources.</param>
+            <exception cref="T:System.NotSupportedException">If trying to change previously set sources.</exception>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.LegalIdUriString(System.String)">
             <summary>
@@ -1175,6 +1185,38 @@
             <param name="Contract">Contract to update.</param>
             <returns>Contract</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Validate(Waher.Networking.XMPP.Contracts.Contract,Waher.Networking.XMPP.Contracts.ContractValidationEventHandler,System.Object)">
+            <summary>
+            Validates a smart contract.
+            </summary>
+            <param name="Contract">Contract to validate</param>
+            <param name="Callback">Method to call when validation is completed</param>
+            <param name="State">State object to pass to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Validate(Waher.Networking.XMPP.Contracts.Contract,System.Boolean,Waher.Networking.XMPP.Contracts.ContractValidationEventHandler,System.Object)">
+            <summary>
+            Validates a smart contract.
+            </summary>
+            <param name="Contract">Contract to validate</param>
+            <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+            <param name="Callback">Method to call when validation is completed</param>
+            <param name="State">State object to pass to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateAsync(Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Validates a smart contract.
+            </summary>
+            <param name="Contract">Contract to validate</param>
+            <returns>Status of validation.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateAsync(Waher.Networking.XMPP.Contracts.Contract,System.Boolean)">
+            <summary>
+            Validates a smart contract.
+            </summary>
+            <param name="Contract">Contract to validate</param>
+            <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+            <returns>Status of validation.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemas(Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler,System.Object)">
             <summary>
             Gets available schemas.
@@ -1778,6 +1820,147 @@
         <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalIdUriString">
             <summary>
             ID of legal identity signing the contract, as an URI string.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractStatus">
+            <summary>
+            Validation Status of smart contract
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ContractUndefined">
+            <summary>
+            Contract is not defined.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NotApproved">
+            <summary>
+            Contract is not approved (yet) by trust provider.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NotValidYet">
+            <summary>
+            Contract is not valid yet. 
+            <see cref="P:Waher.Networking.XMPP.Contracts.Contract.From"/>
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NotValidAnymore">
+            <summary>
+            Contract is not valid anymore.
+            <see cref="P:Waher.Networking.XMPP.Contracts.Contract.To"/>
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.TemplateOnly">
+            <summary>
+            Contract is a template, not a valid legal document.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NotLegallyBinding">
+            <summary>
+            The contract is not in a legally binding state. The prerequisites of the contracts are not met.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.HumanReadableNotWellDefined">
+            <summary>
+            Human-readable section not properly defined.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.MachineReadableNotWellDefined">
+            <summary>
+            Machine-readable section not properly defined.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoSchemaAccess">
+            <summary>
+            Unable to get access to schema used to validate the machine-readable section.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.CorruptSchema">
+            <summary>
+            Corrupt schema used for validating machine-readable part.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.FraudulentSchema">
+            <summary>
+            Fraudulent schema used for validating machine-readable part.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.FraudulentMachineReadable">
+            <summary>
+            Fraudulent machine-readable claim. Does not validate against schema.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoClientSignatures">
+            <summary>
+            No client signature found.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ClientSignatureInvalid">
+            <summary>
+            One or more of the client signatures are invalid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ClientIdentityInvalid">
+            <summary>
+            One or more of the legal identities used to sign the contract are invalid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoTrustProvider">
+            <summary>
+            No Trust Provider attesting to the validity of the identity.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoProviderPublicKey">
+            <summary>
+            No provider public key found.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoProviderSignature">
+            <summary>
+            No Trust Provider signature found.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ProviderSignatureInvalid">
+            <summary>
+            Provider signature invalid.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ProviderKeyNotRecognized">
+            <summary>
+            Provider key not recognized.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.Valid">
+            <summary>
+            Contract valid.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractValidationEventHandler">
+            <summary>
+            Delegate for identity validation callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractValidationEventArgs">
+            <summary>
+            Event arguments for identity validation responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractValidationEventArgs.#ctor(Waher.Networking.XMPP.Contracts.ContractStatus,System.Object)">
+            <summary>
+            Event arguments for identity validation responses
+            </summary>
+            <param name="Status">Validation status</param>
+            <param name="State">State object</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractValidationEventArgs.Status">
+            <summary>
+            Validation status of smart contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractValidationEventArgs.State">
+            <summary>
+            State object.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.IdentityStatus">

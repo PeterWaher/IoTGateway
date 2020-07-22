@@ -88,6 +88,16 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Contract identity of template, if one was used to create the contract, as an URI.
+		/// </summary>
+		public Uri TemplateIdUri => string.IsNullOrEmpty(this.templateId) ? null : ContractsClient.ContractIdUri(this.templateId);
+
+		/// <summary>
+		/// Contract identity of template, if one was used to create the contract, as an URI string.
+		/// </summary>
+		public string TemplateIdUriString => string.IsNullOrEmpty(this.templateId) ? null : ContractsClient.ContractIdUriString(this.templateId);
+
+		/// <summary>
 		/// Contract state
 		/// </summary>
 		public ContractState State
@@ -727,9 +737,9 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 
-                        Signature.DigitalSignature = Convert.FromBase64String(E.InnerText);
+						Signature.DigitalSignature = Convert.FromBase64String(E.InnerText);
 
-                        if (string.IsNullOrEmpty(Signature.LegalId) ||
+						if (string.IsNullOrEmpty(Signature.LegalId) ||
 							string.IsNullOrEmpty(Signature.BareJid) ||
 							string.IsNullOrEmpty(Signature.Role) ||
 							Signature.Timestamp == DateTime.MinValue)
@@ -827,9 +837,9 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 
-                        ServerSignature.DigitalSignature = Convert.FromBase64String(E.InnerText);
+						ServerSignature.DigitalSignature = Convert.FromBase64String(E.InnerText);
 
-                        if (ServerSignature.Timestamp == DateTime.MinValue)
+						if (ServerSignature.Timestamp == DateTime.MinValue)
 							return null;
 
 						Result.serverSignature = ServerSignature;

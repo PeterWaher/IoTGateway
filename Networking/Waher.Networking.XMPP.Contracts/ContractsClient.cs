@@ -5,14 +5,17 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Settings;
+using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
 
@@ -42,6 +45,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
+		#region Construction
 
 		/// <summary>
 		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
@@ -101,6 +106,44 @@ namespace Waher.Networking.XMPP.Contracts
 			return Result;
 		}
 
+		/// <summary>
+		/// Disposes of the extension.
+		/// </summary>
+		public override void Dispose()
+		{
+			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
+			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+
+			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
+
+			this.localEndpoint?.Dispose();
+			this.localEndpoint = null;
+
+			this.rnd?.Dispose();
+			this.rnd = null;
+
+			base.Dispose();
+		}
+
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
+		public override string[] Extensions => new string[] { };
+
+		/// <summary>
+		/// Component address.
+		/// </summary>
+		public string ComponentAddress => this.componentAddress;
+
+		#endregion
+
+		#region Keys
+
 		private async Task<EndpointSecurity> LoadKeys()
 		{
 			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
@@ -150,6 +193,10 @@ namespace Waher.Networking.XMPP.Contracts
 			return Convert.FromBase64String(s);
 		}
 
+		#endregion
+
+		#region Security
+
 		/// <summary>
 		/// If access to sensitive methods is only accessible from a set of approved sources.
 		/// </summary>
@@ -169,39 +216,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Assert.CallFromSource(this.approvedSources);
 		}
 
-		/// <summary>
-		/// Disposes of the extension.
-		/// </summary>
-		public override void Dispose()
-		{
-			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
-			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
-
-			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
-			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
-			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
-			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
-
-			this.localEndpoint?.Dispose();
-			this.localEndpoint = null;
-
-			this.rnd?.Dispose();
-			this.rnd = null;
-
-			base.Dispose();
-		}
-
-		/// <summary>
-		/// Implemented extensions.
-		/// </summary>
-		public override string[] Extensions => new string[] { };
-
-		/// <summary>
-		/// Component address.
-		/// </summary>
-		public string ComponentAddress => this.componentAddress;
+		#endregion
 
 		#region URIs
 
@@ -2442,6 +2457,349 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 
 			return Result.Task;
+		}
+
+		#endregion
+
+		#region Validate Contract
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public Task Validate(Contract Contract, ContractValidationEventHandler Callback, object State)
+		{
+			return this.Validate(Contract, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public async Task Validate(Contract Contract, bool ValidateState, ContractValidationEventHandler Callback, object State)
+		{
+			if (Contract is null)
+			{
+				await this.ReturnStatus(ContractStatus.ContractUndefined, Callback, State);
+				return;
+			}
+
+			if (ValidateState && Contract.State != ContractState.Approved)
+			{
+				await this.ReturnStatus(ContractStatus.NotApproved, Callback, State);
+				return;
+			}
+
+			DateTime Now = DateTime.Now;
+
+			if (Now.Date.AddDays(1) < Contract.From)    // To avoid Time-zone problems
+			{
+				await this.ReturnStatus(ContractStatus.NotValidYet, Callback, State);
+				return;
+			}
+
+			if (Now.Date.AddDays(1) > Contract.To)      // To avoid Time-zone problems
+			{
+				await this.ReturnStatus(ContractStatus.NotValidAnymore, Callback, State);
+				return;
+			}
+
+			if (string.IsNullOrEmpty(Contract.Provider))
+			{
+				await this.ReturnStatus(ContractStatus.NoTrustProvider, Callback, State);
+				return;
+			}
+
+			if (Contract.PartsMode == ContractParts.TemplateOnly)
+			{
+				await this.ReturnStatus(ContractStatus.TemplateOnly, Callback, State);
+				return;
+			}
+
+			if (Contract.ClientSignatures is null || Contract.ClientSignatures.Length == 0)
+			{
+				await this.ReturnStatus(ContractStatus.NoClientSignatures, Callback, State);
+				return;
+			}
+
+			if (!Contract.IsLegallyBinding(false))
+			{
+				await this.ReturnStatus(ContractStatus.NotLegallyBinding, Callback, State);
+				return;
+			}
+
+			if (!IsHumanReadableWellDefined(Contract))
+			{
+				await this.ReturnStatus(ContractStatus.HumanReadableNotWellDefined, Callback, State);
+				return;
+			}
+
+			if (string.IsNullOrEmpty(Contract.ForMachinesLocalName) ||
+				string.IsNullOrEmpty(Contract.ForMachinesNamespace) ||
+				Contract.ForMachines is null ||
+				Contract.ForMachinesLocalName != Contract.ForMachines.LocalName ||
+				Contract.ForMachinesNamespace != Contract.ForMachines.NamespaceURI)
+			{
+				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State);
+				return;
+			}
+
+			string SchemaKey = Contract.ForMachinesNamespace + "#" + Contract.ForMachinesLocalName + "#" + Convert.ToBase64String(Contract.ContentSchemaDigest);
+			byte[] SchemaBin;
+			XmlSchema Schema;
+
+			lock (this.schemas)
+			{
+				if (this.schemas.TryGetValue(SchemaKey, out KeyValuePair<byte[], XmlSchema> P))
+				{
+					SchemaBin = P.Key;
+					Schema = P.Value;
+				}
+				else
+				{
+					SchemaBin = null;
+					Schema = null;
+				}
+			}
+
+			if (SchemaBin is null)
+			{
+				TaskCompletionSource<ContractStatus> T = new TaskCompletionSource<ContractStatus>();
+
+				this.GetSchema(Contract.ForMachinesNamespace, new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest),
+					(_, e) =>
+					{
+						if (e.Ok)
+						{
+							try
+							{
+								SchemaBin = e.Schema;
+								using (MemoryStream ms = new MemoryStream(SchemaBin))
+								{
+									Schema = XSL.LoadSchema(ms, string.Empty);
+								}
+
+								lock (this.schemas)
+								{
+									this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
+								}
+
+								T.TrySetResult(ContractStatus.Valid);
+							}
+							catch (Exception)
+							{
+								T.TrySetResult(ContractStatus.CorruptSchema);
+							}
+						}
+						else
+							T.TrySetResult(ContractStatus.NoSchemaAccess);
+
+						return Task.CompletedTask;
+					}, null);
+
+				ContractStatus Temp = await T.Task;
+				if (Temp != ContractStatus.Valid)
+				{
+					await this.ReturnStatus(Temp, Callback, State);
+					return;
+				}
+			}
+
+			byte[] Digest = Hashes.ComputeHash(Contract.ContentSchemaHashFunction, SchemaBin);
+			if (Convert.ToBase64String(Digest) != Convert.ToBase64String(Contract.ContentSchemaDigest))
+			{
+				await this.ReturnStatus(ContractStatus.FraudulentSchema, Callback, State);
+				return;
+			}
+
+			try
+			{
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Contract.ForMachines.OuterXml);
+
+				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schema);
+			}
+			catch (Exception)
+			{
+				await this.ReturnStatus(ContractStatus.FraudulentMachineReadable, Callback, State);
+				return;
+			}
+
+			StringBuilder Xml = new StringBuilder();
+			Contract.Serialize(Xml, false, false, false, false, false);
+			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			foreach (ClientSignature Signature in Contract.ClientSignatures)
+			{
+				LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
+				if (Identity is null)
+				{
+					await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State);
+					return;
+				}
+
+				IdentityStatus Status = await this.ValidateAsync(Identity);
+				if (Status != IdentityStatus.NotApproved)
+				{
+					await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback, State);
+					return;
+				}
+			}
+
+			if (Contract.ServerSignature is null)
+			{
+				await this.ReturnStatus(ContractStatus.NoProviderSignature, Callback, State);
+				return;
+			}
+
+			Xml.Clear();
+			Contract.Serialize(Xml, false, true, true, true, false);
+			Data = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			bool HasOldPublicKey;
+
+			lock (this.publicKeys)
+			{
+				HasOldPublicKey = this.publicKeys.ContainsKey(Contract.Provider);
+			}
+
+			await this.GetServerPublicKey(Contract.Provider, async (sender, e) =>
+			{
+				if (e.Ok && e.Key != null)
+				{
+					bool Valid = e.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
+
+					if (Valid)
+					{
+						await this.ReturnStatus(ContractStatus.Valid, Callback, State);
+						return;
+					}
+
+					if (!HasOldPublicKey)
+					{
+						await this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+						return;
+					}
+
+					lock (this.publicKeys)
+					{
+						this.publicKeys.Remove(Contract.Provider);
+					}
+
+					await this.GetServerPublicKey(Contract.Provider, (sender2, e2) =>
+					{
+						if (e2.Ok && e2.Key != null)
+						{
+							if (e.Key.Equals(e2.Key))
+								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+
+							Valid = e2.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
+
+							if (Valid)
+								return this.ReturnStatus(ContractStatus.Valid, Callback, State);
+							else
+								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+						}
+						else
+							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State);
+
+					}, State);
+				}
+				else
+					await this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State);
+
+			}, State);
+		}
+
+		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
+
+		private async Task ReturnStatus(ContractStatus Status, ContractValidationEventHandler Callback, object State)
+		{
+			if (!(Callback is null))
+			{
+				try
+				{
+					await Callback(this, new ContractValidationEventArgs(Status, State));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		private static bool IsHumanReadableWellDefined(HumanReadableText[] Texts)
+		{
+			if (Texts is null)
+				return false;
+
+			foreach (HumanReadableText Text in Texts)
+			{
+				if (!Text.IsWellDefined)
+					return false;
+			}
+
+			return false;
+		}
+
+		private static bool IsHumanReadableWellDefined(Contract Contract)
+		{
+			if (!IsHumanReadableWellDefined(Contract.ForHumans))
+				return false;
+
+			if (!(Contract.Roles is null))
+			{
+				foreach (Role Role in Contract.Roles)
+				{
+					if (!IsHumanReadableWellDefined(Role.Descriptions))
+						return false;
+				}
+			}
+
+			if (!(Contract.Parameters is null))
+			{
+				foreach (Parameter Parameter in Contract.Parameters)
+				{
+					if (!IsHumanReadableWellDefined(Parameter.Descriptions))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <returns>Status of validation.</returns>
+		public Task<ContractStatus> ValidateAsync(Contract Contract)
+		{
+			return this.ValidateAsync(Contract, true);
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <returns>Status of validation.</returns>
+		public async Task<ContractStatus> ValidateAsync(Contract Contract, bool ValidateState)
+		{
+			TaskCompletionSource<ContractStatus> Result = new TaskCompletionSource<ContractStatus>();
+
+			await this.Validate(Contract, ValidateState, (sender, e) =>
+			{
+				Result.SetResult(e.Status);
+				return Task.CompletedTask;
+			}, null);
+
+			return await Result.Task;
 		}
 
 		#endregion

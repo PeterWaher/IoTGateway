@@ -4,14 +4,14 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Events;
 
-namespace Waher.Content
+namespace Waher.Content.Xsl
 {
 	/// <summary>
 	/// Class performing XML validation.
 	/// </summary>
 	internal class XmlValidator
 	{
-		private string objectId = null;
+		private readonly string objectId = null;
 		private XmlSchemaException exception;
 
 		public XmlValidator(string ObjectID)
@@ -29,7 +29,8 @@ namespace Waher.Content
 					break;
 
 				case XmlSeverityType.Warning:
-					Log.Warning(e.Message, this.objectId);
+					if (!string.IsNullOrEmpty(this.objectId))
+						Log.Warning(e.Message, this.objectId);
 					break;
 			}
 		}

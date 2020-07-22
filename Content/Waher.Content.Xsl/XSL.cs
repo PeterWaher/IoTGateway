@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-using System.Security.Cryptography.X509Certificates;
 using System.Xml.Xsl;
-using Waher.Script;
 
 namespace Waher.Content.Xsl
 {
@@ -43,13 +40,25 @@ namespace Waher.Content.Xsl
 				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
-				XmlValidator Validator = new XmlValidator(ResourceName);
-				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-
-				Validator.AssertNoError();
-
-				return Result;
+				return LoadSchema(f, ResourceName);
 			}
+		}
+
+		/// <summary>
+		/// Loads an XML schema from an embedded resource.
+		/// </summary>
+		/// <param name="Input">Schema Input stream.</param>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <returns>XML Schema.</returns>
+		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
+		public static XmlSchema LoadSchema(Stream Input, string ResourceName)
+		{
+			XmlValidator Validator = new XmlValidator(ResourceName);
+			XmlSchema Result = XmlSchema.Read(Input, Validator.ValidationCallback);
+
+			Validator.AssertNoError();
+
+			return Result;
 		}
 
 		/// <summary>
@@ -77,13 +86,24 @@ namespace Waher.Content.Xsl
 				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
-				using (XmlReader r = XmlReader.Create(f))
-				{
-					XslCompiledTransform Xslt = new XslCompiledTransform();
-					Xslt.Load(r);
+				return LoadTransform(f, ResourceName);
+			}
+		}
 
-					return Xslt;
-				}
+		/// <summary>
+		/// Loads an XSL transformation from an embedded resource.
+		/// </summary>
+		/// <param name="Input">XSLT Input stream.</param>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <returns>XSL tranformation.</returns>
+		public static XslCompiledTransform LoadTransform(Stream Input, string ResourceName)
+		{
+			using (XmlReader r = XmlReader.Create(Input))
+			{
+				XslCompiledTransform Xslt = new XslCompiledTransform();
+				Xslt.Load(r);
+
+				return Xslt;
 			}
 		}
 

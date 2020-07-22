@@ -307,9 +307,9 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.ContractSigned += ContractsClient_ContractSigned;
 				Gateway.ContractsClient.ContractUpdated += ContractsClient_ContractUpdated;
 				Gateway.ContractsClient.IdentityUpdated += ContractsClient_IdentityUpdated;
-				Gateway.ContractsClient.PetitionedContractResponseReceived += ContractsClient_PetitionedContractResponseReceived;
 				Gateway.ContractsClient.PetitionedIdentityResponseReceived += ContractsClient_PetitionedIdentityResponseReceived;
-				
+				Gateway.ContractsClient.PetitionedContractResponseReceived += ContractsClient_PetitionedContractResponseReceived;
+
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
@@ -892,7 +892,80 @@ namespace Waher.IoTGateway.Setup
 			return true;
 		}
 
+		/// <summary>
+		/// Petitions information about a smart contract from its owner.
+		/// </summary>
+		/// <param name="ContractId">ID of petitioned smart contract.</param>
+		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
+		public Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
+			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			if (this.protectWithPassword)
+				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+
+			return this.PetitionContract(ContractId, PetitionId, Purpose, string.Empty, Callback, Timeout);
+		}
+
+		/// <summary>
+		/// Petitions information about a smart contract from its owner.
+		/// </summary>
+		/// <param name="ContractId">ID of petitioned smart contract.</param>
+		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
+		/// <param name="Password">Password of smart contract on the current machine used to sign the petition.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a smart contract was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
+		public async Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose, string Password,
+			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			if (!HasApprovedLegalIdentities)
+				return false;
+
+			if (this.protectWithPassword)
+			{
+				string Id = this.GetPasswordLegalId(Password);
+				if (string.IsNullOrEmpty(Id))
+					return false;
+			}
+
+			lock (this.contractPetitionCallbackMethods)
+			{
+				if (this.contractPetitionCallbackMethods.ContainsKey(PetitionId))
+					throw new ArgumentException("Petition ID already used.", nameof(PetitionId));
+
+				this.contractPetitionCallbackMethods[PetitionId] = Callback;
+			}
+
+			try
+			{
+				await Gateway.ContractsClient.PetitionContractAsync(ContractId, PetitionId, Purpose);
+
+				Gateway.ScheduleEvent((P) =>
+				{
+					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false);
+					this.ContractsClient_PetitionedContractResponseReceived(Gateway.ContractsClient, e);
+				}, DateTime.Now.Add(Timeout), PetitionId);
+			}
+			catch (Exception ex)
+			{
+				lock (this.contractPetitionCallbackMethods)
+				{
+					this.contractPetitionCallbackMethods.Remove(PetitionId);
+				}
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return true;
+		}
+
 		private readonly Dictionary<string, LegalIdentityPetitionResponseEventHandler> identityPetitionCallbackMethods = new Dictionary<string, LegalIdentityPetitionResponseEventHandler>();
+		private readonly Dictionary<string, ContractPetitionResponseEventHandler> contractPetitionCallbackMethods = new Dictionary<string, ContractPetitionResponseEventHandler>();
 
 		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
 		{
@@ -921,6 +994,26 @@ namespace Waher.IoTGateway.Setup
 
 		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
 		{
+			ContractPetitionResponseEventHandler Callback;
+			string PetitionId = e.PetitionId;
+
+			lock (this.contractPetitionCallbackMethods)
+			{
+				if (!this.contractPetitionCallbackMethods.TryGetValue(PetitionId, out Callback))
+					return Task.CompletedTask;
+				else
+					this.contractPetitionCallbackMethods.Remove(PetitionId);
+			}
+
+			try
+			{
+				Callback(Sender, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
 			return Task.CompletedTask;
 		}
 

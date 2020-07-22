@@ -3481,6 +3481,37 @@ namespace Waher.IoTGateway
 			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Password, Callback, Timeout);
 		}
 
+		/// <summary>
+		/// Petitions information about a smart contract from its owner.
+		/// </summary>
+		/// <param name="ContractId">ID of petitioned smart contract.</param>
+		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
+		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
+			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout);
+		}
+
+		/// <summary>
+		/// Petitions information about a smart contract from its owner.
+		/// </summary>
+		/// <param name="ContractId">ID of petitioned smart contract.</param>
+		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
+		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
+		/// <param name="Password">Password of smart contract on the current machine used to sign the petition.</param>
+		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
+		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <returns>If a smart contract was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
+		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose, string Password,
+			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+		{
+			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Password, Callback, Timeout);
+		}
+
 		#endregion
 
 		#region Finding Files

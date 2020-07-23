@@ -97,6 +97,12 @@ namespace Waher.IoTGateway.Svc
 					Log.Critical(e.ExceptionObject.ToString());
 				else
 					Log.Critical("Unexpected null exception thrown.");
+
+				if (e.IsTerminating)
+				{
+					Gateway.Stop().Wait();
+					Log.Terminate();
+				}
 			};
 
 			AppDomain.CurrentDomain.DomainUnload += (sender, e) =>

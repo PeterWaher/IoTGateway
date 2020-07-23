@@ -139,6 +139,12 @@ namespace Waher.IoTGateway.Console
 						Log.Critical(e.ExceptionObject.ToString());
 					else
 						Log.Critical("Unexpected null exception thrown.");
+
+					if (e.IsTerminating)
+					{
+						Gateway.Stop().Wait();
+						Log.Terminate();
+					}
 				};
 
 				Gateway.GetDatabaseProvider += GetDatabase;

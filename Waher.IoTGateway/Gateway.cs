@@ -893,6 +893,20 @@ namespace Waher.IoTGateway
 						}
 					}
 
+					foreach (string UnhandledException in Directory.GetFiles(appDataFolder, "UnhandledException*.txt", SearchOption.TopDirectoryOnly))
+					{
+						try
+						{
+							string Msg = File.ReadAllText(UnhandledException);
+							File.Delete(UnhandledException);
+							Log.Alert("Unhandled Exception\r\n=======================\r\n\r\n```\r\n" + Msg + "\r\n```");
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex, UnhandledException);
+						}
+					}
+
 					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
 						Log.Informational("Server started.");
 					else

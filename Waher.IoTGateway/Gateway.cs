@@ -210,7 +210,7 @@ namespace Waher.IoTGateway
 		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
 		{
 			bool FirstStart = firstStart;
-
+			
 			firstStart = false;
 			instance = InstanceName;
 

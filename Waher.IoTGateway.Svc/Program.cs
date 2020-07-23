@@ -116,6 +116,16 @@ namespace Waher.IoTGateway.Svc
 				Log.Terminate();
 			};
 
+			TaskScheduler.UnobservedTaskException += (sender, e) =>
+			{
+				Exception ex = Log.UnnestException(e.Exception);
+				string StackTrace = Log.CleanStackTrace(ex.StackTrace);
+
+				Log.Alert("Unobserved Task Exception\r\n============================\r\n\r\n" + ex.Message + "\r\n\r\n```\r\n" + StackTrace + "\r\n```");
+
+				e.SetObserved();
+			};
+
 			try
 			{
 				string ServiceName = "IoT Gateway Service";

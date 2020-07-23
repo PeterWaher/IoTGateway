@@ -147,6 +147,16 @@ namespace Waher.IoTGateway.Console
 					}
 				};
 
+				TaskScheduler.UnobservedTaskException += (sender, e) =>
+				{
+					Exception ex = Log.UnnestException(e.Exception);
+					string StackTrace = Log.CleanStackTrace(ex.StackTrace);
+
+					Log.Alert("Unobserved Task Exception\r\n============================\r\n\r\n" + ex.Message + "\r\n\r\n```\r\n" + StackTrace + "\r\n```");
+
+					e.SetObserved();
+				};
+
 				Gateway.GetDatabaseProvider += GetDatabase;
 				Gateway.RegistrationSuccessful += RegistrationSuccessful;
 

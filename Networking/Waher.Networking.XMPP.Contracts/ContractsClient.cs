@@ -2489,7 +2489,10 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (ValidateState && Contract.State != ContractState.Approved)
+			if (ValidateState &&
+				Contract.State != ContractState.Approved &&
+				Contract.State != ContractState.BeingSigned &&
+				Contract.State != ContractState.Signed)
 			{
 				await this.ReturnStatus(ContractStatus.NotApproved, Callback, State);
 				return;
@@ -2644,7 +2647,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 
 				IdentityStatus Status = await this.ValidateAsync(Identity);
-				if (Status != IdentityStatus.NotApproved)
+				if (Status != IdentityStatus.Valid)
 				{
 					await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback, State);
 					return;
@@ -2676,6 +2679,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (Valid)
 					{
+
 						await this.ReturnStatus(ContractStatus.Valid, Callback, State);
 						return;
 					}
@@ -2744,7 +2748,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return false;
 			}
 
-			return false;
+			return true;
 		}
 
 		private static bool IsHumanReadableWellDefined(Contract Contract)

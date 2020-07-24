@@ -45,61 +45,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			object[] FindParameters = new object[] { this.collectionName, Offset, Top,
-				TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order) };
-			object Obj = FindMethod.Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
+			IEnumerable<object> Objects = await Database.Find(this.collectionName, Offset, Top,
+				TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
 
-			await Task;
-
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI is null)
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			Obj = PI.GetValue(Task);
-			if (!(Obj is IEnumerable Enumerable))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			return new SynchEnumerator(Enumerable.GetEnumerator());
-		}
-
-		private static MethodInfo findMethod = null;
-
-		/// <summary>
-		/// Generic object database Find method: <see cref="Database.Find(string, int, int, Filter, string[])"/>
-		/// </summary>
-		public static MethodInfo FindMethod
-		{
-			get
-			{
-				if (findMethod is null)
-				{
-					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
-					{
-						if (MI.ContainsGenericParameters)
-							continue;
-
-						ParameterInfo[] Parameters = MI.GetParameters();
-						if (Parameters.Length != 5 ||
-							Parameters[0].ParameterType != typeof(string) ||
-							Parameters[1].ParameterType != typeof(int) ||
-							Parameters[2].ParameterType != typeof(int) ||
-							Parameters[3].ParameterType != typeof(Filter) ||
-							Parameters[4].ParameterType != typeof(string[]))
-						{
-							continue;
-						}
-
-						findMethod = MI;
-					}
-
-					if (findMethod is null)
-						throw new InvalidOperationException("Appropriate Database.Find method not found.");
-				}
-
-				return findMethod;
-			}
+			return new SynchEnumerator(Objects.GetEnumerator());
 		}
 
 		/// <summary>
@@ -115,61 +64,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
+			IEnumerable<object> Objects = await Database.FindDelete(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
+			int Count = 0;
 
-			object[] FindParameters = new object[] { this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order) };
-			object Obj = FindDeleteMethod.Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			await Task;
-
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI is null)
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			Obj = PI.GetValue(Task);
-			if (!(Obj is int Count))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
+			foreach (object Obj in Objects)
+				Count++;
+			
 			return Count;
-		}
-
-		private static MethodInfo findDeleteMethod = null;
-
-		/// <summary>
-		/// Generic object database Find method: <see cref="Database.Find(string, int, int, Filter, string[])"/>
-		/// </summary>
-		public static MethodInfo FindDeleteMethod
-		{
-			get
-			{
-				if (findDeleteMethod is null)
-				{
-					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("FindDelete"))
-					{
-						if (MI.ContainsGenericParameters)
-							continue;
-
-						ParameterInfo[] Parameters = MI.GetParameters();
-						if (Parameters.Length != 5 ||
-							Parameters[0].ParameterType != typeof(string) ||
-							Parameters[1].ParameterType != typeof(int) ||
-							Parameters[2].ParameterType != typeof(int) ||
-							Parameters[3].ParameterType != typeof(Filter) ||
-							Parameters[4].ParameterType != typeof(string[]))
-						{
-							continue;
-						}
-
-						findDeleteMethod = MI;
-					}
-
-					if (findDeleteMethod is null)
-						throw new InvalidOperationException("Appropriate Database.FindDelete method not found.");
-				}
-
-				return findDeleteMethod;
-			}
 		}
 
 		/// <summary>

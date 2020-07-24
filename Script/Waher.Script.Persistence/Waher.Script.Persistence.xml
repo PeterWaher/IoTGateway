@@ -1501,11 +1501,6 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindMethod">
-            <summary>
-            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
-            </summary>
-        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
@@ -1516,11 +1511,6 @@
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
-        </member>
-        <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDeleteMethod">
-            <summary>
-            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
-            </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>

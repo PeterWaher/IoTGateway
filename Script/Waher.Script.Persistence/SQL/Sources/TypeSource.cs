@@ -132,8 +132,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
 			Obj = PI.GetValue(Task);
-			if (!(Obj is int Count))
+			if (!(Obj is IEnumerable<object> Objects))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			int Count = 0;
+
+			foreach (object Obj2 in Objects)
+				Count++;
 
 			return Count;
 		}

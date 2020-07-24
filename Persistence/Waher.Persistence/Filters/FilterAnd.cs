@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// This filter selects objects that conform to all child-filters provided.
 	/// </summary>
-	public class FilterAnd : FilterChildren
+	public class FilterAnd : FilterChildren, ICustomFilter
 	{
 		/// <summary>
 		/// This filter selects objects that conform to all child-filters provided.
@@ -70,17 +68,17 @@ namespace Waher.Persistence.Filters
 			{
 				Filter = F.Normalize();
 
-				if (Filter is FilterAnd)
+				if (Filter is FilterAnd And)
 				{
-					foreach (Filter F2 in ((FilterAnd)Filter).ChildFilters)
+					foreach (Filter F2 in And.ChildFilters)
 						Children.Add(F2);
 				}
-				else if (Filter is FilterOr)
+				else if (Filter is FilterOr Or)
 				{
 					if (Ors is null)
 						Ors = new List<Filter[]>();
 
-					Ors.Add(((FilterOr)Filter).ChildFilters);
+					Ors.Add(Or.ChildFilters);
 				}
 				else
 					Children.Add(Filter);
@@ -146,6 +144,27 @@ namespace Waher.Persistence.Filters
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Checks if an object passes the test or not.
+		/// </summary>
+		/// <param name="Object">Untyped object</param>
+		/// <returns>If the object passes the test.</returns>
+		public bool Passes(object Object)
+		{
+			foreach (Filter F in this.ChildFilters)
+			{
+				if (F is ICustomFilter CustomFilter)
+				{
+					if (!CustomFilter.Passes(Object))
+						return false;
+				}
+				else
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// This filter selects objects that conform to any of the child-filters provided.
 	/// </summary>
-	public class FilterOr : FilterChildren
+	public class FilterOr : FilterChildren, ICustomFilter
 	{
 		/// <summary>
 		/// This filter selects objects that conform to any of the child-filters provided.
@@ -69,9 +67,9 @@ namespace Waher.Persistence.Filters
 			{
 				Filter = F.Normalize();
 
-				if (Filter is FilterOr)
+				if (Filter is FilterOr Or)
 				{
-					foreach (Filter F2 in ((FilterOr)Filter).ChildFilters)
+					foreach (Filter F2 in Or.ChildFilters)
 						Children.Add(F2);
 				}
 				else
@@ -102,6 +100,22 @@ namespace Waher.Persistence.Filters
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Checks if an object passes the test or not.
+		/// </summary>
+		/// <param name="Object">Untyped object</param>
+		/// <returns>If the object passes the test.</returns>
+		public bool Passes(object Object)
+		{
+			foreach (Filter F in this.ChildFilters)
+			{
+				if (F is ICustomFilter CustomFilter && CustomFilter.Passes(Object))
+					return true;
+			}
+
+			return false;
 		}
 	}
 }

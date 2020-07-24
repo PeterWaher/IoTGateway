@@ -1,5 +1,4 @@
 ﻿using System;
-using Waher.Events;
 
 namespace Waher.Persistence.Filters
 {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Waher.Persistence.Filters
 {
@@ -69,5 +66,28 @@ namespace Waher.Persistence.Filters
 		{
 			return this.FieldName + " LIKE " + this.regularExpression.ToString();
 		}
+
+		/// <summary>
+		/// Performs a comparison on the object with the field value <paramref name="Value"/>.
+		/// </summary>
+		/// <param name="Value">Field value for comparison.</param>
+		/// <returns>Result of comparison.</returns>
+		public override bool Compare(object Value)
+		{
+			if (Value is null)
+				return false;
+
+			string s = Value?.ToString();
+
+			if (this.regex is null)
+				this.regex = new Regex(this.regularExpression, RegexOptions.Singleline);
+
+			Match M = this.regex.Match(s);
+
+			return M.Success && M.Index == 0 && M.Length == s.Length;
+		}
+
+		private Regex regex = null;
+
 	}
 }

@@ -9,7 +9,7 @@ namespace Waher.Persistence.Filters
 	/// <summary>
 	/// This filter selects objects that does not conform to the child-filter provided.
 	/// </summary>
-	public class FilterNot : FilterChild 
+	public class FilterNot : FilterChild, ICustomFilter
 	{
 		/// <summary>
 		/// This filter selects objects that does not conform to the child-filter provided.
@@ -53,6 +53,19 @@ namespace Waher.Persistence.Filters
 		public override string ToString()
 		{
 			return "NOT(" + this.ChildFilter.ToString() + ")";
+		}
+
+		/// <summary>
+		/// Checks if an object passes the test or not.
+		/// </summary>
+		/// <param name="Object">Untyped object</param>
+		/// <returns>If the object passes the test.</returns>
+		public bool Passes(object Object)
+		{
+			if (this.ChildFilter is ICustomFilter CustomFilter)
+				return !CustomFilter.Passes(Object);
+			else
+				return false;
 		}
 	}
 }

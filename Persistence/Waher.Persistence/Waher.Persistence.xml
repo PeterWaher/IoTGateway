@@ -3170,6 +3170,13 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterAnd.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterChild">
             <summary>
             Abstract base class for filters having a single child-filters.
@@ -3274,6 +3281,20 @@
             FIeld Name.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterField.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterField.Compare(System.Object)">
+            <summary>
+            Performs a comparison on the object with the field value <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Field value for comparison.</param>
+            <returns>Result of comparison.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldEqualTo">
             <summary>
             This filter selects objects that have a named field equal to a given value.
@@ -3302,6 +3323,30 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
         </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo">
             <summary>
@@ -3332,6 +3377,30 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldGreaterThan">
             <summary>
             This filter selects objects that have a named field greater than a given value.
@@ -3360,6 +3429,30 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
         </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo">
             <summary>
@@ -3390,6 +3483,30 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldLesserThan">
             <summary>
             This filter selects objects that have a named field lesser than a given value.
@@ -3418,6 +3535,30 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
         </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldLikeRegEx">
             <summary>
@@ -3459,6 +3600,13 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLikeRegEx.Compare(System.Object)">
+            <summary>
+            Performs a comparison on the object with the field value <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Field value for comparison.</param>
+            <returns>Result of comparison.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldNotEqualTo">
             <summary>
             This filter selects objects that have a named field not equal to a given value.
@@ -3488,6 +3636,30 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldValue">
             <summary>
             Abstract base class for all field filters operating on a constant value.
@@ -3510,6 +3682,37 @@
             Returns a normalized filter.
             </summary>
             <returns>Normalized filter.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldValue.Compare(System.Object)">
+            <summary>
+            Performs a comparison on the object with the field value <paramref name="Value"/>.
+            </summary>
+            <param name="Value">Field value for comparison.</param>
+            <returns>Result of comparison.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldValue.Compare(System.Object,System.Object)">
+            <summary>
+            Compares two object values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldValue.Compare(System.Double,System.Double)">
+            <summary>
+            Compares two numerical values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldValue.Compare(System.String,System.String)">
+            <summary>
+            Compares two string values.
+            </summary>
+            <param name="Value1">Value 1</param>
+            <param name="Value2">Value 2</param>
+            <returns>Result</returns>
         </member>
         <member name="T:Waher.Persistence.Filters.FilterNot">
             <summary>
@@ -3545,6 +3748,13 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterNot.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterOr">
             <summary>
             This filter selects objects that conform to any of the child-filters provided.
@@ -3578,6 +3788,13 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.Filters.FilterOr.Passes(System.Object)">
+            <summary>
+            Checks if an object passes the test or not.
+            </summary>
+            <param name="Object">Untyped object</param>
+            <returns>If the object passes the test.</returns>
         </member>
         <member name="T:Waher.Persistence.Filters.PassTest`1">
             <summary>

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Filters
 {
@@ -45,6 +41,39 @@ namespace Waher.Persistence.Filters
 		public override string ToString()
 		{
 			return this.FieldName + "<>" + this.Value?.ToString();
+		}
+
+		/// <summary>
+		/// Compares two object values.
+		/// </summary>
+		/// <param name="Value1">Value 1</param>
+		/// <param name="Value2">Value 2</param>
+		/// <returns>Result</returns>
+		protected override bool Compare(object Value1, object Value2)
+		{
+			return !Value1.Equals(Value2);
+		}
+
+		/// <summary>
+		/// Compares two numerical values.
+		/// </summary>
+		/// <param name="Value1">Value 1</param>
+		/// <param name="Value2">Value 2</param>
+		/// <returns>Result</returns>
+		protected override bool Compare(double Value1, double Value2)
+		{
+			return Value1 != Value2;
+		}
+
+		/// <summary>
+		/// Compares two string values.
+		/// </summary>
+		/// <param name="Value1">Value 1</param>
+		/// <param name="Value2">Value 2</param>
+		/// <returns>Result</returns>
+		protected override bool Compare(string Value1, string Value2)
+		{
+			return Value1 != Value2;
 		}
 	}
 }

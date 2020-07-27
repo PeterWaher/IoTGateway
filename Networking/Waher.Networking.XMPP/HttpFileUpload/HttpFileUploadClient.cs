@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		{
 			this.fileUploadJid = FileUploadJid;
 			this.maxFileSize = MaxFileSize;
-			this.hasSupport = !string.IsNullOrEmpty(this.fileUploadJid);
+			this.hasSupport = !string.IsNullOrEmpty(this.fileUploadJid) && MaxFileSize.HasValue && MaxFileSize.Value > 0;
 		}
 
 		/// <summary>
@@ -64,65 +64,25 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				{
 					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
 					{
-						Item Item2 = (Item)e2.State;
-
-						if (e2.Features.ContainsKey(Namespace))
+						if (e2.HasFeature(Namespace))
 						{
-							foreach (XmlNode N in e2.FirstElement.ChildNodes)
+							Item Item2 = (Item)e2.State;
+							this.fileUploadJid = Item2.JID;
+							this.maxFileSize = FindMaxFileSize(this.client, e2);
+							this.hasSupport = this.maxFileSize.HasValue;
+
+							if (!(Callback is null))
 							{
-								if (N is XmlElement E &&
-									E.LocalName == "x" &&
-									E.NamespaceURI == XmppClient.NamespaceData)
+								EventHandler h = Callback;
+								Callback = null;
+
+								try
 								{
-									DataForm Form = new DataForm(this.client, E, null, null, e.From, e.To);
-									Field F = Form["FORM_TYPE"];
-									if (F != null && F.ValueString == Namespace)
-									{
-										F = Form["max-file-size"];
-										if (F != null && long.TryParse(F.ValueString, out long l))
-										{
-											this.fileUploadJid = Item2.JID;
-											this.maxFileSize = l;
-											this.hasSupport = true;
-
-											if (Callback != null)
-											{
-												EventHandler h = Callback;
-												Callback = null;
-
-												try
-												{
-													h(this, new EventArgs());
-												}
-												catch (Exception ex)
-												{
-													Log.Critical(ex);
-												}
-											}
-
-											break;
-										}
-									}
+									h(this, new EventArgs());
 								}
-							}
-
-							if (!maxFileSize.HasValue)
-							{
-								this.hasSupport = false;
-
-								if (Callback != null)
+								catch (Exception ex)
 								{
-									EventHandler h = Callback;
-									Callback = null;
-
-									try
-									{
-										h(this, new EventArgs());
-									}
-									catch (Exception ex)
-									{
-										Log.Critical(ex);
-									}
+									Log.Critical(ex);
 								}
 							}
 						}
@@ -133,6 +93,34 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 				return Task.CompletedTask;
 			}, null);
+		}
+
+		/// <summary>
+		/// Finds the maximum file size supported by the file upload service.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="e">Event arguments.</param>
+		/// <returns>Maximum file size, if available in response.</returns>
+		public static long? FindMaxFileSize(XmppClient Client, ServiceDiscoveryEventArgs e)
+		{
+			foreach (XmlNode N in e.FirstElement.ChildNodes)
+			{
+				if (N is XmlElement E &&
+					E.LocalName == "x" &&
+					E.NamespaceURI == XmppClient.NamespaceData)
+				{
+					DataForm Form = new DataForm(Client, E, null, null, e.From, e.To);
+					Field F = Form["FORM_TYPE"];
+					if (F != null && F.ValueString == Namespace)
+					{
+						F = Form["max-file-size"];
+						if (F != null && long.TryParse(F.ValueString, out long l))
+							return l;
+					}
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -254,5 +242,23 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 		}
 
+		/// <summary>
+		/// Uploads a file to the upload component.
+		/// </summary>
+		/// <param name="FileName">Name of file.</param>
+		/// <param name="ContentType">Internet content type.</param>
+		/// <param name="ContentSize">Size of content.</param>
+		public async Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize)
+		{
+			TaskCompletionSource<HttpFileUploadEventArgs> Result = new TaskCompletionSource<HttpFileUploadEventArgs>();
+
+			this.RequestUploadSlot(FileName, ContentType, ContentSize, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return await Result.Task;
+		}
 	}
 }

@@ -25,7 +25,7 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.5\.xml</DocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />

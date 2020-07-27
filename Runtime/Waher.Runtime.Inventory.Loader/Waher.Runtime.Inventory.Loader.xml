@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Inventory.Loader</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Inventory.Loader.LoadFileCallback">
+            <summary>
+            Delegate for methods filtering what files to be loaded or not.
+            </summary>
+            <param name="FileName">Full path of file to be loaded.</param>
+            <returns>If the file should be dynamically loaded or not.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.Loader.TypesLoader">
+            <summary>
+            Static class, loading and initializing assemblies dynamically.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Loader.TypesLoader.Initialize">
+            <summary>
+            Initializes the inventory engine, registering types and interfaces available in <see cref="T:Waher.Runtime.Inventory.Types"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Loader.TypesLoader.Initialize(System.String)">
+            <summary>
+            Initializes the inventory engine, registering types and interfaces available in <see cref="T:Waher.Runtime.Inventory.Types"/>.
+            </summary>
+            <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Loader.TypesLoader.Initialize(System.String,Waher.Runtime.Inventory.Loader.LoadFileCallback)">
+            <summary>
+            Initializes the inventory engine, registering types and interfaces available in <see cref="T:Waher.Runtime.Inventory.Types"/>.
+            </summary>
+            <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
+            <param name="LoadFile">Optional callback method used to determine what files to load.</param>
+        </member>
+    </members>
+</doc>

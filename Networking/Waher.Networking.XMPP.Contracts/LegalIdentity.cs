@@ -56,6 +56,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime from = DateTime.MinValue;
 		private DateTime to = DateTime.MaxValue;
 		private Property[] properties = null;
+		private Attachment[] attachments = null;
 		private string clientKeyName = null;
 		private byte[] clientPubKey = null;
 		private byte[] clientSignature = null;
@@ -151,6 +152,15 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Attachments assigned to the legal identity.
+		/// </summary>
+		public Attachment[] Attachments
+		{
+			get { return this.attachments; }
+			set { this.attachments = value; }
+		}
+
+		/// <summary>
 		/// Type of key used for client signatures
 		/// </summary>
 		public string ClientKeyName
@@ -194,6 +204,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public static LegalIdentity Parse(XmlElement Xml)
 		{
 			List<Property> Properties = new List<Property>();
+			List<Attachment> Attachments = new List<Attachment>();
 			LegalIdentity Result = new LegalIdentity()
 			{
 				id = XML.Attribute(Xml, "id")
@@ -233,6 +244,18 @@ namespace Waher.Networking.XMPP.Contracts
 
 						case "clientSignature":
                             Result.clientSignature = Convert.FromBase64String(E.InnerText);
+							break;
+
+
+						case "attachment":
+							Attachments.Add(new Attachment()
+							{
+								Id = XML.Attribute(E, "id"),
+								ContentType = XML.Attribute(E, "contentType"),
+								FileName = XML.Attribute(E, "fileName"),
+								Signature = Convert.FromBase64String(XML.Attribute(E, "s")),
+								Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue)
+							});
 							break;
 
 						case "status":
@@ -280,6 +303,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			Result.properties = Properties.ToArray();
+			Result.attachments = Attachments.ToArray();
 
 			return Result;
 		}
@@ -313,10 +337,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="IncludeNamespace">If namespace should be included in the identity element.</param>
 		/// <param name="IncludeIdAttribute">If the id attribute should be included</param>
 		/// <param name="IncludeClientSignature">If the client signature should be included</param>
+		/// <param name="IncludeAttachments">If attachments should be included</param>
 		/// <param name="IncludeStatus">If the status should be included</param>
 		/// <param name="IncludeServerSignature">If the server signature should be included</param>
 		public void Serialize(StringBuilder Xml, bool IncludeNamespace, bool IncludeIdAttribute, bool IncludeClientSignature,
-			bool IncludeStatus, bool IncludeServerSignature)
+			bool IncludeAttachments, bool IncludeStatus, bool IncludeServerSignature)
 		{
 			Xml.Append("<identity");
 
@@ -384,7 +409,25 @@ namespace Waher.Networking.XMPP.Contracts
                 Xml.Append("</clientSignature>");
             }
 
-            if (IncludeStatus)
+			if (IncludeAttachments && !(this.attachments is null))
+			{
+				foreach (Attachment A in this.attachments)
+				{
+					Xml.Append("<attachment contentType=\"");
+					Xml.Append(A.ContentType.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" fileName=\"");
+					Xml.Append(A.FileName.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" id=\"");
+					Xml.Append(A.Id.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" s=\"");
+					Xml.Append(Convert.ToBase64String(A.Signature));
+					Xml.Append("\" timestamp=\"");
+					Xml.Append(XML.Encode(A.Timestamp));
+					Xml.Append("\"/>");
+				}
+			}
+
+			if (IncludeStatus)
 			{
 				Xml.Append("<status created=\"");
 				Xml.Append(XML.Encode(this.created));
@@ -467,7 +510,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return false;
 
 			StringBuilder Xml = new StringBuilder();
-			this.Serialize(Xml, false, false, false, false, false);
+			this.Serialize(Xml, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			return this.ValidateSignature(Data, this.clientSignature);

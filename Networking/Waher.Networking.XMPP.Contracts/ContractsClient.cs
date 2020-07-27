@@ -689,7 +689,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			StringBuilder Xml = new StringBuilder();
-			Identity.Serialize(Xml, false, false, false, false, false);
+			Identity.Serialize(Xml, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
@@ -724,7 +724,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			Xml.Clear();
-			Identity.Serialize(Xml, false, true, true, true, false);
+			Identity.Serialize(Xml, false, true, true, true, true, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			bool HasOldPublicKey;
@@ -3854,5 +3854,78 @@ namespace Waher.Networking.XMPP.Contracts
 		public event ContractPetitionResponseEventHandler PetitionedContractResponseReceived = null;
 
 		#endregion
+
+		#region Attachments
+
+		/// <summary>
+		/// Adds an attachment to a newly created legal identity.
+		/// </summary>
+		/// <param name="LegalId">ID of Legal Identity.</param>
+		/// <param name="GetUrl">The GET URL of the attachment to associate with the legal identity.
+		/// The URL might previously have been provided by the HTTP Upload Service.</param>
+		/// <param name="Signature">Signature of the content of the attachment, made by the same private key used when
+		/// creating the legal identity object.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AddLegalIdAttachment(string LegalId, string GetUrl, byte[] Signature, LegalIdentityEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<addLegalIdAttachment xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' getUrl='");
+			Xml.Append(XML.Encode(GetUrl));
+			Xml.Append("' s='");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				LegalIdentity Identity = null;
+				XmlElement E;
+
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					Identity = LegalIdentity.Parse(E);
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+			}, State);
+		}
+
+		/// <summary>
+		/// Adds an attachment to a newly created legal identity.
+		/// </summary>
+		/// <param name="LegalId">ID of Legal Identity.</param>
+		/// <param name="GetUrl">The GET URL of the attachment to associate with the legal identity.
+		/// The URL is previously provided by the HTTP Upload Service.</param>
+		/// <param name="Signature">Signature of the content of the attachment, made by the same private key used when
+		/// creating the legal identity object.</param>
+		public Task<LegalIdentity> AddLegalIdAttachmentAsync(string LegalId, string GetUrl, byte[] Signature)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Identity);
+				else
+				{
+					Result.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to add attachment." : e.ErrorText));
+				}
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 	}
 }

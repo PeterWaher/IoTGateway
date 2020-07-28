@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -20,17 +19,16 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Checks if the request is authorized.
-		/// </summary>
-		/// <param name="Request">Request object.</param>
-		/// <param name="User">User object, if authenticated.</param>
-		/// <returns>If the request is authorized.</returns>
-		public abstract bool IsAuthenticated(HttpRequest Request, out IUser User);
-
-		/// <summary>
 		/// Gets a challenge for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge string.</returns>
 		public abstract string GetChallenge();
+
+		/// <summary>
+		/// Checks if the request is authorized.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		/// <returns>User object, if authenticated, or null otherwise.</returns>
+		public abstract Task<IUser> IsAuthenticated(HttpRequest Request);
 	}
 }

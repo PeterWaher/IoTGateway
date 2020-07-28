@@ -4,12 +4,12 @@ using System.Reflection;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
-using Waher.Security;
 
 namespace Waher.Security.DTLS
 {
@@ -217,61 +217,68 @@ namespace Waher.Security.DTLS
 			return (this.NextDouble() <= this.probabilityPacketLoss);
 		}
 
-		private void DataReceived(byte[] Data, object RemoteEndpoint)
+		private async void DataReceived(byte[] Data, object RemoteEndpoint)
 		{
-			int Pos = 0;
-			int Len = Data.Length;
-			int Start;
-
-			if (this.probabilityPacketLoss > 0 && this.PacketLost())
+			try
 			{
-				if (this.HasSniffers)
-					this.Warning(DateTime.Now.ToString("T") + " Received packet lost.");
+				int Pos = 0;
+				int Len = Data.Length;
+				int Start;
 
-				return;
-			}
-
-			this.ReceiveBinary(Data);
-
-			EndpointState State = this.GetState(RemoteEndpoint, false);
-			bool First = true;
-
-			while (Pos + 13 <= Len)
-			{
-				Start = Pos;
-
-				DTLSPlaintext Rec = new DTLSPlaintext()
+				if (this.probabilityPacketLoss > 0 && this.PacketLost())
 				{
-					type = (ContentType)Data[Pos],
-					version = new ProtocolVersion()
+					if (this.HasSniffers)
+						this.Warning(DateTime.Now.ToString("T") + " Received packet lost.");
+
+					return;
+				}
+
+				this.ReceiveBinary(Data);
+
+				EndpointState State = this.GetState(RemoteEndpoint, false);
+				bool First = true;
+
+				while (Pos + 13 <= Len)
+				{
+					Start = Pos;
+
+					DTLSPlaintext Rec = new DTLSPlaintext()
 					{
-						major = Data[Pos + 1],
-						minor = Data[Pos + 2]
-					},
-					epoch = GetUInt16(Data, Pos + 3),
-					sequence_number = GetUInt48(Data, Pos + 5),
-					length = GetUInt16(Data, Pos + 11),
-					fragment = null,
-					datagram = Data,
-					recordOffset = Pos
-				};
+						type = (ContentType)Data[Pos],
+						version = new ProtocolVersion()
+						{
+							major = Data[Pos + 1],
+							minor = Data[Pos + 2]
+						},
+						epoch = GetUInt16(Data, Pos + 3),
+						sequence_number = GetUInt48(Data, Pos + 5),
+						length = GetUInt16(Data, Pos + 11),
+						fragment = null,
+						datagram = Data,
+						recordOffset = Pos
+					};
 
-				Pos += 13;
-				if (Pos + Rec.length > Len)
-					break;
+					Pos += 13;
+					if (Pos + Rec.length > Len)
+						break;
 
-				Rec.fragment = new byte[Rec.length];
-				Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
-				Pos += Rec.length;
+					Rec.fragment = new byte[Rec.length];
+					Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
+					Pos += Rec.length;
 
-				if (!this.RecordReceived(Rec, Data, Start, State, First))
-					break;
+					if (!await this.RecordReceived(Rec, Data, Start, State, First))
+						break;
 
-				First = false;
+					First = false;
+				}
+			}
+			catch (Exception ex)
+			{
+				this.Exception(ex);
 			}
 		}
 
-		private bool RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
+		private async Task<bool> RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
 			EndpointState State, bool StartOfFlight)
 		{
 			if (Record.version.major != 254)
@@ -360,7 +367,7 @@ namespace Waher.Security.DTLS
 
 			// TODO: Queue future sequence numbers, is handshake. These must be processed in order.
 
-			if (!this.ProcessRecord(Record, State, StartOfFlight))
+			if (!await this.ProcessRecord(Record, State, StartOfFlight))
 				return false;
 
 			// Update receive window
@@ -475,7 +482,7 @@ namespace Waher.Security.DTLS
 			this.Information(Msg.ToString());
 		}
 
-		private bool ProcessRecord(DTLSPlaintext Record, EndpointState State, bool StartOfFlight)
+		private async Task<bool> ProcessRecord(DTLSPlaintext Record, EndpointState State, bool StartOfFlight)
 		{
 			try
 			{
@@ -783,7 +790,7 @@ namespace Waher.Security.DTLS
 									break;
 
 								if (State.pendingCipher != null)
-									State.pendingCipher.ClientKeyExchange(Record.fragment, ref Pos, State);
+									Pos = await State.pendingCipher.ClientKeyExchange(Record.fragment, Pos, State);
 								break;
 
 							case HandshakeType.finished:

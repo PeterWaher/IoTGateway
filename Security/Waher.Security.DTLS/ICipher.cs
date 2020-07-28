@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -122,6 +121,7 @@ namespace Waher.Security.DTLS
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset where data begins.</param>
 		/// <param name="State">Endpoint state.</param>
-		void ClientKeyExchange(byte[] Data, ref int Offset, EndpointState State);
+		/// <returns>New offset after operation.</returns>
+		Task<int> ClientKeyExchange(byte[] Data, int Offset, EndpointState State);
 	}
 }

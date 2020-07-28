@@ -9,7 +9,7 @@ namespace Waher.Networking.CoAP.Test
 {
 	internal class Users : IUserSource
 	{
-		private Dictionary<string, IUser> users;
+		private readonly Dictionary<string, IUser> users;
 
 		public Users(params IUser[] Users)
 		{
@@ -19,9 +19,12 @@ namespace Waher.Networking.CoAP.Test
 				this.users[User.UserName] = User;
 		}
 
-		public bool TryGetUser(string UserName, out IUser User)
+		public Task<IUser> TryGetUser(string UserName)
 		{
-			return this.users.TryGetValue(UserName, out User);
+			if (this.users.TryGetValue(UserName, out IUser User))
+				return Task.FromResult<IUser>(User);
+			else
+				return Task.FromResult<IUser>(null);
 		}
 	}
 }

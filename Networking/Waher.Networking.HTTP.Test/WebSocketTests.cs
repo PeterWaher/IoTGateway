@@ -76,18 +76,12 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		public bool TryGetUser(string UserName, out IUser User)
+		public Task<IUser> TryGetUser(string UserName)
 		{
 			if (UserName == "User")
-			{
-				User = new User();
-				return true;
-			}
+				return Task.FromResult<IUser>(new User());
 			else
-			{
-				User = null;
-				return false;
-			}
+				return Task.FromResult<IUser>(null);
 		}
 
 		[TestMethod]

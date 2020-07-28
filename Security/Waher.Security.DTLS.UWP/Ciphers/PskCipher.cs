@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Ciphers
 {
@@ -132,7 +132,8 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset where data begins.</param>
 		/// <param name="State">Endpoint state.</param>
-		public override void ClientKeyExchange(byte[] Data, ref int Offset, EndpointState State)
+		/// <returns>New offset after operation.</returns>
+		public override async Task<int> ClientKeyExchange(byte[] Data, int Offset, EndpointState State)
 		{
 			ushort N = Data[Offset++];
 			N <<= 8;
@@ -140,12 +141,12 @@ namespace Waher.Security.DTLS.Ciphers
 
 			byte[] Identity = new byte[N];
 			Array.Copy(Data, Offset, Identity, 0, N);
-
-			string UserId = Encoding.UTF8.GetString(Identity);
-
 			Offset += N;
 
-			if (State.localEndpoint.Users.TryGetUser(UserId, out IUser User) && 
+			string UserId = Encoding.UTF8.GetString(Identity);
+			IUser User = await State.localEndpoint.Users.TryGetUser(UserId);
+
+			if (!(User is null) && 
 				(State.localEndpoint.RequiredPrivilege is null ||
 				User.HasPrivilege(State.localEndpoint.RequiredPrivilege)))
 			{
@@ -164,6 +165,8 @@ namespace Waher.Security.DTLS.Ciphers
 			}
 			else
 				State.credentials = null;
+
+			return Offset;
 		}
 
 	}

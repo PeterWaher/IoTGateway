@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security.LoginMonitor;
@@ -30,12 +29,20 @@ namespace Waher.Networking.HTTP.Authentication
 		}
 
 		/// <summary>
+		/// Gets a challenge for the authenticating client to respond to.
+		/// </summary>
+		/// <returns>Challenge string.</returns>
+		public override string GetChallenge()
+		{
+			return "Basic realm=\"" + this.realm + "\"";
+		}
+
+		/// <summary>
 		/// Checks if the request is authorized.
 		/// </summary>
 		/// <param name="Request">Request object.</param>
-		/// <param name="User">User object, if authenticated.</param>
-		/// <returns>If the request is authorized.</returns>
-		public override bool IsAuthenticated(HttpRequest Request, out IUser User)
+		/// <returns>User object, if authenticated, or null otherwise.</returns>
+		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
 			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.CurrentCultureIgnoreCase))
@@ -48,10 +55,11 @@ namespace Waher.Networking.HTTP.Authentication
 					string UserName = s.Substring(0, i);
 					string Password = s.Substring(i + 1);
 
-					if (!this.users.TryGetUser(UserName, out User))
+					IUser User = await this.users.TryGetUser(UserName);
+					if (User is null)
 					{
 						LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP");
-						return false;
+						return null;
 					}
 
 					switch (User.PasswordHashType)
@@ -64,35 +72,23 @@ namespace Waher.Networking.HTTP.Authentication
 							break;
 
 						default:
-							User = null;
-							return false;
+							return null;
 					}
 
 					if (Password == User.PasswordHash)
 					{
 						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-						return true;
+						return User;
 					}
 					else
 					{
 						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-						User = null;
-						return false;
+						return null;
 					}
 				}
 			}
 
-			User = null;
-			return false;
-		}
-
-		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
-		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
-		{
-			return "Basic realm=\"" + this.realm + "\"";
+			return null;
 		}
 	}
 }

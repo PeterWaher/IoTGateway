@@ -217,7 +217,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
-							if (Scheme.IsAuthenticated(Request, out IUser User))
+							IUser User = await Scheme.IsAuthenticated(Request);
+
+							if (!(User is null))
 							{
 								Request.User = User;
 								break;

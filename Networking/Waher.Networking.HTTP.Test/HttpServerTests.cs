@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Reflection;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
-using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Security;
 
@@ -63,18 +61,12 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		public bool TryGetUser(string UserName, out IUser User)
+		public Task<IUser> TryGetUser(string UserName)
 		{
 			if (UserName == "User")
-			{
-				User = new User();
-				return true;
-			}
+				return Task.FromResult<IUser>(new User());
 			else
-			{
-				User = null;
-				return false;
-			}
+				return Task.FromResult<IUser>(null);
 		}
 
 		[TestMethod]

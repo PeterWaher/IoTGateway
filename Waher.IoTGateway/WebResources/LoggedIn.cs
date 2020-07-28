@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -35,15 +36,12 @@ namespace Waher.IoTGateway.WebResources
 		/// Checks if the request is authorized.
 		/// </summary>
 		/// <param name="Request">Request object.</param>
-		/// <param name="User">User object, if authenticated.</param>
-		/// <returns>If the request is authorized.</returns>
-		public override bool IsAuthenticated(HttpRequest Request, out IUser User)
+		/// <returns>User object, if authenticated, or null otherwise.</returns>
+		public override Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
 			HttpFieldCookie Cookie;
 			Variables Variables = Request.Session;
 			string HttpSessionID;
-
-			User = null;
 
 			if (Variables is null &&
 				(Cookie = Request.Header.Cookie) != null &&
@@ -52,10 +50,10 @@ namespace Waher.IoTGateway.WebResources
 				Request.Session = Variables = this.server.GetSession(HttpSessionID);
 			}
 
-			return 
-				Variables != null && 
-				Variables.TryGetVariable("User", out Variable v) && 
-				(User = v.ValueObject as IUser) != null;
+			if (Variables != null && Variables.TryGetVariable("User", out Variable v))
+				return Task.FromResult<IUser>(v.ValueObject as IUser);
+			else
+				return Task.FromResult<IUser>(null);
 		}
 	}
 }

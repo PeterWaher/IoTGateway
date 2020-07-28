@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Security
 {
@@ -13,8 +12,7 @@ namespace Waher.Security
 		/// Tries to get a user with a given user name.
 		/// </summary>
 		/// <param name="UserName">User Name.</param>
-		/// <param name="User">User, if found, null otherwise.</param>
-		/// <returns>If a user with the given user name was found.</returns>
-		bool TryGetUser(string UserName, out IUser User);
+		/// <returns>User, if found, null otherwise.</returns>
+		Task<IUser> TryGetUser(string UserName);
 	}
 }

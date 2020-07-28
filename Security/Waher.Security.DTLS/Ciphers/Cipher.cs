@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Ciphers
 {
@@ -318,7 +317,8 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset where data begins.</param>
 		/// <param name="State">Endpoint state.</param>
-		public abstract void ClientKeyExchange(byte[] Data, ref int Offset, EndpointState State);
+		/// <returns>New offset after operation.</returns>
+		public abstract Task<int> ClientKeyExchange(byte[] Data, int Offset, EndpointState State);
 
 		/// <summary>
 		/// Encrypts data according to the cipher settings.

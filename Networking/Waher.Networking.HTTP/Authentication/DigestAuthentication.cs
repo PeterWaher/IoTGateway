@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security.LoginMonitor;
@@ -17,8 +18,8 @@ namespace Waher.Networking.HTTP.Authentication
 	{
 		private readonly Dictionary<string, DateTime> expirationByNonce = new Dictionary<string, DateTime>();
 		private readonly SortedDictionary<DateTime, string> nonceByExpiration = new SortedDictionary<DateTime, string>();
-		private readonly Random rnd = new Random();
-		private readonly string opaque = Guid.NewGuid().ToString().Replace("-", string.Empty);
+		private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private readonly string opaque;
 		private readonly IUserSource users;
 		private readonly string realm;
 
@@ -32,18 +33,63 @@ namespace Waher.Networking.HTTP.Authentication
 		{
 			this.realm = Realm;
 			this.users = Users;
+			this.opaque = this.NextRandomString(16);
+		}
+
+		private byte[] NextBytes(int Nr)
+		{
+			byte[] Bin = new byte[Nr];
+
+			lock (this.rnd)
+			{
+				this.rnd.GetBytes(Bin);
+			}
+
+			return Bin;
+		}
+
+		private string NextRandomString(int NrBytes)
+		{
+			byte[] Bin = this.NextBytes(NrBytes);
+			return Convert.ToBase64String(Bin);
+		}
+
+		/// <summary>
+		/// Gets a challenge for the authenticating client to respond to.
+		/// </summary>
+		/// <returns>Challenge string.</returns>
+		public override string GetChallenge()
+		{
+			string Nonce = this.NextRandomString(16);
+			DateTime Expires = DateTime.Now.AddMinutes(1);
+
+			while (true)
+			{
+				lock (this)
+				{
+					if (!this.nonceByExpiration.ContainsKey(Expires))
+					{
+						this.expirationByNonce[Nonce] = Expires;
+						this.nonceByExpiration[Expires] = Nonce;
+						break;
+					}
+				}
+
+				byte[] b = this.NextBytes(1);
+
+				Expires = Expires.AddTicks(b[0] & 15);
+			}
+
+			return "Digest realm=\"" + this.realm + "\", qop=\"auth,auth-int\", nonce=\"" + Nonce + "\", opaque=\"" + this.opaque + "\"";
 		}
 
 		/// <summary>
 		/// Checks if the request is authorized.
 		/// </summary>
 		/// <param name="Request">Request object.</param>
-		/// <param name="User">User object, if authenticated.</param>
-		/// <returns>If the request is authorized.</returns>
-		public override bool IsAuthenticated(HttpRequest Request, out IUser User)
+		/// <returns>User object, if authenticated, or null otherwise.</returns>
+		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
-			User = null;
-
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
 			if (Authorization != null && Authorization.Value.StartsWith("Digest ", StringComparison.CurrentCultureIgnoreCase))
 			{
@@ -109,7 +155,7 @@ namespace Waher.Networking.HTTP.Authentication
 				if (this.realm != Realm || Qop is null || Nonce is null || Cnonce is null || Nc is null ||
 					Uri is null || Response is null || UserName is null || (!Auth && !AuthInt))
 				{
-					return false;
+					return null;
 				}
 
 				if (this.opaque != Opaque)
@@ -118,7 +164,7 @@ namespace Waher.Networking.HTTP.Authentication
 					// (which might have ocurred when another instance of the application ran).
 
 					if (Request.Header.Method != "POST" || Request.Header.ContentType.Value != "application/x-www-form-urlencoded")
-						return false;
+						return null;
 				}
 
 				DateTime TP = DateTime.Now;
@@ -153,7 +199,7 @@ namespace Waher.Networking.HTTP.Authentication
 						// (which might have ocurred when another instance of the application ran).
 
 						if (Request.Header.Method != "POST" || Request.Header.ContentType.Value != "application/x-www-form-urlencoded")
-							return false;
+							return null;
 					}
 
 					if (Request.Header.Method != "HEAD")
@@ -167,8 +213,9 @@ namespace Waher.Networking.HTTP.Authentication
 				string HA2;
 				string Digest;
 
-				if (!this.users.TryGetUser(UserName, out User))
-					return false;
+				IUser User = await this.users.TryGetUser(UserName);
+				if (User is null)
+					return null;
 
 				switch (User.PasswordHashType)
 				{
@@ -181,8 +228,7 @@ namespace Waher.Networking.HTTP.Authentication
 						break;
 
 					default:
-						User = null;
-						return false;
+						return null;
 				}
 
 				if (AuthInt)
@@ -196,37 +242,16 @@ namespace Waher.Networking.HTTP.Authentication
 				if (Digest == Response)
 				{
 					LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-					return true;
+					return User;
 				}
 				else
 				{
 					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-					User = null;
+					return null;
 				}
 			}
 
-			return false;
-		}
-
-		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
-		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
-		{
-			string Nonce = Guid.NewGuid().ToString().Replace("-", string.Empty);
-			DateTime Expires = DateTime.Now.AddMinutes(1);
-
-			lock (this)
-			{
-				while (this.nonceByExpiration.ContainsKey(Expires))
-					Expires = Expires.AddTicks(rnd.Next(1, 10));
-
-				this.expirationByNonce[Nonce] = Expires;
-				this.nonceByExpiration[Expires] = Nonce;
-			}
-
-			return "Digest realm=\"" + this.realm + "\", qop=\"auth,auth-int\", nonce=\"" + Nonce + "\", opaque=\"" + this.opaque + "\"";
+			return null;
 		}
 
 		internal static byte[] H(byte[] Data)

@@ -3189,6 +3189,17 @@ namespace Waher.IoTGateway
 		/// <returns>URL</returns>
 		public static string GetUrl(string LocalResource)
 		{
+			return GetUrl(LocalResource, webServer);
+		}
+
+		/// <summary>
+		/// Gets a URL for a resource.
+		/// </summary>
+		/// <param name="LocalResource">Local resource.</param>
+		/// <param name="Server">HTTP Server to get URL to. (By default is equal to the HTTP Server hosted by the gateway.)</param>
+		/// <returns>URL</returns>
+		public static string GetUrl(string LocalResource, HttpServer Server)
+		{
 			StringBuilder sb = new StringBuilder();
 			int DefaultPort;
 			int[] Ports;
@@ -3197,18 +3208,18 @@ namespace Waher.IoTGateway
 
 			if (certificate is null)
 			{
-				Ports = GetConfigPorts("HTTP");
+				Ports = Server?.OpenHttpPorts ?? GetConfigPorts("HTTP");
 				DefaultPort = 80;
 			}
 			else
 			{
 				sb.Append('s');
-				Ports = GetConfigPorts("HTTPS");
+				Ports = Server?.OpenHttpsPorts ?? GetConfigPorts("HTTPS");
 				DefaultPort = 443;
 			}
 
 			sb.Append("://");
-			if (DomainConfiguration.Instance.UseDomainName)
+			if (DomainConfiguration.Instance?.UseDomainName ?? false)
 				sb.Append(domain);
 			/*else if (httpxProxy?.ServerlessMessaging?.Network.State == PeerToPeerNetworkState.Ready)
 				sb.Append(httpxProxy.ServerlessMessaging.Network.ExternalAddress.ToString());
@@ -3220,22 +3231,25 @@ namespace Waher.IoTGateway
 				IPAddress IP4 = null;
 				IPAddress IP6 = null;
 
-				foreach (IPAddress Addr in webServer.LocalIpAddresses)
+				if (!(Server is null))
 				{
-					if (IPAddress.IsLoopback(Addr))
-						continue;
-
-					switch (Addr.AddressFamily)
+					foreach (IPAddress Addr in Server.LocalIpAddresses)
 					{
-						case System.Net.Sockets.AddressFamily.InterNetwork:
-							if (IP4 is null)
-								IP4 = Addr;
-							break;
+						if (IPAddress.IsLoopback(Addr))
+							continue;
 
-						case System.Net.Sockets.AddressFamily.InterNetworkV6:
-							if (IP6 is null)
-								IP6 = Addr;
-							break;
+						switch (Addr.AddressFamily)
+						{
+							case System.Net.Sockets.AddressFamily.InterNetwork:
+								if (IP4 is null)
+									IP4 = Addr;
+								break;
+
+							case System.Net.Sockets.AddressFamily.InterNetworkV6:
+								if (IP6 is null)
+									IP6 = Addr;
+								break;
+						}
 					}
 				}
 

@@ -2601,7 +2601,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -2634,7 +2634,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -2781,7 +2781,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5370,7 +5370,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -5403,7 +5403,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -5550,7 +5550,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8175,7 +8175,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -8208,7 +8208,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -8355,7 +8355,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10953,7 +10953,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -10986,7 +10986,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -11133,7 +11133,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13767,7 +13767,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -13800,7 +13800,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -13947,7 +13947,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16545,7 +16545,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -16578,7 +16578,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -16725,7 +16725,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19359,7 +19359,7 @@
           "Waher.Runtime.Language": "1.0.2",
           "Waher.Runtime.Settings": "1.0.3",
           "Waher.Runtime.Timing": "1.0.2",
-          "Waher.Security": "1.0.5",
+          "Waher.Security": "1.0.6",
           "Waher.Things": "1.1.0"
         }
       },
@@ -19392,7 +19392,7 @@
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.13",
-          "Waher.Security": "1.0.5"
+          "Waher.Security": "1.0.6"
         }
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
@@ -19539,7 +19539,7 @@
           "Waher.Script": "1.0.37"
         }
       },
-      "Waher.Security/1.0.5": {
+      "Waher.Security/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -29649,7 +29649,7 @@
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
-    "Waher.Security/1.0.5": {
+    "Waher.Security/1.0.6": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"

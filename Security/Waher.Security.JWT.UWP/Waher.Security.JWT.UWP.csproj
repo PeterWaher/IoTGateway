@@ -124,6 +124,10 @@
       <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
       <Name>Waher.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.UWP\Waher.Networking.HTTP.UWP.csproj">
       <Project>{5d9d4910-b0d3-4510-a914-d49a548011c7}</Project>
       <Name>Waher.Networking.HTTP.UWP</Name>
@@ -135,6 +139,10 @@
     <ProjectReference Include="..\Waher.Security.JWS\Waher.Security.JWS.csproj">
       <Project>{712709ac-748d-43d7-a369-3beb829bf5e3}</Project>
       <Name>Waher.Security.JWS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Security.LoginMonitor.UWP\Waher.Security.LoginMonitor.UWP.csproj">
+      <Project>{8024d9a2-2ec9-404c-8506-d34fc861e6b4}</Project>
+      <Name>Waher.Security.LoginMonitor.UWP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>

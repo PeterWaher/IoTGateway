@@ -19,10 +19,10 @@
         <dependency id="Waher.Content" version="1.0.25"/>
         <dependency id="Waher.Content.Emoji" version="1.0.3"/>
         <dependency id="Waher.Content.Markdown" version="1.0.41"/>
-        <dependency id="Waher.Networking.HTTP.UWP" version="1.1.1"/>
+        <dependency id="Waher.Networking.HTTP.UWP" version="1.1.2"/>
         <dependency id="Waher.Runtime.Inventory" version="1.0.13"/>
         <dependency id="Waher.Script" version="1.0.37"/>
-        <dependency id="Waher.Security" version="1.0.5"/>
+        <dependency id="Waher.Security" version="1.0.6"/>
       </group>
     </dependencies>
   </metadata>

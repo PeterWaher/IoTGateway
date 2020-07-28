@@ -15,12 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security Authentication JWT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Security\Waher.Security.JWT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
@@ -34,6 +34,7 @@
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Security.JWS\Waher.Security.JWS.csproj" />
+    <ProjectReference Include="..\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -298,6 +298,20 @@ namespace Waher.Networking.XMPP.Contracts
 						case "serverSignature":
                             Result.serverSignature = Convert.FromBase64String(E.InnerText);
 							break;
+
+						case "attachmentRef":
+							string AttachmentId = XML.Attribute(E, "attachmentId");
+							string Url = XML.Attribute(E, "url");
+
+							foreach (Attachment Attachment in Attachments)
+							{
+								if (Attachment.Id == AttachmentId)
+								{
+									Attachment.Url = Url;
+									break;
+								}
+							}
+							break;
 					}
 				}
 			}
@@ -340,8 +354,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="IncludeAttachments">If attachments should be included</param>
 		/// <param name="IncludeStatus">If the status should be included</param>
 		/// <param name="IncludeServerSignature">If the server signature should be included</param>
+		/// <param name="IncludeAttachmentReferences">If URLs to attachment content is to be included</param>
 		public void Serialize(StringBuilder Xml, bool IncludeNamespace, bool IncludeIdAttribute, bool IncludeClientSignature,
-			bool IncludeAttachments, bool IncludeStatus, bool IncludeServerSignature)
+			bool IncludeAttachments, bool IncludeStatus, bool IncludeServerSignature, bool IncludeAttachmentReferences)
 		{
 			Xml.Append("<identity");
 
@@ -469,7 +484,22 @@ namespace Waher.Networking.XMPP.Contracts
                 Xml.Append("</serverSignature>");
             }
 
-            Xml.Append("</identity>");
+			if (IncludeAttachmentReferences && !(this.attachments is null))
+			{
+				foreach (Attachment A in this.attachments)
+				{
+					if (!string.IsNullOrEmpty(A.Url))
+					{
+						Xml.Append("<attachmentRef attachmentId=\"");
+						Xml.Append(XML.Encode(A.Id));
+						Xml.Append("\" url=\"");
+						Xml.Append(XML.Encode(A.Url));
+						Xml.Append("\"/>");
+					}
+				}
+			}
+
+			Xml.Append("</identity>");
 		}
 
         /// <summary>
@@ -510,7 +540,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return false;
 
 			StringBuilder Xml = new StringBuilder();
-			this.Serialize(Xml, false, false, false, false, false, false);
+			this.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			return this.ValidateSignature(Data, this.clientSignature);

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -689,7 +692,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			StringBuilder Xml = new StringBuilder();
-			Identity.Serialize(Xml, false, false, false, false, false, false);
+			Identity.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
@@ -724,7 +727,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			Xml.Clear();
-			Identity.Serialize(Xml, false, true, true, true, true, false);
+			Identity.Serialize(Xml, false, true, true, true, true, false, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			bool HasOldPublicKey;
@@ -3923,6 +3926,128 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 
 			return Result.Task;
+		}
+
+		/// <summary>
+		/// Gets an attachment from a Trust Provider
+		/// </summary>
+		/// <param name="Url">URL to attachment.</param>
+		/// <returns>Content-Type, and attachment.</returns>
+		public Task<KeyValuePair<string, TemporaryFile>> GetAttachment(string Url)
+		{
+			return this.GetAttachment(Url, 30000);
+		}
+
+		/// <summary>
+		/// Gets an attachment from a Trust Provider
+		/// </summary>
+		/// <param name="Url">URL to attachment.</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Content-Type, and attachment.</returns>
+		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachment(string Url, int Timeout)
+		{
+			using (HttpClient HttpClient = new HttpClient()
+			{
+				Timeout = TimeSpan.FromMilliseconds(Timeout)
+			})
+			{
+				HttpRequestMessage Request;
+				HttpResponseMessage Response = null;
+
+				Request = new HttpRequestMessage()
+				{
+					RequestUri = new Uri(Url),
+					Method = HttpMethod.Get
+				};
+
+				try
+				{
+					Response = await HttpClient.SendAsync(Request);
+
+					if (Response.StatusCode == System.Net.HttpStatusCode.Unauthorized &&
+						!(Response.Headers.WwwAuthenticate is null))
+					{
+						foreach (AuthenticationHeaderValue Header in Response.Headers.WwwAuthenticate)
+						{
+							if (Header.Scheme == "IEEEP1451.99.Sign")
+							{
+								KeyValuePair<string, string>[] Parameters = CommonTypes.ParseFieldValues(Header.Parameter);
+								string Realm = null;
+								string NonceStr = null;
+								byte[] Nonce = null;
+
+								foreach (KeyValuePair<string, string> P in Parameters)
+								{
+									switch (P.Key)
+									{
+										case "realm":
+											Realm = P.Value;
+											break;
+
+										case "n":
+											NonceStr = P.Value;
+											Nonce = Convert.FromBase64String(NonceStr);
+											break;
+									}
+								}
+
+								if (!string.IsNullOrEmpty(Realm) && !string.IsNullOrEmpty(NonceStr))
+								{
+									byte[] Signature = await this.SignAsync(Nonce);
+									StringBuilder sb = new StringBuilder();
+
+									sb.Append("jid=\"");
+									sb.Append(this.client.FullJID);
+									sb.Append("\", realm=\"");
+									sb.Append(Realm);
+									sb.Append("\", n=\"");
+									sb.Append(NonceStr);
+									sb.Append("\", s=\"");
+									sb.Append(Convert.ToBase64String(Signature));
+									sb.Append("\"");
+
+									Request.Dispose();
+									Request = new HttpRequestMessage()
+									{
+										RequestUri = new Uri(Url),
+										Method = HttpMethod.Get
+									};
+
+									Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Scheme, sb.ToString());
+
+									Response.Dispose();
+									Response = null;
+									Response = await HttpClient.SendAsync(Request);
+								}
+								break;
+							}
+						}
+					}
+
+					Response.EnsureSuccessStatusCode();
+
+					string ContentType = Response.Content.Headers.ContentType.ToString();
+					TemporaryFile File = new TemporaryFile();
+					try
+					{
+						await Response.Content.CopyToAsync(File);
+					}
+					catch (Exception ex)
+					{
+						File.Dispose();
+						File = null;
+
+						ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+
+					return new KeyValuePair<string, TemporaryFile>(ContentType, File);
+				}
+				finally
+				{
+					Request?.Dispose();
+					Response?.Dispose();
+				}
+			}
 		}
 
 		#endregion

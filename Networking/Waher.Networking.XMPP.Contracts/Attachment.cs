@@ -12,6 +12,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string id = null;
 		private string contentType = string.Empty;
 		private string fileName = null;
+		private string url = null;
 		private byte[] signature = null;
 		private DateTime timestamp = DateTime.MinValue;
 
@@ -47,6 +48,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.fileName;
 			set => this.fileName = value;
+		}
+
+		/// <summary>
+		/// URL to retrieve attachment, if provided.
+		/// </summary>
+		public string Url
+		{
+			get => this.url;
+			internal set => this.url = value;
 		}
 
 		/// <summary>

@@ -27,6 +27,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private Parameter[] parameters = null;
 		private HumanReadableText[] forHumans = null;
 		private ClientSignature[] clientSignatures = null;
+		private Attachment[] attachments = null;
 		private ServerSignature serverSignature = null;
 		private Waher.Security.HashFunction contentSchemaHashFunction = Waher.Security.HashFunction.SHA256;
 		private ContractState state = ContractState.Proposed;
@@ -210,7 +211,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Hash function of the schema used to validate the machine-readable contents (<see cref="ForMachines"/>) of the smart contract,
 		/// if such a schema was used.
 		/// </summary>
-		public Waher.Security.HashFunction ContentSchemaHashFunction
+		public Security.HashFunction ContentSchemaHashFunction
 		{
 			get { return this.contentSchemaHashFunction; }
 			set { this.contentSchemaHashFunction = value; }
@@ -298,6 +299,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get { return this.clientSignatures; }
 			set { this.clientSignatures = value; }
+		}
+
+		/// <summary>
+		/// Attachments assigned to the legal identity.
+		/// </summary>
+		public Attachment[] Attachments
+		{
+			get { return this.attachments; }
+			set { this.attachments = value; }
 		}
 
 		/// <summary>
@@ -431,6 +441,7 @@ namespace Waher.Networking.XMPP.Contracts
 			List<Role> Roles = new List<Role>();
 			List<Parameter> Parameters = new List<Parameter>();
 			List<ClientSignature> Signatures = new List<ClientSignature>();
+			List<Attachment> Attachments = new List<Attachment>();
 			XmlElement Content = null;
 			HumanReadableText Text;
 			bool First = true;
@@ -750,6 +761,17 @@ namespace Waher.Networking.XMPP.Contracts
 						Signatures.Add(Signature);
 						break;
 
+					case "attachment":
+						Attachments.Add(new Attachment()
+						{
+							Id = XML.Attribute(E, "id"),
+							ContentType = XML.Attribute(E, "contentType"),
+							FileName = XML.Attribute(E, "fileName"),
+							Signature = Convert.FromBase64String(XML.Attribute(E, "s")),
+							Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue)
+						});
+						break;
+
 					case "status":
 						HasStatus = true;
 						foreach (XmlAttribute Attr in E.Attributes)
@@ -845,6 +867,20 @@ namespace Waher.Networking.XMPP.Contracts
 						Result.serverSignature = ServerSignature;
 						break;
 
+					case "attachmentRef":
+						string AttachmentId = XML.Attribute(E, "attachmentId");
+						string Url = XML.Attribute(E, "url");
+
+						foreach (Attachment Attachment in Attachments)
+						{
+							if (Attachment.Id == AttachmentId)
+							{
+								Attachment.Url = Url;
+								break;
+							}
+						}
+						break;
+
 					default:
 						return null;
 				}
@@ -860,6 +896,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Result.forMachinesNamespace = Content.NamespaceURI;
 			Result.forHumans = ForHumans.ToArray();
 			Result.clientSignatures = Signatures.ToArray();
+			Result.attachments = Attachments.ToArray();
 
 			return Result;
 		}

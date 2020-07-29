@@ -244,6 +244,11 @@
             Client signatures of the contract.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Contract.Attachments">
+            <summary>
+            Attachments assigned to the legal identity.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.ServerSignature">
             <summary>
             Server signature attesting to the validity of the contents of the contract.
@@ -1669,6 +1674,26 @@
             <param name="Signature">Signature of the content of the attachment, made by the same private key used when
             creating the legal identity object.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AddContractAttachment(System.String,System.String,System.Byte[],Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Adds an attachment to a proposed or approved contract before it is being signed.
+            </summary>
+            <param name="ContractId">ID of Smart Contract.</param>
+            <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
+            The URL might previously have been provided by the HTTP Upload Service.</param>
+            <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AddContractAttachmentAsync(System.String,System.String,System.Byte[])">
+            <summary>
+            Adds an attachment to a proposed or approved contract before it is being signed.
+            </summary>
+            <param name="ContractId">ID of Smart Contract.</param>
+            <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
+            The URL might previously have been provided by the HTTP Upload Service.</param>
+            <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachment(System.String)">
             <summary>
             Gets an attachment from a Trust Provider
@@ -1683,6 +1708,34 @@
             <param name="Url">URL to attachment.</param>
             <param name="Timeout">Timeout, in milliseconds.</param>
             <returns>Content-Type, and attachment.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.RemoveLegalIdAttachment(System.String,Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
+            <summary>
+            Removes an attachment from a newly created legal identity.
+            </summary>
+            <param name="AttachmentId">ID of Attachment.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.RemoveLegalIdAttachmentAsync(System.String)">
+            <summary>
+            Removes an attachment from a newly created legal identity.
+            </summary>
+            <param name="AttachmentId">ID of Attachment.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.RemoveContractAttachment(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
+            <summary>
+            Removes an attachment from a proposed or approved contract before it is being signed.
+            </summary>
+            <param name="AttachmentId">ID of Attachment.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.RemoveContractAttachmentAsync(System.String)">
+            <summary>
+            Removes an attachment from a proposed or approved contract before it is being signed.
+            </summary>
+            <param name="AttachmentId">ID of Attachment.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>

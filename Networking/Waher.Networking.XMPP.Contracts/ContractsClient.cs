@@ -3874,7 +3874,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<addLegalIdAttachment xmlns='");
+			Xml.Append("<addAttachment xmlns='");
 			Xml.Append(NamespaceLegalIdentities);
 			Xml.Append("' id='");
 			Xml.Append(XML.Encode(LegalId));
@@ -3915,6 +3915,72 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
+				else
+				{
+					Result.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to add attachment." : e.ErrorText));
+				}
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Adds an attachment to a proposed or approved contract before it is being signed.
+		/// </summary>
+		/// <param name="ContractId">ID of Smart Contract.</param>
+		/// <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
+		/// The URL might previously have been provided by the HTTP Upload Service.</param>
+		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AddContractAttachment(string ContractId, string GetUrl, byte[] Signature, SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<addAttachment xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' contractId='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("' getUrl='");
+			Xml.Append(XML.Encode(GetUrl));
+			Xml.Append("' s='");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				Contract Contract = null;
+				XmlElement E;
+
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+					Contract = Contract.Parse(E, out bool _);
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+					await Callback(this, new SmartContractEventArgs(e, Contract));
+			}, State);
+		}
+
+		/// <summary>
+		/// Adds an attachment to a proposed or approved contract before it is being signed.
+		/// </summary>
+		/// <param name="ContractId">ID of Smart Contract.</param>
+		/// <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
+		/// The URL might previously have been provided by the HTTP Upload Service.</param>
+		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
+		public Task<Contract> AddContractAttachmentAsync(string ContractId, string GetUrl, byte[] Signature)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.AddContractAttachment(ContractId, GetUrl, Signature, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Contract);
 				else
 				{
 					Result.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
@@ -4048,6 +4114,118 @@ namespace Waher.Networking.XMPP.Contracts
 					Response?.Dispose();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Removes an attachment from a newly created legal identity.
+		/// </summary>
+		/// <param name="AttachmentId">ID of Attachment.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RemoveLegalIdAttachment(string AttachmentId, LegalIdentityEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<removeAttachment xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' attachmentId='");
+			Xml.Append(XML.Encode(AttachmentId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				LegalIdentity Identity = null;
+				XmlElement E;
+
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					Identity = LegalIdentity.Parse(E);
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+			}, State);
+		}
+
+		/// <summary>
+		/// Removes an attachment from a newly created legal identity.
+		/// </summary>
+		/// <param name="AttachmentId">ID of Attachment.</param>
+		public Task<LegalIdentity> RemoveLegalIdAttachmentAsync(string AttachmentId)
+		{
+			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
+
+			this.RemoveLegalIdAttachment(AttachmentId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Identity);
+				else
+				{
+					Result.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to remove attachment." : e.ErrorText));
+				}
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Removes an attachment from a proposed or approved contract before it is being signed.
+		/// </summary>
+		/// <param name="AttachmentId">ID of Attachment.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RemoveContractAttachment(string AttachmentId, SmartContractEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<removeAttachment xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' attachmentId='");
+			Xml.Append(XML.Encode(AttachmentId));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				Contract Contract = null;
+				XmlElement E;
+
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
+					Contract = Contract.Parse(E, out bool _);
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+					await Callback(this, new SmartContractEventArgs(e, Contract));
+			}, State);
+		}
+
+		/// <summary>
+		/// Removes an attachment from a proposed or approved contract before it is being signed.
+		/// </summary>
+		/// <param name="AttachmentId">ID of Attachment.</param>
+		public Task<Contract> RemoveContractAttachmentAsync(string AttachmentId)
+		{
+			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
+
+			this.RemoveContractAttachment(AttachmentId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Contract);
+				else
+				{
+					Result.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ?
+						"Unable to remove attachment." : e.ErrorText));
+				}
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
 		}
 
 		#endregion

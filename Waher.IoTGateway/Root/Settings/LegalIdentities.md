@@ -38,7 +38,7 @@ JoinResidence(Identity):=
 	s
 );
 
-JoinOther(Properties[]):=
+JoinOther(Properties[],Attachments[]):=
 (
 	First:=true;
 	s:="";
@@ -55,11 +55,25 @@ JoinOther(Properties[]):=
 			s+=MarkdownEncode(Name)+"\\="+MarkdownEncode(Property.Value)
 		)
 	);
+
+	if exists(Attachments) then
+	(
+		foreach Attachment in Attachments do
+		(
+			if First then
+				First:=false
+			else
+				s+=", ";
+			
+			s+="<a target=\"blank\" href=\"/Attachments/"+Attachment.Id+"\">"+Attachment.FileName+"</a>";
+		)
+	);
+
 	s
 );
 
 foreach ID in (Config.AllIdentities ?? []) do
 	]]| `((ID.Id))` ||||||||||
-|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(JoinName(ID["FIRST"],ID["MIDDLE"],ID["LAST"]) ) )) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
+|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(JoinName(ID["FIRST"],ID["MIDDLE"],ID["LAST"]) ) )) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties,ID.Attachments) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
 [[;
 }}

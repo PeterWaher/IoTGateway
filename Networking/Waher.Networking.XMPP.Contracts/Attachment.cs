@@ -56,7 +56,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public string Url
 		{
 			get => this.url;
-			internal set => this.url = value;
+			set => this.url = value;
 		}
 
 		/// <summary>

@@ -58,21 +58,21 @@ namespace Waher.Script.Model
                     LinkedList<IElement> Elements = new LinkedList<IElement>();
                     int i, c = Vector.Dimension;
 
-                    if (Vector is DoubleVector)
+                    if (Vector is DoubleVector dv)
                     {
-                        double[] v = ((DoubleVector)Vector).Values;
+                        double[] v = dv.Values;
                         for (i = 0; i < c; i++)
                             Elements.AddLast(this.EvaluateScalar(v[i], Variables));
                     }
-                    else if (Vector is ComplexVector)
+                    else if (Vector is ComplexVector cv)
                     {
-                        Complex[] v = ((ComplexVector)Vector).Values;
+                        Complex[] v = cv.Values;
                         for (i = 0; i < c; i++)
                             Elements.AddLast(this.EvaluateScalar(v[i], Variables));
                     }
-                    else if (Vector is BooleanVector)
+                    else if (Vector is BooleanVector bv)
                     {
-                        bool[] v = ((BooleanVector)Vector).Values;
+                        bool[] v = bv.Values;
                         for (i = 0; i < c; i++)
                             Elements.AddLast(this.EvaluateScalar(v[i], Variables));
                     }

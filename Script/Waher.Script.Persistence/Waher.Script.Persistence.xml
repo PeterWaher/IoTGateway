@@ -136,6 +136,25 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.Output.CaseInsensitiveStringOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Persistence.CaseInsensitiveString"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.CaseInsensitiveStringOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Output.CaseInsensitiveStringOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.Output.GenericObjectOutput">
             <summary>
             Converts values of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> to expression strings.

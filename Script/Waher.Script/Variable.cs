@@ -111,8 +111,8 @@ namespace Waher.Script
 
 				if (Obj == this)
 					return this.name + "=self";
-				else if (Obj is Variable)
-					return this.name + "=" + ((Variable)Obj).name;
+				else if (Obj is Variable Var)
+					return this.name + "=" + Var.name;
 			}
 
 			return this.name + "=" + this.value.ToString();

@@ -233,15 +233,15 @@ namespace Waher.Networking.HTTP
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
 
-			if (this.UserSessions)
+			if (this.UserSessions && Request.Session is null)
 			{
 				HttpFieldCookie Cookie;
 				string HttpSessionID;
 
 				if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
 				{
-					HttpSessionID = System.Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-					Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
+					HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+					Response.SetCookie(new Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
 				}
 
 				Request.Session = Server.GetSession(HttpSessionID);

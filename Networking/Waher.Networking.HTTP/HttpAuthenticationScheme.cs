@@ -19,6 +19,11 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the authentication scheme uses user sessions.
+		/// </summary>
+		public virtual bool UserSessions => false;
+
+		/// <summary>
 		/// Gets a challenge for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge string.</returns>

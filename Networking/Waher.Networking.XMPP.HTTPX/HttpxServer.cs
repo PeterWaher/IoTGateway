@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -217,8 +216,19 @@ namespace Waher.Networking.XMPP.HTTPX
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
-							IUser User = await Scheme.IsAuthenticated(Request);
+							if (Scheme.UserSessions && Request.Session is null)
+							{
+								HttpFieldCookie Cookie = Request.Header.Cookie;
+								if (!(Cookie is null))
+								{
+									string HttpSessionID = Cookie["HttpSessionID"];
 
+									if (!string.IsNullOrEmpty(HttpSessionID))
+										Request.Session = this.server.GetSession(HttpSessionID);
+								}
+							}
+
+							IUser User = await Scheme.IsAuthenticated(Request);
 							if (!(User is null))
 							{
 								Request.User = User;
@@ -231,7 +241,11 @@ namespace Waher.Networking.XMPP.HTTPX
 							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
 
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
-								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
+							{
+								string Challenge = Scheme.GetChallenge();
+								if (!string.IsNullOrEmpty(Challenge))
+									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+							}
 							
 							await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 401, "Unauthorized", false, MaxChunkSize, Challenges.ToArray());
 							Request.Dispose();

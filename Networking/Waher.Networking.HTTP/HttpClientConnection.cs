@@ -348,6 +348,7 @@ namespace Waher.Networking.HTTP
 				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
+					Request.SubPath = SubPath;
 #if WINDOWS_UWP
 					this.server.RequestReceived(Request, this.client.Client.Information.RemoteAddress.ToString() + ":" + 
 						this.client.Client.Information.RemotePort, Resource, SubPath);
@@ -421,6 +422,18 @@ namespace Waher.Networking.HTTP
 
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
+							if (Scheme.UserSessions && Request.Session is null)
+							{
+								HttpFieldCookie Cookie = Request.Header.Cookie;
+								if (!(Cookie is null))
+								{
+									string HttpSessionID = Cookie["HttpSessionID"];
+
+									if (!string.IsNullOrEmpty(HttpSessionID))
+										Request.Session = this.server.GetSession(HttpSessionID);
+								}
+							}
+
 							IUser User = await Scheme.IsAuthenticated(Request);
 							if (!(User is null))
 							{
@@ -434,7 +447,11 @@ namespace Waher.Networking.HTTP
 							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
 
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
-								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
+							{
+								string Challenge = Scheme.GetChallenge();
+								if (!string.IsNullOrEmpty(Challenge))
+									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+							}
 
 							await this.SendResponse(Request, null, new HttpException(401, "Unauthorized", "Unauthorized access prohibited."), false, Challenges.ToArray());
 							Request.Dispose();
@@ -442,7 +459,6 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					Request.SubPath = SubPath;
 					Resource.Validate(Request);
 
 					if (Request.Header.Expect != null)

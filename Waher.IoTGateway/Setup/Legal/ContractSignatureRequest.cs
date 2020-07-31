@@ -65,7 +65,7 @@ namespace Waher.IoTGateway.Setup.Legal
 			{
 				this.contract = value;
 				StringBuilder Xml = new StringBuilder();
-				this.contract.Serialize(Xml, true, true, true, true, true);
+				this.contract.Serialize(Xml, true, true, true, true, true, true, true);
 				this.contractXml = Xml.ToString();
 			}
 		}

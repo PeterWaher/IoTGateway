@@ -251,6 +251,7 @@ namespace Waher.Networking.XMPP.Contracts
 							Attachments.Add(new Attachment()
 							{
 								Id = XML.Attribute(E, "id"),
+								LegalId = Result.id,
 								ContentType = XML.Attribute(E, "contentType"),
 								FileName = XML.Attribute(E, "fileName"),
 								Signature = Convert.FromBase64String(XML.Attribute(E, "s")),

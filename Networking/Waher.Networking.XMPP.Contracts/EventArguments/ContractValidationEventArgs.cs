@@ -86,6 +86,26 @@ namespace Waher.Networking.XMPP.Contracts
 		ClientIdentityInvalid,
 
 		/// <summary>
+		/// Attachment is missing download URL.
+		/// </summary>
+		AttachmentLacksUrl,
+
+		/// <summary>
+		/// Unable to download attachment.
+		/// </summary>
+		AttachmentUnavailable,
+
+		/// <summary>
+		/// Information about attachment is inconsistent.
+		/// </summary>
+		AttachmentInconsistency,
+
+		/// <summary>
+		/// Attachment signature is invalid.
+		/// </summary>
+		AttachmentSignatureInvalid,
+
+		/// <summary>
 		/// No Trust Provider attesting to the validity of the identity.
 		/// </summary>
 		NoTrustProvider,

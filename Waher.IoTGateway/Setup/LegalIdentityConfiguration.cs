@@ -33,6 +33,8 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GatewayStartup = new Regex(@"Waher[.]IoTGateway[.]Gateway[.+]<Start>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex GetAttachment = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly object[] approvedSources = new object[]
 		{
 			"Waher.Persistence.NeuroLedger.NeuroLedgerProvider",
@@ -44,7 +46,8 @@ namespace Waher.IoTGateway.Setup
 		};
 		private static readonly object[] approvedContractClientSources = new object[]
 		{
-			typeof(LegalIdentityConfiguration)
+			typeof(LegalIdentityConfiguration),
+			GetAttachment
 		};
 
 		private static LegalIdentityConfiguration instance = null;

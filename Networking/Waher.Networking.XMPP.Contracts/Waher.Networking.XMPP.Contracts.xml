@@ -19,6 +19,11 @@
             Attachment ID
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Attachment.LegalId">
+            <summary>
+            Legal ID of uploader of attachment
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Attachment.ContentType">
             <summary>
             Internet Content Type of binary attachment.
@@ -291,7 +296,7 @@
             <param name="CheckCurrentTime">If the current time should be checked as well.</param>
             <returns>If the contract is legally binding.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Serialize(System.Text.StringBuilder,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Serialize(System.Text.StringBuilder,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
             Serializes the Contract, in normalized form.
             </summary>
@@ -299,8 +304,10 @@
             <param name="IncludeNamespace">If namespace attribute should be included.</param>
             <param name="IncludeIdAttribute">If id attribute should be included.</param>
             <param name="IncludeClientSignatures">If client signatures should be included.</param>
+            <param name="IncludeAttachments">If attachments are to be included.</param>
             <param name="IncludeStatus">If the status element should be included.</param>
             <param name="IncludeServerSignature">If the server signature should be included.</param>
+            <param name="IncludeAttachmentReferences">If attachment references (URLs) are to be included.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Contract.GetTags">
             <summary>
@@ -567,6 +574,32 @@
             <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
             <param name="Callback">Method to call when validation is completed</param>
             <param name="State">State object to pass to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignatureAsync(Waher.Networking.XMPP.Contracts.LegalIdentity,System.Byte[],System.Byte[])">
+            <summary>
+            Validates a signature of binary data.
+            </summary>
+            <param name="Identity">Legal identity used to create the signature.</param>
+            <param name="Data">Binary data to sign-</param>
+            <param name="Signature">Digital signature of data</param>
+            <returns>
+            true = Signature is valid.
+            false = Signature is invalid.
+            null = Client key algorithm is unknown, and veracity of signature could not be established.
+            </returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignatureAsync(Waher.Networking.XMPP.Contracts.LegalIdentity,System.IO.Stream,System.Byte[])">
+            <summary>
+            Validates a signature of binary data.
+            </summary>
+            <param name="Identity">Legal identity used to create the signature.</param>
+            <param name="Data">Binary data to sign-</param>
+            <param name="Signature">Digital signature of data</param>
+            <returns>
+            true = Signature is valid.
+            false = Signature is invalid.
+            null = Client key algorithm is unknown, and veracity of signature could not be established.
+            </returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateAsync(Waher.Networking.XMPP.Contracts.LegalIdentity)">
             <summary>
@@ -1694,14 +1727,14 @@
             The URL might previously have been provided by the HTTP Upload Service.</param>
             <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachment(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String)">
             <summary>
             Gets an attachment from a Trust Provider
             </summary>
             <param name="Url">URL to attachment.</param>
             <returns>Content-Type, and attachment.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachment(System.String,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String,System.Int32)">
             <summary>
             Gets an attachment from a Trust Provider
             </summary>
@@ -2035,6 +2068,26 @@
             One or more of the legal identities used to sign the contract are invalid.
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.AttachmentLacksUrl">
+            <summary>
+            Attachment is missing download URL.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.AttachmentUnavailable">
+            <summary>
+            Unable to download attachment.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.AttachmentInconsistency">
+            <summary>
+            Information about attachment is inconsistent.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.AttachmentSignatureInvalid">
+            <summary>
+            Attachment signature is invalid.
+            </summary>
+        </member>
         <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.NoTrustProvider">
             <summary>
             No Trust Provider attesting to the validity of the identity.
@@ -2141,9 +2194,29 @@
             Client signature invalid.
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.AttachmentLacksUrl">
+            <summary>
+            Attachment is missing download URL.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.AttachmentUnavailable">
+            <summary>
+            Unable to download attachment.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.AttachmentInconsistency">
+            <summary>
+            Information about attachment is inconsistent.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.AttachmentSignatureInvalid">
+            <summary>
+            Attachment signature is invalid.
+            </summary>
+        </member>
         <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.NoTrustProvider">
             <summary>
-            No Trust Provider attesting to the validity of the identity
+            No Trust Provider attesting to the validity of the identity.
             </summary>
         </member>
         <member name="F:Waher.Networking.XMPP.Contracts.IdentityStatus.NoProviderPublicKey">

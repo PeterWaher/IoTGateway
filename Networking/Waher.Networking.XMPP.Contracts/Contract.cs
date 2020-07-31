@@ -765,6 +765,7 @@ namespace Waher.Networking.XMPP.Contracts
 						Attachments.Add(new Attachment()
 						{
 							Id = XML.Attribute(E, "id"),
+							LegalId = XML.Attribute(E, "legalId"),
 							ContentType = XML.Attribute(E, "contentType"),
 							FileName = XML.Attribute(E, "fileName"),
 							Signature = Convert.FromBase64String(XML.Attribute(E, "s")),
@@ -1059,10 +1060,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="IncludeNamespace">If namespace attribute should be included.</param>
 		/// <param name="IncludeIdAttribute">If id attribute should be included.</param>
 		/// <param name="IncludeClientSignatures">If client signatures should be included.</param>
+		/// <param name="IncludeAttachments">If attachments are to be included.</param>
 		/// <param name="IncludeStatus">If the status element should be included.</param>
 		/// <param name="IncludeServerSignature">If the server signature should be included.</param>
+		/// <param name="IncludeAttachmentReferences">If attachment references (URLs) are to be included.</param>
 		public void Serialize(StringBuilder Xml, bool IncludeNamespace, bool IncludeIdAttribute, bool IncludeClientSignatures,
-			bool IncludeStatus, bool IncludeServerSignature)
+			bool IncludeAttachments, bool IncludeStatus, bool IncludeServerSignature, bool IncludeAttachmentReferences)
 		{
 			Xml.Append("<contract archiveOpt=\"");
 			Xml.Append(this.archiveOpt.ToString());
@@ -1180,6 +1183,26 @@ namespace Waher.Networking.XMPP.Contracts
 					Signature.Serialize(Xml);
 			}
 
+			if (IncludeAttachments && !(this.attachments is null))
+			{
+				foreach (Attachment A in this.attachments)
+				{
+					Xml.Append("<attachment contentType=\"");
+					Xml.Append(A.ContentType.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" fileName=\"");
+					Xml.Append(A.FileName.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" id=\"");
+					Xml.Append(A.Id.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" legalId=\"");
+					Xml.Append(A.LegalId.Normalize(NormalizationForm.FormC));
+					Xml.Append("\" s=\"");
+					Xml.Append(Convert.ToBase64String(A.Signature));
+					Xml.Append("\" timestamp=\"");
+					Xml.Append(XML.Encode(A.Timestamp));
+					Xml.Append("\"/>");
+				}
+			}
+
 			if (IncludeStatus)
 			{
 				Xml.Append("<status created=\"");
@@ -1229,6 +1252,18 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (IncludeServerSignature)
 				this.serverSignature?.Serialize(Xml);
+
+			if (IncludeAttachmentReferences && !(this.attachments is null))
+			{
+				foreach (Attachment A in this.attachments)
+				{
+					Xml.Append("<attachmentRef attachmentId=\"");
+					Xml.Append(XML.Encode(A.Id));
+					Xml.Append("\" url=\"");
+					Xml.Append(XML.Encode(A.Url));
+					Xml.Append("\"/>");
+				}
+			}
 
 			Xml.Append("</contract>");
 		}

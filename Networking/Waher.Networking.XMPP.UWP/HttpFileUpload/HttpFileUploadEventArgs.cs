@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 	/// <param name="Sender">Sender.</param>
 	/// <param name="e">Event arguments.</param>
 	public delegate Task HttpFileUploadEventHandler(object Sender, HttpFileUploadEventArgs e);
-	
+
 	/// <summary>
 	/// Event arguments for HTTP File Upload callback methods.
 	/// </summary>
@@ -100,7 +100,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 				if (!Response.IsSuccessStatusCode)
-					throw new IOException("Unable to PUT content.");
+				{
+					string Msg = await Response.Content.ReadAsStringAsync();
+					throw new IOException("Unable to PUT content: " + Msg);
+				}
 
 				if (Response.StatusCode != System.Net.HttpStatusCode.Created)
 					throw new IOException("Unexpected response.");

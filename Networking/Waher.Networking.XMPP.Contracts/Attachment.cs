@@ -10,6 +10,7 @@ namespace Waher.Networking.XMPP.Contracts
 	public class Attachment
 	{
 		private string id = null;
+		private string legalId = null;
 		private string contentType = string.Empty;
 		private string fileName = null;
 		private string url = null;
@@ -30,6 +31,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get { return this.id; }
 			set { this.id = value; }
+		}
+
+		/// <summary>
+		/// Legal ID of uploader of attachment
+		/// </summary>
+		public string LegalId
+		{
+			get { return this.legalId; }
+			set { this.legalId = value; }
 		}
 
 		/// <summary>

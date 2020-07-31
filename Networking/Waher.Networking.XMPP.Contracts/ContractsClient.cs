@@ -695,20 +695,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			if (Identity.ClientKeyName.StartsWith("RSA") &&
-				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+			bool? b = this.ValidateSignatureAsync(Identity, Data, Identity.ClientSignature);
+			if (b.HasValue)
 			{
-				if (!RsaEndpoint.Verify(Data, Identity.ClientSignature, KeySize, Identity.ClientPubKey))
-				{
-					await this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
-					return;
-				}
-			}
-			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
-				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
-				LocalKey is EllipticCurveEndpoint LocalEc)
-			{
-				if (!LocalEc.Verify(Data, Identity.ClientPubKey, Identity.ClientSignature))
+				if (!b.Value)
 				{
 					await this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
 					return;
@@ -718,6 +708,54 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
 				return;
+			}
+
+			if (!(Identity.Attachments is null))
+			{
+				foreach (Attachment Attachment in Identity.Attachments)
+				{
+					if (string.IsNullOrEmpty(Attachment.Url))
+					{
+						await this.ReturnStatus(IdentityStatus.AttachmentLacksUrl, Callback, State);
+						return;
+					}
+
+					try
+					{
+						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, 30000);
+
+						using (TemporaryFile File = P.Value)
+						{
+							if (P.Key != Attachment.ContentType)
+							{
+								await this.ReturnStatus(IdentityStatus.AttachmentInconsistency, Callback, State);
+								return;
+							}
+
+							File.Position = 0;
+
+							b = this.ValidateSignatureAsync(Identity, File, Attachment.Signature);
+							if (b.HasValue)
+							{
+								if (!b.Value)
+								{
+									await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State);
+									return;
+								}
+							}
+							else
+							{
+								await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
+								return;
+							}
+						}
+					}
+					catch (Exception)
+					{
+						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State);
+						return;
+					}
+				}
 			}
 
 			if (Identity.ServerSignature is null || Identity.ServerSignature.Length == 0)
@@ -783,6 +821,62 @@ namespace Waher.Networking.XMPP.Contracts
 					await this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
 
 			}, State);
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="Identity">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Signature">Digital signature of data</param>
+		/// <returns>
+		/// true = Signature is valid.
+		/// false = Signature is invalid.
+		/// null = Client key algorithm is unknown, and veracity of signature could not be established.
+		/// </returns>
+		public bool? ValidateSignatureAsync(LegalIdentity Identity, byte[] Data, byte[] Signature)
+		{
+			if (Identity.ClientKeyName.StartsWith("RSA") &&
+				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+			{
+				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
+			}
+			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
+				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
+				LocalKey is EllipticCurveEndpoint LocalEc)
+			{
+				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
+			}
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="Identity">Legal identity used to create the signature.</param>
+		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Signature">Digital signature of data</param>
+		/// <returns>
+		/// true = Signature is valid.
+		/// false = Signature is invalid.
+		/// null = Client key algorithm is unknown, and veracity of signature could not be established.
+		/// </returns>
+		public bool? ValidateSignatureAsync(LegalIdentity Identity, Stream Data, byte[] Signature)
+		{
+			if (Identity.ClientKeyName.StartsWith("RSA") &&
+				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+			{
+				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
+			}
+			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
+				EndpointSecurity.IoTHarmonizationE2E, out IE2eEndpoint LocalKey) &&
+				LocalKey is EllipticCurveEndpoint LocalEc)
+			{
+				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
+			}
+			else
+				return null;
 		}
 
 		private async Task ReturnStatus(IdentityStatus Status, IdentityValidationEventHandler Callback, object State)
@@ -1554,7 +1648,7 @@ namespace Waher.Networking.XMPP.Contracts
 				CanActAsTemplate = CanActAsTemplate
 			};
 
-			Contract.Serialize(Xml, false, false, false, false, false);
+			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 
 			Xml.Append("</createContract>");
 
@@ -1964,7 +2058,7 @@ namespace Waher.Networking.XMPP.Contracts
 			SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
-			Contract.Serialize(Xml, false, false, false, false, false);
+			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			this.Sign(Address, Data, async (sender, e) =>
@@ -2418,7 +2512,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceSmartContracts);
 			Xml.Append("'>");
 
-			Contract.Serialize(Xml, false, true, true, false, false);
+			Contract.Serialize(Xml, false, true, true, true, false, false, false);
 
 			Xml.Append("</updateContract>");
 
@@ -2637,8 +2731,9 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			StringBuilder Xml = new StringBuilder();
-			Contract.Serialize(Xml, false, false, false, false, false);
+			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+			Dictionary<string, LegalIdentity> Identities = new Dictionary<string, LegalIdentity>();
 
 			foreach (ClientSignature Signature in Contract.ClientSignatures)
 			{
@@ -2655,6 +2750,76 @@ namespace Waher.Networking.XMPP.Contracts
 					await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback, State);
 					return;
 				}
+
+				Identities[Signature.LegalId] = Identity;
+			}
+
+			if (!(Contract.Attachments is null))
+			{
+				foreach (Attachment Attachment in Contract.Attachments)
+				{
+					if (string.IsNullOrEmpty(Attachment.Url))
+					{
+						await this.ReturnStatus(ContractStatus.AttachmentLacksUrl, Callback, State);
+						return;
+					}
+
+					try
+					{
+						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, 30000);
+						bool? IsValid;
+
+						using (TemporaryFile File = P.Value)
+						{
+							if (P.Key != Attachment.ContentType)
+							{
+								await this.ReturnStatus(ContractStatus.AttachmentInconsistency, Callback, State);
+								return;
+							}
+
+							File.Position = 0;
+
+							if (Identities.TryGetValue(Attachment.LegalId, out LegalIdentity Identity))
+								IsValid = this.ValidateSignatureAsync(Identity, File, Attachment.Signature);
+							else
+							{
+								MemoryStream ms = new MemoryStream();
+								await File.CopyToAsync(ms);
+								Data = ms.ToArray();
+
+								try
+								{
+									Identity = await this.ValidateSignatureAsync(Attachment.LegalId, Data, Attachment.Signature);
+									Identities[Attachment.LegalId] = Identity;
+									IsValid = true;
+								}
+								catch (Exception)
+								{
+									IsValid = false;
+								}
+							}
+
+							if (IsValid.HasValue)
+							{
+								if (!IsValid.Value)
+								{
+									await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
+									return;
+								}
+							}
+							else
+							{
+								await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
+								return;
+							}
+						}
+					}
+					catch (Exception)
+					{
+						await this.ReturnStatus(ContractStatus.AttachmentUnavailable, Callback, State);
+						return;
+					}
+				}
 			}
 
 			if (Contract.ServerSignature is null)
@@ -2664,7 +2829,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			Xml.Clear();
-			Contract.Serialize(Xml, false, true, true, true, false);
+			Contract.Serialize(Xml, false, true, true, true, true, false, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			bool HasOldPublicKey;
@@ -3999,9 +4164,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Url">URL to attachment.</param>
 		/// <returns>Content-Type, and attachment.</returns>
-		public Task<KeyValuePair<string, TemporaryFile>> GetAttachment(string Url)
+		public Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url)
 		{
-			return this.GetAttachment(Url, 30000);
+			return this.GetAttachmentAsync(Url, 30000);
 		}
 
 		/// <summary>
@@ -4010,7 +4175,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Url">URL to attachment.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>Content-Type, and attachment.</returns>
-		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachment(string Url, int Timeout)
+		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url, int Timeout)
 		{
 			using (HttpClient HttpClient = new HttpClient()
 			{

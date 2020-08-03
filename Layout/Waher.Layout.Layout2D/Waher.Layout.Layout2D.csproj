@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>The Waher.Layout.Layout2D project provides an object model for laying out graphical objects in two dimensions. These models can then be used to generate images. The models can be represented in XML, and contains an XML schema that can be used to validate documents, as well as provide support when editing layout documents.</Description>
+    <Copyright>Copyright © Waher Data AB 2020. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Layout/Waher.Layout.Layout2D</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>Layout 2D</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Model\Backgrounds\" />
+    <Folder Include="Model\Figures\" />
+    <Folder Include="Model\Groups\" />
+    <Folder Include="Model\References\" />
+    <Folder Include="Model\Transforms\" />
+    <Folder Include="Model\Pens\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="2.80.1" />
+  </ItemGroup>
+
+</Project>

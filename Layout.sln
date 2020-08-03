@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Layout", "Layout", "{C69C8978-F070-44A4-A386-52A6C1847E6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Layout.Layout2D", "Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj", "{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B4D2F2F-E46B-49F5-93C5-7E45BA6781A6} = {C69C8978-F070-44A4-A386-52A6C1847E6D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {988B762C-FA18-43FC-83CC-19513C15A4EF}
+	EndGlobalSection
+EndGlobal

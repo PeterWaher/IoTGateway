@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Layout.Layout2D</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Layout.Layout2D.Layout2DDocument">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -29,7 +29,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -2526,7 +2526,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -5044,7 +5044,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -7598,7 +7598,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -10125,7 +10125,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -12688,7 +12688,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -15215,7 +15215,7 @@
           "lib/netcore50/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DependencyValidation.Analyzers/0.10.0": {
+      "Microsoft.DependencyValidation.Analyzers/0.11.0": {
         "type": "package"
       },
       "Microsoft.Net.Native.Compiler/1.7.6": {
@@ -17809,10 +17809,10 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "Microsoft.DependencyValidation.Analyzers/0.10.0": {
-      "sha512": "VXi/pc6FFBhDIhm+WylrAKxN4/CtYVo9fNnD1Hq+XwzqN6KF1gvC3G2bDqETbTLsML/u60c658+0veyQK5M1IQ==",
+    "Microsoft.DependencyValidation.Analyzers/0.11.0": {
+      "sha512": "3xBVhMsM4o9cDpsvmlv78T1FG+cTH8i6bjl1Irk6hoIwEc6Ekoz4mKAR6Hn5M/2G2ZsHNrYBNwGkgF7aiw74UA==",
       "type": "package",
-      "path": "microsoft.dependencyvalidation.analyzers/0.10.0",
+      "path": "microsoft.dependencyvalidation.analyzers/0.11.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -17831,7 +17831,7 @@
         "analyzers/dotnet/tr/Microsoft.DependencyValidation.Analyzers.resources.dll",
         "analyzers/dotnet/zh-HANS/Microsoft.DependencyValidation.Analyzers.resources.dll",
         "analyzers/dotnet/zh-HANT/Microsoft.DependencyValidation.Analyzers.resources.dll",
-        "microsoft.dependencyvalidation.analyzers.0.10.0.nupkg.sha512",
+        "microsoft.dependencyvalidation.analyzers.0.11.0.nupkg.sha512",
         "microsoft.dependencyvalidation.analyzers.nuspec",
         "tools/install.ps1",
         "tools/uninstall.ps1"
@@ -27660,7 +27660,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.DependencyValidation.Analyzers >= 0.10.0",
+      "Microsoft.DependencyValidation.Analyzers >= 0.11.0",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 6.2.10"
     ],
     "UAP,Version=v10.0.10240": []
@@ -27722,7 +27722,7 @@
       }
     },
     "dependencies": {
-      "Microsoft.DependencyValidation.Analyzers": "[0.10.0, )",
+      "Microsoft.DependencyValidation.Analyzers": "[0.11.0, )",
       "Microsoft.NETCore.UniversalWindowsPlatform": "[6.2.10, )"
     },
     "frameworks": {

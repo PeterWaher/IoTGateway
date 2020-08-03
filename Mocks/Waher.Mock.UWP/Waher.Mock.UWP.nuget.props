@@ -24,6 +24,6 @@
     <PkgMicrosoft_Net_Native_SharedLibrary-x64 Condition=" '$(PkgMicrosoft_Net_Native_SharedLibrary-x64)' == '' ">C:\Users\peter\.nuget\packages\microsoft.net.native.sharedlibrary-x64\1.7.3</PkgMicrosoft_Net_Native_SharedLibrary-x64>
     <PkgMicrosoft_Net_Native_SharedLibrary-arm Condition=" '$(PkgMicrosoft_Net_Native_SharedLibrary-arm)' == '' ">C:\Users\peter\.nuget\packages\microsoft.net.native.sharedlibrary-arm\1.7.3</PkgMicrosoft_Net_Native_SharedLibrary-arm>
     <PkgMicrosoft_Net_Native_Compiler Condition=" '$(PkgMicrosoft_Net_Native_Compiler)' == '' ">C:\Users\peter\.nuget\packages\microsoft.net.native.compiler\1.7.6</PkgMicrosoft_Net_Native_Compiler>
-    <PkgMicrosoft_DependencyValidation_Analyzers Condition=" '$(PkgMicrosoft_DependencyValidation_Analyzers)' == '' ">C:\Users\peter\.nuget\packages\microsoft.dependencyvalidation.analyzers\0.10.0</PkgMicrosoft_DependencyValidation_Analyzers>
+    <PkgMicrosoft_DependencyValidation_Analyzers Condition=" '$(PkgMicrosoft_DependencyValidation_Analyzers)' == '' ">C:\Users\peter\.nuget\packages\microsoft.dependencyvalidation.analyzers\0.11.0</PkgMicrosoft_DependencyValidation_Analyzers>
   </PropertyGroup>
 </Project>

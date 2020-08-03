@@ -28,7 +28,7 @@
     <DocumentationFile>C:\My Projects\IoTGateway\Things\Waher.Things\Waher.Things.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
+    <PackageReference Include="SkiaSharp" Version="2.80.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />

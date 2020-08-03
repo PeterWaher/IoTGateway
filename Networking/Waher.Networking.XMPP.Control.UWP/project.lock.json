@@ -522,29 +522,25 @@
           }
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtimeTargets": {
           "runtimes/osx/native/libSkiaSharp.dylib": {
             "assetType": "native",
             "rid": "osx"
           },
-          "runtimes/tizen-armel/native/libSkiaSharp.so": {
+          "runtimes/win-arm64/native/libSkiaSharp.dll": {
             "assetType": "native",
-            "rid": "tizen-armel"
-          },
-          "runtimes/tizen-x86/native/libSkiaSharp.so": {
-            "assetType": "native",
-            "rid": "tizen-x86"
+            "rid": "win-arm64"
           },
           "runtimes/win-x64/native/libSkiaSharp.dll": {
             "assetType": "native",
@@ -565,6 +561,18 @@
           "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {
             "assetType": "native",
             "rid": "win10-arm"
+          },
+          "runtimes/win10-arm64/nativeassets/uap10.0/libEGL.dll": {
+            "assetType": "native",
+            "rid": "win10-arm64"
+          },
+          "runtimes/win10-arm64/nativeassets/uap10.0/libGLESv2.dll": {
+            "assetType": "native",
+            "rid": "win10-arm64"
+          },
+          "runtimes/win10-arm64/nativeassets/uap10.0/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win10-arm64"
           },
           "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {
             "assetType": "native",
@@ -2651,7 +2659,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -3386,16 +3394,16 @@
           "runtimes/win8-arm/native/clrcompression.dll": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
@@ -5278,7 +5286,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -6049,16 +6057,16 @@
           "runtimes/win8-arm-aot/native/_._": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
@@ -7941,7 +7949,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -8685,16 +8693,16 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
@@ -10577,7 +10585,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -11357,16 +11365,16 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
@@ -13249,7 +13257,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -13993,16 +14001,16 @@
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
@@ -15885,7 +15893,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -16665,16 +16673,16 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
-      "SkiaSharp/1.68.1.1": {
+      "SkiaSharp/2.80.1": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.5.3"
         },
         "compile": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "runtime": {
-          "lib/uap10.0/SkiaSharp.dll": {}
+          "lib/uap10.0.10240/SkiaSharp.dll": {}
         },
         "native": {
           "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
@@ -18557,7 +18565,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "SkiaSharp": "1.68.1.1",
+          "SkiaSharp": "2.80.1",
           "Waher.Content": "1.0.25",
           "Waher.Content.Xml": "1.0.8",
           "Waher.Events": "1.0.12",
@@ -23506,51 +23514,80 @@
         "runtimes/win8-arm/native/clrcompression.dll"
       ]
     },
-    "SkiaSharp/1.68.1.1": {
-      "sha512": "fJteGIKAMmLD9tSQgdvZqLqECub6B55pK1MH5QyanLOr8JQ8uUMKKcrAcpocNnmIS/YsUJOL4AD7dO6mAwP7mQ==",
+    "SkiaSharp/2.80.1": {
+      "sha512": "CiQwnDzG+1JNGzjAN9G/9n/lJgUVA/NPOFgSlEtu6c7qQ0O7P1tMjrXp/+PtWfX0xyyY9ABsFAZK2kW34U7r/A==",
       "type": "package",
-      "path": "skiasharp/1.68.1.1",
+      "path": "skiasharp/2.80.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.txt",
         "THIRD-PARTY-NOTICES.txt",
-        "build/net45/SkiaSharp.targets",
+        "build/monoandroid1.0/SkiaSharp.targets",
+        "build/monoandroid1.0/arm/libSkiaSharp.so",
+        "build/monoandroid1.0/arm64/libSkiaSharp.so",
+        "build/monoandroid1.0/x64/libSkiaSharp.so",
+        "build/monoandroid1.0/x86/libSkiaSharp.so",
+        "build/net462/SkiaSharp.targets",
         "build/tizen40/SkiaSharp.targets",
-        "buildTransitive/net45/SkiaSharp.targets",
-        "lib/MonoAndroid/SkiaSharp.dll",
-        "lib/MonoAndroid/SkiaSharp.xml",
-        "lib/Xamarin.Mac20/SkiaSharp.dll",
-        "lib/Xamarin.Mac20/SkiaSharp.xml",
-        "lib/Xamarin.TVOS/SkiaSharp.dll",
-        "lib/Xamarin.TVOS/SkiaSharp.xml",
-        "lib/Xamarin.WatchOS/SkiaSharp.dll",
-        "lib/Xamarin.WatchOS/SkiaSharp.xml",
-        "lib/Xamarin.iOS/SkiaSharp.dll",
-        "lib/Xamarin.iOS/SkiaSharp.xml",
-        "lib/net45/SkiaSharp.dll",
-        "lib/net45/SkiaSharp.xml",
+        "build/tizen40/arm/libSkiaSharp.so",
+        "build/tizen40/x86/libSkiaSharp.so",
+        "build/xamarinios1.0/SkiaSharp.targets",
+        "build/xamarinios1.0/libSkiaSharp.framework/Info.plist",
+        "build/xamarinios1.0/libSkiaSharp.framework/Modules/module.modulemap",
+        "build/xamarinios1.0/libSkiaSharp.framework/_CodeSignature/CodeResources",
+        "build/xamarinios1.0/libSkiaSharp.framework/libSkiaSharp",
+        "build/xamarinmac2.0/SkiaSharp.targets",
+        "build/xamarintvos1.0/SkiaSharp.targets",
+        "build/xamarintvos1.0/libSkiaSharp.framework/Info.plist",
+        "build/xamarintvos1.0/libSkiaSharp.framework/Modules/module.modulemap",
+        "build/xamarintvos1.0/libSkiaSharp.framework/_CodeSignature/CodeResources",
+        "build/xamarintvos1.0/libSkiaSharp.framework/libSkiaSharp",
+        "build/xamarinwatchos1.0/SkiaSharp.targets",
+        "build/xamarinwatchos1.0/libSkiaSharp.framework/Info.plist",
+        "build/xamarinwatchos1.0/libSkiaSharp.framework/Modules/module.modulemap",
+        "build/xamarinwatchos1.0/libSkiaSharp.framework/_CodeSignature/CodeResources",
+        "build/xamarinwatchos1.0/libSkiaSharp.framework/libSkiaSharp",
+        "buildTransitive/net462/SkiaSharp.targets",
+        "lib/monoandroid1.0/SkiaSharp.dll",
+        "lib/monoandroid1.0/SkiaSharp.xml",
+        "lib/net462/SkiaSharp.dll",
+        "lib/net462/SkiaSharp.xml",
         "lib/netstandard1.3/SkiaSharp.dll",
         "lib/netstandard1.3/SkiaSharp.xml",
+        "lib/netstandard2.0/SkiaSharp.dll",
+        "lib/netstandard2.0/SkiaSharp.xml",
         "lib/tizen40/SkiaSharp.dll",
         "lib/tizen40/SkiaSharp.xml",
-        "lib/uap10.0/SkiaSharp.dll",
-        "lib/uap10.0/SkiaSharp.xml",
+        "lib/uap10.0.10240/SkiaSharp.dll",
+        "lib/uap10.0.10240/SkiaSharp.xml",
+        "lib/uap10.0.16299/SkiaSharp.dll",
+        "lib/uap10.0.16299/SkiaSharp.xml",
+        "lib/xamarinios1.0/SkiaSharp.dll",
+        "lib/xamarinios1.0/SkiaSharp.xml",
+        "lib/xamarinmac2.0/SkiaSharp.dll",
+        "lib/xamarinmac2.0/SkiaSharp.xml",
+        "lib/xamarintvos1.0/SkiaSharp.dll",
+        "lib/xamarintvos1.0/SkiaSharp.xml",
+        "lib/xamarinwatchos1.0/SkiaSharp.dll",
+        "lib/xamarinwatchos1.0/SkiaSharp.xml",
         "runtimes/osx/native/libSkiaSharp.dylib",
-        "runtimes/tizen-armel/native/libSkiaSharp.so",
-        "runtimes/tizen-x86/native/libSkiaSharp.so",
+        "runtimes/win-arm64/native/libSkiaSharp.dll",
         "runtimes/win-x64/native/libSkiaSharp.dll",
         "runtimes/win-x86/native/libSkiaSharp.dll",
         "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll",
         "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll",
         "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll",
+        "runtimes/win10-arm64/nativeassets/uap10.0/libEGL.dll",
+        "runtimes/win10-arm64/nativeassets/uap10.0/libGLESv2.dll",
+        "runtimes/win10-arm64/nativeassets/uap10.0/libSkiaSharp.dll",
         "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll",
         "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll",
         "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll",
         "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll",
         "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll",
         "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
-        "skiasharp.1.68.1.1.nupkg.sha512",
+        "skiasharp.2.80.1.nupkg.sha512",
         "skiasharp.nuspec",
         "xamarin.interactive/SkiaSharp.Workbooks.dll"
       ]

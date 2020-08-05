@@ -8,8 +8,8 @@ namespace Waher.Content.Html
 	/// <summary>
 	/// HTML Entity
 	/// </summary>
-    public class HtmlEntity : HtmlNode
-    {
+	public class HtmlEntity : HtmlNode
+	{
 		private readonly string entityName;
 
 		/// <summary>
@@ -56,24 +56,24 @@ namespace Waher.Content.Html
 			Output.WriteRaw(XML.Encode(this.ToString()));
 		}
 
-        /// <summary>
-        /// Exports the HTML document to XML.
-        /// </summary>
-        /// <param name="Output">XML Output</param>
-        public override void Export(StringBuilder Output)
-        {
-            Output.Append(XML.Encode(this.ToString()));
-        }
+		/// <summary>
+		/// Exports the HTML document to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		public override void Export(StringBuilder Output)
+		{
+			Output.Append(XML.Encode(this.ToString()));
+		}
 
-        /// <summary>
-        /// Converts an HTML entity into a character.
-        /// 
-        /// Reference:
-        /// http://dev.w3.org/html5/html-author/charref
-        /// </summary>
-        /// <param name="Entity">HTML entity (without the &amp; and the ;)</param>
-        /// <returns>Character, if entity recognized, or null if not.</returns>
-        public static string EntityToCharacter(string Entity)
+		/// <summary>
+		/// Converts an HTML entity into a character.
+		/// 
+		/// Reference:
+		/// http://dev.w3.org/html5/html-author/charref
+		/// </summary>
+		/// <param name="Entity">HTML entity (without the &amp; and the ;)</param>
+		/// <returns>Character, if entity recognized, or null if not.</returns>
+		public static string EntityToCharacter(string Entity)
 		{
 			// Assumed to be compiled into a dictionary.
 			switch (Entity)
@@ -2117,7 +2117,7 @@ namespace Waher.Content.Html
 					if (Entity.StartsWith("x", StringComparison.CurrentCultureIgnoreCase))
 					{
 						Entity = Entity.Substring(1);
-						if (int.TryParse(Entity,System.Globalization.NumberStyles.HexNumber,null,out int i))
+						if (int.TryParse(Entity, System.Globalization.NumberStyles.HexNumber, null, out int i))
 							return new string((char)i, 1);
 					}
 					else

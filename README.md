@@ -10,6 +10,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Clients](#clients)
 * [Content](#content)
 * [Events](#events)
+* [Layout](#layout)
 * [Mocks](#mocks)
 * [Networking](#networking)
 * [Persistence](#persistence)
@@ -130,7 +131,7 @@ can be run by users to perform different types of interaction with things or the
 Content
 ----------------------
 
-The [Content](Content) folder contains libraries that Internet Content including parsing and rendering, and their
+The [Content](Content) folder contains libraries that handle Internet Content including parsing and rendering, using their
 corresponding Internet Content Type encodings and decodings.
 
 | Project                            | Type         | Link                                                                    | Project description |
@@ -176,6 +177,21 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.WindowsEventLog** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.WindowsEventLog/) | The [Waher.Events.WindowsEventLog](Events/Waher.Events.WindowsEventLog) project defines an event sink that logs events to a Windows Event Log. |
 | **Waher.Events.XMPP**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP/)            | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 | **Waher.Events.XMPP.UWP**        | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP.UWP/)        | The [Waher.Events.XMPP.UWP](Events/Waher.Events.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Events.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+
+Layout
+----------------------
+
+The [Layout](Layout) folder contains libraries for laying out objects visually.
+
+| Project                            | Type         | Link                                                                    | Project description |
+|------------------------------------|--------------|-------------------------------------------------------------------------|---------------------|
+| **Waher.Layout.Layout2D**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Layout.Layout2D/)          | The [Waher.Layout.Layout2D](Layout/Waher.Layout.Layout2D) project provides an object model for laying out graphical objects in two dimensions. These models can then be used to generate images. The models can be represented in XML, and contains an XML schema that can be used to validate documents, as well as provide support when editing layout documents. |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type          | Project description |
+|------------------------------------|---------------|---------------------|
+| **Waher.Layout.Layout2D.Test**     | .NET Core 2.2 | The [Waher.Layout.Layout2D.Test](Layout/Waher.Layout.Layout2D.Test) project contains unit tests for the **Waher.Layout.Layout2D** project. |
 
 Mocks
 ----------------------

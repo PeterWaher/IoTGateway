@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen" 
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black"/>
+  <SolidBackground id="WhiteBackground" color="White"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Line x="25px" y="75px" x2="75px" y2="25px"/>
+</Layout2D>

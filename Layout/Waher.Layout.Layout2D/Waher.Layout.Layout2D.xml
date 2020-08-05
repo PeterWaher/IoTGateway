@@ -4,10 +4,988 @@
         <name>Waher.Layout.Layout2D</name>
     </assembly>
     <members>
+        <member name="T:Waher.Layout.Layout2D.Exceptions.LayoutException">
+            <summary>
+            Base class for all layout-related exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Exceptions.LayoutException.#ctor(System.String)">
+            <summary>
+            Base class for all layout-related exceptions.
+            </summary>
+            <param name="Message">Message</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Exceptions.LayoutSyntaxException">
+            <summary>
+            Syntax-related layout exception
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Exceptions.LayoutSyntaxException.#ctor(System.String)">
+            <summary>
+            Syntax-related layout exception
+            </summary>
+            <param name="Message">Message</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Layout2DDocument">
             <summary>
             Contains a 2D layout document.
             </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Layout2DDocument.LocalName">
+            <summary>
+            Layout2D
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Layout2DDocument.Namespace">
+            <summary>
+            http://waher.se/Layout/Layout2D.xsd
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument)">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,Waher.Script.Variables)">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement)">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,Waher.Script.Variables)">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String)">
+            <summary>
+            Loads a 2D layout document from a file.
+            </summary>
+            <param name="FileName">File name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean)">
+            <summary>
+            Loads a 2D layout document from a file.
+            </summary>
+            <param name="FileName">File name.</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Loads a 2D layout document from a file.
+            </summary>
+            <param name="FileName">File name.</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Session">Session variables.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding)">
+            <summary>
+            Loads a 2D layout document from a stream.
+            </summary>
+            <param name="Input">Stream input.</param>
+            <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean)">
+            <summary>
+            Loads a 2D layout document from a stream.
+            </summary>
+            <param name="Input">Stream input.</param>
+            <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Loads a 2D layout document from a stream.
+            </summary>
+            <param name="Input">Stream input.</param>
+            <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Session">Session variables.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Session">Session variables.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument,Waher.Script.Variables)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement,Waher.Script.Variables)">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="E:Waher.Layout.Layout2D.Layout2DDocument.OnUpdated">
+            <summary>
+            Event raised when the internal state of the layout has been updated.
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.Attribute`1">
+            <summary>
+            Manages an attribute value or expression.
+            </summary>
+            <typeparam name="T">Type of attribute</typeparam>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.Xml.XmlElement,System.String,System.Boolean)">
+            <summary>
+            Manages an attribute value or expression.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="CanEmbedScript">If script can be embedded.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Name">
+            <summary>
+            Attribute name
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.PresetValue">
+            <summary>
+            Preset Value of attribute.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Expression">
+            <summary>
+            Expression returning the value of the attribute.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.HasPresetValue">
+            <summary>
+            If the attribute has a preset value.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryParse(System.String,`0@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.ToString(`0)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Export(System.Xml.XmlWriter)">
+            <summary>
+            Exports the attribute.
+            </summary>
+            <param name="Output">XML Output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute">
+            <summary>
+            Boolean attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Boolean attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.TryParse(System.String,System.Boolean@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.ToString(System.Boolean)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute">
+            <summary>
+            Color attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Color attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.TryParse(System.String,SkiaSharp.SKColor@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.ToString(SkiaSharp.SKColor)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute">
+            <summary>
+            Double attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Double attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.TryParse(System.String,System.Double@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.ToString(System.Double)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1">
+            <summary>
+            Boolean attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Boolean attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.TryParse(System.String,`0@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.ToString(`0)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.EventAttribute">
+            <summary>
+            Event attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Event attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.TryParse(System.String,Waher.Script.Expression@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.ToString(Waher.Script.Expression)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute">
+            <summary>
+            Length attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Length attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.TryParse(System.String,Waher.Layout.Layout2D.Model.Length@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.ToString(Waher.Layout.Layout2D.Model.Length)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.StringAttribute">
+            <summary>
+            String attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            String attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.TryParse(System.String,System.String@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.ToString(System.String)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Background">
+            <summary>
+            Abstract base class for backgrounds.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Background.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for backgrounds.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground">
+            <summary>
+            A solid background
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A solid background
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D">
+            <summary>
+            Root node for two-dimensional layouts
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Root node for two-dimensional layouts
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Line">
+            <summary>
+            A line
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A line
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Fonts.Font">
+            <summary>
+            Abstract base class for fonts.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for fonts.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.ILayoutElement">
+            <summary>
+            Base interface for all layout elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Namespace">
+            <summary>
+            Namespace of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Containing document.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.ToXml(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Overflow">
+            <summary>
+            Overflow handling.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Overflow.Clip">
+            <summary>
+            Clip any content outside of the area.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Overflow.Ignore">
+            <summary>
+            Ignore overflow
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.LayoutArea">
+            <summary>
+            Abstract base class for layout elements with an implicit area.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for layout elements with an implicit area.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.LayoutContainer">
+            <summary>
+            Abstract base class for layout containers (area elements containing 
+            embedded layout elements).
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for layout containers (area elements containing 
+            embedded layout elements).
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.LayoutElement">
+            <summary>
+            Abstract base class for layout elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for layout elements.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Document">
+            <summary>
+            Layout document.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Parent">
+            <summary>
+            Parent element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Namespace">
+            <summary>
+            Namespace of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ToXml(System.Xml.XmlWriter)">
+            <summary>
+            Exports the element to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
+            <summary>
+            Unit of length
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Px">
+            <summary>
+            pixels (1px = 1/96th of 1in) (absolute)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Pt">
+            <summary>
+            points (1pt = 1/72 of 1in) (absolute)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Pc">
+            <summary>
+            picas (1pc = 12 pt) (absolute)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Cm">
+            <summary>
+            centimeters (absolute)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.In">
+            <summary>
+            inches (1in = 96px = 2.54cm)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Mm">
+            <summary>
+            millimeters (absolute)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Em">
+            <summary>
+            Relative to the font-size of the element (2em means 2 times the size of the current font)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Ex">
+            <summary>
+            Relative to the x-height of the current font (rarely used)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Ch">
+            <summary>
+            Relative to the width of the "0" (zero)
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Rem">
+            <summary>
+            Relative to font-size of the root element
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vw">
+            <summary>
+            Relative to 1% of the width of the viewport
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vh">
+            <summary>
+            Relative to 1% of the height of the viewport
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vmin">
+            <summary>
+            Relative to 1% of viewport's* smaller dimension
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vmax">
+            <summary>
+            Relative to 1% of viewport's* larger dimension
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Percent">
+            <summary>
+            Relative to the parent element
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Length">
+            <summary>
+            Length definition.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Length.Value">
+            <summary>
+            Value of length
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Length.Unit">
+            <summary>
+            Unit of length.
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Pens.Pen">
+            <summary>
+            Abstract base class for pens.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for pens.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Pens.SolidPen">
+            <summary>
+            A solid pen
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A solid pen
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.SolidPen.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Point">
+            <summary>
+            Abstract base class for points.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for points.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Point2">
+            <summary>
+            Abstract base class for figures with two points.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with two points.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Point2Weight">
+            <summary>
+            Abstract base class for figures with two points and a weight.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with two points and a weight.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Point3">
+            <summary>
+            Abstract base class for figures with three points.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with three points.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
         </member>
     </members>
 </doc>

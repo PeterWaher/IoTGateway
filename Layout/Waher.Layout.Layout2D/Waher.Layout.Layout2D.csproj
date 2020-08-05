@@ -25,12 +25,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Model\Backgrounds\" />
-    <Folder Include="Model\Figures\" />
     <Folder Include="Model\Groups\" />
+    <Folder Include="Model\Images\" />
+    <Folder Include="Model\Conditional\" />
+    <Folder Include="Model\Content\" />
+    <Folder Include="Model\Filters\" />
     <Folder Include="Model\References\" />
     <Folder Include="Model\Transforms\" />
-    <Folder Include="Model\Pens\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,14 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.1" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
 
 </Project>

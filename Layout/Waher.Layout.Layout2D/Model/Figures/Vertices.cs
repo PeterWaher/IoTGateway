@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
+using Waher.Layout.Layout2D.Model.Figures.VertexNodes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -10,7 +11,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// </summary>
 	public abstract class Vertices : Figure
 	{
-		private Point[] points;
+		private Vertex[] points;
 
 		/// <summary>
 		/// A sequence of points
@@ -31,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (!(this.points is null))
 			{
-				foreach (Point E in this.points)
+				foreach (Vertex E in this.points)
 					E.Dispose();
 			}
 		}
@@ -44,19 +45,19 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			List<Point> Points = null;
+			List<Vertex> Points = null;
 
 			foreach (ILayoutElement Child in this.Children)
 			{
-				if (Child is Point P)
+				if (Child is Vertex P)
 				{
 					if (Points is null)
-						Points = new List<Point>();
+						Points = new List<Vertex>();
 
 					Points.Add(P);
 				}
 				else
-					throw new LayoutSyntaxException("Not a point type: " + Child.Namespace + "#" + Child.LocalName);
+					throw new LayoutSyntaxException("Not a vertex type: " + Child.Namespace + "#" + Child.LocalName);
 			}
 
 			this.points = Points?.ToArray();

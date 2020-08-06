@@ -7,7 +7,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.VertexNodes
 	/// <summary>
 	/// A point, relative to the origo (of the current container)
 	/// </summary>
-	public class RelOrigo : Point
+	public class RelOrigo : Vertex
 	{
 		/// <summary>
 		/// A point, relative to the origo (of the current container)

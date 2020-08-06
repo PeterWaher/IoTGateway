@@ -19,12 +19,12 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:complexType name="LayoutElement" abstract="true">
+  <xs:complexType name="LayoutElement">
     <xs:attribute name="id" type="xs:ID" use="optional"/>
     <xs:attribute name="visible" type="xs:boolean" use="optional" default="true"/>
   </xs:complexType>
 
-  <xs:complexType name="LayoutArea" abstract="true">
+  <xs:complexType name="LayoutArea">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
         <xs:attribute name="width" type="Length" use="optional"/>
@@ -51,7 +51,7 @@
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
 
-  <xs:complexType name="LayoutContainer" abstract="true">
+  <xs:complexType name="LayoutContainer">
     <xs:complexContent>
       <xs:extension base="LayoutArea">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -232,7 +232,7 @@
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="Pen" abstract="true">
+  <xs:complexType name="Pen">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
         <xs:attribute name="width" type="Length" use="optional"/>
@@ -254,7 +254,7 @@
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="Background" abstract="true">
+  <xs:complexType name="Background">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
       </xs:extension>
@@ -328,7 +328,7 @@
 
   <xs:group name="Figures">
     <xs:choice>
-      <xs:element name="Line" type="Point2"/>
+      <xs:element name="Line" type="Line"/>
       <xs:element name="Arrow" type="Arrow"/>
       <xs:element name="Circle" type="Circle"/>
       <xs:element name="CircleArc" type="CircleArc"/>
@@ -356,7 +356,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point2" abstract="true">
+  <xs:complexType name="Point2">
     <xs:complexContent>
       <xs:extension base="Point">
         <xs:attribute name="x2" type="Length" use="optional"/>
@@ -366,7 +366,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point2Weight" abstract="true">
+  <xs:complexType name="Point2Weight">
     <xs:complexContent>
       <xs:extension base="Point2">
         <xs:attribute name="w" type="xs:double" use="optional"/>
@@ -374,13 +374,19 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point3" abstract="true">
+  <xs:complexType name="Point3">
     <xs:complexContent>
       <xs:extension base="Point2">
         <xs:attribute name="x3" type="Length" use="optional"/>
         <xs:attribute name="y3" type="Length" use="optional"/>
         <xs:attribute name="ref3" type="xs:string" use="optional"/>
       </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Line">
+    <xs:complexContent>
+      <xs:extension base="Point2"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -393,7 +399,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Figure" abstract="true">
+  <xs:complexType name="Figure">
     <xs:complexContent>
       <xs:extension base="Point">
         <xs:attribute name="pen" type="xs:string" use="optional"/>
@@ -477,42 +483,44 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Vertices" abstract="true">
+  <xs:complexType name="Vertices">
     <xs:complexContent>
       <xs:extension base="Figure">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="RelOrigo" type="Point"/>
-          <xs:element name="RelLast" type="Point"/>
+          <xs:element name="RelOrigo" type="Vertex"/>
+          <xs:element name="RelLast" type="Vertex"/>
         </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="Vertex">
+    <xs:complexContent>
+      <xs:extension base="Point"/>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="PolyLine">
     <xs:complexContent>
-      <xs:extension base="Vertices">
-      </xs:extension>
+      <xs:extension base="Vertices"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Polygon">
     <xs:complexContent>
-      <xs:extension base="Vertices">
-      </xs:extension>
+      <xs:extension base="Vertices"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Spline">
     <xs:complexContent>
-      <xs:extension base="Vertices">
-      </xs:extension>
+      <xs:extension base="Vertices"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Loop">
     <xs:complexContent>
-      <xs:extension base="Vertices">
-      </xs:extension>
+      <xs:extension base="Vertices"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -589,7 +597,7 @@
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="Image" abstract="true">
+  <xs:complexType name="Image">
     <xs:complexContent>
       <xs:extension base="Point"/>
     </xs:complexContent>
@@ -912,7 +920,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="EmbeddedText" abstract="true">
+  <xs:complexType name="EmbeddedText">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">

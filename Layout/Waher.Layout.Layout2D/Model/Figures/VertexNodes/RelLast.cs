@@ -7,7 +7,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.VertexNodes
 	/// <summary>
 	/// A point, relative to the last point
 	/// </summary>
-	public class RelLast : Point
+	public class RelLast : Vertex
 	{
 		/// <summary>
 		/// A point, relative to the last point

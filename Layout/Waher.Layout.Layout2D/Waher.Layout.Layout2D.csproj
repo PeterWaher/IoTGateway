@@ -25,16 +25,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Model\Groups\" />
-    <Folder Include="Model\Images\" />
-    <Folder Include="Model\Conditional\" />
-    <Folder Include="Model\Content\" />
-    <Folder Include="Model\Filters\" />
-    <Folder Include="Model\References\" />
-    <Folder Include="Model\Transforms\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

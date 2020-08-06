@@ -1,29 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
-namespace Waher.Layout.Layout2D.Model.Fonts
+namespace Waher.Layout.Layout2D.Model.Images
 {
 	/// <summary>
-	/// Abstract base class for fonts.
+	/// An image defined in an embedded resource.
 	/// </summary>
-	public class Font : LayoutElement
+	public class ImageResource : Image
 	{
-		private StringAttribute name;
-		private LengthAttribute size;
-		private EnumAttribute<SKFontStyleWeight> weight;
-		private EnumAttribute<SKFontStyleWidth> width;
-		private EnumAttribute<SKFontStyleSlant> slant;
-		private ColorAttribute color;
+		private StringAttribute resource;
 
 		/// <summary>
-		/// Abstract base class for fonts.
+		/// An image defined in an embedded resource.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Font(Layout2DDocument Document, ILayoutElement Parent)
+		public ImageResource(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
@@ -31,7 +25,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
-		public override string LocalName => "Font";
+		public override string LocalName => "ImageResource";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -41,12 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.FromXml(Input);
 
-			this.name = new StringAttribute(Input, "name");
-			this.size = new LengthAttribute(Input, "size");
-			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
-			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
-			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
-			this.color = new ColorAttribute(Input, "color");
+			this.resource = new StringAttribute(Input, "resource");
 		}
 
 		/// <summary>
@@ -57,12 +46,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.ExportAttributes(Output);
 
-			this.name.Export(Output);
-			this.size.Export(Output);
-			this.weight.Export(Output);
-			this.width.Export(Output);
-			this.slant.Export(Output);
-			this.color.Export(Output);
+			this.resource.Export(Output);
 		}
 
 		/// <summary>
@@ -73,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <returns>New instance.</returns>
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
-			return new Font(Document, Parent);
+			return new ImageResource(Document, Parent);
 		}
 	}
 }

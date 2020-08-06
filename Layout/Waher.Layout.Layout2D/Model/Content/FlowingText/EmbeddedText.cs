@@ -1,32 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Layout.Layout2D.Exceptions;
+using Waher.Layout.Layout2D.Model.Content.FlowingText;
 
-namespace Waher.Layout.Layout2D.Model
+namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
 	/// <summary>
-	/// Abstract base class for layout containers (area elements containing 
-	/// embedded layout elements).
+	/// Abstract base class of embedded text elements in flowing text.
 	/// </summary>
-	public abstract class LayoutContainer : LayoutArea
+	public abstract class EmbeddedText : LayoutElement, IFlowingText
 	{
-		private ILayoutElement[] children;
+		private IFlowingText[] text;
 
 		/// <summary>
-		/// Abstract base class for layout containers (area elements containing 
-		/// embedded layout elements).
+		/// Abstract base class of embedded text elements in flowing text.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public LayoutContainer(Layout2DDocument Document, ILayoutElement Parent)
+		public EmbeddedText(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
-
-		/// <summary>
-		/// Child elements
-		/// </summary>
-		public ILayoutElement[] Children => this.children;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -35,9 +30,9 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.Dispose();
 
-			if (!(this.children is null))
+			if (!(this.text is null))
 			{
-				foreach (ILayoutElement E in this.children)
+				foreach (ILayoutElement E in this.text)
 					E.Dispose();
 			}
 		}
@@ -50,20 +45,22 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.FromXml(Input);
 
-			List<ILayoutElement> Children = null;
+			List<IFlowingText> Children = new List<IFlowingText>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
 				if (Node is XmlElement E)
 				{
-					if (Children is null)
-						Children = new List<ILayoutElement>();
+					ILayoutElement Child = this.Document.CreateElement(E, this);
 
-					Children.Add(this.Document.CreateElement(E, this));
+					if (Child is IFlowingText Text)
+						Children.Add(Text);
+					else
+						throw new LayoutSyntaxException("Not flowing text: " + E.NamespaceURI + "#" + E.LocalName);
 				}
 			}
 
-			this.children = Children?.ToArray();
+			this.text = Children.ToArray();
 		}
 
 		/// <summary>
@@ -74,9 +71,9 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportChildren(Output);
 
-			if (!(this.children is null))
+			if (!(this.text is null))
 			{
-				foreach (ILayoutElement Child in this.children)
+				foreach (ILayoutElement Child in this.text)
 					Child.ToXml(Output);
 			}
 		}

@@ -7,14 +7,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 	/// <summary>
 	/// Event attribute
 	/// </summary>
-	public class EventAttribute : Attribute<Expression>
+	public class ExpressionAttribute : Attribute<Expression>
 	{
 		/// <summary>
 		/// Event attribute
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public EventAttribute(XmlElement E, string AttributeName)
+		public ExpressionAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, false)
 		{
 		}

@@ -4,26 +4,23 @@ using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
-namespace Waher.Layout.Layout2D.Model.Fonts
+namespace Waher.Layout.Layout2D.Model.Filters
 {
 	/// <summary>
-	/// Abstract base class for fonts.
+	/// Blur image filter
 	/// </summary>
-	public class Font : LayoutElement
+	public class Blur : LayoutContainer
 	{
-		private StringAttribute name;
-		private LengthAttribute size;
-		private EnumAttribute<SKFontStyleWeight> weight;
-		private EnumAttribute<SKFontStyleWidth> width;
-		private EnumAttribute<SKFontStyleSlant> slant;
-		private ColorAttribute color;
+		private DoubleAttribute sigmaX;
+		private DoubleAttribute sigmaY;
+		private EnumAttribute<SKShaderTileMode> tileMode;
 
 		/// <summary>
-		/// Abstract base class for fonts.
+		/// Blur image filter
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Font(Layout2DDocument Document, ILayoutElement Parent)
+		public Blur(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
@@ -31,7 +28,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
-		public override string LocalName => "Font";
+		public override string LocalName => "Blur";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -41,12 +38,9 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.FromXml(Input);
 
-			this.name = new StringAttribute(Input, "name");
-			this.size = new LengthAttribute(Input, "size");
-			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
-			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
-			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
-			this.color = new ColorAttribute(Input, "color");
+			this.sigmaX = new DoubleAttribute(Input, "sigmaX");
+			this.sigmaY = new DoubleAttribute(Input, "sigmaY");
+			this.tileMode = new EnumAttribute<SKShaderTileMode>(Input, "tileMode");
 		}
 
 		/// <summary>
@@ -57,12 +51,9 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.ExportAttributes(Output);
 
-			this.name.Export(Output);
-			this.size.Export(Output);
-			this.weight.Export(Output);
-			this.width.Export(Output);
-			this.slant.Export(Output);
-			this.color.Export(Output);
+			this.sigmaX.Export(Output);
+			this.sigmaY.Export(Output);
+			this.tileMode.Export(Output);
 		}
 
 		/// <summary>
@@ -73,7 +64,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <returns>New instance.</returns>
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
-			return new Font(Document, Parent);
+			return new Blur(Document, Parent);
 		}
 	}
 }

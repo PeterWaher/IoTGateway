@@ -34,7 +34,7 @@ namespace Waher.Layout.Layout2D.Model
 		private LengthAttribute minHeight;
 		private BooleanAttribute keepAspectRatio;
 		private EnumAttribute<Overflow> overflow;
-		private EventAttribute onClick;
+		private ExpressionAttribute onClick;
 
 		/// <summary>
 		/// Abstract base class for layout elements with an implicit area.
@@ -62,7 +62,7 @@ namespace Waher.Layout.Layout2D.Model
 			this.minHeight = new LengthAttribute(Input, "minHeight");
 			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio");
 			this.overflow = new EnumAttribute<Overflow>(Input, "overflow");
-			this.onClick = new EventAttribute(Input, "onClick");
+			this.onClick = new ExpressionAttribute(Input, "onClick");
 		}
 
 		/// <summary>

@@ -308,7 +308,9 @@ namespace Waher.Layout.Layout2D
 
 	/* TODO:
 	 * 
-     * {}
+     * Margins
+     * Padding
+     * Border
      * 
      * Tree layout
      * Radix/circular

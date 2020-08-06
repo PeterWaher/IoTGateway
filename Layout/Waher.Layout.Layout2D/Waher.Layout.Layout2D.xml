@@ -169,6 +169,30 @@
             Event raised when the internal state of the layout has been updated.
             </summary>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Angle">
+            <summary>
+            Abstract base class for angle elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for distance elements.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.Attribute`1">
             <summary>
             Manages an attribute value or expression.
@@ -332,19 +356,19 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Attributes.EventAttribute">
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute">
             <summary>
             Event attribute
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.#ctor(System.Xml.XmlElement,System.String)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
             Event attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.TryParse(System.String,Waher.Script.Expression@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.TryParse(System.String,Waher.Script.Expression@)">
             <summary>
             Tries to parse a string value
             </summary>
@@ -352,7 +376,7 @@
             <param name="Value">Parsed value, if successful.</param>
             <returns>If the value could be parsed.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EventAttribute.ToString(Waher.Script.Expression)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.ToString(Waher.Script.Expression)">
             <summary>
             Converts a value to a string.
             </summary>
@@ -380,6 +404,33 @@
             <returns>If the value could be parsed.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.ToString(Waher.Layout.Layout2D.Model.Length)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute">
+            <summary>
+            Positive integer attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Positive integer attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.TryParse(System.String,System.Int32@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.ToString(System.Int32)">
             <summary>
             Converts a value to a string.
             </summary>
@@ -499,6 +550,1000 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.Case">
+            <summary>
+            Layout to show, if a condition is true.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Layout to show, if a condition is true.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.False">
+            <summary>
+            Layout to show, if false.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.False.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Layout to show, if false.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.False.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.False.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.For">
+            <summary>
+            Generates layout elements by iterating through a traditional loop
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Generates layout elements by iterating through a traditional loop
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.ForEach">
+            <summary>
+            Generates layout elements by looping through a set or vector of values.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Generates layout elements by looping through a set or vector of values.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.If">
+            <summary>
+            Conditional layout based on one conditional statement.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Conditional layout based on one conditional statement.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.Otherwise">
+            <summary>
+            Layout to show, if none of the cases apply.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Otherwise.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Layout to show, if none of the cases apply.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Otherwise.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Otherwise.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.Switch">
+            <summary>
+            Conditional layout based on multiple conditional statements.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Conditional layout based on multiple conditional statements.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Switch.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.True">
+            <summary>
+            Layout to show, if true.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.True.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Layout to show, if true.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.True.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.True.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Conditional.While">
+            <summary>
+            Generates layout elements while a condition is true.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Generates layout elements while a condition is true.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold">
+            <summary>
+            Represents a segment of bold text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of bold text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText">
+            <summary>
+            Abstract base class of embedded text elements in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class of embedded text elements in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef">
+            <summary>
+            Represents text using a specific font in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents text using a specific font in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.IFlowingText">
+            <summary>
+            Base interface for flowing text
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript">
+            <summary>
+            Represents output from inline script in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents output from inline script in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic">
+            <summary>
+            Represents a segment of italic text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of italic text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough">
+            <summary>
+            Represents a segment of strikeThrough text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of strikeThrough text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.StrikeThrough.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript">
+            <summary>
+            Represents a segment of subscript text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of subscript text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Subscript.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript">
+            <summary>
+            Represents a segment of superscript text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of superscript text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Superscript.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Text">
+            <summary>
+            Represents a segment of text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor">
+            <summary>
+            Represents a text color segment in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a text color segment in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline">
+            <summary>
+            Represents a segment of underline text in flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a segment of underline text in flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.Label">
+            <summary>
+            Represents an unformatted text label.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents an unformatted text label.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.Paragraph">
+            <summary>
+            Represents a paragraph of flowing text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a paragraph of flowing text.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Paragraph.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Content.Script">
+            <summary>
+            Represents the result of executing script.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents the result of executing script.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Distance">
+            <summary>
+            Abstract base class for distance elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for distance elements.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Arrow">
+            <summary>
+            An arrow
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An arrow
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Arrow.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Circle">
+            <summary>
+            A circle
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A circle
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Circle.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.CircleArc">
+            <summary>
+            A circle arc
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A circle arc
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Ellipse">
+            <summary>
+            An ellipse
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An ellipse
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.EllipseArc">
+            <summary>
+            An ellipse arc
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An ellipse arc
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Figure">
+            <summary>
+            Abstract base class for figures
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Line">
             <summary>
             A line
@@ -517,6 +1562,1044 @@
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Loop">
+            <summary>
+            A loop
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A loop
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Loop.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Path">
+            <summary>
+            A path
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A path
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Polygon">
+            <summary>
+            A polygon
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Polygon.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A polygon
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Polygon.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Polygon.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.PolyLine">
+            <summary>
+            A poly-line
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A poly-line
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Rectangle">
+            <summary>
+            A rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A rectangle
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Rectangle.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle">
+            <summary>
+            A rounded rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A rounded rectangle
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedSquare">
+            <summary>
+            A rounded square
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A rounded square
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward">
+            <summary>
+            Draws a line to a point that lies a certain distance backward of the last point,
+            in the current direction of movement.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a line to a point that lies a certain distance backward of the last point,
+            in the current direction of movement.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo">
+            <summary>
+            Draws a circle arc to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a circle arc to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel">
+            <summary>
+            Draws a circle arc to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a circle arc to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo">
+            <summary>
+            Draws a conic curve to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a conic curve to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel">
+            <summary>
+            Draws a conic curve to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a conic curve to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo">
+            <summary>
+            Draws a cubic curve to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a cubic curve to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel">
+            <summary>
+            Draws a cubic curve to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a cubic curve to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo">
+            <summary>
+            Draws a ellipse arc to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a ellipse arc to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel">
+            <summary>
+            Draws a ellipse arc to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a ellipse arc to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward">
+            <summary>
+            Draws a line to a point that lies a certain distance forward of the last point,
+            in the current direction of movement.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a line to a point that lies a certain distance forward of the last point,
+            in the current direction of movement.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment">
+            <summary>
+            Interface for path segment nodes
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo">
+            <summary>
+            Draws a line to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a line to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel">
+            <summary>
+            Draws a line to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a line to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo">
+            <summary>
+            Moves to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Moves to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel">
+            <summary>
+            Moves to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Moves to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo">
+            <summary>
+            Draws a quadratic curve to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a quadratic curve to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel">
+            <summary>
+            Draws a quadratic curve to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a quadratic curve to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo">
+            <summary>
+            Draws a spline to a point, relative to the origio of the current container
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a spline to a point, relative to the origio of the current container
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel">
+            <summary>
+            Draws a spline to a point, relative to the end of the last segment
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Draws a spline to a point, relative to the end of the last segment
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft">
+            <summary>
+            Turns the current direction left.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Turns the current direction left.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight">
+            <summary>
+            Turns the current direction right.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Turns the current direction right.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Spline">
+            <summary>
+            A spline
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A spline
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Square">
+            <summary>
+            A square
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A square
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Square.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast">
+            <summary>
+            A point, relative to the last point
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A point, relative to the last point
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo">
+            <summary>
+            A point, relative to the origo (of the current container)
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A point, relative to the origo (of the current container)
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Vertices">
+            <summary>
+            A sequence of points
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A sequence of points
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Filters.Blur">
+            <summary>
+            Blur image filter
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Blur image filter
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Filters.Dilate">
+            <summary>
+            Dilation filter
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Dilation filter
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Filters.Erode">
+            <summary>
+            Erosion filter
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Erosion filter
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Filters.Shadow">
+            <summary>
+            Shadow filter
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Shadow filter
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
             </summary>
@@ -561,6 +2644,229 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Cell">
+            <summary>
+            Defines a cell in a grid.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Defines a cell in a grid.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder">
+            <summary>
+            How elements are ordered using flexible ordering.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder.HorizontalVertical">
+            <summary>
+            First horizontally, then vertically
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder.VerticalHorizontal">
+            <summary>
+            First vertically, then horizontally
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.HorizontalDirection">
+            <summary>
+            Horizontal ordering
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.HorizontalDirection.LeftRight">
+            <summary>
+            From left to right
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.HorizontalDirection.RightLeft">
+            <summary>
+            From right to left
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.VerticalDirection">
+            <summary>
+            Vertical ordering
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalDirection.TopDown">
+            <summary>
+            From the top, downwards
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalDirection.BottomUp">
+            <summary>
+            From the bottom, upwards
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Flexible">
+            <summary>
+            Ordering child elements flexibly.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Ordering child elements flexibly.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Grid">
+            <summary>
+            A grid of cells
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A grid of cells
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.ExportChildren(System.Xml.XmlWriter)">
+            <summary>
+            Exports child elements to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Horizontal">
+            <summary>
+            Ordering child elements horizontally.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Horizontal.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Ordering child elements horizontally.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Horizontal.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Horizontal.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Overlay">
+            <summary>
+            Ordering child elements one on-top of the other.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Overlay.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Ordering child elements one on-top of the other.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Overlay.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Overlay.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Vertical">
+            <summary>
+            Ordering child elements vertically.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Vertical.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Ordering child elements vertically.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Vertical.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Vertical.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.ILayoutElement">
             <summary>
             Base interface for all layout elements.
@@ -595,6 +2901,129 @@
             Exports the element to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Images.Image">
+            <summary>
+            Abstract base class for images.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for images.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Images.ImageInternal">
+            <summary>
+            An image provided by the caller, identified by a content id.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An image provided by the caller, identified by a content id.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageInternal.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Images.ImageResource">
+            <summary>
+            An image defined in an embedded resource.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An image defined in an embedded resource.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageResource.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Images.ImageUrl">
+            <summary>
+            An image defined by a URL.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            An image defined by a URL.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Overflow">
             <summary>
@@ -648,6 +3077,11 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutContainer.Children">
+            <summary>
+            Child elements
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Dispose">
             <summary>
@@ -986,6 +3420,278 @@
             Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.References.Copy">
+            <summary>
+            Copies the layout from a reference
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies the layout from a reference
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.References.Copy.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.References.Shape">
+            <summary>
+            Defines a shape for use elsewhere in the layout.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Defines a shape for use elsewhere in the layout.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.References.Shape.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.References.Vertex">
+            <summary>
+            Defines a vertex in the graf
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Vertex.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Defines a vertex in the graf
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.References.Vertex.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Vertex.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Transforms.Rotate">
+            <summary>
+            A rotation transform
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A rotation transform
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Rotate.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Transforms.Scale">
+            <summary>
+            A scale transform
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A scale transform
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Transforms.SkewX">
+            <summary>
+            A skew transform along the X-axis.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A skew transform along the X-axis.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewX.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Transforms.SkewY">
+            <summary>
+            A skew transform along the Y-axis.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A skew transform along the Y-axis.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewY.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Transforms.Translate">
+            <summary>
+            A translation transform
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A translation transform
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
         </member>
     </members>
 </doc>

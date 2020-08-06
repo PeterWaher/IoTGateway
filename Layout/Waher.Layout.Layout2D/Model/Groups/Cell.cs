@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
-namespace Waher.Layout.Layout2D.Model.Fonts
+namespace Waher.Layout.Layout2D.Model.Groups
 {
 	/// <summary>
-	/// Abstract base class for fonts.
+	/// Defines a cell in a grid.
 	/// </summary>
-	public class Font : LayoutElement
+	public class Cell : LayoutContainer
 	{
-		private StringAttribute name;
-		private LengthAttribute size;
-		private EnumAttribute<SKFontStyleWeight> weight;
-		private EnumAttribute<SKFontStyleWidth> width;
-		private EnumAttribute<SKFontStyleSlant> slant;
-		private ColorAttribute color;
+		private PositiveIntegerAttribute column;
+		private PositiveIntegerAttribute row;
+		private PositiveIntegerAttribute colSpan;
+		private PositiveIntegerAttribute rowSpan;
 
 		/// <summary>
-		/// Abstract base class for fonts.
+		/// Defines a cell in a grid.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Font(Layout2DDocument Document, ILayoutElement Parent)
+		public Cell(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
@@ -31,7 +28,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
-		public override string LocalName => "Font";
+		public override string LocalName => "Cell";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -41,12 +38,10 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.FromXml(Input);
 
-			this.name = new StringAttribute(Input, "name");
-			this.size = new LengthAttribute(Input, "size");
-			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
-			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
-			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
-			this.color = new ColorAttribute(Input, "color");
+			this.column = new PositiveIntegerAttribute(Input, "column");
+			this.row = new PositiveIntegerAttribute(Input, "row");
+			this.colSpan = new PositiveIntegerAttribute(Input, "colSpan");
+			this.rowSpan = new PositiveIntegerAttribute(Input, "rowSpan");
 		}
 
 		/// <summary>
@@ -57,12 +52,10 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			base.ExportAttributes(Output);
 
-			this.name.Export(Output);
-			this.size.Export(Output);
-			this.weight.Export(Output);
-			this.width.Export(Output);
-			this.slant.Export(Output);
-			this.color.Export(Output);
+			this.column.Export(Output);
+			this.row.Export(Output);
+			this.colSpan.Export(Output);
+			this.rowSpan.Export(Output);
 		}
 
 		/// <summary>
@@ -73,7 +66,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <returns>New instance.</returns>
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
-			return new Font(Document, Parent);
+			return new Cell(Document, Parent);
 		}
 	}
 }

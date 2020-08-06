@@ -1,32 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Layout.Layout2D.Exceptions;
+using Waher.Layout.Layout2D.Model.Groups;
 
-namespace Waher.Layout.Layout2D.Model
+namespace Waher.Layout.Layout2D.Model.Groups
 {
 	/// <summary>
-	/// Abstract base class for layout containers (area elements containing 
-	/// embedded layout elements).
+	/// A grid of cells
 	/// </summary>
-	public abstract class LayoutContainer : LayoutArea
+	public abstract class Grid : LayoutArea
 	{
-		private ILayoutElement[] children;
+		private Cell[] cells;
 
 		/// <summary>
-		/// Abstract base class for layout containers (area elements containing 
-		/// embedded layout elements).
+		/// A grid of cells
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public LayoutContainer(Layout2DDocument Document, ILayoutElement Parent)
+		public Grid(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
-
-		/// <summary>
-		/// Child elements
-		/// </summary>
-		public ILayoutElement[] Children => this.children;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -35,9 +30,9 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.Dispose();
 
-			if (!(this.children is null))
+			if (!(this.cells is null))
 			{
-				foreach (ILayoutElement E in this.children)
+				foreach (Cell E in this.cells)
 					E.Dispose();
 			}
 		}
@@ -50,20 +45,22 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.FromXml(Input);
 
-			List<ILayoutElement> Children = null;
+			List<Cell> Children = new List<Cell>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
 				if (Node is XmlElement E)
 				{
-					if (Children is null)
-						Children = new List<ILayoutElement>();
+					ILayoutElement Child = this.Document.CreateElement(E, this);
 
-					Children.Add(this.Document.CreateElement(E, this));
+					if (Child is Cell Cell)
+						Children.Add(Cell);
+					else
+						throw new LayoutSyntaxException("Not a cell: " + E.NamespaceURI + "#" + E.LocalName);
 				}
 			}
 
-			this.children = Children?.ToArray();
+			this.cells = Children.ToArray();
 		}
 
 		/// <summary>
@@ -74,9 +71,9 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportChildren(Output);
 
-			if (!(this.children is null))
+			if (!(this.cells is null))
 			{
-				foreach (ILayoutElement Child in this.children)
+				foreach (ILayoutElement Child in this.cells)
 					Child.ToXml(Output);
 			}
 		}

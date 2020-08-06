@@ -20,7 +20,7 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		private void Test(string FileName)
+		protected virtual void Test(string FileName)
 		{
 			Layout2DDocument.FromFile("Xml\\" + FileName);
 		}

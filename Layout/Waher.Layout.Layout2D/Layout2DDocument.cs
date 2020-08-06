@@ -292,9 +292,56 @@ namespace Waher.Layout.Layout2D
 
 		#region Rendering
 
-		public SKImage Render(int Width, int Height, double Zoom, int OffsetX, int OffsetY, out Map[] Maps)
+		/// <summary>
+		/// Renders the layout to an image
+		/// </summary>
+		/// <param name="Settings">Rendering settings.</param>
+		/// <param name="Maps">Generated maps</param>
+		/// <returns></returns>
+		public SKImage Render(RenderSettings Settings, out Map[] Maps)
 		{
-			throw new NotImplementedException();
+			Maps = null;    // TODO: Generate maps.
+
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
+			{
+				SKCanvas Canvas = Surface.Canvas;
+
+				SKPaint Font = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					HintingLevel = SKPaintHinting.Full,
+					SubpixelText = true,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.TextColor,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal),
+					TextSize = (float)Settings.FontSize
+				};
+
+				SKPaint Pen = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.PenColor
+				};
+
+				SKPaint Fill = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.BackgroundColor
+				};
+
+				SKImage Result = Surface.Snapshot();
+
+				Font?.Dispose();
+				Pen?.Dispose();
+				Fill?.Dispose();
+
+				return Result;
+			}
 		}
 
 		#endregion

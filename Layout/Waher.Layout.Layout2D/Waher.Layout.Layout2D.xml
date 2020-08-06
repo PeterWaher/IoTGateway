@@ -164,6 +164,14 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Render(Waher.Layout.Layout2D.RenderSettings,Waher.Layout.Layout2D.Map[]@)">
+            <summary>
+            Renders the layout to an image
+            </summary>
+            <param name="Settings">Rendering settings.</param>
+            <param name="Maps">Generated maps</param>
+            <returns></returns>
+        </member>
         <member name="E:Waher.Layout.Layout2D.Layout2DDocument.OnUpdated">
             <summary>
             Event raised when the internal state of the layout has been updated.
@@ -2436,6 +2444,18 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.Vertex">
+            <summary>
+            Represents a vertex.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.Vertex.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Represents a vertex.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Vertices">
             <summary>
             A sequence of points
@@ -3692,6 +3712,66 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.RenderSettings">
+            <summary>
+            Render settings.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.RenderSettings.#ctor">
+            <summary>
+            Render settings.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.Width">
+            <summary>
+            Width of image
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.Height">
+            <summary>
+            Height of image
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.Zoom">
+            <summary>
+            Zoom factor
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.OffsetX">
+            <summary>
+            Offset along X-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.OffsetY">
+            <summary>
+            Offset along Y-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.BackgroundColor">
+            <summary>
+            Background color
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.PenColor">
+            <summary>
+            Pen color
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.TextColor">
+            <summary>
+            Text color
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.FontName">
+            <summary>
+            Font name
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.FontSize">
+            <summary>
+            Font size
+            </summary>
         </member>
     </members>
 </doc>

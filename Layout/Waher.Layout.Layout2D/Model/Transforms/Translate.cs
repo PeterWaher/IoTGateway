@@ -62,5 +62,20 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			return new Translate(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Translate Dest)
+			{
+				Dest.translateX = this.translateX.CopyIfNotPreset();
+				Dest.translateY = this.translateY.CopyIfNotPreset();
+			}
+		}
 	}
 }

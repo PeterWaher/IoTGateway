@@ -75,5 +75,24 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		{
 			return new Font(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Font Dest)
+			{
+				Dest.name = this.name.CopyIfNotPreset();
+				Dest.size = this.size.CopyIfNotPreset();
+				Dest.weight = this.weight.CopyIfNotPreset();
+				Dest.width = this.width.CopyIfNotPreset();
+				Dest.slant = this.slant.CopyIfNotPreset();
+				Dest.color = this.color.CopyIfNotPreset();
+			}
+		}
 	}
 }

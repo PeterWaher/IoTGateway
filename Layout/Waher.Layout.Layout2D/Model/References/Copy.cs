@@ -59,5 +59,17 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			return new Copy(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Copy Dest)
+				Dest._ref = this._ref.CopyIfNotPreset();
+		}
 	}
 }

@@ -43,5 +43,17 @@ namespace Waher.Layout.Layout2D.Model
 			this.distance.Export(Output);
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Distance Dest)
+				Dest.distance = this.distance.CopyIfNotPreset();
+		}
+
 	}
 }

@@ -11,6 +11,9 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 	/// <typeparam name="T">Type of attribute</typeparam>
 	public abstract class Attribute<T>
 	{
+		private T evaluatedValue = default;
+		private bool hasEvaluated = false;
+		private bool hasEvaluatedValue = false;
 		private readonly T presetValue;
 		private readonly bool hasPresetValue;
 		private readonly Expression expression;
@@ -68,6 +71,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
+		/// Defines an undefined attribute.
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		protected Attribute(string AttributeName, Expression Expression)
+		{
+			this.name = AttributeName;
+			this.presetValue = default;
+			this.hasPresetValue = false;
+			this.expression = Expression;
+		}
+
+		/// <summary>
 		/// Attribute name
 		/// </summary>
 		public string Name => this.name;
@@ -86,6 +102,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// If the attribute has a preset value.
 		/// </summary>
 		public bool HasPresetValue => this.hasPresetValue;
+
+		/// <summary>
+		/// If the attribute is defined by an expression.
+		/// </summary>
+		public bool HasExpression => !(this.expression is null);
+
+		/// <summary>
+		/// If the attribute is undefined.
+		/// </summary>
+		public bool Undefined => !this.hasPresetValue && this.expression is null;
 
 		/// <summary>
 		/// Tries to parse a string value
@@ -112,6 +138,63 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				Output.WriteAttributeString(this.name, this.ToString(this.presetValue));
 			else if (!(this.expression is null))
 				Output.WriteAttributeString(this.name, "{" + this.expression.Script + "}");
+		}
+
+		/// <summary>
+		/// Tries to evaluate the attribute value.
+		/// </summary>
+		/// <param name="Session">Current session.</param>
+		/// <param name="Result">Result, if successful.</param>
+		/// <returns>If evaluation was possible.</returns>
+		public bool TryEvaluate(Variables Session, out T Result)
+		{
+			if (this.hasPresetValue)
+			{
+				Result = this.presetValue;
+				return true;
+			}
+			else if (this.hasEvaluatedValue)
+			{
+				Result = this.evaluatedValue;
+				return true;
+			}
+			else if (this.hasEvaluated)
+			{
+				Result = default;
+				return false;
+			}
+			else if (!(this.expression is null))
+			{
+				try
+				{
+					object Value = this.expression.Evaluate(Session);
+					if (Value is T Eval)
+					{
+						Result = this.evaluatedValue = Eval;
+						this.hasEvaluated = true;
+						this.hasEvaluatedValue = true;
+
+						return true;
+					}
+					else
+					{
+						this.hasEvaluated = true;
+						Result = default;
+						return false;
+					}
+				}
+				catch (Exception)
+				{
+					this.hasEvaluated = true;
+					Result = default;
+					return false;
+				}
+			}
+			else
+			{
+				Result = default;
+				return false;
+			}
 		}
 
 	}

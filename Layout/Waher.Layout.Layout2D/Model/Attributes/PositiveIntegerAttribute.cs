@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Xml;
-using Waher.Content;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -16,6 +16,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <param name="AttributeName">Attribute name.</param>
 		public PositiveIntegerAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
+		{
+		}
+
+		/// <summary>
+		/// Positive integer attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		public PositiveIntegerAttribute(string AttributeName, Expression Expression)
+			: base(AttributeName, Expression)
 		{
 		}
 
@@ -41,6 +51,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public override string ToString(int Value)
 		{
 			return Value.ToString();
+		}
+
+		/// <summary>
+		/// Copies the attribute object if undefined, or defined by an expression.
+		/// Returns a reference to itself, if preset (set by a constant value).
+		/// </summary>
+		/// <returns>Attribute reference.</returns>
+		public PositiveIntegerAttribute CopyIfNotPreset()
+		{
+			if (this.HasPresetValue)
+				return this;
+			else
+				return new PositiveIntegerAttribute(this.Name, this.Expression);
 		}
 
 	}

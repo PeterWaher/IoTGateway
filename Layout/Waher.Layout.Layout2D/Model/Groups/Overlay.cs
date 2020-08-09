@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// <summary>
 	/// Ordering child elements one on-top of the other.
 	/// </summary>
-	public class Overlay : LayoutContainer
+	public class Overlay : SpatialDistribution
 	{
 		/// <summary>
 		/// Ordering child elements one on-top of the other.
@@ -35,5 +35,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			return new Overlay(Document, Parent);
 		}
+
+		/// <summary>
+		/// Gets a cell layout object that will be responsible for laying out cells.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Cell layout object.</returns>
+		public override ICellLayout GetCellLayout(DrawingState State)
+		{
+			return new OverlayCells(State.Session);
+		}
+
 	}
 }

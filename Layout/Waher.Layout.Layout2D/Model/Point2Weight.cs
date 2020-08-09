@@ -43,5 +43,17 @@ namespace Waher.Layout.Layout2D.Model
 			this.w.Export(Output);
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Point2Weight Dest)
+				Dest.w = this.w.CopyIfNotPreset();
+		}
+
 	}
 }

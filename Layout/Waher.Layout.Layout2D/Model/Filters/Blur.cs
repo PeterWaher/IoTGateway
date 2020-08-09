@@ -66,5 +66,21 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		{
 			return new Blur(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Blur Dest)
+			{
+				Dest.sigmaX = this.sigmaX.CopyIfNotPreset();
+				Dest.sigmaY = this.sigmaY.CopyIfNotPreset();
+				Dest.tileMode = this.tileMode.CopyIfNotPreset();
+			}
+		}
 	}
 }

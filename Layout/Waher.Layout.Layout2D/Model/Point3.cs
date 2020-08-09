@@ -49,5 +49,21 @@ namespace Waher.Layout.Layout2D.Model
 			this.ref3.Export(Output);
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Point3 Dest)
+			{
+				Dest.x3 = this.x3.CopyIfNotPreset();
+				Dest.y3 = this.y3.CopyIfNotPreset();
+				Dest.ref3 = this.ref3.CopyIfNotPreset();
+			}
+		}
+
 	}
 }

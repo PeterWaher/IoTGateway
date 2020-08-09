@@ -79,5 +79,29 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			return new Path(Document, Parent);
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Path Dest)
+			{
+				if (!(this.segments is null))
+				{
+					int i, c = this.segments.Length;
+
+					ISegment[] Children = new ISegment[c];
+
+					for (i = 0; i < c; i++)
+						Children[i] = this.segments[i].Copy(Dest) as ISegment;
+
+					Dest.segments = Children;
+				}
+			}
+		}
+
 	}
 }

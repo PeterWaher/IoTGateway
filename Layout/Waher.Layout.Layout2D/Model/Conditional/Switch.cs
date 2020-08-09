@@ -13,6 +13,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	{
 		private Case[] cases;
 		private Otherwise otherwise;
+		private Case activeCase;
 
 		/// <summary>
 		/// Conditional layout based on multiple conditional statements.
@@ -28,6 +29,21 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "Switch";
+
+		/// <summary>
+		/// Dynamic array of children
+		/// </summary>
+		public ILayoutElement[] DynamicChildren
+		{
+			get
+			{
+				ILayoutElement E = this.activeCase is null ? (ILayoutElement)this.activeCase : this.otherwise;
+				if (E is null)
+					return new ILayoutElement[0];
+				else
+					return new ILayoutElement[] { E };
+			}
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -103,6 +119,68 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new Switch(Document, Parent);
+		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Switch Dest)
+			{
+				if (!(this.cases is null))
+				{
+					int i, c = this.cases.Length;
+
+					Case[] Children = new Case[c];
+
+					for (i = 0; i < c; i++)
+						Children[i] = this.cases[i].Copy(Dest) as Case;
+
+					Dest.cases = Children;
+				}
+
+				Dest.otherwise = this.otherwise?.Copy(Dest) as Otherwise;
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			this.activeCase = null;
+
+			foreach (Case Case in this.cases)
+			{
+				object Result = Case.Condition?.Evaluate(State.Session);
+				if (Result is bool b && b)
+				{
+					this.activeCase = Case;
+					break;
+				}
+			}
+
+			if (this.activeCase is null)
+				this.otherwise?.Measure(State);
+			else
+				this.activeCase?.Measure(State);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			if (this.activeCase is null)
+				this.otherwise?.Draw(State);
+			else
+				this.activeCase?.Draw(State);
 		}
 
 	}

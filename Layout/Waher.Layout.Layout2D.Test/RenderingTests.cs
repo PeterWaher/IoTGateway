@@ -10,7 +10,9 @@ namespace Waher.Layout.Layout2D.Test
 		protected override void Test(string FileName)
 		{
 			Layout2DDocument Doc = Layout2DDocument.FromFile("Xml\\" + FileName);
-			using (SKImage Image = Doc.Render(800, 600, 1, 0, 0, out Map[] _))
+			RenderSettings Settings = new RenderSettings();
+
+			using (SKImage Image = Doc.Render(Settings, out Map[] _))
 			{
 				using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
 				{

@@ -6,10 +6,27 @@ using SkiaSharp;
 namespace Waher.Layout.Layout2D
 {
 	/// <summary>
+	/// Affects the size of the rendered image.
+	/// </summary>
+	public enum RenderedImageSize
+	{
+		/// <summary>
+		/// Scales the layout to fit the desired image size.
+		/// </summary>
+		ScaleToFit,
+
+		/// <summary>
+		/// Resizes the output to match the size of the layout.
+		/// </summary>
+		ResizeImage
+	}
+
+	/// <summary>
 	/// Render settings.
 	/// </summary>
 	public class RenderSettings
 	{
+		private RenderedImageSize imageSize = RenderedImageSize.ResizeImage;
 		private int width = 800;
 		private int height = 600;
 		private double zoom = 1;
@@ -20,12 +37,22 @@ namespace Waher.Layout.Layout2D
 		private SKColor textColor = SKColors.Black;
 		private string fontName = "Segoe UI";
 		private double fontSize = 12;
+		private double pixelsPerInch = 96;
 
 		/// <summary>
-		/// Render settings.
+		/// Determines the size of the rendered image.
 		/// </summary>
 		public RenderSettings()
 		{
+		}
+
+		/// <summary>
+		/// Offset along X-axis.
+		/// </summary>
+		public RenderedImageSize ImageSize
+		{
+			get => this.imageSize;
+			set => this.imageSize = value;
 		}
 
 		/// <summary>
@@ -134,7 +161,7 @@ namespace Waher.Layout.Layout2D
 		}
 
 		/// <summary>
-		/// Font size
+		/// Font size, in points
 		/// </summary>
 		public double FontSize
 		{
@@ -145,6 +172,21 @@ namespace Waher.Layout.Layout2D
 					throw new ArgumentException("Invalid font size.", nameof(FontSize));
 
 				this.fontSize = value;
+			}
+		}
+
+		/// <summary>
+		/// Pixels per inch (defualt=96 pixels/inch)
+		/// </summary>
+		public double PixelsPerInch
+		{
+			get => this.pixelsPerInch;
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentException("Invalid number of pixels per inch.", nameof(PixelsPerInch));
+
+				this.pixelsPerInch = value;
 			}
 		}
 

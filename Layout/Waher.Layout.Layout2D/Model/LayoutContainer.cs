@@ -81,5 +81,29 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is LayoutContainer Dest)
+			{
+				if (!(this.children is null))
+				{
+					int i, c = this.children.Length;
+
+					ILayoutElement[] Children = new ILayoutElement[c];
+
+					for (i = 0; i < c; i++)
+						Children[i] = this.children[i].Copy(Dest);
+
+					Dest.children = Children;
+				}
+			}
+		}
+
 	}
 }

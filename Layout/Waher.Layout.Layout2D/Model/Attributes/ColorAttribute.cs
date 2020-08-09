@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -71,6 +71,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
+		/// Color attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		public ColorAttribute(string AttributeName, Expression Expression)
+			: base(AttributeName, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Tries to parse a string value
 		/// </summary>
 		/// <param name="StringValue">String value for attribute.</param>
@@ -126,6 +136,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				return s2;
 			else
 				return s;
+		}
+
+		/// <summary>
+		/// Copies the attribute object if undefined, or defined by an expression.
+		/// Returns a reference to itself, if preset (set by a constant value).
+		/// </summary>
+		/// <returns>Attribute reference.</returns>
+		public ColorAttribute CopyIfNotPreset()
+		{
+			if (this.HasPresetValue)
+				return this;
+			else
+				return new ColorAttribute(this.Name, this.Expression);
 		}
 
 	}

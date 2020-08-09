@@ -305,42 +305,25 @@ namespace Waher.Layout.Layout2D
 			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
-
-				SKPaint Font = new SKPaint()
+				using (DrawingState State = new DrawingState(Canvas, Settings, this.session))
 				{
-					FilterQuality = SKFilterQuality.High,
-					HintingLevel = SKPaintHinting.Full,
-					SubpixelText = true,
-					IsAntialias = true,
-					Style = SKPaintStyle.Fill,
-					Color = Settings.TextColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal),
-					TextSize = (float)Settings.FontSize
-				};
+					this.root?.Measure(State);
 
-				SKPaint Pen = new SKPaint()
-				{
-					FilterQuality = SKFilterQuality.High,
-					IsAntialias = true,
-					Style = SKPaintStyle.Fill,
-					Color = Settings.PenColor
-				};
+					switch (Settings.ImageSize)
+					{
+						case RenderedImageSize.ResizeImage:
+							// TODO
+							break;
 
-				SKPaint Fill = new SKPaint()
-				{
-					FilterQuality = SKFilterQuality.High,
-					IsAntialias = true,
-					Style = SKPaintStyle.Fill,
-					Color = Settings.BackgroundColor
-				};
+						case RenderedImageSize.ScaleToFit:
+							// TODO
+							break;
+					}
 
-				SKImage Result = Surface.Snapshot();
+					this.root?.Draw(State);
 
-				Font?.Dispose();
-				Pen?.Dispose();
-				Fill?.Dispose();
-
-				return Result;
+					return Surface.Snapshot();
+				}
 			}
 		}
 

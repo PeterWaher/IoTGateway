@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// <summary>
 	/// Ordering child elements horizontally.
 	/// </summary>
-	public class Horizontal : LayoutContainer
+	public class Horizontal : SpatialDistribution
 	{
 		/// <summary>
 		/// Ordering child elements horizontally.
@@ -35,5 +35,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			return new Horizontal(Document, Parent);
 		}
+
+		/// <summary>
+		/// Gets a cell layout object that will be responsible for laying out cells.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Cell layout object.</returns>
+		public override ICellLayout GetCellLayout(DrawingState State)
+		{
+			return new HorizontalCells(State.Session);
+		}
+
 	}
 }

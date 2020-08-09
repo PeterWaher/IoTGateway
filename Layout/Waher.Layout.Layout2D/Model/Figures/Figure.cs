@@ -46,6 +46,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.pen.Export(Output);
 			this.fill.Export(Output);
 		}
-	
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Figure Dest)
+			{
+				Dest.pen = this.pen.CopyIfNotPreset();
+				Dest.fill = this.fill.CopyIfNotPreset();
+			}
+		}
+
 	}
 }

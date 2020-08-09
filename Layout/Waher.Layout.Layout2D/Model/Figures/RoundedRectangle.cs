@@ -62,5 +62,20 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			return new RoundedRectangle(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is RoundedRectangle Dest)
+			{
+				Dest.radiusX = this.radiusX.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+			}
+		}
 	}
 }

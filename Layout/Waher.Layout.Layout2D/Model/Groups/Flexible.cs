@@ -56,11 +56,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// <summary>
 	/// Ordering child elements flexibly.
 	/// </summary>
-	public class Flexible : LayoutContainer
+	public class Flexible : SpatialDistribution
 	{
 		private EnumAttribute<FlexibleOrder> order;
 		private EnumAttribute<HorizontalDirection> horizontalDirection;
 		private EnumAttribute<VerticalDirection> verticalDirection;
+		private EnumAttribute<HorizontalAlignment> halign;
+		private EnumAttribute<VerticalAlignment> valign;
 
 		/// <summary>
 		/// Ordering child elements flexibly.
@@ -88,6 +90,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.order = new EnumAttribute<FlexibleOrder>(Input, "order");
 			this.horizontalDirection = new EnumAttribute<HorizontalDirection>(Input, "horizontalDirection");
 			this.verticalDirection = new EnumAttribute<VerticalDirection>(Input, "verticalDirection");
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 		}
 
 		/// <summary>
@@ -101,6 +105,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.order.Export(Output);
 			this.horizontalDirection.Export(Output);
 			this.verticalDirection.Export(Output);
+			this.halign.Export(Output);
+			this.valign.Export(Output);
 		}
 
 		/// <summary>
@@ -113,5 +119,81 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			return new Flexible(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Flexible Dest)
+			{
+				Dest.order = this.order.CopyIfNotPreset();
+				Dest.horizontalDirection = this.horizontalDirection.CopyIfNotPreset();
+				Dest.verticalDirection = this.verticalDirection.CopyIfNotPreset();
+				Dest.halign = this.halign.CopyIfNotPreset();
+				Dest.valign = this.valign.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Gets a cell layout object that will be responsible for laying out cells.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Cell layout object.</returns>
+		public override ICellLayout GetCellLayout(DrawingState State)
+		{
+			if (!this.order.TryEvaluate(State.Session, out FlexibleOrder Order))
+				Order = FlexibleOrder.HorizontalVertical;
+
+			if (!this.horizontalDirection.TryEvaluate(State.Session, out HorizontalDirection HorizontalDirection))
+				HorizontalDirection = HorizontalDirection.LeftRight;
+
+			if (!this.verticalDirection.TryEvaluate(State.Session, out VerticalDirection VerticalDirection))
+				VerticalDirection = VerticalDirection.TopDown;
+
+			switch (Order)
+			{
+				case FlexibleOrder.HorizontalVertical:
+				default:
+					double? Size = this.GetWidthEstimate(State);
+					if (Size.HasValue)
+					{
+						if (!this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
+						{
+							if (HorizontalDirection == HorizontalDirection.LeftRight)
+								HorizontalAlignment = HorizontalAlignment.Left;
+							else
+								HorizontalAlignment = HorizontalAlignment.Right;
+						}
+
+						return new FlexibleHorizontalCells(State.Session, Size.Value,
+							HorizontalDirection, VerticalDirection, HorizontalAlignment);
+					}
+					else
+						return new HorizontalCells(State.Session);
+
+				case FlexibleOrder.VerticalHorizontal:
+					Size = this.GetHeightEstimate(State);
+					if (Size.HasValue)
+					{
+						if (!this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
+						{
+							if (VerticalDirection == VerticalDirection.TopDown)
+								VerticalAlignment = VerticalAlignment.Top;
+							else
+								VerticalAlignment = VerticalAlignment.Bottom;
+						}
+
+						return new FlexibleVerticalCells(State.Session, Size.Value,
+							HorizontalDirection, VerticalDirection, VerticalAlignment);
+					}
+					else
+						return new VerticalCells(State.Session);
+			}
+		}
+
 	}
 }

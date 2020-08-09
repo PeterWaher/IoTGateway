@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Xml;
-using Waher.Content;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -16,6 +16,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <param name="AttributeName">Attribute name.</param>
 		public StringAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
+		{
+		}
+
+		/// <summary>
+		/// String attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		public StringAttribute(string AttributeName, Expression Expression)
+			: base(AttributeName, Expression)
 		{
 		}
 
@@ -39,6 +49,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public override string ToString(string Value)
 		{
 			return Value;
+		}
+
+		/// <summary>
+		/// Copies the attribute object if undefined, or defined by an expression.
+		/// Returns a reference to itself, if preset (set by a constant value).
+		/// </summary>
+		/// <returns>Attribute reference.</returns>
+		public StringAttribute CopyIfNotPreset()
+		{
+			if (this.HasPresetValue)
+				return this;
+			else
+				return new StringAttribute(this.Name, this.Expression);
 		}
 
 	}

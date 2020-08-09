@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Xml;
-using Waher.Content;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
 	/// <summary>
-	/// Boolean attribute
+	/// Enumeration attribute
 	/// </summary>
 	public class EnumAttribute<TEnum> : Attribute<TEnum>
 		where TEnum : struct
 	{
 		/// <summary>
-		/// Boolean attribute
+		/// Enumeration attribute
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public EnumAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
+		{
+		}
+
+		/// <summary>
+		/// Enumeration attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		public EnumAttribute(string AttributeName, Expression Expression)
+			: base(AttributeName, Expression)
 		{
 		}
 
@@ -39,6 +49,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public override string ToString(TEnum Value)
 		{
 			return Value.ToString();
+		}
+
+		/// <summary>
+		/// Copies the attribute object if undefined, or defined by an expression.
+		/// Returns a reference to itself, if preset (set by a constant value).
+		/// </summary>
+		/// <returns>Attribute reference.</returns>
+		public EnumAttribute<TEnum> CopyIfNotPreset()
+		{
+			if (this.HasPresetValue)
+				return this;
+			else
+				return new EnumAttribute<TEnum>(this.Name, this.Expression);
 		}
 
 	}

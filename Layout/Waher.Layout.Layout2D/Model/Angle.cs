@@ -46,5 +46,20 @@ namespace Waher.Layout.Layout2D.Model
 			this.degrees.Export(Output);
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Angle Dest)
+			{
+				Dest.radians = this.radians.CopyIfNotPreset();
+				Dest.degrees = this.degrees.CopyIfNotPreset();
+			}
+		}
+
 	}
 }

@@ -8,11 +8,12 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Conditional layout based on one conditional statement.
 	/// </summary>
-	public class If : LayoutElement
+	public class If : LayoutElement, IDynamicChildren
 	{
 		private ExpressionAttribute condition;
 		private LayoutContainer ifTrue;
 		private LayoutContainer ifFalse;
+		private bool conditionResult;
 
 		/// <summary>
 		/// Conditional layout based on one conditional statement.
@@ -28,6 +29,21 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "If";
+
+		/// <summary>
+		/// Dynamic array of children
+		/// </summary>
+		public ILayoutElement[] DynamicChildren
+		{
+			get
+			{
+				ILayoutElement E = this.conditionResult ? this.ifTrue : this.ifFalse;
+				if (E is null)
+					return new ILayoutElement[0];
+				else
+					return new ILayoutElement[] { E };
+			}
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -107,6 +123,52 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new If(Document, Parent);
+		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is If Dest)
+			{
+				Dest.condition = this.condition.CopyIfNotPreset();
+				Dest.ifTrue = this.ifTrue?.Copy(Dest) as LayoutContainer;
+				Dest.ifFalse = this.ifFalse?.Copy(Dest) as LayoutContainer;
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			object Result = this.condition?.Evaluate(State.Session);
+			if (Result is bool b)
+				this.conditionResult = b;
+			else
+				this.conditionResult = false;
+
+			if (this.conditionResult)
+				this.ifTrue?.Measure(State);
+			else
+				this.ifFalse?.Measure(State);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			if (this.conditionResult)
+				this.ifTrue?.Draw(State);
+			else
+				this.ifFalse?.Draw(State);
 		}
 
 	}

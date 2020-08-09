@@ -8,10 +8,11 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Generates layout elements while a condition is true.
 	/// </summary>
-	public class While : LayoutContainer
+	public class While : LayoutContainer, IDynamicChildren
 	{
 		private ExpressionAttribute expression;
 		private BooleanAttribute testAfter;
+		private ILayoutElement[] measured;
 
 		/// <summary>
 		/// Generates layout elements while a condition is true.
@@ -27,6 +28,11 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "While";
+
+		/// <summary>
+		/// Dynamic array of children
+		/// </summary>
+		public ILayoutElement[] DynamicChildren => this.measured;
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -62,5 +68,61 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			return new While(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is While Dest)
+			{
+				Dest.expression = this.expression.CopyIfNotPreset();
+				Dest.testAfter = this.testAfter.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			List<ILayoutElement> Measured = new List<ILayoutElement>();
+
+			if (!this.testAfter.TryEvaluate(State.Session, out bool TestAfter))
+				TestAfter = false;
+
+			if (TestAfter)
+			{
+				do
+				{
+					foreach (ILayoutElement Child in this.Children)
+					{
+						ILayoutElement Copy = Child.Copy(this);
+						Measured.Add(Copy);
+						Copy.Measure(State);
+					}
+				}
+				while (this.expression.Evaluate(State.Session) is bool b && b);
+			}
+			else
+			{
+				while (this.expression.Evaluate(State.Session) is bool b && b)
+				{
+					foreach (ILayoutElement Child in this.Children)
+					{
+						ILayoutElement Copy = Child.Copy(this);
+						Measured.Add(Copy);
+						Copy.Measure(State);
+					}
+				}
+			}
+
+			this.measured = Measured.ToArray();
+		}
+
 	}
 }

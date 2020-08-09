@@ -3,6 +3,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Layout.Layout2D.Exceptions;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -18,6 +19,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <param name="AttributeName">Attribute name.</param>
 		public LengthAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
+		{
+		}
+
+		/// <summary>
+		/// Length attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Expression">Expression.</param>
+		public LengthAttribute(string AttributeName, Expression Expression)
+			: base(AttributeName, Expression)
 		{
 		}
 
@@ -201,6 +212,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				case LengthUnit.Percent: return s + " %";
 				default: return s;
 			}
+		}
+
+		/// <summary>
+		/// Copies the attribute object if undefined, or defined by an expression.
+		/// Returns a reference to itself, if preset (set by a constant value).
+		/// </summary>
+		/// <returns>Attribute reference.</returns>
+		public LengthAttribute CopyIfNotPreset()
+		{
+			if (this.HasPresetValue)
+				return this;
+			else
+				return new LengthAttribute(this.Name, this.Expression);
 		}
 
 	}

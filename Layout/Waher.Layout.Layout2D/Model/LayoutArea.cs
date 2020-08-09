@@ -83,5 +83,105 @@ namespace Waher.Layout.Layout2D.Model
 			this.overflow.Export(Output);
 			this.onClick.Export(Output);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is LayoutArea Dest)
+			{
+				Dest.width = this.width.CopyIfNotPreset();
+				Dest.height = this.height.CopyIfNotPreset();
+				Dest.maxWidth = this.maxWidth.CopyIfNotPreset();
+				Dest.maxHeight = this.maxHeight.CopyIfNotPreset();
+				Dest.minWidth = this.minWidth.CopyIfNotPreset();
+				Dest.minHeight = this.minHeight.CopyIfNotPreset();
+				Dest.keepAspectRatio = this.keepAspectRatio.CopyIfNotPreset();
+				Dest.overflow = this.overflow.CopyIfNotPreset();
+				Dest.onClick = this.onClick.CopyIfNotPreset();
+			}
+		}
+
+		private double? GetSize(DrawingState State, bool Horizontal, params LengthAttribute[] Sizes)
+		{
+			double? Size;
+
+			foreach (LengthAttribute Attr in Sizes)
+			{
+				if (!Attr.TryEvaluate(State.Session, out Length L))
+					continue;
+
+				Size = State.GetDrawingSize(L, this, Horizontal);
+				if (Size.HasValue)
+					return Size;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the maximum width of the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Maximum width, if defined.</returns>
+		public double? GetMaxWidth(DrawingState State)
+		{
+			return this.GetSize(State, true, this.maxWidth, this.width);
+		}
+
+		/// <summary>
+		/// Gets the minimum width of the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Maximum width, if defined.</returns>
+		public double? GetMinWidth(DrawingState State)
+		{
+			return this.GetSize(State, true, this.minWidth, this.width);
+		}
+
+		/// <summary>
+		/// Gets the maximum height of the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Maximum height, if defined.</returns>
+		public double? GetMaxHeight(DrawingState State)
+		{
+			return this.GetSize(State, false, this.maxHeight, this.height);
+		}
+
+		/// <summary>
+		/// Gets the minimum height of the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Maximum height, if defined.</returns>
+		public double? GetMinHeight(DrawingState State)
+		{
+			return this.GetSize(State, false, this.minHeight, this.height);
+		}
+
+		/// <summary>
+		/// Gets a width estimate.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Width estimate.</returns>
+		public double? GetWidthEstimate(DrawingState State)
+		{
+			return this.GetSize(State, true, this.width, this.maxWidth, this.minWidth);
+		}
+
+		/// <summary>
+		/// Gets a height estimate.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Height estimate.</returns>
+		public double? GetHeightEstimate(DrawingState State)
+		{
+			return this.GetSize(State, false, this.height, this.minHeight, this.maxHeight);
+		}
+
 	}
 }

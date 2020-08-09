@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Xml;
-using Waher.Content;
-using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -44,6 +41,42 @@ namespace Waher.Layout.Layout2D.Model
 		public abstract string LocalName
 		{
 			get;
+		}
+
+		/// <summary>
+		/// Left coordinate of bounding box, after measurement.
+		/// </summary>
+		public double Left
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Right coordinate of bounding box, after measurement.
+		/// </summary>
+		public double Right
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Top coordinate of bounding box, after measurement.
+		/// </summary>
+		public double Top
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Bottom coordinate of bounding box, after measurement.
+		/// </summary>
+		public double Bottom
+		{
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -105,6 +138,43 @@ namespace Waher.Layout.Layout2D.Model
 		public virtual void ExportChildren(XmlWriter Output)
 		{
 		}
+
+		/// <summary>
+		/// Creates a copy of the layout element.
+		/// </summary>
+		/// <param name="Parent">Parent of the new element.</param>
+		/// <returns></returns>
+		public ILayoutElement Copy(ILayoutElement Parent)
+		{
+			ILayoutElement Result = this.Create(this.document, Parent);
+			this.CopyContents(Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public virtual void CopyContents(ILayoutElement Destination)
+		{
+			if (Destination is LayoutElement Dest)
+			{
+				Dest.id = this.id.CopyIfNotPreset();
+				Dest.visible = this.visible.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public abstract void Measure(DrawingState State);
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public abstract void Draw(DrawingState State);
 
 	}
 }

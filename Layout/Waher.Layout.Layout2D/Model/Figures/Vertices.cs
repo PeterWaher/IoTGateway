@@ -63,5 +63,29 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.points = Points?.ToArray();
 		}
 
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Vertices Dest)
+			{
+				if (!(this.points is null))
+				{
+					int i, c = this.points.Length;
+
+					Vertex[] Children = new Vertex[c];
+
+					for (i = 0; i < c; i++)
+						Children[i] = this.points[i].Copy(Dest) as Vertex;
+
+					Dest.points = Children;
+				}
+			}
+		}
+
 	}
 }

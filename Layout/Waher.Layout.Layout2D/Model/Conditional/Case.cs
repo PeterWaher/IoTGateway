@@ -28,6 +28,11 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override string LocalName => "Case";
 
 		/// <summary>
+		/// Condition of case statement.
+		/// </summary>
+		public ExpressionAttribute Condition => this.condition;
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
@@ -58,6 +63,18 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new Case(Document, Parent);
+		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Case Dest)
+				Dest.condition = this.condition.CopyIfNotPreset();
 		}
 	}
 }

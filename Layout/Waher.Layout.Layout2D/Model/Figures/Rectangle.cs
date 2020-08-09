@@ -62,5 +62,20 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			return new Rectangle(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Rectangle Dest)
+			{
+				Dest.sideX = this.sideX.CopyIfNotPreset();
+				Dest.sideY = this.sideY.CopyIfNotPreset();
+			}
+		}
 	}
 }

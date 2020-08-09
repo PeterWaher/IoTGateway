@@ -328,6 +328,7 @@
 
   <xs:group name="Figures">
     <xs:choice>
+      <xs:element name="Dot" type="Point"/>
       <xs:element name="Line" type="Line"/>
       <xs:element name="Arrow" type="Arrow"/>
       <xs:element name="Circle" type="Circle"/>
@@ -687,29 +688,63 @@
       <xs:element name="Flexible" type="Flexible"/>
       <xs:element name="Grid" type="Grid"/>
       <xs:element name="Overlays" type="Overlays"/>
+      <xs:element name="Cell" type="Cell"/>
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="Horizontal">
+  <xs:complexType name="SpatialDistribution" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="LayoutContainer"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Cell">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
+        <xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
+        <xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
+        <xs:attribute name="colSpan" type="xs:positiveInteger" use="optional"/>
+        <xs:attribute name="rowSpan" type="xs:positiveInteger" use="optional"/>
       </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="VerticalAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Bottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="HorizontalAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Horizontal">
+    <xs:complexContent>
+      <xs:extension base="SpatialDistribution"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Vertical">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-      </xs:extension>
+      <xs:extension base="SpatialDistribution"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Flexible">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="SpatialDistribution">
         <xs:attribute name="order" type="FlexibleOrder" use="optional"/>
         <xs:attribute name="horizontalDirection" type="HorizontalDirection" use="optional"/>
         <xs:attribute name="verticalDirection" type="VerticalDirection" use="optional"/>
+        <xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
+        <xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -737,29 +772,15 @@
 
   <xs:complexType name="Grid">
     <xs:complexContent>
-      <xs:extension base="LayoutArea">
-        <xs:sequence>
-          <xs:element name="Cell" minOccurs="0" maxOccurs="unbounded">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="LayoutContainer">
-                  <xs:attribute name="column" type="xs:positiveInteger" use="optional"/>
-                  <xs:attribute name="row" type="xs:positiveInteger" use="optional"/>
-                  <xs:attribute name="colSpan" type="xs:positiveInteger" use="optional"/>
-                  <xs:attribute name="rowSpan" type="xs:positiveInteger" use="optional"/>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
+      <xs:extension base="SpatialDistribution">
+        <xs:attribute name="columns" type="xs:positiveInteger" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Overlays">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-      </xs:extension>
+      <xs:extension base="SpatialDistribution"/>
     </xs:complexContent>
   </xs:complexType>
 

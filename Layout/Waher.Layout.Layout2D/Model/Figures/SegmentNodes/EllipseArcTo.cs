@@ -65,5 +65,21 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			return new EllipseArcTo(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is EllipseArcTo Dest)
+			{
+				Dest.radiusX = this.radiusX.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+			}
+		}
 	}
 }

@@ -93,5 +93,29 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			return new Paragraph(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Paragraph Dest)
+			{
+				if (!(this.text is null))
+				{
+					int i, c = this.text.Length;
+
+					IFlowingText[] Children = new IFlowingText[c];
+
+					for (i = 0; i < c; i++)
+						Children[i] = this.text[i].Copy(Dest) as IFlowingText;
+
+					Dest.text = Children;
+				}
+			}
+		}
 	}
 }

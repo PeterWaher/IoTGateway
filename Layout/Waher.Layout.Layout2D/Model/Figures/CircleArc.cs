@@ -71,5 +71,23 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			return new CircleArc(Document, Parent);
 		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is CircleArc Dest)
+			{
+				Dest.startAngleRadians = this.startAngleRadians.CopyIfNotPreset();
+				Dest.startAngleDegrees = this.startAngleDegrees.CopyIfNotPreset();
+				Dest.endAngleRadians = this.endAngleRadians.CopyIfNotPreset();
+				Dest.endAngleDegrees = this.endAngleDegrees.CopyIfNotPreset();
+				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+			}
+		}
 	}
 }

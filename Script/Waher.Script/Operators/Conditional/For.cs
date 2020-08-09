@@ -93,7 +93,7 @@ namespace Waher.Script.Operators.Conditional
                     Done = true;
                 else
                 {
-                    From = Operators.Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
+                    From = Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
                     if (From is null)
                         throw new ScriptRuntimeException("Invalid step size.", this);
 

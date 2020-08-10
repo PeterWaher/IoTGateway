@@ -29,7 +29,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Cell element</param>
 		public void Add(ILayoutElement Element)
 		{
-			this.measured.Add(new Padding(Element, this.x - Element.Left, -Element.Top));
+			this.measured.Add(new Padding(Element, -Element.Left, -Element.Top));
 
 			double Width = Element.Right - Element.Left;
 			if (Width > this.maxWidth)

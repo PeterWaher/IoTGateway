@@ -13,8 +13,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 	{
 		private LengthAttribute dX;
 		private LengthAttribute dY;
-		private DoubleAttribute sigmaX;
-		private DoubleAttribute sigmaY;
+		private FloatAttribute sigmaX;
+		private FloatAttribute sigmaY;
 		private ColorAttribute color;
 
 		/// <summary>
@@ -42,8 +42,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			this.dX = new LengthAttribute(Input, "dX");
 			this.dY = new LengthAttribute(Input, "dY");
-			this.sigmaX = new DoubleAttribute(Input, "sigmaX");
-			this.sigmaY = new DoubleAttribute(Input, "sigmaY");
+			this.sigmaX = new FloatAttribute(Input, "sigmaX");
+			this.sigmaY = new FloatAttribute(Input, "sigmaY");
 			this.color = new ColorAttribute(Input, "color");
 		}
 

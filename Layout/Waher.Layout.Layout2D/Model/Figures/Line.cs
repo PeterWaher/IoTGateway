@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -34,6 +35,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new Line(Document, Parent);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+			{
+				State.Canvas.DrawLine((float)this.xCoordinate, (float)this.yCoordinate,
+					(float)this.xCoordinate2, (float)this.yCoordinate2, this.GetPen(State));
+			}
 		}
 	}
 }

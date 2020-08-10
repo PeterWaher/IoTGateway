@@ -12,8 +12,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	{
 		private LengthAttribute radiusX;
 		private LengthAttribute radiusY;
-		private double rX;
-		private double rY;
+		private float rX;
+		private float rY;
 
 		/// <summary>
 		/// An ellipse

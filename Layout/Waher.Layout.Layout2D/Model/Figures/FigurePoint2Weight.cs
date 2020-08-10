@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// </summary>
 	public abstract class FigurePoint2Weight : FigurePoint2
 	{
-		private DoubleAttribute w;
+		private FloatAttribute w;
 
 		/// <summary>
 		/// Abstract base class for figures with two points and a weight.
@@ -29,7 +29,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			this.w = new DoubleAttribute(Input, "w");
+			this.w = new FloatAttribute(Input, "w");
 		}
 
 		/// <summary>

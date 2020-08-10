@@ -22,13 +22,19 @@ namespace Waher.Layout.Layout2D.Test
 
 		protected virtual void Test(string FileName)
 		{
-			Layout2DDocument.FromFile("Xml\\" + FileName);
+			Layout2DDocument.FromFile("Xml\\" + FileName + ".xml");
 		}
 
 		[TestMethod]
 		public void Test_01_Line()
 		{
-			this.Test("Test_01_Line.xml");
+			this.Test("Test_01_Line");
+		}
+
+		[TestMethod]
+		public void Test_02_Lengths()
+		{
+			this.Test("Test_02_Lengths");
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	public class Circle : FigurePoint
 	{
 		private LengthAttribute radius;
-		private double r;
+		private float r;
 
 		/// <summary>
 		/// A circle

@@ -80,12 +80,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Measured X-coordinate
 		/// </summary>
-		protected double xCoordinate3;
+		protected float xCoordinate3;
 
 		/// <summary>
 		/// Measured Y-coordinate
 		/// </summary>
-		protected double yCoordinate3;
+		protected float yCoordinate3;
 
 	}
 }

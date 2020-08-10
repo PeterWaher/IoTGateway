@@ -21,7 +21,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="OffsetY">Y-offset</param>
 		/// <param name="ColSpan">Column span</param>
 		/// <param name="RowSpan">Row span</param>
-		public GridPadding(ILayoutElement Element, double OffsetX, double OffsetY,
+		public GridPadding(ILayoutElement Element, float OffsetX, float OffsetY,
 			int ColSpan, int RowSpan)
 			: base(Element, OffsetX, OffsetY)
 		{

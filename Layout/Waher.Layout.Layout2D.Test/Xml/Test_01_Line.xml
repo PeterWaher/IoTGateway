@@ -2,8 +2,10 @@
 <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
           backgroundId="WhiteBackground" penId="BlackPen" 
           fontId="Text" textColor="Black">
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
   <SolidPen id="BlackPen" color="Black"/>
-  <SolidBackground id="WhiteBackground" color="White"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
   <Font id="Text" name="Arial" size="12pt"/>
-  <Line x="25px" y="75px" x2="75px" y2="25px"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <Line x="25px" y="75px" x2="75px" y2="25px" pen="RedPen"/>
 </Layout2D>

@@ -138,10 +138,10 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="RX">Radius along X-axis</param>
 		/// <param name="RY">Radius along Y-axis</param>
 		/// <param name="Angle">Angle, in degrees, clockwise from positive horizontal X-axis.</param>
-		protected void IncludePoint(double X, double Y, double RX, double RY, double Angle)
+		protected void IncludePoint(float X, float Y, float RX, float RY, float Angle)
 		{
-			double Px = X + RX * Math.Cos(Angle * DegreesToRadians);
-			double Py = Y + RY * Math.Sin(Angle * DegreesToRadians);
+			float Px = (float)(X + RX * Math.Cos(Angle * DegreesToRadians));
+			float Py = (float)(Y + RY * Math.Sin(Angle * DegreesToRadians));
 
 			this.IncludePoint(Px, Py);
 		}
@@ -151,7 +151,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="X">X-Coordinate</param>
 		/// <param name="Y">Y-Coordinate</param>
-		public void IncludePoint(double X, double Y)
+		public void IncludePoint(float X, float Y)
 		{
 			if (this.firstPoint)
 			{
@@ -186,7 +186,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <returns>If point is well-defined.</returns>
 		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute, 
 			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			out double X, out double Y)
+			out float X, out float Y)
 		{
 			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, out X, out Y);
 

@@ -12,13 +12,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	{
 		private LengthAttribute radiusX;
 		private LengthAttribute radiusY;
-		private DoubleAttribute startDegrees;
-		private DoubleAttribute endDegrees;
+		private FloatAttribute startDegrees;
+		private FloatAttribute endDegrees;
 		private BooleanAttribute clockwise;
-		private double rX;
-		private double rY;
-		private double start;
-		private double end;
+		private float rX;
+		private float rY;
+		private float start;
+		private float end;
 		private bool clockDir;
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			this.radiusX = new LengthAttribute(Input, "radiusX");
 			this.radiusY = new LengthAttribute(Input, "radiusY");
-			this.startDegrees = new DoubleAttribute(Input, "startDegrees");
-			this.endDegrees = new DoubleAttribute(Input, "endDegrees");
+			this.startDegrees = new FloatAttribute(Input, "startDegrees");
+			this.endDegrees = new FloatAttribute(Input, "endDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
 		}
 
@@ -114,12 +114,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.defined = false;
 
 			if (this.startDegrees.TryEvaluate(State.Session, out this.start))
-				this.start = Math.IEEERemainder(this.start, 360);
+				this.start = (float)Math.IEEERemainder(this.start, 360);
 			else
 				this.defined = false;
 
 			if (this.endDegrees.TryEvaluate(State.Session, out this.end))
-				this.end = Math.IEEERemainder(this.end, 360);
+				this.end = (float)Math.IEEERemainder(this.end, 360);
 			else
 				this.defined = false;
 
@@ -128,8 +128,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (this.defined)
 			{
-				double a = this.start;
-				double r = Math.IEEERemainder(this.start, 90);
+				float a = this.start;
+				float r = (float)Math.IEEERemainder(this.start, 90);
 				bool First = true;
 
 				this.IncludePoint(this.xCoordinate, this.yCoordinate, this.rX, this.rY, this.start);

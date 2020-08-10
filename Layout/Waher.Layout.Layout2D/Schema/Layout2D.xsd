@@ -47,7 +47,7 @@
   <xs:complexType name="Point2Weight">
     <xs:complexContent>
       <xs:extension base="Point2">
-        <xs:attribute name="w" type="xs:double" use="optional"/>
+        <xs:attribute name="w" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -415,7 +415,7 @@
   <xs:complexType name="FigurePoint2Weight">
     <xs:complexContent>
       <xs:extension base="FigurePoint2">
-        <xs:attribute name="w" type="xs:double" use="optional"/>
+        <xs:attribute name="w" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -456,8 +456,8 @@
   <xs:complexType name="CircleArc">
     <xs:complexContent>
       <xs:extension base="Circle">
-        <xs:attribute name="startDegrees" type="xs:double" use="optional"/>
-        <xs:attribute name="endDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="startDegrees" type="xs:float" use="optional"/>
+        <xs:attribute name="endDegrees" type="xs:float" use="optional"/>
         <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
       </xs:extension>
     </xs:complexContent>
@@ -475,8 +475,8 @@
   <xs:complexType name="EllipseArc">
     <xs:complexContent>
       <xs:extension base="Ellipse">
-        <xs:attribute name="startDegrees" type="xs:double" use="optional"/>
-        <xs:attribute name="endDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="startDegrees" type="xs:float" use="optional"/>
+        <xs:attribute name="endDegrees" type="xs:float" use="optional"/>
         <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
       </xs:extension>
     </xs:complexContent>
@@ -574,7 +574,7 @@
   <xs:complexType name="Angle">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
-        <xs:attribute name="degrees" type="xs:double" use="optional"/>
+        <xs:attribute name="degrees" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -649,8 +649,8 @@
   <xs:complexType name="Scale">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="scaleX" type="xs:double" use="optional"/>
-        <xs:attribute name="scaleY" type="xs:double" use="optional"/>
+        <xs:attribute name="scaleX" type="xs:float" use="optional"/>
+        <xs:attribute name="scaleY" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -658,8 +658,8 @@
   <xs:complexType name="Translate">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="translateX" type="xs:double" use="optional"/>
-        <xs:attribute name="translateY" type="xs:double" use="optional"/>
+        <xs:attribute name="translateX" type="xs:float" use="optional"/>
+        <xs:attribute name="translateY" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -667,7 +667,7 @@
   <xs:complexType name="Rotate">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="degrees" type="xs:double" use="optional"/>
+        <xs:attribute name="degrees" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -675,7 +675,7 @@
   <xs:complexType name="SkewX">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="factor" type="xs:double" use="optional"/>
+        <xs:attribute name="factor" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -683,7 +683,7 @@
   <xs:complexType name="SkewY">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="factor" type="xs:double" use="optional"/>
+        <xs:attribute name="factor" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1022,8 +1022,8 @@
   <xs:complexType name="Blur">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="sigmaX" type="xs:double" use="optional"/>
-        <xs:attribute name="sigmaY" type="xs:double" use="optional"/>
+        <xs:attribute name="sigmaX" type="xs:float" use="optional"/>
+        <xs:attribute name="sigmaY" type="xs:float" use="optional"/>
         <xs:attribute name="tileMode" type="TileMode" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -1061,8 +1061,8 @@
       <xs:extension base="LayoutContainer">
         <xs:attribute name="dX" type="Length" use="optional"/>
         <xs:attribute name="dY" type="Length" use="optional"/>
-        <xs:attribute name="sigmaX" type="xs:double" use="optional"/>
-        <xs:attribute name="sigmaY" type="xs:double" use="optional"/>
+        <xs:attribute name="sigmaX" type="xs:float" use="optional"/>
+        <xs:attribute name="sigmaY" type="xs:float" use="optional"/>
         <xs:attribute name="color" type="Color" use="optional"/>
       </xs:extension>
     </xs:complexContent>

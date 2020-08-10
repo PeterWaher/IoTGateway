@@ -10,7 +10,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// </summary>
 	public class SkewX : LayoutContainer
 	{
-		private DoubleAttribute factor;
+		private FloatAttribute factor;
 
 		/// <summary>
 		/// A skew transform along the X-axis.
@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.factor = new DoubleAttribute(Input, "factor");
+			this.factor = new FloatAttribute(Input, "factor");
 		}
 
 		/// <summary>

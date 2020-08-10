@@ -25,7 +25,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Total width of layout
 		/// </summary>
-		double TotWidth
+		float TotWidth
 		{
 			get;
 		}
@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Total height of layout
 		/// </summary>
-		double TotHeight
+		float TotHeight
 		{
 			get;
 		}

@@ -11,8 +11,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 	/// </summary>
 	public class Blur : LayoutContainer
 	{
-		private DoubleAttribute sigmaX;
-		private DoubleAttribute sigmaY;
+		private FloatAttribute sigmaX;
+		private FloatAttribute sigmaY;
 		private EnumAttribute<SKShaderTileMode> tileMode;
 
 		/// <summary>
@@ -38,8 +38,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		{
 			base.FromXml(Input);
 
-			this.sigmaX = new DoubleAttribute(Input, "sigmaX");
-			this.sigmaY = new DoubleAttribute(Input, "sigmaY");
+			this.sigmaX = new FloatAttribute(Input, "sigmaX");
+			this.sigmaY = new FloatAttribute(Input, "sigmaY");
 			this.tileMode = new EnumAttribute<SKShaderTileMode>(Input, "tileMode");
 		}
 

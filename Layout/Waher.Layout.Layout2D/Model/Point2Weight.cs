@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public abstract class Point2Weight : Point2
 	{
-		private DoubleAttribute w;
+		private FloatAttribute w;
 
 		/// <summary>
 		/// Abstract base class for layout elements with two points and a weight.
@@ -29,7 +29,7 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.FromXml(Input);
 
-			this.w = new DoubleAttribute(Input, "w");
+			this.w = new FloatAttribute(Input, "w");
 		}
 
 		/// <summary>

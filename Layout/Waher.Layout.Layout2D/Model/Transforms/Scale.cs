@@ -10,8 +10,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// </summary>
 	public class Scale : LayoutContainer
 	{
-		private DoubleAttribute scaleX;
-		private DoubleAttribute scaleY;
+		private FloatAttribute scaleX;
+		private FloatAttribute scaleY;
 
 		/// <summary>
 		/// A scale transform
@@ -36,8 +36,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.scaleX = new DoubleAttribute(Input, "scaleX");
-			this.scaleY = new DoubleAttribute(Input, "scaleY");
+			this.scaleX = new FloatAttribute(Input, "scaleX");
+			this.scaleY = new FloatAttribute(Input, "scaleY");
 		}
 
 		/// <summary>

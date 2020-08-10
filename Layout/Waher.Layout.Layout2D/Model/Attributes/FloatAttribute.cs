@@ -8,14 +8,14 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 	/// <summary>
 	/// Double attribute
 	/// </summary>
-	public class DoubleAttribute : Attribute<double>
+	public class FloatAttribute : Attribute<float>
 	{
 		/// <summary>
 		/// Double attribute
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public DoubleAttribute(XmlElement E, string AttributeName)
+		public FloatAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
 		{
 		}
@@ -25,7 +25,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		public DoubleAttribute(string AttributeName, Expression Expression)
+		public FloatAttribute(string AttributeName, Expression Expression)
 			: base(AttributeName, Expression)
 		{
 		}
@@ -36,7 +36,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <param name="StringValue">String value for attribute.</param>
 		/// <param name="Value">Parsed value, if successful.</param>
 		/// <returns>If the value could be parsed.</returns>
-		public override bool TryParse(string StringValue, out double Value)
+		public override bool TryParse(string StringValue, out float Value)
 		{
 			return CommonTypes.TryParse(StringValue, out Value);
 		}
@@ -46,7 +46,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>String representation.</returns>
-		public override string ToString(double Value)
+		public override string ToString(float Value)
 		{
 			return CommonTypes.Encode(Value);
 		}
@@ -56,12 +56,12 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// Returns a reference to itself, if preset (set by a constant value).
 		/// </summary>
 		/// <returns>Attribute reference.</returns>
-		public DoubleAttribute CopyIfNotPreset()
+		public FloatAttribute CopyIfNotPreset()
 		{
 			if (this.HasPresetValue)
 				return this;
 			else
-				return new DoubleAttribute(this.Name, this.Expression);
+				return new FloatAttribute(this.Name, this.Expression);
 		}
 
 	}

@@ -158,7 +158,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			{
 				case FlexibleOrder.HorizontalVertical:
 				default:
-					double? Size = this.GetWidthEstimate(State);
+					float? Size = this.GetWidthEstimate(State);
 					if (Size.HasValue)
 					{
 						if (!this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))

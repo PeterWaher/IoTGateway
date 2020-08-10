@@ -10,9 +10,9 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	public class PathState
 	{
 		private readonly Path path;
-		private double x, y;
-		private double xPrev, yPrev;
-		private double? angle;
+		private float x, y;
+		private float xPrev, yPrev;
+		private float? angle;
 
 		/// <summary>
 		/// Current state tracing the path.
@@ -25,39 +25,39 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Current X-coordinate
 		/// </summary>
-		public double X => this.x;
+		public float X => this.x;
 
 		/// <summary>
 		/// Current Y-coordinte
 		/// </summary>
-		public double Y => this.y;
+		public float Y => this.y;
 
 		/// <summary>
 		/// Previous X-coordinate
 		/// </summary>
-		public double XPrev => this.xPrev;
+		public float XPrev => this.xPrev;
 
 		/// <summary>
 		/// Previous Y-coordinate
 		/// </summary>
-		public double YPrev => this.yPrev;
+		public float YPrev => this.yPrev;
 
 		/// <summary>
 		/// Calculates the current direction angle, in radians
 		/// </summary>
-		public double Angle
+		public float Angle
 		{
 			get
 			{
 				if (!this.angle.HasValue)
 				{
-					double dx = this.x - this.xPrev;
-					double dy = this.y - this.yPrev;
+					float dx = this.x - this.xPrev;
+					float dy = this.y - this.yPrev;
 
 					if (dx == 0 && dy == 0)
 						this.angle = 0;
 					else
-						this.angle = Math.Atan2(dy, dx);
+						this.angle = (float)Math.Atan2(dy, dx);
 				}
 
 				return this.angle.Value;
@@ -69,7 +69,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="X">X-coordinate</param>
 		/// <param name="Y">Y-coordinate</param>
-		public void Set(double X, double Y)
+		public void Set(float X, float Y)
 		{
 			if (X != this.x || Y != this.y)
 			{
@@ -88,7 +88,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Sets a new coordinate
 		/// </summary>
-		public void Add(double DeltaX, double DeltaY)
+		public void Add(float DeltaX, float DeltaY)
 		{
 			if (DeltaX != 0 || DeltaY != 0)
 			{
@@ -106,13 +106,13 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// Moves forward
 		/// </summary>
 		/// <param name="Distance"></param>
-		public void Forward(double Distance)
+		public void Forward(float Distance)
 		{
 			if (Distance != 0)
 			{
-				double Radians = this.Angle;
-				double Dx = Distance * Math.Cos(Radians);
-				double Dy = Distance * Math.Sin(Radians);
+				float Radians = this.Angle;
+				float Dx = (float)(Distance * Math.Cos(Radians));
+				float Dy = (float)(Distance * Math.Sin(Radians));
 
 				this.Add(Dx, Dy);
 			}
@@ -122,7 +122,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// Moves forward
 		/// </summary>
 		/// <param name="Distance"></param>
-		public void Backward(double Distance)
+		public void Backward(float Distance)
 		{
 			this.Forward(-Distance);
 		}
@@ -131,7 +131,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// Turns the current direction left.
 		/// </summary>
 		/// <param name="DeltaDegrees">Angle, in degrees.</param>
-		public void TurnLeft(double DeltaDegrees)
+		public void TurnLeft(float DeltaDegrees)
 		{
 			this.angle = this.Angle - DeltaDegrees * LayoutElement.DegreesToRadians;
 		}
@@ -140,7 +140,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// Turns the current direction right.
 		/// </summary>
 		/// <param name="DeltaDegrees">Angle, in degrees.</param>
-		public void TurnRight(double DeltaDegrees)
+		public void TurnRight(float DeltaDegrees)
 		{
 			this.angle = this.Angle + DeltaDegrees * LayoutElement.DegreesToRadians;
 		}

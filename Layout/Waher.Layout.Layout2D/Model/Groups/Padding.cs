@@ -13,8 +13,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private readonly ILayoutElement element;
 		private readonly Cell cell;
 		private readonly bool isCell;
-		private double offsetX;
-		private double offsetY;
+		private float offsetX;
+		private float offsetY;
 
 		/// <summary>
 		/// Provides padding for a cell in a group contruct.
@@ -22,7 +22,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Embedded element.</param>
 		/// <param name="OffsetX">X-offset</param>
 		/// <param name="OffsetY">Y-offset</param>
-		public Padding(ILayoutElement Element, double OffsetX, double OffsetY)
+		public Padding(ILayoutElement Element, float OffsetX, float OffsetY)
 		{
 			this.element = Element;
 			this.cell = Element as Cell;
@@ -49,7 +49,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// X-offset
 		/// </summary>
-		public double OffsetX
+		public float OffsetX
 		{
 			get => this.offsetX;
 			set => this.offsetX = value;
@@ -58,7 +58,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Y-offset
 		/// </summary>
-		public double OffsetY
+		public float OffsetY
 		{
 			get => this.offsetY;
 			set => this.offsetY = value;
@@ -70,7 +70,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="MaxWidth">Maximum width of area assigned to the cell</param>
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
 		/// <param name="Session">Current session.</param>
-		public void AlignedMeasuredCell(double? MaxWidth, double? MaxHeight, Variables Session)
+		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, Variables Session)
 		{
 			if (this.isCell)
 				this.cell.AlignedMeasuredCell(MaxWidth, MaxHeight, ref this.offsetX, ref this.offsetY, Session);

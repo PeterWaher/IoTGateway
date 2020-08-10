@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Backgrounds;
+using Waher.Layout.Layout2D.Model.Fonts;
+using Waher.Layout.Layout2D.Model.Pens;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -59,6 +63,68 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			{
 				Dest.pen = this.pen.CopyIfNotPreset();
 				Dest.fill = this.fill.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Gets the pen associated with the element. If not found, the default pen
+		/// is returned.
+		/// </summary>
+		/// <param name="State">Current state</param>
+		/// <returns>Pen.</returns>
+		public SKPaint GetPen(DrawingState State)
+		{
+			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
+				State.TryGetElement(PenId, out ILayoutElement E) &&
+				E is Pen PenDefinition)
+			{
+				return PenDefinition.Paint;
+			}
+			else
+				return State.DefaultPen;
+		}
+
+		/// <summary>
+		/// Tries to get the pen associated with the element, if one is defined.
+		/// </summary>
+		/// <param name="State">Current state</param>
+		/// <param name="Pen">Pen, if defined.</param>
+		/// <returns>If a pen was defined, and was found.<returns>
+		public bool TryGetPen(DrawingState State, out SKPaint Pen)
+		{
+			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
+				State.TryGetElement(PenId, out ILayoutElement E) &&
+				E is Pen PenDefinition)
+			{
+				Pen = PenDefinition.Paint;
+				return true;
+			}
+			else
+			{
+				Pen = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get the filling of the figure, if one is defined.
+		/// </summary>
+		/// <param name="State">State object.</param>
+		/// <param name="Fill">Filling, if defined.</param>
+		/// <returns>If a filling was defined, and was found.</returns>
+		public bool TryGetFill(DrawingState State, out SKPaint Fill)
+		{
+			if (this.fill.TryEvaluate(State.Session, out string FillId) &&
+				State.TryGetElement(FillId, out ILayoutElement E) &&
+				E is Background FillDefinition)
+			{
+				Fill = FillDefinition.Paint;
+				return true;
+			}
+			else
+			{
+				Fill = null;
+				return false;
 			}
 		}
 

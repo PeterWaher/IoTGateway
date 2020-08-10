@@ -11,16 +11,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	public class FlexibleVerticalCells : ICellLayout
 	{
 		private readonly List<Padding> currentColumn = new List<Padding>();
-		private readonly List<Tuple<double, double, Padding[]>> columns = new List<Tuple<double, double, Padding[]>>();
+		private readonly List<Tuple<float, float, Padding[]>> columns = new List<Tuple<float, float, Padding[]>>();
 		private readonly Variables session;
-		private readonly double limitHeight;
+		private readonly float limitHeight;
 		private readonly HorizontalDirection horizontalDirection;
 		private readonly VerticalDirection verticalDirection;
 		private readonly VerticalAlignment verticalAlignment;
-		private double maxWidth = 0;
-		private double maxHeight = 0;
-		private double x = 0;
-		private double y = 0;
+		private float maxWidth = 0;
+		private float maxHeight = 0;
+		private float x = 0;
+		private float y = 0;
 
 		/// <summary>
 		/// Lays out elements flexibly, first vertically, then horizontally.
@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="HorizontalDirection">Horizontal direction</param>
 		/// <param name="VerticalDirection">Vertical direction</param>
 		/// <param name="VerticalAlignment">Vertical alignment of cells in layout.</param>
-		public FlexibleVerticalCells(Variables Session, double WidthLimit,
+		public FlexibleVerticalCells(Variables Session, float WidthLimit,
 			HorizontalDirection HorizontalDirection, VerticalDirection VerticalDirection,
 			VerticalAlignment VerticalAlignment)
 		{
@@ -47,8 +47,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Cell element</param>
 		public void Add(ILayoutElement Element)
 		{
-			double Width = Element.Width;
-			double Height = Element.Height;
+			float Width = Element.Width;
+			float Height = Element.Height;
 
 			if (this.y + Height > this.limitHeight)
 				this.Flush();
@@ -64,7 +64,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			if (this.currentColumn.Count > 0)
 			{
-				this.columns.Add(new Tuple<double, double, Padding[]>(this.maxWidth, this.y, this.currentColumn.ToArray()));
+				this.columns.Add(new Tuple<float, float, Padding[]>(this.maxWidth, this.y, this.currentColumn.ToArray()));
 				this.currentColumn.Clear();
 				this.x += this.maxWidth;
 
@@ -79,12 +79,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Total width of layout
 		/// </summary>
-		public double TotWidth => this.x;
+		public float TotWidth => this.x;
 
 		/// <summary>
 		/// Total height of layout
 		/// </summary>
-		public double TotHeight => this.maxHeight;
+		public float TotHeight => this.maxHeight;
 
 		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
@@ -93,12 +93,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public Padding[] Align()
 		{
 			List<Padding> Result = new List<Padding>();
-			double X = this.horizontalDirection == HorizontalDirection.LeftRight ? 0 : this.x;
-			double Y;
-			double Diff;
+			float X = this.horizontalDirection == HorizontalDirection.LeftRight ? 0 : this.x;
+			float Y;
+			float Diff;
 			this.Flush();
 
-			foreach (Tuple<double, double, Padding[]> Column in this.columns)
+			foreach (Tuple<float, float, Padding[]> Column in this.columns)
 			{
 				Diff = this.maxHeight - Column.Item2;
 				switch (this.verticalAlignment)
@@ -113,9 +113,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 					case VerticalAlignment.Center:
 						if (this.verticalDirection == VerticalDirection.TopDown)
-							Y = Diff * 0.5;
+							Y = Diff / 2;
 						else
-							Y = this.maxHeight - Diff * 0.5;
+							Y = this.maxHeight - Diff / 2;
 						break;
 
 					case VerticalAlignment.Bottom:
@@ -131,7 +131,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 				foreach (Padding P in Column.Item3)
 				{
-					double Height = P.Element.Height;
+					float Height = P.Element.Height;
 
 					if (this.verticalDirection == VerticalDirection.BottomUp)
 						Y -= Height;

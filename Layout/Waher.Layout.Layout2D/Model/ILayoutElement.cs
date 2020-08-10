@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Left coordinate of bounding box, after measurement.
 		/// </summary>
-		double Left
+		float Left
 		{
 			get;
 			set;
@@ -53,7 +53,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Right coordinate of bounding box, after measurement.
 		/// </summary>
-		double Right
+		float Right
 		{
 			get;
 			set;
@@ -62,7 +62,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Top coordinate of bounding box, after measurement.
 		/// </summary>
-		double Top
+		float Top
 		{
 			get;
 			set;
@@ -71,7 +71,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Bottom coordinate of bounding box, after measurement.
 		/// </summary>
-		double Bottom
+		float Bottom
 		{
 			get;
 			set;
@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Width of element
 		/// </summary>
-		double Width
+		float Width
 		{
 			get;
 			set;
@@ -89,7 +89,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Height of element
 		/// </summary>
-		double Height
+		float Height
 		{
 			get;
 			set;

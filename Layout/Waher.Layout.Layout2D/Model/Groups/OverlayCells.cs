@@ -11,8 +11,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	{
 		private readonly List<Padding> measured = new List<Padding>();
 		private readonly Variables session;
-		private double maxWidth = 0;
-		private double maxHeight = 0;
+		private float maxWidth = 0;
+		private float maxHeight = 0;
 
 		/// <summary>
 		/// Lays ut cells one on-top of another
@@ -31,11 +31,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			this.measured.Add(new Padding(Element, -Element.Left, -Element.Top));
 
-			double Width = Element.Width;
+			float Width = Element.Width;
 			if (Width > this.maxWidth)
 				this.maxWidth = Width;
 
-			double Height = Element.Height;
+			float Height = Element.Height;
 			if (Height > this.maxHeight)
 				this.maxHeight = Height;
 		}
@@ -43,12 +43,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Total width of layout
 		/// </summary>
-		public double TotWidth => this.maxWidth;
+		public float TotWidth => this.maxWidth;
 
 		/// <summary>
 		/// Total height of layout
 		/// </summary>
-		public double TotHeight => this.maxHeight;
+		public float TotHeight => this.maxHeight;
 
 		/// <summary>
 		/// Aligns cells and returns an array of padded cells.

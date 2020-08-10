@@ -106,7 +106,7 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
-		private double? GetSize(DrawingState State, bool Horizontal, params LengthAttribute[] Sizes)
+		private float? GetSize(DrawingState State, bool Horizontal, params LengthAttribute[] Sizes)
 		{
 			foreach (LengthAttribute Attr in Sizes)
 			{
@@ -124,7 +124,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Maximum width, if defined.</returns>
-		public double? GetMaxWidth(DrawingState State)
+		public float? GetMaxWidth(DrawingState State)
 		{
 			return this.GetSize(State, true, this.maxWidth, this.width);
 		}
@@ -134,7 +134,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Maximum width, if defined.</returns>
-		public double? GetMinWidth(DrawingState State)
+		public float? GetMinWidth(DrawingState State)
 		{
 			return this.GetSize(State, true, this.minWidth, this.width);
 		}
@@ -144,7 +144,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Maximum height, if defined.</returns>
-		public double? GetMaxHeight(DrawingState State)
+		public float? GetMaxHeight(DrawingState State)
 		{
 			return this.GetSize(State, false, this.maxHeight, this.height);
 		}
@@ -154,7 +154,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Maximum height, if defined.</returns>
-		public double? GetMinHeight(DrawingState State)
+		public float? GetMinHeight(DrawingState State)
 		{
 			return this.GetSize(State, false, this.minHeight, this.height);
 		}
@@ -164,7 +164,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Width estimate.</returns>
-		public double? GetWidthEstimate(DrawingState State)
+		public float? GetWidthEstimate(DrawingState State)
 		{
 			return this.GetSize(State, true, this.width, this.maxWidth, this.minWidth);
 		}
@@ -174,7 +174,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Height estimate.</returns>
-		public double? GetHeightEstimate(DrawingState State)
+		public float? GetHeightEstimate(DrawingState State)
 		{
 			return this.GetSize(State, false, this.height, this.minHeight, this.maxHeight);
 		}

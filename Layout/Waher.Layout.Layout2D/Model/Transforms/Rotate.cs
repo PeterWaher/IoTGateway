@@ -10,7 +10,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// </summary>
 	public class Rotate : LayoutContainer
 	{
-		private DoubleAttribute degrees;
+		private FloatAttribute degrees;
 
 		/// <summary>
 		/// A rotation transform
@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.degrees = new DoubleAttribute(Input, "degrees");
+			this.degrees = new FloatAttribute(Input, "degrees");
 		}
 
 		/// <summary>

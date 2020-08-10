@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Pens
@@ -13,6 +14,11 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		private LengthAttribute width;
 
 		/// <summary>
+		/// Current pen
+		/// </summary>
+		protected SKPaint paint;
+
+		/// <summary>
 		/// Abstract base class for pens.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
@@ -21,6 +27,22 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			: base(Document, Parent)
 		{
 		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			this.paint?.Dispose();
+			this.paint = null;
+		}
+
+		/// <summary>
+		/// Current pen
+		/// </summary>
+		public SKPaint Paint => this.paint;
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -55,5 +77,25 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			if (Destination is Pen Dest)
 				Dest.width = this.width.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.width.TryEvaluate(State.Session, out Length Width))
+				this.penWidth = State.GetDrawingSize(Width, this, true);
+			else
+				this.penWidth = null;
+		}
+
+		/// <summary>
+		/// Measured pen width.
+		/// </summary>
+		protected float? penWidth;
+
 	}
 }

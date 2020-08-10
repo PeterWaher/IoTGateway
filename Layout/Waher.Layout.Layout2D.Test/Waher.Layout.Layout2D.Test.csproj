@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <None Remove="Xml\Test_01_Line.xml" />
+    <None Remove="Xml\Test_02_Lengths.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Xml\Test_02_Lengths.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Xml\Test_01_Line.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

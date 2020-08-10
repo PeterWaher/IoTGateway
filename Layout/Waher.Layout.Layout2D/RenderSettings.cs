@@ -29,15 +29,15 @@ namespace Waher.Layout.Layout2D
 		private RenderedImageSize imageSize = RenderedImageSize.ResizeImage;
 		private int width = 800;
 		private int height = 600;
-		private double zoom = 1;
-		private double offsetX = 0;
-		private double offsetY = 0;
+		private float zoom = 1;
+		private float offsetX = 0;
+		private float offsetY = 0;
 		private SKColor backgroundColor = SKColors.White;
 		private SKColor penColor = SKColors.Black;
 		private SKColor textColor = SKColors.Black;
 		private string fontName = "Segoe UI";
-		private double fontSize = 12;
-		private double pixelsPerInch = 96;
+		private float fontSize = 12;
+		private float pixelsPerInch = 96;
 
 		/// <summary>
 		/// Determines the size of the rendered image.
@@ -88,7 +88,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Zoom factor
 		/// </summary>
-		public double Zoom
+		public float Zoom
 		{
 			get => this.zoom;
 			set
@@ -103,7 +103,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Offset along X-axis.
 		/// </summary>
-		public double OffsetX
+		public float OffsetX
 		{
 			get => this.offsetX;
 			set => this.offsetX = value;
@@ -112,7 +112,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Offset along Y-axis.
 		/// </summary>
-		public double OffsetY
+		public float OffsetY
 		{
 			get => this.offsetY;
 			set => this.offsetY = value;
@@ -163,7 +163,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Font size, in points
 		/// </summary>
-		public double FontSize
+		public float FontSize
 		{
 			get => this.fontSize;
 			set
@@ -178,7 +178,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Pixels per inch (defualt=96 pixels/inch)
 		/// </summary>
-		public double PixelsPerInch
+		public float PixelsPerInch
 		{
 			get => this.pixelsPerInch;
 			set

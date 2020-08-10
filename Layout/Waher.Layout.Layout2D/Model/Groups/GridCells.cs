@@ -13,8 +13,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private readonly List<GridPadding> elements = new List<GridPadding>();
 		private readonly Variables session;
 		private readonly int nrColumns;
-		private readonly double?[] rights;
-		private readonly List<double?> bottoms;
+		private readonly float?[] rights;
+		private readonly List<float?> bottoms;
 		private int x = 0;
 		private int y = 0;
 
@@ -27,8 +27,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			this.session = Session;
 			this.nrColumns = NrColumns;
-			this.rights = new double?[this.nrColumns];
-			this.bottoms = new List<double?>();
+			this.rights = new float?[this.nrColumns];
+			this.bottoms = new List<float?>();
 		}
 
 		private GridPadding GetElement(int X, int Y)
@@ -56,9 +56,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			}
 		}
 
-		private double GetRight(int x)
+		private float GetRight(int x)
 		{
-			double? Result = 0;
+			float? Result = 0;
 
 			while (x >= 0 && !(Result = this.rights[x]).HasValue)
 				x--;
@@ -69,9 +69,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				return Result.Value;
 		}
 
-		private double GetBottom(int y)
+		private float GetBottom(int y)
 		{
-			double? Result = 0;
+			float? Result = 0;
 
 			while (this.bottoms.Count <= this.y)
 				this.bottoms.Add(null);
@@ -108,15 +108,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (this.x >= this.nrColumns)
 				this.x = this.nrColumns - 1;
 
-			double Right = this.GetRight(this.x - 1) + Element.Width;
-			double Right2 = this.GetRight(this.x);
+			float Right = this.GetRight(this.x - 1) + Element.Width;
+			float Right2 = this.GetRight(this.x);
 			if (Right > Right2)
 				this.rights[this.x] = Right;
 
 			this.y += RowSpan;
 
-			double Bottom = this.GetBottom(this.y - 1) + Element.Height;
-			double Bottom2 = this.GetBottom(this.y);
+			float Bottom = this.GetBottom(this.y - 1) + Element.Height;
+			float Bottom2 = this.GetBottom(this.y);
 			if (Bottom > Bottom2)
 				this.bottoms[this.y] = Bottom;
 		}
@@ -176,12 +176,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Total width of layout
 		/// </summary>
-		public double TotWidth => this.GetRight(this.nrColumns - 1);
+		public float TotWidth => this.GetRight(this.nrColumns - 1);
 
 		/// <summary>
 		/// Total height of layout
 		/// </summary>
-		public double TotHeight => this.GetBottom(this.bottoms.Count - 1);
+		public float TotHeight => this.GetBottom(this.bottoms.Count - 1);
 
 		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
@@ -197,10 +197,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			{
 				if (!(P.Element is null))
 				{
-					double Left = this.GetRight(X + P.ColSpan - 1);
-					double Top = this.GetBottom(Y + P.RowSpan - 1);
-					double MaxWidth = Left - this.GetRight(X - 1);
-					double MaxHeight = Top - this.GetBottom(Y - 1);
+					float Left = this.GetRight(X + P.ColSpan - 1);
+					float Top = this.GetBottom(Y + P.RowSpan - 1);
+					float MaxWidth = Left - this.GetRight(X - 1);
+					float MaxHeight = Top - this.GetBottom(Y - 1);
 
 					P.OffsetX += Left;
 					P.OffsetY += Top;

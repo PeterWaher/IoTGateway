@@ -72,7 +72,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Measured distance
 		/// </summary>
-		protected double dist;
+		protected float dist;
 
 	}
 }

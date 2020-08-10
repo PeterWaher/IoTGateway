@@ -14,15 +14,14 @@ namespace Waher.Layout.Layout2D.Model
 		private Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private Variables session;
 		private SKCanvas canvas;
-		private SKPaint font;
 		private SKPaint fontRoot;
-		private SKPaint pen;
-		private SKPaint fill;
-		private double pixelsPerInch;
+		private SKPaint font;
+		private SKPaint defaultPen;
 		private float? width_0;
 		private float? height_0;
-		private int viewportWidth;
-		private int viewportHeight;
+		private readonly float pixelsPerInch;
+		private readonly int viewportWidth;
+		private readonly int viewportHeight;
 
 		/// <summary>
 		/// Current drawing state.
@@ -50,20 +49,12 @@ namespace Waher.Layout.Layout2D.Model
 				TextSize = (float)(Settings.FontSize * this.pixelsPerInch / 72)
 			};
 
-			this.pen = new SKPaint()
+			this.defaultPen = new SKPaint()
 			{
 				FilterQuality = SKFilterQuality.High,
 				IsAntialias = true,
-				Style = SKPaintStyle.Fill,
+				Style = SKPaintStyle.Stroke,
 				Color = Settings.PenColor
-			};
-
-			this.fill = new SKPaint()
-			{
-				FilterQuality = SKFilterQuality.High,
-				IsAntialias = true,
-				Style = SKPaintStyle.Fill,
-				Color = Settings.BackgroundColor
 			};
 		}
 
@@ -73,8 +64,7 @@ namespace Waher.Layout.Layout2D.Model
 		public void Dispose()
 		{
 			this.font?.Dispose();
-			this.pen?.Dispose();
-			this.fill?.Dispose();
+			this.defaultPen?.Dispose();
 		}
 
 		/// <summary>
@@ -87,6 +77,15 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		public SKCanvas Canvas => this.canvas;
 
+		/// <summary>
+		/// Current font
+		/// </summary>
+		public SKPaint Font => this.font;
+
+		/// <summary>
+		/// Default pen
+		/// </summary>
+		public SKPaint DefaultPen => this.defaultPen;
 
 		/// <summary>
 		/// Converts a defined length to drawing size.
@@ -95,7 +94,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Element">Current element.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
 		/// <returns>Drawing size, if defined.</returns>
-		public double GetDrawingSize(Length L, ILayoutElement Element, bool Horizontal)
+		public float GetDrawingSize(Length L, ILayoutElement Element, bool Horizontal)
 		{
 			switch (L.Unit)
 			{
@@ -113,7 +112,7 @@ namespace Waher.Layout.Layout2D.Model
 
 				// centimeters (absolute)
 				case LengthUnit.Cm:
-					return L.Value * this.pixelsPerInch / 2.54;
+					return L.Value * this.pixelsPerInch / 2.54f;
 
 				// inches (1in = 96px = 2.54cm)
 				case LengthUnit.In:
@@ -121,7 +120,7 @@ namespace Waher.Layout.Layout2D.Model
 
 				// millimeters (absolute)
 				case LengthUnit.Mm:
-					return L.Value * this.pixelsPerInch / 25.4;
+					return L.Value * this.pixelsPerInch / 25.4f;
 
 				// Relative to the font-size of the element (2em means 2 times the size of the current font)
 				case LengthUnit.Em:
@@ -147,29 +146,29 @@ namespace Waher.Layout.Layout2D.Model
 
 				// Relative to 1% of the width of the viewport
 				case LengthUnit.Vw:
-					return 0.01 * L.Value * this.viewportWidth;
+					return L.Value * this.viewportWidth / 100;
 
 				// Relative to 1% of the height of the viewport
 				case LengthUnit.Vh:
-					return 0.01 * L.Value * this.viewportHeight;
+					return L.Value * this.viewportHeight / 100;
 
 				// Relative to 1% of viewport's* smaller dimension
 				case LengthUnit.Vmin:
 					if (this.viewportWidth < this.viewportHeight)
-						return 0.01 * L.Value * this.viewportWidth;
+						return L.Value * this.viewportWidth / 100;
 					else
-						return 0.01 * L.Value * this.viewportHeight;
+						return L.Value * this.viewportHeight / 100;
 
 				// Relative to 1% of viewport's* larger dimension
 				case LengthUnit.Vmax:
 					if (this.viewportWidth > this.viewportHeight)
-						return 0.01 * L.Value * this.viewportWidth;
+						return L.Value * this.viewportWidth / 100;
 					else
-						return 0.01 * L.Value * this.viewportHeight;
+						return L.Value * this.viewportHeight / 100;
 
 				// Relative to the parent element
 				case LengthUnit.Percent:
-					double? Size;
+					float? Size;
 
 					Element = Element?.Parent;
 
@@ -183,16 +182,16 @@ namespace Waher.Layout.Layout2D.Model
 								Size = Area.GetHeightEstimate(this);
 
 							if (Size.HasValue)
-								return L.Value * Size.Value * 0.01;
+								return L.Value * Size.Value / 100;
 						}
 
 						Element = Element.Parent;
 					}
 
 					if (Horizontal)
-						return L.Value * this.viewportWidth * 0.01;
+						return L.Value * this.viewportWidth / 100;
 					else
-						return L.Value * this.viewportHeight * 0.01;
+						return L.Value * this.viewportHeight / 100;
 
 				default:
 					return L.Value;

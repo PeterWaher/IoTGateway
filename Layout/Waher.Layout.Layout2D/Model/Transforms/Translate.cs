@@ -10,8 +10,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// </summary>
 	public class Translate : LayoutContainer
 	{
-		private DoubleAttribute translateX;
-		private DoubleAttribute translateY;
+		private FloatAttribute translateX;
+		private FloatAttribute translateY;
 
 		/// <summary>
 		/// A translation transform
@@ -36,8 +36,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.translateX = new DoubleAttribute(Input, "translateX");
-			this.translateY = new DoubleAttribute(Input, "translateY");
+			this.translateX = new FloatAttribute(Input, "translateX");
+			this.translateY = new FloatAttribute(Input, "translateY");
 		}
 
 		/// <summary>

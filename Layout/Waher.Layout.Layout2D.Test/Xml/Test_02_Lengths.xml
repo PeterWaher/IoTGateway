@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen" 
+          fontId="Text" textColor="Black">
+  <SolidPen id="RedPen1" color="Red" width="1px"/>
+  <SolidPen id="RedPen2" color="Red" width="1pt"/>
+  <SolidPen id="RedPen3" color="Red" width="1pc"/>
+  <SolidPen id="RedPen4" color="Red" width="1cm"/>
+  <SolidPen id="RedPen5" color="Red" width="1in"/>
+  <SolidPen id="RedPen6" color="Red" width="1mm"/>
+  <SolidPen id="RedPen7" color="Red" width="1em"/>
+  <SolidPen id="RedPen8" color="Red" width="1ex"/>
+  <SolidPen id="RedPen9" color="Red" width="1ch"/>
+  <SolidPen id="BluePen1" color="Blue" width="1rem"/>
+  <SolidPen id="BluePen2" color="Blue" width="1vw"/>
+  <SolidPen id="BluePen3" color="Blue" width="1vh"/>
+  <SolidPen id="BluePen4" color="Blue" width="1vmin"/>
+  <SolidPen id="BluePen5" color="Blue" width="1vmax"/>
+  <SolidPen id="BluePen6" color="Blue" width="1%"/>
+  <SolidPen id="BlackPen" color="Black"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <Line x="10%" y="10%" x2="10%" y2="90%" pen="RedPen1"/>
+  <Line x="20%" y="10%" x2="20%" y2="90%" pen="RedPen2"/>
+  <Line x="30%" y="10%" x2="30%" y2="90%" pen="RedPen3"/>
+  <Line x="40%" y="10%" x2="40%" y2="90%" pen="RedPen4"/>
+  <Line x="50%" y="10%" x2="50%" y2="90%" pen="RedPen5"/>
+  <Line x="60%" y="10%" x2="60%" y2="90%" pen="RedPen6"/>
+  <Line x="70%" y="10%" x2="70%" y2="90%" pen="RedPen7"/>
+  <Line x="80%" y="10%" x2="80%" y2="90%" pen="RedPen8"/>
+  <Line x="90%" y="10%" x2="90%" y2="90%" pen="RedPen9"/>
+  <Line x="10%" y="30%" x2="90%" y2="30%" pen="BluePen1"/>
+  <Line x="10%" y="40%" x2="90%" y2="40%" pen="BluePen2"/>
+  <Line x="10%" y="50%" x2="90%" y2="50%" pen="BluePen3"/>
+  <Line x="10%" y="60%" x2="90%" y2="60%" pen="BluePen4"/>
+  <Line x="10%" y="70%" x2="90%" y2="70%" pen="BluePen5"/>
+  <Line x="10%" y="80%" x2="90%" y2="80%" pen="BluePen6"/>
+</Layout2D>

@@ -167,7 +167,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 
 			StringValue = StringValue.Substring(0, i);
 
-			if (!CommonTypes.TryParse(StringValue, out double d))
+			if (!CommonTypes.TryParse(StringValue, out float d))
 				throw InvalidLengthException(StringValue);
 
 			Value = new Length()

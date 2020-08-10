@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public abstract class Angle : LayoutElement
 	{
-		private DoubleAttribute degrees;
+		private FloatAttribute degrees;
 
 		/// <summary>
 		/// Abstract base class for distance elements.
@@ -29,7 +29,7 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.FromXml(Input);
 
-			this.degrees = new DoubleAttribute(Input, "degrees");
+			this.degrees = new FloatAttribute(Input, "degrees");
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Measured distance
 		/// </summary>
-		protected double angle;
+		protected float angle;
 
 	}
 }

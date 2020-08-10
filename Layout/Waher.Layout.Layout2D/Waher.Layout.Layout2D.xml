@@ -385,47 +385,6 @@
             </summary>
             <returns>Attribute reference.</returns>
         </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute">
-            <summary>
-            Double attribute
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.#ctor(System.Xml.XmlElement,System.String)">
-            <summary>
-            Double attribute
-            </summary>
-            <param name="E">XML Element</param>
-            <param name="AttributeName">Attribute name.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.#ctor(System.String,Waher.Script.Expression)">
-            <summary>
-            Double attribute
-            </summary>
-            <param name="AttributeName">Attribute name.</param>
-            <param name="Expression">Expression.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.TryParse(System.String,System.Double@)">
-            <summary>
-            Tries to parse a string value
-            </summary>
-            <param name="StringValue">String value for attribute.</param>
-            <param name="Value">Parsed value, if successful.</param>
-            <returns>If the value could be parsed.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.ToString(System.Double)">
-            <summary>
-            Converts a value to a string.
-            </summary>
-            <param name="Value">Value</param>
-            <returns>String representation.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.CopyIfNotPreset">
-            <summary>
-            Copies the attribute object if undefined, or defined by an expression.
-            Returns a reference to itself, if preset (set by a constant value).
-            </summary>
-            <returns>Attribute reference.</returns>
-        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1">
             <summary>
             Enumeration attribute
@@ -524,6 +483,47 @@
             </returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute">
+            <summary>
+            Double attribute
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.Xml.XmlElement,System.String)">
+            <summary>
+            Double attribute
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Double attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.TryParse(System.String,System.Single@)">
+            <summary>
+            Tries to parse a string value
+            </summary>
+            <param name="StringValue">String value for attribute.</param>
+            <param name="Value">Parsed value, if successful.</param>
+            <returns>If the value could be parsed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.ToString(System.Single)">
+            <summary>
+            Converts a value to a string.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.CopyIfNotPreset">
             <summary>
             Copies the attribute object if undefined, or defined by an expression.
             Returns a reference to itself, if preset (set by a constant value).
@@ -658,12 +658,27 @@
             Abstract base class for backgrounds.
             </summary>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Backgrounds.Background.paint">
+            <summary>
+            Current background
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Background.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Abstract base class for backgrounds.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Background.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Background.Paint">
+            <summary>
+            Current pen
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground">
             <summary>
@@ -707,6 +722,12 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D">
             <summary>
@@ -1737,6 +1758,16 @@
             Current drawing canvas.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Font">
+            <summary>
+            Current font
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.DefaultPen">
+            <summary>
+            Default pen
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.DrawingState.GetDrawingSize(Waher.Layout.Layout2D.Model.Length,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean)">
             <summary>
             Converts a defined length to drawing size.
@@ -2060,6 +2091,23 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.GetPen(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets the pen associated with the element. If not found, the default pen
+            is returned.
+            </summary>
+            <param name="State">Current state</param>
+            <returns>Pen.</returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetPen(Waher.Layout.Layout2D.Model.DrawingState,SkiaSharp.SKPaint@)" -->
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetFill(Waher.Layout.Layout2D.Model.DrawingState,SkiaSharp.SKPaint@)">
+            <summary>
+            Tries to get the filling of the figure, if one is defined.
+            </summary>
+            <param name="State">State object.</param>
+            <param name="Fill">Filling, if defined.</param>
+            <returns>If a filling was defined, and was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint">
             <summary>
             Abstract base class for figures based on a point.
@@ -2253,6 +2301,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Loop">
             <summary>
             A loop
@@ -2395,6 +2449,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle">
             <summary>
@@ -2974,37 +3034,37 @@
             Calculates the current direction angle, in radians
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Set(System.Double,System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Set(System.Single,System.Single)">
             <summary>
             Sets a new coordinate
             </summary>
             <param name="X">X-coordinate</param>
             <param name="Y">Y-coordinate</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Add(System.Double,System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Add(System.Single,System.Single)">
             <summary>
             Sets a new coordinate
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Forward(System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Forward(System.Single)">
             <summary>
             Moves forward
             </summary>
             <param name="Distance"></param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Backward(System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Backward(System.Single)">
             <summary>
             Moves forward
             </summary>
             <param name="Distance"></param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnLeft(System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnLeft(System.Single)">
             <summary>
             Turns the current direction left.
             </summary>
             <param name="DeltaDegrees">Angle, in degrees.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnRight(System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnRight(System.Single)">
             <summary>
             Turns the current direction right.
             </summary>
@@ -3549,7 +3609,7 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Double},System.Nullable{System.Double},System.Double@,System.Double@,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},System.Single@,System.Single@,Waher.Script.Variables)">
             <summary>
             Aligns a measured cell
             </summary>
@@ -3667,7 +3727,7 @@
             Lays out elements flexibly, first horizontally, then vertically.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.#ctor(Waher.Script.Variables,System.Double,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.#ctor(Waher.Script.Variables,System.Single,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment)">
             <summary>
             Lays out elements flexibly, first horizontally, then vertically.
             </summary>
@@ -3704,7 +3764,7 @@
             Lays out elements flexibly, first vertically, then horizontally.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.#ctor(Waher.Script.Variables,System.Double,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalAlignment)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.#ctor(Waher.Script.Variables,System.Single,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalAlignment)">
             <summary>
             Lays out elements flexibly, first vertically, then horizontally.
             </summary>
@@ -3825,7 +3885,7 @@
             Provides padding for a layout element in a grid.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridPadding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Double,System.Double,System.Int32,System.Int32)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridPadding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Single,System.Single,System.Int32,System.Int32)">
             <summary>
             Provides padding for a layout element in a grid.
             </summary>
@@ -4007,7 +4067,7 @@
             Provides padding for a layout element in a group contruct.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Double,System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Single,System.Single)">
             <summary>
             Provides padding for a cell in a group contruct.
             </summary>
@@ -4040,7 +4100,7 @@
             Y-offset
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.AlignedMeasuredCell(System.Nullable{System.Double},System.Nullable{System.Double},Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables)">
             <summary>
             Aligns a measured cell
             </summary>
@@ -4540,7 +4600,7 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Double,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Single,System.Single,System.Single,System.Single,System.Single)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -4550,14 +4610,14 @@
             <param name="RY">Radius along Y-axis</param>
             <param name="Angle">Angle, in degrees, clockwise from positive horizontal X-axis.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Double,System.Double)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Single,System.Single)">
             <summary>
             Includes a point in the area measurement.
             </summary>
             <param name="X">X-Coordinate</param>
             <param name="Y">Y-Coordinate</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Double@,System.Double@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -4708,7 +4768,7 @@
             If the element is visible or not.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Double@,System.Double@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -4826,12 +4886,27 @@
             Abstract base class for pens.
             </summary>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.paint">
+            <summary>
+            Current pen
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Abstract base class for pens.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Paint">
+            <summary>
+            Current pen
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -4850,6 +4925,17 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penWidth">
+            <summary>
+            Measured pen width.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.SolidPen">
             <summary>
@@ -4893,6 +4979,12 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point">
             <summary>

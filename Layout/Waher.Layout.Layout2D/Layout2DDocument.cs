@@ -307,6 +307,9 @@ namespace Waher.Layout.Layout2D
 				SKCanvas Canvas = Surface.Canvas;
 				using (DrawingState State = new DrawingState(Canvas, Settings, this.session))
 				{
+					if (Settings.BackgroundColor != SKColor.Empty)
+						Canvas.Clear(Settings.BackgroundColor);
+
 					this.root?.Measure(State);
 
 					switch (Settings.ImageSize)

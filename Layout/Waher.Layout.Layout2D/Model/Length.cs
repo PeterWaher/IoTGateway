@@ -93,7 +93,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Value of length
 		/// </summary>
-		public double Value
+		public float Value
 		{
 			get;
 			internal set;

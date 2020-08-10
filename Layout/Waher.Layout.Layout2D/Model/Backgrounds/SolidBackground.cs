@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Backgrounds
@@ -71,5 +72,29 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			if (Destination is SolidBackground Dest)
 				Dest.color = this.color.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.paint is null &&
+				this.color.TryEvaluate(State.Session, out SKColor Color))
+			{
+				this.paint = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Color
+				};
+
+				this.defined = true;
+			}
+		}
+
 	}
 }

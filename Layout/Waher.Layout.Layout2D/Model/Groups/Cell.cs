@@ -137,7 +137,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="OffsetX">X-offset of cell.</param>
 		/// <param name="OffsetY">Y-offset of cell.</param>
 		/// <param name="Session">Current session.</param>
-		public void AlignedMeasuredCell(double? MaxWidth, double? MaxHeight, ref double OffsetX, ref double OffsetY,
+		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, ref float OffsetX, ref float OffsetY,
 			Variables Session)
 		{
 			if (MaxWidth.HasValue && this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
@@ -146,7 +146,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				if (HAlignment == HorizontalAlignment.Right)
 					OffsetX += (MaxWidth.Value - this.Width);
 				else    // Center
-					OffsetX += (MaxWidth.Value - this.Width) * 0.5;
+					OffsetX += (MaxWidth.Value - this.Width) / 2;
 			}
 
 			if (MaxHeight.HasValue && this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
@@ -155,7 +155,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				if (VAlignment == VerticalAlignment.Bottom)
 					OffsetY += (MaxHeight.Value - this.Height);
 				else    // Center
-					OffsetY += (MaxHeight.Value - this.Height) * 0.5;
+					OffsetY += (MaxHeight.Value - this.Height) / 2;
 			}
 		}
 

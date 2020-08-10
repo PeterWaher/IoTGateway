@@ -12,7 +12,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Pi / 180
 		/// </summary>
-		public const double DegreesToRadians = Math.PI / 180;
+		public const float DegreesToRadians = (float)(Math.PI / 180);
 
 		private StringAttribute id;
 		private BooleanAttribute visible;
@@ -57,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Left coordinate of bounding box, after measurement.
 		/// </summary>
-		public double Left
+		public float Left
 		{
 			get;
 			set;
@@ -66,7 +66,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Right coordinate of bounding box, after measurement.
 		/// </summary>
-		public double Right
+		public float Right
 		{
 			get;
 			set;
@@ -75,7 +75,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Top coordinate of bounding box, after measurement.
 		/// </summary>
-		public double Top
+		public float Top
 		{
 			get;
 			set;
@@ -84,7 +84,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Bottom coordinate of bounding box, after measurement.
 		/// </summary>
-		public double Bottom
+		public float Bottom
 		{
 			get;
 			set;
@@ -93,7 +93,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Width of element
 		/// </summary>
-		public double Width
+		public float Width
 		{
 			get => this.Right - this.Left;
 			set => this.Right = this.Left + value;
@@ -102,7 +102,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Height of element
 		/// </summary>
-		public double Height
+		public float Height
 		{
 			get => this.Bottom - this.Top;
 			set => this.Bottom = this.Top + value;
@@ -225,7 +225,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <returns>If point is well-defined.</returns>
 		protected bool CalcPoint(DrawingState State, LengthAttribute XAttribute,
 			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			out double X, out double Y)
+			out float X, out float Y)
 		{
 			if (XAttribute.TryEvaluate(State.Session, out Length X1) &&
 				YAttribute.TryEvaluate(State.Session, out Length Y1))

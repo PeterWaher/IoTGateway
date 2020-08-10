@@ -201,6 +201,12 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.Attribute`1">
             <summary>
             Manages an attribute value or expression.
@@ -214,6 +220,13 @@
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
             <param name="CanEmbedScript">If script can be embedded.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Defines an undefined attribute.
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Name">
             <summary>
@@ -233,6 +246,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.HasPresetValue">
             <summary>
             If the attribute has a preset value.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.HasExpression">
+            <summary>
+            If the attribute is defined by an expression.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Undefined">
+            <summary>
+            If the attribute is undefined.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryParse(System.String,`0@)">
@@ -256,6 +279,14 @@
             </summary>
             <param name="Output">XML Output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryEvaluate(Waher.Script.Variables,`0@)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Session">Current session.</param>
+            <param name="Result">Result, if successful.</param>
+            <returns>If evaluation was possible.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute">
             <summary>
             Boolean attribute
@@ -267,6 +298,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Boolean attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.TryParse(System.String,System.Boolean@)">
             <summary>
@@ -283,6 +321,13 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute">
             <summary>
             Color attribute
@@ -294,6 +339,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Color attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.TryParse(System.String,SkiaSharp.SKColor@)">
             <summary>
@@ -310,6 +362,13 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute">
             <summary>
             Double attribute
@@ -321,6 +380,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Double attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.TryParse(System.String,System.Double@)">
             <summary>
@@ -337,17 +403,31 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.DoubleAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1">
             <summary>
-            Boolean attribute
+            Enumeration attribute
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
-            Boolean attribute
+            Enumeration attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Enumeration attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.TryParse(System.String,`0@)">
             <summary>
@@ -364,17 +444,31 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute">
             <summary>
-            Event attribute
+            Expression attribute
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
-            Event attribute
+            Expression attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Expression attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.TryParse(System.String,Waher.Script.Expression@)">
             <summary>
@@ -391,6 +485,35 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the expression defined by the attribute.
+            </summary>
+            <param name="Session">Session variables.</param>
+            <returns>
+            Result of the expression, 
+            or <see cref="T:System.Exception"/> object if expression throws an exception, 
+            or null if no expression is defined.
+            </returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.EvaluateElement(Waher.Script.Variables)">
+            <summary>
+            Evaluates the expression defined by the attribute.
+            </summary>
+            <param name="Session">Session variables.</param>
+            <returns>
+            Result of the expression, 
+            or <see cref="T:System.Exception"/> object if expression throws an exception, 
+            or null if no expression is defined.
+            </returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute">
             <summary>
             Length attribute
@@ -402,6 +525,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Length attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.TryParse(System.String,Waher.Layout.Layout2D.Model.Length@)">
             <summary>
@@ -418,6 +548,13 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute">
             <summary>
             Positive integer attribute
@@ -429,6 +566,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Positive integer attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.TryParse(System.String,System.Int32@)">
             <summary>
@@ -445,6 +589,13 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.StringAttribute">
             <summary>
             String attribute
@@ -456,6 +607,13 @@
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            String attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.TryParse(System.String,System.String@)">
             <summary>
@@ -471,6 +629,13 @@
             </summary>
             <param name="Value">Value</param>
             <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.CopyIfNotPreset">
+            <summary>
+            Copies the attribute object if undefined, or defined by an expression.
+            Returns a reference to itself, if preset (set by a constant value).
+            </summary>
+            <returns>Attribute reference.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Background">
             <summary>
@@ -521,6 +686,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D">
             <summary>
             Root node for two-dimensional layouts
@@ -558,6 +729,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.Case">
             <summary>
             Layout to show, if a condition is true.
@@ -573,6 +750,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.Condition">
+            <summary>
+            Condition of case statement.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.FromXml(System.Xml.XmlElement)">
@@ -594,6 +776,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.False">
             <summary>
@@ -637,6 +825,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.DynamicChildren">
+            <summary>
+            Dynamic array of children
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -657,6 +850,18 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.ForEach">
             <summary>
             Generates layout elements by looping through a set or vector of values.
@@ -672,6 +877,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.DynamicChildren">
+            <summary>
+            Dynamic array of children
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.FromXml(System.Xml.XmlElement)">
@@ -694,6 +904,18 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.If">
             <summary>
             Conditional layout based on one conditional statement.
@@ -709,6 +931,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.DynamicChildren">
+            <summary>
+            Dynamic array of children
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Dispose">
@@ -741,6 +968,24 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.Otherwise">
             <summary>
@@ -784,6 +1029,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Switch.DynamicChildren">
+            <summary>
+            Dynamic array of children
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
@@ -808,6 +1058,24 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.True">
             <summary>
@@ -851,6 +1119,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.DynamicChildren">
+            <summary>
+            Dynamic array of children
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -870,6 +1143,18 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold">
             <summary>
@@ -925,6 +1210,12 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.EmbeddedText.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef">
             <summary>
             Represents text using a specific font in flowing text.
@@ -961,6 +1252,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.IFlowingText">
             <summary>
@@ -1003,6 +1300,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Italic">
             <summary>
@@ -1141,6 +1444,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor">
             <summary>
             Represents a text color segment in flowing text.
@@ -1177,6 +1486,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Underline">
             <summary>
@@ -1240,6 +1555,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.Paragraph">
             <summary>
             Represents a paragraph of flowing text.
@@ -1282,6 +1603,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.Script">
             <summary>
             Represents the result of executing script.
@@ -1319,6 +1646,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Distance">
             <summary>
             Abstract base class for distance elements.
@@ -1342,6 +1675,49 @@
             Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.DrawingState">
+            <summary>
+            Current drawing state.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.#ctor(SkiaSharp.SKCanvas,Waher.Layout.Layout2D.RenderSettings,Waher.Script.Variables)">
+            <summary>
+            Current drawing state.
+            </summary>
+            <param name="Canvas">Current drawing canvas.</param>
+            <param name="Settings">Rendering settings.</param>
+            <param name="Session">Session</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Session">
+            <summary>
+            Current session.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Canvas">
+            <summary>
+            Current drawing canvas.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.GetDrawingSize(Waher.Layout.Layout2D.Model.Length,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean)">
+            <summary>
+            Converts a defined length to drawing size.
+            </summary>
+            <param name="L">Length</param>
+            <param name="Element">Current element.</param>
+            <param name="Horizontal">If it is a horizontal size.</param>
+            <returns>Drawing size, if defined.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Arrow">
             <summary>
@@ -1380,6 +1756,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Circle">
             <summary>
             A circle
@@ -1417,6 +1799,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.CircleArc">
             <summary>
             A circle arc
@@ -1447,6 +1835,37 @@
             <param name="Output">XML output.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.Dot">
+            <summary>
+            A dot
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Dot.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A dot
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Dot.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Dot.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
             </summary>
@@ -1491,6 +1910,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.EllipseArc">
             <summary>
             An ellipse arc
@@ -1528,6 +1953,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Figure">
             <summary>
             Abstract base class for figures
@@ -1551,6 +1982,12 @@
             Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Line">
             <summary>
@@ -1637,6 +2074,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Polygon">
             <summary>
@@ -1725,6 +2168,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle">
             <summary>
             A rounded rectangle
@@ -1762,6 +2211,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedSquare">
             <summary>
             A rounded square
@@ -1798,6 +2253,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward">
             <summary>
@@ -1862,6 +2323,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel">
             <summary>
@@ -2024,6 +2491,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel">
             <summary>
@@ -2394,6 +2867,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast">
             <summary>
             A point, relative to the last point
@@ -2479,6 +2958,12 @@
             </summary>
             <param name="Input">XML definition.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Filters.Blur">
             <summary>
             Blur image filter
@@ -2515,6 +3000,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Filters.Dilate">
             <summary>
@@ -2553,6 +3044,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Filters.Erode">
             <summary>
             Erosion filter
@@ -2589,6 +3086,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Filters.Shadow">
             <summary>
@@ -2627,6 +3130,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Fonts.Font">
             <summary>
             Abstract base class for fonts.
@@ -2664,6 +3173,52 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment">
+            <summary>
+            Horizontal alignment
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment.Left">
+            <summary>
+            Aligned to the left
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment.Center">
+            <summary>
+            Aligned along centers
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment.Right">
+            <summary>
+            Aligned to the right
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment">
+            <summary>
+            Vertical alignment
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment.Top">
+            <summary>
+            Aligned at the top
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment.Center">
+            <summary>
+            Aligned along centers
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment.Bottom">
+            <summary>
+            Aligned at the bottom
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.Cell">
             <summary>
             Defines a cell in a grid.
@@ -2700,6 +3255,30 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Double},System.Nullable{System.Double},System.Double@,System.Double@,Waher.Script.Variables)">
+            <summary>
+            Aligns a measured cell
+            </summary>
+            <param name="MaxWidth">Maximum width of area assigned to the cell</param>
+            <param name="MaxHeight">Maximum height of area assigned to the cell</param>
+            <param name="OffsetX">X-offset of cell.</param>
+            <param name="OffsetY">Y-offset of cell.</param>
+            <param name="Session">Current session.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CalcSpan(Waher.Script.Variables,System.Int32@,System.Int32@)">
+            <summary>
+            Calculates the span of the cell.
+            </summary>
+            <param name="Session">Current session.</param>
+            <param name="ColSpan">Column span</param>
+            <param name="RowSpan">Row span</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder">
             <summary>
@@ -2783,6 +3362,93 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells">
+            <summary>
+            Lays out elements flexibly, first horizontally, then vertically.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.#ctor(Waher.Script.Variables,System.Double,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment)">
+            <summary>
+            Lays out elements flexibly, first horizontally, then vertically.
+            </summary>
+            <param name="Session">Current session</param>
+            <param name="WidthLimit">Width limit of area</param>
+            <param name="HorizontalDirection">Horizontal direction</param>
+            <param name="VerticalDirection">Vertical direction</param>
+            <param name="HorizontalAlignment">Horizontal alignment of cells in layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells">
+            <summary>
+            Lays out elements flexibly, first vertically, then horizontally.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.#ctor(Waher.Script.Variables,System.Double,Waher.Layout.Layout2D.Model.Groups.HorizontalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalDirection,Waher.Layout.Layout2D.Model.Groups.VerticalAlignment)">
+            <summary>
+            Lays out elements flexibly, first vertically, then horizontally.
+            </summary>
+            <param name="Session">Current session</param>
+            <param name="WidthLimit">Width limit of area</param>
+            <param name="HorizontalDirection">Horizontal direction</param>
+            <param name="VerticalDirection">Vertical direction</param>
+            <param name="VerticalAlignment">Vertical alignment of cells in layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.Grid">
             <summary>
             A grid of cells
@@ -2795,9 +3461,9 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.Dispose">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Grid.LocalName">
             <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
+            Local name of type of element.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.FromXml(System.Xml.XmlElement)">
@@ -2806,11 +3472,91 @@
             </summary>
             <param name="Input">XML definition.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.ExportChildren(System.Xml.XmlWriter)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.ExportAttributes(System.Xml.XmlWriter)">
             <summary>
-            Exports child elements to XML.
+            Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.GridCells">
+            <summary>
+            Lays out cells in a grid.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.#ctor(Waher.Script.Variables,System.Int32)">
+            <summary>
+            Lays out cells in a grid.
+            </summary>
+            <param name="Session">Current session</param>
+            <param name="NrColumns">Number of columns in grid</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.GridPadding">
+            <summary>
+            Provides padding for a layout element in a grid.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridPadding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Provides padding for a layout element in a grid.
+            </summary>
+            <param name="Element">Embedded element.</param>
+            <param name="OffsetX">X-offset</param>
+            <param name="OffsetY">Y-offset</param>
+            <param name="ColSpan">Column span</param>
+            <param name="RowSpan">Row span</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridPadding.ColSpan">
+            <summary>
+            Column span
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridPadding.RowSpan">
+            <summary>
+            Row span
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.Horizontal">
             <summary>
@@ -2837,6 +3583,73 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Horizontal.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.HorizontalCells">
+            <summary>
+            Lays ut cells horizontally
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.#ctor(Waher.Script.Variables)">
+            <summary>
+            Lays ut cells horizontally
+            </summary>
+            <param name="Session">Current session.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.ICellLayout">
+            <summary>
+            Basic interface for cell layout objects.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.ICellLayout.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.ICellLayout.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.Overlay">
             <summary>
             Ordering child elements one on-top of the other.
@@ -2861,6 +3674,128 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Overlay.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.OverlayCells">
+            <summary>
+            Lays ut cells one on-top of another
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.#ctor(Waher.Script.Variables)">
+            <summary>
+            Lays ut cells one on-top of another
+            </summary>
+            <param name="Session">Current session.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.OverlayCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.OverlayCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Padding">
+            <summary>
+            Provides padding for a layout element in a group contruct.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Double,System.Double)">
+            <summary>
+            Provides padding for a cell in a group contruct.
+            </summary>
+            <param name="Element">Embedded element.</param>
+            <param name="OffsetX">X-offset</param>
+            <param name="OffsetY">Y-offset</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Padding.Element">
+            <summary>
+            Embedded element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Padding.Cell">
+            <summary>
+            Embedded cell
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Padding.IsCell">
+            <summary>
+            If the embedded element is a <see cref="P:Waher.Layout.Layout2D.Model.Groups.Padding.Cell"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Padding.OffsetX">
+            <summary>
+            X-offset
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Padding.OffsetY">
+            <summary>
+            Y-offset
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.AlignedMeasuredCell(System.Nullable{System.Double},System.Nullable{System.Double},Waher.Script.Variables)">
+            <summary>
+            Aligns a measured cell
+            </summary>
+            <param name="MaxWidth">Maximum width of area assigned to the cell</param>
+            <param name="MaxHeight">Maximum height of area assigned to the cell</param>
+            <param name="Session">Current session.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution">
+            <summary>
+            Abstract base class of elements that do spatial distribution of children.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.measured">
+            <summary>
+            Measured children.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class of elements that do spatial distribution of children.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.Vertical">
             <summary>
@@ -2887,9 +3822,69 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Vertical.GetCellLayout(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a cell layout object that will be responsible for laying out cells.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Cell layout object.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.VerticalCells">
+            <summary>
+            Lays ut cells horizontally
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.#ctor(Waher.Script.Variables)">
+            <summary>
+            Lays ut cells horizontally
+            </summary>
+            <param name="Session">Current session</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.Add(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds a cell to the layout.
+            </summary>
+            <param name="Element">Cell element</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.VerticalCells.TotWidth">
+            <summary>
+            Total width of layout
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.VerticalCells.TotHeight">
+            <summary>
+            Total height of layout
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.Align">
+            <summary>
+            Aligns cells and returns an array of padded cells.
+            </summary>
+            <returns>Array of padded cells.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.IDynamicChildren">
+            <summary>
+            Interface for layout elements that generate children dynamically.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.IDynamicChildren.DynamicChildren">
+            <summary>
+            Dynamic array of children
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.ILayoutElement">
             <summary>
             Base interface for all layout elements.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Document">
+            <summary>
+            Layout document.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Parent">
+            <summary>
+            Parent element.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.LocalName">
@@ -2900,6 +3895,26 @@
         <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Namespace">
             <summary>
             Namespace of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Left">
+            <summary>
+            Left coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Right">
+            <summary>
+            Right coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Top">
+            <summary>
+            Top coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Bottom">
+            <summary>
+            Bottom coordinate of bounding box, after measurement.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
@@ -2921,6 +3936,31 @@
             Exports the element to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Copy(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a copy of the layout element.
+            </summary>
+            <param name="Parent">Parent of the new element.</param>
+            <returns>Copy of layout element.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.Image">
             <summary>
@@ -2971,6 +4011,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageResource">
             <summary>
             An image defined in an embedded resource.
@@ -3008,6 +4054,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageUrl">
             <summary>
             An image defined by a URL.
@@ -3044,6 +4096,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Overflow">
             <summary>
@@ -3084,6 +4142,54 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMaxWidth(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets the maximum width of the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Maximum width, if defined.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMinWidth(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets the minimum width of the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Maximum width, if defined.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMaxHeight(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets the maximum height of the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Maximum height, if defined.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMinHeight(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets the minimum height of the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Maximum height, if defined.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetWidthEstimate(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a width estimate.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Width estimate.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetHeightEstimate(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets a height estimate.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Height estimate.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.LayoutContainer">
             <summary>
             Abstract base class for layout containers (area elements containing 
@@ -3120,6 +4226,24 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.LayoutElement">
             <summary>
             Abstract base class for layout elements.
@@ -3145,6 +4269,26 @@
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Left">
+            <summary>
+            Left coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Right">
+            <summary>
+            Right coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Top">
+            <summary>
+            Top coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Bottom">
+            <summary>
+            Bottom coordinate of bounding box, after measurement.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Namespace">
@@ -3188,6 +4332,31 @@
             Exports child elements to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Copy(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a copy of the layout element.
+            </summary>
+            <param name="Parent">Parent of the new element.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
             <summary>
@@ -3308,6 +4477,12 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.SolidPen">
             <summary>
             A solid pen
@@ -3345,6 +4520,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point">
             <summary>
             Abstract base class for points.
@@ -3368,6 +4549,12 @@
             Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point2">
             <summary>
@@ -3393,6 +4580,12 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point2Weight">
             <summary>
             Abstract base class for figures with two points and a weight.
@@ -3417,6 +4610,12 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point3">
             <summary>
             Abstract base class for figures with three points.
@@ -3440,6 +4639,12 @@
             Exports attributes to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Copy">
             <summary>
@@ -3477,6 +4682,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Shape">
             <summary>
@@ -3565,6 +4776,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.Scale">
             <summary>
             A scale transform
@@ -3601,6 +4818,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.SkewX">
             <summary>
@@ -3639,6 +4862,12 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.SkewY">
             <summary>
             A skew transform along the Y-axis.
@@ -3675,6 +4904,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.Translate">
             <summary>
@@ -3713,6 +4948,27 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.RenderedImageSize">
+            <summary>
+            Affects the size of the rendered image.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.RenderedImageSize.ScaleToFit">
+            <summary>
+            Scales the layout to fit the desired image size.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.RenderedImageSize.ResizeImage">
+            <summary>
+            Resizes the output to match the size of the layout.
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.RenderSettings">
             <summary>
             Render settings.
@@ -3720,7 +4976,12 @@
         </member>
         <member name="M:Waher.Layout.Layout2D.RenderSettings.#ctor">
             <summary>
-            Render settings.
+            Determines the size of the rendered image.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.ImageSize">
+            <summary>
+            Offset along X-axis.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.RenderSettings.Width">
@@ -3770,7 +5031,12 @@
         </member>
         <member name="P:Waher.Layout.Layout2D.RenderSettings.FontSize">
             <summary>
-            Font size
+            Font size, in points
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.RenderSettings.PixelsPerInch">
+            <summary>
+            Pixels per inch (defualt=96 pixels/inch)
             </summary>
         </member>
     </members>

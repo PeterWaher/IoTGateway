@@ -101,6 +101,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="State">Current drawing state.</param>
 		public override void Measure(DrawingState State)
 		{
+			base.Measure(State);
+
 			List<ILayoutElement> Measured = new List<ILayoutElement>();
 			IElement FromValue = this.from.EvaluateElement(State.Session);
 			IElement ToValue = this.to.EvaluateElement(State.Session);

@@ -9,7 +9,6 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public abstract class Angle : LayoutElement
 	{
-		private DoubleAttribute radians;
 		private DoubleAttribute degrees;
 
 		/// <summary>
@@ -30,7 +29,6 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.FromXml(Input);
 
-			this.radians = new DoubleAttribute(Input, "radians");
 			this.degrees = new DoubleAttribute(Input, "degrees");
 		}
 
@@ -42,7 +40,6 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportAttributes(Output);
 
-			this.radians.Export(Output);
 			this.degrees.Export(Output);
 		}
 
@@ -55,11 +52,28 @@ namespace Waher.Layout.Layout2D.Model
 			base.CopyContents(Destination);
 
 			if (Destination is Angle Dest)
-			{
-				Dest.radians = this.radians.CopyIfNotPreset();
 				Dest.degrees = this.degrees.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.degrees.TryEvaluate(State.Session, out this.angle))
+			{
+				this.angle = 0;
+				this.defined = false;
 			}
 		}
+
+		/// <summary>
+		/// Measured distance
+		/// </summary>
+		protected double angle;
 
 	}
 }

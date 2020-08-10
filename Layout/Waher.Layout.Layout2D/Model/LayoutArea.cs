@@ -108,16 +108,12 @@ namespace Waher.Layout.Layout2D.Model
 
 		private double? GetSize(DrawingState State, bool Horizontal, params LengthAttribute[] Sizes)
 		{
-			double? Size;
-
 			foreach (LengthAttribute Attr in Sizes)
 			{
 				if (!Attr.TryEvaluate(State.Session, out Length L))
 					continue;
 
-				Size = State.GetDrawingSize(L, this, Horizontal);
-				if (Size.HasValue)
-					return Size;
+				return State.GetDrawingSize(L, this, Horizontal);
 			}
 
 			return null;

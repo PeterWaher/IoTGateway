@@ -10,7 +10,6 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// </summary>
 	public class Rotate : LayoutContainer
 	{
-		private DoubleAttribute radians;
 		private DoubleAttribute degrees;
 
 		/// <summary>
@@ -36,7 +35,6 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.radians = new DoubleAttribute(Input, "radians");
 			this.degrees = new DoubleAttribute(Input, "degrees");
 		}
 
@@ -48,7 +46,6 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.ExportAttributes(Output);
 
-			this.radians.Export(Output);
 			this.degrees.Export(Output);
 		}
 
@@ -72,10 +69,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			base.CopyContents(Destination);
 
 			if (Destination is Rotate Dest)
-			{
-				Dest.radians = this.radians.CopyIfNotPreset();
 				Dest.degrees = this.degrees.CopyIfNotPreset();
-			}
 		}
 	}
 }

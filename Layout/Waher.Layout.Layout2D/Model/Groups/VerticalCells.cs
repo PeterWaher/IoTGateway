@@ -30,9 +30,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public void Add(ILayoutElement Element)
 		{
 			this.measured.Add(new Padding(Element, -Element.Left, this.y - Element.Top));
-			this.y += Element.Bottom - Element.Top;
+			this.y += Element.Height;
 
-			double Width = Element.Right - Element.Left;
+			double Width = Element.Width;
 			if (Width > this.maxWidth)
 				this.maxWidth = Width;
 		}

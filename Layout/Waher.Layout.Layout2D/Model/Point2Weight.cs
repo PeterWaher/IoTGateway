@@ -5,14 +5,14 @@ using Waher.Layout.Layout2D.Model.Attributes;
 namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
-	/// Abstract base class for figures with two points and a weight.
+	/// Abstract base class for layout elements with two points and a weight.
 	/// </summary>
 	public abstract class Point2Weight : Point2
 	{
 		private DoubleAttribute w;
 
 		/// <summary>
-		/// Abstract base class for figures with two points and a weight.
+		/// Abstract base class for layout elements with two points and a weight.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>

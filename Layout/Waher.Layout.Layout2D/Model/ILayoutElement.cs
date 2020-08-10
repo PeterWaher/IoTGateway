@@ -78,6 +78,32 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Width of element
+		/// </summary>
+		double Width
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Height of element
+		/// </summary>
+		double Height
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// If the element is visible or not.
+		/// </summary>
+		bool IsVisible
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Creates a new instance of the layout element.
 		/// </summary>
 		/// <param name="Document">Containing document.</param>

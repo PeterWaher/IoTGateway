@@ -147,6 +147,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="State">Current drawing state.</param>
 		public override void Measure(DrawingState State)
 		{
+			base.Measure(State);
+
 			object Result = this.condition?.Evaluate(State.Session);
 			if (Result is bool b)
 				this.conditionResult = b;
@@ -166,9 +168,15 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override void Draw(DrawingState State)
 		{
 			if (this.conditionResult)
-				this.ifTrue?.Draw(State);
+			{
+				if (this.ifTrue?.IsVisible ?? false)
+					this.ifTrue.Draw(State);
+			}
 			else
-				this.ifFalse?.Draw(State);
+			{
+				if (this.ifFalse?.IsVisible ?? false)
+					this.ifFalse.Draw(State);
+			}
 		}
 
 	}

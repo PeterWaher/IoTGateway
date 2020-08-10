@@ -9,10 +9,21 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public abstract class LayoutElement : ILayoutElement
 	{
+		/// <summary>
+		/// Pi / 180
+		/// </summary>
+		public const double DegreesToRadians = Math.PI / 180;
+
 		private StringAttribute id;
 		private BooleanAttribute visible;
 		private readonly Layout2DDocument document;
 		private readonly ILayoutElement parent;
+		private bool isVisible = true;
+
+		/// <summary>
+		/// If element is well-defined.
+		/// </summary>
+		protected bool defined;
 
 		/// <summary>
 		/// Abstract base class for layout elements.
@@ -77,6 +88,24 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			get;
 			set;
+		}
+
+		/// <summary>
+		/// Width of element
+		/// </summary>
+		public double Width
+		{
+			get => this.Right - this.Left;
+			set => this.Right = this.Left + value;
+		}
+
+		/// <summary>
+		/// Height of element
+		/// </summary>
+		public double Height
+		{
+			get => this.Bottom - this.Top;
+			set => this.Bottom = this.Top + value;
 		}
 
 		/// <summary>
@@ -170,6 +199,56 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="State">Current drawing state.</param>
 		public virtual void Measure(DrawingState State)
 		{
+			if (this.id.TryEvaluate(State.Session, out string Id) && !string.IsNullOrEmpty(Id))
+				State.AddElementId(Id, this);
+
+			if (this.visible.TryEvaluate(State.Session, out bool b))
+				this.isVisible = b;
+
+			this.defined = true;
+		}
+
+		/// <summary>
+		/// If the element is visible or not.
+		/// </summary>
+		public bool IsVisible => this.isVisible;
+
+		/// <summary>
+		/// Includes a point in the area measurement.
+		/// </summary>
+		/// <param name="State">Current drawing state</param>
+		/// <param name="XAttribute">X-Coordinate attribute</param>
+		/// <param name="YAttribute">Y-Coordinate attribute</param>
+		/// <param name="RefAttribute">Reference attribute</param>
+		/// <param name="X">Resulting X-coordinate.</param>
+		/// <param name="Y">Resulting Y-coordinate.</param>
+		/// <returns>If point is well-defined.</returns>
+		protected bool CalcPoint(DrawingState State, LengthAttribute XAttribute,
+			LengthAttribute YAttribute, StringAttribute RefAttribute,
+			out double X, out double Y)
+		{
+			if (XAttribute.TryEvaluate(State.Session, out Length X1) &&
+				YAttribute.TryEvaluate(State.Session, out Length Y1))
+			{
+				X = State.GetDrawingSize(X1, this, true);
+				Y = State.GetDrawingSize(Y1, this, false);
+
+				return true;
+			}
+			else if (!(RefAttribute is null) &&
+				RefAttribute.TryEvaluate(State.Session, out string RefId) &&
+				State.TryGetElement(RefId, out ILayoutElement Element))
+			{
+				X = Element.Left;
+				Y = Element.Top;
+
+				return true;
+			}
+			else
+			{
+				X = Y = 0;
+				return false;
+			}
 		}
 
 		/// <summary>

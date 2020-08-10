@@ -7,7 +7,7 @@ namespace Waher.Layout.Layout2D.Model
 	/// <summary>
 	/// Abstract base class for distance elements.
 	/// </summary>
-	public abstract class Distance : LayoutContainer
+	public abstract class Distance : LayoutElement
 	{
 		private LengthAttribute distance;
 
@@ -54,6 +54,25 @@ namespace Waher.Layout.Layout2D.Model
 			if (Destination is Distance Dest)
 				Dest.distance = this.distance.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.distance.TryEvaluate(State.Session, out Length L))
+				this.dist = State.GetDrawingSize(L, this, true);
+			else
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measured distance
+		/// </summary>
+		protected double dist;
 
 	}
 }

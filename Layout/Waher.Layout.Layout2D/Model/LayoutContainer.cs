@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -11,6 +12,7 @@ namespace Waher.Layout.Layout2D.Model
 	public abstract class LayoutContainer : LayoutArea
 	{
 		private ILayoutElement[] children;
+		private bool firstPoint = true;
 
 		/// <summary>
 		/// Abstract base class for layout containers (area elements containing 
@@ -111,11 +113,87 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="State">Current drawing state.</param>
 		public override void Measure(DrawingState State)
 		{
+			base.Measure(State);
+
+			this.firstPoint = true;
+			this.Left = this.Right = this.Top = this.Bottom = 0;
+			
 			if (!(this.children is null))
 			{
 				foreach (ILayoutElement E in this.children)
+				{
 					E.Measure(State);
+
+					this.IncludePoint(E.Left, E.Top);
+					this.IncludePoint(E.Right, E.Bottom);
+				}
 			}
+		}
+
+		/// <summary>
+		/// Includes a point in the area measurement.
+		/// </summary>
+		/// <param name="X">X-Coordinate of center-point</param>
+		/// <param name="Y">Y-Coordinate of center-point</param>
+		/// <param name="RX">Radius along X-axis</param>
+		/// <param name="RY">Radius along Y-axis</param>
+		/// <param name="Angle">Angle, in degrees, clockwise from positive horizontal X-axis.</param>
+		protected void IncludePoint(double X, double Y, double RX, double RY, double Angle)
+		{
+			double Px = X + RX * Math.Cos(Angle * DegreesToRadians);
+			double Py = Y + RY * Math.Sin(Angle * DegreesToRadians);
+
+			this.IncludePoint(Px, Py);
+		}
+
+		/// <summary>
+		/// Includes a point in the area measurement.
+		/// </summary>
+		/// <param name="X">X-Coordinate</param>
+		/// <param name="Y">Y-Coordinate</param>
+		public void IncludePoint(double X, double Y)
+		{
+			if (this.firstPoint)
+			{
+				this.firstPoint = false;
+
+				this.Left = this.Right = X;
+				this.Top = this.Bottom = Y;
+			}
+			else
+			{
+				if (X < this.Left)
+					this.Left = X;
+				else if (X > this.Right)
+					this.Right = X;
+
+				if (Y < this.Top)
+					this.Top = Y;
+				else if (Y > this.Bottom)
+					this.Bottom = Y;
+			}
+		}
+
+		/// <summary>
+		/// Includes a point in the area measurement.
+		/// </summary>
+		/// <param name="State">Current drawing state</param>
+		/// <param name="XAttribute">X-Coordinate attribute</param>
+		/// <param name="YAttribute">Y-Coordinate attribute</param>
+		/// <param name="RefAttribute">Reference attribute</param>
+		/// <param name="X">Resulting X-coordinate.</param>
+		/// <param name="Y">Resulting Y-coordinate.</param>
+		/// <returns>If point is well-defined.</returns>
+		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute, 
+			LengthAttribute YAttribute, StringAttribute RefAttribute,
+			out double X, out double Y)
+		{
+			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, out X, out Y);
+
+			if (Result)
+				this.IncludePoint(X, Y);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -127,7 +205,10 @@ namespace Waher.Layout.Layout2D.Model
 			if (!(this.children is null))
 			{
 				foreach (ILayoutElement E in this.children)
-					E.Draw(State);
+				{
+					if (E.IsVisible)
+						E.Draw(State);
+				}
 			}
 		}
 

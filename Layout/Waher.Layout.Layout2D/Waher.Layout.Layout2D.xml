@@ -177,6 +177,11 @@
             Event raised when the internal state of the layout has been updated.
             </summary>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Map">
+            <summary>
+            Contains information about an actionable area in a generated image.
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Angle">
             <summary>
             Abstract base class for angle elements.
@@ -206,6 +211,17 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Angle.angle">
+            <summary>
+            Measured distance
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.Attribute`1">
             <summary>
@@ -1682,6 +1698,17 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Distance.dist">
+            <summary>
+            Measured distance
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.DrawingState">
             <summary>
             Current drawing state.
@@ -1718,6 +1745,26 @@
             <param name="Element">Current element.</param>
             <param name="Horizontal">If it is a horizontal size.</param>
             <returns>Drawing size, if defined.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.AddElementId(System.String,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds an element with an ID
+            </summary>
+            <param name="Id">Element ID</param>
+            <param name="Element">Element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.TryGetElement(System.String,Waher.Layout.Layout2D.Model.ILayoutElement@)">
+            <summary>
+            Tries to get a layout element, given an ID reference
+            </summary>
+            <param name="Id">Layout ID</param>
+            <param name="Element">Element retrieved, if found.</param>
+            <returns>If an element with the corresponding ID was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.ClearElementIds">
+            <summary>
+            Clears registered elements with IDs.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Arrow">
             <summary>
@@ -1805,6 +1852,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.CircleArc">
             <summary>
             A circle arc
@@ -1847,6 +1900,12 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Dot">
             <summary>
@@ -1916,6 +1975,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.EllipseArc">
             <summary>
             An ellipse arc
@@ -1959,6 +2024,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Figure">
             <summary>
             Abstract base class for figures
@@ -1988,6 +2059,174 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint">
+            <summary>
+            Abstract base class for figures based on a point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures based on a point.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint.xCoordinate">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint.yCoordinate">
+            <summary>
+            Measured Y-coordinate
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint2">
+            <summary>
+            Abstract base class for figures with two points.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with two points.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.xCoordinate2">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.yCoordinate2">
+            <summary>
+            Measured Y-coordinate
+            </summary>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight">
+            <summary>
+            Abstract base class for figures with two points and a weight.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with two points and a weight.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint3">
+            <summary>
+            Abstract base class for figures with three points.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Abstract base class for figures with three points.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.xCoordinate3">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.yCoordinate3">
+            <summary>
+            Measured Y-coordinate
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Line">
             <summary>
@@ -2056,11 +2295,6 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
-        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2080,6 +2314,12 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Polygon">
             <summary>
@@ -2148,18 +2388,6 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -2167,12 +2395,6 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Rectangle.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle">
             <summary>
@@ -2217,49 +2439,6 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.RoundedSquare">
-            <summary>
-            A rounded square
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            A rounded square
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.LocalName">
-            <summary>
-            Local name of type of element.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Creates a new instance of the layout element.
-            </summary>
-            <param name="Document">Document containing the new element.</param>
-            <param name="Parent">Parent element.</param>
-            <returns>New instance.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedSquare.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
-        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward">
             <summary>
             Draws a line to a point that lies a certain distance backward of the last point,
@@ -2286,6 +2465,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo">
             <summary>
@@ -2330,6 +2516,13 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel">
             <summary>
             Draws a circle arc to a point, relative to the end of the last segment
@@ -2354,6 +2547,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo">
             <summary>
@@ -2380,6 +2580,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel">
             <summary>
             Draws a conic curve to a point, relative to the end of the last segment
@@ -2404,6 +2611,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo">
             <summary>
@@ -2430,6 +2644,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel">
             <summary>
             Draws a cubic curve to a point, relative to the end of the last segment
@@ -2454,6 +2675,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo">
             <summary>
@@ -2498,6 +2726,13 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel">
             <summary>
             Draws a ellipse arc to a point, relative to the end of the last segment
@@ -2522,6 +2757,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward">
             <summary>
@@ -2550,10 +2792,24 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment">
             <summary>
             Interface for path segment nodes
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo">
             <summary>
@@ -2580,6 +2836,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel">
             <summary>
             Draws a line to a point, relative to the end of the last segment
@@ -2604,6 +2867,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo">
             <summary>
@@ -2630,6 +2900,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel">
             <summary>
             Moves to a point, relative to the end of the last segment
@@ -2654,6 +2931,84 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState">
+            <summary>
+            Current state tracing the path.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.#ctor(Waher.Layout.Layout2D.Model.Figures.Path)">
+            <summary>
+            Current state tracing the path.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.X">
+            <summary>
+            Current X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Y">
+            <summary>
+            Current Y-coordinte
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.XPrev">
+            <summary>
+            Previous X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.YPrev">
+            <summary>
+            Previous Y-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Angle">
+            <summary>
+            Calculates the current direction angle, in radians
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Set(System.Double,System.Double)">
+            <summary>
+            Sets a new coordinate
+            </summary>
+            <param name="X">X-coordinate</param>
+            <param name="Y">Y-coordinate</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Add(System.Double,System.Double)">
+            <summary>
+            Sets a new coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Forward(System.Double)">
+            <summary>
+            Moves forward
+            </summary>
+            <param name="Distance"></param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Backward(System.Double)">
+            <summary>
+            Moves forward
+            </summary>
+            <param name="Distance"></param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnLeft(System.Double)">
+            <summary>
+            Turns the current direction left.
+            </summary>
+            <param name="DeltaDegrees">Angle, in degrees.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnRight(System.Double)">
+            <summary>
+            Turns the current direction right.
+            </summary>
+            <param name="DeltaDegrees">Angle, in degrees.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo">
             <summary>
@@ -2680,6 +3035,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel">
             <summary>
             Draws a quadratic curve to a point, relative to the end of the last segment
@@ -2704,6 +3066,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo">
             <summary>
@@ -2730,6 +3099,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel">
             <summary>
             Draws a spline to a point, relative to the end of the last segment
@@ -2754,6 +3130,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft">
             <summary>
@@ -2780,6 +3163,13 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight">
             <summary>
             Turns the current direction right.
@@ -2804,6 +3194,13 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Spline">
             <summary>
@@ -2830,111 +3227,6 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.Square">
-            <summary>
-            A square
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            A square
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Square.LocalName">
-            <summary>
-            Local name of type of element.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Creates a new instance of the layout element.
-            </summary>
-            <param name="Document">Document containing the new element.</param>
-            <param name="Parent">Parent element.</param>
-            <returns>New instance.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Square.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
-        </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast">
-            <summary>
-            A point, relative to the last point
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            A point, relative to the last point
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.LocalName">
-            <summary>
-            Local name of type of element.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelLast.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Creates a new instance of the layout element.
-            </summary>
-            <param name="Document">Document containing the new element.</param>
-            <param name="Parent">Parent element.</param>
-            <returns>New instance.</returns>
-        </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo">
-            <summary>
-            A point, relative to the origo (of the current container)
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            A point, relative to the origo (of the current container)
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.LocalName">
-            <summary>
-            Local name of type of element.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.RelOrigo.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Creates a new instance of the layout element.
-            </summary>
-            <param name="Document">Document containing the new element.</param>
-            <param name="Parent">Parent element.</param>
-            <returns>New instance.</returns>
-        </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.VertexNodes.Vertex">
-            <summary>
-            Represents a vertex.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.VertexNodes.Vertex.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Represents a vertex.
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Vertices">
             <summary>
             A sequence of points
@@ -2946,11 +3238,6 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Vertices.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -3917,6 +4204,21 @@
             Bottom coordinate of bounding box, after measurement.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Width">
+            <summary>
+            Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.Height">
+            <summary>
+            Height of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.IsVisible">
+            <summary>
+            If the element is visible or not.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -4238,6 +4540,35 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Includes a point in the area measurement.
+            </summary>
+            <param name="X">X-Coordinate of center-point</param>
+            <param name="Y">Y-Coordinate of center-point</param>
+            <param name="RX">Radius along X-axis</param>
+            <param name="RY">Radius along Y-axis</param>
+            <param name="Angle">Angle, in degrees, clockwise from positive horizontal X-axis.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Double,System.Double)">
+            <summary>
+            Includes a point in the area measurement.
+            </summary>
+            <param name="X">X-Coordinate</param>
+            <param name="Y">Y-Coordinate</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Double@,System.Double@)">
+            <summary>
+            Includes a point in the area measurement.
+            </summary>
+            <param name="State">Current drawing state</param>
+            <param name="XAttribute">X-Coordinate attribute</param>
+            <param name="YAttribute">Y-Coordinate attribute</param>
+            <param name="RefAttribute">Reference attribute</param>
+            <param name="X">Resulting X-coordinate.</param>
+            <param name="Y">Resulting Y-coordinate.</param>
+            <returns>If point is well-defined.</returns>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
@@ -4247,6 +4578,16 @@
         <member name="T:Waher.Layout.Layout2D.Model.LayoutElement">
             <summary>
             Abstract base class for layout elements.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LayoutElement.DegreesToRadians">
+            <summary>
+            Pi / 180
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.LayoutElement.defined">
+            <summary>
+            If element is well-defined.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
@@ -4289,6 +4630,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Bottom">
             <summary>
             Bottom coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Width">
+            <summary>
+            Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Height">
+            <summary>
+            Height of element
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Namespace">
@@ -4351,6 +4702,23 @@
             Measures layout entities and defines unassigned properties.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.IsVisible">
+            <summary>
+            If the element is visible or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Double@,System.Double@)">
+            <summary>
+            Includes a point in the area measurement.
+            </summary>
+            <param name="State">Current drawing state</param>
+            <param name="XAttribute">X-Coordinate attribute</param>
+            <param name="YAttribute">Y-Coordinate attribute</param>
+            <param name="RefAttribute">Reference attribute</param>
+            <param name="X">Resulting X-coordinate.</param>
+            <param name="Y">Resulting Y-coordinate.</param>
+            <returns>If point is well-defined.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -4528,12 +4896,12 @@
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point">
             <summary>
-            Abstract base class for points.
+            Abstract base class for layout elements with one point.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
-            Abstract base class for points.
+            Abstract base class for layout elements with one point.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
@@ -4556,14 +4924,30 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point.xCoordinate">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point.yCoordinate">
+            <summary>
+            Measured Y-coordinate
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point2">
             <summary>
-            Abstract base class for figures with two points.
+            Abstract base class for layout elements with two points.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point2.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
-            Abstract base class for figures with two points.
+            Abstract base class for layout elements with two points.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
@@ -4586,14 +4970,30 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point2.xCoordinate2">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point2.yCoordinate2">
+            <summary>
+            Measured Y-coordinate
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point2Weight">
             <summary>
-            Abstract base class for figures with two points and a weight.
+            Abstract base class for layout elements with two points and a weight.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
-            Abstract base class for figures with two points and a weight.
+            Abstract base class for layout elements with two points and a weight.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
@@ -4618,12 +5018,12 @@
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point3">
             <summary>
-            Abstract base class for figures with three points.
+            Abstract base class for layout elements with three points.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point3.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
-            Abstract base class for figures with three points.
+            Abstract base class for layout elements with three points.
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
@@ -4645,6 +5045,22 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point3.xCoordinate3">
+            <summary>
+            Measured X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point3.yCoordinate3">
+            <summary>
+            Measured Y-coordinate
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Copy">
             <summary>

@@ -8,13 +8,18 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// An ellipse arc
 	/// </summary>
-	public class EllipseArc : Ellipse
+	public class EllipseArc : FigurePoint
 	{
-		private DoubleAttribute startAngleRadians;
-		private DoubleAttribute startAngleDegrees;
-		private DoubleAttribute endAngleRadians;
-		private DoubleAttribute endAngleDegrees;
+		private LengthAttribute radiusX;
+		private LengthAttribute radiusY;
+		private DoubleAttribute startDegrees;
+		private DoubleAttribute endDegrees;
 		private BooleanAttribute clockwise;
+		private double rX;
+		private double rY;
+		private double start;
+		private double end;
+		private bool clockDir;
 
 		/// <summary>
 		/// An ellipse arc
@@ -39,10 +44,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			this.startAngleRadians = new DoubleAttribute(Input, "startAngleRadians");
-			this.startAngleDegrees = new DoubleAttribute(Input, "startAngleDegrees");
-			this.endAngleRadians = new DoubleAttribute(Input, "endAngleRadians");
-			this.endAngleDegrees = new DoubleAttribute(Input, "endAngleDegrees");
+			this.radiusX = new LengthAttribute(Input, "radiusX");
+			this.radiusY = new LengthAttribute(Input, "radiusY");
+			this.startDegrees = new DoubleAttribute(Input, "startDegrees");
+			this.endDegrees = new DoubleAttribute(Input, "endDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
 		}
 
@@ -54,10 +59,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.startAngleRadians.Export(Output);
-			this.startAngleDegrees.Export(Output);
-			this.endAngleRadians.Export(Output);
-			this.endAngleDegrees.Export(Output);
+			this.radiusX.Export(Output);
+			this.radiusY.Export(Output);
+			this.startDegrees.Export(Output);
+			this.endDegrees.Export(Output);
 			this.clockwise.Export(Output);
 		}
 
@@ -82,11 +87,92 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is EllipseArc Dest)
 			{
-				Dest.startAngleRadians = this.startAngleRadians.CopyIfNotPreset();
-				Dest.startAngleDegrees = this.startAngleDegrees.CopyIfNotPreset();
-				Dest.endAngleRadians = this.endAngleRadians.CopyIfNotPreset();
-				Dest.endAngleDegrees = this.endAngleDegrees.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+				Dest.startDegrees = this.startDegrees.CopyIfNotPreset();
+				Dest.endDegrees = this.endDegrees.CopyIfNotPreset();
 				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.radiusX.TryEvaluate(State.Session, out Length R))
+				this.rX = State.GetDrawingSize(R, this, true);
+			else
+				this.defined = false;
+
+			if (this.radiusY.TryEvaluate(State.Session, out R))
+				this.rY = State.GetDrawingSize(R, this, false);
+			else
+				this.defined = false;
+
+			if (this.startDegrees.TryEvaluate(State.Session, out this.start))
+				this.start = Math.IEEERemainder(this.start, 360);
+			else
+				this.defined = false;
+
+			if (this.endDegrees.TryEvaluate(State.Session, out this.end))
+				this.end = Math.IEEERemainder(this.end, 360);
+			else
+				this.defined = false;
+
+			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+				this.defined = false;
+
+			if (this.defined)
+			{
+				double a = this.start;
+				double r = Math.IEEERemainder(this.start, 90);
+				bool First = true;
+
+				this.IncludePoint(this.xCoordinate, this.yCoordinate, this.rX, this.rY, this.start);
+
+				if (this.clockDir)
+				{
+					if (this.end < this.start)
+						this.end += 360;
+
+					while (a < this.end)
+					{
+						if (First)
+						{
+							a += 90 - r;
+							First = false;
+						}
+						else
+							a += 90;
+
+						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.rX, this.rY, a);
+					}
+				}
+				else
+				{
+					if (this.end > this.start)
+						this.end -= 360;
+
+					while (a > this.end)
+					{
+						if (First)
+						{
+							a -= r;
+							First = false;
+						}
+						else
+							a -= 90;
+
+						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.rX, this.rY, a);
+					}
+				}
+
+				if (this.start != this.end)
+					this.IncludePoint(this.xCoordinate, this.yCoordinate, this.rX, this.rY, this.end);
 			}
 		}
 	}

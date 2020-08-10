@@ -153,6 +153,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="State">Current drawing state.</param>
 		public override void Measure(DrawingState State)
 		{
+			base.Measure(State);
+
 			this.activeCase = null;
 
 			foreach (Case Case in this.cases)
@@ -178,9 +180,15 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override void Draw(DrawingState State)
 		{
 			if (this.activeCase is null)
-				this.otherwise?.Draw(State);
+			{
+				if (this.otherwise?.IsVisible ?? false)
+					this.otherwise.Draw(State);
+			}
 			else
-				this.activeCase?.Draw(State);
+			{
+				if (this.activeCase.IsVisible)
+					this.activeCase.Draw(State);
+			}
 		}
 
 	}

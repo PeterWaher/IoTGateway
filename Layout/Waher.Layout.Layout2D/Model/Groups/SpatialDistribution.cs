@@ -39,6 +39,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="State">Current drawing state.</param>
 		public override void Measure(DrawingState State)
 		{
+			base.Measure(State);
+
 			ICellLayout Measured = this.GetCellLayout(State);
 
 			if (!(this.Children is null))
@@ -46,6 +48,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				foreach (ILayoutElement Child in this.Children)
 				{
 					Child.Measure(State);
+					if (!Child.IsVisible)
+						continue;
 
 					if (Child is IDynamicChildren DynamicChildren)
 					{

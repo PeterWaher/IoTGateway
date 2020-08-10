@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Layout.Layout2D.Model.Figures;
 
-namespace Waher.Layout.Layout2D.Model.References
+namespace Waher.Layout.Layout2D.Model.Figures
 {
 	/// <summary>
-	/// Copies the layout from a reference
+	/// Abstract base class for figures based on a point.
 	/// </summary>
-	public class Copy : Point
+	public abstract class FigurePoint : Figure
 	{
+		private LengthAttribute x;
+		private LengthAttribute y;
 		private StringAttribute _ref;
 
 		/// <summary>
-		/// Copies the layout from a reference
+		/// Abstract base class for figures based on a point.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Copy(Layout2DDocument Document, ILayoutElement Parent)
+		public FigurePoint(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
-
-		/// <summary>
-		/// Local name of type of element.
-		/// </summary>
-		public override string LocalName => "Copy";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -36,6 +31,8 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.FromXml(Input);
 
+			this.x = new LengthAttribute(Input, "x");
+			this.y = new LengthAttribute(Input, "y");
 			this._ref = new StringAttribute(Input, "ref");
 		}
 
@@ -47,18 +44,9 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.ExportAttributes(Output);
 
+			this.x.Export(Output);
+			this.y.Export(Output);
 			this._ref.Export(Output);
-		}
-
-		/// <summary>
-		/// Creates a new instance of the layout element.
-		/// </summary>
-		/// <param name="Document">Document containing the new element.</param>
-		/// <param name="Parent">Parent element.</param>
-		/// <returns>New instance.</returns>
-		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
-		{
-			return new Copy(Document, Parent);
 		}
 
 		/// <summary>
@@ -69,8 +57,34 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.CopyContents(Destination);
 
-			if (Destination is Copy Dest)
+			if (Destination is FigurePoint Dest)
+			{
+				Dest.x = this.x.CopyIfNotPreset();
+				Dest.y = this.y.CopyIfNotPreset();
 				Dest._ref = this._ref.CopyIfNotPreset();
+			}
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			this.defined = this.IncludePoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate);
+		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		protected double xCoordinate;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		protected double yCoordinate;
+
 	}
 }

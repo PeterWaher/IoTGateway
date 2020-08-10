@@ -143,23 +143,19 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (MaxWidth.HasValue && this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
 				HAlignment != HorizontalAlignment.Left)
 			{
-				double Width = this.Right - this.Left;
-
 				if (HAlignment == HorizontalAlignment.Right)
-					OffsetX += (MaxWidth.Value - Width);
+					OffsetX += (MaxWidth.Value - this.Width);
 				else    // Center
-					OffsetX += (MaxWidth.Value - Width) * 0.5;
+					OffsetX += (MaxWidth.Value - this.Width) * 0.5;
 			}
 
 			if (MaxHeight.HasValue && this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
 				VAlignment != VerticalAlignment.Top)
 			{
-				double Height = this.Bottom - this.Top;
-
 				if (VAlignment == VerticalAlignment.Bottom)
-					OffsetY += (MaxHeight.Value - Height);
+					OffsetY += (MaxHeight.Value - this.Height);
 				else    // Center
-					OffsetY += (MaxHeight.Value - Height) * 0.5;
+					OffsetY += (MaxHeight.Value - this.Height) * 0.5;
 			}
 		}
 

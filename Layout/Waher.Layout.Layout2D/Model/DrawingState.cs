@@ -11,6 +11,7 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public class DrawingState : IDisposable
 	{
+		private Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private Variables session;
 		private SKCanvas canvas;
 		private SKPaint font;
@@ -94,7 +95,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Element">Current element.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
 		/// <returns>Drawing size, if defined.</returns>
-		public double? GetDrawingSize(Length L, ILayoutElement Element, bool Horizontal)
+		public double GetDrawingSize(Length L, ILayoutElement Element, bool Horizontal)
 		{
 			switch (L.Unit)
 			{
@@ -182,18 +183,49 @@ namespace Waher.Layout.Layout2D.Model
 								Size = Area.GetHeightEstimate(this);
 
 							if (Size.HasValue)
-								return L.Value * Size.Value;
+								return L.Value * Size.Value * 0.01;
 						}
 
 						Element = Element.Parent;
 					}
 
-					return null;
+					if (Horizontal)
+						return L.Value * this.viewportWidth * 0.01;
+					else
+						return L.Value * this.viewportHeight * 0.01;
 
 				default:
-					return null;
+					return L.Value;
 			}
 		}
 
+		/// <summary>
+		/// Adds an element with an ID
+		/// </summary>
+		/// <param name="Id">Element ID</param>
+		/// <param name="Element">Element</param>
+		public void AddElementId(string Id, ILayoutElement Element)
+		{
+			this.elementsById[Id] = Element;
+		}
+
+		/// <summary>
+		/// Tries to get a layout element, given an ID reference
+		/// </summary>
+		/// <param name="Id">Layout ID</param>
+		/// <param name="Element">Element retrieved, if found.</param>
+		/// <returns>If an element with the corresponding ID was found.</returns>
+		public bool TryGetElement(string Id, out ILayoutElement Element)
+		{
+			return this.elementsById.TryGetValue(Id, out Element);
+		}
+
+		/// <summary>
+		/// Clears registered elements with IDs.
+		/// </summary>
+		public void ClearElementIds()
+		{
+			this.elementsById.Clear();
+		}
 	}
 }

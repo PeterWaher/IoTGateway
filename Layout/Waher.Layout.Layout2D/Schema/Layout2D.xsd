@@ -24,6 +24,44 @@
     <xs:attribute name="visible" type="xs:boolean" use="optional" default="true"/>
   </xs:complexType>
 
+  <xs:complexType name="Point">
+    <xs:complexContent>
+      <xs:extension base="LayoutElement">
+        <xs:attribute name="x" type="Length" use="optional"/>
+        <xs:attribute name="y" type="Length" use="optional"/>
+        <xs:attribute name="ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Point2">
+    <xs:complexContent>
+      <xs:extension base="Point">
+        <xs:attribute name="x2" type="Length" use="optional"/>
+        <xs:attribute name="y2" type="Length" use="optional"/>
+        <xs:attribute name="ref2" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Point2Weight">
+    <xs:complexContent>
+      <xs:extension base="Point2">
+        <xs:attribute name="w" type="xs:double" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Point3">
+    <xs:complexContent>
+      <xs:extension base="Point2">
+        <xs:attribute name="x3" type="Length" use="optional"/>
+        <xs:attribute name="y3" type="Length" use="optional"/>
+        <xs:attribute name="ref3" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="LayoutArea">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
@@ -326,17 +364,24 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name="Figure">
+    <xs:complexContent>
+      <xs:extension base="LayoutContainer">
+        <xs:attribute name="pen" type="xs:string" use="optional"/>
+        <xs:attribute name="fill" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
   <xs:group name="Figures">
     <xs:choice>
-      <xs:element name="Dot" type="Point"/>
+      <xs:element name="Dot" type="FigurePoint"/>
       <xs:element name="Line" type="Line"/>
       <xs:element name="Arrow" type="Arrow"/>
       <xs:element name="Circle" type="Circle"/>
       <xs:element name="CircleArc" type="CircleArc"/>
       <xs:element name="EllipseArc" type="EllipseArc"/>
       <xs:element name="Ellipse" type="Ellipse"/>
-      <xs:element name="Square" type="Square"/>
-      <xs:element name="RoundedSquare" type="RoundedSquare"/>
       <xs:element name="Rectangle" type="Rectangle"/>
       <xs:element name="RoundedRectangle" type="RoundedRectangle"/>
       <xs:element name="PolyLine" type="PolyLine"/>
@@ -347,9 +392,9 @@
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="Point">
+  <xs:complexType name="FigurePoint">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="Figure">
         <xs:attribute name="x" type="Length" use="optional"/>
         <xs:attribute name="y" type="Length" use="optional"/>
         <xs:attribute name="ref" type="xs:string" use="optional"/>
@@ -357,9 +402,9 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point2">
+  <xs:complexType name="FigurePoint2">
     <xs:complexContent>
-      <xs:extension base="Point">
+      <xs:extension base="FigurePoint">
         <xs:attribute name="x2" type="Length" use="optional"/>
         <xs:attribute name="y2" type="Length" use="optional"/>
         <xs:attribute name="ref2" type="xs:string" use="optional"/>
@@ -367,17 +412,17 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point2Weight">
+  <xs:complexType name="FigurePoint2Weight">
     <xs:complexContent>
-      <xs:extension base="Point2">
+      <xs:extension base="FigurePoint2">
         <xs:attribute name="w" type="xs:double" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Point3">
+  <xs:complexType name="FigurePoint3">
     <xs:complexContent>
-      <xs:extension base="Point2">
+      <xs:extension base="FigurePoint2">
         <xs:attribute name="x3" type="Length" use="optional"/>
         <xs:attribute name="y3" type="Length" use="optional"/>
         <xs:attribute name="ref3" type="xs:string" use="optional"/>
@@ -387,31 +432,22 @@
 
   <xs:complexType name="Line">
     <xs:complexContent>
-      <xs:extension base="Point2"/>
+      <xs:extension base="FigurePoint2"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Arrow">
     <xs:complexContent>
-      <xs:extension base="Point2">
+      <xs:extension base="FigurePoint2">
         <xs:attribute name="head" type="xs:string" use="optional"/>
         <xs:attribute name="tail" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="Figure">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="pen" type="xs:string" use="optional"/>
-        <xs:attribute name="fill" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
   <xs:complexType name="Circle">
     <xs:complexContent>
-      <xs:extension base="Figure">
+      <xs:extension base="FigurePoint">
         <xs:attribute name="radius" type="Length" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -420,10 +456,8 @@
   <xs:complexType name="CircleArc">
     <xs:complexContent>
       <xs:extension base="Circle">
-        <xs:attribute name="startAngleRadians" type="xs:double" use="optional"/>
-        <xs:attribute name="startAngleDegrees" type="xs:double" use="optional"/>
-        <xs:attribute name="endAngleRadians" type="xs:double" use="optional"/>
-        <xs:attribute name="endAngleDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="startDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="endDegrees" type="xs:double" use="optional"/>
         <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
       </xs:extension>
     </xs:complexContent>
@@ -431,7 +465,7 @@
 
   <xs:complexType name="Ellipse">
     <xs:complexContent>
-      <xs:extension base="Figure">
+      <xs:extension base="FigurePoint">
         <xs:attribute name="radiusX" type="Length" use="optional"/>
         <xs:attribute name="radiusY" type="Length" use="optional"/>
       </xs:extension>
@@ -441,37 +475,16 @@
   <xs:complexType name="EllipseArc">
     <xs:complexContent>
       <xs:extension base="Ellipse">
-        <xs:attribute name="startAngleRadians" type="xs:double" use="optional"/>
-        <xs:attribute name="startAngleDegrees" type="xs:double" use="optional"/>
-        <xs:attribute name="endAngleRadians" type="xs:double" use="optional"/>
-        <xs:attribute name="endAngleDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="startDegrees" type="xs:double" use="optional"/>
+        <xs:attribute name="endDegrees" type="xs:double" use="optional"/>
         <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Square">
-    <xs:complexContent>
-      <xs:extension base="Figure">
-        <xs:attribute name="side" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="RoundedSquare">
-    <xs:complexContent>
-      <xs:extension base="Square">
-        <xs:attribute name="radius" type="Length" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Rectangle">
     <xs:complexContent>
-      <xs:extension base="Figure">
-        <xs:attribute name="sideX" type="Length" use="optional"/>
-        <xs:attribute name="sideY" type="Length" use="optional"/>
-      </xs:extension>
+      <xs:extension base="FigurePoint2"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -487,10 +500,6 @@
   <xs:complexType name="Vertices">
     <xs:complexContent>
       <xs:extension base="Figure">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="RelOrigo" type="Vertex"/>
-          <xs:element name="RelLast" type="Vertex"/>
-        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -556,7 +565,7 @@
 
   <xs:complexType name="Distance">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="LayoutElement">
         <xs:attribute name="distance" type="Length" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -565,7 +574,6 @@
   <xs:complexType name="Angle">
     <xs:complexContent>
       <xs:extension base="LayoutElement">
-        <xs:attribute name="radians" type="xs:double" use="optional"/>
         <xs:attribute name="degrees" type="xs:double" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -600,7 +608,7 @@
 
   <xs:complexType name="Image">
     <xs:complexContent>
-      <xs:extension base="Point"/>
+      <xs:extension base="FigurePoint2"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -659,7 +667,6 @@
   <xs:complexType name="Rotate">
     <xs:complexContent>
       <xs:extension base="LayoutContainer">
-        <xs:attribute name="radians" type="xs:double" use="optional"/>
         <xs:attribute name="degrees" type="xs:double" use="optional"/>
       </xs:extension>
     </xs:complexContent>

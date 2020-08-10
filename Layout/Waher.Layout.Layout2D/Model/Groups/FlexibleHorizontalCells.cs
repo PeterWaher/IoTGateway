@@ -47,8 +47,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Cell element</param>
 		public void Add(ILayoutElement Element)
 		{
-			double Width = Element.Right - Element.Left;
-			double Height = Element.Bottom - Element.Top;
+			double Width = Element.Width;
+			double Height = Element.Height;
 
 			if (this.x + Width > this.limitWidth)
 				this.Flush();
@@ -131,8 +131,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 				foreach (Padding P in Row.Item3)
 				{
-					double Width = P.Element.Right - P.Element.Left;
-					double Height = P.Element.Bottom - P.Element.Top;
+					double Width = P.Element.Width;
 
 					if (this.horizontalDirection == HorizontalDirection.RightLeft)
 						X -= Width;

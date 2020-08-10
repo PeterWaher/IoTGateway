@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// An arrow
 	/// </summary>
-	public class Arrow : Point2
+	public class Arrow : FigurePoint2
 	{
 		private StringAttribute head;
 		private StringAttribute tail;

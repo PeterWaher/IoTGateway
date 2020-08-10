@@ -29,27 +29,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override string LocalName => "Path";
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public override void Dispose()
-		{
-			base.Dispose();
-
-			if (!(this.segments is null))
-			{
-				foreach (ILayoutElement E in this.segments)
-					E.Dispose();
-			}
-		}
-
-		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
 		public override void FromXml(XmlElement Input)
 		{
 			base.FromXml(Input);
+			this.segments = this.GetSegments();
+		}
 
+		private ISegment[] GetSegments()
+		{
 			List<ISegment> Segments = null;
 
 			foreach (ILayoutElement Child in this.Children)
@@ -65,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					throw new LayoutSyntaxException("Not a segment type: " + Child.Namespace + "#" + Child.LocalName);
 			}
 
-			this.segments = Segments?.ToArray();
+			return Segments?.ToArray();
 		}
 
 		/// <summary>
@@ -88,18 +78,23 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			base.CopyContents(Destination);
 
 			if (Destination is Path Dest)
+				Dest.segments = Dest.GetSegments();
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!(this.segments is null))
 			{
-				if (!(this.segments is null))
-				{
-					int i, c = this.segments.Length;
+				PathState PathState = new PathState(this);
 
-					ISegment[] Children = new ISegment[c];
-
-					for (i = 0; i < c; i++)
-						Children[i] = this.segments[i].Copy(Dest) as ISegment;
-
-					Dest.segments = Children;
-				}
+				foreach (ISegment Segment in this.segments)
+					Segment.Measure(State, PathState);
 			}
 		}
 

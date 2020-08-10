@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// Abstract base class for figures
 	/// </summary>
-	public abstract class Figure : Point
+	public abstract class Figure : LayoutContainer
 	{
 		private StringAttribute pen;
 		private StringAttribute fill;

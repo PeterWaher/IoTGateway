@@ -108,16 +108,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (this.x >= this.nrColumns)
 				this.x = this.nrColumns - 1;
 
-			double Width = Element.Right - Element.Left;
-			double Right = this.GetRight(this.x - 1) + Width;
+			double Right = this.GetRight(this.x - 1) + Element.Width;
 			double Right2 = this.GetRight(this.x);
 			if (Right > Right2)
 				this.rights[this.x] = Right;
 
 			this.y += RowSpan;
 
-			double Height = Element.Bottom - Element.Top;
-			double Bottom = this.GetBottom(this.y - 1) + Height;
+			double Bottom = this.GetBottom(this.y - 1) + Element.Height;
 			double Bottom2 = this.GetBottom(this.y);
 			if (Bottom > Bottom2)
 				this.bottoms[this.y] = Bottom;
@@ -201,8 +199,6 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				{
 					double Left = this.GetRight(X + P.ColSpan - 1);
 					double Top = this.GetBottom(Y + P.RowSpan - 1);
-					double Width = P.Element.Right - P.Element.Left;
-					double Height = P.Element.Bottom - P.Element.Top;
 					double MaxWidth = Left - this.GetRight(X - 1);
 					double MaxHeight = Top - this.GetBottom(Y - 1);
 

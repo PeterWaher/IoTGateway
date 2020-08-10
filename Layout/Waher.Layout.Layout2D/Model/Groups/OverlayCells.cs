@@ -31,11 +31,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			this.measured.Add(new Padding(Element, -Element.Left, -Element.Top));
 
-			double Width = Element.Right - Element.Left;
+			double Width = Element.Width;
 			if (Width > this.maxWidth)
 				this.maxWidth = Width;
 
-			double Height = Element.Bottom - Element.Top;
+			double Height = Element.Height;
 			if (Height > this.maxHeight)
 				this.maxHeight = Height;
 		}

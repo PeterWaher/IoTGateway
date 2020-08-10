@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using Waher.Layout.Layout2D.Exceptions;
-using Waher.Layout.Layout2D.Model.Figures.VertexNodes;
+using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -24,43 +23,31 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public override void Dispose()
-		{
-			base.Dispose();
-
-			if (!(this.points is null))
-			{
-				foreach (Vertex E in this.points)
-					E.Dispose();
-			}
-		}
-
-		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
 		public override void FromXml(XmlElement Input)
 		{
 			base.FromXml(Input);
+			this.points = this.GetVertices();
+		}
 
-			List<Vertex> Points = null;
+		private Vertex[] GetVertices()
+		{
+			List<Vertex> Result = null;
 
 			foreach (ILayoutElement Child in this.Children)
 			{
 				if (Child is Vertex P)
 				{
-					if (Points is null)
-						Points = new List<Vertex>();
+					if (Result is null)
+						Result = new List<Vertex>();
 
-					Points.Add(P);
+					Result.Add(P);
 				}
-				else
-					throw new LayoutSyntaxException("Not a vertex type: " + Child.Namespace + "#" + Child.LocalName);
 			}
 
-			this.points = Points?.ToArray();
+			return Result?.ToArray();
 		}
 
 		/// <summary>
@@ -72,19 +59,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			base.CopyContents(Destination);
 
 			if (Destination is Vertices Dest)
-			{
-				if (!(this.points is null))
-				{
-					int i, c = this.points.Length;
-
-					Vertex[] Children = new Vertex[c];
-
-					for (i = 0; i < c; i++)
-						Children[i] = this.points[i].Copy(Dest) as Vertex;
-
-					Dest.points = Children;
-				}
-			}
+				Dest.points = Dest.GetVertices();
 		}
 
 	}

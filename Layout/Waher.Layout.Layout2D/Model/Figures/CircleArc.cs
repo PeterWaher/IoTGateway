@@ -8,13 +8,16 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// A circle arc
 	/// </summary>
-	public class CircleArc : Circle
+	public class CircleArc : FigurePoint
 	{
-		private DoubleAttribute startAngleRadians;
-		private DoubleAttribute startAngleDegrees;
-		private DoubleAttribute endAngleRadians;
-		private DoubleAttribute endAngleDegrees;
+		private LengthAttribute radius;
+		private DoubleAttribute startDegrees;
+		private DoubleAttribute endDegrees;
 		private BooleanAttribute clockwise;
+		private double r;
+		private double start;
+		private double end;
+		private bool clockDir;
 
 		/// <summary>
 		/// A circle arc
@@ -39,10 +42,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			this.startAngleRadians = new DoubleAttribute(Input, "startAngleRadians");
-			this.startAngleDegrees = new DoubleAttribute(Input, "startAngleDegrees");
-			this.endAngleRadians = new DoubleAttribute(Input, "endAngleRadians");
-			this.endAngleDegrees = new DoubleAttribute(Input, "endAngleDegrees");
+			this.radius = new LengthAttribute(Input, "radius");
+			this.startDegrees = new DoubleAttribute(Input, "startDegrees");
+			this.endDegrees = new DoubleAttribute(Input, "endDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
 		}
 
@@ -54,10 +56,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.startAngleRadians.Export(Output);
-			this.startAngleDegrees.Export(Output);
-			this.endAngleRadians.Export(Output);
-			this.endAngleDegrees.Export(Output);
+			this.radius.Export(Output);
+			this.startDegrees.Export(Output);
+			this.endDegrees.Export(Output);
 			this.clockwise.Export(Output);
 		}
 
@@ -82,11 +83,86 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is CircleArc Dest)
 			{
-				Dest.startAngleRadians = this.startAngleRadians.CopyIfNotPreset();
-				Dest.startAngleDegrees = this.startAngleDegrees.CopyIfNotPreset();
-				Dest.endAngleRadians = this.endAngleRadians.CopyIfNotPreset();
-				Dest.endAngleDegrees = this.endAngleDegrees.CopyIfNotPreset();
+				Dest.radius = this.radius.CopyIfNotPreset();
+				Dest.startDegrees = this.startDegrees.CopyIfNotPreset();
+				Dest.endDegrees = this.endDegrees.CopyIfNotPreset();
 				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.radius.TryEvaluate(State.Session, out Length R))
+				this.r = State.GetDrawingSize(R, this, true);
+			else
+				this.defined = false;
+
+			if (this.startDegrees.TryEvaluate(State.Session, out this.start))
+				this.start = Math.IEEERemainder(this.start, 360);
+			else
+				this.defined = false;
+
+			if (this.endDegrees.TryEvaluate(State.Session, out this.end))
+				this.end = Math.IEEERemainder(this.end, 360);
+			else
+				this.defined = false;
+
+			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+				this.defined = false;
+
+			if (this.defined)
+			{
+				double a = this.start;
+				double r = Math.IEEERemainder(this.start, 90);
+				bool First = true;
+
+				this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.start);
+
+				if (this.clockDir)
+				{
+					if (this.end < this.start)
+						this.end += 360;
+
+					while (a < this.end)
+					{
+						if (First)
+						{
+							a += 90 - r;
+							First = false;
+						}
+						else
+							a += 90;
+
+						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
+					}
+				}
+				else
+				{
+					if (this.end > this.start)
+						this.end -= 360;
+
+					while (a > this.end)
+					{
+						if (First)
+						{
+							a -= r;
+							First = false;
+						}
+						else
+							a -= 90;
+
+						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
+					}
+				}
+
+				if (this.start != this.end)
+					this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.end);
 			}
 		}
 	}

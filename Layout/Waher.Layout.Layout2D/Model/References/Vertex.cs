@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Layout.Layout2D.Model.Figures;
 
 namespace Waher.Layout.Layout2D.Model.References
 {

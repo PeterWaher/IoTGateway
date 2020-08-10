@@ -8,10 +8,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// An ellipse
 	/// </summary>
-	public class Ellipse : Figure
+	public class Ellipse : FigurePoint
 	{
 		private LengthAttribute radiusX;
 		private LengthAttribute radiusY;
+		private double rX;
+		private double rY;
 
 		/// <summary>
 		/// An ellipse
@@ -77,5 +79,33 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Dest.radiusY = this.radiusY.CopyIfNotPreset();
 			}
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.radiusX.TryEvaluate(State.Session, out Length R))
+				this.rX = State.GetDrawingSize(R, this, true);
+			else
+				this.defined = false;
+
+			if (this.radiusY.TryEvaluate(State.Session, out R))
+				this.rY = State.GetDrawingSize(R, this, false);
+			else
+				this.defined = false;
+
+			if (this.defined)
+			{
+				this.IncludePoint(this.xCoordinate - this.rX, this.yCoordinate);
+				this.IncludePoint(this.xCoordinate + this.rX, this.yCoordinate);
+				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.rY);
+				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.rY);
+			}
+		}
+
 	}
 }

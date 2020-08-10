@@ -5,16 +5,16 @@ using Waher.Layout.Layout2D.Model.Attributes;
 namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
-	/// Abstract base class for figures with two points.
+	/// Abstract base class for layout elements with two points.
 	/// </summary>
-	public abstract class Point2 : Point 
+	public abstract class Point2 : Point
 	{
 		private LengthAttribute x2;
 		private LengthAttribute y2;
 		private StringAttribute ref2;
 
 		/// <summary>
-		/// Abstract base class for figures with two points.
+		/// Abstract base class for layout elements with two points.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
@@ -64,6 +64,28 @@ namespace Waher.Layout.Layout2D.Model
 				Dest.ref2 = this.ref2.CopyIfNotPreset();
 			}
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.CalcPoint(State, this.x2, this.y2, this.ref2, out this.xCoordinate2, out this.yCoordinate2))
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		protected double xCoordinate2;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		protected double yCoordinate2;
 
 	}
 }

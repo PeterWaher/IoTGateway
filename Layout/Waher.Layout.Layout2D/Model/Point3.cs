@@ -5,7 +5,7 @@ using Waher.Layout.Layout2D.Model.Attributes;
 namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
-	/// Abstract base class for figures with three points.
+	/// Abstract base class for layout elements with three points.
 	/// </summary>
 	public abstract class Point3 : Point2
 	{
@@ -14,7 +14,7 @@ namespace Waher.Layout.Layout2D.Model
 		private StringAttribute ref3;
 
 		/// <summary>
-		/// Abstract base class for figures with three points.
+		/// Abstract base class for layout elements with three points.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
@@ -64,6 +64,28 @@ namespace Waher.Layout.Layout2D.Model
 				Dest.ref3 = this.ref3.CopyIfNotPreset();
 			}
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.CalcPoint(State, this.x3, this.y3, this.ref3, out this.xCoordinate3, out this.yCoordinate3))
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		protected double xCoordinate3;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		protected double yCoordinate3;
 
 	}
 }

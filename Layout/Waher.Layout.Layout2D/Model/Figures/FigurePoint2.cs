@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
 	/// <summary>
-	/// A circle
+	/// Abstract base class for figures with two points.
 	/// </summary>
-	public class Circle : FigurePoint
+	public abstract class FigurePoint2 : FigurePoint
 	{
-		private LengthAttribute radius;
-		private double r;
+		private LengthAttribute x2;
+		private LengthAttribute y2;
+		private StringAttribute ref2;
 
 		/// <summary>
-		/// A circle
+		/// Abstract base class for figures with two points.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Circle(Layout2DDocument Document, ILayoutElement Parent)
+		public FigurePoint2(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
-
-		/// <summary>
-		/// Local name of type of element.
-		/// </summary>
-		public override string LocalName => "Circle";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -36,7 +31,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			this.radius = new LengthAttribute(Input, "radius");
+			this.x2 = new LengthAttribute(Input, "x2");
+			this.y2 = new LengthAttribute(Input, "y2");
+			this.ref2 = new StringAttribute(Input, "ref2");
 		}
 
 		/// <summary>
@@ -47,18 +44,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.radius.Export(Output);
-		}
-
-		/// <summary>
-		/// Creates a new instance of the layout element.
-		/// </summary>
-		/// <param name="Document">Document containing the new element.</param>
-		/// <param name="Parent">Parent element.</param>
-		/// <returns>New instance.</returns>
-		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
-		{
-			return new Circle(Document, Parent);
+			this.x2.Export(Output);
+			this.y2.Export(Output);
+			this.ref2.Export(Output);
 		}
 
 		/// <summary>
@@ -69,8 +57,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.CopyContents(Destination);
 
-			if (Destination is Circle Dest)
-				Dest.radius = this.radius.CopyIfNotPreset();
+			if (Destination is FigurePoint2 Dest)
+			{
+				Dest.x2 = this.x2.CopyIfNotPreset();
+				Dest.y2 = this.y2.CopyIfNotPreset();
+				Dest.ref2 = this.ref2.CopyIfNotPreset();
+			}
 		}
 
 		/// <summary>
@@ -81,18 +73,19 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.Measure(State);
 
-			if (this.radius.TryEvaluate(State.Session, out Length R))
-				this.r = State.GetDrawingSize(R, this, true);
-			else
+			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, out this.xCoordinate2, out this.yCoordinate2))
 				this.defined = false;
-
-			if (this.defined)
-			{
-				this.IncludePoint(this.xCoordinate - this.r, this.yCoordinate);
-				this.IncludePoint(this.xCoordinate + this.r, this.yCoordinate);
-				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.r);
-				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.r);
-			}
 		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		protected double xCoordinate2;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		protected double yCoordinate2;
+
 	}
 }

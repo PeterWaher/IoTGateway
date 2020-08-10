@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// A dot
 	/// </summary>
-	public class Dot : Point
+	public class Dot : FigurePoint
 	{
 		/// <summary>
 		/// A dot

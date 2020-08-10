@@ -168,13 +168,17 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public abstract void Measure(DrawingState State);
+		public virtual void Measure(DrawingState State)
+		{
+		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public abstract void Draw(DrawingState State);
+		public virtual void Draw(DrawingState State)
+		{
+		}
 
 	}
 }

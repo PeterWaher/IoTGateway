@@ -105,5 +105,31 @@ namespace Waher.Layout.Layout2D.Model
 			}
 		}
 
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			if (!(this.children is null))
+			{
+				foreach (ILayoutElement E in this.children)
+					E.Measure(State);
+			}
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			if (!(this.children is null))
+			{
+				foreach (ILayoutElement E in this.children)
+					E.Draw(State);
+			}
+		}
+
 	}
 }

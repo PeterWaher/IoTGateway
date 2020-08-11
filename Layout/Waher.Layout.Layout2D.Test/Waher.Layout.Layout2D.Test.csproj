@@ -7,15 +7,63 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Xml\Test_01_Line.xml" />
-    <None Remove="Xml\Test_02_Lengths.xml" />
+    <None Remove="Xml\Test_01_Lengths.xml" />
+    <None Remove="Xml\Test_02_Arrow.xml" />
+    <None Remove="Xml\Test_03_Circle.xml" />
+    <None Remove="Xml\Test_04_CircleArc.xml" />
+    <None Remove="Xml\Test_05_Dot.xml" />
+    <None Remove="Xml\Test_06_Ellipse.xml" />
+    <None Remove="Xml\Test_07_EllipseArc.xml" />
+    <None Remove="Xml\Test_08_Line.xml" />
+    <None Remove="Xml\Test_09_Loop.xml" />
+    <None Remove="Xml\Test_10_Polygon.xml" />
+    <None Remove="Xml\Test_11_PolyLine.xml" />
+    <None Remove="Xml\Test_12_Rectangle.xml" />
+    <None Remove="Xml\Test_13_RoundedRectangle.xml" />
+    <None Remove="Xml\Test_14_Spline.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Xml\Test_02_Lengths.xml">
+    <Content Include="Xml\Test_02_Arrow.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_01_Line.xml">
+    <Content Include="Xml\Test_11_PolyLine.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_12_Rectangle.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_13_RoundedRectangle.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_14_Spline.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_03_Circle.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_04_CircleArc.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_05_Dot.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_06_Ellipse.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_07_EllipseArc.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_08_Line.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_09_Loop.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_10_Polygon.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_01_Lengths.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

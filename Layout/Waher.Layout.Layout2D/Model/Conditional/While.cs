@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Generates layout elements while a condition is true.
 	/// </summary>
-	public class While : LayoutContainer, IDynamicChildren
+	public class While : DynamicContainer
 	{
 		private ExpressionAttribute expression;
 		private BooleanAttribute testAfter;
@@ -32,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Dynamic array of children
 		/// </summary>
-		public ILayoutElement[] DynamicChildren => this.measured;
+		public override ILayoutElement[] DynamicChildren => this.measured;
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.

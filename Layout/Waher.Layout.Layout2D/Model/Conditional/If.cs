@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Conditional layout based on one conditional statement.
 	/// </summary>
-	public class If : LayoutElement, IDynamicChildren
+	public class If : DynamicElement
 	{
 		private ExpressionAttribute condition;
 		private LayoutContainer ifTrue;
@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Dynamic array of children
 		/// </summary>
-		public ILayoutElement[] DynamicChildren
+		public override ILayoutElement[] DynamicChildren
 		{
 			get
 			{

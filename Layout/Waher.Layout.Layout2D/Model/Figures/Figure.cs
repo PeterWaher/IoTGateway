@@ -89,7 +89,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current state</param>
 		/// <param name="Pen">Pen, if defined.</param>
-		/// <returns>If a pen was defined, and was found.<returns>
+		/// <returns>If a pen was defined, and was found.</returns>
 		public bool TryGetPen(DrawingState State, out SKPaint Pen)
 		{
 			if (this.pen.TryEvaluate(State.Session, out string PenId) &&

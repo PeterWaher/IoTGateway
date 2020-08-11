@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="BlackBackground" color="Black"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Arrow x="25%" y="25%" x2="75%" y2="75%" pen="RedPen" head="ArrowHead" tail="ArrowTail">
+    <Shape id="ArrowHead">
+      <Path>
+        <TurnRight degrees="150"/>
+        <Forward distance="5px"/>
+        <TurnRight degrees="120"/>
+        <Forward distance="5px"/>
+        <TurnRight degrees="120"/>
+        <Forward distance="5px"/>
+      </Path>
+    </Shape>
+    <Shape id="ArrowTail">
+      <Path>
+        <TurnRight degrees="150"/>
+        <Forward distance="5px"/>
+        <TurnLeft degrees="150"/>
+        <Forward distance="5px"/>
+        <TurnLeft degrees="30"/>
+        <Forward distance="5px"/>
+        <TurnLeft degrees="300"/>
+        <Forward distance="5px"/>
+        <TurnLeft degrees="30"/>
+        <Forward distance="5px"/>
+        <TurnLeft degrees="150"/>
+        <Forward distance="5px"/>
+      </Path>
+    </Shape>
+  </Arrow>
+</Layout2D>

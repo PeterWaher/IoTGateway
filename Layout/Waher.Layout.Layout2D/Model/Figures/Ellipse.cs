@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -104,6 +104,24 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.IncludePoint(this.xCoordinate + this.rX, this.yCoordinate);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.rY);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.rY);
+			}
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+			{
+				if (this.TryGetFill(State, out SKPaint Fill))
+					State.Canvas.DrawOval(this.xCoordinate, this.yCoordinate, this.rX, this.rY, Fill);
+
+				if (this.TryGetPen(State, out SKPaint Pen))
+					State.Canvas.DrawOval(this.xCoordinate, this.yCoordinate, this.rX, this.rY, Pen);
 			}
 		}
 

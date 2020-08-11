@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -76,6 +77,67 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Dest.radiusX = this.radiusX.CopyIfNotPreset();
 				Dest.radiusY = this.radiusY.CopyIfNotPreset();
 			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.radiusX.TryEvaluate(State.Session, out Length L))
+				this.rx = State.GetDrawingSize(L, this, true);
+			else
+				this.defined = false;
+
+			if (this.radiusY.TryEvaluate(State.Session, out L))
+				this.ry = State.GetDrawingSize(L, this, false);
+			else
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		protected float rx;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		protected float ry;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			if (this.defined)
+			{
+				this.defined = false;
+				base.Draw(State);
+				this.defined = true;
+
+				if (this.TryGetFill(State, out SKPaint Fill))
+				{
+					State.Canvas.DrawRoundRect(this.xCoordinate, this.yCoordinate,
+						this.xCoordinate2 - this.xCoordinate,
+						this.yCoordinate2 - this.yCoordinate,
+						this.rx, this.ry, Fill);
+				}
+
+				if (this.TryGetPen(State, out SKPaint Pen))
+				{
+					State.Canvas.DrawRoundRect(this.xCoordinate, this.yCoordinate,
+						this.xCoordinate2 - this.xCoordinate,
+						this.yCoordinate2 - this.yCoordinate,
+						this.rx, this.ry, Pen);
+				}
+			}
+			else
+				base.Draw(State);
 		}
 	}
 }

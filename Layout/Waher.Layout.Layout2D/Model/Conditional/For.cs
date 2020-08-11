@@ -11,7 +11,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Generates layout elements by iterating through a traditional loop
 	/// </summary>
-	public class For : LayoutContainer, IDynamicChildren
+	public class For : DynamicContainer
 	{
 		private ExpressionAttribute from;
 		private ExpressionAttribute to;
@@ -37,7 +37,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Dynamic array of children
 		/// </summary>
-		public ILayoutElement[] DynamicChildren => this.measured;
+		public override ILayoutElement[] DynamicChildren => this.measured;
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.

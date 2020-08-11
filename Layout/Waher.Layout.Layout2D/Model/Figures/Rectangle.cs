@@ -49,14 +49,16 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			{
 				if (this.TryGetFill(State, out SKPaint Fill))
 				{
-					State.Canvas.DrawRect((float)this.xCoordinate, (float)this.yCoordinate,
-						(float)this.xCoordinate2, (float)this.yCoordinate2, Fill);
+					State.Canvas.DrawRect(this.xCoordinate, this.yCoordinate,
+						this.xCoordinate2 - this.xCoordinate, 
+						this.yCoordinate2 - this.yCoordinate, Fill);
 				}
 
 				if (this.TryGetPen(State, out SKPaint Pen))
 				{
-					State.Canvas.DrawRect((float)this.xCoordinate, (float)this.yCoordinate,
-						(float)this.xCoordinate2, (float)this.yCoordinate2, Pen);
+					State.Canvas.DrawRect(this.xCoordinate, this.yCoordinate,
+						this.xCoordinate2 - this.xCoordinate, 
+						this.yCoordinate2 - this.yCoordinate, Pen);
 				}
 			}
 		}

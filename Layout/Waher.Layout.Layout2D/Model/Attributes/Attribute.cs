@@ -168,7 +168,8 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				try
 				{
 					object Value = this.expression.Evaluate(Session);
-					if (Value is T Eval)
+					if (Value is T Eval ||
+						(Value is string s && this.TryParse(s, out Eval)))
 					{
 						Result = this.evaluatedValue = Eval;
 						this.hasEvaluated = true;

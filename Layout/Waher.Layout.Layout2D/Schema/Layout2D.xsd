@@ -112,7 +112,7 @@
 
   <xs:simpleType name="Length">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%)"/>
+      <xs:pattern value="((\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%))|([{].*[}])"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -600,6 +600,7 @@
 
   <xs:group name="Images">
     <xs:choice>
+      <xs:element name="ImageFile" type="ImageFile"/>
       <xs:element name="ImageResource" type="ImageResource"/>
       <xs:element name="ImageUrl" type="ImageUrl"/>
       <xs:element name="ImageInternal" type="ImageInternal"/>
@@ -609,6 +610,14 @@
   <xs:complexType name="Image">
     <xs:complexContent>
       <xs:extension base="FigurePoint2"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ImageFile">
+    <xs:complexContent>
+      <xs:extension base="Image">
+        <xs:attribute name="fileName" type="xs:string" use="required"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 

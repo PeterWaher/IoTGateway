@@ -47,8 +47,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (this.defined)
 			{
-				State.Canvas.DrawLine((float)this.xCoordinate, (float)this.yCoordinate,
-					(float)this.xCoordinate2, (float)this.yCoordinate2, this.GetPen(State));
+				State.Canvas.DrawLine(this.xCoordinate, this.yCoordinate,
+					this.xCoordinate2, this.yCoordinate2, this.GetPen(State));
 			}
 		}
 	}

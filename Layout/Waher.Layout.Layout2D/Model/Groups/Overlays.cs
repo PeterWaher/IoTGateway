@@ -8,14 +8,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// <summary>
 	/// Ordering child elements one on-top of the other.
 	/// </summary>
-	public class Overlay : SpatialDistribution
+	public class Overlays : SpatialDistribution
 	{
 		/// <summary>
 		/// Ordering child elements one on-top of the other.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Overlay(Layout2DDocument Document, ILayoutElement Parent)
+		public Overlays(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
@@ -23,7 +23,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
-		public override string LocalName => "Overlay";
+		public override string LocalName => "Overlays";
 
 		/// <summary>
 		/// Creates a new instance of the layout element.
@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>New instance.</returns>
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
-			return new Overlay(Document, Parent);
+			return new Overlays(Document, Parent);
 		}
 
 		/// <summary>

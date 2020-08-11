@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			foreach (Padding P in this.measured)
 			{
 				Canvas.SetMatrix(M);
-				Canvas.Translate((float)P.OffsetX, (float)P.OffsetY);
+				Canvas.Translate(P.OffsetX, P.OffsetY);
 				P.Element.Draw(State);
 			}
 

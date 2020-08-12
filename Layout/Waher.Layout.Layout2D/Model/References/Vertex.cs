@@ -35,5 +35,15 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			return new Vertex(Document, Parent);
 		}
+
+		/// <summary>
+		/// Measured X-coordinate
+		/// </summary>
+		public float XCoordinate => this.xCoordinate;
+
+		/// <summary>
+		/// Measured Y-coordinate
+		/// </summary>
+		public float YCoordinate => this.yCoordinate;
 	}
 }

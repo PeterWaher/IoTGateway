@@ -15,8 +15,8 @@
   </ForEach>
   <PolyLine pen="RedPen">
     <Vertex x="25%" y="25%"/>
-    <Vertex x="75%" y="25%"/>
+    <Vertex x="65%" y="35%"/>
     <Vertex x="75%" y="75%"/>
-    <Vertex x="25%" y="75%"/>
+    <Vertex x="35%" y="65%"/>
   </PolyLine>
 </Layout2D>

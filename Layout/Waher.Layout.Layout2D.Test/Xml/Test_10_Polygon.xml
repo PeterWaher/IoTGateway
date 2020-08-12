@@ -13,10 +13,10 @@
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Polygon pen="RedPen">
+  <Polygon pen="RedPen" fill="BlackBackground">
     <Vertex x="25%" y="25%"/>
-    <Vertex x="75%" y="25%"/>
+    <Vertex x="65%" y="35%"/>
     <Vertex x="75%" y="75%"/>
-    <Vertex x="25%" y="75%"/>
+    <Vertex x="35%" y="65%"/>
   </Polygon>
 </Layout2D>

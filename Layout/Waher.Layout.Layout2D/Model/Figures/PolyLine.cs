@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using Waher.Layout.Layout2D.Model.Attributes;
+using SkiaSharp;
+using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -34,6 +33,36 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
 			return new PolyLine(Document, Parent);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+			{
+				using (SKPath Path = new SKPath())
+				{
+					bool First = true;
+
+					foreach (Vertex V in this.points)
+					{
+						if (First)
+						{
+							Path.MoveTo(V.XCoordinate, V.YCoordinate);
+							First = false;
+						}
+						else
+							Path.LineTo(V.XCoordinate, V.YCoordinate);
+					}
+
+					State.Canvas.DrawPath(Path, this.GetPen(State));
+				}
+			}
 		}
 	}
 }

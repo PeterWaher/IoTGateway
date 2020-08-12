@@ -10,7 +10,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// </summary>
 	public abstract class Vertices : Figure
 	{
-		private Vertex[] points;
+		/// <summary>
+		/// Vertex nodes
+		/// </summary>
+		protected Vertex[] points;
 
 		/// <summary>
 		/// A sequence of points

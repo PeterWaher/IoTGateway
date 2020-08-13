@@ -6,7 +6,7 @@
   <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
   <SolidPen id="RedPen" color="Red" width="2mm"/>
   <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
-  <SolidBackground id="BlackBackground" color="Black"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
   <Font id="Text" name="Arial" size="12pt"/>
   <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
   <ForEach variable="k" expression="(10..90|10)+'%'">

@@ -2401,6 +2401,35 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.CreateLoop(Waher.Layout.Layout2D.Model.References.Vertex[])">
+            <summary>
+            Creates a Loop (Closed Spline) path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the loop will be created.</param>
+            <returns>Loop path.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.CreateLoop(SkiaSharp.SKPath,Waher.Layout.Layout2D.Model.References.Vertex[])">
+            <summary>
+            Creates a Loop (Closed Spline) path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the loop will be created.</param>
+            <returns>Loop path.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.GetCubicBezierCoefficients(System.Single[],System.Single[]@,System.Single[]@)">
+            <summary>
+            Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
+            </summary>
+            <param name="V">One set of coordinates, where the first and last must be the same.</param>
+            <param name="A">Corresponding coefficients for first control points.</param>
+            <param name="B">Corresponding coefficients for second control points.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Path">
             <summary>
             A path

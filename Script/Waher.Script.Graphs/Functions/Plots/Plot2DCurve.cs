@@ -218,7 +218,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			// Choose control points A[i] and B[i] such that:
 			//
 			// B'[i](1) = B'[i+1](0) => A[i+1]+B[i]=2P[i+1], i<N		(eq 1)
-			// B"[1](1) = B"[i+1](0) => A[i]-2B[i]+2A[i+1]-B[i+1]=0		(eq 2)
+			// B"[i](1) = B"[i+1](0) => A[i]-2B[i]+2A[i+1]-B[i+1]=0		(eq 2)
 			//
 			// Also add the boundary conditions:
 			//

@@ -3,6 +3,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Graphs;
 
 namespace Waher.Layout.Layout2D.Test
 {
@@ -17,6 +18,7 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(InternetContent).Assembly,
 				typeof(Log).Assembly,
 				typeof(Expression).Assembly,
+				typeof(Graph).Assembly,
 				typeof(Layout2DDocument).Assembly);
 		}
 

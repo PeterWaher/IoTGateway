@@ -114,7 +114,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			// Choose control points A[i] and B[i] such that:
 			//
 			// B'[i](1) = B'[i+1](0) => A[i+1]+B[i]=2P[i+1], i<N		(eq 1)
-			// B"[1](1) = B"[i+1](0) => A[i]-2B[i]+2A[i+1]-B[i+1]=0		(eq 2)
+			// B"[i](1) = B"[i+1](0) => A[i]-2B[i]+2A[i+1]-B[i+1]=0		(eq 2)
 			//
 			// Also add the boundary conditions:
 			//
@@ -127,6 +127,22 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			// the diagonal, and in the right-most column need to be processed. Furthermore,
 			// we don't have to store values we know are zero or one. Since number of operations
 			// depend linearly on number of vertices, algorithm is O(N).
+			//
+			// Matrix of system of linear equations has the following form (zeroes excluded):
+			//
+			// | A0 B0 A1 B1 A2 B2 A3 B3 ... AN BN |  EQ |
+			// |-----------------------------------|-----|
+			// |  2 -1                             |  P0 | (eq 3)
+			// |  1 -2  2 -1                       |   0 | (eq 2)
+			// |     1  1                          | 2P1 | (eq 1)
+			// |        1 -2  2 -1                 |   0 | (eq 2)
+			// |           1  1                    | 2P2 | (eq 1)
+			// |              1 -2  2 -1           |   0 | (eq 2)
+			// |                 1  1              | 2P3 | (eq 1)
+			// |                    ...            |   . |
+			// |                       ...         |   . |
+			// |                          ...      |   . |
+			// |                             -1  2 |  PN | (eq 4)
 
 			int N = V.Length - 1;
 			int N2 = N << 1;
@@ -149,7 +165,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			r23 = 1;
 			r25 = 2 * V[j++];
 
-			// r31 = 1;        // eq 2
+			// r31 = 1;     // eq 2
 			r32 = -2;
 			r33 = 2;
 			r34 = -1;

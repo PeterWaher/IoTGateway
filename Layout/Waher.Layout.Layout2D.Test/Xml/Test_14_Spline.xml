@@ -6,21 +6,29 @@
   <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
   <SolidPen id="RedPen" color="Red" width="2mm"/>
   <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
-  <SolidBackground id="BlackBackground" color="Black"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
   <Font id="Text" name="Arial" size="12pt"/>
   <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
   <ForEach variable="k" expression="(10..90|10)+'%'">
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Circle x="25%" y="25%" radius="3mm" pen="LightGrayPen"/>
-  <Circle x="65%" y="35%" radius="3mm" pen="LightGrayPen"/>
-  <Circle x="75%" y="75%" radius="3mm" pen="LightGrayPen"/>
-  <Circle x="35%" y="65%" radius="3mm" pen="LightGrayPen"/>
+  <Circle x="50%" y="10%" radius="3mm" pen="BlackPen"/>
+  <Circle x="65%" y="35%" radius="3mm" pen="BlackPen"/>
+  <Circle x="90%" y="50%" radius="3mm" pen="BlackPen"/>
+  <Circle x="65%" y="65%" radius="3mm" pen="BlackPen"/>
+  <Circle x="50%" y="90%" radius="3mm" pen="BlackPen"/>
+  <Circle x="10%" y="95%" radius="3mm" pen="BlackPen"/>
+  <Circle x="10%" y="50%" radius="3mm" pen="BlackPen"/>
+  <Circle x="35%" y="35%" radius="3mm" pen="BlackPen"/>
   <Spline pen="RedPen">
-    <Vertex x="25%" y="25%"/>
+    <Vertex x="50%" y="10%"/>
     <Vertex x="65%" y="35%"/>
-    <Vertex x="75%" y="75%"/>
-    <Vertex x="35%" y="65%"/>
+    <Vertex x="90%" y="50%"/>
+    <Vertex x="65%" y="65%"/>
+    <Vertex x="50%" y="90%"/>
+    <Vertex x="10%" y="95%"/>
+    <Vertex x="10%" y="50%"/>
+    <Vertex x="35%" y="35%"/>
   </Spline>
 </Layout2D>

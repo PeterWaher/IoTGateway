@@ -6,12 +6,12 @@
   <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
   <SolidPen id="RedPen" color="Red" width="2mm"/>
   <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
-  <SolidBackground id="BlackBackground" color="Black"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
   <Font id="Text" name="Arial" size="12pt"/>
   <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
   <ForEach variable="k" expression="(10..90|10)+'%'">
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Dot x="50%" y="50%" pen="RedPen" fill="BlackBackground"/>
+  <Dot x="50%" y="50%" pen="RedPen" fill="RedBackground"/>
 </Layout2D>

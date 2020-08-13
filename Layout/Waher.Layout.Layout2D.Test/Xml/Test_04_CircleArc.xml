@@ -13,5 +13,5 @@
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <CircleArc x="50%" y="50%" radius="30%" startDegrees="60" endDegrees="300" clockwise="true" pen="RedPen" fill="RedBackground"/>
+  <CircleArc x="50%" y="50%" radius="30%" startDegrees="60" endDegrees="300" clockwise="true" center="true" pen="RedPen" fill="RedBackground"/>
 </Layout2D>

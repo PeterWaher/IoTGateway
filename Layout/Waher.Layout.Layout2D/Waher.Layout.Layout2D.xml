@@ -1994,6 +1994,12 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Dot">
             <summary>
             A dot
@@ -2120,6 +2126,12 @@
         <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>

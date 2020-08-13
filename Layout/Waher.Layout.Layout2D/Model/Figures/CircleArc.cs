@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -14,10 +14,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		private FloatAttribute startDegrees;
 		private FloatAttribute endDegrees;
 		private BooleanAttribute clockwise;
+		private BooleanAttribute center;
 		private float r;
 		private float start;
 		private float end;
 		private bool clockDir;
+		private bool includeCenter;
 
 		/// <summary>
 		/// A circle arc
@@ -46,6 +48,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.startDegrees = new FloatAttribute(Input, "startDegrees");
 			this.endDegrees = new FloatAttribute(Input, "endDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
+			this.center = new BooleanAttribute(Input, "center");
 		}
 
 		/// <summary>
@@ -60,6 +63,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.startDegrees.Export(Output);
 			this.endDegrees.Export(Output);
 			this.clockwise.Export(Output);
+			this.center.Export(Output);
 		}
 
 		/// <summary>
@@ -87,6 +91,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Dest.startDegrees = this.startDegrees.CopyIfNotPreset();
 				Dest.endDegrees = this.endDegrees.CopyIfNotPreset();
 				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+				Dest.center = this.center.CopyIfNotPreset();
 			}
 		}
 
@@ -114,7 +119,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.defined = false;
 
 			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
-				this.defined = false;
+				this.clockDir = true;
+
+			if (!this.center.TryEvaluate(State.Session, out this.includeCenter))
+				this.includeCenter = false;
 
 			if (this.defined)
 			{
@@ -163,7 +171,55 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 				if (this.start != this.end)
 					this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.end);
+
+				if (this.includeCenter)
+					this.IncludePoint(this.xCoordinate, this.yCoordinate);
 			}
 		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+			{
+				float Sweep;
+				SKRect Oval = new SKRect(
+					this.xCoordinate - this.r, this.yCoordinate - this.r,
+					this.xCoordinate + this.r, this.yCoordinate + this.r);
+
+				this.start = (float)Math.IEEERemainder(this.start, 360);
+				if (this.start < 0)
+					this.start += 360;
+
+				this.end = (float)Math.IEEERemainder(this.end, 360);
+				if (this.end < 0)
+					this.end += 360;
+
+				if (this.clockDir)
+				{
+					Sweep = this.end - this.start;
+					if (Sweep < 0)
+						Sweep += 360;
+				}
+				else
+				{
+					Sweep = this.end - this.start;
+					if (Sweep > 0)
+						Sweep -= 360;
+				}
+
+				if (this.TryGetFill(State, out SKPaint Fill))
+					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Fill);
+
+				if (this.TryGetPen(State, out SKPaint Pen))
+					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Pen);
+			}
+		}
+
 	}
 }

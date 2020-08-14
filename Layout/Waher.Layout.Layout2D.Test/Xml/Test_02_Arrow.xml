@@ -13,32 +13,31 @@
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Arrow x="25%" y="25%" x2="75%" y2="75%" pen="RedPen" head="ArrowHead" tail="ArrowTail">
-    <Shape id="ArrowHead">
-      <Path>
-        <TurnRight degrees="150"/>
-        <Forward distance="5px"/>
-        <TurnRight degrees="120"/>
-        <Forward distance="5px"/>
-        <TurnRight degrees="120"/>
-        <Forward distance="5px"/>
-      </Path>
-    </Shape>
-    <Shape id="ArrowTail">
-      <Path>
-        <TurnRight degrees="150"/>
-        <Forward distance="5px"/>
-        <TurnLeft degrees="150"/>
-        <Forward distance="5px"/>
-        <TurnLeft degrees="30"/>
-        <Forward distance="5px"/>
-        <TurnLeft degrees="300"/>
-        <Forward distance="5px"/>
-        <TurnLeft degrees="30"/>
-        <Forward distance="5px"/>
-        <TurnLeft degrees="150"/>
-        <Forward distance="5px"/>
-      </Path>
-    </Shape>
-  </Arrow>
+  <Shape id="ArrowHead">
+    <Path>
+      <TurnRight degrees="150"/>
+      <Forward distance="5px"/>
+      <TurnRight degrees="120"/>
+      <Forward distance="5px"/>
+      <TurnRight degrees="120"/>
+      <Forward distance="5px"/>
+    </Path>
+  </Shape>
+  <Shape id="ArrowTail">
+    <Path>
+      <TurnRight degrees="150"/>
+      <Forward distance="5px"/>
+      <TurnLeft degrees="150"/>
+      <Forward distance="5px"/>
+      <TurnLeft degrees="30"/>
+      <Forward distance="5px"/>
+      <TurnLeft degrees="300"/>
+      <Forward distance="5px"/>
+      <TurnLeft degrees="30"/>
+      <Forward distance="5px"/>
+      <TurnLeft degrees="150"/>
+      <Forward distance="5px"/>
+    </Path>
+  </Shape>
+  <Arrow x="25%" y="75%" x2="75%" y2="25%" pen="RedPen" head="ArrowHead" tail="ArrowTail"/>
 </Layout2D>

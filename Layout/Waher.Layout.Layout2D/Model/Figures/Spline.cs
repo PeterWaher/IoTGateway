@@ -53,6 +53,34 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Spline path.</returns>
 		public static SKPath CreateSpline(SKPath AppendTo, params Vertex[] Points)
 		{
+			int c = Points.Length;
+			int i;
+			SKPoint[] P = new SKPoint[c];
+
+			for (i = 0; i < c; i++)
+				P[i] = new SKPoint(Points[i].XCoordinate, Points[i].YCoordinate);
+
+			return CreateSpline(AppendTo, P);
+		}
+
+		/// <summary>
+		/// Creates a Spline path through a given set of points.
+		/// </summary>
+		/// <param name="Points">Points between which the spline will be created.</param>
+		/// <returns>Spline path.</returns>
+		public static SKPath CreateSpline(params SKPoint[] Points)
+		{
+			return CreateSpline(null, Points);
+		}
+
+		/// <summary>
+		/// Creates a Spline path through a given set of points.
+		/// </summary>
+		/// <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+		/// <param name="Points">Points between which the spline will be created.</param>
+		/// <returns>Spline path.</returns>
+		public static SKPath CreateSpline(SKPath AppendTo, params SKPoint[] Points)
+		{
 			int i, c = Points.Length;
 			if (c == 0)
 				throw new ArgumentException("No points provided.", nameof(Points));
@@ -60,37 +88,39 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			if (AppendTo is null)
 			{
 				AppendTo = new SKPath();
-				AppendTo.MoveTo(Points[0].XCoordinate, Points[0].YCoordinate);
+				AppendTo.MoveTo(Points[0]);
 			}
 			else
-				AppendTo.LineTo(Points[0].XCoordinate, Points[0].YCoordinate);
+			{
+				SKPoint P = AppendTo.LastPoint;
+
+				if (P.X != Points[0].X || P.Y != Points[0].Y)
+					AppendTo.LineTo(Points[0]);
+			}
 
 			if (c == 1)
 				return AppendTo;
 
 			if (c == 2)
 			{
-				AppendTo.LineTo(Points[1].XCoordinate, Points[1].YCoordinate);
+				AppendTo.LineTo(Points[1]);
 				return AppendTo;
 			}
 
 			float[] V = new float[c];
 
 			for (i = 0; i < c; i++)
-				V[i] = Points[i].XCoordinate;
+				V[i] = Points[i].X;
 
 			GetCubicBezierCoefficients(V, out float[] Ax, out float[] Bx);
 
 			for (i = 0; i < c; i++)
-				V[i] = Points[i].YCoordinate;
+				V[i] = Points[i].Y;
 
 			GetCubicBezierCoefficients(V, out float[] Ay, out float[] By);
 
 			for (i = 0; i < c - 1; i++)
-			{
-				AppendTo.CubicTo(Ax[i], Ay[i], Bx[i], By[i],
-					Points[i + 1].XCoordinate, Points[i + 1].YCoordinate);
-			}
+				AppendTo.CubicTo(Ax[i], Ay[i], Bx[i], By[i], Points[i + 1].X, Points[i + 1].Y);
 
 			return AppendTo;
 		}

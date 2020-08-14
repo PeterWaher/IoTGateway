@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Figures.SegmentNodes;
 
@@ -91,10 +92,41 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (!(this.segments is null))
 			{
-				PathState PathState = new PathState(this);
+				PathState PathState = new PathState(this, null);
 
 				foreach (ISegment Segment in this.segments)
 					Segment.Measure(State, PathState);
+			}
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (!(this.segments is null))
+			{
+				using (SKPath Path = new SKPath())
+				{
+					PathState PathState = new PathState(this, Path);
+
+					foreach (ISegment Segment in this.segments)
+					{
+						if (Segment.IsVisible)
+							Segment.Draw(State, PathState, Path);
+					}
+
+					PathState.FlushSpline();
+
+					if (this.TryGetFill(State, out SKPaint Fill))
+						State.Canvas.DrawPath(Path, Fill);
+
+					if (this.TryGetPen(State, out SKPaint Pen))
+						State.Canvas.DrawPath(Path, Pen);
+				}
 			}
 		}
 

@@ -1890,6 +1890,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Circle">
             <summary>
             A circle
@@ -2024,6 +2030,12 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Dot.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Ellipse">
             <summary>
@@ -2281,82 +2293,6 @@
             Measured Y-coordinate
             </summary>
         </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight">
-            <summary>
-            Abstract base class for figures with two points and a weight.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Abstract base class for figures with two points and a weight.
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2Weight.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
-        </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint3">
-            <summary>
-            Abstract base class for figures with three points.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Abstract base class for figures with three points.
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Measures layout entities and defines unassigned properties.
-            </summary>
-            <param name="State">Current drawing state.</param>
-        </member>
-        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.xCoordinate3">
-            <summary>
-            Measured X-coordinate
-            </summary>
-        </member>
-        <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint3.yCoordinate3">
-            <summary>
-            Measured Y-coordinate
-            </summary>
-        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Line">
             <summary>
             A line
@@ -2428,6 +2364,21 @@
             <param name="Points">Points between which the loop will be created.</param>
             <returns>Loop path.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.CreateLoop(SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Loop (Closed Spline) path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the loop will be created.</param>
+            <returns>Loop path.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.CreateLoop(SkiaSharp.SKPath,SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Loop (Closed Spline) path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the loop will be created.</param>
+            <returns>Loop path.</returns>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Loop.GetCubicBezierCoefficients(System.Single[],System.Single[]@,System.Single[]@)">
             <summary>
             Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
@@ -2482,6 +2433,12 @@
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2677,6 +2634,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo">
             <summary>
             Draws a circle arc to a point, relative to the origio of the current container
@@ -2727,6 +2692,24 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.r">
+            <summary>
+            Measured radius
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.clockDir">
+            <summary>
+            Measured direction of arc
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel">
             <summary>
             Draws a circle arc to a point, relative to the end of the last segment
@@ -2758,6 +2741,94 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine">
+            <summary>
+            Closes a path (i.e. returns to the origin), using a line.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Closes a path (i.e. returns to the origin), using a line.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop">
+            <summary>
+            Closes a path (i.e. returns to the origin), using a spline, creating a closed smooth loop.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Closes a path (i.e. returns to the origin), using a spline, creating a closed smooth loop.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo">
             <summary>
@@ -2791,6 +2862,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel">
             <summary>
             Draws a conic curve to a point, relative to the end of the last segment
@@ -2822,6 +2901,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo">
             <summary>
@@ -2855,6 +2942,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel">
             <summary>
             Draws a cubic curve to a point, relative to the end of the last segment
@@ -2886,6 +2981,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo">
             <summary>
@@ -2937,6 +3040,29 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.rX">
+            <summary>
+            Measured radius along X-axis
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.rY">
+            <summary>
+            Measured radius along Y-axis
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.clockDir">
+            <summary>
+            Measured direction of arc
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel">
             <summary>
             Draws a ellipse arc to a point, relative to the end of the last segment
@@ -2968,6 +3094,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward">
             <summary>
@@ -3003,6 +3137,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment">
             <summary>
             Interface for path segment nodes
@@ -3014,6 +3156,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo">
             <summary>
@@ -3047,6 +3197,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel">
             <summary>
             Draws a line to a point, relative to the end of the last segment
@@ -3078,6 +3236,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo">
             <summary>
@@ -3111,6 +3277,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel">
             <summary>
             Moves to a point, relative to the end of the last segment
@@ -3143,15 +3317,25 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.MoveToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState">
             <summary>
             Current state tracing the path.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.#ctor(Waher.Layout.Layout2D.Model.Figures.Path)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.#ctor(Waher.Layout.Layout2D.Model.Figures.Path,SkiaSharp.SKPath)">
             <summary>
             Current state tracing the path.
             </summary>
+            <param name="PathDef">Path definition</param>
+            <param name="Path">Path being drawn (null when measuring).</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.X">
             <summary>
@@ -3178,6 +3362,31 @@
             Calculates the current direction angle, in radians
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Set0(System.Single,System.Single)">
+            <summary>
+            Sets the start coordinate of a new contour.
+            </summary>
+            <param name="X">X-coordinate</param>
+            <param name="Y">Y-coordinate</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Add0(System.Single,System.Single)">
+            <summary>
+            Sets the start coordinate of a new contour, relative to the last point.
+            </summary>
+            <param name="DeltaX">X-coordinate</param>
+            <param name="DeltaY">Y-coordinate</param>
+            <returns>Absolute coordinates.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.CloseLine">
+            <summary>
+            Closes the current contour, using a line.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.CloseLoop">
+            <summary>
+            Closes the current contour, using a spline, creating a closed smooth loop.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Set(System.Single,System.Single)">
             <summary>
             Sets a new coordinate
@@ -3189,18 +3398,21 @@
             <summary>
             Sets a new coordinate
             </summary>
+            <returns>Absolute coordinates.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Forward(System.Single)">
             <summary>
             Moves forward
             </summary>
             <param name="Distance"></param>
+            <returns>Absolute coordinates.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Backward(System.Single)">
             <summary>
             Moves forward
             </summary>
             <param name="Distance"></param>
+            <returns>Absolute coordinates.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnLeft(System.Single)">
             <summary>
@@ -3213,6 +3425,25 @@
             Turns the current direction right.
             </summary>
             <param name="DeltaDegrees">Angle, in degrees.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.FlushSpline">
+            <summary>
+            Closes an ongoing spline curve (if one open).
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.SetSplineVertex(System.Single,System.Single)">
+            <summary>
+            Sets a new spline vertex
+            </summary>
+            <param name="X">X-coordinate</param>
+            <param name="Y">Y-coordinate</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.AddSplineVertex(System.Single,System.Single)">
+            <summary>
+            Sets a new spline vertex, relative to the last coordinate
+            </summary>
+            <param name="DeltaX">X-coordinate</param>
+            <param name="DeltaY">Y-coordinate</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo">
             <summary>
@@ -3246,6 +3477,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel">
             <summary>
             Draws a quadratic curve to a point, relative to the end of the last segment
@@ -3277,6 +3516,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo">
             <summary>
@@ -3310,6 +3557,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel">
             <summary>
             Draws a spline to a point, relative to the end of the last segment
@@ -3341,6 +3596,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft">
             <summary>
@@ -3374,6 +3637,14 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnLeft.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight">
             <summary>
             Turns the current direction right.
@@ -3405,6 +3676,14 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnRight.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Spline">
             <summary>
@@ -3439,6 +3718,21 @@
             <returns>Spline path.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.CreateSpline(SkiaSharp.SKPath,Waher.Layout.Layout2D.Model.References.Vertex[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.CreateSpline(SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.CreateSpline(SkiaSharp.SKPath,SkiaSharp.SKPoint[])">
             <summary>
             Creates a Spline path through a given set of points.
             </summary>
@@ -5329,6 +5623,17 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Point2Weight.weight">
+            <summary>
+            Measured weight
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point3">
             <summary>
             Abstract base class for layout elements with three points.
@@ -5418,6 +5723,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Shape">
             <summary>
             Defines a shape for use elsewhere in the layout.
@@ -5442,6 +5753,18 @@
             <param name="Document">Document containing the new element.</param>
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.DrawShape(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws the shape
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Vertex">
             <summary>

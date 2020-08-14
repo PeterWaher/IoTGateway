@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
@@ -43,7 +42,19 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public override void Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
-				PathState.Add(this.xCoordinate, this.yCoordinate);
+				PathState.Add0(this.xCoordinate, this.yCoordinate);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="PathState">Current path state.</param>
+		/// <param name="Path">Path being generated.</param>
+		public override void Draw(DrawingState State, PathState PathState, SKPath Path)
+		{
+			if (this.defined)
+				Path.MoveTo(PathState.Add0(this.xCoordinate, this.yCoordinate));
 		}
 	}
 }

@@ -34,5 +34,23 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			return new Shape(Document, Parent);
 		}
+
+		/// <summary>
+		/// Draws the shape
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void DrawShape(DrawingState State)
+		{
+			base.Draw(State);
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			// Don't draw a shape definition.
+		}
 	}
 }

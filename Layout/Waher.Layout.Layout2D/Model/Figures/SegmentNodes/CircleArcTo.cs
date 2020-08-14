@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
@@ -85,8 +85,43 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="PathState">Current path state.</param>
 		public virtual void Measure(DrawingState State, PathState PathState)
 		{
+			if (this.radius.TryEvaluate(State.Session, out Length R))
+				this.r = State.GetDrawingSize(R, this, true);
+			else
+				this.defined = false;
+
+			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+				this.defined = false;
+
 			if (this.defined)
 				PathState.Set(this.xCoordinate, this.yCoordinate);
+		}
+
+		/// <summary>
+		/// Measured radius
+		/// </summary>
+		protected float r;
+
+		/// <summary>
+		/// Measured direction of arc
+		/// </summary>
+		protected bool clockDir;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="PathState">Current path state.</param>
+		/// <param name="Path">Path being generated.</param>
+		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
+		{
+			if (this.defined)
+			{
+				PathState.Set(this.xCoordinate, this.yCoordinate);
+				Path.ArcTo(this.r, this.r, 0, SKPathArcSize.Small, 
+					this.clockDir ? SKPathDirection.Clockwise : SKPathDirection.CounterClockwise,
+					this.xCoordinate, this.yCoordinate);
+			}
 		}
 	}
 }

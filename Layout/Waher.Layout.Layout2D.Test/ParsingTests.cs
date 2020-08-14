@@ -110,6 +110,12 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			this.Test("Test_14_Spline");
 		}
-		
+
+		[TestMethod]
+		public void Test_15_Path()
+		{
+			this.Test("Test_15_Path");
+		}
+
 	}
 }

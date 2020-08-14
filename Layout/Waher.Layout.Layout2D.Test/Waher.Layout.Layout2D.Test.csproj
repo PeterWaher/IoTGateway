@@ -21,6 +21,7 @@
     <None Remove="Xml\Test_12_Rectangle.xml" />
     <None Remove="Xml\Test_13_RoundedRectangle.xml" />
     <None Remove="Xml\Test_14_Spline.xml" />
+    <None Remove="Xml\Test_15_Path.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_13_RoundedRectangle.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_15_Path.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_14_Spline.xml">

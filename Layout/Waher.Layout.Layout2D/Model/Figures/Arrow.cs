@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -76,6 +77,40 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Dest.head = this.head.CopyIfNotPreset();
 				Dest.tail = this.tail.CopyIfNotPreset();
 			}
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+			{
+				State.Canvas.DrawLine(this.xCoordinate, this.yCoordinate,
+					this.xCoordinate2, this.yCoordinate2, this.GetPen(State));
+
+				if (this.head.TryEvaluate(State.Session, out string RefId) &&
+					State.TryGetElement(RefId, out ILayoutElement Element))
+				{
+					if (Element is Shape Shape)
+						Shape.DrawShape(State);
+					else
+						Element.Draw(State);
+				}
+
+				if (this.tail.TryEvaluate(State.Session, out RefId) &&
+					State.TryGetElement(RefId, out Element))
+				{
+					if (Element is Shape Shape)
+						Shape.DrawShape(State);
+					else
+						Element.Draw(State);
+				}
+			}
+
 		}
 	}
 }

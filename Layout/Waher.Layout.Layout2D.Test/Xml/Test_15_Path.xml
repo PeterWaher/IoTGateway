@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Circle x="50%" y="90%" radius="3mm" pen="BlackPen"/>
+  <Circle x="50%" y="50%" radius="3mm" pen="BlackPen"/>
+  <Circle x="35%" y="65%" radius="3mm" pen="BlackPen"/>
+  <Circle x="35%" y="90%" radius="3mm" pen="BlackPen"/>
+  <Circle x="50%" y="80%" radius="3mm" pen="BlackPen"/>
+  <Circle x="10%" y="50%" radius="3mm" pen="BlackPen"/>
+  <Circle x="25%" y="75%" radius="3mm" pen="BlackPen"/>
+  <Circle x="20%" y="10%" radius="3mm" pen="BlackPen"/>
+  <Circle x="30%" y="50%" radius="3mm" pen="BlackPen"/>
+  <Circle x="40%" y="10%" radius="3mm" pen="BlackPen"/>
+  <Circle x="50%" y="10%" radius="3mm" pen="BlackPen"/>
+  <Path pen="RedPen" fill="RedBackground">
+    <MoveTo x="50%" y="10%"/>
+    <LineTo x="65%" y="35%"/>
+    <CircleArcTo clockwise="true" radius="50%" x="90%" y="50%"/>
+    <EllipseArcTo clockwise="true" radiusX="50%" radiusY="30%" x="65%" y="65%"/>
+    <ConicTo x="50%" y="90%" x2="50%" y2="50%" w="1"/>
+    <CubicTo x="35%" y="65%" x2="35%" y2="90%" x3="50%" y3="80%"/>
+    <TurnLeft degrees="90"/>
+    <Forward distance="5%"/>
+    <TurnRight degrees="90"/>
+    <Forward distance="10%"/>
+    <TurnRight degrees="90"/>
+    <Forward distance="5%"/>
+    <TurnRight degrees="90"/>
+    <Forward distance="5%"/>
+    <TurnLeft degrees="45"/>
+    <Forward distance="5%"/>
+    <TurnRight degrees="90"/>
+    <Backward distance="5%"/>
+    <QuadraticTo x="10%" y="50%" x2="25%" y2="75%"/>
+    <SplineTo x="20%" y="10%"/>
+    <SplineTo x="30%" y="50%"/>
+    <SplineTo x="40%" y="10%"/>
+    <SplineTo x="50%" y="10%"/>
+    <CloseLine/>
+  </Path>
+</Layout2D>

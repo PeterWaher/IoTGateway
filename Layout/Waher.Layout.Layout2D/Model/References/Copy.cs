@@ -72,5 +72,24 @@ namespace Waher.Layout.Layout2D.Model.References
 			if (Destination is Copy Dest)
 				Dest._ref = this._ref.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined &&
+				this._ref.TryEvaluate(State.Session, out string RefId) &&
+				State.TryGetElement(RefId, out ILayoutElement Element))
+			{
+				if (Element is Shape Shape)
+					Shape.DrawShape(State);
+				else
+					Element.Draw(State);
+			}
+		}
 	}
 }

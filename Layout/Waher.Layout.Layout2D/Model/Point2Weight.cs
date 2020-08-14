@@ -55,5 +55,22 @@ namespace Waher.Layout.Layout2D.Model
 				Dest.w = this.w.CopyIfNotPreset();
 		}
 
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.w.TryEvaluate(State.Session, out this.weight))
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measured weight
+		/// </summary>
+		protected float weight;
+
 	}
 }

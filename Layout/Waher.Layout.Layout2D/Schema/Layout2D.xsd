@@ -47,7 +47,7 @@
   <xs:complexType name="Point2Weight">
     <xs:complexContent>
       <xs:extension base="Point2">
-        <xs:attribute name="w" type="xs:float" use="optional"/>
+        <xs:attribute name="w" type="xs:float" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -260,7 +260,7 @@
       <xs:enumeration value="Gray"/>
       <xs:enumeration value="ForestGreen"/>
       <xs:enumeration value="Empty"/>
-      <xs:pattern value="AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8}|([{].*[}])"/>
+      <xs:pattern value="(AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8})|([{].*[}])"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -412,14 +412,6 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="FigurePoint2Weight">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2">
-        <xs:attribute name="w" type="xs:float" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
   <xs:complexType name="FigurePoint3">
     <xs:complexContent>
       <xs:extension base="FigurePoint2">
@@ -560,6 +552,8 @@
           <xs:element name="Backward" type="Distance"/>
           <xs:element name="TurnLeft" type="Angle"/>
           <xs:element name="TurnRight" type="Angle"/>
+          <xs:element name="CloseLine" type="LayoutElement"/>
+          <xs:element name="CloseLoop" type="LayoutElement"/>
         </xs:choice>
       </xs:extension>
     </xs:complexContent>
@@ -593,8 +587,8 @@
   <xs:complexType name="EllipseArcTo">
     <xs:complexContent>
       <xs:extension base="Point">
-        <xs:attribute name="radiusX" type="xs:boolean" use="required"/>
-        <xs:attribute name="radiusY" type="xs:boolean" use="required"/>
+        <xs:attribute name="radiusX" type="Length" use="required"/>
+        <xs:attribute name="radiusY" type="Length" use="required"/>
         <xs:attribute name="clockwise" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:complexContent>

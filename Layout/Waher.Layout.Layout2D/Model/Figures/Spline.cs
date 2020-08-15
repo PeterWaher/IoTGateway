@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Xml;
 using SkiaSharp;
+using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -7,8 +9,11 @@ namespace Waher.Layout.Layout2D.Model.Figures
 	/// <summary>
 	/// A spline
 	/// </summary>
-	public class Spline : Vertices
+	public class Spline : Vertices, IDirectedElement
 	{
+		private StringAttribute head;
+		private StringAttribute tail;
+
 		/// <summary>
 		/// A spline
 		/// </summary>
@@ -20,9 +25,44 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			this.spline?.Dispose();
+			this.spline = null;
+		}
+
+		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "Spline";
+
+		/// <summary>
+		/// Populates the element (including children) with information from its XML definition.
+		/// </summary>
+		/// <param name="Input">XML definition.</param>
+		public override void FromXml(XmlElement Input)
+		{
+			base.FromXml(Input);
+
+			this.head = new StringAttribute(Input, "head");
+			this.tail = new StringAttribute(Input, "tail");
+		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportAttributes(XmlWriter Output)
+		{
+			base.ExportAttributes(Output);
+
+			this.head.Export(Output);
+			this.tail.Export(Output);
+		}
 
 		/// <summary>
 		/// Creates a new instance of the layout element.
@@ -53,6 +93,11 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Spline path.</returns>
 		public static SKPath CreateSpline(SKPath AppendTo, params Vertex[] Points)
 		{
+			return CreateSpline(AppendTo, ToPoints(Points));
+		}
+
+		private static SKPoint[] ToPoints(Vertex[] Points)
+		{
 			int c = Points.Length;
 			int i;
 			SKPoint[] P = new SKPoint[c];
@@ -60,7 +105,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			for (i = 0; i < c; i++)
 				P[i] = new SKPoint(Points[i].XCoordinate, Points[i].YCoordinate);
 
-			return CreateSpline(AppendTo, P);
+			return P;
 		}
 
 		/// <summary>
@@ -81,6 +126,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Spline path.</returns>
 		public static SKPath CreateSpline(SKPath AppendTo, params SKPoint[] Points)
 		{
+			return CreateSpline(AppendTo, out _, out _, out _, out _, Points);
+		}
+
+		private static SKPath CreateSpline(SKPath AppendTo,
+			out float[] Ax, out float[] Ay, out float[] Bx, out float[] By,
+			params SKPoint[] Points)
+		{
 			int i, c = Points.Length;
 			if (c == 0)
 				throw new ArgumentException("No points provided.", nameof(Points));
@@ -99,11 +151,15 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			}
 
 			if (c == 1)
+			{
+				Ax = Ay = Bx = By = null;
 				return AppendTo;
+			}
 
 			if (c == 2)
 			{
 				AppendTo.LineTo(Points[1]);
+				Ax = Ay = Bx = By = null;
 				return AppendTo;
 			}
 
@@ -112,12 +168,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			for (i = 0; i < c; i++)
 				V[i] = Points[i].X;
 
-			GetCubicBezierCoefficients(V, out float[] Ax, out float[] Bx);
+			GetCubicBezierCoefficients(V, out Ax, out Bx);
 
 			for (i = 0; i < c; i++)
 				V[i] = Points[i].Y;
 
-			GetCubicBezierCoefficients(V, out float[] Ay, out float[] By);
+			GetCubicBezierCoefficients(V, out Ay, out By);
 
 			for (i = 0; i < c - 1; i++)
 				AppendTo.CubicTo(Ax[i], Ay[i], Bx[i], By[i], Points[i + 1].X, Points[i + 1].Y);
@@ -319,6 +375,55 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Spline Dest)
+			{
+				Dest.head = this.head.CopyIfNotPreset();
+				Dest.tail = this.tail.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.head.TryEvaluate(State.Session, out string RefId) &&
+				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				Element is Shape Shape)
+			{
+				this.headElement = Shape;
+			}
+
+			if (this.tail.TryEvaluate(State.Session, out RefId) &&
+				State.TryGetElement(RefId, out Element) &&
+				Element is Shape Shape2)
+			{
+				this.tailElement = Shape2;
+			}
+
+			this.spline?.Dispose();
+			this.spline = null;
+		}
+
+		private Shape headElement;
+		private Shape tailElement;
+		private SKPath spline;
+		private float[] ax;
+		private float[] ay;
+		private float[] bx;
+		private float[] by;
+
+		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
@@ -328,11 +433,114 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (this.defined)
 			{
-				using (SKPath Path = CreateSpline(this.points))
+				SKPaint Pen = this.GetPen(State);
+
+				this.CheckSpline();
+
+				State.Canvas.DrawPath(this.spline, Pen);
+
+				if (!(this.tailElement is null) || !(this.headElement is null))
 				{
-					State.Canvas.DrawPath(Path, this.GetPen(State));
+					if (!this.TryGetFill(State, out SKPaint Fill))
+						Fill = null;
+
+					this.tailElement?.DrawTail(State, this, Pen, Fill);
+					this.headElement?.DrawHead(State, this, Pen, Fill);
 				}
 			}
+		}
+
+		private void CheckSpline()
+		{
+			if (this.spline is null)
+			{
+				this.spline = CreateSpline(null, out this.ax, out this.ay,
+					out this.bx, out this.by, ToPoints(this.points));
+			}
+		}
+
+		/// <summary>
+		/// Tries to get start position and initial direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Initial direction.</param>
+		/// <returns>If a start position was found.</returns>
+		public bool TryGetStart(out float X, out float Y, out float Direction)
+		{
+			int c;
+
+			if (this.defined && !(this.points is null) && (c = this.points.Length) >= 2)
+			{
+				Vertex P1 = this.points[0];
+
+				X = P1.XCoordinate;
+				Y = P1.YCoordinate;
+
+				if (c == 2)
+				{
+					Vertex P2 = this.points[1];
+			
+					Direction = CalcDirection(P1, P2);
+				}
+				else
+				{
+					// B'[i](t) = (-3+6t-3t²)P[i]+(3-12t+9t²)A[i]+(6t-9t²)B[i]+3t²P[i+1]
+					// B'[i](0) = -3P[i]+3A[i]
+
+					float dx = 3 * (this.ax[0] - P1.XCoordinate);
+					float dy = 3 * (this.ay[0] - P1.YCoordinate);
+
+					Direction = CalcDirection(dx, dy);
+				}
+
+				return true;
+			}
+
+			X = Y = Direction = 0;
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to get end position and terminating direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Terminating direction.</param>
+		/// <returns>If a terminating position was found.</returns>
+		public bool TryGetEnd(out float X, out float Y, out float Direction)
+		{
+			int c;
+
+			if (this.defined && !(this.points is null) && (c = this.points.Length) >= 2)
+			{
+				Vertex P2 = this.points[c - 1];
+
+				X = P2.XCoordinate;
+				Y = P2.YCoordinate;
+
+				if (c == 2)
+				{
+					Vertex P1 = this.points[c - 2];
+
+					Direction = CalcDirection(P1, P2);
+				}
+				else
+				{
+					// B'[i](t) = (-3+6t-3t²)P[i]+(3-12t+9t²)A[i]+(6t-9t²)B[i]+3t²P[i+1]
+					// B'[i](1) = -3B[i]+3P[i+1]
+
+					float dx = 3 * (P2.XCoordinate - this.bx[c - 2]);
+					float dy = 3 * (P2.YCoordinate - this.by[c - 2]);
+
+					Direction = CalcDirection(dx, dy);
+				}
+
+				return true;
+			}
+
+			X = Y = Direction = 0;
+			return false;
 		}
 
 	}

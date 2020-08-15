@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm" cap="Round" join="Round"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="RedBackground" color="{Blend('Red','White',0.5)}"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Shape id="ArrowHead">
+    <Path>
+      <TurnRight degrees="150"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="120"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="120"/>
+      <Forward distance="1cm"/>
+    </Path>
+  </Shape>
+  <Shape id="ArrowTail">
+    <Path>
+      <TurnRight degrees="150"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="30"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="150"/>
+      <Forward distance="1cm"/>
+      <TurnLeft degrees="120"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="150"/>
+      <Forward distance="1cm"/>
+      <TurnRight degrees="30"/>
+      <Forward distance="1cm"/>
+    </Path>
+  </Shape>
+  <Line x="25%" y="75%" x2="75%" y2="25%" pen="RedPen" fill="RedBackground" head="ArrowHead" tail="ArrowTail"/>
+  <PolyLine pen="RedPen" fill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <Vertex x="25%" y="90%"/>
+    <Vertex x="90%" y="90%"/>
+    <Vertex x="90%" y="25%"/>
+  </PolyLine>
+  <Spline pen="RedPen" fill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <Vertex x="35%" y="82.5%"/>
+    <Vertex x="70%" y="70%"/>
+    <Vertex x="82.5%" y="35%"/>
+  </Spline>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="10%" y="75%"/>
+    <LineTo x="25%" y="60%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="10%" y="60%"/>
+    <ConicTo x="15%" y="35%" x2="25%" y2="45%" w="1"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="10%" y="40%"/>
+    <CubicTo x="12%" y="25%" x2="20%" y2="20%" x3="25%" y3="30%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="10%" y="25%"/>
+    <QuadraticTo x="15%" y="10%" x2="25%" y2="15%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="40%" y="40%"/>
+    <SplineTo x="60%" y="20%"/>
+    <SplineTo x="60%" y="10%"/>
+    <SplineTo x="40%" y="10%"/>
+    <SplineTo x="40%" y="20%"/>
+    <SplineTo x="50%" y="20%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="50%" y="70%"/>
+    <TurnTowards x="60%" y="60%"/>
+    <Forward distance="20%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="70%" y="40%"/>
+    <TurnTowards x="80%" y="30%"/>
+    <Backward distance="20%"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="70%" y="20%"/>
+    <CircleArcTo x="90%" y="20%" radius="30%" clockwise="true"/>
+  </Path>
+  <Path pen="RedPen" shapeFill="RedBackground" head="ArrowHead" tail="ArrowTail">
+    <MoveTo x="70%" y="10%"/>
+    <EllipseArcTo x="90%" y="10%" radiusX="30%" radiusY="60%" clockwise="true"/>
+  </Path>
+</Layout2D>

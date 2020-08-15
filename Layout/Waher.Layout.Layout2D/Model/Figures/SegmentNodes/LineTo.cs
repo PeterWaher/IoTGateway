@@ -6,7 +6,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	/// <summary>
 	/// Draws a line to a point, relative to the origio of the current container
 	/// </summary>
-	public class LineTo : Point, ISegment
+	public class LineTo : Point, ISegment, IDirectedElement
 	{
 		/// <summary>
 		/// Draws a line to a point, relative to the origio of the current container
@@ -55,9 +55,53 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			if (this.defined)
 			{
+				this.P1 = Path.LastPoint;
 				PathState.Set(this.xCoordinate, this.yCoordinate);
 				Path.LineTo(this.xCoordinate, this.yCoordinate);
+				this.P2 = Path.LastPoint;
 			}
+		}
+
+		/// <summary>
+		/// Line drawn from this point
+		/// </summary>
+		protected SKPoint P1;
+
+		/// <summary>
+		/// Line drawn to this point
+		/// </summary>
+		protected SKPoint P2;
+
+		/// <summary>
+		/// Tries to get start position and initial direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Initial direction.</param>
+		/// <returns>If a start position was found.</returns>
+		public bool TryGetStart(out float X, out float Y, out float Direction)
+		{
+			X = this.P1.X;
+			Y = this.P1.Y;
+			Direction = CalcDirection(this.P1, this.P2);
+
+			return this.defined;
+		}
+
+		/// <summary>
+		/// Tries to get end position and terminating direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Terminating direction.</param>
+		/// <returns>If a terminating position was found.</returns>
+		public bool TryGetEnd(out float X, out float Y, out float Direction)
+		{
+			X = this.P2.X;
+			Y = this.P2.Y;
+			Direction = CalcDirection(this.P1, this.P2);
+
+			return this.defined;
 		}
 
 	}

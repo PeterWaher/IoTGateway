@@ -11,12 +11,14 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	{
 		private readonly Path pathDef;
 		private readonly SKPath path;
+		private readonly bool calcStart;
+		private readonly bool calcEnd;
 		private float x0, y0;
 		private float x, y;
 		private float xPrev, yPrev;
 		private float? angle;
 		private bool drawingSpline = false;
-		private List<SKPoint> vertices = null;
+		private PathSpline currentSpline = null;
 		private bool nonSpline = false;
 
 		/// <summary>
@@ -24,10 +26,14 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="PathDef">Path definition</param>
 		/// <param name="Path">Path being drawn (null when measuring).</param>
-		public PathState(Path PathDef, SKPath Path)
+		/// <param name="CalcStart">If start position and angle are to be calculated.</param>
+		/// <param name="CalcEnd">If end position and angle are to be calculated.</param>
+		public PathState(Path PathDef, SKPath Path, bool CalcStart, bool CalcEnd)
 		{
 			this.pathDef = PathDef;
 			this.path = Path;
+			this.calcStart = CalcStart;
+			this.calcEnd = CalcEnd;
 		}
 
 		/// <summary>
@@ -51,15 +57,22 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public float YPrev => this.yPrev;
 
 		/// <summary>
+		/// If start position and angle are to be calculated.
+		/// </summary>
+		public bool CalcStart => this.calcStart;
+
+		/// <summary>
+		/// If end position and angle are to be calculated.
+		/// </summary>
+		public bool CalcEnd => this.calcEnd;
+
+		/// <summary>
 		/// Calculates the current direction angle, in radians
 		/// </summary>
 		public float Angle
 		{
 			get
 			{
-				if (this.drawingSpline)
-					this.FlushSpline();
-
 				if (!this.angle.HasValue)
 				{
 					float dx = this.x - this.xPrev;
@@ -131,8 +144,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 				}
 				else
 				{
-					Loop.CreateLoop(this.path, this.vertices.ToArray());
-					this.vertices.Clear();
+					Loop.CreateLoop(this.path, this.currentSpline.ToArray());
+					this.currentSpline = null;
 				}
 
 				this.drawingSpline = false;
@@ -162,7 +175,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 
 				this.angle = null;
 
-				this.pathDef.IncludePoint(X, Y);
+				this.pathDef?.IncludePoint(X, Y);
 			}
 		}
 
@@ -237,6 +250,40 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		}
 
 		/// <summary>
+		/// Turns the current direction towards a given point.
+		/// </summary>
+		public void TurnTowards(float X, float Y)
+		{
+			this.TurnTowardsRel(X - this.x, Y - this.y);
+		}
+
+		/// <summary>
+		/// Turns the current direction towards a given point, relative to the current point.
+		/// </summary>
+		public void TurnTowardsRel(float DeltaX, float DeltaY)
+		{
+			if (this.drawingSpline)
+				this.FlushSpline();
+
+			if (DeltaX == 0 && DeltaY == 0)
+				this.angle = 0;
+			else
+				this.angle = (float)Math.Atan2(DeltaY, DeltaX);
+		}
+
+		/// <summary>
+		/// Turns the current direction towards a given direction.
+		/// </summary>
+		/// <param name="Angle">Angle</param>
+		public void TurnTowards(float Angle)
+		{
+			if (this.drawingSpline)
+				this.FlushSpline();
+
+			this.angle = Angle;
+		}
+
+		/// <summary>
 		/// Closes an ongoing spline curve (if one open).
 		/// </summary>
 		public void FlushSpline()
@@ -245,8 +292,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			{
 				this.drawingSpline = false;
 
-				Spline.CreateSpline(this.path, this.vertices.ToArray());
-				this.vertices.Clear();
+				Spline.CreateSpline(this.path, this.currentSpline.ToArray());
+				this.currentSpline = null;
 				this.nonSpline = false;
 			}
 		}
@@ -256,16 +303,20 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="X">X-coordinate</param>
 		/// <param name="Y">Y-coordinate</param>
-		public void SetSplineVertex(float X, float Y)
+		/// <returns>Dynamic spline curve</returns>
+		public PathSpline SetSplineVertex(float X, float Y)
 		{
 			if (this.path is null)
+			{
 				this.Set(X, Y);
+				return null;
+			}
 			else
 			{
-				if (this.vertices is null)
-					this.vertices = new List<SKPoint>() { new SKPoint(this.x, this.y) };
+				if (this.currentSpline is null)
+					this.currentSpline = new PathSpline(this.x, this.y);
 
-				this.vertices.Add(new SKPoint(X, Y));
+				this.currentSpline.Add(X, Y);
 				this.drawingSpline = true;
 
 				if (X != this.x || Y != this.y)
@@ -278,8 +329,10 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 
 					this.angle = null;
 
-					this.pathDef.IncludePoint(X, Y);
+					this.pathDef?.IncludePoint(X, Y);
 				}
+
+				return this.currentSpline;
 			}
 		}
 
@@ -288,9 +341,10 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="DeltaX">X-coordinate</param>
 		/// <param name="DeltaY">Y-coordinate</param>
-		public void AddSplineVertex(float DeltaX, float DeltaY)
+		/// <returns>Dynamic spline curve</returns>
+		public PathSpline AddSplineVertex(float DeltaX, float DeltaY)
 		{
-			this.SetSplineVertex(this.x + DeltaX, this.y + DeltaY);
+			return this.SetSplineVertex(this.x + DeltaX, this.y + DeltaY);
 		}
 	}
 }

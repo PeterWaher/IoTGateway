@@ -58,9 +58,10 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			if (this.defined)
 			{
-				SKPoint P1 = PathState.Add(this.xCoordinate, this.yCoordinate);
-				SKPoint P2 = PathState.Add(this.xCoordinate2, this.yCoordinate2);
-				Path.ConicTo(P1, P2, this.weight);
+				this.P0 = Path.LastPoint;
+				this.P1 = PathState.Add(this.xCoordinate, this.yCoordinate);
+				this.P2 = PathState.Add(this.xCoordinate2, this.yCoordinate2);
+				Path.ConicTo(this.P1, this.P2, this.weight);
 			}
 		}
 	}

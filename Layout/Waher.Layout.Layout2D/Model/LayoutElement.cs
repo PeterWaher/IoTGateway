@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -259,5 +261,53 @@ namespace Waher.Layout.Layout2D.Model
 		{
 		}
 
+		/// <summary>
+		/// Calculates the direction of the pen when drawing from (x1,y1) to (x2,y2).
+		/// </summary>
+		/// <param name="x1">First X-coordinate</param>
+		/// <param name="y1">First Y-coordinate</param>
+		/// <param name="x2">Second X-coordinate</param>
+		/// <param name="y2">Second Y-coordinate</param>
+		/// <returns>Direction angle</returns>
+		public static float CalcDirection(float x1, float y1, float x2, float y2)
+		{
+			return CalcDirection(x2 - x1, y2 - y1);
+		}
+
+		/// <summary>
+		/// Calculates the direction of the pen when drawing in the direction of (dx,dy)
+		/// </summary>
+		/// <param name="dx">Delta-X</param>
+		/// <param name="dy">Delta-Y</param>
+		/// <returns>Direction angle</returns>
+		public static float CalcDirection(float dx, float dy)
+		{
+			if (dx == 0 && dy == 0)
+				return 0;
+			else
+				return (float)Math.Atan2(dy, dx);
+		}
+
+		/// <summary>
+		/// Calculates the direction of the pen when drawing from P1 to P2.
+		/// </summary>
+		/// <param name="P1">First point</param>
+		/// <param name="P2">Second point</param>
+		/// <returns>Direction angle</returns>
+		public static float CalcDirection(SKPoint P1, SKPoint P2)
+		{
+			return CalcDirection(P2.X - P1.X, P2.Y - P1.Y);
+		}
+
+		/// <summary>
+		/// Calculates the direction of the pen when drawing from P1 to P2.
+		/// </summary>
+		/// <param name="P1">First vertex</param>
+		/// <param name="P2">Second vertex</param>
+		/// <returns>Direction angle</returns>
+		public static float CalcDirection(Vertex P1, Vertex P2)
+		{
+			return CalcDirection(P2.XCoordinate - P1.XCoordinate, P2.YCoordinate - P1.YCoordinate);
+		}
 	}
 }

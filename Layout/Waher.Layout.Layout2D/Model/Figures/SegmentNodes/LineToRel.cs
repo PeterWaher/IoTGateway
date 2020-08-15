@@ -54,7 +54,11 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public override void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
+			{
+				this.P1 = Path.LastPoint;
 				Path.LineTo(PathState.Add(this.xCoordinate, this.yCoordinate));
+				this.P2 = Path.LastPoint;
+			}
 		}
 
 	}

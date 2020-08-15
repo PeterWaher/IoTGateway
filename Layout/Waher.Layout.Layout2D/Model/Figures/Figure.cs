@@ -74,12 +74,18 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Pen.</returns>
 		public SKPaint GetPen(DrawingState State)
 		{
-			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
-				State.TryGetElement(PenId, out ILayoutElement E) &&
-				E is Pen PenDefinition)
+			if (this.pen.TryEvaluate(State.Session, out string PenId))
 			{
-				return PenDefinition.Paint;
+				if (State.TryGetElement(PenId, out ILayoutElement E) &&
+					E is Pen PenDefinition)
+				{
+					return PenDefinition.Paint;
+				}
+				else
+					return State.DefaultPen;
 			}
+			else if (!(State.ShapePen is null))
+				return State.ShapePen;
 			else
 				return State.DefaultPen;
 		}
@@ -92,18 +98,23 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>If a pen was defined, and was found.</returns>
 		public bool TryGetPen(DrawingState State, out SKPaint Pen)
 		{
-			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
-				State.TryGetElement(PenId, out ILayoutElement E) &&
-				E is Pen PenDefinition)
+			if (this.pen.TryEvaluate(State.Session, out string PenId))
 			{
-				Pen = PenDefinition.Paint;
+				if (State.TryGetElement(PenId, out ILayoutElement E) &&
+					E is Pen PenDefinition)
+				{
+					Pen = PenDefinition.Paint;
+					return true;
+				}
+			}
+			else if (!(State.ShapePen is null))
+			{
+				Pen = State.ShapePen;
 				return true;
 			}
-			else
-			{
-				Pen = null;
-				return false;
-			}
+
+			Pen = null;
+			return false;
 		}
 
 		/// <summary>
@@ -114,18 +125,23 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>If a filling was defined, and was found.</returns>
 		public bool TryGetFill(DrawingState State, out SKPaint Fill)
 		{
-			if (this.fill.TryEvaluate(State.Session, out string FillId) &&
-				State.TryGetElement(FillId, out ILayoutElement E) &&
-				E is Background FillDefinition)
+			if (this.fill.TryEvaluate(State.Session, out string FillId))
 			{
-				Fill = FillDefinition.Paint;
+				if (State.TryGetElement(FillId, out ILayoutElement E) &&
+					E is Background FillDefinition)
+				{
+					Fill = FillDefinition.Paint;
+					return true;
+				}
+			}
+			else if (!(State.ShapeFill is null))
+			{
+				Fill = State.ShapeFill;
 				return true;
 			}
-			else
-			{
-				Fill = null;
-				return false;
-			}
+
+			Fill = null;
+			return false;
 		}
 
 	}

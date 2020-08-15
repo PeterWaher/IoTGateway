@@ -123,5 +123,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 					this.xCoordinate, this.yCoordinate);
 			}
 		}
+
+		// TODO: IDirectedElement
 	}
 }

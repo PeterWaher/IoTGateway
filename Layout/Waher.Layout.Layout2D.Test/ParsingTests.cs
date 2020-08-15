@@ -34,87 +34,87 @@ namespace Waher.Layout.Layout2D.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Arrow()
+		public void Test_02_Circle()
 		{
-			this.Test("Test_02_Arrow");
+			this.Test("Test_02_Circle");
 		}
 
 		[TestMethod]
-		public void Test_03_Circle()
+		public void Test_03_CircleArc()
 		{
-			this.Test("Test_03_Circle");
+			this.Test("Test_03_CircleArc");
 		}
 
 		[TestMethod]
-		public void Test_04_CircleArc()
+		public void Test_04_Dot()
 		{
-			this.Test("Test_04_CircleArc");
+			this.Test("Test_04_Dot");
 		}
 
 		[TestMethod]
-		public void Test_05_Dot()
+		public void Test_05_Ellipse()
 		{
-			this.Test("Test_05_Dot");
+			this.Test("Test_05_Ellipse");
 		}
 
 		[TestMethod]
-		public void Test_06_Ellipse()
+		public void Test_06_EllipseArc()
 		{
-			this.Test("Test_06_Ellipse");
+			this.Test("Test_06_EllipseArc");
 		}
 
 		[TestMethod]
-		public void Test_07_EllipseArc()
+		public void Test_07_Line()
 		{
-			this.Test("Test_07_EllipseArc");
+			this.Test("Test_07_Line");
 		}
 
 		[TestMethod]
-		public void Test_08_Line()
+		public void Test_08_Loop()
 		{
-			this.Test("Test_08_Line");
+			this.Test("Test_08_Loop");
 		}
 
 		[TestMethod]
-		public void Test_09_Loop()
+		public void Test_09_Polygon()
 		{
-			this.Test("Test_09_Loop");
+			this.Test("Test_09_Polygon");
 		}
 
 		[TestMethod]
-		public void Test_10_Polygon()
+		public void Test_10_PolyLine()
 		{
-			this.Test("Test_10_Polygon");
+			this.Test("Test_10_PolyLine");
 		}
 
 		[TestMethod]
-		public void Test_11_PolyLine()
+		public void Test_11_Rectangle()
 		{
-			this.Test("Test_11_PolyLine");
+			this.Test("Test_11_Rectangle");
 		}
 
 		[TestMethod]
-		public void Test_12_Rectangle()
+		public void Test_12_RoundedRectangle()
 		{
-			this.Test("Test_12_Rectangle");
+			this.Test("Test_12_RoundedRectangle");
 		}
 
 		[TestMethod]
-		public void Test_13_RoundedRectangle()
+		public void Test_13_Spline()
 		{
-			this.Test("Test_13_RoundedRectangle");
+			this.Test("Test_13_Spline");
 		}
 
 		[TestMethod]
-		public void Test_14_Spline()
+		public void Test_14_Path()
 		{
-			this.Test("Test_14_Spline");
+			this.Test("Test_14_Path");
 		}
 
 		[TestMethod]
-		public void Test_15_Path()
+		public void Test_15_Arrow()
 		{
-			this.Test("Test_15_Path");
+			this.Test("Test_15_Arrow");
 		}
 
 	}

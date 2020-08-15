@@ -274,9 +274,28 @@
     <xs:complexContent>
       <xs:extension base="LayoutElement">
         <xs:attribute name="width" type="Length" use="optional"/>
+        <xs:attribute name="cap" type="PenCap" use="optional"/>
+        <xs:attribute name="join" type="PenJoin" use="optional"/>
+        <xs:attribute name="miter" type="Length" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  
+  <xs:simpleType name="PenCap">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Butt"/>
+      <xs:enumeration value="Round"/>
+      <xs:enumeration value="Square"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="PenJoin">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Miter"/>
+      <xs:enumeration value="Round"/>
+      <xs:enumeration value="Bevel"/>
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:complexType name="SolidPen">
     <xs:complexContent>
@@ -377,7 +396,6 @@
     <xs:choice>
       <xs:element name="Dot" type="FigurePoint"/>
       <xs:element name="Line" type="Line"/>
-      <xs:element name="Arrow" type="Arrow"/>
       <xs:element name="Circle" type="Circle"/>
       <xs:element name="CircleArc" type="CircleArc"/>
       <xs:element name="EllipseArc" type="EllipseArc"/>
@@ -423,12 +441,6 @@
   </xs:complexType>
 
   <xs:complexType name="Line">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Arrow">
     <xs:complexContent>
       <xs:extension base="FigurePoint2">
         <xs:attribute name="head" type="xs:string" use="optional"/>
@@ -506,7 +518,10 @@
 
   <xs:complexType name="PolyLine">
     <xs:complexContent>
-      <xs:extension base="Vertices"/>
+      <xs:extension base="Vertices">
+        <xs:attribute name="head" type="xs:string" use="optional"/>
+        <xs:attribute name="tail" type="xs:string" use="optional"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
@@ -518,7 +533,10 @@
 
   <xs:complexType name="Spline">
     <xs:complexContent>
-      <xs:extension base="Vertices"/>
+      <xs:extension base="Vertices">
+        <xs:attribute name="head" type="xs:string" use="optional"/>
+        <xs:attribute name="tail" type="xs:string" use="optional"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
@@ -552,9 +570,15 @@
           <xs:element name="Backward" type="Distance"/>
           <xs:element name="TurnLeft" type="Angle"/>
           <xs:element name="TurnRight" type="Angle"/>
+          <xs:element name="TurnTowards" type="Point"/>
+          <xs:element name="TurnTowardsRel" type="Point"/>
           <xs:element name="CloseLine" type="LayoutElement"/>
           <xs:element name="CloseLoop" type="LayoutElement"/>
+          <xs:element name="Replay" type="Copy"/>
         </xs:choice>
+        <xs:attribute name="head" type="xs:string" use="optional"/>
+        <xs:attribute name="tail" type="xs:string" use="optional"/>
+        <xs:attribute name="shapeFill" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

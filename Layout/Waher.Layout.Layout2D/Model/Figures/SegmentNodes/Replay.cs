@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Layout.Layout2D.Model.References;
 
-namespace Waher.Layout.Layout2D.Model.Figures
+namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
 	/// <summary>
-	/// An arrow
+	/// Replays the segments of another path.
 	/// </summary>
-	public class Arrow : FigurePoint2
+	public class Replay : LayoutElement, ISegment
 	{
-		private StringAttribute head;
-		private StringAttribute tail;
+		private StringAttribute _ref;
 
 		/// <summary>
-		/// An arrow
+		/// Replays the segments of another path.
 		/// </summary>
 		/// <param name="Document">Layout document containing the element.</param>
 		/// <param name="Parent">Parent element.</param>
-		public Arrow(Layout2DDocument Document, ILayoutElement Parent)
+		public Replay(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
 		}
@@ -27,7 +25,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Local name of type of element.
 		/// </summary>
-		public override string LocalName => "Arrow";
+		public override string LocalName => "Replay";
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -37,8 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.FromXml(Input);
 
-			this.head = new StringAttribute(Input, "head");
-			this.tail = new StringAttribute(Input, "tail");
+			this._ref = new StringAttribute(Input, "ref");
 		}
 
 		/// <summary>
@@ -49,8 +46,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.head.Export(Output);
-			this.tail.Export(Output);
+			this._ref.Export(Output);
 		}
 
 		/// <summary>
@@ -61,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>New instance.</returns>
 		public override ILayoutElement Create(Layout2DDocument Document, ILayoutElement Parent)
 		{
-			return new Arrow(Document, Parent);
+			return new Replay(Document, Parent);
 		}
 
 		/// <summary>
@@ -72,45 +68,45 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.CopyContents(Destination);
 
-			if (Destination is Arrow Dest)
+			if (Destination is Replay Dest)
+				Dest._ref = this._ref.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="PathState">Current path state.</param>
+		public virtual void Measure(DrawingState State, PathState PathState)
+		{
+			if (this.defined &&
+				this._ref.TryEvaluate(State.Session, out string RefId) &&
+				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				Element is ISegment Segment)
 			{
-				Dest.head = this.head.CopyIfNotPreset();
-				Dest.tail = this.tail.CopyIfNotPreset();
+				this.reference = Segment;
+				this.reference.Measure(State, PathState);
+			}
+			else
+			{
+				this.reference = null;
+				this.defined = false;
 			}
 		}
+
+		private ISegment reference;
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		/// <param name="PathState">Current path state.</param>
+		/// <param name="Path">Path being generated.</param>
+		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
-			base.Draw(State);
-
 			if (this.defined)
-			{
-				State.Canvas.DrawLine(this.xCoordinate, this.yCoordinate,
-					this.xCoordinate2, this.yCoordinate2, this.GetPen(State));
-
-				if (this.head.TryEvaluate(State.Session, out string RefId) &&
-					State.TryGetElement(RefId, out ILayoutElement Element))
-				{
-					if (Element is Shape Shape)
-						Shape.DrawShape(State);
-					else
-						Element.Draw(State);
-				}
-
-				if (this.tail.TryEvaluate(State.Session, out RefId) &&
-					State.TryGetElement(RefId, out Element))
-				{
-					if (Element is Shape Shape)
-						Shape.DrawShape(State);
-					else
-						Element.Draw(State);
-				}
-			}
-
+				this.reference.Draw(State, PathState, Path);
 		}
+
 	}
 }

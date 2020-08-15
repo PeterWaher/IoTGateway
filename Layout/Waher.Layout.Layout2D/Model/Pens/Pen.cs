@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -12,6 +11,9 @@ namespace Waher.Layout.Layout2D.Model.Pens
 	public abstract class Pen : LayoutElement
 	{
 		private LengthAttribute width;
+		private EnumAttribute<SKStrokeCap> cap;
+		private EnumAttribute<SKStrokeJoin> join;
+		private LengthAttribute miter;
 
 		/// <summary>
 		/// Current pen
@@ -53,6 +55,9 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			base.FromXml(Input);
 
 			this.width = new LengthAttribute(Input, "width");
+			this.cap = new EnumAttribute<SKStrokeCap>(Input, "cap");
+			this.join = new EnumAttribute<SKStrokeJoin>(Input, "join");
+			this.miter = new LengthAttribute(Input, "miter");
 		}
 
 		/// <summary>
@@ -64,6 +69,9 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			base.ExportAttributes(Output);
 
 			this.width.Export(Output);
+			this.cap.Export(Output);
+			this.join.Export(Output);
+			this.miter.Export(Output);
 		}
 
 		/// <summary>
@@ -75,7 +83,12 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			base.CopyContents(Destination);
 
 			if (Destination is Pen Dest)
+			{
 				Dest.width = this.width.CopyIfNotPreset();
+				Dest.cap = this.cap.CopyIfNotPreset();
+				Dest.join = this.join.CopyIfNotPreset();
+				Dest.miter = this.miter.CopyIfNotPreset();
+			}
 		}
 
 		/// <summary>
@@ -90,12 +103,42 @@ namespace Waher.Layout.Layout2D.Model.Pens
 				this.penWidth = State.GetDrawingSize(Width, this, true);
 			else
 				this.penWidth = null;
+
+			if (this.cap.TryEvaluate(State.Session, out SKStrokeCap Cap))
+				this.penCap = Cap;
+			else
+				this.penCap = null;
+
+			if (this.join.TryEvaluate(State.Session, out SKStrokeJoin Join))
+				this.penJoin = Join;
+			else
+				this.penJoin = null;
+
+			if (this.miter.TryEvaluate(State.Session, out Width))
+				this.penMiter = State.GetDrawingSize(Width, this, true);
+			else
+				this.penMiter = null;
 		}
 
 		/// <summary>
 		/// Measured pen width.
 		/// </summary>
 		protected float? penWidth;
+
+		/// <summary>
+		/// Measured pen stroke cap.
+		/// </summary>
+		protected SKStrokeCap? penCap;
+
+		/// <summary>
+		/// Measured pen stroke join.
+		/// </summary>
+		protected SKStrokeJoin? penJoin;
+
+		/// <summary>
+		/// Measured pen miter.
+		/// </summary>
+		protected float? penMiter;
 
 	}
 }

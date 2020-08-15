@@ -89,11 +89,20 @@ namespace Waher.Layout.Layout2D.Model.Pens
 					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Stroke, 
-					Color = Color
+					Color = Color,
 				};
 
 				if (this.penWidth.HasValue)
 					this.paint.StrokeWidth = this.penWidth.Value;
+
+				if (this.penCap.HasValue)
+					this.paint.StrokeCap = this.penCap.Value;
+
+				if (this.penJoin.HasValue)
+					this.paint.StrokeJoin = this.penJoin.Value;
+
+				if (this.penMiter.HasValue)
+					this.paint.StrokeMiter = this.penMiter.Value;
 
 				this.defined = true;
 			}

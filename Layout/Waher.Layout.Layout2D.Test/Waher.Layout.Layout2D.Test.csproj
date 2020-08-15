@@ -8,63 +8,63 @@
 
   <ItemGroup>
     <None Remove="Xml\Test_01_Lengths.xml" />
-    <None Remove="Xml\Test_02_Arrow.xml" />
-    <None Remove="Xml\Test_03_Circle.xml" />
-    <None Remove="Xml\Test_04_CircleArc.xml" />
-    <None Remove="Xml\Test_05_Dot.xml" />
-    <None Remove="Xml\Test_06_Ellipse.xml" />
-    <None Remove="Xml\Test_07_EllipseArc.xml" />
-    <None Remove="Xml\Test_08_Line.xml" />
-    <None Remove="Xml\Test_09_Loop.xml" />
-    <None Remove="Xml\Test_10_Polygon.xml" />
-    <None Remove="Xml\Test_11_PolyLine.xml" />
-    <None Remove="Xml\Test_12_Rectangle.xml" />
-    <None Remove="Xml\Test_13_RoundedRectangle.xml" />
-    <None Remove="Xml\Test_14_Spline.xml" />
-    <None Remove="Xml\Test_15_Path.xml" />
+    <None Remove="Xml\Test_02_Circle.xml" />
+    <None Remove="Xml\Test_03_CircleArc.xml" />
+    <None Remove="Xml\Test_04_Dot.xml" />
+    <None Remove="Xml\Test_05_Ellipse.xml" />
+    <None Remove="Xml\Test_06_EllipseArc.xml" />
+    <None Remove="Xml\Test_07_Line.xml" />
+    <None Remove="Xml\Test_08_Loop.xml" />
+    <None Remove="Xml\Test_09_Polygon.xml" />
+    <None Remove="Xml\Test_10_PolyLine.xml" />
+    <None Remove="Xml\Test_11_Rectangle.xml" />
+    <None Remove="Xml\Test_12_RoundedRectangle.xml" />
+    <None Remove="Xml\Test_13_Spline.xml" />
+    <None Remove="Xml\Test_14_Path.xml" />
+    <None Remove="Xml\Test_15_Arrow.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Xml\Test_02_Arrow.xml">
+    <Content Include="Xml\Test_15_Arrow.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_11_PolyLine.xml">
+    <Content Include="Xml\Test_10_PolyLine.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_12_Rectangle.xml">
+    <Content Include="Xml\Test_11_Rectangle.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_13_RoundedRectangle.xml">
+    <Content Include="Xml\Test_12_RoundedRectangle.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_15_Path.xml">
+    <Content Include="Xml\Test_14_Path.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_14_Spline.xml">
+    <Content Include="Xml\Test_13_Spline.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_03_Circle.xml">
+    <Content Include="Xml\Test_02_Circle.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_04_CircleArc.xml">
+    <Content Include="Xml\Test_03_CircleArc.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_05_Dot.xml">
+    <Content Include="Xml\Test_04_Dot.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_06_Ellipse.xml">
+    <Content Include="Xml\Test_05_Ellipse.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_07_EllipseArc.xml">
+    <Content Include="Xml\Test_06_EllipseArc.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_08_Line.xml">
+    <Content Include="Xml\Test_07_Line.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_09_Loop.xml">
+    <Content Include="Xml\Test_08_Loop.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_10_Polygon.xml">
+    <Content Include="Xml\Test_09_Polygon.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_01_Lengths.xml">

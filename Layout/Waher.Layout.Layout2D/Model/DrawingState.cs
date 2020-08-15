@@ -11,12 +11,14 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public class DrawingState : IDisposable
 	{
-		private Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
-		private Variables session;
-		private SKCanvas canvas;
-		private SKPaint fontRoot;
-		private SKPaint font;
-		private SKPaint defaultPen;
+		private readonly Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
+		private readonly Variables session;
+		private readonly SKCanvas canvas;
+		private readonly SKPaint fontRoot;
+		private readonly SKPaint font;
+		private readonly SKPaint defaultPen;
+		private SKPaint shapePen;
+		private SKPaint shapeFill;
 		private float? width_0;
 		private float? height_0;
 		private readonly float pixelsPerInch;
@@ -86,6 +88,24 @@ namespace Waher.Layout.Layout2D.Model
 		/// Default pen
 		/// </summary>
 		public SKPaint DefaultPen => this.defaultPen;
+
+		/// <summary>
+		/// Pen to use for shape, if no other is specified in the shape.
+		/// </summary>
+		public SKPaint ShapePen
+		{
+			get => this.shapePen;
+			set => this.shapePen = value;
+		}
+
+		/// <summary>
+		/// Fill to use for shape, if no other is specified in the shape.
+		/// </summary>
+		public SKPaint ShapeFill
+		{
+			get => this.shapeFill;
+			set => this.shapeFill = value;
+		}
 
 		/// <summary>
 		/// Converts a defined length to drawing size.

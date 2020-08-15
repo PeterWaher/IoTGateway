@@ -54,7 +54,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public override void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
-				PathState.AddSplineVertex(this.xCoordinate, this.yCoordinate);
+				this.splineCurve = PathState.AddSplineVertex(this.xCoordinate, this.yCoordinate);
 		}
 	}
 }

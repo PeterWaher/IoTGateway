@@ -6,7 +6,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	/// <summary>
 	/// Draws a spline to a point, relative to the origio of the current container
 	/// </summary>
-	public class SplineTo : Point, ISegment
+	public class SplineTo : Point, ISegment, IDirectedElement
 	{
 		/// <summary>
 		/// Draws a spline to a point, relative to the origio of the current container
@@ -54,7 +54,49 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
-				PathState.SetSplineVertex(this.xCoordinate, this.yCoordinate);
+				this.splineCurve = PathState.SetSplineVertex(this.xCoordinate, this.yCoordinate);
 		}
+
+		/// <summary>
+		/// Dynamic spline curve.
+		/// </summary>
+		protected PathSpline splineCurve;
+
+		/// <summary>
+		/// Tries to get start position and initial direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Initial direction.</param>
+		/// <returns>If a start position was found.</returns>
+		public bool TryGetStart(out float X, out float Y, out float Direction)
+		{
+			if (this.splineCurve is null)
+			{
+				X = Y = Direction = 0;
+				return false;
+			}
+			else
+				return this.splineCurve.TryGetStart(out X, out Y, out Direction);
+		}
+
+		/// <summary>
+		/// Tries to get end position and terminating direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Terminating direction.</param>
+		/// <returns>If a terminating position was found.</returns>
+		public bool TryGetEnd(out float X, out float Y, out float Direction)
+		{
+			if (this.splineCurve is null)
+			{
+				X = Y = Direction = 0;
+				return false;
+			}
+			else
+				return this.splineCurve.TryGetEnd(out X, out Y, out Direction);
+		}
+
 	}
 }

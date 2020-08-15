@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model.References
 	/// <summary>
 	/// Copies the layout from a reference
 	/// </summary>
-	public class Copy : Point
+	public class Copy : LayoutElement
 	{
 		private StringAttribute _ref;
 
@@ -74,6 +74,24 @@ namespace Waher.Layout.Layout2D.Model.References
 		}
 
 		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.defined &&
+				(!this._ref.TryEvaluate(State.Session, out string RefId) ||
+				!State.TryGetElement(RefId, out this.reference)))
+			{
+				this.defined = false;
+			}
+		}
+
+		private ILayoutElement reference;
+
+		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
@@ -81,14 +99,12 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.Draw(State);
 
-			if (this.defined &&
-				this._ref.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element))
+			if (this.defined)
 			{
-				if (Element is Shape Shape)
+				if (this.reference is Shape Shape)
 					Shape.DrawShape(State);
 				else
-					Element.Draw(State);
+					this.reference.Draw(State);
 			}
 		}
 	}

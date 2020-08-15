@@ -39,7 +39,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public virtual void Measure(DrawingState State, PathState PathState)
+		public void Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
 				PathState.TurnLeft(this.angle);
@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 				PathState.TurnLeft(this.angle);

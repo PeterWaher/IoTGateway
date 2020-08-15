@@ -1768,6 +1768,16 @@
             Default pen
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.ShapePen">
+            <summary>
+            Pen to use for shape, if no other is specified in the shape.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.ShapeFill">
+            <summary>
+            Fill to use for shape, if no other is specified in the shape.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.DrawingState.GetDrawingSize(Waher.Layout.Layout2D.Model.Length,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean)">
             <summary>
             Converts a defined length to drawing size.
@@ -1842,55 +1852,6 @@
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.DynamicElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Draws layout entities.
-            </summary>
-            <param name="State">Current drawing state.</param>
-        </member>
-        <member name="T:Waher.Layout.Layout2D.Model.Figures.Arrow">
-            <summary>
-            An arrow
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            An arrow
-            </summary>
-            <param name="Document">Layout document containing the element.</param>
-            <param name="Parent">Parent element.</param>
-        </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Arrow.LocalName">
-            <summary>
-            Local name of type of element.
-            </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Populates the element (including children) with information from its XML definition.
-            </summary>
-            <param name="Input">XML definition.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.ExportAttributes(System.Xml.XmlWriter)">
-            <summary>
-            Exports attributes to XML.
-            </summary>
-            <param name="Output">XML output.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Creates a new instance of the layout element.
-            </summary>
-            <param name="Document">Document containing the new element.</param>
-            <param name="Parent">Parent element.</param>
-            <returns>New instance.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Copies contents (attributes and children) to the destination element.
-            </summary>
-            <param name="Destination">Destination element</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Arrow.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
             </summary>
@@ -2310,6 +2271,18 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -2318,11 +2291,41 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Loop">
             <summary>
@@ -2416,6 +2419,12 @@
             </summary>
             <param name="Input">XML definition.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -2441,6 +2450,39 @@
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws the segments of the path.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Polygon">
             <summary>
@@ -2490,6 +2532,18 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -2498,11 +2552,41 @@
             <param name="Parent">Parent element.</param>
             <returns>New instance.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Rectangle">
             <summary>
@@ -2641,6 +2725,34 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.P1">
+            <summary>
+            Line drawn from this point
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.P2">
+            <summary>
+            Line drawn to this point
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Backward.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo">
             <summary>
@@ -2790,6 +2902,34 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.P1">
+            <summary>
+            Line drawn from this point
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.P2">
+            <summary>
+            Line drawn to this point
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLine.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CloseLoop">
             <summary>
             Closes a path (i.e. returns to the origin), using a spline, creating a closed smooth loop.
@@ -2870,6 +3010,39 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.P0">
+            <summary>
+            Starting point.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.P1">
+            <summary>
+            Intermediate point.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.P2">
+            <summary>
+            Ending point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicTo.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ConicToRel">
             <summary>
             Draws a conic curve to a point, relative to the end of the last segment
@@ -2949,6 +3122,44 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.P0">
+            <summary>
+            Starting point.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.P1">
+            <summary>
+            Intermediate point 1.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.P2">
+            <summary>
+            Intermediate point 2.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.P3">
+            <summary>
+            Ending point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicTo.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CubicToRel">
             <summary>
@@ -3145,6 +3356,34 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.P1">
+            <summary>
+            Line drawn from this point
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.P2">
+            <summary>
+            Line drawn to this point
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Forward.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment">
             <summary>
             Interface for path segment nodes
@@ -3204,6 +3443,34 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.P1">
+            <summary>
+            Line drawn from this point
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.P2">
+            <summary>
+            Line drawn to this point
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineTo.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.LineToRel">
             <summary>
@@ -3325,17 +3592,62 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline">
+            <summary>
+            Represents a spline curve in a path
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline.#ctor(System.Single,System.Single)">
+            <summary>
+            Represents a spline curve in a path
+            </summary>
+            <param name="X0">Starting X-coordinate.</param>
+            <param name="Y0">Starting Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline.Add(System.Single,System.Single)">
+            <summary>
+            Adds a vertex
+            </summary>
+            <param name="X">X-Coordinate</param>
+            <param name="Y">Y-Coordinte</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline.ToArray">
+            <summary>
+            Returns an array of vertices of the spline curve.
+            </summary>
+            <returns>Vertices</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathSpline.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState">
             <summary>
             Current state tracing the path.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.#ctor(Waher.Layout.Layout2D.Model.Figures.Path,SkiaSharp.SKPath)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.#ctor(Waher.Layout.Layout2D.Model.Figures.Path,SkiaSharp.SKPath,System.Boolean,System.Boolean)">
             <summary>
             Current state tracing the path.
             </summary>
             <param name="PathDef">Path definition</param>
             <param name="Path">Path being drawn (null when measuring).</param>
+            <param name="CalcStart">If start position and angle are to be calculated.</param>
+            <param name="CalcEnd">If end position and angle are to be calculated.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.X">
             <summary>
@@ -3355,6 +3667,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.YPrev">
             <summary>
             Previous Y-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.CalcStart">
+            <summary>
+            If start position and angle are to be calculated.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.CalcEnd">
+            <summary>
+            If end position and angle are to be calculated.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.Angle">
@@ -3426,6 +3748,22 @@
             </summary>
             <param name="DeltaDegrees">Angle, in degrees.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnTowards(System.Single,System.Single)">
+            <summary>
+            Turns the current direction towards a given point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnTowardsRel(System.Single,System.Single)">
+            <summary>
+            Turns the current direction towards a given point, relative to the current point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.TurnTowards(System.Single)">
+            <summary>
+            Turns the current direction towards a given direction.
+            </summary>
+            <param name="Angle">Angle</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.FlushSpline">
             <summary>
             Closes an ongoing spline curve (if one open).
@@ -3437,6 +3775,7 @@
             </summary>
             <param name="X">X-coordinate</param>
             <param name="Y">Y-coordinate</param>
+            <returns>Dynamic spline curve</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState.AddSplineVertex(System.Single,System.Single)">
             <summary>
@@ -3444,6 +3783,7 @@
             </summary>
             <param name="DeltaX">X-coordinate</param>
             <param name="DeltaY">Y-coordinate</param>
+            <returns>Dynamic spline curve</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo">
             <summary>
@@ -3485,6 +3825,39 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.P0">
+            <summary>
+            Starting point.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.P1">
+            <summary>
+            Intermediate point.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.P2">
+            <summary>
+            Ending point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticTo.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel">
             <summary>
             Draws a quadratic curve to a point, relative to the end of the last segment
@@ -3518,6 +3891,64 @@
             <param name="PathState">Current path state.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.QuadraticToRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay">
+            <summary>
+            Replays the segments of another path.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Replays the segments of another path.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
             <summary>
             Draws layout entities.
             </summary>
@@ -3564,6 +3995,29 @@
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.splineCurve">
+            <summary>
+            Dynamic spline curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineTo.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.SplineToRel">
             <summary>
@@ -3685,6 +4139,86 @@
             <param name="PathState">Current path state.</param>
             <param name="Path">Path being generated.</param>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards">
+            <summary>
+            Turns the current direction towards a point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Turns the current direction towards a point.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowards.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel">
+            <summary>
+            Turns the current direction towards a point, relative to the current point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Turns the current direction towards a point, relative to the current point.
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.TurnTowardsRel.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Spline">
             <summary>
             A spline
@@ -3697,10 +4231,27 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.LocalName">
             <summary>
             Local name of type of element.
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
@@ -3748,11 +4299,41 @@
             <param name="A">Corresponding coefficients for first control points.</param>
             <param name="B">Corresponding coefficients for second control points.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.Vertices">
             <summary>
@@ -4681,6 +5262,29 @@
             </summary>
             <returns>Array of padded cells.</returns>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.IDirectedElement">
+            <summary>
+            Interface for directed elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.IDirectedElement.TryGetStart(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get start position and initial direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Initial direction.</param>
+            <returns>If a start position was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.IDirectedElement.TryGetEnd(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Tries to get end position and terminating direction.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Direction">Terminating direction.</param>
+            <returns>If a terminating position was found.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.IDynamicChildren">
             <summary>
             Interface for layout elements that generate children dynamically.
@@ -5301,6 +5905,40 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcDirection(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Calculates the direction of the pen when drawing from (x1,y1) to (x2,y2).
+            </summary>
+            <param name="x1">First X-coordinate</param>
+            <param name="y1">First Y-coordinate</param>
+            <param name="x2">Second X-coordinate</param>
+            <param name="y2">Second Y-coordinate</param>
+            <returns>Direction angle</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcDirection(System.Single,System.Single)">
+            <summary>
+            Calculates the direction of the pen when drawing in the direction of (dx,dy)
+            </summary>
+            <param name="dx">Delta-X</param>
+            <param name="dy">Delta-Y</param>
+            <returns>Direction angle</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcDirection(SkiaSharp.SKPoint,SkiaSharp.SKPoint)">
+            <summary>
+            Calculates the direction of the pen when drawing from P1 to P2.
+            </summary>
+            <param name="P1">First point</param>
+            <param name="P2">Second point</param>
+            <returns>Direction angle</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcDirection(Waher.Layout.Layout2D.Model.References.Vertex,Waher.Layout.Layout2D.Model.References.Vertex)">
+            <summary>
+            Calculates the direction of the pen when drawing from P1 to P2.
+            </summary>
+            <param name="P1">First vertex</param>
+            <param name="P2">Second vertex</param>
+            <returns>Direction angle</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
             <summary>
             Unit of length
@@ -5450,6 +6088,21 @@
         <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penWidth">
             <summary>
             Measured pen width.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penCap">
+            <summary>
+            Measured pen stroke cap.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penJoin">
+            <summary>
+            Measured pen stroke join.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penMiter">
+            <summary>
+            Measured pen miter.
             </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.SolidPen">
@@ -5723,6 +6376,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.References.Copy.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
@@ -5765,6 +6424,50 @@
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.Draw(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState,SkiaSharp.SKPath)">
+            <summary>
+            Draws the segments of the path.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="PathState">Current path state.</param>
+            <param name="Path">Path being generated.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.DrawTail(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.IDirectedElement,SkiaSharp.SKPaint,SkiaSharp.SKPaint)">
+            <summary>
+            Draws shape as a tail
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="DirectedElement">Directed element.</param>
+            <param name="DefaultPen">Default pen, if any, null otherwise</param>
+            <param name="DefaultFill">Default fill, if any, null otherwise.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.DrawHead(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.IDirectedElement,SkiaSharp.SKPaint,SkiaSharp.SKPaint)">
+            <summary>
+            Draws shape as a head
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="DirectedElement">Directed element.</param>
+            <param name="DefaultPen">Default pen, if any, null otherwise</param>
+            <param name="DefaultFill">Default fill, if any, null otherwise.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Shape.Draw(Waher.Layout.Layout2D.Model.DrawingState,SkiaSharp.SKPaint,SkiaSharp.SKPaint,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws the shape at a given position &amp; direction.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <param name="DefaultPen">Default pen, if any, null otherwise</param>
+            <param name="DefaultFill">Default fill, if any, null otherwise.</param>
+            <param name="X"></param>
+            <param name="Y"></param>
+            <param name="Direction"></param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.References.Vertex">
             <summary>

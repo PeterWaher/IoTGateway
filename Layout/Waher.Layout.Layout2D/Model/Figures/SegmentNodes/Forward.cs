@@ -7,7 +7,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	/// Draws a line to a point that lies a certain distance forward of the last point,
 	/// in the current direction of movement.
 	/// </summary>
-	public class Forward : Distance, ISegment
+	public class Forward : Distance, ISegment, IDirectedElement
 	{
 		/// <summary>
 		/// Draws a line to a point that lies a certain distance forward of the last point,
@@ -56,7 +56,52 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
-				Path.LineTo(PathState.Forward(this.dist));
+			{
+				this.P1 = Path.LastPoint;
+				Path.LineTo(this.P2 = PathState.Forward(this.dist));
+			}
+		}
+
+		/// <summary>
+		/// Line drawn from this point
+		/// </summary>
+		protected SKPoint P1;
+
+		/// <summary>
+		/// Line drawn to this point
+		/// </summary>
+		protected SKPoint P2;
+
+		/// <summary>
+		/// Tries to get start position and initial direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Initial direction.</param>
+		/// <returns>If a start position was found.</returns>
+		public bool TryGetStart(out float X, out float Y, out float Direction)
+		{
+			X = this.P1.X;
+			Y = this.P1.Y;
+			Direction = CalcDirection(this.P1, this.P2);
+
+			return this.defined;
+		}
+
+		/// <summary>
+		/// Tries to get end position and terminating direction.
+		/// </summary>
+		/// <param name="X">X-coordinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Direction">Terminating direction.</param>
+		/// <returns>If a terminating position was found.</returns>
+		public bool TryGetEnd(out float X, out float Y, out float Direction)
+		{
+			X = this.P2.X;
+			Y = this.P2.Y;
+			Direction = CalcDirection(this.P1, this.P2);
+
+			return this.defined;
 		}
 	}
 }

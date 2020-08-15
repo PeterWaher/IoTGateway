@@ -61,5 +61,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 					P.X, P.Y);
 			}
 		}
+
+		// TODO: IDirectedElement
 	}
 }

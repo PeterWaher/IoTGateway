@@ -185,7 +185,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Y">Resulting Y-coordinate.</param>
 		/// <returns>If point is well-defined.</returns>
 		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute, 
-			LengthAttribute YAttribute, StringAttribute RefAttribute,
+			LengthAttribute YAttribute, StringAttribute RefAttribute, 
 			out float X, out float Y)
 		{
 			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, out X, out Y);

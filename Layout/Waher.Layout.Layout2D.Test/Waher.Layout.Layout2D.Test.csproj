@@ -22,9 +22,45 @@
     <None Remove="Xml\Test_13_Spline.xml" />
     <None Remove="Xml\Test_14_Path.xml" />
     <None Remove="Xml\Test_15_Arrow.xml" />
+    <None Remove="Xml\Test_16_Rotate.xml" />
+    <None Remove="Xml\Test_17_Rotate_Pivot.xml" />
+    <None Remove="Xml\Test_18_Translate.xml" />
+    <None Remove="Xml\Test_19_Scale.xml" />
+    <None Remove="Xml\Test_20_Scale_Pivot.xml" />
+    <None Remove="Xml\Test_21_SkewX.xml" />
+    <None Remove="Xml\Test_22_SkewX_Pivot.xml" />
+    <None Remove="Xml\Test_23_SkewY.xml" />
+    <None Remove="Xml\Test_24_SkewY_Pivot.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Xml\Test_23_SkewY.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_21_SkewX.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_19_Scale.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_24_SkewY_Pivot.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_22_SkewX_Pivot.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_20_Scale_Pivot.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_18_Translate.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_17_Rotate_Pivot.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_16_Rotate.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Xml\Test_15_Arrow.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

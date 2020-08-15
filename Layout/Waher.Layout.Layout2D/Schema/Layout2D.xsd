@@ -112,7 +112,7 @@
 
   <xs:simpleType name="Length">
     <xs:restriction base="xs:string">
-      <xs:pattern value="((\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%))|([{].*[}])"/>
+      <xs:pattern value="([+-]?(\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%))|([{].*[}])"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -260,7 +260,7 @@
       <xs:enumeration value="Gray"/>
       <xs:enumeration value="ForestGreen"/>
       <xs:enumeration value="Empty"/>
-      <xs:pattern value="(AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8})|([{].*[}])"/>
+      <xs:pattern value="AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8}|[{].*[}]"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -675,9 +675,25 @@
     </xs:choice>
   </xs:group>
 
+  <xs:complexType name="LinearTransformation" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="LayoutContainer"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="PivotTransformation" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="LinearTransformation">
+        <xs:attribute name="x" type="Length" use="optional"/>
+        <xs:attribute name="y" type="Length" use="optional"/>
+        <xs:attribute name="ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="Scale">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="PivotTransformation">
         <xs:attribute name="scaleX" type="xs:float" use="optional"/>
         <xs:attribute name="scaleY" type="xs:float" use="optional"/>
       </xs:extension>
@@ -686,24 +702,27 @@
 
   <xs:complexType name="Translate">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="translateX" type="xs:float" use="optional"/>
-        <xs:attribute name="translateY" type="xs:float" use="optional"/>
+      <xs:extension base="LinearTransformation">
+        <xs:attribute name="translateX" type="Length" use="optional"/>
+        <xs:attribute name="translateY" type="Length" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Rotate">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="PivotTransformation">
         <xs:attribute name="degrees" type="xs:float" use="optional"/>
+        <xs:attribute name="x" type="Length" use="optional"/>
+        <xs:attribute name="y" type="Length" use="optional"/>
+        <xs:attribute name="ref" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="SkewX">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="PivotTransformation">
         <xs:attribute name="factor" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -711,7 +730,7 @@
 
   <xs:complexType name="SkewY">
     <xs:complexContent>
-      <xs:extension base="LayoutContainer">
+      <xs:extension base="PivotTransformation">
         <xs:attribute name="factor" type="xs:float" use="optional"/>
       </xs:extension>
     </xs:complexContent>

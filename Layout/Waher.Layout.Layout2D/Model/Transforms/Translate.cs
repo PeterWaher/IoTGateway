@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
@@ -8,10 +8,10 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// <summary>
 	/// A translation transform
 	/// </summary>
-	public class Translate : LayoutContainer
+	public class Translate : LinearTrasformation
 	{
-		private FloatAttribute translateX;
-		private FloatAttribute translateY;
+		private LengthAttribute translateX;
+		private LengthAttribute translateY;
 
 		/// <summary>
 		/// A translation transform
@@ -36,8 +36,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.FromXml(Input);
 
-			this.translateX = new FloatAttribute(Input, "translateX");
-			this.translateY = new FloatAttribute(Input, "translateY");
+			this.translateX = new LengthAttribute(Input, "translateX");
+			this.translateY = new LengthAttribute(Input, "translateY");
 		}
 
 		/// <summary>
@@ -76,6 +76,50 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 				Dest.translateX = this.translateX.CopyIfNotPreset();
 				Dest.translateY = this.translateY.CopyIfNotPreset();
 			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.translateX.TryEvaluate(State.Session, out Length L))
+			{
+				this.dx = State.GetDrawingSize(L, this, true);
+				this.Left += this.dx;
+				this.Right += this.dx;
+			}
+			else
+				this.dx = 0;
+
+			if (this.translateY.TryEvaluate(State.Session, out L))
+			{
+				this.dy = State.GetDrawingSize(L, this, false);
+				this.Top += this.dy;
+				this.Bottom += this.dy;
+			}
+			else
+				this.dy = 0;
+		}
+
+		private float dx;
+		private float dy;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			SKMatrix M = State.Canvas.TotalMatrix;
+			State.Canvas.Translate(this.dx, this.dy);
+
+			base.Draw(State);
+
+			State.Canvas.SetMatrix(M);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// <summary>
 	/// A scale transform
 	/// </summary>
-	public class Scale : LayoutContainer
+	public class Scale : PivotTrasformation
 	{
 		private FloatAttribute scaleX;
 		private FloatAttribute scaleY;
@@ -76,6 +76,41 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 				Dest.scaleX = this.scaleX.CopyIfNotPreset();
 				Dest.scaleY = this.scaleY.CopyIfNotPreset();
 			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.scaleX.TryEvaluate(State.Session, out this.sx))
+				this.sx = 1;
+
+			if (!this.scaleY.TryEvaluate(State.Session, out this.sy))
+				this.sy = 1;
+
+			SKMatrix M = SKMatrix.CreateScale(this.sx, this.sy, this.xCoordinate, this.yCoordinate);
+			this.TransformBoundingBox(M);
+		}
+
+		private float sx;
+		private float sy;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			SKMatrix M = State.Canvas.TotalMatrix;
+			State.Canvas.Scale(this.sx, this.sy, this.xCoordinate, this.yCoordinate);
+
+			base.Draw(State);
+
+			State.Canvas.SetMatrix(M);
 		}
 	}
 }

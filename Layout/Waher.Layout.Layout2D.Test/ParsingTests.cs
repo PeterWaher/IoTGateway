@@ -117,5 +117,59 @@ namespace Waher.Layout.Layout2D.Test
 			this.Test("Test_15_Arrow");
 		}
 
+		[TestMethod]
+		public void Test_16_Rotate()
+		{
+			this.Test("Test_16_Rotate");
+		}
+
+		[TestMethod]
+		public void Test_17_Rotate_Pivot()
+		{
+			this.Test("Test_17_Rotate_Pivot");
+		}
+
+		[TestMethod]
+		public void Test_18_Translate()
+		{
+			this.Test("Test_18_Translate");
+		}
+
+		[TestMethod]
+		public void Test_19_Scale()
+		{
+			this.Test("Test_19_Scale");
+		}
+
+		[TestMethod]
+		public void Test_20_Scale_Pivot()
+		{
+			this.Test("Test_20_Scale_Pivot");
+		}
+
+		[TestMethod]
+		public void Test_21_SkewX()
+		{
+			this.Test("Test_21_SkewX");
+		}
+
+		[TestMethod]
+		public void Test_22_SkewX_Pivot()
+		{
+			this.Test("Test_22_SkewX_Pivot");
+		}
+
+		[TestMethod]
+		public void Test_23_SkewY()
+		{
+			this.Test("Test_23_SkewY");
+		}
+
+		[TestMethod]
+		public void Test_24_SkewY_Pivot()
+		{
+			this.Test("Test_24_SkewY_Pivot");
+		}
+
 	}
 }

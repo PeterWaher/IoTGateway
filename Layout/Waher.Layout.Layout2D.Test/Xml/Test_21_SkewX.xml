@@ -13,5 +13,7 @@
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Rectangle x="25%" y="25%" x2="75%" y2="75%" pen="RedPen" fill="RedBackground"/>
+  <SkewX factor="0.25">
+    <Rectangle x="25%" y="25%" x2="75%" y2="75%" pen="RedPen" fill="RedBackground"/>
+  </SkewX>
 </Layout2D>

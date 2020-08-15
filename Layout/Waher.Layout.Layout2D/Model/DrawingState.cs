@@ -13,10 +13,10 @@ namespace Waher.Layout.Layout2D.Model
 	{
 		private readonly Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private readonly Variables session;
-		private readonly SKCanvas canvas;
 		private readonly SKPaint fontRoot;
 		private readonly SKPaint font;
 		private readonly SKPaint defaultPen;
+		private SKCanvas canvas;
 		private SKPaint shapePen;
 		private SKPaint shapeFill;
 		private float? width_0;
@@ -77,7 +77,11 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Current drawing canvas.
 		/// </summary>
-		public SKCanvas Canvas => this.canvas;
+		public SKCanvas Canvas
+		{
+			get => this.canvas;
+			internal set => this.canvas = value;
+		}
 
 		/// <summary>
 		/// Current font

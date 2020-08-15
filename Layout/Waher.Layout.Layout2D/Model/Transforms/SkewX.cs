@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// <summary>
 	/// A skew transform along the X-axis.
 	/// </summary>
-	public class SkewX : LayoutContainer
+	public class SkewX : PivotTrasformation
 	{
 		private FloatAttribute factor;
 
@@ -71,5 +71,44 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			if (Destination is SkewX Dest)
 				Dest.factor = this.factor.CopyIfNotPreset();
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.factor.TryEvaluate(State.Session, out this.sx))
+			{
+				SKMatrix M = SKMatrix.CreateTranslation(this.xCoordinate, this.yCoordinate);
+				M = M.PreConcat(SKMatrix.CreateSkew(this.sx, 0));
+				M = M.PreConcat(SKMatrix.CreateTranslation(-this.xCoordinate, -this.yCoordinate));
+
+				this.TransformBoundingBox(M);
+			}
+			else
+				this.sx = 0;
+		}
+
+		private float sx;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			SKMatrix M = State.Canvas.TotalMatrix;
+			State.Canvas.Translate(this.xCoordinate, this.yCoordinate);
+			State.Canvas.Skew(this.sx, 0);
+			State.Canvas.Translate(-this.xCoordinate, -this.yCoordinate);
+
+			base.Draw(State);
+
+			State.Canvas.SetMatrix(M);
+		}
+
 	}
 }

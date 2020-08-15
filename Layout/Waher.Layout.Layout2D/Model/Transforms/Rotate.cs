@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	/// <summary>
 	/// A rotation transform
 	/// </summary>
-	public class Rotate : LayoutContainer
+	public class Rotate : PivotTrasformation
 	{
 		private FloatAttribute degrees;
 
@@ -70,6 +70,39 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			if (Destination is Rotate Dest)
 				Dest.degrees = this.degrees.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.degrees.TryEvaluate(State.Session, out this.angle))
+			{
+				SKMatrix M = SKMatrix.CreateRotationDegrees(this.angle, this.xCoordinate, this.yCoordinate);
+				this.TransformBoundingBox(M);
+			}
+			else
+				this.angle = 0;
+		}
+
+		private float angle;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			SKMatrix M = State.Canvas.TotalMatrix;
+			State.Canvas.RotateDegrees(this.angle, this.xCoordinate, this.yCoordinate);
+			
+			base.Draw(State);
+
+			State.Canvas.SetMatrix(M);
 		}
 	}
 }

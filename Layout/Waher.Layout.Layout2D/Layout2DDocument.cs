@@ -302,31 +302,89 @@ namespace Waher.Layout.Layout2D
 		{
 			Maps = null;    // TODO: Generate maps.
 
-			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
+			int Width;
+			int Height;
+
+			switch (Settings.ImageSize)
+			{
+				case RenderedImageSize.ResizeImage:
+					Width = Height = 10;
+					break;
+
+				case RenderedImageSize.ScaleToFit:
+				default:
+					Width = Settings.Width;
+					Height = Settings.Height;
+					break;
+			}
+
+			SKSurface Surface = SKSurface.Create(new SKImageInfo(Width, Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+			DrawingState State = null;
+			try
 			{
 				SKCanvas Canvas = Surface.Canvas;
-				using (DrawingState State = new DrawingState(Canvas, Settings, this.session))
+				State = new DrawingState(Canvas, Settings, this.session);
+
+				if (Settings.BackgroundColor != SKColor.Empty)
+					Canvas.Clear(Settings.BackgroundColor);
+
+				this.root?.Measure(State);
+
+				switch (Settings.ImageSize)
 				{
-					if (Settings.BackgroundColor != SKColor.Empty)
-						Canvas.Clear(Settings.BackgroundColor);
+					case RenderedImageSize.ResizeImage:
+						Surface.Dispose();
+						Surface = null;
 
-					this.root?.Measure(State);
+						if (!(this.root is null))
+						{
+							Width = (int)this.root.Right - (int)this.root.Left + 1;
+							Height = (int)this.root.Bottom - (int)this.root.Top - 1;
+						}
 
-					switch (Settings.ImageSize)
-					{
-						case RenderedImageSize.ResizeImage:
-							// TODO
-							break;
+						Surface = SKSurface.Create(new SKImageInfo(Width, Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+						Canvas = Surface.Canvas;
+						State.Canvas = Canvas;
 
-						case RenderedImageSize.ScaleToFit:
-							// TODO
-							break;
-					}
+						if (Settings.BackgroundColor != SKColor.Empty)
+							Canvas.Clear(Settings.BackgroundColor);
 
-					this.root?.Draw(State);
+						if (!(this.root is null))
+							State.Canvas.Translate(-this.root.Left, -this.root.Top);
+						break;
 
-					return Surface.Snapshot();
+					case RenderedImageSize.ScaleToFit:
+						if (!(this.root is null))
+						{
+							float Width2 = this.root.Right - this.root.Left + 1;
+							float Height2 = this.root.Height - this.root.Height + 1;
+							float ScaleX = Width / Width2;
+							float ScaleY = Height / Height2;
+
+							if (ScaleX < ScaleY)
+							{
+								State.Canvas.Translate(0, (Height - Height2 * ScaleX) / 2);
+								State.Canvas.Scale(ScaleX);
+							}
+							else if (ScaleY < ScaleX)
+							{
+								State.Canvas.Translate((Width - Width2 * ScaleY) / 2, 0);
+								State.Canvas.Scale(ScaleY);
+							}
+
+							State.Canvas.Translate(-this.root.Left, -this.root.Top);
+						}
+						break;
 				}
+
+				this.root?.Draw(State);
+
+				return Surface.Snapshot();
+			}
+			finally
+			{
+				State?.Dispose();
+				Surface?.Dispose();
 			}
 		}
 

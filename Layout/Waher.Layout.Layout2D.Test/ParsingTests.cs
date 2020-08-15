@@ -171,5 +171,77 @@ namespace Waher.Layout.Layout2D.Test
 			this.Test("Test_24_SkewY_Pivot");
 		}
 
+		[TestMethod]
+		public void Test_25_Horizontal()
+		{
+			this.Test("Test_25_Horizontal");
+		}
+
+		[TestMethod]
+		public void Test_26_Vertical()
+		{
+			this.Test("Test_26_Vertical");
+		}
+
+		[TestMethod]
+		public void Test_27_Overlays()
+		{
+			this.Test("Test_27_Overlays");
+		}
+
+		[TestMethod]
+		public void Test_28_Flexible_LRTD()
+		{
+			this.Test("Test_28_Flexible_LRTD");
+		}
+
+		[TestMethod]
+		public void Test_29_Flexible_RLTD()
+		{
+			this.Test("Test_29_Flexible_RLTD");
+		}
+
+		[TestMethod]
+		public void Test_30_Flexible_LRDT()
+		{
+			this.Test("Test_30_Flexible_LRDT");
+		}
+
+		[TestMethod]
+		public void Test_31_Flexible_RLDT()
+		{
+			this.Test("Test_31_Flexible_RLDT");
+		}
+
+		[TestMethod]
+		public void Test_32_Flexible_TDLR()
+		{
+			this.Test("Test_32_Flexible_TDLR");
+		}
+
+		[TestMethod]
+		public void Test_33_Flexible_TDRL()
+		{
+			this.Test("Test_33_Flexible_TDRL");
+		}
+
+		[TestMethod]
+		public void Test_34_Flexible_DTLR()
+		{
+			this.Test("Test_34_Flexible_DTLR");
+		}
+
+		[TestMethod]
+		public void Test_35_Flexible_DTRL()
+		{
+			this.Test("Test_35_Flexible_DTRL");
+		}
+
+		[TestMethod]
+		public void Test_36_Grid()
+		{
+			this.Test("Test_36_Grid");
+		}
+
 	}
 }

@@ -744,6 +744,7 @@
       <xs:element name="Grid" type="Grid"/>
       <xs:element name="Overlays" type="Overlays"/>
       <xs:element name="Cell" type="Cell"/>
+      <xs:element name="Margins" type="Margins"/>
     </xs:choice>
   </xs:group>
 
@@ -836,6 +837,17 @@
   <xs:complexType name="Overlays">
     <xs:complexContent>
       <xs:extension base="SpatialDistribution"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Margins">
+    <xs:complexContent>
+      <xs:extension base="LayoutContainer">
+        <xs:attribute name="left" type="Length" use="optional"/>
+        <xs:attribute name="right" type="Length" use="optional"/>
+        <xs:attribute name="top" type="Length" use="optional"/>
+        <xs:attribute name="bottom" type="Length" use="optional"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 

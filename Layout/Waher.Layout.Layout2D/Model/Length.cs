@@ -91,6 +91,17 @@ namespace Waher.Layout.Layout2D.Model
 	public class Length
 	{
 		/// <summary>
+		/// Length definition.
+		/// </summary>
+		/// <param name="Value">Value of length</param>
+		/// <param name="Unit">Unit of length.</param>
+		public Length(float Value, LengthUnit Unit)
+		{
+			this.Value = Value;
+			this.Unit = Unit;
+		}
+
+		/// <summary>
 		/// Value of length
 		/// </summary>
 		public float Value
@@ -107,5 +118,10 @@ namespace Waher.Layout.Layout2D.Model
 			get;
 			internal set;
 		}
+
+		/// <summary>
+		/// 100%
+		/// </summary>
+		public static readonly Length HundredPercent = new Length(100, LengthUnit.Percent);
 	}
 }

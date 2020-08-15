@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Grid columns="5">
+    <Cell halign="Left" valign="Top">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center" valign="Top" colSpan="3">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Right" valign="Top">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Left" valign="Center" rowSpan="3">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center" valign="Center" colSpan="3" rowSpan="3">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Right" valign="Center">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Right" valign="Center">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Right" valign="Center">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Left" valign="Bottom">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center" valign="Bottom">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center" valign="Bottom">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center" valign="Bottom">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Right" valign="Bottom">
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+  </Grid>
+</Layout2D>

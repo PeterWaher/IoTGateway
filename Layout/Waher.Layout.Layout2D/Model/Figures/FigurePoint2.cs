@@ -74,7 +74,22 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			base.Measure(State);
 
 			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, out this.xCoordinate2, out this.yCoordinate2))
-				this.defined = false;
+			{
+				float? dx = this.GetWidthEstimate(State);
+				float? dy = this.GetHeightEstimate(State);
+
+				if (dx.HasValue)
+					this.xCoordinate2 = this.xCoordinate + dx.Value;
+				else
+					this.xCoordinate2 = State.GetDrawingSize(Length.HundredPercent, this, true);
+
+				if (dy.HasValue)
+					this.yCoordinate2 = this.yCoordinate + dy.Value;
+				else
+					this.yCoordinate2 = State.GetDrawingSize(Length.HundredPercent, this, false);
+
+				this.IncludePoint(this.xCoordinate2, this.yCoordinate2);
+			}
 		}
 
 		/// <summary>

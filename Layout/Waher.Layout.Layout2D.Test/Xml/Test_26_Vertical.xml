@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Vertical>
+    <Cell halign="Center">
+      <Margins top="10%" right="10%" bottom="5%" left="10%">
+        <Circle radius="25%" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center">
+      <Margins top="5%" right="10%" bottom="5%" left="10%">
+        <Ellipse radiusX="25%" radiusY="40%" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center">
+      <Margins top="5%" right="10%" bottom="5%" left="10%">
+        <Rectangle width="50%" height="30%" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+    <Cell halign="Center">
+      <Margins top="5%" right="10%" bottom="10%" left="10%">
+        <RoundedRectangle width="30%" height="50%" radiusX="5%" radiusY="5%" pen="RedPen" fill="RedBackground"/>
+      </Margins>
+    </Cell>
+  </Vertical>
+</Layout2D>

@@ -92,11 +92,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Array of padded cells.</returns>
 		public Padding[] Align()
 		{
+			this.Flush();
+
 			List<Padding> Result = new List<Padding>();
 			float X;
 			float Y = this.verticalDirection == VerticalDirection.TopDown ? 0 : this.y;
 			float Diff;
-			this.Flush();
 
 			foreach (Tuple<float, float, Padding[]> Row in this.rows)
 			{

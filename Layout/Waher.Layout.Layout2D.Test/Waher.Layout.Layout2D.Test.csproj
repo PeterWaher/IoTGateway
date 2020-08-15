@@ -31,9 +31,57 @@
     <None Remove="Xml\Test_22_SkewX_Pivot.xml" />
     <None Remove="Xml\Test_23_SkewY.xml" />
     <None Remove="Xml\Test_24_SkewY_Pivot.xml" />
+    <None Remove="Xml\Test_25_Horizontal.xml" />
+    <None Remove="Xml\Test_26_Vertical.xml" />
+    <None Remove="Xml\Test_27_Overlays.xml" />
+    <None Remove="Xml\Test_28_Flexible_LRTD.xml" />
+    <None Remove="Xml\Test_29_Flexible_RLTD.xml" />
+    <None Remove="Xml\Test_30_Flexible_LRDT.xml" />
+    <None Remove="Xml\Test_31_Flexible_RLDT.xml" />
+    <None Remove="Xml\Test_32_Flexible_TDLR.xml" />
+    <None Remove="Xml\Test_33_Flexible_TDRL.xml" />
+    <None Remove="Xml\Test_34_Flexible_DTLR.xml" />
+    <None Remove="Xml\Test_35_Flexible_DTRL.xml" />
+    <None Remove="Xml\Test_36_Grid.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Xml\Test_32_Flexible_TDLR.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_33_Flexible_TDRL.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_34_Flexible_DTLR.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_36_Grid.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_35_Flexible_DTRL.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_31_Flexible_RLDT.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_30_Flexible_LRDT.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_29_Flexible_RLTD.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_28_Flexible_LRTD.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_27_Overlays.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_26_Vertical.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_25_Horizontal.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Xml\Test_23_SkewY.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

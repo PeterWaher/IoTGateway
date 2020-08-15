@@ -73,7 +73,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.Measure(State);
 
-			this.defined = this.IncludePoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate);
+			if (!this.IncludePoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate))
+			{
+				this.xCoordinate = 0;
+				this.yCoordinate = 0;
+
+				this.IncludePoint(this.xCoordinate, this.yCoordinate);
+			}
 		}
 
 		/// <summary>

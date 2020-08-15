@@ -5050,6 +5050,61 @@
             Total height of layout
             </summary>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.Margins">
+            <summary>
+            A translation transform
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            A translation transform
+            </summary>
+            <param name="Document">Layout document containing the element.</param>
+            <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.LocalName">
+            <summary>
+            Local name of type of element.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.FromXml(System.Xml.XmlElement)">
+            <summary>
+            Populates the element (including children) with information from its XML definition.
+            </summary>
+            <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Creates a new instance of the layout element.
+            </summary>
+            <param name="Document">Document containing the new element.</param>
+            <param name="Parent">Parent element.</param>
+            <returns>New instance.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.CopyContents(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Copies contents (attributes and children) to the destination element.
+            </summary>
+            <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.OverlayCells">
             <summary>
             Lays ut cells one on-top of another
@@ -6024,6 +6079,13 @@
             Length definition.
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Length.#ctor(System.Single,Waher.Layout.Layout2D.Model.LengthUnit)">
+            <summary>
+            Length definition.
+            </summary>
+            <param name="Value">Value of length</param>
+            <param name="Unit">Unit of length.</param>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Length.Value">
             <summary>
             Value of length
@@ -6032,6 +6094,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Length.Unit">
             <summary>
             Unit of length.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Length.HundredPercent">
+            <summary>
+            100%
             </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.Pen">

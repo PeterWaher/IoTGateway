@@ -73,7 +73,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			float? Result = 0;
 
-			while (this.bottoms.Count <= this.y)
+			while (this.bottoms.Count <= y)
 				this.bottoms.Add(null);
 
 			while (y >= 0 && !(Result = this.bottoms[y]).HasValue)
@@ -113,12 +113,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (Right > Right2)
 				this.rights[this.x] = Right;
 
-			this.y += RowSpan;
+			int TempY = this.y + RowSpan;
 
-			float Bottom = this.GetBottom(this.y - 1) + Element.Height;
-			float Bottom2 = this.GetBottom(this.y);
+			float Bottom = this.GetBottom(TempY - 1) + Element.Height;
+			float Bottom2 = this.GetBottom(TempY);
 			if (Bottom > Bottom2)
-				this.bottoms[this.y] = Bottom;
+				this.bottoms[TempY] = Bottom;
 		}
 
 		private void SetElement(int X, int Y, int ColSpan, int RowSpan, ILayoutElement Element)

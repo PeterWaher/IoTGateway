@@ -170,11 +170,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 			if (!CommonTypes.TryParse(StringValue, out float d))
 				throw InvalidLengthException(StringValue);
 
-			Value = new Length()
-			{
-				Value = d,
-				Unit = Unit
-			};
+			Value = new Length(d, Unit);
 
 			return true;
 		}

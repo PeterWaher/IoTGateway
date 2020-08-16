@@ -15,16 +15,16 @@
   </ForEach>
   <Margins top="10%" right="10%" bottom="10%" left="10%">
     <Overlays>
-      <Cell halign="Center" valign="Center">
+      <Cell halign="Center" valign="Center" border="BlackPen">
         <Circle radius="25%" pen="RedPen" fill="RedBackground"/>
       </Cell>
-      <Cell halign="Center" valign="Center">
+      <Cell halign="Center" valign="Center" border="BlackPen">
         <Ellipse radiusX="25%" radiusY="40%" pen="RedPen" fill="RedBackground"/>
       </Cell>
-      <Cell halign="Center" valign="Center">
+      <Cell halign="Center" valign="Center" border="BlackPen">
         <Rectangle width="50%" height="30%" pen="RedPen" fill="RedBackground"/>
       </Cell>
-      <Cell halign="Center" valign="Center">
+      <Cell halign="Center" valign="Center" border="BlackPen">
         <RoundedRectangle width="30%" height="50%" radiusX="5%" radiusY="5%" pen="RedPen" fill="RedBackground"/>
       </Cell>
     </Overlays>

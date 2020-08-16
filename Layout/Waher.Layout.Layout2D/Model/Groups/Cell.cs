@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Pens;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -57,6 +58,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private PositiveIntegerAttribute rowSpan;
 		private EnumAttribute<HorizontalAlignment> halign;
 		private EnumAttribute<VerticalAlignment> valign;
+		private StringAttribute border;
 
 		/// <summary>
 		/// Defines a cell in a grid.
@@ -85,6 +87,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 			this.colSpan = new PositiveIntegerAttribute(Input, "colSpan");
 			this.rowSpan = new PositiveIntegerAttribute(Input, "rowSpan");
+			this.border = new StringAttribute(Input, "border");
 		}
 
 		/// <summary>
@@ -99,6 +102,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.valign.Export(Output);
 			this.colSpan.Export(Output);
 			this.rowSpan.Export(Output);
+			this.border.Export(Output);
 		}
 
 		/// <summary>
@@ -126,6 +130,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				Dest.valign = this.valign.CopyIfNotPreset();
 				Dest.colSpan = this.colSpan.CopyIfNotPreset();
 				Dest.rowSpan = this.rowSpan.CopyIfNotPreset();
+				Dest.border = this.border.CopyIfNotPreset();
 			}
 		}
 
@@ -134,28 +139,35 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="MaxWidth">Maximum width of area assigned to the cell</param>
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
-		/// <param name="OffsetX">X-offset of cell.</param>
-		/// <param name="OffsetY">Y-offset of cell.</param>
 		/// <param name="Session">Current session.</param>
-		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, ref float OffsetX, ref float OffsetY,
-			Variables Session)
+		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, Variables Session)
 		{
-			if (MaxWidth.HasValue && this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
-				HAlignment != HorizontalAlignment.Left)
+			if (MaxWidth.HasValue)
 			{
-				if (HAlignment == HorizontalAlignment.Right)
-					OffsetX += (MaxWidth.Value - this.Width);
-				else    // Center
-					OffsetX += (MaxWidth.Value - this.Width) / 2;
+				if (this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
+					HAlignment != HorizontalAlignment.Left)
+				{
+					if (HAlignment == HorizontalAlignment.Right)
+						this.dx = (MaxWidth.Value - this.Width);
+					else    // Center
+						this.dx = (MaxWidth.Value - this.Width) / 2;
+				}
+
+				this.Width = MaxWidth.Value;
 			}
 
-			if (MaxHeight.HasValue && this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
-				VAlignment != VerticalAlignment.Top)
+			if (MaxHeight.HasValue)
 			{
-				if (VAlignment == VerticalAlignment.Bottom)
-					OffsetY += (MaxHeight.Value - this.Height);
-				else    // Center
-					OffsetY += (MaxHeight.Value - this.Height) / 2;
+				if (this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
+					VAlignment != VerticalAlignment.Top)
+				{
+					if (VAlignment == VerticalAlignment.Bottom)
+						this.dy = (MaxHeight.Value - this.Height);
+					else    // Center
+						this.dy = (MaxHeight.Value - this.Height) / 2;
+				}
+
+				this.Height = MaxHeight.Value;
 			}
 		}
 
@@ -178,5 +190,49 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				RowSpan = 1;
 		}
 
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (this.border.TryEvaluate(State.Session, out string RefId) &&
+				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				Element is Pen Pen)
+			{
+				this.borderPen = Pen;
+			}
+
+			this.dx = 0;
+			this.dy = 0;
+		}
+
+		private Pen borderPen;
+		private float dx;
+		private float dy;
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			if (!(this.borderPen is null))
+				State.Canvas.DrawRect(this.Left, this.Top, this.Width, this.Height, this.borderPen.Paint);
+
+			if (this.dx == 0 && this.dy == 0)
+				base.Draw(State);
+			else
+			{
+				SKMatrix M = State.Canvas.TotalMatrix;
+				State.Canvas.Translate(this.dx, this.dy);
+
+				base.Draw(State);
+
+				State.Canvas.SetMatrix(M);
+			}
+		}
 	}
 }

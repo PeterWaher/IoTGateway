@@ -761,6 +761,7 @@
         <xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
         <xs:attribute name="colSpan" type="xs:positiveInteger" use="optional"/>
         <xs:attribute name="rowSpan" type="xs:positiveInteger" use="optional"/>
+        <xs:attribute name="border" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

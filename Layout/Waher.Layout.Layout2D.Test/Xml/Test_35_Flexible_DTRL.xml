@@ -14,22 +14,22 @@
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
   <Flexible order="VerticalHorizontal" horizontalDirection="RightLeft" verticalDirection="BottomUp" halign="Center" valign="Center" maxHeight="100%">
-    <Cell halign="Center" valign="Center">
+    <Cell halign="Center" valign="Center" border="BlackPen">
       <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
         <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
-    <Cell halign="Center" valign="Center">
+    <Cell halign="Center" valign="Center" border="BlackPen">
       <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
         <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
-    <Cell halign="Center" valign="Center">
+    <Cell halign="Center" valign="Center" border="BlackPen">
       <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
         <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
-    <Cell halign="Center" valign="Center">
+    <Cell halign="Center" valign="Center" border="BlackPen">
       <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
         <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
       </Margins>

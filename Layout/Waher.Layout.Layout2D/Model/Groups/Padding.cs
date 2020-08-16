@@ -73,7 +73,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, Variables Session)
 		{
 			if (this.isCell)
-				this.cell.AlignedMeasuredCell(MaxWidth, MaxHeight, ref this.offsetX, ref this.offsetY, Session);
+				this.cell.AlignedMeasuredCell(MaxWidth, MaxHeight, Session);
 		}
 
 	}

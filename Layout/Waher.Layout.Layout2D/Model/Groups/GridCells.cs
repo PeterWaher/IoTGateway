@@ -104,26 +104,33 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			this.SetElement(this.x, this.y, ColSpan, RowSpan, Element);
 
-			this.x += ColSpan;
-			if (this.x >= this.nrColumns)
-				this.x = this.nrColumns - 1;
+			int X2 = this.x + ColSpan - 1;
+			if (X2 >= this.nrColumns)
+				X2 = this.nrColumns - 1;
 
 			float Right = this.GetRight(this.x - 1) + Element.Width;
-			float Right2 = this.GetRight(this.x);
+			float Right2 = this.GetRight(X2);
 			if (Right > Right2)
-				this.rights[this.x] = Right;
+				this.rights[X2] = Right;
 
-			int TempY = this.y + RowSpan;
+			int Y2 = this.y + RowSpan - 1;
 
-			float Bottom = this.GetBottom(TempY - 1) + Element.Height;
-			float Bottom2 = this.GetBottom(TempY);
+			float Bottom = this.GetBottom(this.y - 1) + Element.Height;
+			float Bottom2 = this.GetBottom(Y2);
 			if (Bottom > Bottom2)
-				this.bottoms[TempY] = Bottom;
+				this.bottoms[Y2] = Bottom;
+
+			this.x += ColSpan;
+			if (this.x >= this.nrColumns)
+			{
+				this.x = 0;
+				this.y++;
+			}
 		}
 
 		private void SetElement(int X, int Y, int ColSpan, int RowSpan, ILayoutElement Element)
 		{
-			GridPadding P = new GridPadding(Element, -Element.Left, -Element.Top, ColSpan, RowSpan);
+			GridPadding P = new GridPadding(Element, -Element.Left, -Element.Top, X, Y, ColSpan, RowSpan);
 
 			if (ColSpan > 1 || RowSpan > 1)
 			{
@@ -139,7 +146,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 						if (First)
 						{
 							First = false;
-							P = new GridPadding(null, 0, 0, 0, 0);
+							P = new GridPadding(null, 0, 0, 0, 0, 0, 0);
 						}
 					}
 
@@ -190,29 +197,24 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public Padding[] Align()
 		{
 			List<Padding> Result = new List<Padding>();
-			int X = 0;
-			int Y = 0;
 
 			foreach (GridPadding P in this.elements)
 			{
 				if (!(P.Element is null))
 				{
-					float Left = this.GetRight(X + P.ColSpan - 1);
-					float Top = this.GetBottom(Y + P.RowSpan - 1);
-					float MaxWidth = Left - this.GetRight(X - 1);
-					float MaxHeight = Top - this.GetBottom(Y - 1);
+					int X = P.X;
+					int Y = P.Y;
+					float Left = this.GetRight(X - 1);
+					float Top = this.GetBottom(Y - 1);
+					float Right = this.GetRight(X + P.ColSpan - 1);
+					float Bottom = this.GetBottom(Y + P.RowSpan - 1);
+					float MaxWidth = Right - Left;
+					float MaxHeight = Bottom - Top;
 
 					P.OffsetX += Left;
 					P.OffsetY += Top;
 					P.AlignedMeasuredCell(MaxWidth, MaxHeight, this.session);
 					Result.Add(P);
-				}
-
-				X++;
-				if (X >= this.nrColumns)
-				{
-					X = 0;
-					Y++;
 				}
 			}
 

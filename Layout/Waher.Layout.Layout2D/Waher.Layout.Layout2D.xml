@@ -4662,14 +4662,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},System.Single@,System.Single@,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables)">
             <summary>
             Aligns a measured cell
             </summary>
             <param name="MaxWidth">Maximum width of area assigned to the cell</param>
             <param name="MaxHeight">Maximum height of area assigned to the cell</param>
-            <param name="OffsetX">X-offset of cell.</param>
-            <param name="OffsetY">Y-offset of cell.</param>
             <param name="Session">Current session.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CalcSpan(Waher.Script.Variables,System.Int32@,System.Int32@)">
@@ -4679,6 +4677,18 @@
             <param name="Session">Current session.</param>
             <param name="ColSpan">Column span</param>
             <param name="RowSpan">Row span</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder">
             <summary>
@@ -4938,15 +4948,27 @@
             Provides padding for a layout element in a grid.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridPadding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Single,System.Single,System.Int32,System.Int32)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridPadding.#ctor(Waher.Layout.Layout2D.Model.ILayoutElement,System.Single,System.Single,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Provides padding for a layout element in a grid.
             </summary>
             <param name="Element">Embedded element.</param>
             <param name="OffsetX">X-offset</param>
             <param name="OffsetY">Y-offset</param>
+            <param name="X">Cell X-coordinate in grid.</param>
+            <param name="Y">Cell Y-coordinate in grid.</param>
             <param name="ColSpan">Column span</param>
             <param name="RowSpan">Row span</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridPadding.X">
+            <summary>
+            Cell X-coordinate in grid.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.GridPadding.Y">
+            <summary>
+            Cell Y-coordinate in grid.
+            </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.GridPadding.ColSpan">
             <summary>

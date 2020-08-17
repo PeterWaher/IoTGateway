@@ -33,6 +33,51 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		public override string LocalName => "Shadow";
 
 		/// <summary>
+		/// DX
+		/// </summary>
+		public LengthAttribute DX
+		{
+			get => this.dX;
+			set => this.dX = value;
+		}
+
+		/// <summary>
+		/// DY
+		/// </summary>
+		public LengthAttribute DY
+		{
+			get => this.dY;
+			set => this.dY = value;
+		}
+
+		/// <summary>
+		/// Sigma X
+		/// </summary>
+		public FloatAttribute SigmaX
+		{
+			get => this.sigmaX;
+			set => this.sigmaX = value;
+		}
+
+		/// <summary>
+		/// Sigma Y
+		/// </summary>
+		public FloatAttribute SigmaY
+		{
+			get => this.sigmaY;
+			set => this.sigmaY = value;
+		}
+
+		/// <summary>
+		/// Color
+		/// </summary>
+		public ColorAttribute Color
+		{
+			get => this.color;
+			set => this.color = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

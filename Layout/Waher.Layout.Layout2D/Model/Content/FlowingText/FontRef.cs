@@ -28,6 +28,15 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		public override string LocalName => "FontRef";
 
 		/// <summary>
+		/// Font
+		/// </summary>
+		public StringAttribute Font
+		{
+			get => this.font;
+			set => this.font = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

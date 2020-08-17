@@ -33,6 +33,24 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public override string LocalName => "ImageUrl";
 
 		/// <summary>
+		/// URL
+		/// </summary>
+		public StringAttribute Url
+		{
+			get => this.url;
+			set => this.url = value;
+		}
+
+		/// <summary>
+		/// Alternative
+		/// </summary>
+		public StringAttribute Alternative
+		{
+			get => this.alt;
+			set => this.alt = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

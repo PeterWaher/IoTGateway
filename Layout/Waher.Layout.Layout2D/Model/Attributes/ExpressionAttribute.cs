@@ -15,20 +15,20 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Expression attribute
 		/// </summary>
-		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		public ExpressionAttribute(XmlElement E, string AttributeName)
-			: base(E, AttributeName, false)
+		/// <param name="Value">Attribute value.</param>
+		public ExpressionAttribute(string AttributeName, Expression Value)
+			: base(AttributeName, Value)
 		{
 		}
 
 		/// <summary>
 		/// Expression attribute
 		/// </summary>
+		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		/// <param name="Expression">Expression.</param>
-		public ExpressionAttribute(string AttributeName, Expression Expression)
-			: base(AttributeName, Expression)
+		public ExpressionAttribute(XmlElement E, string AttributeName)
+			: base(E, AttributeName, false)
 		{
 		}
 

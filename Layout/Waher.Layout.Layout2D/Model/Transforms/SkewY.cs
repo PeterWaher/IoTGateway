@@ -28,6 +28,15 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		public override string LocalName => "SkewY";
 
 		/// <summary>
+		/// Factor
+		/// </summary>
+		public FloatAttribute Factor
+		{
+			get => this.factor;
+			set => this.factor = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

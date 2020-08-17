@@ -28,6 +28,15 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public override string LocalName => "ImageInternal";
 
 		/// <summary>
+		/// Content ID
+		/// </summary>
+		public StringAttribute Cid
+		{
+			get => this.cid;
+			set => this.cid = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

@@ -29,6 +29,24 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		public override string LocalName => "Translate";
 
 		/// <summary>
+		/// Translate X
+		/// </summary>
+		public LengthAttribute TranslateX
+		{
+			get => this.translateX;
+			set => this.translateX = value;
+		}
+
+		/// <summary>
+		/// Translate Y
+		/// </summary>
+		public LengthAttribute TranslateY
+		{
+			get => this.translateY;
+			set => this.translateY = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

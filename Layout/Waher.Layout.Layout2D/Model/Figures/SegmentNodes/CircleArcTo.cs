@@ -29,6 +29,24 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public override string LocalName => "CircleArcTo";
 
 		/// <summary>
+		/// Radius
+		/// </summary>
+		public LengthAttribute Radius
+		{
+			get => this.radius;
+			set => this.radius = value;
+		}
+
+		/// <summary>
+		/// Clockwise
+		/// </summary>
+		public BooleanAttribute Clockwise
+		{
+			get => this.clockwise;
+			set => this.clockwise = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

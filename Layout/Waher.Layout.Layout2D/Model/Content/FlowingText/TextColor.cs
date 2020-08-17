@@ -28,6 +28,15 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		public override string LocalName => "TextColor";
 
 		/// <summary>
+		/// Color
+		/// </summary>
+		public ColorAttribute Color
+		{
+			get => this.color;
+			set => this.color = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

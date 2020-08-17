@@ -120,6 +120,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 						break;
 
 					case VerticalAlignment.Bottom:
+					case VerticalAlignment.BaseLine:
 						if (this.verticalDirection == VerticalDirection.TopDown)
 							Y = Diff;
 						else

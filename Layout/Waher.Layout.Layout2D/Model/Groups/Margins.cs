@@ -31,6 +31,42 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override string LocalName => "Margins";
 
 		/// <summary>
+		/// Left
+		/// </summary>
+		public LengthAttribute LeftAttribute
+		{
+			get => this.left;
+			set => this.left = value;
+		}
+
+		/// <summary>
+		/// Right
+		/// </summary>
+		public LengthAttribute RightAttribute
+		{
+			get => this.right;
+			set => this.right = value;
+		}
+
+		/// <summary>
+		/// Top
+		/// </summary>
+		public LengthAttribute TopAttribute
+		{
+			get => this.top;
+			set => this.top = value;
+		}
+
+		/// <summary>
+		/// Bottom
+		/// </summary>
+		public LengthAttribute BottomAttribute
+		{
+			get => this.bottom;
+			set => this.bottom = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

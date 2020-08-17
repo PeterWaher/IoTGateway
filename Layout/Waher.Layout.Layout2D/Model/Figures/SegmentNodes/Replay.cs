@@ -28,6 +28,15 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public override string LocalName => "Replay";
 
 		/// <summary>
+		/// Reference
+		/// </summary>
+		public StringAttribute Reference
+		{
+			get => this._ref;
+			set => this._ref = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

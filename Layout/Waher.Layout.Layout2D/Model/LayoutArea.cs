@@ -47,6 +47,87 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Width
+		/// </summary>
+		public LengthAttribute WidthAttribute
+		{
+			get => this.width;
+			set => this.width = value;
+		}
+
+		/// <summary>
+		/// Height
+		/// </summary>
+		public LengthAttribute HeightAttribute
+		{
+			get => this.height;
+			set => this.height = value;
+		}
+
+		/// <summary>
+		/// Maximum Width
+		/// </summary>
+		public LengthAttribute MaxWidth
+		{
+			get => this.maxWidth;
+			set => this.maxWidth = value;
+		}
+
+		/// <summary>
+		/// Maximum Height
+		/// </summary>
+		public LengthAttribute MaxHeight
+		{
+			get => this.maxHeight;
+			set => this.maxHeight = value;
+		}
+
+		/// <summary>
+		/// Minimum Width
+		/// </summary>
+		public LengthAttribute MinWidth
+		{
+			get => this.minWidth;
+			set => this.minWidth = value;
+		}
+
+		/// <summary>
+		/// Minimum Height
+		/// </summary>
+		public LengthAttribute MinHeight
+		{
+			get => this.minHeight;
+			set => this.minHeight = value;
+		}
+
+		/// <summary>
+		/// Keep aspect-ratio
+		/// </summary>
+		public BooleanAttribute KeepAspectRatio
+		{
+			get => this.keepAspectRatio;
+			set => this.keepAspectRatio = value;
+		}
+
+		/// <summary>
+		/// Overflow
+		/// </summary>
+		public EnumAttribute<Overflow> Overflow
+		{
+			get => this.overflow;
+			set => this.overflow = value;
+		}
+
+		/// <summary>
+		/// OnClick event script
+		/// </summary>
+		public ExpressionAttribute OnClick
+		{
+			get => this.onClick;
+			set => this.onClick = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

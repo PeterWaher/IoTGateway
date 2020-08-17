@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          backgroundId="WhiteBackground" penId="BlackPen"
+          fontId="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+  <SolidPen id="RedPen" color="Red" width="2mm"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+  <Font id="Text" name="Arial" size="12pt"/>
+  <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+  <ForEach variable="k" expression="(10..90|10)+'%'">
+    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+  </ForEach>
+  <Label x="10%" y="10%" text="(10%,10%)" valign="Top" halign="Left"/>
+  <Label x="50%" y="10%" text="(50%,10%)" valign="Top" halign="Center"/>
+  <Label x="90%" y="10%" text="(90%,10%)" valign="Top" halign="Right"/>
+  <Label x="10%" y="50%" text="(10%,50%)" valign="Center" halign="Left"/>
+  <Label x="50%" y="50%" text="(50%,50%)" valign="Center" halign="Center"/>
+  <Label x="90%" y="50%" text="(90%,50%)" valign="Center" halign="Right"/>
+  <Label x="10%" y="70%" text="(10%,70%)" valign="BaseLine" halign="Left"/>
+  <Label x="50%" y="70%" text="(50%,70%)" valign="BaseLine" halign="Center"/>
+  <Label x="90%" y="70%" text="(90%,70%)" valign="BaseLine" halign="Right"/>
+  <Label x="10%" y="90%" text="(10%,90%)" valign="Bottom" halign="Left"/>
+  <Label x="50%" y="90%" text="(50%,90%)" valign="Bottom" halign="Center"/>
+  <Label x="90%" y="90%" text="(90%,90%)" valign="Bottom" halign="Right"/>
+  <Rotate degrees="30" x="25%" y="25%">
+    <Label x="25%" y="25%" text="(25%,25%)" halign="Center" valign="Center"/>
+  </Rotate>
+  <Scale scaleX="1.5" scaleY="0.5" x="75%" y="25%">
+    <Label x="75%" y="25%" text="(75%,25%)" halign="Center" valign="Center"/>
+  </Scale>
+  <SkewX factor="0.25" x="25%" y="75%">
+    <Label x="25%" y="75%" text="(25%,75%)" halign="Center" valign="Center"/>
+  </SkewX>
+  <SkewY factor="0.25" x="75%" y="75%">
+    <Label x="75%" y="75%" text="(75%,75%)" halign="Center" valign="Center"/>
+  </SkewY>
+</Layout2D>

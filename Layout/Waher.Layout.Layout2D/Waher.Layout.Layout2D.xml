@@ -237,6 +237,27 @@
             <param name="Content">Content, if found, null otherwise.</param>
             <returns>If attached content was found with the given content ID.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.DisposeContent(System.String)">
+            <summary>
+            Disposes of attached content, given its ID.
+            </summary>
+            <param name="ContentId">Content ID</param>
+            <returns>If content with the corresponding ID was found and disposed.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.AddContent(System.Object)">
+            <summary>
+            Adds content to the layout.
+            </summary>
+            <param name="Content">Content</param>
+            <returns>Content ID of newly added content</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.AddContent(System.String,System.Object)">
+            <summary>
+            Adds content to the layout.
+            </summary>
+            <param name="ContentId">Content ID</param>
+            <param name="Content">Content</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
             Contains information about an actionable area in a generated image.
@@ -253,6 +274,11 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Angle.Degrees">
+            <summary>
+            Degrees
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Angle.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -288,6 +314,13 @@
             Manages an attribute value or expression.
             </summary>
             <typeparam name="T">Type of attribute</typeparam>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.String,`0)">
+            <summary>
+            Manages an attribute value or expression.
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.#ctor(System.Xml.XmlElement,System.String,System.Boolean)">
             <summary>
@@ -368,6 +401,13 @@
             Boolean attribute
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.String,System.Boolean)">
+            <summary>
+            Boolean attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
             Boolean attribute
@@ -408,6 +448,13 @@
             <summary>
             Color attribute
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.String,SkiaSharp.SKColor)">
+            <summary>
+            Color attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ColorAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
@@ -450,6 +497,13 @@
             Enumeration attribute
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.String,`0)">
+            <summary>
+            Enumeration attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.EnumAttribute`1.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
             Enumeration attribute
@@ -491,19 +545,19 @@
             Expression attribute
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.String,Waher.Script.Expression)">
+            <summary>
+            Expression attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
             Expression attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.#ctor(System.String,Waher.Script.Expression)">
-            <summary>
-            Expression attribute
-            </summary>
-            <param name="AttributeName">Attribute name.</param>
-            <param name="Expression">Expression.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.TryParse(System.String,Waher.Script.Expression@)">
             <summary>
@@ -551,19 +605,26 @@
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute">
             <summary>
-            Double attribute
+            Floating point (Single) attribute
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,System.Single)">
+            <summary>
+            Floating point (Single) attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
-            Double attribute
+            Floating point (Single) attribute
             </summary>
             <param name="E">XML Element</param>
             <param name="AttributeName">Attribute name.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.#ctor(System.String,Waher.Script.Expression)">
             <summary>
-            Double attribute
+            Floating point (Single) attribute
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
@@ -594,6 +655,13 @@
             <summary>
             Length attribute
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.String,Waher.Layout.Layout2D.Model.Length)">
+            <summary>
+            Length attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
@@ -636,6 +704,13 @@
             Positive integer attribute
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.String,System.Int32)">
+            <summary>
+            Positive integer attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
             Positive integer attribute
@@ -676,6 +751,13 @@
             <summary>
             String attribute
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.String,System.String)">
+            <summary>
+            String attribute
+            </summary>
+            <param name="AttributeName">Attribute name.</param>
+            <param name="Value">Attribute value.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.#ctor(System.Xml.XmlElement,System.String)">
             <summary>
@@ -757,6 +839,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.Color">
+            <summary>
+            Color
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -806,6 +893,26 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FontId">
+            <summary>
+            Font ID
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.PenId">
+            <summary>
+            Pen ID
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.BackgroundId">
+            <summary>
+            Background ID
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.TextColor">
+            <summary>
+            Text Color
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -851,7 +958,7 @@
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.Condition">
             <summary>
-            Condition of case statement.
+            Condition of case statement
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.Case.FromXml(System.Xml.XmlElement)">
@@ -927,6 +1034,26 @@
             Dynamic array of children
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.From">
+            <summary>
+            From
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.To">
+            <summary>
+            To
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.Step">
+            <summary>
+            Step
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.Variable">
+            <summary>
+            Variable
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -979,6 +1106,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.DynamicChildren">
             <summary>
             Dynamic array of children
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.Expression">
+            <summary>
+            Expression
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.Variable">
+            <summary>
+            Variable
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.FromXml(System.Xml.XmlElement)">
@@ -1038,6 +1175,11 @@
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.Condition">
+            <summary>
+            Condition
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.FromXml(System.Xml.XmlElement)">
@@ -1221,6 +1363,16 @@
             Dynamic array of children
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.Expression">
+            <summary>
+            Expression
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.TestAfter">
+            <summary>
+            Test After attribute
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1330,6 +1482,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.Font">
+            <summary>
+            Font
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1376,6 +1533,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.Expression">
+            <summary>
+            Expression
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.FromXml(System.Xml.XmlElement)">
@@ -1521,6 +1683,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.TextAttribute">
+            <summary>
+            Text
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.Text.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1562,6 +1729,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.Color">
+            <summary>
+            Color
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.FromXml(System.Xml.XmlElement)">
@@ -1632,6 +1804,21 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.Text">
+            <summary>
+            Text
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.HorizontalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.VerticalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Label.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1657,6 +1844,18 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.Paragraph">
             <summary>
@@ -1718,9 +1917,29 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Content.Script.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.Expression">
+            <summary>
+            Expression
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.HorizontalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.VerticalAlignment">
+            <summary>
+            Degrees
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Script.FromXml(System.Xml.XmlElement)">
@@ -1749,6 +1968,18 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Distance">
             <summary>
             Abstract base class for distance elements.
@@ -1760,6 +1991,11 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Distance.DistanceAttribute">
+            <summary>
+            Degrees
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Distance.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -1818,9 +2054,14 @@
             Current drawing canvas.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Text">
+            <summary>
+            Current text paint settings
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Font">
             <summary>
-            Current font
+            Current font.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.DrawingState.DefaultPen">
@@ -1934,6 +2175,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Circle.Radius">
+            <summary>
+            Radius
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1987,6 +2233,31 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Radius">
+            <summary>
+            Radius
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.StartDegrees">
+            <summary>
+            Start Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.EndDegrees">
+            <summary>
+            End Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Clockwise">
+            <summary>
+            Clockwise
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Center">
+            <summary>
+            Include center point
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.FromXml(System.Xml.XmlElement)">
@@ -2075,6 +2346,16 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusY">
+            <summary>
+            Radius Y
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2130,6 +2411,36 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusY">
+            <summary>
+            Radius Y
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.StartDegrees">
+            <summary>
+            Start Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.EndDegrees">
+            <summary>
+            End Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Clockwise">
+            <summary>
+            Clockwise
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Center">
+            <summary>
+            Include center point
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2179,6 +2490,16 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.Pen">
+            <summary>
+            Pen
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.Fill">
+            <summary>
+            Fill
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -2234,6 +2555,21 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Reference">
+            <summary>
+            Reference
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2279,6 +2615,21 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.X2">
+            <summary>
+            X-coordinate 2
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Y2">
+            <summary>
+            Y-coordinate 2
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Reference2">
+            <summary>
+            Reference 2
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -2343,6 +2694,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.Head">
+            <summary>
+            Head
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.Tail">
+            <summary>
+            Tail
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.FromXml(System.Xml.XmlElement)">
@@ -2487,6 +2848,21 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.Head">
+            <summary>
+            Head
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.Tail">
+            <summary>
+            Tail
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.ShapeFill">
+            <summary>
+            Shape Fill
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2606,6 +2982,16 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.Head">
+            <summary>
+            Head
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.Tail">
+            <summary>
+            Tail
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -2708,6 +3094,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusY">
+            <summary>
+            Radius Y
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.FromXml(System.Xml.XmlElement)">
@@ -2843,6 +3239,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Radius">
+            <summary>
+            Radius
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Clockwise">
+            <summary>
+            Clockwise
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.FromXml(System.Xml.XmlElement)">
@@ -3290,6 +3696,21 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusY">
+            <summary>
+            Radius Y
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Clockwise">
+            <summary>
+            Clockwise
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.FromXml(System.Xml.XmlElement)">
@@ -3989,6 +4410,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.Reference">
+            <summary>
+            Reference
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -4315,6 +4741,16 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.Head">
+            <summary>
+            Head
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.Tail">
+            <summary>
+            Tail
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -4455,6 +4891,21 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaX">
+            <summary>
+            Sigma X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaY">
+            <summary>
+            Sigma Y
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.TileMode">
+            <summary>
+            Tile Mode
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Filters.Blur.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -4496,6 +4947,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusY">
+            <summary>
+            Radius Y
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Filters.Dilate.FromXml(System.Xml.XmlElement)">
@@ -4541,6 +5002,16 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusX">
+            <summary>
+            Radius X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusY">
+            <summary>
+            Radius Y
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Filters.Erode.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -4584,6 +5055,31 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DX">
+            <summary>
+            DX
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DY">
+            <summary>
+            DY
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaX">
+            <summary>
+            Sigma X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaY">
+            <summary>
+            Sigma Y
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.Color">
+            <summary>
+            Color
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Filters.Shadow.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -4625,6 +5121,36 @@
         <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Size">
+            <summary>
+            Size
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Weight">
+            <summary>
+            Weight
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.WidthAttribute">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Slant">
+            <summary>
+            Slant
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Color">
+            <summary>
+            Color
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.FromXml(System.Xml.XmlElement)">
@@ -4688,6 +5214,11 @@
             Aligned along centers
             </summary>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment.BaseLine">
+            <summary>
+            Aligned along text base line.
+            </summary>
+        </member>
         <member name="F:Waher.Layout.Layout2D.Model.Groups.VerticalAlignment.Bottom">
             <summary>
             Aligned at the bottom
@@ -4708,6 +5239,31 @@
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.HorizontalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.VerticalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.ColSpan">
+            <summary>
+            Column span
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.RowSpan">
+            <summary>
+            Row span
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.Border">
+            <summary>
+            Border
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.FromXml(System.Xml.XmlElement)">
@@ -4824,6 +5380,31 @@
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.Order">
+            <summary>
+            Order
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalDirection">
+            <summary>
+            Horizontal Direction
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalDirection">
+            <summary>
+            Vertical Direction
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalAlignment">
+            <summary>
+            Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalAlignment">
+            <summary>
+            Degrees
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Flexible.FromXml(System.Xml.XmlElement)">
@@ -4948,6 +5529,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Grid.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Grid.Columns">
+            <summary>
+            Columns
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Grid.FromXml(System.Xml.XmlElement)">
@@ -5161,6 +5747,26 @@
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.LeftAttribute">
+            <summary>
+            Left
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.RightAttribute">
+            <summary>
+            Right
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.TopAttribute">
+            <summary>
+            Top
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.BottomAttribute">
+            <summary>
+            Bottom
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.FromXml(System.Xml.XmlElement)">
@@ -5630,6 +6236,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageFile.FileName">
+            <summary>
+            Filename
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageFile.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -5679,6 +6290,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Images.ImageInternal.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageInternal.Cid">
+            <summary>
+            Content ID
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.FromXml(System.Xml.XmlElement)">
@@ -5732,6 +6348,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageResource.Resource">
+            <summary>
+            Resource
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -5781,6 +6402,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.Url">
+            <summary>
+            URL
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.Alternative">
+            <summary>
+            Alternative
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.FromXml(System.Xml.XmlElement)">
@@ -5869,6 +6500,51 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.WidthAttribute">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.HeightAttribute">
+            <summary>
+            Height
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxWidth">
+            <summary>
+            Maximum Width
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxHeight">
+            <summary>
+            Maximum Height
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinWidth">
+            <summary>
+            Minimum Width
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinHeight">
+            <summary>
+            Minimum Height
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.KeepAspectRatio">
+            <summary>
+            Keep aspect-ratio
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.Overflow">
+            <summary>
+            Overflow
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.OnClick">
+            <summary>
+            OnClick event script
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -6338,6 +7014,26 @@
             Current pen
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.WidthAttribute">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Cap">
+            <summary>
+            Cap
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Join">
+            <summary>
+            Join
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Miter">
+            <summary>
+            Miter
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6399,6 +7095,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.SolidPen.Color">
+            <summary>
+            Color
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6442,6 +7143,21 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point.Reference">
+            <summary>
+            Reference
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -6489,6 +7205,21 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.X2">
+            <summary>
+            X-coordinate 2
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.Y2">
+            <summary>
+            Y-coordinate 2
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.Reference2">
+            <summary>
+            Reference 2
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point2.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6535,6 +7266,11 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point2Weight.Weight">
+            <summary>
+            Weight
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6575,6 +7311,21 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.X3">
+            <summary>
+            X-coordinate 3
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.Y3">
+            <summary>
+            Y-coordinate 3
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.Reference3">
+            <summary>
+            Reference 3
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Point3.FromXml(System.Xml.XmlElement)">
             <summary>
@@ -6625,6 +7376,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.References.Copy.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.References.Copy.Reference">
+            <summary>
+            Reference
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.References.Copy.FromXml(System.Xml.XmlElement)">
@@ -6805,6 +7561,21 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.Reference">
+            <summary>
+            Reference
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6862,6 +7633,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Rotate.Degrees">
+            <summary>
+            Degrees
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -6915,6 +7691,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleX">
+            <summary>
+            Scale X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleY">
+            <summary>
+            Scale Y
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.FromXml(System.Xml.XmlElement)">
@@ -6972,6 +7758,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewX.Factor">
+            <summary>
+            Factor
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -7027,6 +7818,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewY.Factor">
+            <summary>
+            Factor
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -7080,6 +7876,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.LocalName">
             <summary>
             Local name of type of element.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateX">
+            <summary>
+            Translate X
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateY">
+            <summary>
+            Translate Y
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.FromXml(System.Xml.XmlElement)">

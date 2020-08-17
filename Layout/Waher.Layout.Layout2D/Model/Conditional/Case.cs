@@ -28,9 +28,13 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override string LocalName => "Case";
 
 		/// <summary>
-		/// Condition of case statement.
+		/// Condition of case statement
 		/// </summary>
-		public ExpressionAttribute Condition => this.condition;
+		public ExpressionAttribute Condition
+		{
+			get => this.condition;
+			set => this.condition = value;
+		}
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.

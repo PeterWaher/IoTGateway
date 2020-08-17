@@ -29,6 +29,15 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public override string LocalName => "ImageFile";
 
 		/// <summary>
+		/// Filename
+		/// </summary>
+		public StringAttribute FileName
+		{
+			get => this.fileName;
+			set => this.fileName = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

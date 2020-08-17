@@ -28,7 +28,11 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Child elements
 		/// </summary>
-		public ILayoutElement[] Children => this.children;
+		public ILayoutElement[] Children
+		{
+			get => this.children;
+			set => this.children = value;
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

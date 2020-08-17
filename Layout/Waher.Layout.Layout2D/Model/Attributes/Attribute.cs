@@ -22,6 +22,19 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Manages an attribute value or expression.
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public Attribute(string AttributeName, T Value)
+		{
+			this.name = AttributeName;
+			this.presetValue = Value;
+			this.hasPresetValue = true;
+			this.expression = null;
+		}
+
+		/// <summary>
+		/// Manages an attribute value or expression.
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="CanEmbedScript">If script can be embedded.</param>

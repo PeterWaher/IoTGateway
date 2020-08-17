@@ -57,6 +57,15 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		}
 
 		/// <summary>
+		/// Condition
+		/// </summary>
+		public ExpressionAttribute Condition
+		{
+			get => this.condition;
+			set => this.condition = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

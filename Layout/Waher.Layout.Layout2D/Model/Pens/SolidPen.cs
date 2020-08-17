@@ -29,6 +29,15 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		public override string LocalName => "SolidPen";
 
 		/// <summary>
+		/// Color
+		/// </summary>
+		public ColorAttribute Color
+		{
+			get => this.color;
+			set => this.color = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

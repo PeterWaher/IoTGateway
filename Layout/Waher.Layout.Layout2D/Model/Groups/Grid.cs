@@ -30,6 +30,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override string LocalName => "Grid";
 
 		/// <summary>
+		/// Columns
+		/// </summary>
+		public PositiveIntegerAttribute Columns
+		{
+			get => this.columns;
+			set => this.columns = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

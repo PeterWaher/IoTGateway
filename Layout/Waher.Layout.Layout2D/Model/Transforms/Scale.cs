@@ -29,6 +29,24 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		public override string LocalName => "Scale";
 
 		/// <summary>
+		/// Scale X
+		/// </summary>
+		public FloatAttribute ScaleX
+		{
+			get => this.scaleX;
+			set => this.scaleX = value;
+		}
+
+		/// <summary>
+		/// Scale Y
+		/// </summary>
+		public FloatAttribute ScaleY
+		{
+			get => this.scaleY;
+			set => this.scaleY = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

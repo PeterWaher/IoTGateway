@@ -34,6 +34,60 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		public override string LocalName => "Font";
 
 		/// <summary>
+		/// Name
+		/// </summary>
+		public StringAttribute Name
+		{
+			get => this.name;
+			set => this.name = value;
+		}
+
+		/// <summary>
+		/// Size
+		/// </summary>
+		public LengthAttribute Size
+		{
+			get => this.size;
+			set => this.size = value;
+		}
+
+		/// <summary>
+		/// Weight
+		/// </summary>
+		public EnumAttribute<SKFontStyleWeight> Weight
+		{
+			get => this.weight;
+			set => this.weight = value;
+		}
+
+		/// <summary>
+		/// Width
+		/// </summary>
+		public EnumAttribute<SKFontStyleWidth> WidthAttribute
+		{
+			get => this.width;
+			set => this.width = value;
+		}
+
+		/// <summary>
+		/// Slant
+		/// </summary>
+		public EnumAttribute<SKFontStyleSlant> Slant
+		{
+			get => this.slant;
+			set => this.slant = value;
+		}
+
+		/// <summary>
+		/// Color
+		/// </summary>
+		public ColorAttribute Color
+		{
+			get => this.color;
+			set => this.color = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

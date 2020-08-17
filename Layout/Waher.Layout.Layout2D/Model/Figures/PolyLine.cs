@@ -30,6 +30,24 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override string LocalName => "PolyLine";
 
 		/// <summary>
+		/// Head
+		/// </summary>
+		public StringAttribute Head
+		{
+			get => this.head;
+			set => this.head = value;
+		}
+
+		/// <summary>
+		/// Tail
+		/// </summary>
+		public StringAttribute Tail
+		{
+			get => this.tail;
+			set => this.tail = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

@@ -36,6 +36,24 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		public override ILayoutElement[] DynamicChildren => this.measured;
 
 		/// <summary>
+		/// Expression
+		/// </summary>
+		public ExpressionAttribute Expression
+		{
+			get => this.expression;
+			set => this.expression = value;
+		}
+
+		/// <summary>
+		/// Variable
+		/// </summary>
+		public StringAttribute Variable
+		{
+			get => this.variable;
+			set => this.variable = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

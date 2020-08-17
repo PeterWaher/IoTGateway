@@ -771,6 +771,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="Top"/>
       <xs:enumeration value="Center"/>
+      <xs:enumeration value="BaseLine"/>
       <xs:enumeration value="Bottom"/>
     </xs:restriction>
   </xs:simpleType>
@@ -955,16 +956,20 @@
 
   <xs:complexType name="Label">
     <xs:complexContent>
-      <xs:extension base="LayoutArea">
+      <xs:extension base="Point">
         <xs:attribute name="text" type="xs:string" use="required"/>
+        <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
+        <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="Script">
     <xs:complexContent>
-      <xs:extension base="LayoutArea">
+      <xs:extension base="Point">
         <xs:attribute name="expression" type="Expression" use="required"/>
+        <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
+        <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

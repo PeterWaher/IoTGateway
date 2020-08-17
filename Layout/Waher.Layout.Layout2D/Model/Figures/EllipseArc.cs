@@ -39,6 +39,60 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override string LocalName => "EllipseArc";
 
 		/// <summary>
+		/// Radius X
+		/// </summary>
+		public LengthAttribute RadiusX
+		{
+			get => this.radiusX;
+			set => this.radiusX = value;
+		}
+
+		/// <summary>
+		/// Radius Y
+		/// </summary>
+		public LengthAttribute RadiusY
+		{
+			get => this.radiusY;
+			set => this.radiusY = value;
+		}
+
+		/// <summary>
+		/// Start Degrees
+		/// </summary>
+		public FloatAttribute StartDegrees
+		{
+			get => this.startDegrees;
+			set => this.startDegrees = value;
+		}
+
+		/// <summary>
+		/// End Degrees
+		/// </summary>
+		public FloatAttribute EndDegrees
+		{
+			get => this.endDegrees;
+			set => this.endDegrees = value;
+		}
+
+		/// <summary>
+		/// Clockwise
+		/// </summary>
+		public BooleanAttribute Clockwise
+		{
+			get => this.clockwise;
+			set => this.clockwise = value;
+		}
+
+		/// <summary>
+		/// Include center point
+		/// </summary>
+		public BooleanAttribute Center
+		{
+			get => this.center;
+			set => this.center = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

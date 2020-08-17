@@ -80,6 +80,51 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override string LocalName => "Flexible";
 
 		/// <summary>
+		/// Order
+		/// </summary>
+		public EnumAttribute<FlexibleOrder> Order
+		{
+			get => this.order;
+			set => this.order = value;
+		}
+
+		/// <summary>
+		/// Horizontal Direction
+		/// </summary>
+		public EnumAttribute<HorizontalDirection> HorizontalDirection
+		{
+			get => this.horizontalDirection;
+			set => this.horizontalDirection = value;
+		}
+
+		/// <summary>
+		/// Vertical Direction
+		/// </summary>
+		public EnumAttribute<VerticalDirection> VerticalDirection
+		{
+			get => this.verticalDirection;
+			set => this.verticalDirection = value;
+		}
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		{
+			get => this.halign;
+			set => this.halign = value;
+		}
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		{
+			get => this.valign;
+			set => this.valign = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Groups;
 
 namespace Waher.Layout.Layout2D.Model.Content
 {
 	/// <summary>
 	/// Represents an unformatted text label.
 	/// </summary>
-	public class Label : LayoutArea
+	public class Label : Point
 	{
 		private StringAttribute text;
+		private EnumAttribute<HorizontalAlignment> halign;
+		private EnumAttribute<VerticalAlignment> valign;
 
 		/// <summary>
 		/// Represents an unformatted text label.
@@ -28,6 +31,33 @@ namespace Waher.Layout.Layout2D.Model.Content
 		public override string LocalName => "Label";
 
 		/// <summary>
+		/// Text
+		/// </summary>
+		public StringAttribute Text
+		{
+			get => this.text;
+			set => this.text = value;
+		}
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		{
+			get => this.halign;
+			set => this.halign = value;
+		}
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		{
+			get => this.valign;
+			set => this.valign = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
@@ -36,6 +66,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 			base.FromXml(Input);
 
 			this.text = new StringAttribute(Input, "text");
+			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
+			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 		}
 
 		/// <summary>
@@ -47,6 +79,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 			base.ExportAttributes(Output);
 
 			this.text.Export(Output);
+			this.halign.Export(Output);
+			this.valign.Export(Output);
 		}
 
 		/// <summary>
@@ -69,7 +103,96 @@ namespace Waher.Layout.Layout2D.Model.Content
 			base.CopyContents(Destination);
 
 			if (Destination is Label Dest)
+			{
 				Dest.text = this.text.CopyIfNotPreset();
+				Dest.halign = this.halign.CopyIfNotPreset();
+				Dest.valign = this.valign.CopyIfNotPreset();
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			base.Measure(State);
+
+			if (!this.halign.TryEvaluate(State.Session, out this.halignment))
+				this.halignment = Groups.HorizontalAlignment.Left;
+
+			if (!this.valign.TryEvaluate(State.Session, out this.valignment))
+				this.valignment = Groups.VerticalAlignment.Top;
+
+			if (this.text.TryEvaluate(State.Session, out this.textValue))
+			{
+				State.Text.MeasureText(this.textValue, ref this.bounds);
+
+				switch (this.halignment)
+				{
+					case Groups.HorizontalAlignment.Left:
+					default:
+						this.Left = this.xCoordinate + this.bounds.Left;
+						break;
+
+					case Groups.HorizontalAlignment.Center:
+						this.xCoordinate -= this.bounds.Width / 2;
+						this.Left = this.xCoordinate;
+						break;
+
+					case Groups.HorizontalAlignment.Right:
+						this.xCoordinate -= this.bounds.Width;
+						this.Left = this.xCoordinate;
+						break;
+				}
+
+				switch (this.valignment)
+				{
+					case Groups.VerticalAlignment.Top:
+					default:
+						this.yCoordinate -= this.bounds.Top;
+						this.Top = this.yCoordinate;
+						break;
+
+					case Groups.VerticalAlignment.Center:
+						this.yCoordinate -= this.bounds.Top;
+						this.yCoordinate -= this.bounds.Height / 2;
+						this.Top = this.yCoordinate + this.bounds.Top + this.bounds.Height / 2;
+						break;
+
+					case Groups.VerticalAlignment.BaseLine:
+						this.Top = this.yCoordinate + this.bounds.Top;
+						break;
+
+					case Groups.VerticalAlignment.Bottom:
+						this.yCoordinate -= this.bounds.Top;
+						this.yCoordinate -= this.bounds.Height;
+						this.Top = this.yCoordinate + this.bounds.Top;
+						break;
+				}
+
+				this.Width = this.bounds.Width;
+				this.Height = this.bounds.Height;
+			}
+			else
+				this.defined = false;
+		}
+
+		private string textValue;
+		private HorizontalAlignment halignment;
+		private VerticalAlignment valignment;
+		private SKRect bounds = new SKRect();
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (this.defined)
+				State.Canvas.DrawText(this.textValue, this.xCoordinate, this.yCoordinate, State.Font, State.Text);
 		}
 	}
 }

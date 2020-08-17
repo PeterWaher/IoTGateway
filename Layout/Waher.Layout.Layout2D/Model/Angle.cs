@@ -22,6 +22,15 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Degrees
+		/// </summary>
+		public FloatAttribute Degrees
+		{
+			get => this.degrees;
+			set => this.degrees = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

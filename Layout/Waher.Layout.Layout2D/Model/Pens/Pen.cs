@@ -47,6 +47,42 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		public SKPaint Paint => this.paint;
 
 		/// <summary>
+		/// Width
+		/// </summary>
+		public LengthAttribute WidthAttribute
+		{
+			get => this.width;
+			set => this.width = value;
+		}
+
+		/// <summary>
+		/// Cap
+		/// </summary>
+		public EnumAttribute<SKStrokeCap> Cap
+		{
+			get => this.cap;
+			set => this.cap = value;
+		}
+
+		/// <summary>
+		/// Join
+		/// </summary>
+		public EnumAttribute<SKStrokeJoin> Join
+		{
+			get => this.join;
+			set => this.join = value;
+		}
+
+		/// <summary>
+		/// Miter
+		/// </summary>
+		public LengthAttribute Miter
+		{
+			get => this.miter;
+			set => this.miter = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

@@ -29,6 +29,15 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override string LocalName => "Circle";
 
 		/// <summary>
+		/// Radius
+		/// </summary>
+		public LengthAttribute Radius
+		{
+			get => this.radius;
+			set => this.radius = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

@@ -25,6 +25,33 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
+		/// X-coordinate
+		/// </summary>
+		public LengthAttribute X
+		{
+			get => this.x;
+			set => this.x = value;
+		}
+
+		/// <summary>
+		/// Y-coordinate
+		/// </summary>
+		public LengthAttribute Y
+		{
+			get => this.y;
+			set => this.y = value;
+		}
+
+		/// <summary>
+		/// Reference
+		/// </summary>
+		public StringAttribute Reference
+		{
+			get => this._ref;
+			set => this._ref = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

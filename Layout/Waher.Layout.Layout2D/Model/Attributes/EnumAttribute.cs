@@ -13,6 +13,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Enumeration attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public EnumAttribute(string AttributeName, TEnum Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Enumeration attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public EnumAttribute(XmlElement E, string AttributeName)

@@ -13,6 +13,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Boolean attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public BooleanAttribute(string AttributeName, bool Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Boolean attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public BooleanAttribute(XmlElement E, string AttributeName)

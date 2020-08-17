@@ -36,6 +36,33 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		public override string LocalName => "Path";
 
 		/// <summary>
+		/// Head
+		/// </summary>
+		public StringAttribute Head
+		{
+			get => this.head;
+			set => this.head = value;
+		}
+
+		/// <summary>
+		/// Tail
+		/// </summary>
+		public StringAttribute Tail
+		{
+			get => this.tail;
+			set => this.tail = value;
+		}
+
+		/// <summary>
+		/// Shape Fill
+		/// </summary>
+		public StringAttribute ShapeFill
+		{
+			get => this.shapeFill;
+			set => this.shapeFill = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

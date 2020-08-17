@@ -12,6 +12,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Positive integer attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public PositiveIntegerAttribute(string AttributeName, int Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Positive integer attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public PositiveIntegerAttribute(XmlElement E, string AttributeName)

@@ -63,6 +63,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Color attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public ColorAttribute(string AttributeName, SKColor Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Color attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public ColorAttribute(XmlElement E, string AttributeName)

@@ -6,12 +6,22 @@ using Waher.Script;
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
 	/// <summary>
-	/// Double attribute
+	/// Floating point (Single) attribute
 	/// </summary>
 	public class FloatAttribute : Attribute<float>
 	{
 		/// <summary>
-		/// Double attribute
+		/// Floating point (Single) attribute
+		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public FloatAttribute(string AttributeName, float Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Floating point (Single) attribute
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
@@ -21,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
-		/// Double attribute
+		/// Floating point (Single) attribute
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>

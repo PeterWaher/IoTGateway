@@ -12,6 +12,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// String attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public StringAttribute(string AttributeName, string Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// String attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public StringAttribute(XmlElement E, string AttributeName)

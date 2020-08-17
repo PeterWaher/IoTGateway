@@ -30,6 +30,24 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		public override string LocalName => "Erode";
 
 		/// <summary>
+		/// Radius X
+		/// </summary>
+		public LengthAttribute RadiusX
+		{
+			get => this.radiusX;
+			set => this.radiusX = value;
+		}
+
+		/// <summary>
+		/// Radius Y
+		/// </summary>
+		public LengthAttribute RadiusY
+		{
+			get => this.radiusY;
+			set => this.radiusY = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

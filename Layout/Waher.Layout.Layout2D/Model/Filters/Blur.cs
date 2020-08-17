@@ -31,6 +31,33 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		public override string LocalName => "Blur";
 
 		/// <summary>
+		/// Sigma X
+		/// </summary>
+		public FloatAttribute SigmaX
+		{
+			get => this.sigmaX;
+			set => this.sigmaX = value;
+		}
+
+		/// <summary>
+		/// Sigma Y
+		/// </summary>
+		public FloatAttribute SigmaY
+		{
+			get => this.sigmaY;
+			set => this.sigmaY = value;
+		}
+
+		/// <summary>
+		/// Tile Mode
+		/// </summary>
+		public EnumAttribute<SKShaderTileMode> TileMode
+		{
+			get => this.tileMode;
+			set => this.tileMode = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

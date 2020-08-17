@@ -258,5 +258,11 @@ namespace Waher.Layout.Layout2D.Test
 			this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
 		}
 
+		[TestMethod]
+		public void Test_38_Labels()
+		{
+			this.Test("Test_38_Labels");
+		}
+
 	}
 }

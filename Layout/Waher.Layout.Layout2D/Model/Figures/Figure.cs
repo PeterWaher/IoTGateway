@@ -28,6 +28,24 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
+		/// Pen
+		/// </summary>
+		public StringAttribute Pen
+		{
+			get => this.pen;
+			set => this.pen = value;
+		}
+
+		/// <summary>
+		/// Fill
+		/// </summary>
+		public StringAttribute Fill
+		{
+			get => this.fill;
+			set => this.fill = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

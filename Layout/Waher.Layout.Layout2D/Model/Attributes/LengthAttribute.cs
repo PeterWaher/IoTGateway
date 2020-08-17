@@ -15,6 +15,16 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// <summary>
 		/// Length attribute
 		/// </summary>
+		/// <param name="AttributeName">Attribute name.</param>
+		/// <param name="Value">Attribute value.</param>
+		public LengthAttribute(string AttributeName, Length Value)
+			: base(AttributeName, Value)
+		{
+		}
+
+		/// <summary>
+		/// Length attribute
+		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
 		public LengthAttribute(XmlElement E, string AttributeName)

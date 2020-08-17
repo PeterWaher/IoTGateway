@@ -22,6 +22,15 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Weight
+		/// </summary>
+		public FloatAttribute Weight
+		{
+			get => this.w;
+			set => this.w = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

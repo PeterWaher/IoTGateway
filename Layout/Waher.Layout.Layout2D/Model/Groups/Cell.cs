@@ -44,6 +44,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		Center,
 
 		/// <summary>
+		/// Aligned along text base line.
+		/// </summary>
+		BaseLine,
+
+		/// <summary>
 		/// Aligned at the bottom
 		/// </summary>
 		Bottom
@@ -74,6 +79,51 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "Cell";
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		{
+			get => this.halign;
+			set => this.halign = value;
+		}
+
+		/// <summary>
+		/// Degrees
+		/// </summary>
+		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		{
+			get => this.valign;
+			set => this.valign = value;
+		}
+
+		/// <summary>
+		/// Column span
+		/// </summary>
+		public PositiveIntegerAttribute ColSpan
+		{
+			get => this.colSpan;
+			set => this.colSpan = value;
+		}
+
+		/// <summary>
+		/// Row span
+		/// </summary>
+		public PositiveIntegerAttribute RowSpan
+		{
+			get => this.rowSpan;
+			set => this.rowSpan = value;
+		}
+
+		/// <summary>
+		/// Border
+		/// </summary>
+		public StringAttribute Border
+		{
+			get => this.border;
+			set => this.border = value;
+		}
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
@@ -145,9 +195,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (MaxWidth.HasValue)
 			{
 				if (this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
-					HAlignment != HorizontalAlignment.Left)
+					HAlignment != Groups.HorizontalAlignment.Left)
 				{
-					if (HAlignment == HorizontalAlignment.Right)
+					if (HAlignment == Groups.HorizontalAlignment.Right)
 						this.dx = (MaxWidth.Value - this.Width);
 					else    // Center
 						this.dx = (MaxWidth.Value - this.Width) / 2;
@@ -159,9 +209,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (MaxHeight.HasValue)
 			{
 				if (this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
-					VAlignment != VerticalAlignment.Top)
+					VAlignment != Groups.VerticalAlignment.Top)
 				{
-					if (VAlignment == VerticalAlignment.Bottom)
+					if (VAlignment == Groups.VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
 						this.dy = (MaxHeight.Value - this.Height);
 					else    // Center
 						this.dy = (MaxHeight.Value - this.Height) / 2;

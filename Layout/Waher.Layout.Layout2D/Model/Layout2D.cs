@@ -31,6 +31,42 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		public override string LocalName => "Layout2D";
 
 		/// <summary>
+		/// Font ID
+		/// </summary>
+		public StringAttribute FontId
+		{
+			get => this.fontId;
+			set => this.fontId = value;
+		}
+
+		/// <summary>
+		/// Pen ID
+		/// </summary>
+		public StringAttribute PenId
+		{
+			get => this.penId;
+			set => this.penId = value;
+		}
+
+		/// <summary>
+		/// Background ID
+		/// </summary>
+		public StringAttribute BackgroundId
+		{
+			get => this.backgroundId;
+			set => this.backgroundId = value;
+		}
+
+		/// <summary>
+		/// Text Color
+		/// </summary>
+		public ColorAttribute TextColor
+		{
+			get => this.textColor;
+			set => this.textColor = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>

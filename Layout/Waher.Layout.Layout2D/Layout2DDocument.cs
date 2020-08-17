@@ -458,6 +458,57 @@ namespace Waher.Layout.Layout2D
 			return this.attachments.TryGetValue(ContentId, out Content);
 		}
 
+		/// <summary>
+		/// Disposes of attached content, given its ID.
+		/// </summary>
+		/// <param name="ContentId">Content ID</param>
+		/// <returns>If content with the corresponding ID was found and disposed.</returns>
+		public bool DisposeContent(string ContentId)
+		{
+			if (this.attachments.TryGetValue(ContentId, out object Obj))
+			{
+				this.attachments.Remove(ContentId);
+
+				if (Obj is IDisposable Disposable)
+					Disposable.Dispose();
+
+				return true;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Adds content to the layout.
+		/// </summary>
+		/// <param name="Content">Content</param>
+		/// <returns>Content ID of newly added content</returns>
+		public string AddContent(object Content)
+		{
+			string ContentId;
+
+			do
+			{
+				ContentId = Guid.NewGuid().ToString();
+			}
+			while (this.attachments.ContainsKey(ContentId));
+
+			this.attachments[ContentId] = Content;
+
+			return ContentId;
+		}
+
+		/// <summary>
+		/// Adds content to the layout.
+		/// </summary>
+		/// <param name="ContentId">Content ID</param>
+		/// <param name="Content">Content</param>
+		public void AddContent(string ContentId, object Content)
+		{
+			this.DisposeContent(ContentId);
+			this.attachments[ContentId] = Content;
+		}
+
 	}
 
 	/* TODO:

@@ -1,5 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using SkiaSharp;
 using Waher.Content;
+using Waher.Content.Images;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -16,15 +20,17 @@ namespace Waher.Layout.Layout2D.Test
 			Types.Initialize(
 				typeof(ParsingTests).Assembly,
 				typeof(InternetContent).Assembly,
+				typeof(ImageCodec).Assembly,
+				typeof(XML).Assembly,
 				typeof(Log).Assembly,
 				typeof(Expression).Assembly,
 				typeof(Graph).Assembly,
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		protected virtual void Test(string FileName)
+		protected virtual void Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			Layout2DDocument.FromFile("Xml\\" + FileName + ".xml");
+			Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
 		}
 
 		[TestMethod]
@@ -241,6 +247,15 @@ namespace Waher.Layout.Layout2D.Test
 		public void Test_36_Grid()
 		{
 			this.Test("Test_36_Grid");
+		}
+
+		[TestMethod]
+		public void Test_37_Images()
+		{
+			SKBitmap Bitmap = SKBitmap.Decode("Images\\Icon_64x64_File.png");
+			SKImage Image = SKImage.FromBitmap(Bitmap);
+
+			this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
 		}
 
 	}

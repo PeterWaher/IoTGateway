@@ -653,6 +653,7 @@
     <xs:complexContent>
       <xs:extension base="Image">
         <xs:attribute name="url" type="xs:anyURI" use="required"/>
+        <xs:attribute name="alt" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

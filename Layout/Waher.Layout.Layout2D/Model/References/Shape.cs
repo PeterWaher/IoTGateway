@@ -39,7 +39,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// Draws the shape
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public void DrawShape(DrawingState State)
+		public override void DrawShape(DrawingState State)
 		{
 			base.Draw(State);
 		}

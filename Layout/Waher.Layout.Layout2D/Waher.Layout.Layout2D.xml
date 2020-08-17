@@ -4,6 +4,35 @@
         <name>Waher.Layout.Layout2D</name>
     </assembly>
     <members>
+        <member name="T:Waher.Layout.Layout2D.Events.UpdatedEventHandler">
+            <summary>
+            Delegate for Updated event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Events.UpdatedEventArgs">
+            <summary>
+            Event raised when the layout model has been updated internally.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Events.UpdatedEventArgs.#ctor(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Event raised when the layout model has been updated internally.
+            </summary>
+            <param name="Document">Document that has been updated.</param>
+            <param name="Element">Layout element that has been updated.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Events.UpdatedEventArgs.Document">
+            <summary>
+            Document that has been updated.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Events.UpdatedEventArgs.Element">
+            <summary>
+            Layout element that has been updated.
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Exceptions.LayoutException">
             <summary>
             Base class for all layout-related exceptions.
@@ -41,69 +70,78 @@
             http://waher.se/Layout/Layout2D.xsd
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Contains a 2D layout document.
             </summary>
             <param name="Xml">XML Definition</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,Waher.Script.Variables)">
-            <summary>
-            Contains a 2D layout document.
-            </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Session">Session variables</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement)">
-            <summary>
-            Contains a 2D layout document.
-            </summary>
-            <param name="Xml">XML Definition</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Contains a 2D layout document.
             </summary>
             <param name="Xml">XML Definition</param>
             <param name="Session">Session variables</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Contains a 2D layout document.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a file.
             </summary>
             <param name="FileName">File name.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a file.
             </summary>
             <param name="FileName">File name.</param>
             <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromFile(System.String,System.Boolean,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a file.
             </summary>
             <param name="FileName">File name.</param>
             <param name="Preprocess">If embedded script should be preprocessed.</param>
             <param name="Session">Session variables.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a stream.
             </summary>
             <param name="Input">Stream input.</param>
             <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a stream.
             </summary>
             <param name="Input">Stream input.</param>
             <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
             <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromStream(System.IO.Stream,System.Text.Encoding,System.Boolean,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Loads a 2D layout document from a stream.
             </summary>
@@ -111,53 +149,61 @@
             <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
             <param name="Preprocess">If embedded script should be preprocessed.</param>
             <param name="Session">Session variables.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Parses a 2D layout document from its XML definition.
             </summary>
             <param name="Xml">XML Definition</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean)">
-            <summary>
-            Parses a 2D layout document from its XML definition.
-            </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Preprocess">If embedded script should be preprocessed.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Parses a 2D layout document from its XML definition.
             </summary>
             <param name="Xml">XML Definition</param>
             <param name="Preprocess">If embedded script should be preprocessed.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.String,System.Boolean,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Preprocess">If embedded script should be preprocessed.</param>
             <param name="Session">Session variables.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Parses a 2D layout document from its XML definition.
             </summary>
             <param name="Xml">XML Definition</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument,Waher.Script.Variables)">
-            <summary>
-            Parses a 2D layout document from its XML definition.
-            </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Session">Session variables.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement)">
-            <summary>
-            Parses a 2D layout document from its XML definition.
-            </summary>
-            <param name="Xml">XML Definition</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement,Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlDocument,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Parses a 2D layout document from its XML definition.
             </summary>
             <param name="Xml">XML Definition</param>
             <param name="Session">Session variables.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.FromXml(System.Xml.XmlElement,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Parses a 2D layout document from its XML definition.
+            </summary>
+            <param name="Xml">XML Definition</param>
+            <param name="Session">Session variables.</param>
+            <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Dispose">
             <summary>
@@ -176,6 +222,20 @@
             <summary>
             Event raised when the internal state of the layout has been updated.
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.RaiseUpdated(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Raises the <see cref="E:Waher.Layout.Layout2D.Layout2DDocument.OnUpdated"/> event.
+            </summary>
+            <param name="Element">Element being updated.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.TryGetContent(System.String,System.Object@)">
+            <summary>
+            Tries to get content from attached content.
+            </summary>
+            <param name="ContentId">Content ID</param>
+            <param name="Content">Content, if found, null otherwise.</param>
+            <returns>If attached content was found with the given content ID.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
@@ -2243,6 +2303,20 @@
             Measures layout entities and defines unassigned properties.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default width of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Width</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default height of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Height</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.xCoordinate2">
             <summary>
@@ -5477,6 +5551,12 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.DrawShape(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draw the shape represented by the layout element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.Image">
             <summary>
             Abstract base class for images.
@@ -5488,6 +5568,50 @@
             </summary>
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Images.Image.image">
+            <summary>
+            Loaded image
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default width of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Width</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default height of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Height</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Loads the image defined by the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Loaded image, or null if not possible to load image, or
+            image loading is in process.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageFile">
             <summary>
@@ -5532,6 +5656,14 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageFile.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Loads the image defined by the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Loaded image, or null if not possible to load image, or
+            image loading is in process.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageInternal">
             <summary>
             An image provided by the caller, identified by a content id.
@@ -5574,6 +5706,14 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageInternal.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Loads the image defined by the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Loaded image, or null if not possible to load image, or
+            image loading is in process.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageResource">
             <summary>
@@ -5618,6 +5758,14 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageResource.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Loads the image defined by the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Loaded image, or null if not possible to load image, or
+            image loading is in process.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Images.ImageUrl">
             <summary>
             An image defined by a URL.
@@ -5660,6 +5808,40 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Loads the image defined by the element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Loaded image, or null if not possible to load image, or
+            image loading is in process.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default width of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Width</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Default height of element.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Height</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Overflow">
             <summary>
@@ -5979,6 +6161,12 @@
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.DrawShape(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draw the shape represented by the layout element.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>

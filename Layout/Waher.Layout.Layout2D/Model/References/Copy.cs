@@ -100,12 +100,7 @@ namespace Waher.Layout.Layout2D.Model.References
 			base.Draw(State);
 
 			if (this.defined)
-			{
-				if (this.reference is Shape Shape)
-					Shape.DrawShape(State);
-				else
-					this.reference.Draw(State);
-			}
+				this.reference.DrawShape(State);
 		}
 	}
 }

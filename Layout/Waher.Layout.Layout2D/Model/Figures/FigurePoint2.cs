@@ -81,15 +81,35 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (dx.HasValue)
 					this.xCoordinate2 = this.xCoordinate + dx.Value;
 				else
-					this.xCoordinate2 = State.GetDrawingSize(Length.HundredPercent, this, true);
+					this.xCoordinate2 = this.xCoordinate + this.GetDefaultWidth(State);
 
 				if (dy.HasValue)
 					this.yCoordinate2 = this.yCoordinate + dy.Value;
 				else
-					this.yCoordinate2 = State.GetDrawingSize(Length.HundredPercent, this, false);
+					this.yCoordinate2 = this.yCoordinate + this.GetDefaultHeight(State);
 
 				this.IncludePoint(this.xCoordinate2, this.yCoordinate2);
 			}
+		}
+
+		/// <summary>
+		/// Default width of element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Width</returns>
+		public virtual float GetDefaultWidth(DrawingState State)
+		{
+			return State.GetDrawingSize(Length.HundredPercent, this, true);
+		}
+
+		/// <summary>
+		/// Default height of element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Height</returns>
+		public virtual float GetDefaultHeight(DrawingState State)
+		{
+			return State.GetDrawingSize(Length.HundredPercent, this, false);
 		}
 
 		/// <summary>

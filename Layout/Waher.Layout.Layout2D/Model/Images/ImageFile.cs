@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Images
@@ -70,6 +71,24 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 			if (Destination is ImageFile Dest)
 				Dest.fileName = this.fileName.CopyIfNotPreset();
+		}
+
+		/// <summary>
+		/// Loads the image defined by the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Loaded image, or null if not possible to load image, or
+		/// image loading is in process.</returns>
+		protected override SKImage LoadImage(DrawingState State)
+		{
+			if (this.fileName.TryEvaluate(State.Session, out string FileName) &&
+				File.Exists(FileName))
+			{
+				SKBitmap Bitmap = SKBitmap.Decode(FileName);
+				return SKImage.FromBitmap(Bitmap);
+			}
+			else
+				return null;
 		}
 	}
 }

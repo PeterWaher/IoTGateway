@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\Icon_64x64_File.png" />
+    <None Remove="Images\Icon_64x64_Resource.png" />
     <None Remove="Xml\Test_01_Lengths.xml" />
     <None Remove="Xml\Test_02_Circle.xml" />
     <None Remove="Xml\Test_03_CircleArc.xml" />
@@ -43,9 +45,14 @@
     <None Remove="Xml\Test_34_Flexible_DTLR.xml" />
     <None Remove="Xml\Test_35_Flexible_DTRL.xml" />
     <None Remove="Xml\Test_36_Grid.xml" />
+    <None Remove="Xml\Test_37_Images.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Images\Icon_64x64_Resource.png" />
+    <Content Include="Images\Icon_64x64_File.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Xml\Test_32_Flexible_TDLR.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -53,6 +60,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_34_Flexible_DTLR.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_37_Images.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_36_Grid.xml">
@@ -164,6 +174,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />

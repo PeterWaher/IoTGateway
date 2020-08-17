@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
@@ -7,9 +8,9 @@ namespace Waher.Layout.Layout2D.Test
 	[TestClass]
 	public class RenderingTests : ParsingTests
 	{
-		protected override void Test(string FileName)
+		protected override void Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			Layout2DDocument Doc = Layout2DDocument.FromFile("Xml\\" + FileName + ".xml");
+			Layout2DDocument Doc = Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
 			RenderSettings Settings = new RenderSettings();
 
 			using (SKImage Image = Doc.Render(Settings, out Map[] _))

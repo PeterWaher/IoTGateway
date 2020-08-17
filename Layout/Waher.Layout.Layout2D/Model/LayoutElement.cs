@@ -262,6 +262,15 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Draw the shape represented by the layout element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public virtual void DrawShape(DrawingState State)
+		{
+			this.Draw(State);
+		}
+
+		/// <summary>
 		/// Calculates the direction of the pen when drawing from (x1,y1) to (x2,y2).
 		/// </summary>
 		/// <param name="x1">First X-coordinate</param>

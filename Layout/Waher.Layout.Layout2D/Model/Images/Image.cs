@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using Waher.Layout.Layout2D.Model.Attributes;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Figures;
 
 namespace Waher.Layout.Layout2D.Model.Images
@@ -19,6 +17,83 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public Image(Layout2DDocument Document, ILayoutElement Parent)
 			: base(Document, Parent)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			this.image?.Dispose();
+			this.image = null;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Measure(DrawingState State)
+		{
+			if (this.image is null && !this.loadStarted)
+			{
+				this.loadStarted = true;
+				this.image = this.LoadImage(State);
+			}
+
+			base.Measure(State);
+		}
+
+		/// <summary>
+		/// Loaded image
+		/// </summary>
+		protected SKImage image = null;
+
+		private bool loadStarted = false;
+
+		/// <summary>
+		/// Default width of element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Width</returns>
+		public override float GetDefaultWidth(DrawingState State)
+		{
+			return this.image?.Width ?? base.GetDefaultWidth(State);
+		}
+
+		/// <summary>
+		/// Default height of element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Height</returns>
+		public override float GetDefaultHeight(DrawingState State)
+		{
+			return this.image?.Height ?? base.GetDefaultHeight(State);
+		}
+
+		/// <summary>
+		/// Loads the image defined by the element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Loaded image, or null if not possible to load image, or
+		/// image loading is in process.</returns>
+		protected abstract SKImage LoadImage(DrawingState State);
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			base.Draw(State);
+
+			if (!(this.image is null))
+			{
+				State.Canvas.DrawImage(this.image, new SKRect(
+					this.xCoordinate, this.yCoordinate,
+					this.xCoordinate2, this.yCoordinate2));
+			}
 		}
 	}
 }

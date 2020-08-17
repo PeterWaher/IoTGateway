@@ -90,12 +90,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			if (this.radiusX.TryEvaluate(State.Session, out Length L))
 				this.rx = State.GetDrawingSize(L, this, true);
 			else
-				this.defined = false;
+				this.rx = 0;
 
 			if (this.radiusY.TryEvaluate(State.Session, out L))
 				this.ry = State.GetDrawingSize(L, this, false);
 			else
-				this.defined = false;
+				this.ry = 0;
 		}
 
 		/// <summary>

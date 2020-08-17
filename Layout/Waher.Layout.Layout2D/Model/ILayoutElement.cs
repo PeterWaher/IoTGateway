@@ -147,5 +147,11 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		void Draw(DrawingState State);
+
+		/// <summary>
+		/// Draw the shape represented by the layout element.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		void DrawShape(DrawingState State);
 	}
 }

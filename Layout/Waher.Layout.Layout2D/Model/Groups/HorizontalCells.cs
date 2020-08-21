@@ -29,12 +29,30 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Cell element</param>
 		public void Add(ILayoutElement Element)
 		{
-			this.measured.Add(new Padding(Element, this.x - Element.Left, -Element.Top));
-			this.x += Element.Width;
+			this.measured.Add(new Padding(Element, this.x, 0));
+			this.x += Element.Width ?? 0;
 
-			float Height = Element.Height;
+			float Height = Element.Height ?? 0;
 			if (Height > this.maxHeight)
 				this.maxHeight = Height;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void MeasurePositions(DrawingState State)
+		{
+			ILayoutElement Element;
+
+			foreach (Padding P in this.measured)
+			{
+				Element = P.Element;
+
+				Element.MeasurePositions(State);
+				P.OffsetX -= Element.Left ?? 0;
+				P.OffsetY -= Element.Top ?? 0;
+			}
 		}
 
 		/// <summary>

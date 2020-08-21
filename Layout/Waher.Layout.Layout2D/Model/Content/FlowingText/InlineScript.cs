@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <summary>
 		/// Expression
 		/// </summary>
-		public ExpressionAttribute Expression
+		public ExpressionAttribute ExpressionAttribute
 		{
 			get => this.expression;
 			set => this.expression = value;

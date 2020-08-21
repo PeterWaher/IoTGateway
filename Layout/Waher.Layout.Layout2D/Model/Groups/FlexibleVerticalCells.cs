@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -47,17 +46,40 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="Element">Cell element</param>
 		public void Add(ILayoutElement Element)
 		{
-			float Width = Element.Width;
-			float Height = Element.Height;
+			float Width = Element.Width ?? 0;
+			float Height = Element.Height ?? 0;
 
 			if (this.y + Height > this.limitHeight)
 				this.Flush();
 
-			this.currentColumn.Add(new Padding(Element, -Element.Left, -Element.Top));
+			this.currentColumn.Add(new Padding(Element, 0, 0));
 			this.y += Height;
 
 			if (Width > this.maxWidth)
 				this.maxWidth = Width;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void MeasurePositions(DrawingState State)
+		{
+			this.Flush();
+
+			ILayoutElement Element;
+
+			foreach (Tuple<float, float, Padding[]> Row in this.columns)
+			{
+				foreach (Padding P in Row.Item3)
+				{
+					Element = P.Element;
+
+					Element.MeasurePositions(State);
+					P.OffsetX -= Element.Left ?? 0;
+					P.OffsetY -= Element.Top ?? 0;
+				}
+			}
 		}
 
 		private void Flush()
@@ -92,8 +114,6 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Array of padded cells.</returns>
 		public Padding[] Align()
 		{
-			this.Flush();
-
 			List<Padding> Result = new List<Padding>();
 			float X = this.horizontalDirection == HorizontalDirection.LeftRight ? 0 : this.x;
 			float Y;
@@ -133,7 +153,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 				foreach (Padding P in Column.Item3)
 				{
-					float Height = P.Element.Height;
+					float Height = P.Element.Height ?? 0;
 
 					if (this.verticalDirection == VerticalDirection.BottomUp)
 						Y -= Height;

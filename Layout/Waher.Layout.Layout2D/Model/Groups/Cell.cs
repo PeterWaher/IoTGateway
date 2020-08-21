@@ -83,7 +83,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignmentAttribute
 		{
 			get => this.halign;
 			set => this.halign = value;
@@ -92,7 +92,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		public EnumAttribute<VerticalAlignment> VerticalAlignmentAttribute
 		{
 			get => this.valign;
 			set => this.valign = value;
@@ -101,7 +101,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Column span
 		/// </summary>
-		public PositiveIntegerAttribute ColSpan
+		public PositiveIntegerAttribute ColSpanAttribute
 		{
 			get => this.colSpan;
 			set => this.colSpan = value;
@@ -110,7 +110,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Row span
 		/// </summary>
-		public PositiveIntegerAttribute RowSpan
+		public PositiveIntegerAttribute RowSpanAttribute
 		{
 			get => this.rowSpan;
 			set => this.rowSpan = value;
@@ -119,7 +119,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Border
 		/// </summary>
-		public StringAttribute Border
+		public StringAttribute BorderAttribute
 		{
 			get => this.border;
 			set => this.border = value;
@@ -194,13 +194,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			if (MaxWidth.HasValue)
 			{
-				if (this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
+				float? Width = this.Width;
+
+				if (Width.HasValue &&
+					this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
 					HAlignment != Groups.HorizontalAlignment.Left)
 				{
 					if (HAlignment == Groups.HorizontalAlignment.Right)
-						this.dx = (MaxWidth.Value - this.Width);
+						this.dx = (MaxWidth.Value - Width.Value);
 					else    // Center
-						this.dx = (MaxWidth.Value - this.Width) / 2;
+						this.dx = (MaxWidth.Value - Width.Value) / 2;
 				}
 
 				this.Width = MaxWidth.Value;
@@ -208,13 +211,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (MaxHeight.HasValue)
 			{
-				if (this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
+				float? Height = this.Height;
+
+				if (Height.HasValue &&
+					this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
 					VAlignment != Groups.VerticalAlignment.Top)
 				{
 					if (VAlignment == Groups.VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
-						this.dy = (MaxHeight.Value - this.Height);
+						this.dy = (MaxHeight.Value - Height.Value);
 					else    // Center
-						this.dy = (MaxHeight.Value - this.Height) / 2;
+						this.dy = (MaxHeight.Value - Height.Value) / 2;
 				}
 
 				this.Height = MaxHeight.Value;
@@ -241,15 +247,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.border.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is Pen Pen)
 			{
 				this.borderPen = Pen;
@@ -270,7 +276,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override void Draw(DrawingState State)
 		{
 			if (!(this.borderPen is null))
-				State.Canvas.DrawRect(this.Left, this.Top, this.Width, this.Height, this.borderPen.Paint);
+			{
+				SKRect? Rect = this.BoundingRect;
+
+				if (Rect.HasValue)
+					State.Canvas.DrawRect(Rect.Value, this.borderPen.Paint);
+			}
 
 			if (this.dx == 0 && this.dy == 0)
 				base.Draw(State);

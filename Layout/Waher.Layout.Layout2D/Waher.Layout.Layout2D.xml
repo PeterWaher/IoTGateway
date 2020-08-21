@@ -258,6 +258,26 @@
             <param name="ContentId">Content ID</param>
             <param name="Content">Content</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.AddElementId(System.String,Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Adds an element with an ID
+            </summary>
+            <param name="Id">Element ID</param>
+            <param name="Element">Element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.TryGetElement(System.String,Waher.Layout.Layout2D.Model.ILayoutElement@)">
+            <summary>
+            Tries to get a layout element, given an ID reference
+            </summary>
+            <param name="Id">Layout ID</param>
+            <param name="Element">Element retrieved, if found.</param>
+            <returns>If an element with the corresponding ID was found.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.ClearElementIds">
+            <summary>
+            Clears registered elements with IDs.
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
             Contains information about an actionable area in a generated image.
@@ -275,7 +295,7 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Angle.Degrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Angle.DegreesAttribute">
             <summary>
             Degrees
             </summary>
@@ -298,9 +318,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Angle.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Angle.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -839,7 +859,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.Color">
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.ColorAttribute">
             <summary>
             Color
             </summary>
@@ -870,9 +890,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.SolidBackground.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -893,22 +913,22 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FontId">
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FontIdAttribute">
             <summary>
             Font ID
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.PenId">
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.PenIdAttribute">
             <summary>
             Pen ID
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.BackgroundId">
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.BackgroundIdAttribute">
             <summary>
             Background ID
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.TextColor">
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.TextColorAttribute">
             <summary>
             Text Color
             </summary>
@@ -939,6 +959,24 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.Case">
             <summary>
             Layout to show, if a condition is true.
@@ -956,7 +994,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.Condition">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.Case.ConditionAttribute">
             <summary>
             Condition of case statement
             </summary>
@@ -1034,22 +1072,22 @@
             Dynamic array of children
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.From">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.FromAttribute">
             <summary>
             From
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.To">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.ToAttribute">
             <summary>
             To
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.Step">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.StepAttribute">
             <summary>
             Step
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.Variable">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.VariableAttribute">
             <summary>
             Variable
             </summary>
@@ -1080,9 +1118,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.For.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1108,12 +1146,12 @@
             Dynamic array of children
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.Expression">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.ExpressionAttribute">
             <summary>
             Expression
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.Variable">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.VariableAttribute">
             <summary>
             Variable
             </summary>
@@ -1144,9 +1182,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.ForEach.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1177,7 +1215,7 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.Condition">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.If.ConditionAttribute">
             <summary>
             Condition
             </summary>
@@ -1214,9 +1252,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1304,9 +1348,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1363,12 +1413,12 @@
             Dynamic array of children
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.Expression">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.ExpressionAttribute">
             <summary>
             Expression
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.TestAfter">
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.TestAfterAttribute">
             <summary>
             Test After attribute
             </summary>
@@ -1399,9 +1449,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Conditional.While.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1482,7 +1532,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.Font">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.FontRef.FontAttribute">
             <summary>
             Font
             </summary>
@@ -1535,7 +1585,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.Expression">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.InlineScript.ExpressionAttribute">
             <summary>
             Expression
             </summary>
@@ -1731,7 +1781,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.Color">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.FlowingText.TextColor.ColorAttribute">
             <summary>
             Color
             </summary>
@@ -1804,17 +1854,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.Text">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.TextAttribute">
             <summary>
             Text
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.HorizontalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.HorizontalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.VerticalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.VerticalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
@@ -1845,9 +1895,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Label.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -1927,17 +1983,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.Expression">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.ExpressionAttribute">
             <summary>
             Expression
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.HorizontalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.HorizontalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.VerticalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.VerticalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
@@ -1968,9 +2024,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Script.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2015,9 +2077,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Distance.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Distance.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2047,6 +2109,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Session">
             <summary>
             Current session.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.PixelsPerInch">
+            <summary>
+            Pixels per inch
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.DrawingState.Canvas">
@@ -2088,26 +2155,6 @@
             <param name="Horizontal">If it is a horizontal size.</param>
             <returns>Drawing size, if defined.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.AddElementId(System.String,Waher.Layout.Layout2D.Model.ILayoutElement)">
-            <summary>
-            Adds an element with an ID
-            </summary>
-            <param name="Id">Element ID</param>
-            <param name="Element">Element</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.TryGetElement(System.String,Waher.Layout.Layout2D.Model.ILayoutElement@)">
-            <summary>
-            Tries to get a layout element, given an ID reference
-            </summary>
-            <param name="Id">Layout ID</param>
-            <param name="Element">Element retrieved, if found.</param>
-            <returns>If an element with the corresponding ID was found.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.ClearElementIds">
-            <summary>
-            Clears registered elements with IDs.
-            </summary>
-        </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicContainer">
             <summary>
             Abstract base class of dynamic layout containers (i.e. containers that can
@@ -2130,6 +2177,12 @@
         <member name="M:Waher.Layout.Layout2D.Model.DynamicContainer.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DynamicContainer.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2175,7 +2228,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Circle.Radius">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Circle.RadiusAttribute">
             <summary>
             Radius
             </summary>
@@ -2206,9 +2259,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2235,27 +2288,27 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Radius">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.RadiusAttribute">
             <summary>
             Radius
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.StartDegrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.StartDegreesAttribute">
             <summary>
             Start Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.EndDegrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.EndDegreesAttribute">
             <summary>
             End Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Clockwise">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.ClockwiseAttribute">
             <summary>
             Clockwise
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.Center">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.CenterAttribute">
             <summary>
             Include center point
             </summary>
@@ -2286,9 +2339,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2346,12 +2399,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Ellipse.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
@@ -2382,9 +2435,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2411,32 +2464,32 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.StartDegrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.StartDegreesAttribute">
             <summary>
             Start Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.EndDegrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.EndDegreesAttribute">
             <summary>
             End Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Clockwise">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.ClockwiseAttribute">
             <summary>
             Clockwise
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Center">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.CenterAttribute">
             <summary>
             Include center point
             </summary>
@@ -2467,9 +2520,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2491,12 +2544,12 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.Pen">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.PenAttribute">
             <summary>
             Pen
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.Fill">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Figure.FillAttribute">
             <summary>
             Fill
             </summary>
@@ -2555,17 +2608,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.X">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.XAttribute">
             <summary>
             X-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Y">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.YAttribute">
             <summary>
             Y-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Reference">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint.ReferenceAttribute">
             <summary>
             Reference
             </summary>
@@ -2588,9 +2641,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2616,17 +2669,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.X2">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.X2Attribute">
             <summary>
             X-coordinate 2
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Y2">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Y2Attribute">
             <summary>
             Y-coordinate 2
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Reference2">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Reference2Attribute">
             <summary>
             Reference 2
             </summary>
@@ -2649,9 +2702,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2696,12 +2749,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.Head">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.HeadAttribute">
             <summary>
             Head
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.Tail">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Line.TailAttribute">
             <summary>
             Tail
             </summary>
@@ -2732,9 +2785,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2848,17 +2901,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.Head">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.HeadAttribute">
             <summary>
             Head
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.Tail">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.TailAttribute">
             <summary>
             Tail
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.ShapeFill">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Path.ShapeFillAttribute">
             <summary>
             Shape Fill
             </summary>
@@ -2889,9 +2942,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -2982,12 +3035,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.Head">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.HeadAttribute">
             <summary>
             Head
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.Tail">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.PolyLine.TailAttribute">
             <summary>
             Tail
             </summary>
@@ -3018,9 +3071,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -3096,12 +3149,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
@@ -3132,9 +3185,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -3241,12 +3294,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Radius">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.RadiusAttribute">
             <summary>
             Radius
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Clockwise">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.ClockwiseAttribute">
             <summary>
             Clockwise
             </summary>
@@ -3698,17 +3751,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Clockwise">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.ClockwiseAttribute">
             <summary>
             Clockwise
             </summary>
@@ -3886,7 +3939,7 @@
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.ISegment.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
             <param name="PathState">Current path state.</param>
@@ -4410,7 +4463,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.Reference">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.Replay.ReferenceAttribute">
             <summary>
             Reference
             </summary>
@@ -4741,12 +4794,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.Head">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.HeadAttribute">
             <summary>
             Head
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.Tail">
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.Spline.TailAttribute">
             <summary>
             Tail
             </summary>
@@ -4815,9 +4868,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -4891,17 +4944,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaX">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaXAttribute">
             <summary>
             Sigma X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaY">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.SigmaYAttribute">
             <summary>
             Sigma Y
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.TileMode">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Blur.TileModeAttribute">
             <summary>
             Tile Mode
             </summary>
@@ -4949,12 +5002,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Dilate.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
@@ -5002,12 +5055,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusX">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusXAttribute">
             <summary>
             Radius X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusY">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Erode.RadiusYAttribute">
             <summary>
             Radius Y
             </summary>
@@ -5055,27 +5108,27 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DX">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DXAttribute">
             <summary>
             DX
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DY">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.DYAttribute">
             <summary>
             DY
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaX">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaXAttribute">
             <summary>
             Sigma X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaY">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.SigmaYAttribute">
             <summary>
             Sigma Y
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.Color">
+        <member name="P:Waher.Layout.Layout2D.Model.Filters.Shadow.ColorAttribute">
             <summary>
             Color
             </summary>
@@ -5123,17 +5176,17 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Name">
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.NameAttribute">
             <summary>
             Name
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Size">
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.SizeAttribute">
             <summary>
             Size
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Weight">
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.WeightAttribute">
             <summary>
             Weight
             </summary>
@@ -5143,12 +5196,12 @@
             Width
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Slant">
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.SlantAttribute">
             <summary>
             Slant
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Color">
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.ColorAttribute">
             <summary>
             Color
             </summary>
@@ -5178,6 +5231,22 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Fonts.Font.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.FontDef">
+            <summary>
+            Measured Font
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.Text">
+            <summary>
+            Measured Text
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.HorizontalAlignment">
             <summary>
@@ -5241,27 +5310,27 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.HorizontalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.HorizontalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.VerticalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.VerticalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.ColSpan">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.ColSpanAttribute">
             <summary>
             Column span
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.RowSpan">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.RowSpanAttribute">
             <summary>
             Row span
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.Border">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.BorderAttribute">
             <summary>
             Border
             </summary>
@@ -5308,9 +5377,9 @@
             <param name="ColSpan">Column span</param>
             <param name="RowSpan">Row span</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -5382,27 +5451,27 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.Order">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.OrderAttribute">
             <summary>
             Order
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalDirection">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalDirectionAttribute">
             <summary>
             Horizontal Direction
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalDirection">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalDirectionAttribute">
             <summary>
             Vertical Direction
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.HorizontalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalAlignment">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Flexible.VerticalAlignmentAttribute">
             <summary>
             Degrees
             </summary>
@@ -5461,6 +5530,12 @@
             </summary>
             <param name="Element">Cell element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.TotWidth">
             <summary>
             Total width of layout
@@ -5498,6 +5573,12 @@
             </summary>
             <param name="Element">Cell element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.TotWidth">
             <summary>
             Total width of layout
@@ -5531,7 +5612,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Groups.Grid.Columns">
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Grid.ColumnsAttribute">
             <summary>
             Columns
             </summary>
@@ -5596,6 +5677,12 @@
             <summary>
             Total height of layout
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Align">
             <summary>
@@ -5689,6 +5776,12 @@
             </summary>
             <param name="Element">Cell element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.TotWidth">
             <summary>
             Total width of layout
@@ -5715,6 +5808,12 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Align">
             <summary>
@@ -5795,9 +5894,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -5823,6 +5922,12 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.OverlayCells.TotWidth">
             <summary>
@@ -5918,6 +6023,11 @@
             <param name="MaxHeight">Maximum height of area assigned to the cell</param>
             <param name="Session">Current session.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution">
             <summary>
             Abstract base class of elements that do spatial distribution of children.
@@ -5942,9 +6052,15 @@
             <param name="State">Current drawing state.</param>
             <returns>Cell layout object.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -6002,6 +6118,12 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.VerticalCells.TotWidth">
             <summary>
@@ -6112,6 +6234,11 @@
             If the element is visible or not.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.IdAttribute">
+            <summary>
+            ID Attribute
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Create(Waher.Layout.Layout2D.Layout2DDocument,Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
             Creates a new instance of the layout element.
@@ -6145,9 +6272,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -6180,9 +6313,9 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -6236,7 +6369,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageFile.FileName">
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageFile.FileNameAttribute">
             <summary>
             Filename
             </summary>
@@ -6292,7 +6425,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageInternal.Cid">
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageInternal.CidAttribute">
             <summary>
             Content ID
             </summary>
@@ -6348,7 +6481,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageResource.Resource">
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageResource.ResourceAttribute">
             <summary>
             Resource
             </summary>
@@ -6404,12 +6537,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.Url">
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.UrlAttribute">
             <summary>
             URL
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.Alternative">
+        <member name="P:Waher.Layout.Layout2D.Model.Images.ImageUrl.AlternativeAttribute">
             <summary>
             Alternative
             </summary>
@@ -6448,9 +6581,9 @@
             <returns>Loaded image, or null if not possible to load image, or
             image loading is in process.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -6511,37 +6644,37 @@
             Height
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxWidth">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxWidthAttribute">
             <summary>
             Maximum Width
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxHeight">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MaxHeightAttribute">
             <summary>
             Maximum Height
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinWidth">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinWidthAttribute">
             <summary>
             Minimum Width
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinHeight">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.MinHeightAttribute">
             <summary>
             Minimum Height
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.KeepAspectRatio">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.KeepAspectRatioAttribute">
             <summary>
             Keep aspect-ratio
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.Overflow">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.OverflowAttribute">
             <summary>
             Overflow
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.OnClick">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutArea.OnClickAttribute">
             <summary>
             OnClick event script
             </summary>
@@ -6606,6 +6739,12 @@
             <param name="State">Current drawing state.</param>
             <returns>Height estimate.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.LayoutContainer">
             <summary>
             Abstract base class for layout containers (area elements containing 
@@ -6623,6 +6762,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.LayoutContainer.Children">
             <summary>
             Child elements
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutContainer.HasChildren">
+            <summary>
+            If the element has children or not.
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Dispose">
@@ -6648,9 +6792,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -6756,6 +6906,31 @@
             Height of element
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.MinWidth">
+            <summary>
+            Minimum width.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.MaxWidth">
+            <summary>
+            Maximum width.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.MinHeight">
+            <summary>
+            Minimum height.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.MaxHeight">
+            <summary>
+            Maximum height.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.BoundingRect">
+            <summary>
+            Bounding rectangle.
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Namespace">
             <summary>
             Namespace of type of element.
@@ -6772,6 +6947,16 @@
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.IdAttribute">
+            <summary>
+            ID of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.VisibleAttribute">
+            <summary>
+            Visibility attribute
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.FromXml(System.Xml.XmlElement)">
@@ -6811,11 +6996,23 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.TransformBoundingBox(SkiaSharp.SKMatrix)">
+            <summary>
+            Transforms the measured bounding box.
+            </summary>
+            <param name="M">Transformation matrix.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.IsVisible">
             <summary>
@@ -6879,6 +7076,11 @@
             <param name="P1">First vertex</param>
             <param name="P2">Second vertex</param>
             <returns>Direction angle</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
             <summary>
@@ -7019,17 +7221,17 @@
             Width
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Cap">
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.CapAttribute">
             <summary>
             Cap
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Join">
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.JoinAttribute">
             <summary>
             Join
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.Miter">
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.Pen.MiterAttribute">
             <summary>
             Miter
             </summary>
@@ -7052,9 +7254,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.Pen.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7095,7 +7297,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Pens.SolidPen.Color">
+        <member name="P:Waher.Layout.Layout2D.Model.Pens.SolidPen.ColorAttribute">
             <summary>
             Color
             </summary>
@@ -7126,9 +7328,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Pens.SolidPen.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7144,17 +7346,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point.X">
+        <member name="P:Waher.Layout.Layout2D.Model.Point.XAttribute">
             <summary>
             X-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point.Y">
+        <member name="P:Waher.Layout.Layout2D.Model.Point.YAttribute">
             <summary>
             Y-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point.Reference">
+        <member name="P:Waher.Layout.Layout2D.Model.Point.ReferenceAttribute">
             <summary>
             Reference
             </summary>
@@ -7177,9 +7379,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Point.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Point.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7205,17 +7407,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point2.X2">
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.X2Attribute">
             <summary>
             X-coordinate 2
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point2.Y2">
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.Y2Attribute">
             <summary>
             Y-coordinate 2
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point2.Reference2">
+        <member name="P:Waher.Layout.Layout2D.Model.Point2.Reference2Attribute">
             <summary>
             Reference 2
             </summary>
@@ -7238,9 +7440,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Point2.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Point2.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7266,7 +7468,7 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point2Weight.Weight">
+        <member name="P:Waher.Layout.Layout2D.Model.Point2Weight.WeightAttribute">
             <summary>
             Weight
             </summary>
@@ -7289,9 +7491,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Point2Weight.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7312,17 +7514,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point3.X3">
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.X3Attribute">
             <summary>
             X-coordinate 3
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point3.Y3">
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.Y3Attribute">
             <summary>
             Y-coordinate 3
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Point3.Reference3">
+        <member name="P:Waher.Layout.Layout2D.Model.Point3.Reference3Attribute">
             <summary>
             Reference 3
             </summary>
@@ -7345,9 +7547,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Point3.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Point3.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7378,7 +7580,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.References.Copy.Reference">
+        <member name="P:Waher.Layout.Layout2D.Model.References.Copy.ReferenceAttribute">
             <summary>
             Reference
             </summary>
@@ -7409,9 +7611,15 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.References.Copy.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7561,17 +7769,17 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.X">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.XAttribute">
             <summary>
             X-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.Y">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.YAttribute">
             <summary>
             Y-coordinate
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.Reference">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.ReferenceAttribute">
             <summary>
             Reference
             </summary>
@@ -7594,9 +7802,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7609,12 +7817,6 @@
             <summary>
             Measured Y-coordinate
             </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.TransformBoundingBox(SkiaSharp.SKMatrix)">
-            <summary>
-            Transforms the measured bounding box.
-            </summary>
-            <param name="M">Transformation matrix.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.Rotate">
             <summary>
@@ -7633,7 +7835,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Rotate.Degrees">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Rotate.DegreesAttribute">
             <summary>
             Degrees
             </summary>
@@ -7664,9 +7866,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7693,12 +7895,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleX">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleXAttribute">
             <summary>
             Scale X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleY">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Scale.ScaleYAttribute">
             <summary>
             Scale Y
             </summary>
@@ -7729,9 +7931,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7758,7 +7960,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewX.Factor">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewX.FactorAttribute">
             <summary>
             Factor
             </summary>
@@ -7789,9 +7991,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7818,7 +8020,7 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewY.Factor">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.SkewY.FactorAttribute">
             <summary>
             Factor
             </summary>
@@ -7849,9 +8051,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
@@ -7878,12 +8080,12 @@
             Local name of type of element.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateX">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateXAttribute">
             <summary>
             Translate X
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateY">
+        <member name="P:Waher.Layout.Layout2D.Model.Transforms.Translate.TranslateYAttribute">
             <summary>
             Translate Y
             </summary>
@@ -7914,9 +8116,9 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.Measure(Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Measures layout entities and defines unassigned properties.
+            Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
         </member>

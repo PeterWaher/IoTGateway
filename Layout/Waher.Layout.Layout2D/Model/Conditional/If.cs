@@ -59,7 +59,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Condition
 		/// </summary>
-		public ExpressionAttribute Condition
+		public ExpressionAttribute ConditionAttribute
 		{
 			get => this.condition;
 			set => this.condition = value;
@@ -151,12 +151,12 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			object Result = this.condition?.Evaluate(State.Session);
 			if (Result is bool b)
@@ -165,9 +165,21 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 				this.conditionResult = false;
 
 			if (this.conditionResult)
-				this.ifTrue?.Measure(State);
+				this.ifTrue?.MeasureDimensions(State);
 			else
-				this.ifFalse?.Measure(State);
+				this.ifFalse?.MeasureDimensions(State);
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			if (this.conditionResult)
+				this.ifTrue?.MeasurePositions(State);
+			else
+				this.ifFalse?.MeasurePositions(State);
 		}
 
 		/// <summary>

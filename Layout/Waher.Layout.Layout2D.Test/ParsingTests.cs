@@ -264,5 +264,11 @@ namespace Waher.Layout.Layout2D.Test
 			this.Test("Test_38_Labels");
 		}
 
+		[TestMethod]
+		public void Test_39_Stack()
+		{
+			this.Test("Test_39_Stack");
+		}
+		
 	}
 }

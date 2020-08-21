@@ -33,6 +33,7 @@ namespace Waher.Layout.Layout2D
 		private static Dictionary<string, ILayoutElement> elementTypes = new Dictionary<string, ILayoutElement>();
 		private static bool initialized = false;
 
+		private readonly Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private readonly Dictionary<string, object> attachments = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Variables session;
 		private readonly ILayoutElement root;
@@ -137,6 +138,9 @@ namespace Waher.Layout.Layout2D
 
 			ILayoutElement Result = E.Create(this, Parent);
 			Result.FromXml(Xml);
+
+			if (Result.IdAttribute.TryEvaluate(this.session, out string Id) && !string.IsNullOrEmpty(Id))
+				this.AddElementId(Id, Result);
 
 			return Result;
 		}
@@ -359,7 +363,8 @@ namespace Waher.Layout.Layout2D
 				if (Settings.BackgroundColor != SKColor.Empty)
 					Canvas.Clear(Settings.BackgroundColor);
 
-				this.root?.Measure(State);
+				this.root?.MeasureDimensions(State);
+				this.root?.MeasurePositions(State);
 
 				switch (Settings.ImageSize)
 				{
@@ -380,30 +385,34 @@ namespace Waher.Layout.Layout2D
 						if (Settings.BackgroundColor != SKColor.Empty)
 							Canvas.Clear(Settings.BackgroundColor);
 
-						if (!(this.root is null))
-							State.Canvas.Translate(-this.root.Left, -this.root.Top);
+						if (!(this.root is null) && this.root.Left.HasValue && this.root.Top.HasValue)
+							State.Canvas.Translate(-this.root.Left.Value, -this.root.Top.Value);
 						break;
 
 					case RenderedImageSize.ScaleToFit:
 						if (!(this.root is null))
 						{
-							float Width2 = this.root.Right - this.root.Left + 1;
-							float Height2 = this.root.Height - this.root.Height + 1;
-							float ScaleX = Width / Width2;
-							float ScaleY = Height / Height2;
-
-							if (ScaleX < ScaleY)
+							if (this.root.Width.HasValue && this.root.Height.HasValue)
 							{
-								State.Canvas.Translate(0, (Height - Height2 * ScaleX) / 2);
-								State.Canvas.Scale(ScaleX);
-							}
-							else if (ScaleY < ScaleX)
-							{
-								State.Canvas.Translate((Width - Width2 * ScaleY) / 2, 0);
-								State.Canvas.Scale(ScaleY);
+								float Width2 = this.root.Width.Value + 1;
+								float Height2 = this.root.Height.Value + 1;
+								float ScaleX = Width / Width2;
+								float ScaleY = Height / Height2;
+
+								if (ScaleX < ScaleY)
+								{
+									State.Canvas.Translate(0, (Height - Height2 * ScaleX) / 2);
+									State.Canvas.Scale(ScaleX);
+								}
+								else if (ScaleY < ScaleX)
+								{
+									State.Canvas.Translate((Width - Width2 * ScaleY) / 2, 0);
+									State.Canvas.Scale(ScaleY);
+								}
 							}
 
-							State.Canvas.Translate(-this.root.Left, -this.root.Top);
+							if (this.root.Left.HasValue && this.root.Top.HasValue)
+								State.Canvas.Translate(-this.root.Left.Value, -this.root.Top.Value);
 						}
 						break;
 				}
@@ -509,6 +518,35 @@ namespace Waher.Layout.Layout2D
 			this.attachments[ContentId] = Content;
 		}
 
+		/// <summary>
+		/// Adds an element with an ID
+		/// </summary>
+		/// <param name="Id">Element ID</param>
+		/// <param name="Element">Element</param>
+		public void AddElementId(string Id, ILayoutElement Element)
+		{
+			this.elementsById[Id] = Element;
+		}
+
+		/// <summary>
+		/// Tries to get a layout element, given an ID reference
+		/// </summary>
+		/// <param name="Id">Layout ID</param>
+		/// <param name="Element">Element retrieved, if found.</param>
+		/// <returns>If an element with the corresponding ID was found.</returns>
+		public bool TryGetElement(string Id, out ILayoutElement Element)
+		{
+			return this.elementsById.TryGetValue(Id, out Element);
+		}
+
+		/// <summary>
+		/// Clears registered elements with IDs.
+		/// </summary>
+		public void ClearElementIds()
+		{
+			this.elementsById.Clear();
+		}
+
 	}
 
 	/* TODO:
@@ -516,6 +554,7 @@ namespace Waher.Layout.Layout2D
      * Tree layout
      * Radix/circular
      * Directed graphs
+     * Smart Art/Graphs/Layout
      * 
      * Blur when too small, and dont continue rendering
      * Clip optimization

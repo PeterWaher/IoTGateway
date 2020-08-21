@@ -148,18 +148,18 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			this.activeCase = null;
 
 			foreach (Case Case in this.cases)
 			{
-				object Result = Case.Condition?.Evaluate(State.Session);
+				object Result = Case.ConditionAttribute?.Evaluate(State.Session);
 				if (Result is bool b && b)
 				{
 					this.activeCase = Case;
@@ -168,9 +168,21 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			}
 
 			if (this.activeCase is null)
-				this.otherwise?.Measure(State);
+				this.otherwise?.MeasureDimensions(State);
 			else
-				this.activeCase?.Measure(State);
+				this.activeCase?.MeasureDimensions(State);
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			if (this.activeCase is null)
+				this.otherwise?.MeasurePositions(State);
+			else
+				this.activeCase.MeasurePositions(State);
 		}
 
 		/// <summary>

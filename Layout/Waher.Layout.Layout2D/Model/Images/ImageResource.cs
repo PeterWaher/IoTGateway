@@ -32,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <summary>
 		/// Resource
 		/// </summary>
-		public StringAttribute Resource
+		public StringAttribute ResourceAttribute
 		{
 			get => this.resource;
 			set => this.resource = value;

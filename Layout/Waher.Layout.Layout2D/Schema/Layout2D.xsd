@@ -10,9 +10,9 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="LayoutContainer">
-          <xs:attribute name="fontId" type="xs:string" use="optional"/>
-          <xs:attribute name="penId" type="xs:string" use="optional"/>
-          <xs:attribute name="backgroundId" type="xs:string" use="optional"/>
+          <xs:attribute name="font" type="xs:string" use="optional"/>
+          <xs:attribute name="pen" type="xs:string" use="optional"/>
+          <xs:attribute name="background" type="xs:string" use="optional"/>
           <xs:attribute name="textColor" type="Color" use="optional"/>
         </xs:extension>
       </xs:complexContent>

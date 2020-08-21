@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// DX
 		/// </summary>
-		public LengthAttribute DX
+		public LengthAttribute DXAttribute
 		{
 			get => this.dX;
 			set => this.dX = value;
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// DY
 		/// </summary>
-		public LengthAttribute DY
+		public LengthAttribute DYAttribute
 		{
 			get => this.dY;
 			set => this.dY = value;
@@ -53,7 +53,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Sigma X
 		/// </summary>
-		public FloatAttribute SigmaX
+		public FloatAttribute SigmaXAttribute
 		{
 			get => this.sigmaX;
 			set => this.sigmaX = value;
@@ -62,7 +62,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Sigma Y
 		/// </summary>
-		public FloatAttribute SigmaY
+		public FloatAttribute SigmaYAttribute
 		{
 			get => this.sigmaY;
 			set => this.sigmaY = value;
@@ -71,7 +71,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Color
 		/// </summary>
-		public ColorAttribute Color
+		public ColorAttribute ColorAttribute
 		{
 			get => this.color;
 			set => this.color = value;

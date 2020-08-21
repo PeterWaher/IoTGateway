@@ -26,7 +26,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// X-coordinate 2
 		/// </summary>
-		public LengthAttribute X2
+		public LengthAttribute X2Attribute
 		{
 			get => this.x2;
 			set => this.x2 = value;
@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Y-coordinate 2
 		/// </summary>
-		public LengthAttribute Y2
+		public LengthAttribute Y2Attribute
 		{
 			get => this.y2;
 			set => this.y2 = value;
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Reference 2
 		/// </summary>
-		public StringAttribute Reference2
+		public StringAttribute Reference2Attribute
 		{
 			get => this.ref2;
 			set => this.ref2 = value;
@@ -93,12 +93,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, out this.xCoordinate2, out this.yCoordinate2))
 			{
@@ -126,7 +126,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Width</returns>
 		public virtual float GetDefaultWidth(DrawingState State)
 		{
-			return State.GetDrawingSize(Length.HundredPercent, this, true);
+			if (this.HasChildren && this.Width.HasValue)
+				return this.Width.Value;
+			else
+				return State.GetDrawingSize(Length.HundredPercent, this, true);
 		}
 
 		/// <summary>
@@ -136,7 +139,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Height</returns>
 		public virtual float GetDefaultHeight(DrawingState State)
 		{
-			return State.GetDrawingSize(Length.HundredPercent, this, false);
+			if (this.HasChildren && this.Height.HasValue)
+				return this.Height.Value;
+			else
+				return State.GetDrawingSize(Length.HundredPercent, this, false);
 		}
 
 		/// <summary>

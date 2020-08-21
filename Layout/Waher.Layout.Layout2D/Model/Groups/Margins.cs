@@ -123,12 +123,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.left.TryEvaluate(State.Session, out Length L))
 			{

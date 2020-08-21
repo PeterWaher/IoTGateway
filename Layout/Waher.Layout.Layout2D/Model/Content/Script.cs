@@ -52,7 +52,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Expression
 		/// </summary>
-		public ExpressionAttribute Expression
+		public ExpressionAttribute ExpressionAttribute
 		{
 			get => this.expression;
 			set => this.expression = value;
@@ -61,7 +61,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignmentAttribute
 		{
 			get => this.halign;
 			set => this.halign = value;
@@ -70,7 +70,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		public EnumAttribute<VerticalAlignment> VerticalAlignmentAttribute
 		{
 			get => this.valign;
 			set => this.valign = value;
@@ -130,19 +130,18 @@ namespace Waher.Layout.Layout2D.Model.Content
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.evaluated is null)
 			{
 				if (this.expression.TryEvaluate(State.Session, out this.parsed))
 				{
 					object Result;
-					bool Align = false;
 
 					try
 					{
@@ -211,32 +210,30 @@ namespace Waher.Layout.Layout2D.Model.Content
 						this.cid = this.Document.AddContent(Bmp);
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							Cid = new StringAttribute("cid", this.cid)
+							CidAttribute = new StringAttribute("cid", this.cid)
 						};
-						Align = true;
 					}
 					else if (Result is SKImage Img)
 					{
 						this.cid = this.Document.AddContent(Img);
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
-							Cid = new StringAttribute("cid", this.cid)
+							CidAttribute = new StringAttribute("cid", this.cid)
 						};
-						Align = true;
 					}
 					else if (Result is Exception ex)
 					{
 						Translate T = new Translate(this.Document, this)
 						{
-							TranslateX = this.X,
-							TranslateY = this.Y
+							TranslateXAttribute = this.XAttribute,
+							TranslateYAttribute = this.YAttribute
 						};
 						Vertical Vertical = new Vertical(this.Document, T);
 						List<ILayoutElement> Children = new List<ILayoutElement>()
 						{
 							new Label(this.Document, Vertical)
 							{
-								Text = new StringAttribute("text", ex.Message)
+								TextAttribute = new StringAttribute("text", ex.Message)
 							},
 							new Margins(this.Document, Vertical)
 							{
@@ -248,7 +245,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							Children.Add(new Label(this.Document, Vertical)
 							{
-								Text = new StringAttribute("text", Row)
+								TextAttribute = new StringAttribute("text", Row)
 							});
 						}
 
@@ -256,7 +253,6 @@ namespace Waher.Layout.Layout2D.Model.Content
 						T.Children = new ILayoutElement[] { Vertical };
 
 						this.evaluated = Vertical;
-						Align = true;
 					}
 					else if (Result is ObjectMatrix M && M.ColumnNames != null)
 					{
@@ -266,31 +262,47 @@ namespace Waher.Layout.Layout2D.Model.Content
 					{
 						this.evaluated = new Label(this.Document, this)
 						{
-							Text = new StringAttribute("text", Result.ToString()),
-							X = this.X,
-							Y = this.Y,
-							HorizontalAlignment = this.HorizontalAlignment,
-							VerticalAlignment = this.VerticalAlignment
+							TextAttribute = new StringAttribute("text", Result.ToString()),
+							XAttribute = this.XAttribute,
+							YAttribute = this.YAttribute,
+							HorizontalAlignmentAttribute = this.HorizontalAlignmentAttribute,
+							VerticalAlignmentAttribute = this.VerticalAlignmentAttribute
 						};
 					}
 
 					if (!(this.evaluated is null))
 					{
-						this.evaluated.Measure(State);
+						this.evaluated.MeasureDimensions(State);
 
-						this.Left = this.evaluated.Left;
-						this.Top = this.evaluated.Top;
-						this.Right = this.evaluated.Right;
-						this.Bottom = this.evaluated.Bottom;
-
-						if (Align)
-						{
-							// TODO
-						}
+						this.Width = this.evaluated.Width;
+						this.Height = this.evaluated.Height;
 					}
 				}
 				else
 					this.defined = false;
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			base.MeasurePositions(State);
+
+			if (!(this.evaluated is null))
+			{
+				this.evaluated.MeasurePositions(State);
+
+				this.Left = this.evaluated.Left;
+				this.Top = this.evaluated.Top;
+
+				if (!this.Width.HasValue)
+					this.Right = this.evaluated.Right;
+
+				if (!this.Height.HasValue)
+					this.Bottom = this.evaluated.Bottom;
 			}
 		}
 
@@ -304,9 +316,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			this.evaluated?.Draw(State);
+			base.Draw(State);
 		}
 	}
 }

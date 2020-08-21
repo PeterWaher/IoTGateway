@@ -58,7 +58,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// <summary>
 		/// Cap
 		/// </summary>
-		public EnumAttribute<SKStrokeCap> Cap
+		public EnumAttribute<SKStrokeCap> CapAttribute
 		{
 			get => this.cap;
 			set => this.cap = value;
@@ -67,7 +67,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// <summary>
 		/// Join
 		/// </summary>
-		public EnumAttribute<SKStrokeJoin> Join
+		public EnumAttribute<SKStrokeJoin> JoinAttribute
 		{
 			get => this.join;
 			set => this.join = value;
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// <summary>
 		/// Miter
 		/// </summary>
-		public LengthAttribute Miter
+		public LengthAttribute MiterAttribute
 		{
 			get => this.miter;
 			set => this.miter = value;
@@ -128,12 +128,12 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.width.TryEvaluate(State.Session, out Length Width))
 				this.penWidth = State.GetDrawingSize(Width, this, true);

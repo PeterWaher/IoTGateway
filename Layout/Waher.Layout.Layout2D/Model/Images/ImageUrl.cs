@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <summary>
 		/// URL
 		/// </summary>
-		public StringAttribute Url
+		public StringAttribute UrlAttribute
 		{
 			get => this.url;
 			set => this.url = value;
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <summary>
 		/// Alternative
 		/// </summary>
-		public StringAttribute Alternative
+		public StringAttribute AlternativeAttribute
 		{
 			get => this.alt;
 			set => this.alt = value;
@@ -134,18 +134,18 @@ namespace Waher.Layout.Layout2D.Model.Images
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
 			if (this.alt.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element))
+				this.Document.TryGetElement(RefId, out ILayoutElement Element))
 			{
 				this.alternative = Element;
 			}
 
-			base.Measure(State);
+			base.MeasureDimensions(State);
 		}
 
 		private ILayoutElement alternative = null;
@@ -161,8 +161,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 				return base.GetDefaultWidth(State);
 			else if (this.alternative is FigurePoint2 P2)
 				return P2.GetDefaultWidth(State);
-			else if (this.alternative is LayoutArea A)
-				return A.Width;
+			else if (this.alternative is LayoutArea A && A.Width.HasValue)
+				return A.Width.Value;
 			else
 				return base.GetDefaultWidth(State);
 		}
@@ -178,8 +178,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 				return base.GetDefaultHeight(State);
 			else if (this.alternative is FigurePoint2 P2)
 				return P2.GetDefaultHeight(State);
-			else if (this.alternative is LayoutArea A)
-				return A.Height;
+			else if (this.alternative is LayoutArea A && A.Height.HasValue)
+				return A.Height.Value;
 			else
 				return base.GetDefaultHeight(State);
 		}
@@ -190,10 +190,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.image is null && !(this.alternative is null))
 				this.alternative.DrawShape(State);
+		
+			base.Draw(State);
 		}
 	}
 }

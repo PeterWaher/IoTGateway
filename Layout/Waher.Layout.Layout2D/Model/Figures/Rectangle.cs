@@ -43,8 +43,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 			{
 				if (this.TryGetFill(State, out SKPaint Fill))
@@ -61,6 +59,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 						this.yCoordinate2 - this.yCoordinate, Pen);
 				}
 			}
+		
+			base.Draw(State);
 		}
 	}
 }

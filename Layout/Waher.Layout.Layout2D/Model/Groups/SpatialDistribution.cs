@@ -34,38 +34,52 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public abstract ICellLayout GetCellLayout(DrawingState State);
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
-			ICellLayout Measured = this.GetCellLayout(State);
+			this.cellLayout = this.GetCellLayout(State);
 
-			if (!(this.Children is null))
+			if (this.HasChildren)
 			{
 				foreach (ILayoutElement Child in this.Children)
 				{
-					Child.Measure(State);
 					if (!Child.IsVisible)
 						continue;
 
 					if (Child is IDynamicChildren DynamicChildren)
 					{
 						foreach (ILayoutElement Child2 in DynamicChildren.DynamicChildren)
-							Measured.Add(Child2);
+							this.cellLayout.Add(Child2);
 					}
 					else
-						Measured.Add(Child);
+						this.cellLayout.Add(Child);
 				}
 			}
 
-			this.measured = Measured.Align();
-			this.Top = 0;
 			this.Left = 0;
-			this.Right = Measured.TotWidth;
-			this.Bottom = Measured.TotHeight;
+			this.Top = 0;
+			this.Right = null;
+			this.Bottom = null;
+			this.Width = this.cellLayout.TotWidth;
+			this.Height = this.cellLayout.TotHeight;
+		}
+
+		private ICellLayout cellLayout = null;
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			// Don't call base method. Cell Layout calls MeasurePositions on children.
+			
+			this.cellLayout?.MeasurePositions(State);
+			this.measured = this.cellLayout?.Align();
 		}
 
 		/// <summary>
@@ -79,12 +93,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			foreach (Padding P in this.measured)
 			{
-				Canvas.SetMatrix(M);
 				Canvas.Translate(P.OffsetX, P.OffsetY);
 				P.Element.Draw(State);
+				Canvas.SetMatrix(M);
 			}
-
-			Canvas.SetMatrix(M);
 		}
 
 	}

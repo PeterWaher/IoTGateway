@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// From
 		/// </summary>
-		public ExpressionAttribute From
+		public ExpressionAttribute FromAttribute
 		{
 			get => this.from;
 			set => this.from = value;
@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// To
 		/// </summary>
-		public ExpressionAttribute To
+		public ExpressionAttribute ToAttribute
 		{
 			get => this.to;
 			set => this.to = value;
@@ -60,7 +60,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Step
 		/// </summary>
-		public ExpressionAttribute Step
+		public ExpressionAttribute StepAttribute
 		{
 			get => this.step;
 			set => this.step = value;
@@ -69,7 +69,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Variable
 		/// </summary>
-		public StringAttribute Variable
+		public StringAttribute VariableAttribute
 		{
 			get => this.variable;
 			set => this.variable = value;
@@ -132,12 +132,12 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			List<ILayoutElement> Measured = new List<ILayoutElement>();
 			IElement FromValue = this.from.EvaluateElement(State.Session);
@@ -181,7 +181,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 					{
 						ILayoutElement Copy = Child.Copy(this);
 						Measured.Add(Copy);
-						Copy.Measure(State);
+						Copy.MeasureDimensions(State);
 					}
 
 					if (Direction == 0)

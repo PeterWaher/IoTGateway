@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Condition of case statement
 		/// </summary>
-		public ExpressionAttribute Condition
+		public ExpressionAttribute ConditionAttribute
 		{
 			get => this.condition;
 			set => this.condition = value;

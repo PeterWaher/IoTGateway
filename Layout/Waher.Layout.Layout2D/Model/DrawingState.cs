@@ -11,15 +11,14 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public class DrawingState : IDisposable
 	{
-		private readonly Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private readonly Variables session;
 		private readonly SKPaint textRoot;
-		private readonly SKPaint text;
 		private readonly SKPaint defaultPen;
 		private SKCanvas canvas;
 		private SKPaint shapePen;
 		private SKPaint shapeFill;
 		private SKFont font;
+		private SKPaint text;
 		private float? width_0;
 		private float? height_0;
 		private readonly float pixelsPerInch;
@@ -86,6 +85,11 @@ namespace Waher.Layout.Layout2D.Model
 		public Variables Session => this.session;
 
 		/// <summary>
+		/// Pixels per inch
+		/// </summary>
+		public float PixelsPerInch => this.pixelsPerInch;
+
+		/// <summary>
 		/// Current drawing canvas.
 		/// </summary>
 		public SKCanvas Canvas
@@ -97,12 +101,20 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Current text paint settings
 		/// </summary>
-		public SKPaint Text => this.text;
+		public SKPaint Text
+		{
+			get => this.text;
+			set => this.text = value;
+		}
 
 		/// <summary>
 		/// Current font.
 		/// </summary>
-		public SKFont Font => this.font;
+		public SKFont Font
+		{
+			get => this.font;
+			set => this.font = value;
+		}
 
 		/// <summary>
 		/// Default pen
@@ -169,7 +181,11 @@ namespace Waher.Layout.Layout2D.Model
 				// Relative to the x-height of the current font (rarely used)
 				case LengthUnit.Ex:
 					if (!this.height_0.HasValue)
-						this.height_0 = this.text.MeasureText("x"); // TODO: Measure height, not width
+					{
+						SKRect Bounds = new SKRect();
+						this.text.MeasureText("x", ref Bounds);
+						this.height_0 = Bounds.Height;
+					}
 
 					return L.Value * this.height_0.Value;
 
@@ -236,35 +252,6 @@ namespace Waher.Layout.Layout2D.Model
 				default:
 					return L.Value;
 			}
-		}
-
-		/// <summary>
-		/// Adds an element with an ID
-		/// </summary>
-		/// <param name="Id">Element ID</param>
-		/// <param name="Element">Element</param>
-		public void AddElementId(string Id, ILayoutElement Element)
-		{
-			this.elementsById[Id] = Element;
-		}
-
-		/// <summary>
-		/// Tries to get a layout element, given an ID reference
-		/// </summary>
-		/// <param name="Id">Layout ID</param>
-		/// <param name="Element">Element retrieved, if found.</param>
-		/// <returns>If an element with the corresponding ID was found.</returns>
-		public bool TryGetElement(string Id, out ILayoutElement Element)
-		{
-			return this.elementsById.TryGetValue(Id, out Element);
-		}
-
-		/// <summary>
-		/// Clears registered elements with IDs.
-		/// </summary>
-		public void ClearElementIds()
-		{
-			this.elementsById.Clear();
 		}
 	}
 }

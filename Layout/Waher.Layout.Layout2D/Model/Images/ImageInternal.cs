@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <summary>
 		/// Content ID
 		/// </summary>
-		public StringAttribute Cid
+		public StringAttribute CidAttribute
 		{
 			get => this.cid;
 			set => this.cid = value;

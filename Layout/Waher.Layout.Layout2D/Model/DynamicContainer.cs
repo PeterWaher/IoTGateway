@@ -45,7 +45,25 @@ namespace Waher.Layout.Layout2D.Model
 						E.Draw(State);
 				}
 			}
-
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			ILayoutElement[] Children = this.DynamicChildren;
+
+			if (!(Children is null))
+			{
+				foreach (ILayoutElement E in Children)
+				{
+					if (E.IsVisible)
+						E.MeasurePositions(State);
+				}
+			}
+		}
+
 	}
 }

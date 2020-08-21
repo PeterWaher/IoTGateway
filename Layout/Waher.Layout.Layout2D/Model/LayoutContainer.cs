@@ -12,7 +12,6 @@ namespace Waher.Layout.Layout2D.Model
 	public abstract class LayoutContainer : LayoutArea
 	{
 		private ILayoutElement[] children;
-		private bool firstPoint = true;
 
 		/// <summary>
 		/// Abstract base class for layout containers (area elements containing 
@@ -35,13 +34,18 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// If the element has children or not.
+		/// </summary>
+		public bool HasChildren => !(this.children is null) && this.children.Length > 0;
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();
 
-			if (!(this.children is null))
+			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.children)
 					E.Dispose();
@@ -80,7 +84,7 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportChildren(Output);
 
-			if (!(this.children is null))
+			if (this.HasChildren)
 			{
 				foreach (ILayoutElement Child in this.children)
 					Child.ToXml(Output);
@@ -97,7 +101,7 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (Destination is LayoutContainer Dest)
 			{
-				if (!(this.children is null))
+				if (this.HasChildren)
 				{
 					int i, c = this.children.Length;
 
@@ -112,25 +116,46 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
-			this.firstPoint = true;
-			this.Left = this.Right = this.Top = this.Bottom = 0;
-			
-			if (!(this.children is null))
+			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.children)
 				{
-					E.Measure(State);
+					E.MeasureDimensions(State);
 
-					this.IncludePoint(E.Left, E.Top);
-					this.IncludePoint(E.Right, E.Bottom);
+					float? X = E.Left;
+					float? Y = E.Top;
+
+					if (X.HasValue && Y.HasValue)
+						this.IncludePoint(X.Value, Y.Value);
+
+					X = E.Right;
+					Y = E.Bottom;
+
+					if (X.HasValue && Y.HasValue)
+						this.IncludePoint(X.Value, Y.Value);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			base.MeasurePositions(State);
+
+			if (this.HasChildren)
+			{
+				foreach (ILayoutElement E in this.children)
+					E.MeasurePositions(State);
 			}
 		}
 
@@ -157,25 +182,17 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Y">Y-Coordinate</param>
 		public void IncludePoint(float X, float Y)
 		{
-			if (this.firstPoint)
-			{
-				this.firstPoint = false;
+			if (!this.Left.HasValue || X < this.Left.Value)
+				this.Left = X;
 
-				this.Left = this.Right = X;
-				this.Top = this.Bottom = Y;
-			}
-			else
-			{
-				if (X < this.Left)
-					this.Left = X;
-				else if (X > this.Right)
-					this.Right = X;
+			if (!this.Right.HasValue || X > this.Right.Value)
+				this.Right = X;
 
-				if (Y < this.Top)
-					this.Top = Y;
-				else if (Y > this.Bottom)
-					this.Bottom = Y;
-			}
+			if (!this.Top.HasValue || Y < this.Top.Value)
+				this.Top = Y;
+
+			if (!this.Bottom.HasValue || Y > this.Bottom.Value)
+				this.Bottom = Y;
 		}
 
 		/// <summary>
@@ -188,8 +205,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="X">Resulting X-coordinate.</param>
 		/// <param name="Y">Resulting Y-coordinate.</param>
 		/// <returns>If point is well-defined.</returns>
-		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute, 
-			LengthAttribute YAttribute, StringAttribute RefAttribute, 
+		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute,
+			LengthAttribute YAttribute, StringAttribute RefAttribute,
 			out float X, out float Y)
 		{
 			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, out X, out Y);
@@ -206,7 +223,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			if (!(this.children is null))
+			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.children)
 				{

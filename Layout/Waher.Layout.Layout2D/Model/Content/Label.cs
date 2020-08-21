@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Text
 		/// </summary>
-		public StringAttribute Text
+		public StringAttribute TextAttribute
 		{
 			get => this.text;
 			set => this.text = value;
@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignmentAttribute
 		{
 			get => this.halign;
 			set => this.halign = value;
@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		public EnumAttribute<VerticalAlignment> VerticalAlignmentAttribute
 		{
 			get => this.valign;
 			set => this.valign = value;
@@ -111,12 +111,12 @@ namespace Waher.Layout.Layout2D.Model.Content
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.halign.TryEvaluate(State.Session, out this.halignment))
 				this.halignment = Groups.HorizontalAlignment.Left;
@@ -128,6 +128,23 @@ namespace Waher.Layout.Layout2D.Model.Content
 			{
 				State.Text.MeasureText(this.textValue, ref this.bounds);
 
+				this.Width = this.bounds.Width;
+				this.Height = this.bounds.Height;
+			}
+			else
+				this.defined = false;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			base.MeasurePositions(State);
+
+			if (this.defined)
+			{
 				switch (this.halignment)
 				{
 					case Groups.HorizontalAlignment.Left:
@@ -170,12 +187,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						this.Top = this.yCoordinate + this.bounds.Top;
 						break;
 				}
-
-				this.Width = this.bounds.Width;
-				this.Height = this.bounds.Height;
 			}
-			else
-				this.defined = false;
 		}
 
 		private string textValue;
@@ -189,10 +201,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 				State.Canvas.DrawText(this.textValue, this.xCoordinate, this.yCoordinate, State.Font, State.Text);
+		
+			base.Draw(State);
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// X-coordinate
 		/// </summary>
-		public LengthAttribute X
+		public LengthAttribute XAttribute
 		{
 			get => this.x;
 			set => this.x = value;
@@ -36,7 +36,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Y-coordinate
 		/// </summary>
-		public LengthAttribute Y
+		public LengthAttribute YAttribute
 		{
 			get => this.y;
 			set => this.y = value;
@@ -45,7 +45,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Reference
 		/// </summary>
-		public StringAttribute Reference
+		public StringAttribute ReferenceAttribute
 		{
 			get => this._ref;
 			set => this._ref = value;
@@ -94,12 +94,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.CalcPoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate))
 				this.xCoordinate = this.yCoordinate = 0;
@@ -114,21 +114,5 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Measured Y-coordinate
 		/// </summary>
 		protected float yCoordinate;
-
-		/// <summary>
-		/// Transforms the measured bounding box.
-		/// </summary>
-		/// <param name="M">Transformation matrix.</param>
-		protected void TransformBoundingBox(SKMatrix M)
-		{
-			SKRect Rect = new SKRect(this.Left, this.Top, this.Right, this.Bottom);
-
-			Rect = M.MapRect(Rect);
-
-			this.Left = Rect.Left;
-			this.Top = Rect.Top;
-			this.Right = Rect.Right;
-			this.Bottom = Rect.Bottom;
-		}
 	}
 }

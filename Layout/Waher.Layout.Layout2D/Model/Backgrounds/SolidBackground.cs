@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// <summary>
 		/// Color
 		/// </summary>
-		public ColorAttribute Color
+		public ColorAttribute ColorAttribute
 		{
 			get => this.color;
 			set => this.color = value;
@@ -83,12 +83,12 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.paint is null &&
 				this.color.TryEvaluate(State.Session, out SKColor Color))

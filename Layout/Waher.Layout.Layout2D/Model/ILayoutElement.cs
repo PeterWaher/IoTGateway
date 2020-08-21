@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Xml;
-using SkiaSharp;
+using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Left coordinate of bounding box, after measurement.
 		/// </summary>
-		float Left
+		float? Left
 		{
 			get;
 			set;
@@ -53,7 +53,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Right coordinate of bounding box, after measurement.
 		/// </summary>
-		float Right
+		float? Right
 		{
 			get;
 			set;
@@ -62,7 +62,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Top coordinate of bounding box, after measurement.
 		/// </summary>
-		float Top
+		float? Top
 		{
 			get;
 			set;
@@ -71,7 +71,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Bottom coordinate of bounding box, after measurement.
 		/// </summary>
-		float Bottom
+		float? Bottom
 		{
 			get;
 			set;
@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Width of element
 		/// </summary>
-		float Width
+		float? Width
 		{
 			get;
 			set;
@@ -89,7 +89,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Height of element
 		/// </summary>
-		float Height
+		float? Height
 		{
 			get;
 			set;
@@ -99,6 +99,14 @@ namespace Waher.Layout.Layout2D.Model
 		/// If the element is visible or not.
 		/// </summary>
 		bool IsVisible
+		{
+			get;
+		}
+
+		/// <summary>
+		/// ID Attribute
+		/// </summary>
+		StringAttribute IdAttribute
 		{
 			get;
 		}
@@ -137,10 +145,16 @@ namespace Waher.Layout.Layout2D.Model
 		void CopyContents(ILayoutElement Destination);
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		void Measure(DrawingState State);
+		void MeasureDimensions(DrawingState State);
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		void MeasurePositions(DrawingState State);
 
 		/// <summary>
 		/// Draws layout entities.

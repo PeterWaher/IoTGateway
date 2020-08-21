@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public FloatAttribute Degrees
+		public FloatAttribute DegreesAttribute
 		{
 			get => this.degrees;
 			set => this.degrees = value;
@@ -82,12 +82,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.degrees.TryEvaluate(State.Session, out this.angle))
 			{

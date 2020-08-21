@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Translate X
 		/// </summary>
-		public LengthAttribute TranslateX
+		public LengthAttribute TranslateXAttribute
 		{
 			get => this.translateX;
 			set => this.translateX = value;
@@ -40,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Translate Y
 		/// </summary>
-		public LengthAttribute TranslateY
+		public LengthAttribute TranslateYAttribute
 		{
 			get => this.translateY;
 			set => this.translateY = value;
@@ -97,30 +97,25 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.translateX.TryEvaluate(State.Session, out Length L))
-			{
 				this.dx = State.GetDrawingSize(L, this, true);
-				this.Left += this.dx;
-				this.Right += this.dx;
-			}
 			else
 				this.dx = 0;
 
 			if (this.translateY.TryEvaluate(State.Session, out L))
-			{
 				this.dy = State.GetDrawingSize(L, this, false);
-				this.Top += this.dy;
-				this.Bottom += this.dy;
-			}
 			else
 				this.dy = 0;
+
+			SKMatrix M = SKMatrix.CreateTranslation(this.dx, this.dy);
+			this.TransformBoundingBox(M);
 		}
 
 		private float dx;

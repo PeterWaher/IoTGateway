@@ -31,10 +31,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
 			if (this.image is null && !this.loadStarted)
 			{
@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 				this.image = this.LoadImage(State);
 			}
 
-			base.Measure(State);
+			base.MeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -86,14 +86,14 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (!(this.image is null))
 			{
 				State.Canvas.DrawImage(this.image, new SKRect(
 					this.xCoordinate, this.yCoordinate,
 					this.xCoordinate2, this.yCoordinate2));
 			}
+		
+			base.Draw(State);
 		}
 	}
 }

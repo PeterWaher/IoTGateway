@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -108,14 +107,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (X2 >= this.nrColumns)
 				X2 = this.nrColumns - 1;
 
-			float Right = this.GetRight(this.x - 1) + Element.Width;
+			float Right = this.GetRight(this.x - 1) + (Element.Width ?? 0);
 			float Right2 = this.GetRight(X2);
 			if (Right > Right2)
 				this.rights[X2] = Right;
 
 			int Y2 = this.y + RowSpan - 1;
 
-			float Bottom = this.GetBottom(this.y - 1) + Element.Height;
+			float Bottom = this.GetBottom(this.y - 1) + (Element.Height ?? 0);
 			float Bottom2 = this.GetBottom(Y2);
 			if (Bottom > Bottom2)
 				this.bottoms[Y2] = Bottom;
@@ -130,7 +129,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 		private void SetElement(int X, int Y, int ColSpan, int RowSpan, ILayoutElement Element)
 		{
-			GridPadding P = new GridPadding(Element, -Element.Left, -Element.Top, X, Y, ColSpan, RowSpan);
+			GridPadding P = new GridPadding(Element, 0, 0, X, Y, ColSpan, RowSpan);
 
 			if (ColSpan > 1 || RowSpan > 1)
 			{
@@ -189,6 +188,27 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Total height of layout
 		/// </summary>
 		public float TotHeight => this.GetBottom(this.bottoms.Count - 1);
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void MeasurePositions(DrawingState State)
+		{
+			ILayoutElement Element;
+
+			foreach (GridPadding P in this.elements)
+			{
+				Element = P.Element;
+
+				if (!(Element is null))
+				{
+					Element.MeasurePositions(State);
+					P.OffsetX -= Element.Left ?? 0;
+					P.OffsetY -= Element.Top ?? 0;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Aligns cells and returns an array of padded cells.

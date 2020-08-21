@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
-          backgroundId="WhiteBackground" penId="BlackPen" 
-          fontId="Text" textColor="Black">
+          background="WhiteBackground" pen="BlackPen" 
+          font="Text" textColor="Black">
   <SolidPen id="RedPen1" color="Red" width="1px"/>
   <SolidPen id="RedPen2" color="Red" width="1pt"/>
   <SolidPen id="RedPen3" color="Red" width="1pc"/>

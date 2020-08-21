@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Radius
 		/// </summary>
-		public LengthAttribute Radius
+		public LengthAttribute RadiusAttribute
 		{
 			get => this.radius;
 			set => this.radius = value;
@@ -83,15 +83,18 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.radius.TryEvaluate(State.Session, out Length R))
+			{
 				this.r = State.GetDrawingSize(R, this, true);
+				this.Width = this.Height = 2 * this.r;
+			}
 			else
 				this.defined = false;
 
@@ -110,8 +113,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 			{
 				if (this.TryGetFill(State, out SKPaint Fill))
@@ -120,6 +121,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (this.TryGetPen(State, out SKPaint Pen))
 					State.Canvas.DrawCircle(this.xCoordinate, this.yCoordinate, this.r, Pen);
 			}
+		
+			base.Draw(State);
 		}
 	}
 }

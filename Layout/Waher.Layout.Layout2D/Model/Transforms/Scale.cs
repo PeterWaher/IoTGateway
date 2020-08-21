@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Scale X
 		/// </summary>
-		public FloatAttribute ScaleX
+		public FloatAttribute ScaleXAttribute
 		{
 			get => this.scaleX;
 			set => this.scaleX = value;
@@ -40,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Scale Y
 		/// </summary>
-		public FloatAttribute ScaleY
+		public FloatAttribute ScaleYAttribute
 		{
 			get => this.scaleY;
 			set => this.scaleY = value;
@@ -97,12 +97,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.scaleX.TryEvaluate(State.Session, out this.sx))
 				this.sx = 1;

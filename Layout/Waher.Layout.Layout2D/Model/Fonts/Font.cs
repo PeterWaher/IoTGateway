@@ -36,7 +36,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Name
 		/// </summary>
-		public StringAttribute Name
+		public StringAttribute NameAttribute
 		{
 			get => this.name;
 			set => this.name = value;
@@ -45,7 +45,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Size
 		/// </summary>
-		public LengthAttribute Size
+		public LengthAttribute SizeAttribute
 		{
 			get => this.size;
 			set => this.size = value;
@@ -54,7 +54,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Weight
 		/// </summary>
-		public EnumAttribute<SKFontStyleWeight> Weight
+		public EnumAttribute<SKFontStyleWeight> WeightAttribute
 		{
 			get => this.weight;
 			set => this.weight = value;
@@ -72,7 +72,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Slant
 		/// </summary>
-		public EnumAttribute<SKFontStyleSlant> Slant
+		public EnumAttribute<SKFontStyleSlant> SlantAttribute
 		{
 			get => this.slant;
 			set => this.slant = value;
@@ -81,7 +81,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// <summary>
 		/// Color
 		/// </summary>
-		public ColorAttribute Color
+		public ColorAttribute ColorAttribute
 		{
 			get => this.color;
 			set => this.color = value;
@@ -148,5 +148,76 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 				Dest.color = this.color.CopyIfNotPreset();
 			}
 		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasureDimensions(DrawingState State)
+		{
+			base.MeasureDimensions(State);
+
+			float Size;
+			int Weight;
+			int Width;
+			
+			if (!this.name.TryEvaluate(State.Session, out string Name))
+				Name = State.Font.Typeface.FamilyName;
+
+			if (this.size.TryEvaluate(State.Session, out Length Length))
+				Size = State.GetDrawingSize(Length, this, false);
+			else
+				Size = State.Font.Size;
+
+			if (this.weight.TryEvaluate(State.Session, out SKFontStyleWeight W))
+				Weight = (int)W;
+			else
+				Weight = State.Font.Typeface.FontWeight;
+
+			if (this.width.TryEvaluate(State.Session, out SKFontStyleWidth W2))
+				Width = (int)W2;
+			else
+				Width = State.Font.Typeface.FontWidth;
+
+			if (!this.slant.TryEvaluate(State.Session, out SKFontStyleSlant Slant))
+				Slant = State.Font.Typeface.FontSlant;
+
+			if (!this.color.TryEvaluate(State.Session, out SKColor Color))
+				Color = State.Text.Color;
+
+			this.font = new SKFont()
+			{
+				Edging = SKFontEdging.SubpixelAntialias,
+				Hinting = SKFontHinting.Full,
+				Subpixel = true,
+				Size = (float)(Size * State.PixelsPerInch / 72),
+				Typeface = SKTypeface.FromFamilyName(Name, Weight, Width, Slant)
+			};
+
+			this.text = new SKPaint()
+			{
+				FilterQuality = SKFilterQuality.High,
+				HintingLevel = SKPaintHinting.Full,
+				SubpixelText = true,
+				IsAntialias = true,
+				Style = SKPaintStyle.Fill,
+				Color = Color,
+				Typeface = this.font.Typeface,
+				TextSize = this.font.Size
+			};
+		}
+
+		private SKFont font;
+		private SKPaint text;
+
+		/// <summary>
+		/// Measured Font
+		/// </summary>
+		public SKFont FontDef => this.font;
+
+		/// <summary>
+		/// Measured Text
+		/// </summary>
+		public SKPaint Text => this.text;
 	}
 }

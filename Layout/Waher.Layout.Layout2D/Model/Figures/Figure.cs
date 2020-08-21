@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Pen
 		/// </summary>
-		public StringAttribute Pen
+		public StringAttribute PenAttribute
 		{
 			get => this.pen;
 			set => this.pen = value;
@@ -39,7 +39,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Fill
 		/// </summary>
-		public StringAttribute Fill
+		public StringAttribute FillAttribute
 		{
 			get => this.fill;
 			set => this.fill = value;
@@ -94,7 +94,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			if (this.pen.TryEvaluate(State.Session, out string PenId))
 			{
-				if (State.TryGetElement(PenId, out ILayoutElement E) &&
+				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
 					E is Pen PenDefinition)
 				{
 					return PenDefinition.Paint;
@@ -118,7 +118,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			if (this.pen.TryEvaluate(State.Session, out string PenId))
 			{
-				if (State.TryGetElement(PenId, out ILayoutElement E) &&
+				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
 					E is Pen PenDefinition)
 				{
 					Pen = PenDefinition.Paint;
@@ -145,7 +145,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			if (this.fill.TryEvaluate(State.Session, out string FillId))
 			{
-				if (State.TryGetElement(FillId, out ILayoutElement E) &&
+				if (this.Document.TryGetElement(FillId, out ILayoutElement E) &&
 					E is Background FillDefinition)
 				{
 					Fill = FillDefinition.Paint;

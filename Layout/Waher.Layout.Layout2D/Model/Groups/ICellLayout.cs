@@ -17,6 +17,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		void Add(ILayoutElement Element);
 
 		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		void MeasurePositions(DrawingState State);
+
+		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
 		/// </summary>
 		/// <returns>Array of padded cells.</returns>

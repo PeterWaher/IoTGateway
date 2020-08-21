@@ -39,7 +39,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Radius
 		/// </summary>
-		public LengthAttribute Radius
+		public LengthAttribute RadiusAttribute
 		{
 			get => this.radius;
 			set => this.radius = value;
@@ -48,7 +48,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Start Degrees
 		/// </summary>
-		public FloatAttribute StartDegrees
+		public FloatAttribute StartDegreesAttribute
 		{
 			get => this.startDegrees;
 			set => this.startDegrees = value;
@@ -57,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// End Degrees
 		/// </summary>
-		public FloatAttribute EndDegrees
+		public FloatAttribute EndDegreesAttribute
 		{
 			get => this.endDegrees;
 			set => this.endDegrees = value;
@@ -66,7 +66,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Clockwise
 		/// </summary>
-		public BooleanAttribute Clockwise
+		public BooleanAttribute ClockwiseAttribute
 		{
 			get => this.clockwise;
 			set => this.clockwise = value;
@@ -75,7 +75,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Include center point
 		/// </summary>
-		public BooleanAttribute Center
+		public BooleanAttribute CenterAttribute
 		{
 			get => this.center;
 			set => this.center = value;
@@ -141,12 +141,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.radius.TryEvaluate(State.Session, out Length R))
 				this.r = State.GetDrawingSize(R, this, true);
@@ -228,8 +228,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 			{
 				float Sweep;
@@ -264,6 +262,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (this.TryGetPen(State, out SKPaint Pen))
 					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Pen);
 			}
+		
+			base.Draw(State);
 		}
 
 	}

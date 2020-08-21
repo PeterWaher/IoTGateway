@@ -82,7 +82,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Order
 		/// </summary>
-		public EnumAttribute<FlexibleOrder> Order
+		public EnumAttribute<FlexibleOrder> OrderAttribute
 		{
 			get => this.order;
 			set => this.order = value;
@@ -91,7 +91,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Horizontal Direction
 		/// </summary>
-		public EnumAttribute<HorizontalDirection> HorizontalDirection
+		public EnumAttribute<HorizontalDirection> HorizontalDirectionAttribute
 		{
 			get => this.horizontalDirection;
 			set => this.horizontalDirection = value;
@@ -100,7 +100,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Vertical Direction
 		/// </summary>
-		public EnumAttribute<VerticalDirection> VerticalDirection
+		public EnumAttribute<VerticalDirection> VerticalDirectionAttribute
 		{
 			get => this.verticalDirection;
 			set => this.verticalDirection = value;
@@ -109,7 +109,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<HorizontalAlignment> HorizontalAlignment
+		public EnumAttribute<HorizontalAlignment> HorizontalAlignmentAttribute
 		{
 			get => this.halign;
 			set => this.halign = value;
@@ -118,7 +118,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Degrees
 		/// </summary>
-		public EnumAttribute<VerticalAlignment> VerticalAlignment
+		public EnumAttribute<VerticalAlignment> VerticalAlignmentAttribute
 		{
 			get => this.valign;
 			set => this.valign = value;

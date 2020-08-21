@@ -32,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Radius X
 		/// </summary>
-		public LengthAttribute RadiusX
+		public LengthAttribute RadiusXAttribute
 		{
 			get => this.radiusX;
 			set => this.radiusX = value;
@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Radius Y
 		/// </summary>
-		public LengthAttribute RadiusY
+		public LengthAttribute RadiusYAttribute
 		{
 			get => this.radiusY;
 			set => this.radiusY = value;
@@ -98,12 +98,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.radiusX.TryEvaluate(State.Session, out Length L))
 				this.rx = State.GetDrawingSize(L, this, true);
@@ -134,10 +134,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			if (this.defined)
 			{
-				this.defined = false;
-				base.Draw(State);
-				this.defined = true;
-
 				if (this.TryGetFill(State, out SKPaint Fill))
 				{
 					State.Canvas.DrawRoundRect(this.xCoordinate, this.yCoordinate,
@@ -153,6 +149,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 						this.yCoordinate2 - this.yCoordinate,
 						this.rx, this.ry, Pen);
 				}
+
+				this.defined = false;
+				base.Draw(State);
+				this.defined = true;
 			}
 			else
 				base.Draw(State);

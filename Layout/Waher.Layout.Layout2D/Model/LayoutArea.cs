@@ -67,7 +67,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Maximum Width
 		/// </summary>
-		public LengthAttribute MaxWidth
+		public LengthAttribute MaxWidthAttribute
 		{
 			get => this.maxWidth;
 			set => this.maxWidth = value;
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Maximum Height
 		/// </summary>
-		public LengthAttribute MaxHeight
+		public LengthAttribute MaxHeightAttribute
 		{
 			get => this.maxHeight;
 			set => this.maxHeight = value;
@@ -85,7 +85,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Minimum Width
 		/// </summary>
-		public LengthAttribute MinWidth
+		public LengthAttribute MinWidthAttribute
 		{
 			get => this.minWidth;
 			set => this.minWidth = value;
@@ -94,7 +94,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Minimum Height
 		/// </summary>
-		public LengthAttribute MinHeight
+		public LengthAttribute MinHeightAttribute
 		{
 			get => this.minHeight;
 			set => this.minHeight = value;
@@ -103,7 +103,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Keep aspect-ratio
 		/// </summary>
-		public BooleanAttribute KeepAspectRatio
+		public BooleanAttribute KeepAspectRatioAttribute
 		{
 			get => this.keepAspectRatio;
 			set => this.keepAspectRatio = value;
@@ -112,7 +112,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Overflow
 		/// </summary>
-		public EnumAttribute<Overflow> Overflow
+		public EnumAttribute<Overflow> OverflowAttribute
 		{
 			get => this.overflow;
 			set => this.overflow = value;
@@ -121,7 +121,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// OnClick event script
 		/// </summary>
-		public ExpressionAttribute OnClick
+		public ExpressionAttribute OnClickAttribute
 		{
 			get => this.onClick;
 			set => this.onClick = value;
@@ -258,6 +258,33 @@ namespace Waher.Layout.Layout2D.Model
 		public float? GetHeightEstimate(DrawingState State)
 		{
 			return this.GetSize(State, false, this.height, this.minHeight, this.maxHeight);
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasureDimensions(DrawingState State)
+		{
+			base.MeasureDimensions(State);
+
+			if (this.width.TryEvaluate(State.Session, out Length L))
+				this.Width = State.GetDrawingSize(L, this, true);
+
+			if (this.height.TryEvaluate(State.Session, out L))
+				this.Height = State.GetDrawingSize(L, this, false);
+
+			if (this.minWidth.TryEvaluate(State.Session, out L))
+				this.MinWidth = State.GetDrawingSize(L, this, true);
+
+			if (this.maxWidth.TryEvaluate(State.Session, out L))
+				this.MaxWidth = State.GetDrawingSize(L, this, true);
+
+			if (this.minHeight.TryEvaluate(State.Session, out L))
+				this.MinHeight = State.GetDrawingSize(L, this, true);
+
+			if (this.maxHeight.TryEvaluate(State.Session, out L))
+				this.MaxHeight = State.GetDrawingSize(L, this, true);
 		}
 
 	}

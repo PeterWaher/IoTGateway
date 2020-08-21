@@ -76,5 +76,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				this.cell.AlignedMeasuredCell(MaxWidth, MaxHeight, Session);
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return "(" + this.offsetX.ToString() + ", " + this.offsetY.ToString() + "): " + this.element.ToString();
+		}
 	}
 }

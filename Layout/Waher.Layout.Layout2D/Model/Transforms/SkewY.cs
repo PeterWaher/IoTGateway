@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <summary>
 		/// Factor
 		/// </summary>
-		public FloatAttribute Factor
+		public FloatAttribute FactorAttribute
 		{
 			get => this.factor;
 			set => this.factor = value;
@@ -82,12 +82,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.factor.TryEvaluate(State.Session, out this.sy))
 			{

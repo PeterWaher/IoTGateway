@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -21,6 +22,16 @@ namespace Waher.Layout.Layout2D.Model
 		private readonly Layout2DDocument document;
 		private readonly ILayoutElement parent;
 		private bool isVisible = true;
+		private float? left;
+		private float? right;
+		private float? top;
+		private float? bottom;
+		private float? width;
+		private float? height;
+		private float? minWidth;
+		private float? minHeight;
+		private float? maxWidth;
+		private float? maxHeight;
 
 		/// <summary>
 		/// If element is well-defined.
@@ -59,55 +70,304 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Left coordinate of bounding box, after measurement.
 		/// </summary>
-		public float Left
+		public float? Left
 		{
-			get;
-			set;
+			get
+			{
+				if (this.left.HasValue)
+					return this.left;
+				else if (this.right.HasValue && this.width.HasValue)
+					return this.right.Value - this.width.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				this.left = value;
+				if (this.left.HasValue)
+				{
+					if (this.width.HasValue)
+						this.right = null;
+					else if (this.minWidth.HasValue || this.maxWidth.HasValue)
+					{
+						float? W = this.Width;
+						if (W.HasValue)
+						{
+							if (this.minWidth.HasValue && W.Value < this.minWidth.Value)
+								this.right = this.left.Value + this.minWidth.Value;
+							else if (this.maxWidth.HasValue && W.Value > this.maxWidth.Value)
+								this.right = this.left.Value + this.maxWidth.Value;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Right coordinate of bounding box, after measurement.
 		/// </summary>
-		public float Right
+		public float? Right
 		{
-			get;
-			set;
+			get
+			{
+				if (this.right.HasValue)
+					return this.right;
+				else if (this.left.HasValue && this.width.HasValue)
+					return this.left.Value + this.width.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				this.right = value;
+				if (this.right.HasValue)
+				{
+					if (this.width.HasValue)
+						this.left = null;
+					else if (this.minWidth.HasValue || this.maxWidth.HasValue)
+					{
+						float? W = this.Width;
+						if (W.HasValue)
+						{
+							if (this.minWidth.HasValue && W.Value < this.minWidth.Value)
+								this.left = this.right.Value - this.minWidth.Value;
+							else if (this.maxWidth.HasValue && W.Value > this.maxWidth.Value)
+								this.left = this.right.Value - this.maxWidth.Value;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Top coordinate of bounding box, after measurement.
 		/// </summary>
-		public float Top
+		public float? Top
 		{
-			get;
-			set;
+			get
+			{
+				if (this.top.HasValue)
+					return this.top;
+				else if (this.bottom.HasValue && this.height.HasValue)
+					return this.bottom.Value - this.height.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				this.top = value;
+				if (this.top.HasValue)
+				{
+					if (this.height.HasValue)
+						this.bottom = null;
+					else if (this.minHeight.HasValue || this.maxHeight.HasValue)
+					{
+						float? H = this.Height;
+						if (H.HasValue)
+						{
+							if (this.minHeight.HasValue && H.Value < this.minHeight.Value)
+								this.bottom = this.top.Value + this.minHeight.Value;
+							else if (this.maxHeight.HasValue && H.Value > this.maxHeight.Value)
+								this.bottom = this.top.Value + this.maxHeight.Value;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Bottom coordinate of bounding box, after measurement.
 		/// </summary>
-		public float Bottom
+		public float? Bottom
 		{
-			get;
-			set;
+			get
+			{
+				if (this.bottom.HasValue)
+					return this.bottom;
+				else if (this.top.HasValue && this.height.HasValue)
+					return this.top.Value + this.height.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				this.bottom = value;
+				if (this.bottom.HasValue)
+				{
+					if (this.height.HasValue)
+						this.top = null;
+					else if (this.minHeight.HasValue || this.maxHeight.HasValue)
+					{
+						float? H = this.Height;
+						if (H.HasValue)
+						{
+							if (this.minHeight.HasValue && H.Value < this.minHeight.Value)
+								this.top = this.bottom.Value - this.minHeight.Value;
+							else if (this.maxHeight.HasValue && H.Value > this.maxHeight.Value)
+								this.top = this.bottom.Value - this.maxHeight.Value;
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
 		/// Width of element
 		/// </summary>
-		public float Width
+		public float? Width
 		{
-			get => this.Right - this.Left;
-			set => this.Right = this.Left + value;
+			get
+			{
+				if (this.width.HasValue)
+					return this.width;
+				else if (this.left.HasValue && this.right.HasValue)
+					return this.right.Value - this.left.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				if (value.HasValue)
+				{
+					if (this.minWidth.HasValue && value.Value < this.minWidth.Value)
+						value = this.minWidth;
+					else if (this.maxWidth.HasValue && value.Value > this.maxWidth.Value)
+						value = this.maxWidth;
+
+					if (this.left.HasValue)
+						this.right = null;
+				}
+
+				this.width = value;
+			}
 		}
 
 		/// <summary>
 		/// Height of element
 		/// </summary>
-		public float Height
+		public float? Height
 		{
-			get => this.Bottom - this.Top;
-			set => this.Bottom = this.Top + value;
+			get
+			{
+				if (this.height.HasValue)
+					return this.height;
+				else if (this.top.HasValue && this.bottom.HasValue)
+					return this.bottom.Value - this.top.Value;
+				else
+					return null;
+			}
+
+			set
+			{
+				if (value.HasValue)
+				{
+					if (this.minHeight.HasValue && value.Value < this.minHeight.Value)
+						value = this.minHeight;
+					else if (this.maxHeight.HasValue && value.Value > this.maxHeight.Value)
+						value = this.maxHeight;
+
+					if (this.top.HasValue)
+						this.bottom = null;
+				}
+
+				this.height = value;
+			}
+		}
+
+		/// <summary>
+		/// Minimum width.
+		/// </summary>
+		public float? MinWidth
+		{
+			get => this.minWidth;
+			set
+			{
+				this.minWidth = value;
+				if (value.HasValue)
+				{
+					float? W = this.Width;
+					if (W.HasValue && W.Value < this.minWidth.Value)
+						this.Width = this.minWidth;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Maximum width.
+		/// </summary>
+		public float? MaxWidth
+		{
+			get => this.maxWidth;
+			set
+			{
+				this.maxWidth = value;
+				if (value.HasValue)
+				{
+					float? W = this.Width;
+					if (W.HasValue && W.Value > this.maxWidth.Value)
+						this.Width = this.maxWidth;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Minimum height.
+		/// </summary>
+		public float? MinHeight
+		{
+			get => this.minHeight;
+			set
+			{
+				this.minHeight = value;
+				if (value.HasValue)
+				{
+					float? H = this.Height;
+					if (H.HasValue && H.Value < this.minHeight.Value)
+						this.Height = this.minHeight;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Maximum height.
+		/// </summary>
+		public float? MaxHeight
+		{
+			get => this.maxHeight;
+			set
+			{
+				this.maxHeight = value;
+				if (value.HasValue)
+				{
+					float? H = this.Height;
+					if (H.HasValue && H.Value > this.maxHeight.Value)
+						this.Height = this.maxHeight;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Bounding rectangle.
+		/// </summary>
+		public SKRect? BoundingRect
+		{
+			get
+			{
+				float? X = this.Left;
+				float? Y = this.Top;
+				float? R = this.Right;
+				float? B = this.Bottom;
+
+				if (X.HasValue && Y.HasValue && R.HasValue && B.HasValue)
+					return new SKRect(X.Value, Y.Value, R.Value, B.Value);
+				else
+					return null;
+			}
 		}
 
 		/// <summary>
@@ -128,6 +388,24 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		public virtual void Dispose()
 		{
+		}
+
+		/// <summary>
+		/// ID of element
+		/// </summary>
+		public StringAttribute IdAttribute
+		{
+			get => this.id;
+			set => this.id = value;
+		}
+
+		/// <summary>
+		/// Visibility attribute
+		/// </summary>
+		public BooleanAttribute VisibleAttribute
+		{
+			get => this.visible;
+			set => this.visible = value;
 		}
 
 		/// <summary>
@@ -196,18 +474,49 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public virtual void Measure(DrawingState State)
+		public virtual void MeasureDimensions(DrawingState State)
 		{
-			if (this.id.TryEvaluate(State.Session, out string Id) && !string.IsNullOrEmpty(Id))
-				State.AddElementId(Id, this);
-
 			if (this.visible.TryEvaluate(State.Session, out bool b))
 				this.isVisible = b;
 
 			this.defined = true;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public virtual void MeasurePositions(DrawingState State)
+		{
+		}
+
+		/// <summary>
+		/// Transforms the measured bounding box.
+		/// </summary>
+		/// <param name="M">Transformation matrix.</param>
+		protected void TransformBoundingBox(SKMatrix M)
+		{
+			float? L = this.Left;
+			float? R = this.Right;
+			float? T = this.Top;
+			float? B = this.Bottom;
+
+			if (L.HasValue && R.HasValue && T.HasValue && B.HasValue)
+			{
+				SKRect Rect = new SKRect(L.Value, T.Value, R.Value, B.Value);
+
+				Rect = M.MapRect(Rect);
+
+				this.width = null;
+				this.height = null;
+				this.left = Rect.Left;
+				this.top = Rect.Top;
+				this.right = Rect.Right;
+				this.bottom = Rect.Bottom;
+			}
 		}
 
 		/// <summary>
@@ -239,10 +548,10 @@ namespace Waher.Layout.Layout2D.Model
 			}
 			else if (!(RefAttribute is null) &&
 				RefAttribute.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element))
+				this.Document.TryGetElement(RefId, out ILayoutElement Element))
 			{
-				X = Element.Left;
-				Y = Element.Top;
+				X = Element.Left ?? 0;
+				Y = Element.Top ?? 0;
 
 				return true;
 			}
@@ -317,6 +626,49 @@ namespace Waher.Layout.Layout2D.Model
 		public static float CalcDirection(Vertex P1, Vertex P2)
 		{
 			return CalcDirection(P2.XCoordinate - P1.XCoordinate, P2.YCoordinate - P1.YCoordinate);
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append('(');
+
+			if (this.left.HasValue)
+				sb.Append(this.left.Value.ToString());
+
+			sb.Append(", ");
+
+			if (this.top.HasValue)
+				sb.Append(this.right.Value.ToString());
+
+			sb.Append(") - (");
+
+			if (this.right.HasValue)
+				sb.Append(this.right.Value.ToString());
+
+			sb.Append(", ");
+
+			if (this.bottom.HasValue)
+				sb.Append(this.bottom.Value.ToString());
+
+			sb.Append(") (");
+
+			if (this.width.HasValue)
+				sb.Append(this.width.Value.ToString());
+
+			sb.Append(" x ");
+
+			if (this.height.HasValue)
+				sb.Append(this.height.Value.ToString());
+
+			sb.Append("): ");
+			sb.Append(this.LocalName);
+
+			return sb.ToString();
 		}
 	}
 }

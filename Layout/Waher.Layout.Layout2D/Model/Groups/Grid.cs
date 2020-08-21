@@ -32,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <summary>
 		/// Columns
 		/// </summary>
-		public PositiveIntegerAttribute Columns
+		public PositiveIntegerAttribute ColumnsAttribute
 		{
 			get => this.columns;
 			set => this.columns = value;

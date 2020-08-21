@@ -41,8 +41,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 			{
 				using (SKPath Path = new SKPath())
@@ -69,6 +67,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 						State.Canvas.DrawPath(Path, Pen);
 				}
 			}
+		
+			base.Draw(State);
 		}
 	}
 }

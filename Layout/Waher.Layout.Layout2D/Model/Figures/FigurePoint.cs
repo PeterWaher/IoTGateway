@@ -26,7 +26,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// X-coordinate
 		/// </summary>
-		public LengthAttribute X
+		public LengthAttribute XAttribute
 		{
 			get => this.x;
 			set => this.x = value;
@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Y-coordinate
 		/// </summary>
-		public LengthAttribute Y
+		public LengthAttribute YAttribute
 		{
 			get => this.y;
 			set => this.y = value;
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Reference
 		/// </summary>
-		public StringAttribute Reference
+		public StringAttribute ReferenceAttribute
 		{
 			get => this._ref;
 			set => this._ref = value;
@@ -93,12 +93,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.IncludePoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate))
 			{

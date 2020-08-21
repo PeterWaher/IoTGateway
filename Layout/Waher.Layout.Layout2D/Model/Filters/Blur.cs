@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Sigma X
 		/// </summary>
-		public FloatAttribute SigmaX
+		public FloatAttribute SigmaXAttribute
 		{
 			get => this.sigmaX;
 			set => this.sigmaX = value;
@@ -42,7 +42,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Sigma Y
 		/// </summary>
-		public FloatAttribute SigmaY
+		public FloatAttribute SigmaYAttribute
 		{
 			get => this.sigmaY;
 			set => this.sigmaY = value;
@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// <summary>
 		/// Tile Mode
 		/// </summary>
-		public EnumAttribute<SKShaderTileMode> TileMode
+		public EnumAttribute<SKShaderTileMode> TileModeAttribute
 		{
 			get => this.tileMode;
 			set => this.tileMode = value;

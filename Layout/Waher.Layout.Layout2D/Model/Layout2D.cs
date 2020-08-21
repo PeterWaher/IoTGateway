@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Fonts;
+using Waher.Layout.Layout2D.Model.Pens;
 
 namespace Waher.Layout.Layout2D.Model.Backgrounds
 {
@@ -10,9 +12,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 	/// </summary>
 	public class Layout2D : LayoutContainer
 	{
-		private StringAttribute fontId;
-		private StringAttribute penId;
-		private StringAttribute backgroundId;
+		private StringAttribute font;
+		private StringAttribute pen;
+		private StringAttribute background;
 		private ColorAttribute textColor;
 
 		/// <summary>
@@ -33,34 +35,34 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// <summary>
 		/// Font ID
 		/// </summary>
-		public StringAttribute FontId
+		public StringAttribute FontIdAttribute
 		{
-			get => this.fontId;
-			set => this.fontId = value;
+			get => this.font;
+			set => this.font = value;
 		}
 
 		/// <summary>
 		/// Pen ID
 		/// </summary>
-		public StringAttribute PenId
+		public StringAttribute PenIdAttribute
 		{
-			get => this.penId;
-			set => this.penId = value;
+			get => this.pen;
+			set => this.pen = value;
 		}
 
 		/// <summary>
 		/// Background ID
 		/// </summary>
-		public StringAttribute BackgroundId
+		public StringAttribute BackgroundIdAttribute
 		{
-			get => this.backgroundId;
-			set => this.backgroundId = value;
+			get => this.background;
+			set => this.background = value;
 		}
 
 		/// <summary>
 		/// Text Color
 		/// </summary>
-		public ColorAttribute TextColor
+		public ColorAttribute TextColorAttribute
 		{
 			get => this.textColor;
 			set => this.textColor = value;
@@ -74,9 +76,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			base.FromXml(Input);
 
-			this.fontId = new StringAttribute(Input, "fontId");
-			this.penId = new StringAttribute(Input, "penId");
-			this.backgroundId = new StringAttribute(Input, "backgroundId");
+			this.font = new StringAttribute(Input, "font");
+			this.pen = new StringAttribute(Input, "pen");
+			this.background = new StringAttribute(Input, "background");
 			this.textColor = new ColorAttribute(Input, "textColor");
 		}
 
@@ -88,9 +90,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			base.ExportAttributes(Output);
 
-			this.fontId.Export(Output);
-			this.penId.Export(Output);
-			this.backgroundId.Export(Output);
+			this.font.Export(Output);
+			this.pen.Export(Output);
+			this.background.Export(Output);
 			this.textColor.Export(Output);
 		}
 
@@ -115,11 +117,113 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (Destination is Layout2D Dest)
 			{
-				Dest.fontId = this.fontId.CopyIfNotPreset();
-				Dest.penId = this.penId.CopyIfNotPreset();
-				Dest.backgroundId = this.backgroundId.CopyIfNotPreset();
+				Dest.font = this.font.CopyIfNotPreset();
+				Dest.pen = this.pen.CopyIfNotPreset();
+				Dest.background = this.background.CopyIfNotPreset();
 				Dest.textColor = this.textColor.CopyIfNotPreset();
 			}
+		}
+
+		private Font fontDef = null;
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasureDimensions(DrawingState State)
+		{
+			SKFont FontBak = null;
+			SKPaint TextBak = null;
+
+			if (this.font.TryEvaluate(State.Session, out string FontId) &&
+				this.Document.TryGetElement(FontId, out ILayoutElement Element) &&
+				Element is Font Font)
+			{
+				this.fontDef = Font;
+				Font.MeasureDimensions(State);	// Not measured before.
+				
+				FontBak = State.Font;
+				State.Font = this.fontDef.FontDef;
+
+				TextBak = State.Text;
+				State.Text = this.fontDef.Text;
+			}
+
+			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
+				this.Document.TryGetElement(PenId, out Element) &&
+				Element is Pen Pen)
+			{
+				// TODO
+			}
+
+			if (this.background.TryEvaluate(State.Session, out string BackgroundId) &&
+				this.Document.TryGetElement(BackgroundId, out Element) &&
+				Element is Background Background)
+			{
+				// TODO
+			}
+
+			base.MeasureDimensions(State);
+
+			if (!(FontBak is null))
+				State.Font = FontBak;
+
+			if (!(TextBak is null))
+				State.Text = TextBak;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			SKFont FontBak = null;
+			SKPaint TextBak = null;
+
+			if (!(this.fontDef is null))
+			{
+				FontBak = State.Font;
+				State.Font = this.fontDef.FontDef;
+
+				TextBak = State.Text;
+				State.Text = this.fontDef.Text;
+			}
+
+			base.MeasurePositions(State);
+
+			if (!(FontBak is null))
+				State.Font = FontBak;
+
+			if (!(TextBak is null))
+				State.Text = TextBak;
+		}
+
+		/// <summary>
+		/// Draws layout entities.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void Draw(DrawingState State)
+		{
+			SKFont FontBak = null;
+			SKPaint TextBak = null;
+
+			if (!(this.fontDef is null))
+			{
+				FontBak = State.Font;
+				State.Font = this.fontDef.FontDef;
+
+				TextBak = State.Text;
+				State.Text = this.fontDef.Text;
+			}
+
+			base.Draw(State);
+
+			if (!(FontBak is null))
+				State.Font = FontBak;
+
+			if (!(TextBak is null))
+				State.Text = TextBak;
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// X-coordinate 3
 		/// </summary>
-		public LengthAttribute X3
+		public LengthAttribute X3Attribute
 		{
 			get => this.x3;
 			set => this.x3 = value;
@@ -35,7 +35,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Y-coordinate 3
 		/// </summary>
-		public LengthAttribute Y3
+		public LengthAttribute Y3Attribute
 		{
 			get => this.y3;
 			set => this.y3 = value;
@@ -44,7 +44,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Reference 3
 		/// </summary>
-		public StringAttribute Reference3
+		public StringAttribute Reference3Attribute
 		{
 			get => this.ref3;
 			set => this.ref3 = value;
@@ -93,12 +93,12 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.CalcPoint(State, this.x3, this.y3, this.ref3, out this.xCoordinate3, out this.yCoordinate3))
 				this.defined = false;

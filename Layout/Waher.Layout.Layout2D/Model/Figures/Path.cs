@@ -38,7 +38,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Head
 		/// </summary>
-		public StringAttribute Head
+		public StringAttribute HeadAttribute
 		{
 			get => this.head;
 			set => this.head = value;
@@ -47,7 +47,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Tail
 		/// </summary>
-		public StringAttribute Tail
+		public StringAttribute TailAttribute
 		{
 			get => this.tail;
 			set => this.tail = value;
@@ -56,7 +56,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <summary>
 		/// Shape Fill
 		/// </summary>
-		public StringAttribute ShapeFill
+		public StringAttribute ShapeFillAttribute
 		{
 			get => this.shapeFill;
 			set => this.shapeFill = value;
@@ -140,31 +140,31 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			PathState PathState = new PathState(this, null, false, false);
 
 			if (this.head.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is Shape Shape)
 			{
 				this.headElement = Shape;
 			}
 
 			if (this.tail.TryEvaluate(State.Session, out RefId) &&
-				State.TryGetElement(RefId, out Element) &&
+				this.Document.TryGetElement(RefId, out Element) &&
 				Element is Shape Shape2)
 			{
 				this.tailElement = Shape2;
 			}
 
 			if (this.shapeFill.TryEvaluate(State.Session, out RefId) &&
-				State.TryGetElement(RefId, out Element) &&
+				this.Document.TryGetElement(RefId, out Element) &&
 				Element is Background Background)
 			{
 				this.shapeFiller = Background;
@@ -187,8 +187,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (!this.TryGetFill(State, out SKPaint Fill))
 				Fill = null;
 
@@ -224,6 +222,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.tailElement?.DrawTail(State, this, Pen, Fill);
 				this.headElement?.DrawHead(State, this, Pen, Fill);
 			}
+		
+			base.Draw(State);
 		}
 
 		/// <summary>

@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <summary>
 		/// Color
 		/// </summary>
-		public ColorAttribute Color
+		public ColorAttribute ColorAttribute
 		{
 			get => this.color;
 			set => this.color = value;

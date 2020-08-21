@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	public interface ISegment : ILayoutElement
 	{
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>

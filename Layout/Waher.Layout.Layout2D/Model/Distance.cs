@@ -65,12 +65,12 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.distance.TryEvaluate(State.Session, out Length L))
 				this.dist = State.GetDrawingSize(L, this, true);

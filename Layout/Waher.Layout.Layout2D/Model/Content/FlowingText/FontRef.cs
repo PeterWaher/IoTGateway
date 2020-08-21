@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <summary>
 		/// Font
 		/// </summary>
-		public StringAttribute Font
+		public StringAttribute FontAttribute
 		{
 			get => this.font;
 			set => this.font = value;

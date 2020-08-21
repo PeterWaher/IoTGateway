@@ -32,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Radius X
 		/// </summary>
-		public LengthAttribute RadiusX
+		public LengthAttribute RadiusXAttribute
 		{
 			get => this.radiusX;
 			set => this.radiusX = value;
@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Radius Y
 		/// </summary>
-		public LengthAttribute RadiusY
+		public LengthAttribute RadiusYAttribute
 		{
 			get => this.radiusY;
 			set => this.radiusY = value;
@@ -50,7 +50,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Clockwise
 		/// </summary>
-		public BooleanAttribute Clockwise
+		public BooleanAttribute ClockwiseAttribute
 		{
 			get => this.clockwise;
 			set => this.clockwise = value;

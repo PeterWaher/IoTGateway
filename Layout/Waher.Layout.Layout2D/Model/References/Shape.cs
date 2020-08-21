@@ -60,11 +60,9 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="PathState">Current path state.</param>
 		public void Measure(DrawingState State, PathState PathState)
 		{
-			ILayoutElement[] Children = this.Children;
-
-			if (!(Children is null))
+			if (this.HasChildren)
 			{
-				foreach (ILayoutElement E in Children)
+				foreach (ILayoutElement E in this.Children)
 				{
 					if (E.IsVisible && E is ISegment Segment)
 						Segment.Measure(State, PathState);
@@ -80,11 +78,9 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="Path">Path being generated.</param>
 		public void Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
-			ILayoutElement[] Children = this.Children;
-
-			if (!(Children is null))
+			if (this.HasChildren)
 			{
-				foreach (ILayoutElement E in Children)
+				foreach (ILayoutElement E in this.Children)
 				{
 					if (E.IsVisible && E is ISegment Segment)
 						Segment.Draw(State, PathState, Path);
@@ -132,8 +128,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		public void Draw(DrawingState State, SKPaint DefaultPen, SKPaint DefaultFill, 
 			float X, float Y, float Direction)
 		{
-			ILayoutElement[] Children = this.Children;
-			if (!(Children is null))
+			if (this.HasChildren)
 			{
 				SKPaint PenBak = null;
 				SKPaint FillBak = null;
@@ -158,7 +153,7 @@ namespace Waher.Layout.Layout2D.Model.References
 
 				try
 				{
-					foreach (ILayoutElement Element in Children)
+					foreach (ILayoutElement Element in this.Children)
 					{
 						if (Element is ISegment Segment)
 						{

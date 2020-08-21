@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <summary>
 		/// Reference
 		/// </summary>
-		public StringAttribute Reference
+		public StringAttribute ReferenceAttribute
 		{
 			get => this._ref;
 			set => this._ref = value;
@@ -83,22 +83,41 @@ namespace Waher.Layout.Layout2D.Model.References
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (this.defined &&
-				(!this._ref.TryEvaluate(State.Session, out string RefId) ||
-				!State.TryGetElement(RefId, out this.reference)))
+				this._ref.TryEvaluate(State.Session, out string RefId) &&
+				this.Document.TryGetElement(RefId, out this.reference))
 			{
-				this.defined = false;
+				this.reference = this.reference.Copy(this);
+				this.reference.MeasureDimensions(State);
+				this.Width = this.reference.Width;
+				this.Height = this.reference.Height;
 			}
+			else
+				this.defined = false;
 		}
 
 		private ILayoutElement reference;
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			if (this.defined)
+			{
+				this.reference.MeasurePositions(State);
+				this.Left = this.reference.Left;
+				this.Top = this.reference.Top;
+			}
+		}
 
 		/// <summary>
 		/// Draws layout entities.
@@ -106,10 +125,10 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			base.Draw(State);
-
 			if (this.defined)
 				this.reference.DrawShape(State);
+		
+			base.Draw(State);
 		}
 	}
 }

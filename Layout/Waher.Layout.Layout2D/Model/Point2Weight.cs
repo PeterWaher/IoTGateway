@@ -24,7 +24,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Weight
 		/// </summary>
-		public FloatAttribute Weight
+		public FloatAttribute WeightAttribute
 		{
 			get => this.w;
 			set => this.w = value;
@@ -65,12 +65,12 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties.
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Measure(DrawingState State)
+		public override void MeasureDimensions(DrawingState State)
 		{
-			base.Measure(State);
+			base.MeasureDimensions(State);
 
 			if (!this.w.TryEvaluate(State.Session, out this.weight))
 				this.defined = false;

@@ -31,7 +31,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <summary>
 		/// Filename
 		/// </summary>
-		public StringAttribute FileName
+		public StringAttribute FileNameAttribute
 		{
 			get => this.fileName;
 			set => this.fileName = value;

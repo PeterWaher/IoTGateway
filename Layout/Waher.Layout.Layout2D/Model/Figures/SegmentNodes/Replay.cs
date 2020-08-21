@@ -30,7 +30,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <summary>
 		/// Reference
 		/// </summary>
-		public StringAttribute Reference
+		public StringAttribute ReferenceAttribute
 		{
 			get => this._ref;
 			set => this._ref = value;
@@ -90,7 +90,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			if (this.defined &&
 				this._ref.TryEvaluate(State.Session, out string RefId) &&
-				State.TryGetElement(RefId, out ILayoutElement Element) &&
+				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is ISegment Segment)
 			{
 				this.reference = Segment;

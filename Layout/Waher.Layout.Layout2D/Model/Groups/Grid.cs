@@ -57,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			base.ExportAttributes(Output);
 
-			this.columns.Export(Output);
+			this.columns?.Export(Output);
 		}
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			base.CopyContents(Destination);
 
 			if (Destination is Grid Dest)
-				Dest.columns = this.columns.CopyIfNotPreset();
+				Dest.columns = this.columns?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -90,7 +90,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Cell layout object.</returns>
 		public override ICellLayout GetCellLayout(DrawingState State)
 		{
-			if (!this.columns.TryEvaluate(State.Session, out int NrColumns))
+			if (this.columns is null || !this.columns.TryEvaluate(State.Session, out int NrColumns))
 				NrColumns = 1;
 
 			return new GridCells(State.Session, NrColumns);

@@ -73,8 +73,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			base.ExportAttributes(Output);
 
-			this.expression.Export(Output);
-			this.variable.Export(Output);
+			this.expression?.Export(Output);
+			this.variable?.Export(Output);
 		}
 
 		/// <summary>
@@ -98,8 +98,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is ForEach Dest)
 			{
-				Dest.expression = this.expression.CopyIfNotPreset();
-				Dest.variable = this.variable.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset();
+				Dest.variable = this.variable?.CopyIfNotPreset();
 			}
 		}
 
@@ -107,34 +107,60 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			List<ILayoutElement> Measured = new List<ILayoutElement>();
-			object Result = this.expression.Evaluate(State.Session);
-			
-			if (Result is IEnumerable Set && 
-				this.HasChildren &&
-				this.variable.TryEvaluate(State.Session, out string VariableName))
+			if (this.measured is null)
 			{
-				IEnumerator e = Set.GetEnumerator();
+				List<ILayoutElement> Measured = new List<ILayoutElement>();
+				object Result = this.expression.Evaluate(State.Session);
 
-				while (e.MoveNext())
+				if (Result is IEnumerable Set &&
+					this.HasChildren &&
+					!(this.variable is null) &&
+					this.variable.TryEvaluate(State.Session, out string VariableName))
 				{
-					State.Session[VariableName] = e.Current;
+					IEnumerator e = Set.GetEnumerator();
 
-					foreach (ILayoutElement Child in this.Children)
+					while (e.MoveNext())
 					{
-						ILayoutElement Copy = Child.Copy(this);
-						Measured.Add(Copy);
-						Copy.MeasureDimensions(State);
+						State.Session[VariableName] = e.Current;
+
+						foreach (ILayoutElement Child in this.Children)
+						{
+							ILayoutElement Copy = Child.Copy(this);
+							Measured.Add(Copy);
+
+							if (Copy.MeasureDimensions(State))
+								Relative = true;
+
+							this.IncludeElement(Copy);
+						}
 					}
+				}
+
+				this.measured = Measured.ToArray();
+			}
+			else
+			{
+				foreach (ILayoutElement E in this.measured)
+				{
+					if (E.MeasureDimensions(State))
+						Relative = true;
+
+					this.IncludeElement(E);
 				}
 			}
 
-			this.measured = Measured.ToArray();
+			return Relative;
 		}
+
+		/// <summary>
+		/// If children dimensions are to be measured.
+		/// </summary>
+		protected override bool MeasureChildrenDimensions => false;
 
 	}
 }

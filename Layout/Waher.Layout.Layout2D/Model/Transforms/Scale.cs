@@ -66,8 +66,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.ExportAttributes(Output);
 
-			this.scaleX.Export(Output);
-			this.scaleY.Export(Output);
+			this.scaleX?.Export(Output);
+			this.scaleY?.Export(Output);
 		}
 
 		/// <summary>
@@ -91,8 +91,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			if (Destination is Scale Dest)
 			{
-				Dest.scaleX = this.scaleX.CopyIfNotPreset();
-				Dest.scaleY = this.scaleY.CopyIfNotPreset();
+				Dest.scaleX = this.scaleX?.CopyIfNotPreset();
+				Dest.scaleY = this.scaleY?.CopyIfNotPreset();
 			}
 		}
 
@@ -100,18 +100,21 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (!this.scaleX.TryEvaluate(State.Session, out this.sx))
+			if (this.scaleX is null || !this.scaleX.TryEvaluate(State.Session, out this.sx))
 				this.sx = 1;
 
-			if (!this.scaleY.TryEvaluate(State.Session, out this.sy))
+			if (this.scaleY is null || !this.scaleY.TryEvaluate(State.Session, out this.sy))
 				this.sy = 1;
 
 			SKMatrix M = SKMatrix.CreateScale(this.sx, this.sy, this.xCoordinate, this.yCoordinate);
 			this.TransformBoundingBox(M);
+
+			return Relative;
 		}
 
 		private float sx;

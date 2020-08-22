@@ -211,5 +211,22 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 			}
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			if (this.hasPresetValue)
+				return this.presetValue?.ToString();
+			else if (this.hasEvaluatedValue)
+				return this.evaluatedValue?.ToString();
+			else if (this.hasEvaluated)
+				return "<Evaluation error>";
+			else if (!(this.expression is null))
+				return this.expression.Script;
+			else
+				return "<Not set>";
+		}
+
 	}
 }

@@ -9,6 +9,7 @@ using Waher.Layout.Layout2D.Model.Images;
 using Waher.Layout.Layout2D.Model.Transforms;
 using Waher.Script;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Vectors;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 
@@ -97,9 +98,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			base.ExportAttributes(Output);
 
-			this.expression.Export(Output);
-			this.halign.Export(Output);
-			this.valign.Export(Output);
+			this.expression?.Export(Output);
+			this.halign?.Export(Output);
+			this.valign?.Export(Output);
 		}
 
 		/// <summary>
@@ -123,9 +124,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Script Dest)
 			{
-				Dest.expression = this.expression.CopyIfNotPreset();
-				Dest.halign = this.halign.CopyIfNotPreset();
-				Dest.valign = this.valign.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset();
+				Dest.halign = this.halign?.CopyIfNotPreset();
+				Dest.valign = this.valign?.CopyIfNotPreset();
 			}
 		}
 
@@ -133,13 +134,14 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			if (this.evaluated is null)
 			{
-				if (this.expression.TryEvaluate(State.Session, out this.parsed))
+				if (!(this.expression is null) && this.expression.TryEvaluate(State.Session, out this.parsed))
 				{
 					object Result;
 
@@ -281,6 +283,11 @@ namespace Waher.Layout.Layout2D.Model.Content
 				else
 					this.defined = false;
 			}
+
+			if (this.evaluated?.MeasureDimensions(State) ?? false)
+				Relative = true;
+
+			return Relative;
 		}
 
 		/// <summary>

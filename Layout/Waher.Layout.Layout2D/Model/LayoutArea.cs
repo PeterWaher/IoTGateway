@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Script;
@@ -154,15 +155,15 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportAttributes(Output);
 
-			this.width.Export(Output);
-			this.height.Export(Output);
-			this.maxWidth.Export(Output);
-			this.maxHeight.Export(Output);
-			this.minWidth.Export(Output);
-			this.minHeight.Export(Output);
-			this.keepAspectRatio.Export(Output);
-			this.overflow.Export(Output);
-			this.onClick.Export(Output);
+			this.width?.Export(Output);
+			this.height?.Export(Output);
+			this.maxWidth?.Export(Output);
+			this.maxHeight?.Export(Output);
+			this.minWidth?.Export(Output);
+			this.minHeight?.Export(Output);
+			this.keepAspectRatio?.Export(Output);
+			this.overflow?.Export(Output);
+			this.onClick?.Export(Output);
 		}
 
 		/// <summary>
@@ -175,116 +176,71 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (Destination is LayoutArea Dest)
 			{
-				Dest.width = this.width.CopyIfNotPreset();
-				Dest.height = this.height.CopyIfNotPreset();
-				Dest.maxWidth = this.maxWidth.CopyIfNotPreset();
-				Dest.maxHeight = this.maxHeight.CopyIfNotPreset();
-				Dest.minWidth = this.minWidth.CopyIfNotPreset();
-				Dest.minHeight = this.minHeight.CopyIfNotPreset();
-				Dest.keepAspectRatio = this.keepAspectRatio.CopyIfNotPreset();
-				Dest.overflow = this.overflow.CopyIfNotPreset();
-				Dest.onClick = this.onClick.CopyIfNotPreset();
+				Dest.width = this.width?.CopyIfNotPreset();
+				Dest.height = this.height?.CopyIfNotPreset();
+				Dest.maxWidth = this.maxWidth?.CopyIfNotPreset();
+				Dest.maxHeight = this.maxHeight?.CopyIfNotPreset();
+				Dest.minWidth = this.minWidth?.CopyIfNotPreset();
+				Dest.minHeight = this.minHeight?.CopyIfNotPreset();
+				Dest.keepAspectRatio = this.keepAspectRatio?.CopyIfNotPreset();
+				Dest.overflow = this.overflow?.CopyIfNotPreset();
+				Dest.onClick = this.onClick?.CopyIfNotPreset();
 			}
-		}
-
-		private float? GetSize(DrawingState State, bool Horizontal, params LengthAttribute[] Sizes)
-		{
-			foreach (LengthAttribute Attr in Sizes)
-			{
-				if (!Attr.TryEvaluate(State.Session, out Length L))
-					continue;
-
-				return State.GetDrawingSize(L, this, Horizontal);
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Gets the maximum width of the element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Maximum width, if defined.</returns>
-		public float? GetMaxWidth(DrawingState State)
-		{
-			return this.GetSize(State, true, this.maxWidth, this.width);
-		}
-
-		/// <summary>
-		/// Gets the minimum width of the element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Maximum width, if defined.</returns>
-		public float? GetMinWidth(DrawingState State)
-		{
-			return this.GetSize(State, true, this.minWidth, this.width);
-		}
-
-		/// <summary>
-		/// Gets the maximum height of the element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Maximum height, if defined.</returns>
-		public float? GetMaxHeight(DrawingState State)
-		{
-			return this.GetSize(State, false, this.maxHeight, this.height);
-		}
-
-		/// <summary>
-		/// Gets the minimum height of the element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Maximum height, if defined.</returns>
-		public float? GetMinHeight(DrawingState State)
-		{
-			return this.GetSize(State, false, this.minHeight, this.height);
-		}
-
-		/// <summary>
-		/// Gets a width estimate.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Width estimate.</returns>
-		public float? GetWidthEstimate(DrawingState State)
-		{
-			return this.GetSize(State, true, this.width, this.maxWidth, this.minWidth);
-		}
-
-		/// <summary>
-		/// Gets a height estimate.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Height estimate.</returns>
-		public float? GetHeightEstimate(DrawingState State)
-		{
-			return this.GetSize(State, false, this.height, this.minHeight, this.maxHeight);
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
+			float a;
 
-			if (this.width.TryEvaluate(State.Session, out Length L))
-				this.Width = State.GetDrawingSize(L, this, true);
+			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length L))
+			{
+				a = this.Width ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.Width = a;
+			}
 
-			if (this.height.TryEvaluate(State.Session, out L))
-				this.Height = State.GetDrawingSize(L, this, false);
+			if (!(this.height is null) && this.height.TryEvaluate(State.Session, out L))
+			{
+				a = this.Height ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.Height = a;
+			}
 
-			if (this.minWidth.TryEvaluate(State.Session, out L))
-				this.MinWidth = State.GetDrawingSize(L, this, true);
+			if (!(this.minWidth is null) && this.minWidth.TryEvaluate(State.Session, out L))
+			{
+				a = this.MinWidth ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.MinWidth = a;
+			}
 
-			if (this.maxWidth.TryEvaluate(State.Session, out L))
-				this.MaxWidth = State.GetDrawingSize(L, this, true);
+			if (!(this.maxWidth is null) && this.maxWidth.TryEvaluate(State.Session, out L))
+			{
+				a = this.MaxWidth ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.MaxWidth = a;
+			}
 
-			if (this.minHeight.TryEvaluate(State.Session, out L))
-				this.MinHeight = State.GetDrawingSize(L, this, true);
+			if (!(this.minHeight is null) && this.minHeight.TryEvaluate(State.Session, out L))
+			{
+				a = this.MinHeight ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.MinHeight = a;
+			}
 
-			if (this.maxHeight.TryEvaluate(State.Session, out L))
-				this.MaxHeight = State.GetDrawingSize(L, this, true);
+			if (!(this.maxHeight is null) && this.maxHeight.TryEvaluate(State.Session, out L))
+			{
+				a = this.MaxHeight ?? 0;
+				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				this.MaxHeight = a;
+			}
+
+			return Relative;
 		}
 
 	}

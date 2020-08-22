@@ -72,8 +72,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			base.ExportAttributes(Output);
 
-			this.expression.Export(Output);
-			this.testAfter.Export(Output);
+			this.expression?.Export(Output);
+			this.testAfter?.Export(Output);
 		}
 
 		/// <summary>
@@ -97,8 +97,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is While Dest)
 			{
-				Dest.expression = this.expression.CopyIfNotPreset();
-				Dest.testAfter = this.testAfter.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset();
+				Dest.testAfter = this.testAfter?.CopyIfNotPreset();
 			}
 		}
 
@@ -106,43 +106,71 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			List<ILayoutElement> Measured = new List<ILayoutElement>();
-
-			if (!this.testAfter.TryEvaluate(State.Session, out bool TestAfter))
-				TestAfter = false;
-
-			if (TestAfter)
+			if (this.measured is null)
 			{
-				do
+				List<ILayoutElement> Measured = new List<ILayoutElement>();
+
+				if (this.testAfter is null || !this.testAfter.TryEvaluate(State.Session, out bool TestAfter))
+					TestAfter = false;
+
+				if (TestAfter)
 				{
-					foreach (ILayoutElement Child in this.Children)
+					do
 					{
-						ILayoutElement Copy = Child.Copy(this);
-						Measured.Add(Copy);
-						Copy.MeasureDimensions(State);
+						foreach (ILayoutElement Child in this.Children)
+						{
+							ILayoutElement Copy = Child.Copy(this);
+							Measured.Add(Copy);
+							if (Copy.MeasureDimensions(State))
+								Relative = true;
+
+							this.IncludeElement(Copy);
+						}
+					}
+					while (this.expression.Evaluate(State.Session) is bool b && b);
+				}
+				else
+				{
+					while (this.expression.Evaluate(State.Session) is bool b && b)
+					{
+						foreach (ILayoutElement Child in this.Children)
+						{
+							ILayoutElement Copy = Child.Copy(this);
+							Measured.Add(Copy);
+
+							if (Copy.MeasureDimensions(State))
+								Relative = true;
+
+							this.IncludeElement(Copy);
+						}
 					}
 				}
-				while (this.expression.Evaluate(State.Session) is bool b && b);
+
+				this.measured = Measured.ToArray();
 			}
 			else
 			{
-				while (this.expression.Evaluate(State.Session) is bool b && b)
+				foreach (ILayoutElement E in this.measured)
 				{
-					foreach (ILayoutElement Child in this.Children)
-					{
-						ILayoutElement Copy = Child.Copy(this);
-						Measured.Add(Copy);
-						Copy.MeasureDimensions(State);
-					}
+					if (E.MeasureDimensions(State))
+						Relative = true;
+				
+					this.IncludeElement(E);
 				}
 			}
 
-			this.measured = Measured.ToArray();
+			return Relative;
 		}
+
+		/// <summary>
+		/// If children dimensions are to be measured.
+		/// </summary>
+		protected override bool MeasureChildrenDimensions => false;
 
 	}
 }

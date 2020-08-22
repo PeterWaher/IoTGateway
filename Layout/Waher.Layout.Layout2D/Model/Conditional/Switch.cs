@@ -9,11 +9,12 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 	/// <summary>
 	/// Conditional layout based on multiple conditional statements.
 	/// </summary>
-	public class Switch : LayoutElement
+	public class Switch : DynamicElement
 	{
 		private Case[] cases;
 		private Otherwise otherwise;
-		private Case activeCase;
+		private ILayoutElement activeCase;
+		private bool evaluated;
 
 		/// <summary>
 		/// Conditional layout based on multiple conditional statements.
@@ -33,7 +34,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <summary>
 		/// Dynamic array of children
 		/// </summary>
-		public ILayoutElement[] DynamicChildren
+		public override ILayoutElement[] DynamicChildren
 		{
 			get
 			{
@@ -151,26 +152,33 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			this.activeCase = null;
-
-			foreach (Case Case in this.cases)
+			if (!this.evaluated)
 			{
-				object Result = Case.ConditionAttribute?.Evaluate(State.Session);
-				if (Result is bool b && b)
+				foreach (Case Case in this.cases)
 				{
-					this.activeCase = Case;
-					break;
+					object Result = Case.ConditionAttribute?.Evaluate(State.Session);
+					if (Result is bool b && b)
+					{
+						this.activeCase = Case;
+						break;
+					}
 				}
+
+				if (this.activeCase is null)
+					this.activeCase = this.otherwise;
+
+				this.evaluated = true;
 			}
 
-			if (this.activeCase is null)
-				this.otherwise?.MeasureDimensions(State);
-			else
-				this.activeCase?.MeasureDimensions(State);
+			if (this.activeCase?.MeasureDimensions(State) ?? false)
+				Relative = true;
+
+			return Relative;
 		}
 
 		/// <summary>
@@ -179,10 +187,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="State">Current drawing state.</param>
 		public override void MeasurePositions(DrawingState State)
 		{
-			if (this.activeCase is null)
-				this.otherwise?.MeasurePositions(State);
-			else
-				this.activeCase.MeasurePositions(State);
+			this.activeCase?.MeasurePositions(State);
 		}
 
 		/// <summary>
@@ -191,16 +196,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
-			if (this.activeCase is null)
-			{
-				if (this.otherwise?.IsVisible ?? false)
-					this.otherwise.Draw(State);
-			}
-			else
-			{
-				if (this.activeCase.IsVisible)
-					this.activeCase.Draw(State);
-			}
+			if (this.activeCase?.IsVisible ?? false)
+				this.activeCase.Draw(State);
 		}
 
 	}

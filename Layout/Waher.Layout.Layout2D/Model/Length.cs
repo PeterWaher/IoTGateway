@@ -123,5 +123,16 @@ namespace Waher.Layout.Layout2D.Model
 		/// 100%
 		/// </summary>
 		public static readonly Length HundredPercent = new Length(100, LengthUnit.Percent);
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			if (this.Unit == LengthUnit.Percent)
+				return this.Value.ToString() + "%";
+			else
+				return this.Value.ToString() + " " + this.Unit.ToString().ToLower();
+		}
 	}
 }

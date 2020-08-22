@@ -116,12 +116,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.radiusX.Export(Output);
-			this.radiusY.Export(Output);
-			this.startDegrees.Export(Output);
-			this.endDegrees.Export(Output);
-			this.clockwise.Export(Output);
-			this.center.Export(Output);
+			this.radiusX?.Export(Output);
+			this.radiusY?.Export(Output);
+			this.startDegrees?.Export(Output);
+			this.endDegrees?.Export(Output);
+			this.clockwise?.Export(Output);
+			this.center?.Export(Output);
 		}
 
 		/// <summary>
@@ -145,12 +145,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is EllipseArc Dest)
 			{
-				Dest.radiusX = this.radiusX.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY.CopyIfNotPreset();
-				Dest.startDegrees = this.startDegrees.CopyIfNotPreset();
-				Dest.endDegrees = this.endDegrees.CopyIfNotPreset();
-				Dest.clockwise = this.clockwise.CopyIfNotPreset();
-				Dest.center = this.center.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
+				Dest.startDegrees = this.startDegrees?.CopyIfNotPreset();
+				Dest.endDegrees = this.endDegrees?.CopyIfNotPreset();
+				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
+				Dest.center = this.center?.CopyIfNotPreset();
 			}
 		}
 
@@ -158,34 +158,35 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.radiusX.TryEvaluate(State.Session, out Length R))
-				this.rX = State.GetDrawingSize(R, this, true);
+			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
+				State.CalcDrawingSize(R, ref this.rX, this, true, ref Relative);
 			else
 				this.defined = false;
 
-			if (this.radiusY.TryEvaluate(State.Session, out R))
-				this.rY = State.GetDrawingSize(R, this, false);
+			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
+				State.CalcDrawingSize(R, ref this.rY, this, false, ref Relative);
 			else
 				this.defined = false;
 
-			if (this.startDegrees.TryEvaluate(State.Session, out this.start))
+			if (!(this.startDegrees is null) && this.startDegrees.TryEvaluate(State.Session, out this.start))
 				this.start = (float)Math.IEEERemainder(this.start, 360);
 			else
 				this.defined = false;
 
-			if (this.endDegrees.TryEvaluate(State.Session, out this.end))
+			if (!(this.endDegrees is null) && this.endDegrees.TryEvaluate(State.Session, out this.end))
 				this.end = (float)Math.IEEERemainder(this.end, 360);
 			else
 				this.defined = false;
 
-			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+			if (this.clockwise is null || !this.clockwise.TryEvaluate(State.Session, out this.clockDir))
 				this.clockDir = true;
 
-			if (!this.center.TryEvaluate(State.Session, out this.includeCenter))
+			if (this.center is null || !this.center.TryEvaluate(State.Session, out this.includeCenter))
 				this.includeCenter = false;
 
 			if (this.defined)
@@ -239,6 +240,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (this.includeCenter)
 					this.IncludePoint(this.xCoordinate, this.yCoordinate);
 			}
+
+			return Relative;
 		}
 
 		/// <summary>

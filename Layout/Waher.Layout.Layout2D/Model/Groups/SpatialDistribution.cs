@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Resources;
 using System.Xml;
 using SkiaSharp;
 using Waher.Script;
@@ -37,9 +38,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			this.cellLayout = this.GetCellLayout(State);
 
@@ -66,6 +68,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.Bottom = null;
 			this.Width = this.cellLayout.TotWidth;
 			this.Height = this.cellLayout.TotHeight;
+
+			return Relative;
 		}
 
 		private ICellLayout cellLayout = null;
@@ -76,11 +80,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="State">Current drawing state.</param>
 		public override void MeasurePositions(DrawingState State)
 		{
-			// Don't call base method. Cell Layout calls MeasurePositions on children.
+			base.MeasurePositions(State);
 			
 			this.cellLayout?.MeasurePositions(State);
 			this.measured = this.cellLayout?.Align();
 		}
+
+		/// <summary>
+		/// If children positions are to be measured.
+		/// </summary>
+		protected override bool MeasureChildrenPositions => false;  // Cell Layout calls MeasurePositions on children.
 
 		/// <summary>
 		/// Draws layout entities.

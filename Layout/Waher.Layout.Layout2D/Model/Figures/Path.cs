@@ -105,9 +105,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.head.Export(Output);
-			this.tail.Export(Output);
-			this.shapeFill.Export(Output);
+			this.head?.Export(Output);
+			this.tail?.Export(Output);
+			this.shapeFill?.Export(Output);
 		}
 
 		/// <summary>
@@ -131,9 +131,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Path Dest)
 			{
-				Dest.head = this.head.CopyIfNotPreset();
-				Dest.tail = this.tail.CopyIfNotPreset();
-				Dest.shapeFill = this.shapeFill.CopyIfNotPreset();
+				Dest.head = this.head?.CopyIfNotPreset();
+				Dest.tail = this.tail?.CopyIfNotPreset();
+				Dest.shapeFill = this.shapeFill?.CopyIfNotPreset();
 
 				Dest.segments = Dest.GetSegments();
 			}
@@ -143,27 +143,31 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			PathState PathState = new PathState(this, null, false, false);
 
-			if (this.head.TryEvaluate(State.Session, out string RefId) &&
+			if (!(this.head is null) &&
+				this.head.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is Shape Shape)
 			{
 				this.headElement = Shape;
 			}
 
-			if (this.tail.TryEvaluate(State.Session, out RefId) &&
+			if (!(this.tail is null) &&
+				this.tail.TryEvaluate(State.Session, out RefId) &&
 				this.Document.TryGetElement(RefId, out Element) &&
 				Element is Shape Shape2)
 			{
 				this.tailElement = Shape2;
 			}
 
-			if (this.shapeFill.TryEvaluate(State.Session, out RefId) &&
+			if (!(this.shapeFill is null) &&
+				this.shapeFill.TryEvaluate(State.Session, out RefId) &&
 				this.Document.TryGetElement(RefId, out Element) &&
 				Element is Background Background)
 			{
@@ -175,6 +179,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				foreach (ISegment Segment in this.segments)
 					Segment.Measure(State, PathState);
 			}
+
+			return Relative;
 		}
 
 		private Shape headElement;
@@ -203,7 +209,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					PathState PathState = new PathState(this, Path, CalcStart, CalcEnd);
 
 					this.Draw(State, PathState, Path);
-					
+
 					PathState.FlushSpline();
 
 					if (!(Fill is null))
@@ -222,7 +228,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.tailElement?.DrawTail(State, this, Pen, Fill);
 				this.headElement?.DrawHead(State, this, Pen, Fill);
 			}
-		
+
 			base.Draw(State);
 		}
 

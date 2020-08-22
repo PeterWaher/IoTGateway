@@ -148,11 +148,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			base.ExportAttributes(Output);
 
-			this.halign.Export(Output);
-			this.valign.Export(Output);
-			this.colSpan.Export(Output);
-			this.rowSpan.Export(Output);
-			this.border.Export(Output);
+			this.halign?.Export(Output);
+			this.valign?.Export(Output);
+			this.colSpan?.Export(Output);
+			this.rowSpan?.Export(Output);
+			this.border?.Export(Output);
 		}
 
 		/// <summary>
@@ -176,11 +176,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Cell Dest)
 			{
-				Dest.halign = this.halign.CopyIfNotPreset();
-				Dest.valign = this.valign.CopyIfNotPreset();
-				Dest.colSpan = this.colSpan.CopyIfNotPreset();
-				Dest.rowSpan = this.rowSpan.CopyIfNotPreset();
-				Dest.border = this.border.CopyIfNotPreset();
+				Dest.halign = this.halign?.CopyIfNotPreset();
+				Dest.valign = this.valign?.CopyIfNotPreset();
+				Dest.colSpan = this.colSpan?.CopyIfNotPreset();
+				Dest.rowSpan = this.rowSpan?.CopyIfNotPreset();
+				Dest.border = this.border?.CopyIfNotPreset();
 			}
 		}
 
@@ -197,6 +197,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				float? Width = this.Width;
 
 				if (Width.HasValue &&
+					!(this.halign is null) &&
 					this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
 					HAlignment != Groups.HorizontalAlignment.Left)
 				{
@@ -214,6 +215,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				float? Height = this.Height;
 
 				if (Height.HasValue &&
+					!(this.valign is null) &&
 					this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
 					VAlignment != Groups.VerticalAlignment.Top)
 				{
@@ -235,12 +237,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="RowSpan">Row span</param>
 		public void CalcSpan(Variables Session, out int ColSpan, out int RowSpan)
 		{
-			if (this.colSpan.TryEvaluate(Session, out int Span))
+			if (!(this.colSpan is null) && this.colSpan.TryEvaluate(Session, out int Span))
 				ColSpan = Span;
 			else
 				ColSpan = 1;
 
-			if (this.rowSpan.TryEvaluate(Session, out Span))
+			if (!(this.rowSpan is null) && this.rowSpan.TryEvaluate(Session, out Span))
 				RowSpan = Span;
 			else
 				RowSpan = 1;
@@ -250,11 +252,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.border.TryEvaluate(State.Session, out string RefId) &&
+			if (!(this.border is null) &&
+				this.border.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is Pen Pen)
 			{
@@ -263,6 +267,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			this.dx = 0;
 			this.dy = 0;
+
+			return Relative;
 		}
 
 		private Pen borderPen;

@@ -139,8 +139,12 @@ namespace Waher.Layout.Layout2D
 			ILayoutElement Result = E.Create(this, Parent);
 			Result.FromXml(Xml);
 
-			if (Result.IdAttribute.TryEvaluate(this.session, out string Id) && !string.IsNullOrEmpty(Id))
+			if (!(Result.IdAttribute is null) &&
+				Result.IdAttribute.TryEvaluate(this.session, out string Id) &&
+				!string.IsNullOrEmpty(Id))
+			{
 				this.AddElementId(Id, Result);
+			}
 
 			return Result;
 		}
@@ -363,7 +367,14 @@ namespace Waher.Layout.Layout2D
 				if (Settings.BackgroundColor != SKColor.Empty)
 					Canvas.Clear(Settings.BackgroundColor);
 
-				this.root?.MeasureDimensions(State);
+				int Limit = 100;
+
+				while (this.root?.MeasureDimensions(State) ?? false)
+				{
+					if (--Limit <= 0)
+						throw new InvalidOperationException("Layout cannot be measured.");
+				}
+
 				this.root?.MeasurePositions(State);
 
 				switch (Settings.ImageSize)

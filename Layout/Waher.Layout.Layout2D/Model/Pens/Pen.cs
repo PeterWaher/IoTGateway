@@ -104,10 +104,10 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		{
 			base.ExportAttributes(Output);
 
-			this.width.Export(Output);
-			this.cap.Export(Output);
-			this.join.Export(Output);
-			this.miter.Export(Output);
+			this.width?.Export(Output);
+			this.cap?.Export(Output);
+			this.join?.Export(Output);
+			this.miter?.Export(Output);
 		}
 
 		/// <summary>
@@ -120,10 +120,10 @@ namespace Waher.Layout.Layout2D.Model.Pens
 
 			if (Destination is Pen Dest)
 			{
-				Dest.width = this.width.CopyIfNotPreset();
-				Dest.cap = this.cap.CopyIfNotPreset();
-				Dest.join = this.join.CopyIfNotPreset();
-				Dest.miter = this.miter.CopyIfNotPreset();
+				Dest.width = this.width?.CopyIfNotPreset();
+				Dest.cap = this.cap?.CopyIfNotPreset();
+				Dest.join = this.join?.CopyIfNotPreset();
+				Dest.miter = this.miter?.CopyIfNotPreset();
 			}
 		}
 
@@ -131,29 +131,41 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
+			float a;
 
-			if (this.width.TryEvaluate(State.Session, out Length Width))
-				this.penWidth = State.GetDrawingSize(Width, this, true);
+			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length Width))
+			{
+				a = this.penWidth ?? 0;
+				State.CalcDrawingSize(Width, ref a, this, true, ref Relative);
+				this.penWidth = a;
+			}
 			else
 				this.penWidth = null;
 
-			if (this.cap.TryEvaluate(State.Session, out SKStrokeCap Cap))
+			if (!(this.cap is null) && this.cap.TryEvaluate(State.Session, out SKStrokeCap Cap))
 				this.penCap = Cap;
 			else
 				this.penCap = null;
 
-			if (this.join.TryEvaluate(State.Session, out SKStrokeJoin Join))
+			if (!(this.join is null) && this.join.TryEvaluate(State.Session, out SKStrokeJoin Join))
 				this.penJoin = Join;
 			else
 				this.penJoin = null;
 
-			if (this.miter.TryEvaluate(State.Session, out Width))
-				this.penMiter = State.GetDrawingSize(Width, this, true);
+			if (!(this.miter is null) && this.miter.TryEvaluate(State.Session, out Width))
+			{
+				a = this.penMiter ?? 0;
+				State.CalcDrawingSize(Width, ref a, this, true, ref Relative);
+				this.penMiter = a;
+			}
 			else
 				this.penMiter = null;
+
+			return Relative;
 		}
 
 		/// <summary>

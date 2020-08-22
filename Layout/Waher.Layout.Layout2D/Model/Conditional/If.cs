@@ -14,6 +14,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		private LayoutContainer ifTrue;
 		private LayoutContainer ifFalse;
 		private bool conditionResult;
+		private bool conditionResultEvaluated;
 
 		/// <summary>
 		/// Conditional layout based on one conditional statement.
@@ -108,7 +109,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			base.ExportAttributes(Output);
 
-			this.condition.Export(Output);
+			this.condition?.Export(Output);
 		}
 
 		/// <summary>
@@ -144,7 +145,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is If Dest)
 			{
-				Dest.condition = this.condition.CopyIfNotPreset();
+				Dest.condition = this.condition?.CopyIfNotPreset();
 				Dest.ifTrue = this.ifTrue?.Copy(Dest) as LayoutContainer;
 				Dest.ifFalse = this.ifFalse?.Copy(Dest) as LayoutContainer;
 			}
@@ -154,20 +155,30 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			object Result = this.condition?.Evaluate(State.Session);
-			if (Result is bool b)
-				this.conditionResult = b;
-			else
-				this.conditionResult = false;
+			if (!this.conditionResultEvaluated)
+			{
+				object Result = this.condition?.Evaluate(State.Session);
+				if (Result is bool b)
+					this.conditionResult = b;
+				else
+					this.conditionResult = false;
 
-			if (this.conditionResult)
-				this.ifTrue?.MeasureDimensions(State);
-			else
-				this.ifFalse?.MeasureDimensions(State);
+				this.conditionResultEvaluated = true;
+			}
+
+			if (this.conditionResult ?
+				(this.ifTrue?.MeasureDimensions(State) ?? false) :
+				(this.ifFalse?.MeasureDimensions(State) ?? false))
+			{
+				Relative = true;
+			}
+
+			return Relative;
 		}
 
 		/// <summary>

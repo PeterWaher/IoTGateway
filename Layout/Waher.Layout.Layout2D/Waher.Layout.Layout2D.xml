@@ -323,6 +323,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Angle.angle">
             <summary>
@@ -415,6 +416,11 @@
             <param name="Session">Current session.</param>
             <param name="Result">Result, if successful.</param>
             <returns>If evaluation was possible.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute">
             <summary>
@@ -895,6 +901,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D">
             <summary>
@@ -964,6 +971,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -1124,6 +1132,11 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.For.MeasureChildrenDimensions">
+            <summary>
+            If children dimensions are to be measured.
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.ForEach">
             <summary>
             Generates layout elements by looping through a set or vector of values.
@@ -1187,6 +1200,12 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.ForEach.MeasureChildrenDimensions">
+            <summary>
+            If children dimensions are to be measured.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.If">
             <summary>
@@ -1257,6 +1276,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.If.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -1353,6 +1373,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Conditional.Switch.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -1454,6 +1475,12 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Conditional.While.MeasureChildrenDimensions">
+            <summary>
+            If children dimensions are to be measured.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Content.FlowingText.Bold">
             <summary>
@@ -1900,6 +1927,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Label.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2029,6 +2057,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Script.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2082,6 +2111,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Distance.dist">
             <summary>
@@ -2146,14 +2176,25 @@
             Fill to use for shape, if no other is specified in the shape.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.GetDrawingSize(Waher.Layout.Layout2D.Model.Length,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean)">
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.AreaWidth">
+            <summary>
+            Width of current area
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.AreaHeight">
+            <summary>
+            Height of current area
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean,System.Boolean@)">
             <summary>
             Converts a defined length to drawing size.
             </summary>
             <param name="L">Length</param>
+            <param name="Size">Calculated size.</param>
             <param name="Element">Current element.</param>
             <param name="Horizontal">If it is a horizontal size.</param>
-            <returns>Drawing size, if defined.</returns>
+            <param name="Relative">If size is relative, and should be recalculated if dimensions change.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicContainer">
             <summary>
@@ -2185,6 +2226,11 @@
             Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DynamicContainer.MeasureChildrenPositions">
+            <summary>
+            If children positions are to be measured.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicElement">
             <summary>
@@ -2264,6 +2310,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Circle.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2344,6 +2391,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.CircleArc.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2440,6 +2488,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Ellipse.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2525,6 +2574,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.EllipseArc.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2646,6 +2696,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint.xCoordinate">
             <summary>
@@ -2707,20 +2758,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default width of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Width</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default height of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Height</returns>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Figures.FigurePoint2.xCoordinate2">
             <summary>
@@ -2790,6 +2828,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Line.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -2947,6 +2986,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Path.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -3076,6 +3116,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.PolyLine.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -3190,6 +3231,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Figures.RoundedRectangle.rx">
             <summary>
@@ -3329,6 +3371,13 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.CircleArcTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
             <summary>
@@ -3791,6 +3840,13 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.SegmentNodes.EllipseArcTo.Measure(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Figures.SegmentNodes.PathState)">
             <summary>
@@ -4873,6 +4929,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Spline.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -5237,6 +5294,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Fonts.Font.FontDef">
             <summary>
@@ -5382,6 +5440,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -5899,6 +5958,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6057,12 +6117,18 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.MeasureChildrenPositions">
+            <summary>
+            If children positions are to be measured.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6277,6 +6343,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6318,25 +6385,12 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Images.Image.image">
             <summary>
             Loaded image
             </summary>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default width of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Width</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default height of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Height</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.Image.LoadImage(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6586,20 +6640,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.GetDefaultWidth(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default width of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Width</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.GetDefaultHeight(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Default height of element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Height</returns>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6697,53 +6738,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMaxWidth(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets the maximum width of the element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Maximum width, if defined.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMinWidth(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets the minimum width of the element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Maximum width, if defined.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMaxHeight(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets the maximum height of the element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Maximum height, if defined.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetMinHeight(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets the minimum height of the element.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Maximum height, if defined.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetWidthEstimate(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets a width estimate.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Width estimate.</returns>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.GetHeightEstimate(Waher.Layout.Layout2D.Model.DrawingState)">
-            <summary>
-            Gets a height estimate.
-            </summary>
-            <param name="State">Current drawing state.</param>
-            <returns>Height estimate.</returns>
-        </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutArea.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.LayoutContainer">
             <summary>
@@ -6797,12 +6797,29 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludeElement(Waher.Layout.Layout2D.Model.ILayoutElement)">
+            <summary>
+            Includes element in dimension measurement.
+            </summary>
+            <param name="Element">Element to include.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutContainer.MeasureChildrenDimensions">
+            <summary>
+            If children dimensions are to be measured.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutContainer.MeasureChildrenPositions">
+            <summary>
+            If children positions are to be measured.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(System.Single,System.Single,System.Single,System.Single,System.Single)">
             <summary>
@@ -6821,7 +6838,7 @@
             <param name="X">X-Coordinate</param>
             <param name="Y">Y-Coordinate</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@,System.Boolean@)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -6831,6 +6848,7 @@
             <param name="RefAttribute">Reference attribute</param>
             <param name="X">Resulting X-coordinate.</param>
             <param name="Y">Resulting Y-coordinate.</param>
+            <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
             <returns>If point is well-defined.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
@@ -6894,6 +6912,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Bottom">
             <summary>
             Bottom coordinate of bounding box, after measurement.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PresetWidth">
+            <summary>
+            Width of element, if defined explicitly (i.e. not evaluated from Left and Right).
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PresetHeight">
+            <summary>
+            Height of element, if defined explicitly (i.e. not evaluated from Top and Bottom).
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Width">
@@ -7001,6 +7029,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7019,7 +7048,7 @@
             If the element is visible or not.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@,System.Boolean@)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -7029,6 +7058,7 @@
             <param name="RefAttribute">Reference attribute</param>
             <param name="X">Resulting X-coordinate.</param>
             <param name="Y">Resulting Y-coordinate.</param>
+            <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
             <returns>If point is well-defined.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
@@ -7189,6 +7219,11 @@
             100%
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Length.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.Pen">
             <summary>
             Abstract base class for pens.
@@ -7259,6 +7294,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Pens.Pen.penWidth">
             <summary>
@@ -7333,6 +7369,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Point">
             <summary>
@@ -7384,6 +7421,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Point.xCoordinate">
             <summary>
@@ -7445,6 +7483,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Point2.xCoordinate2">
             <summary>
@@ -7496,6 +7535,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Point2Weight.weight">
             <summary>
@@ -7552,6 +7592,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Point3.xCoordinate3">
             <summary>
@@ -7616,6 +7657,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.References.Copy.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7757,6 +7799,13 @@
             <param name="Document">Layout document containing the element.</param>
             <param name="Parent">Parent element.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.LinearTrasformation.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to dimensions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation">
             <summary>
             Base abstract class for transformations using an optional pivot point.
@@ -7807,6 +7856,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.Transforms.PivotTrasformation.xCoordinate">
             <summary>
@@ -7871,6 +7921,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7936,6 +7987,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7996,6 +8048,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8056,6 +8109,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8121,6 +8175,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
+            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>

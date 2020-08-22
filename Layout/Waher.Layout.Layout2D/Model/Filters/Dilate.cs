@@ -67,8 +67,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		{
 			base.ExportAttributes(Output);
 
-			this.radiusX.Export(Output);
-			this.radiusY.Export(Output);
+			this.radiusX?.Export(Output);
+			this.radiusY?.Export(Output);
 		}
 
 		/// <summary>
@@ -92,8 +92,8 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Dilate Dest)
 			{
-				Dest.radiusX = this.radiusX.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
 			}
 		}
 	}

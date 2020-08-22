@@ -97,10 +97,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			base.ExportAttributes(Output);
 
-			this.from.Export(Output);
-			this.to.Export(Output);
-			this.step.Export(Output);
-			this.variable.Export(Output);
+			this.from?.Export(Output);
+			this.to?.Export(Output);
+			this.step?.Export(Output);
+			this.variable?.Export(Output);
 		}
 
 		/// <summary>
@@ -124,10 +124,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (Destination is For Dest)
 			{
-				Dest.from = this.from.CopyIfNotPreset();
-				Dest.to = this.to.CopyIfNotPreset();
-				Dest.step = this.step.CopyIfNotPreset();
-				Dest.variable = this.variable.CopyIfNotPreset();
+				Dest.from = this.from?.CopyIfNotPreset();
+				Dest.to = this.to?.CopyIfNotPreset();
+				Dest.step = this.step?.CopyIfNotPreset();
+				Dest.variable = this.variable?.CopyIfNotPreset();
 			}
 		}
 
@@ -135,73 +135,98 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			List<ILayoutElement> Measured = new List<ILayoutElement>();
-			IElement FromValue = this.from.EvaluateElement(State.Session);
-			IElement ToValue = this.to.EvaluateElement(State.Session);
-			IElement Step = this.step.EvaluateElement(State.Session);
-			
-			if (this.variable.TryEvaluate(State.Session, out string VariableName) &&
-				FromValue is ICommutativeRingWithIdentityElement From &&
-				ToValue is ICommutativeRingWithIdentityElement To &&
-				From.AssociatedSet is IOrderedSet S)
+			if (this.measured is null)
 			{
-				int Direction = S.Compare(From, To);
-				bool DoLoop = true;
+				List<ILayoutElement> Measured = new List<ILayoutElement>();
+				IElement FromValue = this.from.EvaluateElement(State.Session);
+				IElement ToValue = this.to.EvaluateElement(State.Session);
+				IElement Step = this.step.EvaluateElement(State.Session);
 
-				if (Step is null)
+				if (!(this.variable is null) &&
+					this.variable.TryEvaluate(State.Session, out string VariableName) &&
+					FromValue is ICommutativeRingWithIdentityElement From &&
+					ToValue is ICommutativeRingWithIdentityElement To &&
+					From.AssociatedSet is IOrderedSet S)
 				{
-					if (Direction <= 0)
-						Step = From.One;
-					else
-						Step = From.One.Negate();
-				}
-				else
-				{
-					if (Direction < 0)
-					{
-						if (S.Compare(Step, From.Zero) <= 0)
-							DoLoop = false;
-					}
-					else if (Direction > 0)
-					{
-						if (S.Compare(Step, From.Zero) >= 0)
-							DoLoop = false;
-					}
-				}
+					int Direction = S.Compare(From, To);
+					bool DoLoop = true;
 
-				while (DoLoop)
-				{
-					State.Session[VariableName] = From;
-
-					foreach (ILayoutElement Child in this.Children)
+					if (Step is null)
 					{
-						ILayoutElement Copy = Child.Copy(this);
-						Measured.Add(Copy);
-						Copy.MeasureDimensions(State);
-					}
-
-					if (Direction == 0)
-						break;
-					else
-					{
-						From = Script.Operators.Arithmetics.Add.EvaluateAddition(From, Step, null) as ICommutativeRingWithIdentityElement;
-						if (From is null)
-							break;
-
-						if (Direction > 0)
-							DoLoop = S.Compare(From, To) >= 0;
+						if (Direction <= 0)
+							Step = From.One;
 						else
-							DoLoop = S.Compare(From, To) <= 0;
+							Step = From.One.Negate();
 					}
+					else
+					{
+						if (Direction < 0)
+						{
+							if (S.Compare(Step, From.Zero) <= 0)
+								DoLoop = false;
+						}
+						else if (Direction > 0)
+						{
+							if (S.Compare(Step, From.Zero) >= 0)
+								DoLoop = false;
+						}
+					}
+
+					while (DoLoop)
+					{
+						State.Session[VariableName] = From;
+
+						foreach (ILayoutElement Child in this.Children)
+						{
+							ILayoutElement Copy = Child.Copy(this);
+							Measured.Add(Copy);
+
+							if (Copy.MeasureDimensions(State))
+								Relative = true;
+
+							this.IncludeElement(Copy);
+						}
+
+						if (Direction == 0)
+							break;
+						else
+						{
+							From = Script.Operators.Arithmetics.Add.EvaluateAddition(From, Step, null) as ICommutativeRingWithIdentityElement;
+							if (From is null)
+								break;
+
+							if (Direction > 0)
+								DoLoop = S.Compare(From, To) >= 0;
+							else
+								DoLoop = S.Compare(From, To) <= 0;
+						}
+					}
+				}
+
+				this.measured = Measured.ToArray();
+			}
+			else
+			{
+				foreach (ILayoutElement E in this.measured)
+				{
+					if (E.MeasureDimensions(State))
+						Relative = true;
+
+					this.IncludeElement(E);
 				}
 			}
 
-			this.measured = Measured.ToArray();
+			return Relative;
 		}
+
+		/// <summary>
+		/// If children dimensions are to be measured.
+		/// </summary>
+		protected override bool MeasureChildrenDimensions => false;
 
 	}
 }

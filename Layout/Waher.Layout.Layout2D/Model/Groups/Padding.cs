@@ -81,7 +81,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		public override string ToString()
 		{
-			return "(" + this.offsetX.ToString() + ", " + this.offsetY.ToString() + "): " + this.element.ToString();
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append('('); 
+			sb.Append(this.offsetX.ToString());
+			sb.Append(", ");
+			sb.Append(this.offsetY.ToString());
+			sb.Append("): ");
+			sb.Append(this.element?.ToString() ?? "null");
+
+			return sb.ToString();
 		}
 	}
 }

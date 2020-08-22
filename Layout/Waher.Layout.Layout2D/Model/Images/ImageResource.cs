@@ -57,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			base.ExportAttributes(Output);
 
-			this.resource.Export(Output);
+			this.resource?.Export(Output);
 		}
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 			base.CopyContents(Destination);
 
 			if (Destination is ImageResource Dest)
-				Dest.resource = this.resource.CopyIfNotPreset();
+				Dest.resource = this.resource?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// image loading is in process.</returns>
 		protected override SKImage LoadImage(DrawingState State)
 		{
-			if (this.resource.TryEvaluate(State.Session, out string ResourceName))
+			if (!(this.resource is null) && this.resource.TryEvaluate(State.Session, out string ResourceName))
 			{
 				byte[] Bin = Resources.LoadResource(ResourceName);
 				SKBitmap Bitmap = SKBitmap.Decode(Bin);

@@ -147,11 +147,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			base.ExportAttributes(Output);
 
-			this.order.Export(Output);
-			this.horizontalDirection.Export(Output);
-			this.verticalDirection.Export(Output);
-			this.halign.Export(Output);
-			this.valign.Export(Output);
+			this.order?.Export(Output);
+			this.horizontalDirection?.Export(Output);
+			this.verticalDirection?.Export(Output);
+			this.halign?.Export(Output);
+			this.valign?.Export(Output);
 		}
 
 		/// <summary>
@@ -175,11 +175,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Flexible Dest)
 			{
-				Dest.order = this.order.CopyIfNotPreset();
-				Dest.horizontalDirection = this.horizontalDirection.CopyIfNotPreset();
-				Dest.verticalDirection = this.verticalDirection.CopyIfNotPreset();
-				Dest.halign = this.halign.CopyIfNotPreset();
-				Dest.valign = this.valign.CopyIfNotPreset();
+				Dest.order = this.order?.CopyIfNotPreset();
+				Dest.horizontalDirection = this.horizontalDirection?.CopyIfNotPreset();
+				Dest.verticalDirection = this.verticalDirection?.CopyIfNotPreset();
+				Dest.halign = this.halign?.CopyIfNotPreset();
+				Dest.valign = this.valign?.CopyIfNotPreset();
 			}
 		}
 
@@ -190,23 +190,23 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Cell layout object.</returns>
 		public override ICellLayout GetCellLayout(DrawingState State)
 		{
-			if (!this.order.TryEvaluate(State.Session, out FlexibleOrder Order))
+			if (this.order is null || !this.order.TryEvaluate(State.Session, out FlexibleOrder Order))
 				Order = FlexibleOrder.HorizontalVertical;
 
-			if (!this.horizontalDirection.TryEvaluate(State.Session, out HorizontalDirection HorizontalDirection))
+			if (this.horizontalDirection is null || !this.horizontalDirection.TryEvaluate(State.Session, out HorizontalDirection HorizontalDirection))
 				HorizontalDirection = HorizontalDirection.LeftRight;
 
-			if (!this.verticalDirection.TryEvaluate(State.Session, out VerticalDirection VerticalDirection))
+			if (this.verticalDirection is null || !this.verticalDirection.TryEvaluate(State.Session, out VerticalDirection VerticalDirection))
 				VerticalDirection = VerticalDirection.TopDown;
 
 			switch (Order)
 			{
 				case FlexibleOrder.HorizontalVertical:
 				default:
-					float? Size = this.GetWidthEstimate(State);
+					float? Size = this.Width;
 					if (Size.HasValue)
 					{
-						if (!this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
+						if (this.halign is null || !this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
 						{
 							if (HorizontalDirection == HorizontalDirection.LeftRight)
 								HorizontalAlignment = HorizontalAlignment.Left;
@@ -221,10 +221,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 						return new HorizontalCells(State.Session);
 
 				case FlexibleOrder.VerticalHorizontal:
-					Size = this.GetHeightEstimate(State);
+					Size = this.Height;
 					if (Size.HasValue)
 					{
-						if (!this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
+						if (this.valign is null || !this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
 						{
 							if (VerticalDirection == VerticalDirection.TopDown)
 								VerticalAlignment = VerticalAlignment.Top;

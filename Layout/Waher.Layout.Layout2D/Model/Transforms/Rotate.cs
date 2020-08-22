@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.ExportAttributes(Output);
 
-			this.degrees.Export(Output);
+			this.degrees?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,24 +78,25 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			base.CopyContents(Destination);
 
 			if (Destination is Rotate Dest)
-				Dest.degrees = this.degrees.CopyIfNotPreset();
+				Dest.degrees = this.degrees?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.degrees.TryEvaluate(State.Session, out this.angle))
-			{
-				SKMatrix M = SKMatrix.CreateRotationDegrees(this.angle, this.xCoordinate, this.yCoordinate);
-				this.TransformBoundingBox(M);
-			}
-			else
+			if (this.degrees is null || !this.degrees.TryEvaluate(State.Session, out this.angle))
 				this.angle = 0;
+
+			SKMatrix M = SKMatrix.CreateRotationDegrees(this.angle, this.xCoordinate, this.yCoordinate);
+			this.TransformBoundingBox(M);
+
+			return Relative;
 		}
 
 		private float angle;

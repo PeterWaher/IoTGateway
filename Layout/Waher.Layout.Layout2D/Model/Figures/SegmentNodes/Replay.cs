@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			base.ExportAttributes(Output);
 
-			this._ref.Export(Output);
+			this._ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			base.CopyContents(Destination);
 
 			if (Destination is Replay Dest)
-				Dest._ref = this._ref.CopyIfNotPreset();
+				Dest._ref = this._ref?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -89,6 +89,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public virtual void Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined &&
+				!(this._ref is null) &&
 				this._ref.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is ISegment Segment)

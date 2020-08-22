@@ -78,9 +78,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			base.ExportAttributes(Output);
 
-			this.text.Export(Output);
-			this.halign.Export(Output);
-			this.valign.Export(Output);
+			this.text?.Export(Output);
+			this.halign?.Export(Output);
+			this.valign?.Export(Output);
 		}
 
 		/// <summary>
@@ -104,9 +104,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Label Dest)
 			{
-				Dest.text = this.text.CopyIfNotPreset();
-				Dest.halign = this.halign.CopyIfNotPreset();
-				Dest.valign = this.valign.CopyIfNotPreset();
+				Dest.text = this.text?.CopyIfNotPreset();
+				Dest.halign = this.halign?.CopyIfNotPreset();
+				Dest.valign = this.valign?.CopyIfNotPreset();
 			}
 		}
 
@@ -114,17 +114,18 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (!this.halign.TryEvaluate(State.Session, out this.halignment))
-				this.halignment = Groups.HorizontalAlignment.Left;
+			if (this.halign is null || !this.halign.TryEvaluate(State.Session, out this.halignment))
+				this.halignment = HorizontalAlignment.Left;
 
-			if (!this.valign.TryEvaluate(State.Session, out this.valignment))
-				this.valignment = Groups.VerticalAlignment.Top;
+			if (this.valign is null || !this.valign.TryEvaluate(State.Session, out this.valignment))
+				this.valignment = VerticalAlignment.Top;
 
-			if (this.text.TryEvaluate(State.Session, out this.textValue))
+			if (!(this.text is null) && this.text.TryEvaluate(State.Session, out this.textValue))
 			{
 				State.Text.MeasureText(this.textValue, ref this.bounds);
 
@@ -133,6 +134,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 			}
 			else
 				this.defined = false;
+
+			return Relative;
 		}
 
 		/// <summary>
@@ -147,17 +150,17 @@ namespace Waher.Layout.Layout2D.Model.Content
 			{
 				switch (this.halignment)
 				{
-					case Groups.HorizontalAlignment.Left:
+					case HorizontalAlignment.Left:
 					default:
 						this.Left = this.xCoordinate + this.bounds.Left;
 						break;
 
-					case Groups.HorizontalAlignment.Center:
+					case HorizontalAlignment.Center:
 						this.xCoordinate -= this.bounds.Width / 2;
 						this.Left = this.xCoordinate;
 						break;
 
-					case Groups.HorizontalAlignment.Right:
+					case HorizontalAlignment.Right:
 						this.xCoordinate -= this.bounds.Width;
 						this.Left = this.xCoordinate;
 						break;
@@ -165,23 +168,23 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 				switch (this.valignment)
 				{
-					case Groups.VerticalAlignment.Top:
+					case VerticalAlignment.Top:
 					default:
 						this.yCoordinate -= this.bounds.Top;
 						this.Top = this.yCoordinate;
 						break;
 
-					case Groups.VerticalAlignment.Center:
+					case VerticalAlignment.Center:
 						this.yCoordinate -= this.bounds.Top;
 						this.yCoordinate -= this.bounds.Height / 2;
 						this.Top = this.yCoordinate + this.bounds.Top + this.bounds.Height / 2;
 						break;
 
-					case Groups.VerticalAlignment.BaseLine:
+					case VerticalAlignment.BaseLine:
 						this.Top = this.yCoordinate + this.bounds.Top;
 						break;
 
-					case Groups.VerticalAlignment.Bottom:
+					case VerticalAlignment.Bottom:
 						this.yCoordinate -= this.bounds.Top;
 						this.yCoordinate -= this.bounds.Height;
 						this.Top = this.yCoordinate + this.bounds.Top;

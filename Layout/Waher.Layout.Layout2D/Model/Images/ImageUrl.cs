@@ -70,8 +70,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			base.ExportAttributes(Output);
 
-			this.url.Export(Output);
-			this.alt.Export(Output);
+			this.url?.Export(Output);
+			this.alt?.Export(Output);
 		}
 
 		/// <summary>
@@ -95,8 +95,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 			if (Destination is ImageUrl Dest)
 			{
-				Dest.url = this.url.CopyIfNotPreset();
-				Dest.alt = this.alt.CopyIfNotPreset();
+				Dest.url = this.url?.CopyIfNotPreset();
+				Dest.alt = this.alt?.CopyIfNotPreset();
 			}
 		}
 
@@ -108,7 +108,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// image loading is in process.</returns>
 		protected override SKImage LoadImage(DrawingState State)
 		{
-			if (this.url.TryEvaluate(State.Session, out string URL))
+			if (!(this.url is null) && this.url.TryEvaluate(State.Session, out string URL))
 				this.StartLoad(URL);
 
 			return null;
@@ -137,52 +137,28 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			if (this.alt.TryEvaluate(State.Session, out string RefId) &&
+			if (!(this.alt is null) &&
+				this.alt.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element))
 			{
 				this.alternative = Element;
 			}
+		
+			bool Relative = base.MeasureDimensions(State);
 
-			base.MeasureDimensions(State);
+			if (this.image is null && !(this.alternative is null))
+			{
+				this.Width = this.alternative.Width;
+				this.Height = this.alternative.Height;
+			}
+
+			return Relative;
 		}
 
 		private ILayoutElement alternative = null;
-
-		/// <summary>
-		/// Default width of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Width</returns>
-		public override float GetDefaultWidth(DrawingState State)
-		{
-			if (!(this.image is null) || this.alternative is null)
-				return base.GetDefaultWidth(State);
-			else if (this.alternative is FigurePoint2 P2)
-				return P2.GetDefaultWidth(State);
-			else if (this.alternative is LayoutArea A && A.Width.HasValue)
-				return A.Width.Value;
-			else
-				return base.GetDefaultWidth(State);
-		}
-
-		/// <summary>
-		/// Default height of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Height</returns>
-		public override float GetDefaultHeight(DrawingState State)
-		{
-			if (!(this.image is null) || this.alternative is null)
-				return base.GetDefaultHeight(State);
-			else if (this.alternative is FigurePoint2 P2)
-				return P2.GetDefaultHeight(State);
-			else if (this.alternative is LayoutArea A && A.Height.HasValue)
-				return A.Height.Value;
-			else
-				return base.GetDefaultHeight(State);
-		}
 
 		/// <summary>
 		/// Draws layout entities.

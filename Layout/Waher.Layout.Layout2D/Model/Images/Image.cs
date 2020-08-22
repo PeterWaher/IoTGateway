@@ -34,15 +34,22 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
 			if (this.image is null && !this.loadStarted)
 			{
 				this.loadStarted = true;
 				this.image = this.LoadImage(State);
+
+				if (!(this.image is null))
+				{
+					this.Width = this.image.Width;
+					this.Height = this.image.Height;
+				}
 			}
 
-			base.MeasureDimensions(State);
+			return base.MeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -51,26 +58,6 @@ namespace Waher.Layout.Layout2D.Model.Images
 		protected SKImage image = null;
 
 		private bool loadStarted = false;
-
-		/// <summary>
-		/// Default width of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Width</returns>
-		public override float GetDefaultWidth(DrawingState State)
-		{
-			return this.image?.Width ?? base.GetDefaultWidth(State);
-		}
-
-		/// <summary>
-		/// Default height of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Height</returns>
-		public override float GetDefaultHeight(DrawingState State)
-		{
-			return this.image?.Height ?? base.GetDefaultHeight(State);
-		}
 
 		/// <summary>
 		/// Loads the image defined by the element.
@@ -92,7 +79,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 					this.xCoordinate, this.yCoordinate,
 					this.xCoordinate2, this.yCoordinate2));
 			}
-		
+
 			base.Draw(State);
 		}
 	}

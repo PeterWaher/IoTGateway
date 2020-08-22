@@ -78,9 +78,9 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		{
 			base.ExportAttributes(Output);
 
-			this.sigmaX.Export(Output);
-			this.sigmaY.Export(Output);
-			this.tileMode.Export(Output);
+			this.sigmaX?.Export(Output);
+			this.sigmaY?.Export(Output);
+			this.tileMode?.Export(Output);
 		}
 
 		/// <summary>
@@ -104,9 +104,9 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Blur Dest)
 			{
-				Dest.sigmaX = this.sigmaX.CopyIfNotPreset();
-				Dest.sigmaY = this.sigmaY.CopyIfNotPreset();
-				Dest.tileMode = this.tileMode.CopyIfNotPreset();
+				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset();
+				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset();
+				Dest.tileMode = this.tileMode?.CopyIfNotPreset();
 			}
 		}
 	}

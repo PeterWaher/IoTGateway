@@ -78,8 +78,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.head.Export(Output);
-			this.tail.Export(Output);
+			this.head?.Export(Output);
+			this.tail?.Export(Output);
 		}
 
 		/// <summary>
@@ -402,8 +402,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Spline Dest)
 			{
-				Dest.head = this.head.CopyIfNotPreset();
-				Dest.tail = this.tail.CopyIfNotPreset();
+				Dest.head = this.head?.CopyIfNotPreset();
+				Dest.tail = this.tail?.CopyIfNotPreset();
 			}
 		}
 
@@ -411,18 +411,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.head.TryEvaluate(State.Session, out string RefId) &&
+			if (!(this.head is null) &&
+				this.head.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
 				Element is Shape Shape)
 			{
 				this.headElement = Shape;
 			}
 
-			if (this.tail.TryEvaluate(State.Session, out RefId) &&
+			if (!(this.tail is null) &&
+				this.tail.TryEvaluate(State.Session, out RefId) &&
 				this.Document.TryGetElement(RefId, out Element) &&
 				Element is Shape Shape2)
 			{
@@ -431,6 +434,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			this.spline?.Dispose();
 			this.spline = null;
+
+			return Relative;
 		}
 
 		private Shape headElement;

@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		{
 			base.ExportAttributes(Output);
 
-			this.expression.Export(Output);
+			this.expression?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is InlineScript Dest)
-				Dest.expression = this.expression.CopyIfNotPreset();
+				Dest.expression = this.expression?.CopyIfNotPreset();
 		}
 	}
 }

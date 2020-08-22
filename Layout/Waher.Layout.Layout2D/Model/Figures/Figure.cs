@@ -65,8 +65,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.pen.Export(Output);
-			this.fill.Export(Output);
+			this.pen?.Export(Output);
+			this.fill?.Export(Output);
 		}
 
 		/// <summary>
@@ -79,8 +79,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Figure Dest)
 			{
-				Dest.pen = this.pen.CopyIfNotPreset();
-				Dest.fill = this.fill.CopyIfNotPreset();
+				Dest.pen = this.pen?.CopyIfNotPreset();
+				Dest.fill = this.fill?.CopyIfNotPreset();
 			}
 		}
 
@@ -92,7 +92,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>Pen.</returns>
 		public SKPaint GetPen(DrawingState State)
 		{
-			if (this.pen.TryEvaluate(State.Session, out string PenId))
+			if (!(this.pen is null) && this.pen.TryEvaluate(State.Session, out string PenId))
 			{
 				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
 					E is Pen PenDefinition)
@@ -116,7 +116,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>If a pen was defined, and was found.</returns>
 		public bool TryGetPen(DrawingState State, out SKPaint Pen)
 		{
-			if (this.pen.TryEvaluate(State.Session, out string PenId))
+			if (!(this.pen is null) && this.pen.TryEvaluate(State.Session, out string PenId))
 			{
 				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
 					E is Pen PenDefinition)
@@ -143,7 +143,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <returns>If a filling was defined, and was found.</returns>
 		public bool TryGetFill(DrawingState State, out SKPaint Fill)
 		{
-			if (this.fill.TryEvaluate(State.Session, out string FillId))
+			if (!(this.fill is null) && this.fill.TryEvaluate(State.Session, out string FillId))
 			{
 				if (this.Document.TryGetElement(FillId, out ILayoutElement E) &&
 					E is Background FillDefinition)

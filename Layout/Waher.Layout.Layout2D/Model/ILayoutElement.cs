@@ -148,7 +148,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		void MeasureDimensions(DrawingState State);
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		bool MeasureDimensions(DrawingState State);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.

@@ -49,7 +49,7 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.ExportAttributes(Output);
 
-			this.distance.Export(Output);
+			this.distance?.Export(Output);
 		}
 
 		/// <summary>
@@ -61,21 +61,24 @@ namespace Waher.Layout.Layout2D.Model
 			base.CopyContents(Destination);
 
 			if (Destination is Distance Dest)
-				Dest.distance = this.distance.CopyIfNotPreset();
+				Dest.distance = this.distance?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.distance.TryEvaluate(State.Session, out Length L))
-				this.dist = State.GetDrawingSize(L, this, true);
+			if (!(this.distance is null) && this.distance.TryEvaluate(State.Session, out Length L))
+				State.CalcDrawingSize(L, ref this.dist, this, true, ref Relative);
 			else
 				this.defined = false;
+
+			return Relative;
 		}
 
 		/// <summary>

@@ -68,8 +68,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.radiusX.Export(Output);
-			this.radiusY.Export(Output);
+			this.radiusX?.Export(Output);
+			this.radiusY?.Export(Output);
 		}
 
 		/// <summary>
@@ -93,8 +93,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is Ellipse Dest)
 			{
-				Dest.radiusX = this.radiusX.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
 			}
 		}
 
@@ -102,21 +102,22 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.radiusX.TryEvaluate(State.Session, out Length R))
+			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
 			{
-				this.rX = State.GetDrawingSize(R, this, true);
+				State.CalcDrawingSize(R, ref this.rX, this, true, ref Relative);
 				this.Width = 2 * this.rX;
 			}
 			else
 				this.defined = false;
 
-			if (this.radiusY.TryEvaluate(State.Session, out R))
+			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
 			{
-				this.rY = State.GetDrawingSize(R, this, false);
+				State.CalcDrawingSize(R, ref this.rY, this, false, ref Relative);
 				this.Height = 2 * this.rY;
 			}
 			else
@@ -129,6 +130,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.rY);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.rY);
 			}
+
+			return Relative;
 		}
 
 		/// <summary>

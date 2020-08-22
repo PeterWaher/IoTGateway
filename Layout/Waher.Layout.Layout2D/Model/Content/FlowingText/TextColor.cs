@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		{
 			base.ExportAttributes(Output);
 
-			this.color.Export(Output);
+			this.color?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is TextColor Dest)
-				Dest.color = this.color.CopyIfNotPreset();
+				Dest.color = this.color?.CopyIfNotPreset();
 		}
 	}
 }

@@ -90,10 +90,10 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			base.ExportAttributes(Output);
 
-			this.font.Export(Output);
-			this.pen.Export(Output);
-			this.background.Export(Output);
-			this.textColor.Export(Output);
+			this.font?.Export(Output);
+			this.pen?.Export(Output);
+			this.background?.Export(Output);
+			this.textColor?.Export(Output);
 		}
 
 		/// <summary>
@@ -117,10 +117,10 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (Destination is Layout2D Dest)
 			{
-				Dest.font = this.font.CopyIfNotPreset();
-				Dest.pen = this.pen.CopyIfNotPreset();
-				Dest.background = this.background.CopyIfNotPreset();
-				Dest.textColor = this.textColor.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset();
+				Dest.pen = this.pen?.CopyIfNotPreset();
+				Dest.background = this.background?.CopyIfNotPreset();
+				Dest.textColor = this.textColor?.CopyIfNotPreset();
 			}
 		}
 
@@ -130,12 +130,14 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
 
-			if (this.font.TryEvaluate(State.Session, out string FontId) &&
+			if (!(this.font is null) &&
+				this.font.TryEvaluate(State.Session, out string FontId) &&
 				this.Document.TryGetElement(FontId, out ILayoutElement Element) &&
 				Element is Font Font)
 			{
@@ -149,27 +151,31 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.Text = this.fontDef.Text;
 			}
 
-			if (this.pen.TryEvaluate(State.Session, out string PenId) &&
+			if (!(this.pen is null) &&
+				this.pen.TryEvaluate(State.Session, out string PenId) &&
 				this.Document.TryGetElement(PenId, out Element) &&
 				Element is Pen Pen)
 			{
 				// TODO
 			}
 
-			if (this.background.TryEvaluate(State.Session, out string BackgroundId) &&
+			if (!(this.background is null) &&
+				this.background.TryEvaluate(State.Session, out string BackgroundId) &&
 				this.Document.TryGetElement(BackgroundId, out Element) &&
 				Element is Background Background)
 			{
 				// TODO
 			}
 
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			if (!(FontBak is null))
 				State.Font = FontBak;
 
 			if (!(TextBak is null))
 				State.Text = TextBak;
+
+			return Relative;
 		}
 
 		/// <summary>

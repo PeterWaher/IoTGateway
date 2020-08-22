@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			base.ExportAttributes(Output);
 
-			this.cid.Export(Output);
+			this.cid?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 			base.CopyContents(Destination);
 
 			if (Destination is ImageInternal Dest)
-				Dest.cid = this.cid.CopyIfNotPreset();
+				Dest.cid = this.cid?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -89,7 +89,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// image loading is in process.</returns>
 		protected override SKImage LoadImage(DrawingState State)
 		{
-			if (this.cid.TryEvaluate(State.Session, out string ContentId) &&
+			if (!(this.cid is null) &&
+				this.cid.TryEvaluate(State.Session, out string ContentId) &&
 				this.Document.TryGetContent(ContentId, out object Content) &&
 				Content is SKImage Image)
 			{

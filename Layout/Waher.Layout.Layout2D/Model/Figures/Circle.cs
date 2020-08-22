@@ -56,7 +56,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.radius.Export(Output);
+			this.radius?.Export(Output);
 		}
 
 		/// <summary>
@@ -79,20 +79,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			base.CopyContents(Destination);
 
 			if (Destination is Circle Dest)
-				Dest.radius = this.radius.CopyIfNotPreset();
+				Dest.radius = this.radius?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.radius.TryEvaluate(State.Session, out Length R))
+			if (!(this.radius is null) && this.radius.TryEvaluate(State.Session, out Length R))
 			{
-				this.r = State.GetDrawingSize(R, this, true);
+				State.CalcDrawingSize(R, ref this.r, this, true, ref Relative);
 				this.Width = this.Height = 2 * this.r;
 			}
 			else
@@ -105,6 +106,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.r);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.r);
 			}
+
+			return Relative;
 		}
 
 		/// <summary>

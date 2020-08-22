@@ -53,6 +53,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="State">Current drawing state.</param>
 		public override void MeasurePositions(DrawingState State)
 		{
+			base.MeasurePositions(State);
+
 			ILayoutElement[] Children = this.DynamicChildren;
 
 			if (!(Children is null))
@@ -64,6 +66,11 @@ namespace Waher.Layout.Layout2D.Model
 				}
 			}
 		}
+
+		/// <summary>
+		/// If children positions are to be measured.
+		/// </summary>
+		protected override bool MeasureChildrenPositions => false;
 
 	}
 }

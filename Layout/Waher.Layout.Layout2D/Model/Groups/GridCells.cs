@@ -12,8 +12,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private readonly List<GridPadding> elements = new List<GridPadding>();
 		private readonly Variables session;
 		private readonly int nrColumns;
-		private readonly float?[] rights;
-		private readonly List<float?> bottoms;
+		private readonly float[] rights;
+		private readonly List<float> bottoms;
 		private int x = 0;
 		private int y = 0;
 
@@ -26,8 +26,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			this.session = Session;
 			this.nrColumns = NrColumns;
-			this.rights = new float?[this.nrColumns];
-			this.bottoms = new List<float?>();
+			this.rights = new float[this.nrColumns];
+			this.bottoms = new List<float>();
 		}
 
 		private GridPadding GetElement(int X, int Y)
@@ -57,31 +57,29 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 		private float GetRight(int x)
 		{
-			float? Result = 0;
-
-			while (x >= 0 && !(Result = this.rights[x]).HasValue)
-				x--;
-
 			if (x < 0)
 				return 0;
 			else
-				return Result.Value;
+				return this.rights[x];
 		}
 
 		private float GetBottom(int y)
 		{
-			float? Result = 0;
-
-			while (this.bottoms.Count <= y)
-				this.bottoms.Add(null);
-
-			while (y >= 0 && !(Result = this.bottoms[y]).HasValue)
-				y--;
-
 			if (y < 0)
 				return 0;
-			else
-				return Result.Value;
+
+			int c = this.bottoms.Count;
+			while (c <= y)
+			{
+				if (c == 0)
+					this.bottoms.Add(0);
+				else
+					this.bottoms.Add(this.bottoms[c - 1]);
+
+				c++;
+			}
+
+			return this.bottoms[y];
 		}
 
 		/// <summary>
@@ -109,15 +107,27 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			float Right = this.GetRight(this.x - 1) + (Element.Width ?? 0);
 			float Right2 = this.GetRight(X2);
-			if (Right > Right2)
-				this.rights[X2] = Right;
+			float Diff = Right - Right2;
+
+			if (Diff > 0)
+			{
+				while (X2 < this.nrColumns)
+					this.rights[X2++] += Diff;
+			}
 
 			int Y2 = this.y + RowSpan - 1;
 
 			float Bottom = this.GetBottom(this.y - 1) + (Element.Height ?? 0);
 			float Bottom2 = this.GetBottom(Y2);
-			if (Bottom > Bottom2)
-				this.bottoms[Y2] = Bottom;
+
+			Diff = Bottom - Bottom2;
+			if (Diff > 0)
+			{
+				int c = this.bottoms.Count;
+
+				while (Y2 < c)
+					this.bottoms[Y2++] += Diff;
+			}
 
 			this.x += ColSpan;
 			if (this.x >= this.nrColumns)

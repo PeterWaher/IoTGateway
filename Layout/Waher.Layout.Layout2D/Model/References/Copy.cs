@@ -56,7 +56,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.ExportAttributes(Output);
 
-			this._ref.Export(Output);
+			this._ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -79,28 +79,34 @@ namespace Waher.Layout.Layout2D.Model.References
 			base.CopyContents(Destination);
 
 			if (Destination is Copy Dest)
-				Dest._ref = this._ref.CopyIfNotPreset();
+				Dest._ref = this._ref?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			if (this.defined &&
+				!(this._ref is null) &&
 				this._ref.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out this.reference))
 			{
 				this.reference = this.reference.Copy(this);
-				this.reference.MeasureDimensions(State);
+				if (this.reference.MeasureDimensions(State))
+					Relative = true;
+
 				this.Width = this.reference.Width;
 				this.Height = this.reference.Height;
 			}
 			else
 				this.defined = false;
+
+			return Relative;
 		}
 
 		private ILayoutElement reference;

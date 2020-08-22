@@ -71,9 +71,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.x2.Export(Output);
-			this.y2.Export(Output);
-			this.ref2.Export(Output);
+			this.x2?.Export(Output);
+			this.y2?.Export(Output);
+			this.ref2?.Export(Output);
 		}
 
 		/// <summary>
@@ -86,9 +86,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is FigurePoint2 Dest)
 			{
-				Dest.x2 = this.x2.CopyIfNotPreset();
-				Dest.y2 = this.y2.CopyIfNotPreset();
-				Dest.ref2 = this.ref2.CopyIfNotPreset();
+				Dest.x2 = this.x2?.CopyIfNotPreset();
+				Dest.y2 = this.y2?.CopyIfNotPreset();
+				Dest.ref2 = this.ref2?.CopyIfNotPreset();
 			}
 		}
 
@@ -96,53 +96,32 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, out this.xCoordinate2, out this.yCoordinate2))
+			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, ref this.xCoordinate2, ref this.yCoordinate2, ref Relative))
 			{
-				float? dx = this.GetWidthEstimate(State);
-				float? dy = this.GetHeightEstimate(State);
+				float X = this.xCoordinate + this.PresetWidth ?? State.AreaWidth;
+				float Y = this.yCoordinate + this.PresetHeight ?? State.AreaHeight;
 
-				if (dx.HasValue)
-					this.xCoordinate2 = this.xCoordinate + dx.Value;
-				else
-					this.xCoordinate2 = this.xCoordinate + this.GetDefaultWidth(State);
+				if (X != this.xCoordinate2)
+				{
+					Relative = true;
+					this.xCoordinate2 = X;
+				}
 
-				if (dy.HasValue)
-					this.yCoordinate2 = this.yCoordinate + dy.Value;
-				else
-					this.yCoordinate2 = this.yCoordinate + this.GetDefaultHeight(State);
+				if (Y != this.yCoordinate2)
+				{
+					Relative = true;
+					this.yCoordinate2 = Y;
+				}
 
 				this.IncludePoint(this.xCoordinate2, this.yCoordinate2);
 			}
-		}
 
-		/// <summary>
-		/// Default width of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Width</returns>
-		public virtual float GetDefaultWidth(DrawingState State)
-		{
-			if (this.HasChildren && this.Width.HasValue)
-				return this.Width.Value;
-			else
-				return State.GetDrawingSize(Length.HundredPercent, this, true);
-		}
-
-		/// <summary>
-		/// Default height of element.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>Height</returns>
-		public virtual float GetDefaultHeight(DrawingState State)
-		{
-			if (this.HasChildren && this.Height.HasValue)
-				return this.Height.Value;
-			else
-				return State.GetDrawingSize(Length.HundredPercent, this, false);
+			return Relative;
 		}
 
 		/// <summary>

@@ -67,8 +67,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.radiusX.Export(Output);
-			this.radiusY.Export(Output);
+			this.radiusX?.Export(Output);
+			this.radiusY?.Export(Output);
 		}
 
 		/// <summary>
@@ -92,8 +92,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is RoundedRectangle Dest)
 			{
-				Dest.radiusX = this.radiusX.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
 			}
 		}
 
@@ -101,19 +101,22 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.radiusX.TryEvaluate(State.Session, out Length L))
-				this.rx = State.GetDrawingSize(L, this, true);
+			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length L))
+				State.CalcDrawingSize(L, ref this.rx, this, true, ref Relative);
 			else
 				this.rx = 0;
 
-			if (this.radiusY.TryEvaluate(State.Session, out L))
-				this.ry = State.GetDrawingSize(L, this, false);
+			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out L))
+				State.CalcDrawingSize(L, ref this.ry, this, false, ref Relative);
 			else
 				this.ry = 0;
+
+			return Relative;
 		}
 
 		/// <summary>

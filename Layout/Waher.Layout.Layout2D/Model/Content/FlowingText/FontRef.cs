@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		{
 			base.ExportAttributes(Output);
 
-			this.font.Export(Output);
+			this.font?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			base.CopyContents(Destination);
 
 			if (Destination is FontRef Dest)
-				Dest.font = this.font.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset();
 		}
 	}
 }

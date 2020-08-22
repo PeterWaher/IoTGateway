@@ -119,29 +119,67 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.HasChildren)
+			if (this.HasChildren && this.MeasureChildrenDimensions)
 			{
 				foreach (ILayoutElement E in this.children)
 				{
-					E.MeasureDimensions(State);
+					if (E.MeasureDimensions(State))
+						Relative = true;
 
-					float? X = E.Left;
-					float? Y = E.Top;
-
-					if (X.HasValue && Y.HasValue)
-						this.IncludePoint(X.Value, Y.Value);
-
-					X = E.Right;
-					Y = E.Bottom;
-
-					if (X.HasValue && Y.HasValue)
-						this.IncludePoint(X.Value, Y.Value);
+					this.IncludeElement(E);
 				}
 			}
+
+			return Relative;
+		}
+
+		/// <summary>
+		/// Includes element in dimension measurement.
+		/// </summary>
+		/// <param name="Element">Element to include.</param>
+		protected void IncludeElement(ILayoutElement Element)
+		{
+			float? X = Element.Left;
+			float? Y = Element.Top;
+			float? V, V2;
+
+			if (X.HasValue && Y.HasValue)
+				this.IncludePoint(X.Value, Y.Value);
+			else
+			{
+				V = this.Width;
+				V2 = Element.Width;
+
+				if (!V.HasValue || (V2.HasValue && V2.Value > V.Value))
+					this.Width = V2;
+			}
+
+			X = Element.Right;
+			Y = Element.Bottom;
+
+			if (X.HasValue && Y.HasValue)
+				this.IncludePoint(X.Value, Y.Value);
+			else
+			{
+				V = this.Height;
+				V2 = Element.Height;
+
+				if (!V.HasValue || (V2.HasValue && V2.Value > V.Value))
+					this.Height = V2;
+			}
+		}
+
+		/// <summary>
+		/// If children dimensions are to be measured.
+		/// </summary>
+		protected virtual bool MeasureChildrenDimensions
+		{
+			get => true;
 		}
 
 		/// <summary>
@@ -152,11 +190,19 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			base.MeasurePositions(State);
 
-			if (this.HasChildren)
+			if (this.HasChildren && this.MeasureChildrenPositions)
 			{
 				foreach (ILayoutElement E in this.children)
 					E.MeasurePositions(State);
 			}
+		}
+
+		/// <summary>
+		/// If children positions are to be measured.
+		/// </summary>
+		protected virtual bool MeasureChildrenPositions
+		{
+			get => true;
 		}
 
 		/// <summary>
@@ -204,12 +250,13 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="RefAttribute">Reference attribute</param>
 		/// <param name="X">Resulting X-coordinate.</param>
 		/// <param name="Y">Resulting Y-coordinate.</param>
+		/// <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
 		/// <returns>If point is well-defined.</returns>
 		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute,
 			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			out float X, out float Y)
+			ref float X, ref float Y, ref bool Relative)
 		{
-			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, out X, out Y);
+			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, ref X, ref Y, ref Relative);
 
 			if (Result)
 				this.IncludePoint(X, Y);

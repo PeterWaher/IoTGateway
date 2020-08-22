@@ -216,6 +216,16 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Width of element, if defined explicitly (i.e. not evaluated from Left and Right).
+		/// </summary>
+		public float? PresetWidth => this.width;
+
+		/// <summary>
+		/// Height of element, if defined explicitly (i.e. not evaluated from Top and Bottom).
+		/// </summary>
+		public float? PresetHeight => this.height;
+
+		/// <summary>
 		/// Width of element
 		/// </summary>
 		public float? Width
@@ -436,8 +446,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Output">XML output.</param>
 		public virtual void ExportAttributes(XmlWriter Output)
 		{
-			this.id.Export(Output);
-			this.visible.Export(Output);
+			this.id?.Export(Output);
+			this.visible?.Export(Output);
 		}
 
 		/// <summary>
@@ -468,8 +478,8 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			if (Destination is LayoutElement Dest)
 			{
-				Dest.id = this.id.CopyIfNotPreset();
-				Dest.visible = this.visible.CopyIfNotPreset();
+				Dest.id = this.id?.CopyIfNotPreset();
+				Dest.visible = this.visible?.CopyIfNotPreset();
 			}
 		}
 
@@ -477,12 +487,15 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public virtual void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public virtual bool MeasureDimensions(DrawingState State)
 		{
-			if (this.visible.TryEvaluate(State.Session, out bool b))
+			if (!(this.visible is null) && this.visible.TryEvaluate(State.Session, out bool b))
 				this.isVisible = b;
 
 			this.defined = true;
+
+			return false;
 		}
 
 		/// <summary>
@@ -514,8 +527,8 @@ namespace Waher.Layout.Layout2D.Model
 				this.height = null;
 				this.left = Rect.Left;
 				this.top = Rect.Top;
-				this.right = Rect.Right;
-				this.bottom = Rect.Bottom;
+				this.Width = Rect.Width;
+				this.Height = Rect.Height;
 			}
 		}
 
@@ -533,16 +546,19 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="RefAttribute">Reference attribute</param>
 		/// <param name="X">Resulting X-coordinate.</param>
 		/// <param name="Y">Resulting Y-coordinate.</param>
+		/// <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
 		/// <returns>If point is well-defined.</returns>
 		protected bool CalcPoint(DrawingState State, LengthAttribute XAttribute,
 			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			out float X, out float Y)
+			ref float X, ref float Y, ref bool Relative)
 		{
-			if (XAttribute.TryEvaluate(State.Session, out Length X1) &&
+			if (!(XAttribute is null) &&
+				!(YAttribute is null) &&
+				XAttribute.TryEvaluate(State.Session, out Length X1) &&
 				YAttribute.TryEvaluate(State.Session, out Length Y1))
 			{
-				X = State.GetDrawingSize(X1, this, true);
-				Y = State.GetDrawingSize(Y1, this, false);
+				State.CalcDrawingSize(X1, ref X, this, true, ref Relative);
+				State.CalcDrawingSize(Y1, ref Y, this, false, ref Relative);
 
 				return true;
 			}
@@ -550,16 +566,26 @@ namespace Waher.Layout.Layout2D.Model
 				RefAttribute.TryEvaluate(State.Session, out string RefId) &&
 				this.Document.TryGetElement(RefId, out ILayoutElement Element))
 			{
-				X = Element.Left ?? 0;
-				Y = Element.Top ?? 0;
+				float a = Element.Left ?? 0;
+
+				if (X != a)
+				{
+					X = a;
+					Relative = true;
+				}
+
+				a = Element.Top ?? 0;
+
+				if (Y != a)
+				{
+					Y = a;
+					Relative = true;
+				}
 
 				return true;
 			}
 			else
-			{
-				X = Y = 0;
 				return false;
-			}
 		}
 
 		/// <summary>
@@ -643,7 +669,7 @@ namespace Waher.Layout.Layout2D.Model
 			sb.Append(", ");
 
 			if (this.top.HasValue)
-				sb.Append(this.right.Value.ToString());
+				sb.Append(this.top.Value.ToString());
 
 			sb.Append(") - (");
 

@@ -88,10 +88,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			base.ExportAttributes(Output);
 
-			this.left.Export(Output);
-			this.right.Export(Output);
-			this.top.Export(Output);
-			this.bottom.Export(Output);
+			this.left?.Export(Output);
+			this.right?.Export(Output);
+			this.top?.Export(Output);
+			this.bottom?.Export(Output);
 		}
 
 		/// <summary>
@@ -115,10 +115,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (Destination is Margins Dest)
 			{
-				Dest.left = this.left.CopyIfNotPreset();
-				Dest.right = this.right.CopyIfNotPreset();
-				Dest.top = this.top.CopyIfNotPreset();
-				Dest.bottom = this.bottom.CopyIfNotPreset();
+				Dest.left = this.left?.CopyIfNotPreset();
+				Dest.right = this.right?.CopyIfNotPreset();
+				Dest.top = this.top?.CopyIfNotPreset();
+				Dest.bottom = this.bottom?.CopyIfNotPreset();
 			}
 		}
 
@@ -126,41 +126,44 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.left.TryEvaluate(State.Session, out Length L))
+			if (!(this.left is null) && this.left.TryEvaluate(State.Session, out Length L))
 			{
-				this.leftMargin = State.GetDrawingSize(L, this, true);
+				State.CalcDrawingSize(L, ref this.leftMargin, this, true, ref Relative);
 				this.Right += this.leftMargin;
 			}
 			else
 				this.leftMargin = 0;
 
-			if (this.right.TryEvaluate(State.Session, out L))
+			if (!(this.right is null) && this.right.TryEvaluate(State.Session, out L))
 			{
-				this.rightMargin = State.GetDrawingSize(L, this, true);
+				State.CalcDrawingSize(L, ref this.rightMargin, this, true, ref Relative);
 				this.Right += this.rightMargin;
 			}
 			else
 				this.rightMargin = 0;
 
-			if (this.top.TryEvaluate(State.Session, out L))
+			if (!(this.top is null) && this.top.TryEvaluate(State.Session, out L))
 			{
-				this.topMargin = State.GetDrawingSize(L, this, true);
+				State.CalcDrawingSize(L, ref this.topMargin, this, true, ref Relative);
 				this.Bottom += this.topMargin;
 			}
 			else
 				this.topMargin = 0;
 
-			if (this.bottom.TryEvaluate(State.Session, out L))
+			if (!(this.bottom is null) && this.bottom.TryEvaluate(State.Session, out L))
 			{
-				this.bottomMargin = State.GetDrawingSize(L, this, true);
+				State.CalcDrawingSize(L, ref this.bottomMargin, this, true, ref Relative);
 				this.Bottom += this.bottomMargin;
 			}
 			else
 				this.bottomMargin = 0;
+
+			return Relative;
 		}
 
 		private float leftMargin;

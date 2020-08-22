@@ -71,9 +71,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			base.ExportAttributes(Output);
 
-			this.x.Export(Output);
-			this.y.Export(Output);
-			this._ref.Export(Output);
+			this.x?.Export(Output);
+			this.y?.Export(Output);
+			this._ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -86,9 +86,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (Destination is FigurePoint Dest)
 			{
-				Dest.x = this.x.CopyIfNotPreset();
-				Dest.y = this.y.CopyIfNotPreset();
-				Dest._ref = this._ref.CopyIfNotPreset();
+				Dest.x = this.x?.CopyIfNotPreset();
+				Dest.y = this.y?.CopyIfNotPreset();
+				Dest._ref = this._ref?.CopyIfNotPreset();
 			}
 		}
 
@@ -96,17 +96,20 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (!this.IncludePoint(State, this.x, this.y, this._ref, out this.xCoordinate, out this.yCoordinate))
+			if (!this.IncludePoint(State, this.x, this.y, this._ref, ref this.xCoordinate, ref this.yCoordinate, ref Relative))
 			{
 				this.xCoordinate = 0;
 				this.yCoordinate = 0;
 
 				this.IncludePoint(this.xCoordinate, this.yCoordinate);
 			}
+
+			return Relative;
 		}
 
 		/// <summary>

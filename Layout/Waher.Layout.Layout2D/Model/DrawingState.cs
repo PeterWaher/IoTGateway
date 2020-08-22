@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SkiaSharp;
 using Waher.Script;
 
@@ -20,10 +18,10 @@ namespace Waher.Layout.Layout2D.Model
 		private SKFont font;
 		private SKPaint text;
 		private float? width_0;
-		private float? height_0;
+		private float? height_x;
+		private SKSize areaSize;
+		private SKSize viewportSize;
 		private readonly float pixelsPerInch;
-		private readonly int viewportWidth;
-		private readonly int viewportHeight;
 
 		/// <summary>
 		/// Current drawing state.
@@ -36,8 +34,7 @@ namespace Waher.Layout.Layout2D.Model
 			this.canvas = Canvas;
 			this.session = Session;
 			this.pixelsPerInch = Settings.PixelsPerInch;
-			this.viewportWidth = Settings.Width;
-			this.viewportHeight = Settings.Height;
+			this.areaSize = this.viewportSize = new SKSize(Settings.Width, Settings.Height);
 
 			this.font = new SKFont()
 			{
@@ -140,117 +137,172 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Width of current area
+		/// </summary>
+		public float AreaWidth => this.areaSize.Width;
+
+		/// <summary>
+		/// Height of current area
+		/// </summary>
+		public float AreaHeight => this.areaSize.Height;
+
+		/// <summary>
 		/// Converts a defined length to drawing size.
 		/// </summary>
 		/// <param name="L">Length</param>
+		/// <param name="Size">Calculated size.</param>
 		/// <param name="Element">Current element.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
-		/// <returns>Drawing size, if defined.</returns>
-		public float GetDrawingSize(Length L, ILayoutElement Element, bool Horizontal)
+		/// <param name="Relative">If size is relative, and should be recalculated if dimensions change.</param>
+		public void CalcDrawingSize(Length L, ref float Size, ILayoutElement Element, bool Horizontal, ref bool Relative)
 		{
 			switch (L.Unit)
 			{
 				// pixels (1px = 1/96th of 1in) (absolute)
 				case LengthUnit.Px:
-					return L.Value * this.pixelsPerInch / 96;
+					Size = L.Value * this.pixelsPerInch / 96;
+					break;
 
 				// points (1pt = 1/72 of 1in) (absolute)
 				case LengthUnit.Pt:
-					return L.Value * this.pixelsPerInch / 72;
+					Size = L.Value * this.pixelsPerInch / 72;
+					break;
 
 				// picas (1pc = 12 pt) (absolute)
 				case LengthUnit.Pc:
-					return L.Value * this.pixelsPerInch / 12;
+					Size = L.Value * this.pixelsPerInch / 12;
+					break;
 
 				// centimeters (absolute)
 				case LengthUnit.Cm:
-					return L.Value * this.pixelsPerInch / 2.54f;
+					Size = L.Value * this.pixelsPerInch / 2.54f;
+					break;
 
 				// inches (1in = 96px = 2.54cm)
 				case LengthUnit.In:
-					return L.Value * this.pixelsPerInch;
+					Size = L.Value * this.pixelsPerInch;
+					break;
 
 				// millimeters (absolute)
 				case LengthUnit.Mm:
-					return L.Value * this.pixelsPerInch / 25.4f;
+					Size = L.Value * this.pixelsPerInch / 25.4f;
+					break;
 
 				// Relative to the font-size of the element (2em means 2 times the size of the current font)
 				case LengthUnit.Em:
-					return L.Value * this.text.TextSize;
+					float Size2 = L.Value * this.text.TextSize;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to the x-height of the current font (rarely used)
 				case LengthUnit.Ex:
-					if (!this.height_0.HasValue)
+					if (!this.height_x.HasValue)
 					{
 						SKRect Bounds = new SKRect();
 						this.text.MeasureText("x", ref Bounds);
-						this.height_0 = Bounds.Height;
+						this.height_x = Bounds.Height;
 					}
 
-					return L.Value * this.height_0.Value;
+					Size2 = L.Value * this.height_x.Value;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to the width of the "0" (zero)
 				case LengthUnit.Ch:
 					if (!this.width_0.HasValue)
 						this.width_0 = this.text.MeasureText("0");
 
-					return L.Value * this.width_0.Value;
+					Size2 = L.Value * this.width_0.Value;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to font-size of the root element
 				case LengthUnit.Rem:
-					return L.Value * this.textRoot.TextSize;
+					Size2 = L.Value * this.textRoot.TextSize;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to 1% of the width of the viewport
 				case LengthUnit.Vw:
-					return L.Value * this.viewportWidth / 100;
+					Size2 = L.Value * this.viewportSize.Width / 100;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to 1% of the height of the viewport
 				case LengthUnit.Vh:
-					return L.Value * this.viewportHeight / 100;
+					Size2 = L.Value * this.viewportSize.Height / 100;
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to 1% of viewport's* smaller dimension
 				case LengthUnit.Vmin:
-					if (this.viewportWidth < this.viewportHeight)
-						return L.Value * this.viewportWidth / 100;
+					if (this.viewportSize.Width < this.viewportSize.Height)
+						Size2 = L.Value * this.viewportSize.Width / 100;
 					else
-						return L.Value * this.viewportHeight / 100;
+						Size2 = L.Value * this.viewportSize.Height / 100;
+
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to 1% of viewport's* larger dimension
 				case LengthUnit.Vmax:
-					if (this.viewportWidth > this.viewportHeight)
-						return L.Value * this.viewportWidth / 100;
+					if (this.viewportSize.Width > this.viewportSize.Height)
+						Size2 = L.Value * this.viewportSize.Width / 100;
 					else
-						return L.Value * this.viewportHeight / 100;
+						Size2 = L.Value * this.viewportSize.Height / 100;
+
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				// Relative to the parent element
 				case LengthUnit.Percent:
-					float? Size;
-
-					Element = Element?.Parent;
-
-					while (!(Element is null))
-					{
-						if (Element is LayoutArea Area)
-						{
-							if (Horizontal)
-								Size = Area.GetWidthEstimate(this);
-							else
-								Size = Area.GetHeightEstimate(this);
-
-							if (Size.HasValue)
-								return L.Value * Size.Value / 100;
-						}
-
-						Element = Element.Parent;
-					}
-
 					if (Horizontal)
-						return L.Value * this.viewportWidth / 100;
+						Size2 = L.Value * this.areaSize.Width / 100;
 					else
-						return L.Value * this.viewportHeight / 100;
+						Size2 = L.Value * this.areaSize.Height / 100;
+
+					if (Size != Size2)
+					{
+						Size = Size2;
+						Relative = true;
+					}
+					break;
 
 				default:
-					return L.Value;
+					Size = L.Value;
+					break;
 			}
 		}
 	}

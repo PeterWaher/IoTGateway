@@ -77,9 +77,9 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			base.ExportAttributes(Output);
 
-			this.radiusX.Export(Output);
-			this.radiusY.Export(Output);
-			this.clockwise.Export(Output);
+			this.radiusX?.Export(Output);
+			this.radiusY?.Export(Output);
+			this.clockwise?.Export(Output);
 		}
 
 		/// <summary>
@@ -103,10 +103,35 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 
 			if (Destination is EllipseArcTo Dest)
 			{
-				Dest.radiusX = this.radiusX.CopyIfNotPreset();
-				Dest.radiusY = this.radiusY.CopyIfNotPreset();
-				Dest.clockwise = this.clockwise.CopyIfNotPreset();
+				Dest.radiusX = this.radiusX?.CopyIfNotPreset();
+				Dest.radiusY = this.radiusY?.CopyIfNotPreset();
+				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
 			}
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
+		{
+			bool Relative = base.MeasureDimensions(State);
+
+			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
+				State.CalcDrawingSize(R, ref this.rX, this, true, ref Relative);
+			else
+				this.defined = false;
+
+			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
+				State.CalcDrawingSize(R, ref this.rY, this, false, ref Relative);
+			else
+				this.defined = false;
+
+			if (this.clockwise is null || !this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+				this.defined = false;
+
+			return Relative;
 		}
 
 		/// <summary>
@@ -116,19 +141,6 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="PathState">Current path state.</param>
 		public virtual void Measure(DrawingState State, PathState PathState)
 		{
-			if (this.radiusX.TryEvaluate(State.Session, out Length R))
-				this.rX = State.GetDrawingSize(R, this, true);
-			else
-				this.defined = false;
-
-			if (this.radiusY.TryEvaluate(State.Session, out R))
-				this.rY = State.GetDrawingSize(R, this, false);
-			else
-				this.defined = false;
-
-			if (!this.clockwise.TryEvaluate(State.Session, out this.clockDir))
-				this.defined = false;
-
 			if (this.defined)
 				PathState.Set(this.xCoordinate, this.yCoordinate);
 		}

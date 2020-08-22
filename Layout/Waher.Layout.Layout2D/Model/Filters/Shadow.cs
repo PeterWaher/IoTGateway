@@ -100,11 +100,11 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		{
 			base.ExportAttributes(Output);
 
-			this.dX.Export(Output);
-			this.dY.Export(Output);
-			this.sigmaX.Export(Output);
-			this.sigmaY.Export(Output);
-			this.color.Export(Output);
+			this.dX?.Export(Output);
+			this.dY?.Export(Output);
+			this.sigmaX?.Export(Output);
+			this.sigmaY?.Export(Output);
+			this.color?.Export(Output);
 		}
 
 		/// <summary>
@@ -128,11 +128,11 @@ namespace Waher.Layout.Layout2D.Model.Filters
 
 			if (Destination is Shadow Dest)
 			{
-				Dest.dX = this.dX.CopyIfNotPreset();
-				Dest.dY = this.dY.CopyIfNotPreset();
-				Dest.sigmaX = this.sigmaX.CopyIfNotPreset();
-				Dest.sigmaY = this.sigmaY.CopyIfNotPreset();
-				Dest.color = this.color.CopyIfNotPreset();
+				Dest.dX = this.dX?.CopyIfNotPreset();
+				Dest.dY = this.dY?.CopyIfNotPreset();
+				Dest.sigmaX = this.sigmaX?.CopyIfNotPreset();
+				Dest.sigmaY = this.sigmaY?.CopyIfNotPreset();
+				Dest.color = this.color?.CopyIfNotPreset();
 			}
 		}
 	}

@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			base.ExportAttributes(Output);
 
-			this.condition.Export(Output);
+			this.condition?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			base.CopyContents(Destination);
 
 			if (Destination is Case Dest)
-				Dest.condition = this.condition.CopyIfNotPreset();
+				Dest.condition = this.condition?.CopyIfNotPreset();
 		}
 	}
 }

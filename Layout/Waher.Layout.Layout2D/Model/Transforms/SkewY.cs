@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		{
 			base.ExportAttributes(Output);
 
-			this.factor.Export(Output);
+			this.factor?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,18 +78,19 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			base.CopyContents(Destination);
 
 			if (Destination is SkewY Dest)
-				Dest.factor = this.factor.CopyIfNotPreset();
+				Dest.factor = this.factor?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
-			if (this.factor.TryEvaluate(State.Session, out this.sy))
+			if (!(this.factor is null) && this.factor.TryEvaluate(State.Session, out this.sy))
 			{
 				SKMatrix M = SKMatrix.CreateTranslation(this.xCoordinate, this.yCoordinate);
 				M = M.PreConcat(SKMatrix.CreateSkew(0, this.sy));
@@ -99,6 +100,8 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			}
 			else
 				this.sy = 0;
+
+			return Relative;
 		}
 
 		private float sy;

@@ -56,7 +56,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			base.ExportAttributes(Output);
 
-			this.color.Export(Output);
+			this.color?.Export(Output);
 		}
 
 		/// <summary>
@@ -79,18 +79,20 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			base.CopyContents(Destination);
 
 			if (Destination is SolidBackground Dest)
-				Dest.color = this.color.CopyIfNotPreset();
+				Dest.color = this.color?.CopyIfNotPreset();
 		}
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void MeasureDimensions(DrawingState State)
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public override bool MeasureDimensions(DrawingState State)
 		{
-			base.MeasureDimensions(State);
+			bool Relative = base.MeasureDimensions(State);
 
 			if (this.paint is null &&
+				!(this.color is null) &&
 				this.color.TryEvaluate(State.Session, out SKColor Color))
 			{
 				this.paint = new SKPaint()
@@ -103,6 +105,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 				this.defined = true;
 			}
+
+			return Relative;
 		}
 
 	}

@@ -253,7 +253,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
 			SKRect? BoundingBox = this.BoundingRect;
 			SKSize? PrevSize;
@@ -263,7 +263,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			else
 				PrevSize = null;
 			
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (!(this.border is null) &&
 				this.border.TryEvaluate(State.Session, out string RefId) &&

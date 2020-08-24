@@ -131,10 +131,11 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
+			bool Relative = false;
 
 			if (!(this.font is null) &&
 				this.font.TryEvaluate(State.Session, out string FontId) &&
@@ -142,8 +143,10 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				Element is Font Font)
 			{
 				this.fontDef = Font;
-				Font.MeasureDimensions(State);	// Not measured before.
-				
+
+				if (Font.MeasureDimensions(State))
+					Relative = true;
+
 				FontBak = State.Font;
 				State.Font = this.fontDef.FontDef;
 
@@ -167,7 +170,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				// TODO
 			}
 
-			bool Relative = base.MeasureDimensions(State);
+			if (base.DoMeasureDimensions(State))
+				Relative = true;
 
 			if (!(FontBak is null))
 				State.Font = FontBak;

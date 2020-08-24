@@ -87,9 +87,9 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (this.defined &&
 				!(this._ref is null) &&
@@ -97,6 +97,7 @@ namespace Waher.Layout.Layout2D.Model.References
 				this.Document.TryGetElement(RefId, out this.reference))
 			{
 				this.reference = this.reference.Copy(this);
+
 				if (this.reference.MeasureDimensions(State))
 					Relative = true;
 

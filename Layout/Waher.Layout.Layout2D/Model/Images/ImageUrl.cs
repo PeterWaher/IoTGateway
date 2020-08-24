@@ -138,7 +138,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
 			if (!(this.alt is null) &&
 				this.alt.TryEvaluate(State.Session, out string RefId) &&
@@ -147,7 +147,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 				this.alternative = Element;
 			}
 		
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (this.alternative?.MeasureDimensions(State) ?? false)
 				Relative = true;

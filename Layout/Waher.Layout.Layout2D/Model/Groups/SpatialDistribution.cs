@@ -39,9 +39,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			this.cellLayout = this.GetCellLayout(State);
 
@@ -62,14 +62,24 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				}
 			}
 
+			return Relative;
+		}
+
+		/// <summary>
+		/// Called when dimensions have been measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		{
+			base.AfterMeasureDimensions(State, ref Relative);
+
 			this.Left = 0;
 			this.Top = 0;
 			this.Right = null;
 			this.Bottom = null;
 			this.Width = this.cellLayout.TotWidth;
 			this.Height = this.cellLayout.TotHeight;
-
-			return Relative;
 		}
 
 		private ICellLayout cellLayout = null;

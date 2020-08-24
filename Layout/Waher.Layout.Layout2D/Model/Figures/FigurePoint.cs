@@ -97,9 +97,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (!this.IncludePoint(State, this.x, this.y, this._ref, ref this.xCoordinate, ref this.yCoordinate, ref Relative))
 			{

@@ -116,27 +116,103 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Called before dimensions are measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void BeforeMeasureDimensions(DrawingState State)
+		{
+			this.left0 = this.right0 = this.top0 = this.bottom0 = this.width0 = this.height0 = null;
+		}
+
+		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (this.HasChildren && this.MeasureChildrenDimensions)
 			{
 				foreach (ILayoutElement E in this.children)
 				{
-					if (E.MeasureDimensions(State))
+					E.BeforeMeasureDimensions(State);
+
+					if (E.DoMeasureDimensions(State))
 						Relative = true;
 
+					E.AfterMeasureDimensions(State, ref Relative);
 					this.IncludeElement(E);
 				}
 			}
 
 			return Relative;
 		}
+
+		/// <summary>
+		/// Called when dimensions have been measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		{
+			float f;
+
+			if (this.left0.HasValue && this.right0.HasValue)
+			{
+				f = this.right0.Value - this.left0.Value;
+
+				if (!this.width0.HasValue || f > this.width0.Value)
+					this.width0 = f;
+			}
+
+			if (this.top0.HasValue && this.bottom0.HasValue)
+			{
+				f = this.bottom0.Value - this.top0.Value;
+
+				if (!this.height0.HasValue || f > this.height0.Value)
+					this.height0 = f;
+			}
+
+			this.Left = this.Right = this.Width = null;
+			this.Top = this.Bottom = this.Height = null;
+
+			if (this.width0.HasValue)
+			{
+				this.Width = this.width0;
+				if (this.left0.HasValue)
+					this.Left = this.left0;
+				else
+					this.Right = this.right0;
+			}
+			else
+			{
+				this.Right = this.right0;
+				this.Left = this.left0;
+			}
+
+			if (this.height0.HasValue)
+			{
+				this.Height = this.height0;
+				if (this.top0.HasValue)
+					this.Top = this.top0;
+				else
+					this.Bottom = this.bottom0;
+			}
+			else
+			{
+				this.Bottom = this.bottom0;
+				this.Top = this.top0;
+			}
+		}
+
+		private float? left0;
+		private float? right0;
+		private float? top0;
+		private float? bottom0;
+		private float? width0;
+		private float? height0;
 
 		/// <summary>
 		/// Includes element in dimension measurement.
@@ -146,32 +222,24 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			float? X = Element.Left;
 			float? Y = Element.Top;
-			float? V, V2;
+			float? V;
 
 			if (X.HasValue && Y.HasValue)
 				this.IncludePoint(X.Value, Y.Value);
-			else
-			{
-				V = this.Width;
-				V2 = Element.Width;
 
-				if (!V.HasValue || (V2.HasValue && V2.Value > V.Value))
-					this.Width = V2;
-			}
+			V = Element.Width;
+			if (!this.width0.HasValue || (V.HasValue && V.Value > this.width0.Value))
+				this.width0 = V;
 
 			X = Element.Right;
 			Y = Element.Bottom;
 
 			if (X.HasValue && Y.HasValue)
 				this.IncludePoint(X.Value, Y.Value);
-			else
-			{
-				V = this.Height;
-				V2 = Element.Height;
 
-				if (!V.HasValue || (V2.HasValue && V2.Value > V.Value))
-					this.Height = V2;
-			}
+			V = Element.Height;
+			if (!this.height0.HasValue || (V.HasValue && V.Value > this.height0.Value))
+				this.height0 = V;
 		}
 
 		/// <summary>
@@ -228,17 +296,17 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="Y">Y-Coordinate</param>
 		public void IncludePoint(float X, float Y)
 		{
-			if (!this.Left.HasValue || X < this.Left.Value)
-				this.Left = X;
+			if (!this.left0.HasValue || X < this.left0.Value)
+				this.left0 = X;
 
-			if (!this.Right.HasValue || X > this.Right.Value)
-				this.Right = X;
+			if (!this.right0.HasValue || X > this.right0.Value)
+				this.right0 = X;
 
-			if (!this.Top.HasValue || Y < this.Top.Value)
-				this.Top = Y;
+			if (!this.top0.HasValue || Y < this.top0.Value)
+				this.top0 = Y;
 
-			if (!this.Bottom.HasValue || Y > this.Bottom.Value)
-				this.Bottom = Y;
+			if (!this.bottom0.HasValue || Y > this.bottom0.Value)
+				this.bottom0 = Y;
 		}
 
 		/// <summary>

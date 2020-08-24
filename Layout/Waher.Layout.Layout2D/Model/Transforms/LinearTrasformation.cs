@@ -19,18 +19,5 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			: base(Document, Parent)
 		{
 		}
-
-		/// <summary>
-		/// Measures layout entities and defines unassigned properties, related to dimensions.
-		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
-		{
-			this.Width = this.Height = this.Left = this.Top = this.Right = this.Bottom = null;
-
-			return base.MeasureDimensions(State);
-		}
-
 	}
 }

@@ -156,9 +156,9 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (!this.conditionResultEvaluated)
 			{
@@ -171,12 +171,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 				this.conditionResultEvaluated = true;
 			}
 
-			if (this.conditionResult ?
-				(this.ifTrue?.MeasureDimensions(State) ?? false) :
-				(this.ifFalse?.MeasureDimensions(State) ?? false))
-			{
+			ILayoutElement E = this.conditionResult ? this.ifTrue : this.ifFalse;
+
+			if (E?.MeasureDimensions(State) ?? false)
 				Relative = true;
-			}
 
 			return Relative;
 		}

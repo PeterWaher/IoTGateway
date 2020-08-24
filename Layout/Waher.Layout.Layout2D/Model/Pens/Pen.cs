@@ -132,9 +132,9 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 			float a;
 
 			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length Width))

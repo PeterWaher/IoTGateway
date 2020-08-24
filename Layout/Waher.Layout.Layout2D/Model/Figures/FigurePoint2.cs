@@ -97,21 +97,26 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, ref this.xCoordinate2, ref this.yCoordinate2, ref Relative))
 			{
-				float? W = this.Width;
-				float? H = this.Height;
+				ILayoutElement P = this.Parent;
+				float? Value = this.ExplicitWidth;
+				float? Temp;
 
-				if (W.HasValue)
-					this.xCoordinate2 = this.xCoordinate + W.Value;
-				else
+				if (!Value.HasValue)
 				{
-					float X = this.xCoordinate + this.ExplicitWidth ?? State.AreaWidth;
+					Value = this.Width;
+					if ((Temp = P?.InnerWidth).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
+						Value = Temp.Value;
+				}
 
+				if (Value.HasValue)
+				{
+					float X = this.xCoordinate + Value.Value;
 					if (X != this.xCoordinate2)
 					{
 						Relative = true;
@@ -119,12 +124,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					}
 				}
 
-				if (H.HasValue)
-					this.yCoordinate2 = this.yCoordinate + H.Value;
-				else
+				Value = this.ExplicitHeight;
+				if (!Value.HasValue)
 				{
-					float Y = this.yCoordinate + this.ExplicitHeight ?? State.AreaHeight;
+					Value = this.Height;
+					if ((Temp = P?.InnerHeight).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
+						Value = Temp.Value;
+				}
 
+				if (Value.HasValue)
+				{
+					float Y = this.yCoordinate + Value.Value;
 					if (Y != this.yCoordinate2)
 					{
 						Relative = true;

@@ -135,9 +135,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (this.evaluated is null)
 			{
@@ -271,21 +271,19 @@ namespace Waher.Layout.Layout2D.Model.Content
 							VerticalAlignmentAttribute = this.VerticalAlignmentAttribute
 						};
 					}
-
-					if (!(this.evaluated is null))
-					{
-						this.evaluated.MeasureDimensions(State);
-
-						this.Width = this.evaluated.Width;
-						this.Height = this.evaluated.Height;
-					}
 				}
 				else
 					this.defined = false;
 			}
 
-			if (this.evaluated?.MeasureDimensions(State) ?? false)
-				Relative = true;
+			if (!(this.evaluated is null))
+			{
+				if (this.evaluated.MeasureDimensions(State))
+					Relative = true;
+
+				this.Width = this.evaluated.Width;
+				this.Height = this.evaluated.Height;
+			}
 
 			return Relative;
 		}

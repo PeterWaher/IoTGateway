@@ -127,10 +127,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			this.Width = this.Height = this.Left = this.Top = this.Right = this.Bottom = null;
-
 			bool Relative = false;
 
 			if (!(this.left is null) && this.left.TryEvaluate(State.Session, out Length L))
@@ -157,16 +155,42 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				State.AreaWidth - this.leftMargin - this.rightMargin,
 				State.AreaHeight - this.topMargin - this.bottomMargin));
 
-			if (base.MeasureDimensions(State))
+			if (base.DoMeasureDimensions(State))
 				Relative = true;
 
 			State.SetAreaSize(Prev);
 
-			this.Width += this.leftMargin + this.rightMargin;
-			this.Height += this.topMargin + this.bottomMargin;
-
 			return Relative;
 		}
+
+		/// <summary>
+		/// Called when dimensions have been measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		{
+			base.AfterMeasureDimensions(State, ref Relative);
+
+			this.innerWidth = this.Width;
+			this.innerHeight = this.Height;
+
+			this.Width = this.innerWidth + this.leftMargin + this.rightMargin;
+			this.Height = this.innerHeight + this.topMargin + this.bottomMargin;
+		}
+
+		private float? innerWidth;
+		private float? innerHeight;
+
+		/// <summary>
+		/// Inner Width of element
+		/// </summary>
+		public override float? InnerWidth => this.innerWidth;
+
+		/// <summary>
+		/// Inner Height of element
+		/// </summary>
+		public override float? InnerHeight => this.innerHeight;
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.

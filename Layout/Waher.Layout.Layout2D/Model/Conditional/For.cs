@@ -135,9 +135,9 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override bool MeasureDimensions(DrawingState State)
+		public override bool DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = base.DoMeasureDimensions(State);
 
 			if (this.measured is null)
 			{
@@ -187,7 +187,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 							if (Copy.MeasureDimensions(State))
 								Relative = true;
-
+							
 							this.IncludeElement(Copy);
 						}
 

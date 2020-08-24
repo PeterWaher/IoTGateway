@@ -97,13 +97,13 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool MeasureDimensions(DrawingState State)
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
 		{
-			bool Relative = base.MeasureDimensions(State);
+			base.AfterMeasureDimensions(State, ref Relative);
 
 			if (!(this.translateX is null) && this.translateX.TryEvaluate(State.Session, out Length L))
 				State.CalcDrawingSize(L, ref this.dx, true, ref Relative);
@@ -117,8 +117,6 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			SKMatrix M = SKMatrix.CreateTranslation(this.dx, this.dy);
 			this.TransformBoundingBox(M);
-
-			return Relative;
 		}
 
 		private float dx;

@@ -218,6 +218,16 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Inner Width of element
+		/// </summary>
+		public virtual float? InnerWidth => this.Width;
+
+		/// <summary>
+		/// Inner Height of element
+		/// </summary>
+		public virtual float? InnerHeight => this.Height;
+
+		/// <summary>
 		/// Explicit set width of element, if defined.
 		/// </summary>
 		public float? ExplicitWidth
@@ -495,10 +505,27 @@ namespace Waher.Layout.Layout2D.Model
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// Calls, in order: <see cref="BeforeMeasureDimensions(DrawingState)"/>,
+		/// <see cref="DoMeasureDimensions(DrawingState)"/> and
+		/// <see cref="AfterMeasureDimensions(DrawingState, ref bool)"/>.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public virtual bool MeasureDimensions(DrawingState State)
+		public bool MeasureDimensions(DrawingState State)
+		{
+			this.BeforeMeasureDimensions(State);
+			bool Relative = this.DoMeasureDimensions(State);
+			this.AfterMeasureDimensions(State, ref Relative);
+			
+			return Relative;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		public virtual bool DoMeasureDimensions(DrawingState State)
 		{
 			if (!(this.visible is null) && this.visible.TryEvaluate(State.Session, out bool b))
 				this.isVisible = b;
@@ -506,6 +533,25 @@ namespace Waher.Layout.Layout2D.Model
 			this.defined = true;
 
 			return false;
+		}
+
+		/// <summary>
+		/// Called before dimensions are measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public virtual void BeforeMeasureDimensions(DrawingState State)
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
+		/// Called when dimensions have been measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		public virtual void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		{
+			// Do nothing by default.
 		}
 
 		/// <summary>

@@ -96,6 +96,22 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Inner Width of element
+		/// </summary>
+		float? InnerWidth
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Inner Height of element
+		/// </summary>
+		float? InnerHeight
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Explicit set width of element, if defined.
 		/// </summary>
 		float? ExplicitWidth
@@ -164,10 +180,33 @@ namespace Waher.Layout.Layout2D.Model
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// Calls, in order: <see cref="BeforeMeasureDimensions(DrawingState)"/>,
+		/// <see cref="DoMeasureDimensions(DrawingState)"/> and
+		/// <see cref="AfterMeasureDimensions(DrawingState, ref bool)"/>.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
 		bool MeasureDimensions(DrawingState State);
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to dimensions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+		bool DoMeasureDimensions(DrawingState State);
+
+		/// <summary>
+		/// Called before dimensions are measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		void BeforeMeasureDimensions(DrawingState State);
+
+		/// <summary>
+		/// Called when dimensions have been measured.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
+		void AfterMeasureDimensions(DrawingState State, ref bool Relative);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.

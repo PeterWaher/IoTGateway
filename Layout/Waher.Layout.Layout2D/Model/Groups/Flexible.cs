@@ -203,40 +203,30 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			{
 				case FlexibleOrder.HorizontalVertical:
 				default:
-					float? Size = this.Width;
-					if (Size.HasValue)
+					float Size = this.PresetWidth ?? State.AreaWidth;
+					if (this.halign is null || !this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
 					{
-						if (this.halign is null || !this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
-						{
-							if (HorizontalDirection == HorizontalDirection.LeftRight)
-								HorizontalAlignment = HorizontalAlignment.Left;
-							else
-								HorizontalAlignment = HorizontalAlignment.Right;
-						}
-
-						return new FlexibleHorizontalCells(State.Session, Size.Value,
-							HorizontalDirection, VerticalDirection, HorizontalAlignment);
+						if (HorizontalDirection == HorizontalDirection.LeftRight)
+							HorizontalAlignment = HorizontalAlignment.Left;
+						else
+							HorizontalAlignment = HorizontalAlignment.Right;
 					}
-					else
-						return new HorizontalCells(State.Session);
+
+					return new FlexibleHorizontalCells(State.Session, Size,
+						HorizontalDirection, VerticalDirection, HorizontalAlignment);
 
 				case FlexibleOrder.VerticalHorizontal:
-					Size = this.Height;
-					if (Size.HasValue)
+					Size = this.PresetHeight ?? State.AreaHeight;
+					if (this.valign is null || !this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
 					{
-						if (this.valign is null || !this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
-						{
-							if (VerticalDirection == VerticalDirection.TopDown)
-								VerticalAlignment = VerticalAlignment.Top;
-							else
-								VerticalAlignment = VerticalAlignment.Bottom;
-						}
-
-						return new FlexibleVerticalCells(State.Session, Size.Value,
-							HorizontalDirection, VerticalDirection, VerticalAlignment);
+						if (VerticalDirection == VerticalDirection.TopDown)
+							VerticalAlignment = VerticalAlignment.Top;
+						else
+							VerticalAlignment = VerticalAlignment.Bottom;
 					}
-					else
-						return new VerticalCells(State.Session);
+
+					return new FlexibleVerticalCells(State.Session, Size,
+						HorizontalDirection, VerticalDirection, VerticalAlignment);
 			}
 		}
 

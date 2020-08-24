@@ -129,6 +129,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
 		public override bool MeasureDimensions(DrawingState State)
 		{
+			this.Width = this.Height = this.Left = this.Top = this.Right = this.Bottom = null;
+
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.left is null) && this.left.TryEvaluate(State.Session, out Length L))

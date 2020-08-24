@@ -13,19 +13,19 @@
     <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
     <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
   </ForEach>
-  <Margins top="10%" right="10%" bottom="10%" left="10%">
+  <Margins top="10mm" right="10mm" bottom="10mm" left="10mm">
     <Overlays>
       <Cell halign="Center" valign="Center" border="BlackPen">
-        <Circle radius="25%" pen="RedPen" fill="RedBackground"/>
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
       </Cell>
       <Cell halign="Center" valign="Center" border="BlackPen">
-        <Ellipse radiusX="25%" radiusY="40%" pen="RedPen" fill="RedBackground"/>
+        <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
       </Cell>
       <Cell halign="Center" valign="Center" border="BlackPen">
-        <Rectangle width="50%" height="30%" pen="RedPen" fill="RedBackground"/>
+        <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
       </Cell>
       <Cell halign="Center" valign="Center" border="BlackPen">
-        <RoundedRectangle width="30%" height="50%" radiusX="5%" radiusY="5%" pen="RedPen" fill="RedBackground"/>
+        <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
       </Cell>
     </Overlays>
   </Margins>

@@ -28,6 +28,8 @@ namespace Waher.Layout.Layout2D.Model
 		private float? bottom;
 		private float? width;
 		private float? height;
+		private float? explicitWidth;
+		private float? explicitHeight;
 		private float? minWidth;
 		private float? minHeight;
 		private float? maxWidth;
@@ -216,14 +218,22 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Width of element, if defined explicitly (i.e. not evaluated from Left and Right).
+		/// Explicit set width of element, if defined.
 		/// </summary>
-		public float? PresetWidth => this.width;
+		public float? ExplicitWidth
+		{
+			get => this.explicitWidth;
+			set => this.explicitWidth = value;
+		}
 
 		/// <summary>
-		/// Height of element, if defined explicitly (i.e. not evaluated from Top and Bottom).
+		/// Explicit set height of element, if defined.
 		/// </summary>
-		public float? PresetHeight => this.height;
+		public float? ExplicitHeight
+		{
+			get => this.explicitHeight;
+			set => this.explicitHeight = value;
+		}
 
 		/// <summary>
 		/// Width of element
@@ -557,8 +567,8 @@ namespace Waher.Layout.Layout2D.Model
 				XAttribute.TryEvaluate(State.Session, out Length X1) &&
 				YAttribute.TryEvaluate(State.Session, out Length Y1))
 			{
-				State.CalcDrawingSize(X1, ref X, this, true, ref Relative);
-				State.CalcDrawingSize(Y1, ref Y, this, false, ref Relative);
+				State.CalcDrawingSize(X1, ref X, true, ref Relative);
+				State.CalcDrawingSize(Y1, ref Y, false, ref Relative);
 
 				return true;
 			}

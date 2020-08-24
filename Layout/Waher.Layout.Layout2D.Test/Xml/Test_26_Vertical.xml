@@ -15,23 +15,23 @@
   </ForEach>
   <Vertical>
     <Cell halign="Center" border="BlackPen">
-      <Margins top="5%" right="5%" bottom="5%" left="5%">
-        <Circle radius="25%" pen="RedPen" fill="RedBackground"/>
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Circle radius="25mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
     <Cell halign="Center" border="BlackPen">
-      <Margins top="5%" right="5%" bottom="5%" left="5%">
-        <Ellipse radiusX="25%" radiusY="40%" pen="RedPen" fill="RedBackground"/>
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Ellipse radiusX="25mm" radiusY="40mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
     <Cell halign="Center" border="BlackPen">
-      <Margins top="5%" right="5%" bottom="5%" left="5%">
-        <Rectangle width="50%" height="30%" pen="RedPen" fill="RedBackground"/>
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <Rectangle width="50mm" height="30mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
     <Cell halign="Center" border="BlackPen">
-      <Margins top="5%" right="5%" bottom="5%" left="5%">
-        <RoundedRectangle width="30%" height="50%" radiusX="5%" radiusY="5%" pen="RedPen" fill="RedBackground"/>
+      <Margins top="5mm" right="5mm" bottom="5mm" left="5mm">
+        <RoundedRectangle width="30mm" height="50mm" radiusX="5mm" radiusY="5mm" pen="RedPen" fill="RedBackground"/>
       </Margins>
     </Cell>
   </Vertical>

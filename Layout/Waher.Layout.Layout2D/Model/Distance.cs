@@ -74,7 +74,7 @@ namespace Waher.Layout.Layout2D.Model
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.distance is null) && this.distance.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.dist, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref this.dist, true, ref Relative);
 			else
 				this.defined = false;
 

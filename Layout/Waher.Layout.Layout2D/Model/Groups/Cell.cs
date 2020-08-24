@@ -199,9 +199,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				if (Width.HasValue &&
 					!(this.halign is null) &&
 					this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
-					HAlignment != Groups.HorizontalAlignment.Left)
+					HAlignment != HorizontalAlignment.Left)
 				{
-					if (HAlignment == Groups.HorizontalAlignment.Right)
+					if (HAlignment == HorizontalAlignment.Right)
 						this.dx = (MaxWidth.Value - Width.Value);
 					else    // Center
 						this.dx = (MaxWidth.Value - Width.Value) / 2;
@@ -217,9 +217,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				if (Height.HasValue &&
 					!(this.valign is null) &&
 					this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
-					VAlignment != Groups.VerticalAlignment.Top)
+					VAlignment != VerticalAlignment.Top)
 				{
-					if (VAlignment == Groups.VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
+					if (VAlignment == VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
 						this.dy = (MaxHeight.Value - Height.Value);
 					else    // Center
 						this.dy = (MaxHeight.Value - Height.Value) / 2;
@@ -255,6 +255,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
 		public override bool MeasureDimensions(DrawingState State)
 		{
+			SKRect? BoundingBox = this.BoundingRect;
+			SKSize? PrevSize;
+
+			if (BoundingBox.HasValue)
+				PrevSize = State.SetAreaSize(BoundingBox.Value.Size);
+			else
+				PrevSize = null;
+			
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.border is null) &&
@@ -268,7 +276,30 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.dx = 0;
 			this.dy = 0;
 
+			if (PrevSize.HasValue)
+				State.SetAreaSize(PrevSize.Value);
+
 			return Relative;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			SKRect? BoundingBox = this.BoundingRect;
+			SKSize? PrevSize;
+
+			if (BoundingBox.HasValue)
+				PrevSize = State.SetAreaSize(BoundingBox.Value.Size);
+			else
+				PrevSize = null;
+
+			base.MeasurePositions(State);
+
+			if (PrevSize.HasValue)
+				State.SetAreaSize(PrevSize.Value);
 		}
 
 		private Pen borderPen;

@@ -101,7 +101,9 @@ namespace Waher.Layout.Layout2D.Model.References
 					Relative = true;
 
 				this.Width = this.reference.Width;
+				this.ExplicitWidth = this.reference.ExplicitWidth;
 				this.Height = this.reference.Height;
+				this.ExplicitHeight = this.reference.ExplicitHeight;
 			}
 			else
 				this.defined = false;

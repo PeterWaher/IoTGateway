@@ -106,7 +106,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.radius is null) && this.radius.TryEvaluate(State.Session, out Length R))
-				State.CalcDrawingSize(R, ref this.r, this, true, ref Relative);
+				State.CalcDrawingSize(R, ref this.r, true, ref Relative);
 			else
 				this.defined = false;
 

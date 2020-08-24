@@ -203,7 +203,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			{
 				case FlexibleOrder.HorizontalVertical:
 				default:
-					float Size = this.PresetWidth ?? State.AreaWidth;
+					float Size = this.ExplicitWidth ?? State.AreaWidth;
 					if (this.halign is null || !this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
 					{
 						if (HorizontalDirection == HorizontalDirection.LeftRight)
@@ -216,7 +216,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 						HorizontalDirection, VerticalDirection, HorizontalAlignment);
 
 				case FlexibleOrder.VerticalHorizontal:
-					Size = this.PresetHeight ?? State.AreaHeight;
+					Size = this.ExplicitHeight ?? State.AreaHeight;
 					if (this.valign is null || !this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
 					{
 						if (VerticalDirection == VerticalDirection.TopDown)

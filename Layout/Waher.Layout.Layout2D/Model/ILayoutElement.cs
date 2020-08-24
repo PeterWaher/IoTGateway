@@ -96,6 +96,24 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Explicit set width of element, if defined.
+		/// </summary>
+		float? ExplicitWidth
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Explicit set height of element, if defined.
+		/// </summary>
+		float? ExplicitHeight
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// If the element is visible or not.
 		/// </summary>
 		bool IsVisible

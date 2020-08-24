@@ -131,41 +131,56 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			this.Width = this.Height = this.Left = this.Top = this.Right = this.Bottom = null;
 
-			bool Relative = base.MeasureDimensions(State);
+			bool Relative = false;
 
 			if (!(this.left is null) && this.left.TryEvaluate(State.Session, out Length L))
-			{
-				State.CalcDrawingSize(L, ref this.leftMargin, this, true, ref Relative);
-				this.Right += this.leftMargin;
-			}
+				State.CalcDrawingSize(L, ref this.leftMargin, true, ref Relative);
 			else
 				this.leftMargin = 0;
 
 			if (!(this.right is null) && this.right.TryEvaluate(State.Session, out L))
-			{
-				State.CalcDrawingSize(L, ref this.rightMargin, this, true, ref Relative);
-				this.Right += this.rightMargin;
-			}
+				State.CalcDrawingSize(L, ref this.rightMargin, true, ref Relative);
 			else
 				this.rightMargin = 0;
 
 			if (!(this.top is null) && this.top.TryEvaluate(State.Session, out L))
-			{
-				State.CalcDrawingSize(L, ref this.topMargin, this, true, ref Relative);
-				this.Bottom += this.topMargin;
-			}
+				State.CalcDrawingSize(L, ref this.topMargin, true, ref Relative);
 			else
 				this.topMargin = 0;
 
 			if (!(this.bottom is null) && this.bottom.TryEvaluate(State.Session, out L))
-			{
-				State.CalcDrawingSize(L, ref this.bottomMargin, this, true, ref Relative);
-				this.Bottom += this.bottomMargin;
-			}
+				State.CalcDrawingSize(L, ref this.bottomMargin, true, ref Relative);
 			else
 				this.bottomMargin = 0;
 
+			SKSize Prev = State.SetAreaSize(new SKSize(
+				State.AreaWidth - this.leftMargin - this.rightMargin,
+				State.AreaHeight - this.topMargin - this.bottomMargin));
+
+			if (base.MeasureDimensions(State))
+				Relative = true;
+
+			State.SetAreaSize(Prev);
+
+			this.Width += this.leftMargin + this.rightMargin;
+			this.Height += this.topMargin + this.bottomMargin;
+
 			return Relative;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public override void MeasurePositions(DrawingState State)
+		{
+			SKSize Prev = State.SetAreaSize(new SKSize(
+				State.AreaWidth - this.leftMargin - this.rightMargin,
+				State.AreaHeight - this.topMargin - this.bottomMargin));
+
+			base.MeasurePositions(State);
+
+			State.SetAreaSize(Prev);
 		}
 
 		private float leftMargin;

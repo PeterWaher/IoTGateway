@@ -2186,15 +2186,21 @@
             Height of current area
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,Waher.Layout.Layout2D.Model.ILayoutElement,System.Boolean,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,System.Boolean,System.Boolean@)">
             <summary>
             Converts a defined length to drawing size.
             </summary>
             <param name="L">Length</param>
             <param name="Size">Calculated size.</param>
-            <param name="Element">Current element.</param>
             <param name="Horizontal">If it is a horizontal size.</param>
             <param name="Relative">If size is relative, and should be recalculated if dimensions change.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.SetAreaSize(SkiaSharp.SKSize)">
+            <summary>
+            Sets the current area size.
+            </summary>
+            <param name="AreaSize">New area size</param>
+            <returns>Previous area size</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicContainer">
             <summary>
@@ -5442,6 +5448,12 @@
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
@@ -5960,6 +5972,12 @@
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Measures layout entities and defines unassigned properties, related to positions.
+            </summary>
+            <param name="State">Current drawing state.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Draws layout entities.
@@ -6295,6 +6313,16 @@
             Height of element
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.ExplicitWidth">
+            <summary>
+            Explicit set width of element, if defined.
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.ExplicitHeight">
+            <summary>
+            Explicit set height of element, if defined.
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.IsVisible">
             <summary>
             If the element is visible or not.
@@ -6399,6 +6427,13 @@
             <param name="State">Current drawing state.</param>
             <returns>Loaded image, or null if not possible to load image, or
             image loading is in process.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.Image.GetAlternative(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets an alternative representation, in case the image is not available.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Alternative representation, if available, null otherwise.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.Image.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6641,6 +6676,13 @@
             </summary>
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.GetAlternative(Waher.Layout.Layout2D.Model.DrawingState)">
+            <summary>
+            Gets an alternative representation, in case the image is not available.
+            </summary>
+            <param name="State">Current drawing state.</param>
+            <returns>Alternative representation, if available, null otherwise.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Images.ImageUrl.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6914,14 +6956,14 @@
             Bottom coordinate of bounding box, after measurement.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PresetWidth">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.ExplicitWidth">
             <summary>
-            Width of element, if defined explicitly (i.e. not evaluated from Left and Right).
+            Explicit set width of element, if defined.
             </summary>
         </member>
-        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PresetHeight">
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.ExplicitHeight">
             <summary>
-            Height of element, if defined explicitly (i.e. not evaluated from Top and Bottom).
+            Explicit set height of element, if defined.
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.Width">

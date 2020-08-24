@@ -103,19 +103,33 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, ref this.xCoordinate2, ref this.yCoordinate2, ref Relative))
 			{
-				float X = this.xCoordinate + this.PresetWidth ?? State.AreaWidth;
-				float Y = this.yCoordinate + this.PresetHeight ?? State.AreaHeight;
+				float? W = this.Width;
+				float? H = this.Height;
 
-				if (X != this.xCoordinate2)
+				if (W.HasValue)
+					this.xCoordinate2 = this.xCoordinate + W.Value;
+				else
 				{
-					Relative = true;
-					this.xCoordinate2 = X;
+					float X = this.xCoordinate + this.ExplicitWidth ?? State.AreaWidth;
+
+					if (X != this.xCoordinate2)
+					{
+						Relative = true;
+						this.xCoordinate2 = X;
+					}
 				}
 
-				if (Y != this.yCoordinate2)
+				if (H.HasValue)
+					this.yCoordinate2 = this.yCoordinate + H.Value;
+				else
 				{
-					Relative = true;
-					this.yCoordinate2 = Y;
+					float Y = this.yCoordinate + this.ExplicitHeight ?? State.AreaHeight;
+
+					if (Y != this.yCoordinate2)
+					{
+						Relative = true;
+						this.yCoordinate2 = Y;
+					}
 				}
 
 				this.IncludePoint(this.xCoordinate2, this.yCoordinate2);

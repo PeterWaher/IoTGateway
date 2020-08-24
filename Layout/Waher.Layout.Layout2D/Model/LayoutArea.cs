@@ -201,42 +201,42 @@ namespace Waher.Layout.Layout2D.Model
 			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length L))
 			{
 				a = this.Width ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
-				this.Width = a;
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				this.Width = this.ExplicitWidth = a;
 			}
 
 			if (!(this.height is null) && this.height.TryEvaluate(State.Session, out L))
 			{
 				a = this.Height ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
-				this.Height = a;
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				this.Height = this.ExplicitHeight = a;
 			}
 
 			if (!(this.minWidth is null) && this.minWidth.TryEvaluate(State.Session, out L))
 			{
 				a = this.MinWidth ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
 				this.MinWidth = a;
 			}
 
 			if (!(this.maxWidth is null) && this.maxWidth.TryEvaluate(State.Session, out L))
 			{
 				a = this.MaxWidth ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
 				this.MaxWidth = a;
 			}
 
 			if (!(this.minHeight is null) && this.minHeight.TryEvaluate(State.Session, out L))
 			{
 				a = this.MinHeight ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
 				this.MinHeight = a;
 			}
 
 			if (!(this.maxHeight is null) && this.maxHeight.TryEvaluate(State.Session, out L))
 			{
 				a = this.MaxHeight ?? 0;
-				State.CalcDrawingSize(L, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref a, true, ref Relative);
 				this.MaxHeight = a;
 			}
 

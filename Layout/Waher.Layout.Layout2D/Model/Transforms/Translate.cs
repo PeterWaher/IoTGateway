@@ -106,12 +106,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.translateX is null) && this.translateX.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.dx, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref this.dx, true, ref Relative);
 			else
 				this.dx = 0;
 
 			if (!(this.translateY is null) && this.translateY.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.dy, this, false, ref Relative);
+				State.CalcDrawingSize(L, ref this.dy, false, ref Relative);
 			else
 				this.dy = 0;
 

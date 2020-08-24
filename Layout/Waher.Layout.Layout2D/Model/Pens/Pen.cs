@@ -140,7 +140,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length Width))
 			{
 				a = this.penWidth ?? 0;
-				State.CalcDrawingSize(Width, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(Width, ref a, true, ref Relative);
 				this.penWidth = a;
 			}
 			else
@@ -159,7 +159,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			if (!(this.miter is null) && this.miter.TryEvaluate(State.Session, out Width))
 			{
 				a = this.penMiter ?? 0;
-				State.CalcDrawingSize(Width, ref a, this, true, ref Relative);
+				State.CalcDrawingSize(Width, ref a, true, ref Relative);
 				this.penMiter = a;
 			}
 			else

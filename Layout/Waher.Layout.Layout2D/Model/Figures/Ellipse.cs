@@ -109,16 +109,16 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
 			{
-				State.CalcDrawingSize(R, ref this.rX, this, true, ref Relative);
-				this.Width = 2 * this.rX;
+				State.CalcDrawingSize(R, ref this.rX, true, ref Relative);
+				this.Width = this.ExplicitWidth = 2 * this.rX;
 			}
 			else
 				this.defined = false;
 
 			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
 			{
-				State.CalcDrawingSize(R, ref this.rY, this, false, ref Relative);
-				this.Height = 2 * this.rY;
+				State.CalcDrawingSize(R, ref this.rY, false, ref Relative);
+				this.Height = this.ExplicitHeight = 2 * this.rY;
 			}
 			else
 				this.defined = false;

@@ -167,7 +167,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 
 			Size = State.Font.Size;
 			if (!(this.size is null) && this.size.TryEvaluate(State.Session, out Length Length))
-				State.CalcDrawingSize(Length, ref Size, this, false, ref Relative);
+				State.CalcDrawingSize(Length, ref Size, false, ref Relative);
 
 			if (!(this.weight is null) && this.weight.TryEvaluate(State.Session, out SKFontStyleWeight W))
 				Weight = (int)W;

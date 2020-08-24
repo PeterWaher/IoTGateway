@@ -149,13 +149,20 @@ namespace Waher.Layout.Layout2D.Model.Images
 		
 			bool Relative = base.MeasureDimensions(State);
 
-			if (this.image is null && !(this.alternative is null))
-			{
-				this.Width = this.alternative.Width;
-				this.Height = this.alternative.Height;
-			}
+			if (this.alternative?.MeasureDimensions(State) ?? false)
+				Relative = true;
 
 			return Relative;
+		}
+
+		/// <summary>
+		/// Gets an alternative representation, in case the image is not available.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Alternative representation, if available, null otherwise.</returns>
+		protected override ILayoutElement GetAlternative(DrawingState State)
+		{
+			return this.alternative;
 		}
 
 		private ILayoutElement alternative = null;

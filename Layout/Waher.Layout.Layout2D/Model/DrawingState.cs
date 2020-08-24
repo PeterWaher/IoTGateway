@@ -151,10 +151,9 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="L">Length</param>
 		/// <param name="Size">Calculated size.</param>
-		/// <param name="Element">Current element.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
 		/// <param name="Relative">If size is relative, and should be recalculated if dimensions change.</param>
-		public void CalcDrawingSize(Length L, ref float Size, ILayoutElement Element, bool Horizontal, ref bool Relative)
+		public void CalcDrawingSize(Length L, ref float Size, bool Horizontal, ref bool Relative)
 		{
 			switch (L.Unit)
 			{
@@ -193,8 +192,8 @@ namespace Waher.Layout.Layout2D.Model
 					float Size2 = L.Value * this.text.TextSize;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -210,8 +209,8 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.height_x.Value;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -223,8 +222,8 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.width_0.Value;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -233,8 +232,8 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.textRoot.TextSize;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -243,8 +242,8 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Width / 100;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -253,8 +252,8 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Height / 100;
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -267,8 +266,8 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -281,8 +280,8 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -295,8 +294,8 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						Size = Size2;
 						Relative = true;
+						Size = Size2;
 					}
 					break;
 
@@ -304,6 +303,18 @@ namespace Waher.Layout.Layout2D.Model
 					Size = L.Value;
 					break;
 			}
+		}
+
+		/// <summary>
+		/// Sets the current area size.
+		/// </summary>
+		/// <param name="AreaSize">New area size</param>
+		/// <returns>Previous area size</returns>
+		public SKSize SetAreaSize(SKSize AreaSize)
+		{
+			SKSize Prev = this.areaSize;
+			this.areaSize = AreaSize;
+			return Prev;
 		}
 	}
 }

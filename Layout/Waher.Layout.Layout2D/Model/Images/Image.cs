@@ -41,11 +41,23 @@ namespace Waher.Layout.Layout2D.Model.Images
 			{
 				this.loadStarted = true;
 				this.image = this.LoadImage(State);
+			}
 
-				if (!(this.image is null))
+			if (!(this.image is null))
+			{
+				this.Width = this.ExplicitWidth = this.image.Width;
+				this.Height = this.ExplicitHeight = this.image.Height;
+			}
+			else
+			{
+				ILayoutElement Alternative = this.GetAlternative(State);
+
+				if (!(Alternative is null))
 				{
-					this.Width = this.image.Width;
-					this.Height = this.image.Height;
+					this.Width = Alternative.Width;
+					this.ExplicitWidth = Alternative.ExplicitWidth;
+					this.Height = Alternative.Height;
+					this.ExplicitHeight = Alternative.ExplicitHeight;
 				}
 			}
 
@@ -66,6 +78,16 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <returns>Loaded image, or null if not possible to load image, or
 		/// image loading is in process.</returns>
 		protected abstract SKImage LoadImage(DrawingState State);
+
+		/// <summary>
+		/// Gets an alternative representation, in case the image is not available.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		/// <returns>Alternative representation, if available, null otherwise.</returns>
+		protected virtual ILayoutElement GetAlternative(DrawingState State)
+		{
+			return null;
+		}
 
 		/// <summary>
 		/// Draws layout entities.

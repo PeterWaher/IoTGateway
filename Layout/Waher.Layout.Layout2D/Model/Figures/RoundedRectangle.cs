@@ -107,12 +107,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.rx, this, true, ref Relative);
+				State.CalcDrawingSize(L, ref this.rx, true, ref Relative);
 			else
 				this.rx = 0;
 
 			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.ry, this, false, ref Relative);
+				State.CalcDrawingSize(L, ref this.ry, false, ref Relative);
 			else
 				this.ry = 0;
 

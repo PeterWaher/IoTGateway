@@ -119,12 +119,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			bool Relative = base.MeasureDimensions(State);
 
 			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
-				State.CalcDrawingSize(R, ref this.rX, this, true, ref Relative);
+				State.CalcDrawingSize(R, ref this.rX, true, ref Relative);
 			else
 				this.defined = false;
 
 			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
-				State.CalcDrawingSize(R, ref this.rY, this, false, ref Relative);
+				State.CalcDrawingSize(R, ref this.rY, false, ref Relative);
 			else
 				this.defined = false;
 

@@ -112,6 +112,22 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
+		/// Potential Width of element
+		/// </summary>
+		float? PotentialWidth
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Potential Height of element
+		/// </summary>
+		float? PotentialHeight
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Explicit set width of element, if defined.
 		/// </summary>
 		float? ExplicitWidth

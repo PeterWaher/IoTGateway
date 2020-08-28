@@ -367,12 +367,12 @@ namespace Waher.Layout.Layout2D
 				if (Settings.BackgroundColor != SKColor.Empty)
 					Canvas.Clear(Settings.BackgroundColor);
 
-				int Limit = 100;
+				int Limit = 10;
 
 				while (this.root?.MeasureDimensions(State) ?? false)
 				{
 					if (--Limit <= 0)
-						throw new InvalidOperationException("Layout cannot be measured.");
+						break;
 				}
 
 				this.root?.MeasurePositions(State);

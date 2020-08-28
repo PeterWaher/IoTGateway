@@ -103,14 +103,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, ref this.xCoordinate2, ref this.yCoordinate2, ref Relative))
 			{
-				ILayoutElement P = this.Parent;
 				float? Value = this.ExplicitWidth;
 				float? Temp;
 
 				if (!Value.HasValue)
 				{
-					Value = this.Width;
-					if ((Temp = P?.InnerWidth).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
+					Value = this.PotentialWidth;
+					if ((Temp = this.Width).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
 						Value = Temp.Value;
 				}
 
@@ -127,8 +126,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Value = this.ExplicitHeight;
 				if (!Value.HasValue)
 				{
-					Value = this.Height;
-					if ((Temp = P?.InnerHeight).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
+					Value = this.PotentialHeight;
+					if ((Temp = this.Height).HasValue && (!Value.HasValue || Temp.Value > Value.Value))
 						Value = Temp.Value;
 				}
 

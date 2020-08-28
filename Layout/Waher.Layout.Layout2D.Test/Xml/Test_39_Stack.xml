@@ -3,16 +3,28 @@
           background="WhiteBackground" pen="BlackPen"
           font="Text" textColor="Black">
   <SolidPen id="BlackPen" color="Black" width="1px"/>
-  <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
-  <SolidPen id="RedPen" color="Red" width="2mm"/>
   <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
-  <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+  <SolidBackground id="Core" color="{Alpha('Red',128)}"/>
+  <SolidBackground id="IoTGateway" color="{Alpha('Orange',128)}"/>
+  <SolidBackground id="NeuroLedger" color="{Alpha('Blue',128)}"/>
+  <SolidBackground id="Neuron" color="{Alpha('Green',128)}"/>
   <Font id="Text" name="Arial" size="20pt" color="White"/>
-  <Grid columns="8">
-    <Cell colSpan="7" border="BlackPen"/>
-    <Cell border="BlackPen">
+  <Grid columns="9">
+    <Cell colSpan="8"/>
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
+          <Margins left="0.5em" right="0.5em">
+            <Label text="IEEE P1451.99 Services" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+
+    <Cell colSpan="8"/>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
           <Margins left="0.5em" right="0.5em">
             <Label text="Edge Services" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
@@ -20,19 +32,46 @@
       </Margins>
     </Cell>
 
-    <Cell colSpan="6" border="BlackPen"/>
-    <Cell border="BlackPen">
+    <Cell colSpan="2"/>
+    <Cell rowSpan="2">
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Neuron">
+          <Margins left="0.5em" right="0.5em">
+            <Label text=".NET Services" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell colSpan="2">
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
+          <Margins left="0.5em" right="0.5em">
+            <Label text="Web Apps" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell colSpan="2">
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
+          <Margins left="0.5em" right="0.5em">
+            <Label text="Web Services" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="NeuroLedger">
           <Margins left="0.5em" right="0.5em">
             <Label text="Distributed DB" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
           <Margins left="0.5em" right="0.5em">
             <Label text="Neuron" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
@@ -40,55 +79,55 @@
       </Margins>
     </Cell>
 
-    <Cell border="BlackPen"/>
-    <Cell border="BlackPen">
+    <Cell/>
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
             <Label text="NuGets" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
-            <Label text=".NET Services" x="50%" y="50%" halign="Center" valign="Center"/>
+            <Label text="Web Server" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
-            <Label text="Web Apps" x="50%" y="50%" halign="Center" valign="Center"/>
+            <Label text="Markdown" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
             <Label text="Script" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
             <Label text="Object DB" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell colSpan="2" border="BlackPen">
+    <Cell colSpan="2">
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="NeuroLedger">
           <Margins left="0.5em" right="0.5em">
             <Label text="Neuro-Ledger" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
@@ -96,27 +135,27 @@
       </Margins>
     </Cell>
 
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
           <Margins left="0.5em" right="0.5em">
             <Label text="XamarinApp" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell border="BlackPen">
+    <Cell>
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
             <Label text="SDK" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
         </RoundedRectangle>
       </Margins>
     </Cell>
-    <Cell colSpan="6" border="BlackPen">
+    <Cell colSpan="7">
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="IoTGateway">
           <Margins left="0.5em" right="0.5em">
             <Label text="IoT Gateway" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>
@@ -124,9 +163,9 @@
       </Margins>
     </Cell>
 
-    <Cell colSpan="8" border="BlackPen">
+    <Cell colSpan="9">
       <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="RedBackground">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Core">
           <Margins left="0.5em" right="0.5em">
             <Label text=".NET Core/Standard" x="50%" y="50%" halign="Center" valign="Center"/>
           </Margins>

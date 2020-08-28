@@ -23,6 +23,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		void MeasurePositions(DrawingState State);
 
 		/// <summary>
+		/// Distributes cells in layout.
+		/// </summary>
+		/// <param name="SetPosition">If position of inner content is to be set..</param>
+		void Distribute(bool SetPosition);
+
+		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
 		/// </summary>
 		/// <returns>Array of padded cells.</returns>

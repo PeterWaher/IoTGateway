@@ -228,6 +228,36 @@ namespace Waher.Layout.Layout2D.Model
 		public virtual float? InnerHeight => this.Height;
 
 		/// <summary>
+		/// Potential Width of element
+		/// </summary>
+		public virtual float? PotentialWidth
+		{
+			get
+			{
+				float? f = this.parent?.ExplicitWidth;
+				if (f.HasValue)
+					return f;
+				else
+					return this.parent?.PotentialWidth;
+			}
+		}
+
+		/// <summary>
+		/// Potential Height of element
+		/// </summary>
+		public virtual float? PotentialHeight
+		{
+			get
+			{
+				float? f = this.parent?.ExplicitWidth;
+				if (f.HasValue)
+					return f;
+				else
+					return this.parent?.PotentialHeight;
+			}
+		}
+
+		/// <summary>
 		/// Explicit set width of element, if defined.
 		/// </summary>
 		public float? ExplicitWidth
@@ -388,13 +418,33 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			get
 			{
-				float? X = this.Left;
-				float? Y = this.Top;
+				float? L = this.Left;
+				float? T = this.Top;
 				float? R = this.Right;
 				float? B = this.Bottom;
 
-				if (X.HasValue && Y.HasValue && R.HasValue && B.HasValue)
-					return new SKRect(X.Value, Y.Value, R.Value, B.Value);
+				if (!L.HasValue && !R.HasValue)
+				{
+					float? W = this.Width;
+					if (W.HasValue)
+					{
+						L = 0;
+						R = W;
+					}
+				}
+
+				if (!T.HasValue && !B.HasValue)
+				{
+					float? H = this.Height;
+					if (H.HasValue)
+					{
+						T = 0;
+						B = H;
+					}
+				}
+
+				if (L.HasValue && T.HasValue && R.HasValue && B.HasValue)
+					return new SKRect(L.Value, T.Value, R.Value, B.Value);
 				else
 					return null;
 			}
@@ -516,7 +566,7 @@ namespace Waher.Layout.Layout2D.Model
 			this.BeforeMeasureDimensions(State);
 			bool Relative = this.DoMeasureDimensions(State);
 			this.AfterMeasureDimensions(State, ref Relative);
-			
+
 			return Relative;
 		}
 
@@ -626,16 +676,16 @@ namespace Waher.Layout.Layout2D.Model
 
 				if (X != a)
 				{
-					X = a;
 					Relative = true;
+					X = a;
 				}
 
 				a = Element.Top ?? 0;
 
 				if (Y != a)
 				{
-					Y = a;
 					Relative = true;
+					Y = a;
 				}
 
 				return true;

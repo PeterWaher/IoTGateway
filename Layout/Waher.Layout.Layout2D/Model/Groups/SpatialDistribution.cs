@@ -74,6 +74,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			base.AfterMeasureDimensions(State, ref Relative);
 
+			this.cellLayout?.Distribute(false);
+
 			this.Left = 0;
 			this.Top = 0;
 			this.Right = null;
@@ -93,6 +95,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			base.MeasurePositions(State);
 			
 			this.cellLayout?.MeasurePositions(State);
+			this.cellLayout?.Distribute(true);
 			this.measured = this.cellLayout?.Align();
 		}
 

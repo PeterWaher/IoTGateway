@@ -69,14 +69,21 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public float TotHeight => this.maxHeight;
 
 		/// <summary>
+		/// Distributes cells in layout.
+		/// </summary>
+		/// <param name="SetPosition">If position of inner content is to be set..</param>
+		public void Distribute(bool SetPosition)
+		{
+			foreach (Padding P in this.measured)
+				P.Distribute(this.maxWidth, this.maxHeight, this.session, SetPosition);
+		}
+
+		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
 		/// </summary>
 		/// <returns>Array of padded cells.</returns>
 		public Padding[] Align()
 		{
-			foreach (Padding P in this.measured)
-				P.AlignedMeasuredCell(this.maxWidth, this.maxHeight, this.session);
-
 			return this.measured.ToArray();
 		}
 	}

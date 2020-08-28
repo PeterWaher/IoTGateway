@@ -2,6 +2,7 @@
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Pens;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -151,9 +152,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			else
 				this.bottomMargin = 0;
 
+			float InnerWidth = this.ExplicitWidth ?? this.Parent?.InnerWidth ?? State.AreaWidth;
+			float InnerHeight = this.ExplicitHeight ?? this.Parent?.InnerHeight ?? State.AreaHeight;
+
 			SKSize Prev = State.SetAreaSize(new SKSize(
-				State.AreaWidth - this.leftMargin - this.rightMargin,
-				State.AreaHeight - this.topMargin - this.bottomMargin));
+				InnerWidth - this.leftMargin - this.rightMargin,
+				InnerHeight - this.topMargin - this.bottomMargin));
 
 			if (base.DoMeasureDimensions(State))
 				Relative = true;
@@ -173,14 +177,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			base.AfterMeasureDimensions(State, ref Relative);
 
 			this.innerWidth = this.Width;
-			this.innerHeight = this.Height;
-
 			this.Width = this.innerWidth + this.leftMargin + this.rightMargin;
-			this.Height = this.innerHeight + this.topMargin + this.bottomMargin;
-		}
 
-		private float? innerWidth;
-		private float? innerHeight;
+			this.innerHeight = this.Height;
+			this.Height = this.innerHeight + this.topMargin + this.bottomMargin;
+
+		}
 
 		/// <summary>
 		/// Inner Width of element
@@ -193,20 +195,57 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override float? InnerHeight => this.innerHeight;
 
 		/// <summary>
+		/// Potential Width of element
+		/// </summary>
+		public override float? PotentialWidth
+		{
+			get
+			{
+				float? f = base.PotentialWidth;
+
+				if (f.HasValue)
+					return f.Value - this.leftMargin - this.rightMargin;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// Potential Height of element
+		/// </summary>
+		public override float? PotentialHeight
+		{
+			get
+			{
+				float? f = base.PotentialHeight;
+
+				if (f.HasValue)
+					return f.Value - this.topMargin - this.bottomMargin;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		public override void MeasurePositions(DrawingState State)
 		{
+			float InnerWidth = this.ExplicitWidth ?? this.Parent?.InnerWidth ?? State.AreaWidth;
+			float InnerHeight = this.ExplicitHeight ?? this.Parent?.InnerHeight ?? State.AreaHeight;
+
 			SKSize Prev = State.SetAreaSize(new SKSize(
-				State.AreaWidth - this.leftMargin - this.rightMargin,
-				State.AreaHeight - this.topMargin - this.bottomMargin));
+				InnerWidth - this.leftMargin - this.rightMargin,
+				InnerHeight - this.topMargin - this.bottomMargin));
 
 			base.MeasurePositions(State);
 
 			State.SetAreaSize(Prev);
 		}
 
+		private float? innerWidth;
+		private float? innerHeight;
 		private float leftMargin;
 		private float rightMargin;
 		private float topMargin;

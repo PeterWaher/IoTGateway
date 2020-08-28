@@ -5425,13 +5425,24 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.Distribute(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables,System.Boolean)">
             <summary>
             Aligns a measured cell
             </summary>
             <param name="MaxWidth">Maximum width of area assigned to the cell</param>
             <param name="MaxHeight">Maximum height of area assigned to the cell</param>
             <param name="Session">Current session.</param>
+            <param name="SetPosition">If position of inner content is to be set..</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.InnerWidth">
+            <summary>
+            Inner Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.InnerHeight">
+            <summary>
+            Inner Height of element
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CalcSpan(Waher.Script.Variables,System.Int32@,System.Int32@)">
             <summary>
@@ -5440,6 +5451,16 @@
             <param name="Session">Current session.</param>
             <param name="ColSpan">Column span</param>
             <param name="RowSpan">Row span</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.PotentialWidth">
+            <summary>
+            Potential Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.PotentialHeight">
+            <summary>
+            Potential Height of element
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.DoMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -5617,6 +5638,12 @@
             Total height of layout
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.Align">
             <summary>
             Aligns cells and returns an array of padded cells.
@@ -5659,6 +5686,12 @@
             <summary>
             Total height of layout
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.Align">
             <summary>
@@ -5754,6 +5787,12 @@
             Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Align">
             <summary>
@@ -5863,6 +5902,12 @@
             Total height of layout
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.Align">
             <summary>
             Aligns cells and returns an array of padded cells.
@@ -5885,6 +5930,12 @@
             Measures layout entities and defines unassigned properties, related to positions.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Align">
             <summary>
@@ -5989,6 +6040,16 @@
             Inner Height of element
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.PotentialWidth">
+            <summary>
+            Potential Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.PotentialHeight">
+            <summary>
+            Potential Height of element
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to positions.
@@ -6033,6 +6094,12 @@
             <summary>
             Total height of layout
             </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.Align">
             <summary>
@@ -6110,13 +6177,14 @@
             Y-offset
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.AlignedMeasuredCell(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.Distribute(System.Nullable{System.Single},System.Nullable{System.Single},Waher.Script.Variables,System.Boolean)">
             <summary>
             Aligns a measured cell
             </summary>
             <param name="MaxWidth">Maximum width of area assigned to the cell</param>
             <param name="MaxHeight">Maximum height of area assigned to the cell</param>
             <param name="Session">Current session.</param>
+            <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.ToString">
             <summary>
@@ -6243,6 +6311,12 @@
             Total height of layout
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.Distribute(System.Boolean)">
+            <summary>
+            Distributes cells in layout.
+            </summary>
+            <param name="SetPosition">If position of inner content is to be set..</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.Align">
             <summary>
             Aligns cells and returns an array of padded cells.
@@ -6345,6 +6419,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.InnerHeight">
             <summary>
             Inner Height of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.PotentialWidth">
+            <summary>
+            Potential Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.PotentialHeight">
+            <summary>
+            Potential Height of element
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.ILayoutElement.ExplicitWidth">
@@ -7034,6 +7118,16 @@
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.InnerHeight">
             <summary>
             Inner Height of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PotentialWidth">
+            <summary>
+            Potential Width of element
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.PotentialHeight">
+            <summary>
+            Potential Height of element
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.LayoutElement.ExplicitWidth">

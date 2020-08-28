@@ -70,10 +70,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="MaxWidth">Maximum width of area assigned to the cell</param>
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
 		/// <param name="Session">Current session.</param>
-		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, Variables Session)
+		/// <param name="SetPosition">If position of inner content is to be set..</param>
+		public void Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
 		{
 			if (this.isCell)
-				this.cell.AlignedMeasuredCell(MaxWidth, MaxHeight, Session);
+				this.cell.Distribute(MaxWidth, MaxHeight, Session, SetPosition);
 		}
 
 		/// <summary>

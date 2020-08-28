@@ -64,6 +64,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private EnumAttribute<HorizontalAlignment> halign;
 		private EnumAttribute<VerticalAlignment> valign;
 		private StringAttribute border;
+		private float? innerWidth;
+		private float? innerHeight;
 
 		/// <summary>
 		/// Defines a cell in a grid.
@@ -190,44 +192,65 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="MaxWidth">Maximum width of area assigned to the cell</param>
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
 		/// <param name="Session">Current session.</param>
-		public void AlignedMeasuredCell(float? MaxWidth, float? MaxHeight, Variables Session)
+		/// <param name="SetPosition">If position of inner content is to be set..</param>
+		public void Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
 		{
 			if (MaxWidth.HasValue)
 			{
-				float? Width = this.Width;
+				this.innerWidth = MaxWidth;
 
-				if (Width.HasValue &&
-					!(this.halign is null) &&
-					this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
-					HAlignment != HorizontalAlignment.Left)
+				if (SetPosition)
 				{
-					if (HAlignment == HorizontalAlignment.Right)
-						this.dx = (MaxWidth.Value - Width.Value);
-					else    // Center
-						this.dx = (MaxWidth.Value - Width.Value) / 2;
-				}
+					float? Width = this.Width;
 
-				this.Width = MaxWidth.Value;
+					if (Width.HasValue &&
+						!(this.halign is null) &&
+						this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
+						HAlignment != HorizontalAlignment.Left)
+					{
+						if (HAlignment == HorizontalAlignment.Right)
+							this.dx = (MaxWidth.Value - Width.Value);
+						else    // Center
+							this.dx = (MaxWidth.Value - Width.Value) / 2;
+					}
+
+					this.Width = MaxWidth.Value;
+				}
 			}
 
 			if (MaxHeight.HasValue)
 			{
-				float? Height = this.Height;
+				this.innerHeight = MaxHeight;
 
-				if (Height.HasValue &&
-					!(this.valign is null) &&
-					this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
-					VAlignment != VerticalAlignment.Top)
+				if (SetPosition)
 				{
-					if (VAlignment == VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
-						this.dy = (MaxHeight.Value - Height.Value);
-					else    // Center
-						this.dy = (MaxHeight.Value - Height.Value) / 2;
-				}
+					float? Height = this.Height;
 
-				this.Height = MaxHeight.Value;
+					if (Height.HasValue &&
+						!(this.valign is null) &&
+						this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
+						VAlignment != VerticalAlignment.Top)
+					{
+						if (VAlignment == VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
+							this.dy = (MaxHeight.Value - Height.Value);
+						else    // Center
+							this.dy = (MaxHeight.Value - Height.Value) / 2;
+					}
+
+					this.Height = MaxHeight.Value;
+				}
 			}
 		}
+
+		/// <summary>
+		/// Inner Width of element
+		/// </summary>
+		public override float? InnerWidth => this.innerWidth;
+
+		/// <summary>
+		/// Inner Height of element
+		/// </summary>
+		public override float? InnerHeight => this.innerHeight;
 
 		/// <summary>
 		/// Calculates the span of the cell.
@@ -247,6 +270,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			else
 				RowSpan = 1;
 		}
+
+		/// <summary>
+		/// Potential Width of element
+		/// </summary>
+		public override float? PotentialWidth => this.innerWidth;
+
+		/// <summary>
+		/// Potential Height of element
+		/// </summary>
+		public override float? PotentialHeight => this.innerHeight;
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.

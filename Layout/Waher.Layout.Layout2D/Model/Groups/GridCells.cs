@@ -13,7 +13,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		private readonly Variables session;
 		private readonly int nrColumns;
 		private readonly float[] rights;
+		private readonly float[] widths;
 		private readonly List<float> bottoms;
+		private readonly List<float> heights;
 		private int x = 0;
 		private int y = 0;
 
@@ -27,7 +29,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.session = Session;
 			this.nrColumns = NrColumns;
 			this.rights = new float[this.nrColumns];
+			this.widths = new float[this.nrColumns];
 			this.bottoms = new List<float>();
+			this.heights = new List<float>();
 		}
 
 		private GridPadding GetElement(int X, int Y)
@@ -59,6 +63,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			if (x < 0)
 				return 0;
+			else if (x >= this.nrColumns)
+				throw new InvalidOperationException("Cell does not fit in grid.");
 			else
 				return this.rights[x];
 		}
@@ -71,6 +77,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			int c = this.bottoms.Count;
 			while (c <= y)
 			{
+				this.heights.Add(0);
+
 				if (c == 0)
 					this.bottoms.Add(0);
 				else
@@ -105,28 +113,49 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			if (X2 >= this.nrColumns)
 				X2 = this.nrColumns - 1;
 
-			float Right = this.GetRight(this.x - 1) + (Element.Width ?? 0);
+			float? f = Element.Width;
+			if (f.HasValue && ColSpan == 1 && f.Value > this.widths[this.x])
+				this.widths[this.x] = f.Value;
+
+			float Right = this.GetRight(this.x - 1) + (f ?? 0);
 			float Right2 = this.GetRight(X2);
 			float Diff = Right - Right2;
 
-			if (Diff > 0)
+			while (Diff > 0)
 			{
-				while (X2 < this.nrColumns)
-					this.rights[X2++] += Diff;
+				this.rights[X2] += Diff;
+
+				if (++X2 >= this.nrColumns)
+					break;
+
+				Right2 = this.GetRight(X2);
+				Right += this.widths[X2];
+				Diff = Right - Right2;
 			}
 
 			int Y2 = this.y + RowSpan - 1;
-
-			float Bottom = this.GetBottom(this.y - 1) + (Element.Height ?? 0);
+			
+			f = Element.Height;
+			
+			float Bottom = this.GetBottom(this.y - 1) + (f ?? 0);
 			float Bottom2 = this.GetBottom(Y2);
+			int c = this.bottoms.Count;
+
+			if (f.HasValue && RowSpan == 1 && f.Value > this.heights[this.y])
+				this.heights[this.y] = f.Value;
 
 			Diff = Bottom - Bottom2;
-			if (Diff > 0)
-			{
-				int c = this.bottoms.Count;
 
-				while (Y2 < c)
-					this.bottoms[Y2++] += Diff;
+			while (Diff > 0)
+			{
+				this.bottoms[Y2] += Diff;
+
+				if (++Y2 >= c)
+					break;
+
+				Bottom2 = this.GetBottom(Y2);
+				Bottom += this.heights[Y2];
+				Diff = Bottom - Bottom2;
 			}
 
 			this.x += ColSpan;
@@ -150,7 +179,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				{
 					for (i = 0; i < ColSpan; i++)
 					{
-						this.SetElement(X + i, Y, P);
+						if (!this.SetElement(X + i, Y, P))
+							throw new InvalidOperationException("Cell does not fit in grid.");
 
 						if (First)
 						{
@@ -163,16 +193,19 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				}
 			}
 			else
-				this.SetElement(X, Y, P);
+			{
+				if (!this.SetElement(X, Y, P))
+					throw new InvalidOperationException("Cell does not fit in grid.");
+			}
 		}
 
-		private void SetElement(int X, int Y, GridPadding Element)
+		private bool SetElement(int X, int Y, GridPadding Element)
 		{
 			if (X < 0 || X >= this.nrColumns)
-				return;
+				return false;
 
 			if (Y < 0)
-				return;
+				return false;
 
 			int i = Y * this.nrColumns + X;
 			int c = this.elements.Count;
@@ -184,9 +217,20 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			}
 
 			if (i == c)
+			{
 				this.elements.Add(Element);
+				return true;
+			}
 			else
-				this.elements[i] = Element;
+			{
+				if (this.elements[i] is null)
+				{
+					this.elements[i] = Element;
+					return true;
+				}
+				else
+					return false;
+			}
 		}
 
 		/// <summary>
@@ -221,6 +265,30 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		}
 
 		/// <summary>
+		/// Distributes cells in layout.
+		/// </summary>
+		/// <param name="SetPosition">If position of inner content is to be set..</param>
+		public void Distribute(bool SetPosition)
+		{
+			foreach (GridPadding P in this.elements)
+			{
+				if (!(P.Element is null))
+				{
+					int X = P.X;
+					int Y = P.Y;
+					float Left = this.GetRight(X - 1);
+					float Top = this.GetBottom(Y - 1);
+					float Right = this.GetRight(X + P.ColSpan - 1);
+					float Bottom = this.GetBottom(Y + P.RowSpan - 1);
+					float MaxWidth = Right - Left;
+					float MaxHeight = Bottom - Top;
+
+					P.Distribute(MaxWidth, MaxHeight, this.session, SetPosition);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Aligns cells and returns an array of padded cells.
 		/// </summary>
 		/// <returns>Array of padded cells.</returns>
@@ -236,14 +304,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 					int Y = P.Y;
 					float Left = this.GetRight(X - 1);
 					float Top = this.GetBottom(Y - 1);
-					float Right = this.GetRight(X + P.ColSpan - 1);
-					float Bottom = this.GetBottom(Y + P.RowSpan - 1);
-					float MaxWidth = Right - Left;
-					float MaxHeight = Bottom - Top;
 
 					P.OffsetX += Left;
 					P.OffsetY += Top;
-					P.AlignedMeasuredCell(MaxWidth, MaxHeight, this.session);
 					Result.Add(P);
 				}
 			}

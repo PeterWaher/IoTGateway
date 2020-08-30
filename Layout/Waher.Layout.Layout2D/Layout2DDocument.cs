@@ -367,7 +367,7 @@ namespace Waher.Layout.Layout2D
 				if (Settings.BackgroundColor != SKColor.Empty)
 					Canvas.Clear(Settings.BackgroundColor);
 
-				int Limit = 10;
+				int Limit = 100;
 
 				while (this.root?.MeasureDimensions(State) ?? false)
 				{
@@ -566,6 +566,7 @@ namespace Waher.Layout.Layout2D
      * Radix/circular
      * Directed graphs
      * Smart Art/Graphs/Layout
+     * Mindmap (Example: https://bhavkaran.com/reconspider/mindmap.html)
      * 
      * Blur when too small, and dont continue rendering
      * Clip optimization

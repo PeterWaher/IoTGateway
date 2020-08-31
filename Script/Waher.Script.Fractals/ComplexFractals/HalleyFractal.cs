@@ -109,12 +109,10 @@ namespace Waher.Script.Fractals.ComplexFractals
             int c = Arguments.Length;
             int i = 0;
             object Obj;
-            Complex z;
 
             Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
                 ic = z.Imaginary;
             }
@@ -233,12 +231,10 @@ namespace Waher.Script.Fractals.ComplexFractals
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
             object[] Parameters = (object[])State;
-            SKColor[] Palette = (SKColor[])Parameters[0];
             int DimX = (int)Parameters[1];
             int DimY = (int)Parameters[2];
             Complex R = (Complex)Parameters[3];
             double[] Coefficients = Parameters[4] as double[];
-            Complex[] CoefficientsZ = Parameters[4] as Complex[];
 			string ColorExpression = (string)Parameters[5];
 
 			StringBuilder sb = new StringBuilder();
@@ -255,7 +251,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
-			else if (CoefficientsZ != null)
+			else if (Parameters[4] is Complex[] CoefficientsZ)
 				sb.Append(Expression.ToString(CoefficientsZ));
 			else
 				sb.Append(Expression.ToString(Coefficients));
@@ -430,7 +426,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}
@@ -622,13 +618,13 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}
 
         public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
-            ILambdaExpression f, ScriptNode fDef, Variables Variables, SKColor[] Palette, int Width, int Height, 
+            ILambdaExpression f, ScriptNode _, Variables Variables, SKColor[] Palette, int Width, int Height, 
             ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
             byte[] reds;
@@ -790,7 +786,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}

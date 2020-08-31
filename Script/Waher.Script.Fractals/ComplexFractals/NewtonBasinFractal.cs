@@ -96,12 +96,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 			int c = Arguments.Length;
 			int i = 0;
 			object Obj;
-			Complex z;
 
 			Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
 				ic = z.Imaginary;
 			}
@@ -216,7 +214,6 @@ namespace Waher.Script.Fractals.ComplexFractals
 			int N = (int)Parameters[2];
 			Complex R = (Complex)Parameters[3];
 			double[] Coefficients = Parameters[4] as double[];
-			Complex[] CoefficientsZ = Parameters[4] as Complex[];
 
 			StringBuilder sb = new StringBuilder();
 
@@ -232,7 +229,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
-			else if (CoefficientsZ != null)
+			else if (Parameters[4] is Complex[] CoefficientsZ)
 				sb.Append(Expression.ToString(CoefficientsZ));
 			else
 				sb.Append(Expression.ToString(Coefficients));
@@ -248,9 +245,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return sb.ToString();
 		}
 
-		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R,
-			double[] Coefficients, int N, int Width, int Height, ScriptNode Node,
-			FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, double[] Coefficients, 
+			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
@@ -420,14 +416,13 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}
 
-		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R,
-			Complex[] Coefficients, int N, int Width, int Height, ScriptNode Node,
-			FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, Complex[] Coefficients, 
+			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
@@ -619,13 +614,13 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}
 
 		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R,
-			ILambdaExpression f, ScriptNode fDef, Variables Variables, int N, int Width, int Height,
+			ILambdaExpression f, ScriptNode _, Variables Variables, int N, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;
@@ -819,7 +814,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}

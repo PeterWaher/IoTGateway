@@ -86,7 +86,7 @@ namespace Waher.Content.Xsl
 				if (f is null)
 					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
-				return LoadTransform(f, ResourceName);
+				return LoadTransform(f);
 			}
 		}
 
@@ -94,9 +94,8 @@ namespace Waher.Content.Xsl
 		/// Loads an XSL transformation from an embedded resource.
 		/// </summary>
 		/// <param name="Input">XSLT Input stream.</param>
-		/// <param name="ResourceName">Resource Name.</param>
 		/// <returns>XSL tranformation.</returns>
-		public static XslCompiledTransform LoadTransform(Stream Input, string ResourceName)
+		public static XslCompiledTransform LoadTransform(Stream Input)
 		{
 			using (XmlReader r = XmlReader.Create(Input))
 			{

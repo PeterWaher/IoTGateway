@@ -44,7 +44,10 @@ namespace Waher.Events.MQTT
 		private Task Client_OnContentReceived(object Sender, MqttContent Content)
 		{
 			string Xml = System.Text.Encoding.UTF8.GetString(Content.Data);
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			try
 			{
 				Doc.LoadXml(Xml);

@@ -85,7 +85,10 @@ namespace Waher.Content.Xml.Text
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 
 			if (Encoding is null)
 			{

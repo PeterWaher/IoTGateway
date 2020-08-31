@@ -130,7 +130,10 @@ namespace Waher.Client.WPF.Model
 		/// <param name="FileName">File Name.</param>
 		public void Load(string FileName)
 		{
-			XmlDocument Xml = new XmlDocument();
+			XmlDocument Xml = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Xml.Load(FileName);
 
 			this.Load(FileName, Xml);

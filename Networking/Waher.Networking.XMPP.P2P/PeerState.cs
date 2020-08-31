@@ -641,7 +641,10 @@ namespace Waher.Networking.XMPP.P2P
 				else
 					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml + this.streamFooter);
 
 				if (Doc.DocumentElement.LocalName != "stream")

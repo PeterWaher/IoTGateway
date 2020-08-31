@@ -112,7 +112,10 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 
 			this.Build(Doc, null, Variables);	
 

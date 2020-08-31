@@ -190,7 +190,10 @@ namespace Waher.Networking.XMPP.Contracts
 		private byte[] GetKey(EllipticCurve Curve)
 		{
 			string s = Curve.Export();
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(s);
 			s = Doc.DocumentElement.GetAttribute("d");
 			return Convert.FromBase64String(s);
@@ -2719,7 +2722,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 			try
 			{
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Contract.ForMachines.OuterXml);
 
 				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schema);

@@ -851,7 +851,10 @@ namespace Waher.Client.WPF
 			DataForm Form = (DataForm)P;
 
 			/*string Xml = File.ReadAllText("../../../../Networking/Waher.Networking.XMPP.Test/Data/TestForm.xml");
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(Xml);
 			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);*/
 

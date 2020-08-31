@@ -1083,7 +1083,10 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(this.fullJid));
 			Xml.Append("' type='unavailable'/>");
 
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(Xml.ToString());
 
 			this.ProcessPresence(new PresenceEventArgs(this, Doc.DocumentElement));
@@ -1762,7 +1765,10 @@ namespace Waher.Networking.XMPP
 				else
 					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml + this.streamFooter);
 
 				if (Doc.DocumentElement.LocalName != "stream")
@@ -1793,7 +1799,10 @@ namespace Waher.Networking.XMPP
 
 			try
 			{
-				Doc = new XmlDocument();
+				Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(this.streamHeader + Xml + this.streamFooter);
 
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
@@ -6899,7 +6908,10 @@ namespace Waher.Networking.XMPP
 								Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
 
-								XmlDocument Doc = new XmlDocument();
+								XmlDocument Doc = new XmlDocument()
+								{
+									PreserveWhitespace = true
+								};
 								Doc.LoadXml(Xml.ToString());
 
 								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
@@ -7273,7 +7285,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="ElementXml">XML element to store.</param>
 		public Task SetPrivateXmlElementAsync(string ElementXml)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(ElementXml);
 
 			return this.SetPrivateXmlElementAsync(Doc.DocumentElement);
@@ -7308,7 +7323,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public void SetPrivateXmlElement(string ElementXml, PrivateXmlEventHandler Callback, object State)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(ElementXml);
 
 			this.SetPrivateXmlElement(Doc.DocumentElement, Callback, State);

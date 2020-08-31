@@ -313,7 +313,10 @@ namespace Waher.IoTGateway
 					});
 				}
 
-				XmlDocument Config = new XmlDocument();
+				XmlDocument Config = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 
 				string GatewayConfigFileName = appDataFolder + "Gateway.config";
 				if (!File.Exists(GatewayConfigFileName))
@@ -873,7 +876,10 @@ namespace Waher.IoTGateway
 									Log.Informational("Importing language file.", FileName);
 
 									string Xml = File.ReadAllText(LanguageFile);
-									XmlDocument Doc = new XmlDocument();
+									XmlDocument Doc = new XmlDocument()
+									{
+										PreserveWhitespace = true
+									};
 									Doc.LoadXml(Xml);
 
 									XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
@@ -1028,7 +1034,10 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.Load(ManifestFileName);
 
 				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")
@@ -1113,7 +1122,10 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.Load(ManifestFileName);
 
 				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "Module" && Doc.DocumentElement.NamespaceURI == "http://waher.se/Schema/ModuleManifest.xsd")

@@ -53,7 +53,10 @@ namespace Waher.IoTGateway.Setup.Legal
 			{
 				if (this.contract is null)
 				{
-					XmlDocument Doc = new XmlDocument();
+					XmlDocument Doc = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Doc.LoadXml(this.contractXml);
 					this.contract = Contract.Parse(Doc.DocumentElement, out bool _);
 				}

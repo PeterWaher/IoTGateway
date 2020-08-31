@@ -186,7 +186,10 @@ namespace Waher.Networking.XMPP.WebSocket
 
 				string XmlResponse = await this.ReadText();
 
-				XmlDocument ResponseXml = new XmlDocument();
+				XmlDocument ResponseXml = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				ResponseXml.LoadXml(XmlResponse);
 
 				XmlElement Open;
@@ -559,7 +562,10 @@ namespace Waher.Networking.XMPP.WebSocket
 
 			if (Xml.StartsWith("<close"))
 			{
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml);
 
 				if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "close" && Doc.DocumentElement.NamespaceURI == FramingNamespace)

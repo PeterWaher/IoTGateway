@@ -491,7 +491,10 @@ namespace Waher.Networking.UPnP
 					Client.Timeout = TimeSpan.FromMilliseconds(Timeout);
 					Stream Stream = await Client.GetStreamAsync(LocationUri);
 
-					XmlDocument Xml = new XmlDocument();
+					XmlDocument Xml = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Xml.Load(Stream);
 
 					return new DeviceDescriptionDocument(Xml, this, Location);
@@ -556,7 +559,10 @@ namespace Waher.Networking.UPnP
 					Client.Timeout = TimeSpan.FromMilliseconds(Timeout);
 					Stream Stream = await Client.GetStreamAsync(Service.SCPDURI);
 
-					XmlDocument Xml = new XmlDocument();
+					XmlDocument Xml = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Xml.Load(Stream);
 
 					return new ServiceDescriptionDocument(Xml, this, Service);

@@ -1103,7 +1103,10 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					try
 					{
-						XmlDocument Doc = new XmlDocument();
+						XmlDocument Doc = new XmlDocument()
+						{
+							PreserveWhitespace = true
+						};
 						Doc.LoadXml(Query.Response);
 
 						XmlElement E = Doc.DocumentElement;

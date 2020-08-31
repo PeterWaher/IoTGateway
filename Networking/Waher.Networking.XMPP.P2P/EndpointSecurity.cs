@@ -519,7 +519,10 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.AppendE2eInfo(Xml);
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml.ToString());
 
 				return ParseE2eKeys(Doc.DocumentElement)?.ToArray() ?? new IE2eEndpoint[0];
@@ -726,7 +729,10 @@ namespace Waher.Networking.XMPP.P2P
 				return Task.CompletedTask;
 			}
 
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(Xml);
 
 			MessageEventArgs e2 = new MessageEventArgs(Client, Doc.DocumentElement)
@@ -795,7 +801,10 @@ namespace Waher.Networking.XMPP.P2P
 					Xml.Append(Content);
 					Xml.Append("</iq>");
 
-					XmlDocument Doc = new XmlDocument();
+					XmlDocument Doc = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Doc.LoadXml(Xml.ToString());
 
 					IqResultEventArgs e2 = new IqResultEventArgs(this, EndpointReference, Cipher,
@@ -916,7 +925,10 @@ namespace Waher.Networking.XMPP.P2P
 				return Task.CompletedTask;
 			}
 
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(this.EmbedIq(e, "get", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
@@ -951,7 +963,10 @@ namespace Waher.Networking.XMPP.P2P
 				return Task.CompletedTask;
 			}
 
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.LoadXml(this.EmbedIq(e, "set", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);

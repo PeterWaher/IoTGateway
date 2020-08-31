@@ -39,7 +39,10 @@ namespace Waher.Script.Xml.Functions
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-            XmlDocument Doc = new XmlDocument();
+            XmlDocument Doc = new XmlDocument()
+            {
+                PreserveWhitespace = true
+            };
 
             Doc.LoadXml(Argument);
 

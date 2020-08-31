@@ -33,7 +33,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			this.value = new XmlDocument();
+			this.value = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			this.xml = Encoding.UTF8.GetString(Content.Data);
 			this.value.LoadXml(this.xml);
 			this.timestamp = DateTime.Now;
@@ -156,7 +159,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n) => Task.FromResult<string>(this.xml),
 					(n, v) =>
 					{
-						XmlDocument Doc = new XmlDocument();
+						XmlDocument Doc = new XmlDocument()
+						{
+							PreserveWhitespace = true
+						};
 						Doc.LoadXml(v);
 						this.value = Doc;
 						this.xml = v;

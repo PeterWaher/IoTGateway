@@ -108,7 +108,10 @@ namespace Waher.IoTGateway.Setup
 				{
 					try
 					{
-						XmlDocument Doc = new XmlDocument();
+						XmlDocument Doc = new XmlDocument()
+						{
+							PreserveWhitespace = true
+						};
 						Doc.Load(FileName);
 
 						XSL.Validate(FileName, Doc, "Theme", "http://waher.se/Schema/Theme.xsd", Schema);

@@ -281,7 +281,10 @@ namespace Waher.Things.Mqtt.Model
 				{
 					try
 					{
-						XmlDocument Doc = new XmlDocument();
+						XmlDocument Doc = new XmlDocument()
+						{
+							PreserveWhitespace = true
+						};
 						Doc.LoadXml(s);
 						this.RemoveWarning();
 						return new XmlData(this, s, Doc);

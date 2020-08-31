@@ -2432,7 +2432,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4950,7 +4950,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7504,7 +7504,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10031,7 +10031,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12594,7 +12594,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15121,7 +15121,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17684,7 +17684,7 @@
           "Waher.Script": "1.0.39"
         }
       },
-      "Waher.Content.Xml/1.0.8": {
+      "Waher.Content.Xml/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27617,7 +27617,7 @@
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
     },
-    "Waher.Content.Xml/1.0.8": {
+    "Waher.Content.Xml/1.0.9": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj"

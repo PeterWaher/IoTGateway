@@ -830,7 +830,10 @@ namespace Waher.IoTGateway.Setup
 										Encoding = InternetContent.GetEncoding(CharSet);
 
 									string XmlResponse = Encoding.GetString(Bin);
-									XmlDocument Doc = new XmlDocument();
+									XmlDocument Doc = new XmlDocument()
+									{
+										PreserveWhitespace = true
+									};
 									Doc.LoadXml(XmlResponse);
 
 									if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "XRD")

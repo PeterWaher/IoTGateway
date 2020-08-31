@@ -361,7 +361,10 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Loading manifest file.");
 
-			XmlDocument Manifest = new XmlDocument();
+			XmlDocument Manifest = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Manifest.Load(ManifestFile);
 
 			Log.Informational("Validating manifest file.");
@@ -631,7 +634,10 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Loading manifest file.");
 
-			XmlDocument Manifest = new XmlDocument();
+			XmlDocument Manifest = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Manifest.Load(ManifestFile);
 
 			Log.Informational("Validating manifest file.");
@@ -779,7 +785,10 @@ namespace Waher.Utility.Install
 				{
 					Log.Informational("Loading manifest file.");
 
-					XmlDocument Manifest = new XmlDocument();
+					XmlDocument Manifest = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Manifest.Load(ManifestFile);
 
 					Log.Informational("Validating manifest file.");

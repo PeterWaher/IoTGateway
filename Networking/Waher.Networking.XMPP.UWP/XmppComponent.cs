@@ -873,7 +873,10 @@ namespace Waher.Networking.XMPP
 				else
 					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml + this.streamFooter);
 
 				if (Doc.DocumentElement.LocalName != "stream")
@@ -909,7 +912,10 @@ namespace Waher.Networking.XMPP
 
 			try
 			{
-				Doc = new XmlDocument();
+				Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(this.streamHeader + Xml + this.streamFooter);
 
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
@@ -2006,7 +2012,10 @@ namespace Waher.Networking.XMPP
 				Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				Doc.LoadXml(Xml.ToString());
 
 				PresenceEventArgs e2 = new PresenceEventArgs(this, Doc.DocumentElement);
@@ -2759,7 +2768,10 @@ namespace Waher.Networking.XMPP
 								Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
 
-								XmlDocument Doc = new XmlDocument();
+								XmlDocument Doc = new XmlDocument()
+								{
+									PreserveWhitespace = true
+								};
 								Doc.LoadXml(Xml.ToString());
 
 								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,

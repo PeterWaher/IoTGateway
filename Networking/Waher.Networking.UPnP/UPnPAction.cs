@@ -211,7 +211,10 @@ namespace Waher.Networking.UPnP
 				HttpResponseMessage Response = await HttpClient.PostAsync(this.parent.Service.ControlURI, Body);
 				Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 
-				ResponseXml = new XmlDocument();
+				ResponseXml = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
 				ResponseXml.Load(Stream);
 
 				if (ResponseXml.DocumentElement is null ||

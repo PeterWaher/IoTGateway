@@ -115,7 +115,10 @@ namespace Waher.Utility.Sign
                             if (Endpoint is EllipticCurveEndpoint EC)
                             {
                                 s = EC.Curve.Export();
-                                XmlDocument Doc = new XmlDocument();
+                                XmlDocument Doc = new XmlDocument()
+                                {
+                                    PreserveWhitespace = true
+                                };
                                 Doc.LoadXml(s);
                                 s = Doc.DocumentElement.GetAttribute("d");
                             }

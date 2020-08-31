@@ -1397,11 +1397,17 @@ namespace Waher.IoTGateway.Setup
 
 		private static void ImportGatewayConfig(Stream File)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Doc.Load(File);
 
 			string OriginalFileName = Path.Combine(Gateway.AppDataFolder, "Gateway.config");
-			XmlDocument Original = new XmlDocument();
+			XmlDocument Original = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 			Original.Load(OriginalFileName);
 
 			if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "GatewayConfiguration")
@@ -1533,7 +1539,10 @@ namespace Waher.IoTGateway.Setup
 		private static async Task<(ICryptoTransform, CryptoStream)> RestoreEncrypted(Stream BackupFile, Stream KeyFile, string TabID, ValidateBackupFile Import,
 			bool Overwrite, bool OnlySelectedCollections, Array SelectedCollections)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
 
 			try
 			{

@@ -21,7 +21,7 @@
       <dependency id="Waher.Networking.UWP" version="1.0.16"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.3"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.13"/>
-      <dependency id="Waher.Script" version="1.0.38"/>
+      <dependency id="Waher.Script" version="1.0.39"/>
       <dependency id="Waher.Security" version="1.0.6"/>
       <dependency id="Waher.Security.LoginMonitor.UWP" version="1.0.0"/>
     </dependencies>

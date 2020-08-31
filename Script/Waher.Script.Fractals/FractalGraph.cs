@@ -65,6 +65,11 @@ namespace Waher.Script.Fractals
 		}
 
 		/// <summary>
+		/// Node generating the graph.
+		/// </summary>
+		public ScriptNode Node => this.node;
+
+		/// <summary>
 		/// <see cref="Graph.GetImageClickScript"/>
 		/// </summary>
 		public override string GetBitmapClickScript(double X, double Y, object[] States)
@@ -583,7 +588,7 @@ namespace Waher.Script.Fractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				return SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 			}
 		}
 
@@ -632,7 +637,7 @@ namespace Waher.Script.Fractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				return SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 			}
 		}
 

@@ -158,7 +158,6 @@ namespace Waher.Script.Fractals.ComplexFractals
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
             object[] Parameters = (object[])State;
-            SKColor[] Palette = (SKColor[])Parameters[0];
             int DimX = (int)Parameters[1];
             int DimY = (int)Parameters[2];
             double Rr = (double)Parameters[3];
@@ -339,7 +338,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 			}
 		}

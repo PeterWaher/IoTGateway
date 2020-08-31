@@ -587,7 +587,7 @@ namespace Waher.Script.Fractals.IFS
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				return SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 			}
         }
 
@@ -625,11 +625,10 @@ namespace Waher.Script.Fractals.IFS
             int rowStep = Width * this.superSampling;
             int rowStep2 = rowStep - this.superSampling;
             int srcYStep = rowStep * this.superSampling;
-            int SuperSampling2 = this.superSampling * this.superSampling;
             int dx, dy;
             int i, j;
             double H, S, L;
-            int freq, maxfreq = 0;
+            int freq, maxfreq;
             long R2, G2, B2;
 			SKColor cl;
 			bool HasBg = Background.HasValue;
@@ -780,7 +779,7 @@ namespace Waher.Script.Fractals.IFS
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				return SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 			}
 		}
 

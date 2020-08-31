@@ -291,7 +291,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
-		private static Random gen = new Random();
+		private static readonly Random gen = new Random();
 
 		public override string FunctionName
 		{
@@ -498,7 +498,7 @@ namespace Waher.Script.Fractals.IFS
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 			}
 		}
@@ -690,7 +690,7 @@ namespace Waher.Script.Fractals.IFS
 
 			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
 			{
-				SKImage Bitmap = SKImage.FromPixelData(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
+				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
 				return new FractalGraph(Bitmap, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 			}
 		}

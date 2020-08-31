@@ -132,7 +132,7 @@ namespace Waher.Script.Graphs
 
 				using (SKData Data = SKData.Create(Pixels, c))
 				{
-					SKImage Result = SKImage.FromPixelData(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
+					SKImage Result = SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
 					Pixels = IntPtr.Zero;
 
 					return Result;

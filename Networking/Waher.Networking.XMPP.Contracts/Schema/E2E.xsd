@@ -1,0 +1,315 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:ieee:iot:e2e:1.0'
+    xmlns='urn:ieee:iot:e2e:1.0'
+    elementFormDefault='qualified'
+		xmlns:p2="urn:ieee:iot:p2p:1.0">
+
+  <!--
+Copyright 2017-2019 The Institute of Electrical and Electronics Engineers, 
+Incorporated (IEEE).
+
+This work is licensed to The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) under one or more contributor license
+agreements.
+
+See the LICENSE.md file distributed with this work for additional
+information regarding copyright ownership. Use of this file is
+governed by a BSD-style license, the terms of which are as follows:
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions, the following disclaimer, and the
+NOTICE file.
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions, the following disclaimer in the
+documentation and/or other materials provided with the
+distribution, and the NOTICE file.
+Neither the name of The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SPDX-License-Identifier: BSD-3-Clause
+  
+Disclaimer: This open source repository contains material that may be 
+included-in or referenced by an unapproved draft of a proposed IEEE 
+Standard. All material in this repository is subject to change. The 
+material in this repository is presented "as is" and with all faults. 
+Use of the material is at the sole risk of the user. IEEE specifically 
+disclaims all warranties and representations with respect to all 
+material contained in this repository and shall not be liable, under 
+any theory, for any use of the material. Unapproved drafts of proposed 
+IEEE standards must not be utilized for any conformance/compliance 
+purposes.
+-->
+
+  <xs:import namespace="urn:ieee:iot:p2p:1.0"/>
+
+  <xs:element name="e2e">
+    <xs:annotation>
+      <xs:documentation>Element added to online presence stanza, to inform peers with presence subscription on how to establish end-to-end encrypted communication with the application.</xs:documentation>
+      <xs:documentation>Public keys should be regularly changed, and new presence stanzas issued, to protect the forward secrecy of communication.</xs:documentation>
+      <xs:documentation>If a public/private key pair is broken, it only affects messages using that keypair.</xs:documentation>
+      <xs:documentation>Update frequency depends on the sensitivity of the data being communicated.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group ref="PublicKeys" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="PublicKeys">
+    <xs:choice>
+      <xs:element ref="ed25519"/>
+      <xs:element ref="ed448"/>
+      <xs:element ref="p521"/>
+      <xs:element ref="p384"/>
+      <xs:element ref="p256"/>
+      <xs:element ref="p224"/>
+      <xs:element ref="p192"/>
+      <xs:element ref="x25519"/>
+      <xs:element ref="x448"/>
+      <xs:element ref="rsa"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="Endpoint" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Base class for Endpoints.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="pub" type="xs:base64Binary" use="required">
+      <xs:annotation>
+        <xs:documentation>Public key, base-64 encoded.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="EllipticCurve" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Base class for hybrid algorithms using Elliptic Curve ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Endpoint"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="x25519">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the the Curve25519 Montgomery curve, ECDH key exchange (to generate symmetric keys for for encryption). Cryptographic signatures are not provided by the curve.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="x448">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the the Curve448 Montgomery curve, ECDH key exchange (to generate symmetric keys for for encryption).</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ed25519">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the the Edward25519 Twisted Edward curve, ECDH key exchange (to generate symmetric keys for encryption) and EdDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ed448">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the the Edward448 Edward curve, ECDH key exchange (to generate symmetric keys for encryption) and EdDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p521">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the NIST P-521 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p384">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the NIST P-384 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p256">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the NIST P-256 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p224">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the NIST P-224 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p192">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using the NIST P-192 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EllipticCurve">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rsa">
+    <xs:annotation>
+      <xs:documentation>End-to-End encryption using RSA Public Key cryptography to encrypt shared secrets, that are then used with AES-256 to encrypt the payload.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="Endpoint">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="SymmetricCipher" abstract="true">
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attribute name="r" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Reference to the remote endpoint encrypting the data.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="c" type="xs:unsignedInt" use="required">
+          <xs:annotation>
+            <xs:documentation>32-bit unsigned counter.</xs:documentation>
+            <xs:documentation>Used to build the IV.</xs:documentation>
+            <xs:documentation>Incremented once for every encrypted stanza.</xs:documentation>
+            <xs:documentation>Can be reset when a new key is generated.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="k" type="xs:base64Binary" use="optional">
+          <xs:annotation>
+            <xs:documentation>If the public-key algorithm referenced does not support derivation of shared keys (such as RSA), the AES shared secret is explicitly generated by the sender, encrypted using the public key of the recipient, and sent in this attribute.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="s" type="xs:base64Binary" use="optional">
+          <xs:annotation>
+            <xs:documentation>Signature of sender, if public-key algorithm supports signatures.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="aes">
+    <xs:annotation>
+      <xs:documentation>AES-256 encryption of payload, using Cipher Block Chaining (CBC) and PKCS#7 padding.</xs:documentation>
+      <xs:documentation>Payload must not be accepted if the decryption fails or if signatures do not validate using the corresponding public keys of the senders that the receiver has on record.</xs:documentation>
+      <xs:documentation>Initiation Vector (IV) is the first 12 bytes of the SHA-256 hash of the concatenation of the id, type, from and to attributes values of the stanza element, followed by the 4 bytes of the counter, in little-endian order.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="SymmetricCipher"/>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="cha">
+    <xs:annotation>
+      <xs:documentation>ChaCha20 encryption of payload, starting with block counter 1.</xs:documentation>
+      <xs:documentation>Payload must not be accepted if the decryption fails or if signatures do not validate using the corresponding public keys of the senders that the receiver has on record.</xs:documentation>
+      <xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the id, type, from and to attributes values of the stanza element, followed by the 4 bytes of the counter, in little-endian order.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="SymmetricCipher"/>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="acp">
+    <xs:annotation>
+      <xs:documentation>AEAD-ChaCha20-Poly1305 authenticated encryption with associated data of payload.</xs:documentation>
+      <xs:documentation>Payload must not be accepted if the decryption fails or if signatures do not validate using the corresponding public keys of the senders that the receiver has on record.</xs:documentation>
+      <xs:documentation>Initiation Vector (IV) is the first 8 bytes of the SHA-256 hash of the concatenation of the id, type, from and to attributes values of the stanza element, followed by the 4 bytes of the counter, in little-endian order.</xs:documentation>
+      <xs:documentation>The Associated Data (AD) used in the AEAD algorithm is the UTF-8 encoding of the `from` attribute value on the stanza (i.e. full JID of the sender).</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="SymmetricCipher"/>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="synchE2e">
+    <xs:annotation>
+      <xs:documentation>Element that can be sent in an iq get stanza to synchronize End-to-End Encryption and Peer-to-Peer parameters.</xs:documentation>
+      <xs:documentation>Expected response element is synchE2e as well, where the recipient of the request returns its parameters, after authorizing the request.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="e2e" minOccurs="0"/>
+        <xs:element ref="p2:p2p" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

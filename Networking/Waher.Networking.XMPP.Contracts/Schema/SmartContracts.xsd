@@ -212,7 +212,12 @@ purposes.
 						<xs:attributeGroup ref='signatureAttributes'/>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name='status' minOccurs='0' maxOccurs='1'>
+        <xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
+          <xs:annotation>
+            <xs:documentation>Any attached items associated with the contract.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name='status' minOccurs='0' maxOccurs='1'>
 					<xs:annotation>
 						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
 						<xs:documentation>Authorized clients can get the latest version of the contract by requesting it from the trust provider, given the id of the contract.</xs:documentation>
@@ -280,7 +285,14 @@ purposes.
 						<xs:attributeGroup ref='signatureAttributes'/>
 					</xs:complexType>
 				</xs:element>
-			</xs:sequence>
+        <xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
+          <xs:annotation>
+            <xs:documentation>Any downloadable references to attachments assigned to the contract.</xs:documentation>
+            <xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
+            <xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
 			<xs:attributeGroup ref='visibilityAndDuration'>
 				<xs:annotation>
 					<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
@@ -1522,6 +1534,110 @@ purposes.
       <xs:attribute name='response' type='xs:boolean' use='required'>
         <xs:annotation>
           <xs:documentation>If the Trust Provider can share the smart contract information with the entity making the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='addAttachment'>
+    <xs:annotation>
+      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a smart contract that is yet to be signed.</xs:documentation>
+      <xs:documentation>After first signature, contract must not accept new attachments.</xs:documentation>
+      <xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
+      <xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
+      <xs:documentation>Only the creator of the contract can add attachments to it.</xs:documentation>
+      <xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
+      <xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
+      <xs:documentation>Expected response element: contract</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='contractId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Smart Contract to which the attachment is to be assigned.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='getUrl' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='s' type='xs:base64Binary' use='required'>
+        <xs:annotation>
+          <xs:documentation>Signature of the content assigned to the smart contract.</xs:documentation>
+          <xs:documentation>The signature must be made by an approved legal identity of the sender.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='removeAttachment'>
+    <xs:annotation>
+      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a smart contract that is proposed or is approved, but before it is being signed.</xs:documentation>
+      <xs:documentation>A client can only remove attachments from its own contracts.</xs:documentation>
+      <xs:documentation>Expected response element: contract</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='attachmentId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Identity of attachment to remove.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name='attachment'>
+    <xs:annotation>
+      <xs:documentation>Represents an attachment.</xs:documentation>
+      <xs:documentation>An attachment can	be assigned to smart contracts.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The identity of the attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='legalId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The legal identity of the uploader of the attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='contentType' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Internet Content-Type of attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='fileName' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Filename of attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='s' type='xs:base64Binary' use='required'>
+        <xs:annotation>
+          <xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='timestamp' type='xs:dateTime' use='required'>
+        <xs:annotation>
+          <xs:documentation>Timestamp of attachment upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='attachmentRef'>
+    <xs:annotation>
+      <xs:documentation>Includes information on how to download an attachment.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='attachmentId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The ID of the attachment referenced to.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='url' type='xs:anyURI' use='required'>
+        <xs:annotation>
+          <xs:documentation>An URL to download the attachment.</xs:documentation>
+          <xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

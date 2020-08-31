@@ -1,0 +1,610 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:ieee:iot:leg:id:1.0'
+    xmlns='urn:ieee:iot:leg:id:1.0'
+    xmlns:e2='urn:ieee:iot:e2e:1.0'
+    elementFormDefault='qualified'>
+
+	<!--
+Copyright 2017-2018 The Institute of Electrical and Electronics Engineers, 
+Incorporated (IEEE).
+
+This work is licensed to The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) under one or more contributor license
+agreements.
+
+See the LICENSE.md file distributed with this work for additional
+information regarding copyright ownership. Use of this file is
+governed by a BSD-style license, the terms of which are as follows:
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions, the following disclaimer, and the
+NOTICE file.
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions, the following disclaimer in the
+documentation and/or other materials provided with the
+distribution, and the NOTICE file.
+Neither the name of The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SPDX-License-Identifier: BSD-3-Clause
+  
+Disclaimer: This open source repository contains material that may be 
+included-in or referenced by an unapproved draft of a proposed IEEE 
+Standard. All material in this repository is subject to change. The 
+material in this repository is presented "as is" and with all faults. 
+Use of the material is at the sole risk of the user. IEEE specifically 
+disclaims all warranties and representations with respect to all 
+material contained in this repository and shall not be liable, under 
+any theory, for any use of the material. Unapproved drafts of proposed 
+IEEE standards must not be utilized for any conformance/compliance 
+purposes.
+-->
+
+	<xs:import namespace='urn:ieee:iot:e2e:1.0'/>
+
+	<xs:element name='getPublicKey'>
+		<xs:annotation>
+			<xs:documentation>Sent by one entity to another when it needs to get the public key of the other.</xs:documentation>
+			<xs:documentation>Expected response element: publicKey</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name='publicKey'>
+		<xs:annotation>
+			<xs:documentation>Contains a public key.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:group ref='e2:PublicKeys' minOccurs='1' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Public keys corresponding to available methods to create signatures.</xs:documentation>
+				</xs:annotation>
+			</xs:group>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='apply'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to apply for a pairing between the online identity (bare JID) of the sender and a Legal Identity.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+			<xs:documentation>Note: The approval process is taken care of out-of-band.</xs:documentation>
+			<xs:documentation>Note: Whenever the state of the legal identity is changed on the server, a message is sent to the bare JID of the account, containing the identity, in an identity element. Identities should only be accepted by clients, if the provider corresponds to the sender, and if the server signature is valid, and corresponds to the public key of the server.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='identity'>
+					<xs:annotation>
+						<xs:documentation>The legal identity the client wishes to assign to the account.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='identity'>
+		<xs:annotation>
+			<xs:documentation>Element containing information about a legal identity.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='clientPublicKey' minOccurs='1' maxOccurs='1'>
+					<xs:complexType>
+						<xs:group ref='e2:PublicKeys' minOccurs='1' maxOccurs='1'>
+							<xs:annotation>
+								<xs:documentation>Public keys corresponding to available methods to create signatures.</xs:documentation>
+							</xs:annotation>
+						</xs:group>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='property' minOccurs='1' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>An identity consists of a sequence of properties.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='name' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>Name of the property.</xs:documentation>
+								<xs:documentation>Predefined names:</xs:documentation>
+								<xs:documentation>FIRST = First name</xs:documentation>
+								<xs:documentation>MIDDLE = Middle name</xs:documentation>
+								<xs:documentation>LAST = Last name</xs:documentation>
+								<xs:documentation>PNR = Personal number</xs:documentation>
+								<xs:documentation>ADDR = Address</xs:documentation>
+								<xs:documentation>ADDR2 = Address, second line</xs:documentation>
+								<xs:documentation>ZIP = Zip or postal code</xs:documentation>
+								<xs:documentation>AREA = Area</xs:documentation>
+								<xs:documentation>CITY = City</xs:documentation>
+								<xs:documentation>REGION = Region, state</xs:documentation>
+								<xs:documentation>COUNTRY = Country</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='value' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>Value of the property.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='clientSignature' minOccurs='1' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Client signature of the identity.</xs:documentation>
+						<xs:documentation>The signature is calculated on the identity element excluding the id attribute and the clientSignature, status and serverSignature elements.</xs:documentation>
+						<xs:documentation>All text nodes and attribute values contain XML-encoded normalized Unicode text (in NFC).</xs:documentation>
+						<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
+						<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
+						<xs:documentation>The identity element never includes the xmlns attribute when calculating the signature.</xs:documentation>
+						<xs:documentation>Note: The purpose of the signature, is for the server to validate that the client has access to the private keys corresponding to the public keys registered with the trust provider, and that the contents of the identity is consistent over time.</xs:documentation>
+						<xs:documentation>Note: Legal identities are updated by the client regularly. Check with the server to get the most recent legal identity, if needed.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+            <xs:attribute name="s" type="xs:base64Binary" use="optional">
+              <xs:annotation>
+                <xs:documentation>Digital signature created using the corresponding client public-key algorithm.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+					</xs:complexType>
+				</xs:element>
+        <xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
+          <xs:annotation>
+            <xs:documentation>Any attached items associated with the identity.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name='status' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
+						<xs:documentation>Anyone can get the latest version of the legal identity by requesting it from the trust provider, given the id of the legal identity.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='provider' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>JID of Trust Provider validating the correctness of the identity.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='state' type='IdentityState' use='required'>
+							<xs:annotation>
+								<xs:documentation>Contains information about the current statue of the legal identity registration.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='created' type='xs:dateTime' use='required'>
+							<xs:annotation>
+								<xs:documentation>When the legal identity was first created.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='updated' type='xs:dateTime' use='optional'>
+							<xs:annotation>
+								<xs:documentation>When the legal identity was last updated.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='from' type='xs:date' use='optional'>
+							<xs:annotation>
+								<xs:documentation>From what date (inclusive) the legal identity can be used.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='to' type='xs:date' use='optional'>
+							<xs:annotation>
+								<xs:documentation>To what date (inclusive) the legal identity can be used.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='serverSignature' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>Server signature of the identity.</xs:documentation>
+						<xs:documentation>The signature is calculated on the identity element excluding the serverSignature element.</xs:documentation>
+						<xs:documentation>All text nodes and attribute values contain XML-encoded normalized Unicode text (in NFC).</xs:documentation>
+						<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
+						<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
+						<xs:documentation>The identity element never includes the xmlns attribute when calculating the signature.</xs:documentation>
+						<xs:documentation>Note: The purpose of the server signature, is to validate the legal identity to other clients that have access to the server public keys.</xs:documentation>
+						<xs:documentation>Note: Server keys may change over time. If a signature does not validate, make sure to get the most recent public key from the server and check signature again.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+            <xs:attribute name="s" type="xs:base64Binary" use="optional">
+              <xs:annotation>
+                <xs:documentation>Digital signature created using the corresponding server public-key algorithm.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+				</xs:element>
+        <xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
+          <xs:annotation>
+            <xs:documentation>Any downloadable references to attachments assigned to the legal identity.</xs:documentation>
+            <xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
+            <xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+			<xs:attribute name='id' type='xs:string' use='optional'>
+				<xs:annotation>
+					<xs:documentation>An identifier assigned to the legal identity.</xs:documentation>
+					<xs:documentation>The identifier is formed as a JID, but is not a JID. The domain part corresponds to the domain of the Trust Provider.</xs:documentation>
+					<xs:documentation>A client must not include an identifier when it applies for a legal identity pairing with the Trust Provider.</xs:documentation>
+					<xs:documentation>Note: Legal IDs are case insensitive in searches and references.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name='IdentityState'>
+		<xs:annotation>
+			<xs:documentation>Lists recognized legal identity states.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Created'>
+				<xs:annotation>
+					<xs:documentation>An application has been received and is pending confirmation out-of-band.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Rejected'>
+				<xs:annotation>
+					<xs:documentation>The legal identity has been rejected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Approved'>
+				<xs:annotation>
+					<xs:documentation>The legal identity is authenticated and approved by the Trust Provider.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Obsoleted'>
+				<xs:annotation>
+					<xs:documentation>The legal identity has been explicitly obsoleted by its owner, or by the Trust Provider.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Compromised'>
+				<xs:annotation>
+					<xs:documentation>The legal identity has been reported compromised by its owner, or by the Trust Provider.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name='getLegalIdentities'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to retrieve a list (possibly empty) of legal identities registered with the provider.</xs:documentation>
+			<xs:documentation>Expected response element: identities</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='identities'>
+		<xs:annotation>
+			<xs:documentation>Contains a set of legal identities.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='identity' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>A legal identity.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getLegalIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to retrieve a specific legal identity given its ID.</xs:documentation>
+			<xs:documentation>The server should only return legal identities belonging to the same account.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+			<xs:documentation>Note: To get the legal identity from a signature, see validateSignature.</xs:documentation>
+			<xs:documentation>Note: To get the legal identities related to contracts, see getLegalIdentities element in the smart contracts namespace.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity to retrieve.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='validateSignature'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to validate a client signature from a legal identity hosted by the provider.</xs:documentation>
+			<xs:documentation>If valid, the information about the corresponding legal identity is returned.</xs:documentation>
+			<xs:documentation>If signature is not valid, a forbidden error will be returned.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+      <xs:documentation>Note: If neither id or bareJid are provided, current approved legal identities for the sender will be used to verify the signature.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity to retrieve.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+      <xs:attribute name='bareJid' type='xs:string' use='optional'>
+        <xs:annotation>
+          <xs:documentation>Bare JID of account on the Trust Provider.</xs:documentation>
+          <xs:documentation>Current approved legal identities for this account will be used to verify the signature.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='data' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Binary data claimed to be signed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+      <xs:attribute name="s" type="xs:base64Binary" use="optional">
+        <xs:annotation>
+          <xs:documentation>Digital signature to validate.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+	</xs:element>
+
+	<xs:element name='obsoleteLegalIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to obsolete one of its legal identities.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity to obsolete.</xs:documentation>
+					<xs:documentation>Note: Obsoleting an application automatically turns it to Rejected.</xs:documentation>
+					<xs:documentation>Note: Trying to obsolete a rejected or compromised identity returns a forbidden error.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='compromisedLegalIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to report one of its legal identities as compromised.</xs:documentation>
+      <xs:documentation>Expected response element: identity</xs:documentation>
+    </xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity to report as compromised.</xs:documentation>
+					<xs:documentation>Note: Reporting an application as compromised automatically turns it to Rejected.</xs:documentation>
+					<xs:documentation>Note: Trying to report a rejected identity as compromised returns a forbidden error.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+  <xs:element name='petitionIdentity'>
+    <xs:annotation>
+      <xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a legal identity managed by the Trust Provider.</xs:documentation>
+      <xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
+      <xs:documentation>The Trust Provider will forward the petition to the corresponding client(s) using a normal message containing a petitionIdentityMsg element.</xs:documentation>
+      <xs:documentation>Expect an empty response on success.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Identifier of the legal identity hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='pid' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='purpose' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='nonce' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
+          <xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='s' type='xs:base64Binary' use='required'>
+        <xs:annotation>
+          <xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
+          <xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
+          <xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='petitionIdentityMsg'>
+    <xs:annotation>
+      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a legal identity owned by the recipient of this message.</xs:documentation>
+      <xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionIdentityResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='identity' minOccurs='1' maxOccurs='1'>
+          <xs:annotation>
+            <xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
+            <xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name='pid' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='from' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='purpose' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name='petitionIdentityResponse'>
+    <xs:annotation>
+      <xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a legal identity owned by the client.</xs:documentation>
+      <xs:documentation>Expect an empty response on success.</xs:documentation>
+      <xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Identifier of the legal identity referred to by the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='pid' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='jid' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Bare JID of the entity making the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='response' type='xs:boolean' use='optional' default='false'>
+        <xs:annotation>
+          <xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name='petitionIdentityResponseMsg'>
+    <xs:annotation>
+      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a legal identity.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='identity' minOccurs='0' maxOccurs='1'>
+          <xs:annotation>
+            <xs:documentation>The legal identity requested, if available, and the owner of the identity consented in sharing the information.</xs:documentation>
+            <xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name='pid' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='response' type='xs:boolean' use='required'>
+        <xs:annotation>
+          <xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='addAttachment'>
+    <xs:annotation>
+      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a legal identity that is yet to be approved.</xs:documentation>
+      <xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
+      <xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
+      <xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
+      <xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
+      <xs:documentation>Expected response element: identity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Legal identity to which the attachment is to be assigned.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='getUrl' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='s' type='xs:base64Binary' use='required'>
+        <xs:annotation>
+          <xs:documentation>Signature of the content assigned to the legal identity.</xs:documentation>
+          <xs:documentation>The signature must be made by the private key of the legal identity to which the attachment is to be assigned.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='removeAttachment'>
+    <xs:annotation>
+      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a legal identity that is yet to be approved.</xs:documentation>
+      <xs:documentation>A client can only remove attachments from its own identities.</xs:documentation>
+      <xs:documentation>Expected response element: identity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='attachmentId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Identity of attachment to remove.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='attachment'>
+    <xs:annotation>
+      <xs:documentation>Represents an attachment.</xs:documentation>
+      <xs:documentation>An attachment can	be assigned to legal identities.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='id' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The identity of the attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='contentType' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Internet Content-Type of attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='fileName' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>Filename of attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='s' type='xs:base64Binary' use='required'>
+        <xs:annotation>
+          <xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='timestamp' type='xs:dateTime' use='required'>
+        <xs:annotation>
+          <xs:documentation>Timestamp of attachment upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='attachmentRef'>
+    <xs:annotation>
+      <xs:documentation>Includes information on how to download an attachment.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name='attachmentId' type='xs:string' use='required'>
+        <xs:annotation>
+          <xs:documentation>The ID of the attachment referenced to.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name='url' type='xs:anyURI' use='required'>
+        <xs:annotation>
+          <xs:documentation>An URL to download the attachment.</xs:documentation>
+          <xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

@@ -1,0 +1,99 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:ieee:iot:p2p:1.0'
+    xmlns='urn:ieee:iot:p2p:1.0'
+    elementFormDefault='qualified'>
+
+<!--
+Copyright 2017-2018 The Institute of Electrical and Electronics Engineers, 
+Incorporated (IEEE).
+
+This work is licensed to The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) under one or more contributor license
+agreements.
+
+See the LICENSE.md file distributed with this work for additional
+information regarding copyright ownership. Use of this file is
+governed by a BSD-style license, the terms of which are as follows:
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions, the following disclaimer, and the
+NOTICE file.
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions, the following disclaimer in the
+documentation and/or other materials provided with the
+distribution, and the NOTICE file.
+Neither the name of The Institute of Electrical and Electronics
+Engineers, Incorporated (IEEE) nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SPDX-License-Identifier: BSD-3-Clause
+  
+Disclaimer: This open source repository contains material that may be 
+included-in or referenced by an unapproved draft of a proposed IEEE 
+Standard. All material in this repository is subject to change. The 
+material in this repository is presented "as is" and with all faults. 
+Use of the material is at the sole risk of the user. IEEE specifically 
+disclaims all warranties and representations with respect to all 
+material contained in this repository and shall not be liable, under 
+any theory, for any use of the material. Unapproved drafts of proposed 
+IEEE standards must not be utilized for any conformance/compliance 
+purposes.
+-->
+
+	<xs:element name="p2p">
+		<xs:annotation>
+			<xs:documentation>Element added to online presence stanza, to inform peers with presence subscription on how to connect directly to the entity using XEP-0174: Serverless Messaging</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="extIp" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>External IP address, reachable from external networks.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="extPort" type="PortNumber" use="required">
+				<xs:annotation>
+					<xs:documentation>External port number, used by external entities to reach the connected application.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="locIp" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Local IP address, reachable from the local network (by devices having the same external IP address).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="locPort" type="PortNumber" use="required">
+				<xs:annotation>
+					<xs:documentation>Local port number, used on the local network, to reach the connected application.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="PortNumber">
+		<xs:annotation>
+			<xs:documentation>Represents a port number on the TCP network.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

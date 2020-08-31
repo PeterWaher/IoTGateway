@@ -32,11 +32,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Schema\E2E.xsd" />
+    <None Remove="Schema\LegalIdentities.xsd" />
+    <None Remove="Schema\P2P.xsd" />
     <None Remove="Schema\SmartContracts.xsd" />
     <None Remove="Schema\Xml.xsd" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Schema\E2E.xsd" />
+    <EmbeddedResource Include="Schema\LegalIdentities.xsd" />
+    <EmbeddedResource Include="Schema\P2P.xsd" />
     <EmbeddedResource Include="Schema\Xml.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>

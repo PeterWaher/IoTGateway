@@ -4441,13 +4441,13 @@ namespace Waher.Script
 				return true;
 			else if (E1 is StringValue)
 			{
-				E2 = new StringValue(E2.ToString());
+				E2 = new StringValue(E2.AssociatedObjectValue?.ToString() ?? string.Empty);
 				Set2 = StringValues.Instance;
 				return true;
 			}
 			else if (E2 is StringValue)
 			{
-				E1 = new StringValue(E1.ToString());
+				E1 = new StringValue(E1.AssociatedObjectValue?.ToString() ?? string.Empty);
 				Set1 = StringValues.Instance;
 				return true;
 			}

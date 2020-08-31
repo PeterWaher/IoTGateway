@@ -13,11 +13,11 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPAction
 	{
-		private Dictionary<string, UPnPArgument> argumentByName = new Dictionary<string, UPnPArgument>();
-		private ServiceDescriptionDocument parent;
-		private XmlElement xml;
-		private UPnPArgument[] arguments;
-		private string name;
+		private readonly Dictionary<string, UPnPArgument> argumentByName = new Dictionary<string, UPnPArgument>();
+		private readonly ServiceDescriptionDocument parent;
+		private readonly XmlElement xml;
+		private readonly UPnPArgument[] arguments;
+		private readonly string name;
 
 		internal UPnPAction(XmlElement Xml, ServiceDescriptionDocument Parent)
 		{

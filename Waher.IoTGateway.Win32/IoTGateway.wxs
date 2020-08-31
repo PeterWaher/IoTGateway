@@ -29,7 +29,7 @@
     <Property Id="ErrorIcon">error_icon</Property>
     <Property Id="QuestionIcon">question_icon</Property>
     <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.26.28720\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.27.29016\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
@@ -484,7 +484,7 @@
             </Component>
             <Component Id='ExternalLibraries' Guid='6545F5ED-1503-454E-9EB4-E211BF6E74B3'>
               <File Id='DnsClient.dll' Name='DnsClient.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\DnsClient.dll' Vital='yes' KeyPath='yes'/>
-              <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Script\Waher.Script.Lab\Bin\Debug\libSkiaSharp.dll' Vital='yes'/>
+              <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libSkiaSharp.dll' Vital='yes'/>
               <File Id='MongoDB.Bson.dll' Name='MongoDB.Bson.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Bson.dll' Vital='yes'/>
               <File Id='MongoDB.Driver.dll' Name='MongoDB.Driver.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.dll' Vital='yes'/>
               <File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.Core.dll' Vital='yes'/>

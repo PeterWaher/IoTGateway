@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -314,12 +315,10 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			return Task.CompletedTask;
 		}
 
-		// 1 is obsolete (previously XMPP Credentials)
-
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public override Task StartExport()
+		public override Task StartDatabase()
 		{
 			this.w.Write((byte)2); // Database
 			return Task.CompletedTask;
@@ -328,7 +327,25 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public override Task EndExport()
+		public override Task EndDatabase()
+		{
+			this.w.Write(string.Empty);
+			return this.UpdateClient(false);
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is started.
+		/// </summary>
+		public override Task StartLedger()
+		{
+			this.w.Write((byte)6); // Ledger
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is finished.
+		/// </summary>
+		public override Task EndLedger()
 		{
 			this.w.Write(string.Empty);
 			return this.UpdateClient(false);
@@ -396,6 +413,47 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		}
 
 		/// <summary>
+		/// Is called when a block in a collection is started.
+		/// </summary>
+		/// <param name="BlockID">Block ID</param>
+		public override Task StartBlock(string BlockID)
+		{
+			if (this.exportCollection)
+			{
+				this.w.Write((byte)1);
+				this.w.Write(BlockID);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when a block in a collection is finished.
+		/// </summary>
+		public override Task EndBlock()
+		{
+			if (this.exportCollection)
+				this.w.Write((byte)3);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Reports block meta-data.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		public override async Task BlockMetaData(string Key, object Value)
+		{
+			if (this.exportCollection)
+			{
+				this.w.Write((byte)4);
+				this.w.Write(Key);
+				await this.ReportProperty(null, Value);
+			}
+		}
+
+		/// <summary>
 		/// Is called when an object is started.
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
@@ -416,6 +474,48 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// Is called when an object is finished.
 		/// </summary>
 		public override Task EndObject()
+		{
+			if (this.exportCollection)
+			{
+				this.w.Write(TYPE_NULL);
+				this.w.Write(string.Empty);
+			}
+
+			return this.UpdateClient(false);
+		}
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		public override Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		{
+			if (this.exportCollection)
+			{
+				this.w.Write((byte)2);
+				this.w.Write(ObjectId);
+				this.w.Write(TypeName);
+				this.w.Write((byte)EntryType);
+
+				DateTime DT = EntryTimestamp.DateTime;
+				TimeSpan TS = EntryTimestamp.Offset;
+
+				this.w.Write((byte)DT.Kind);
+				this.w.Write(DT.Ticks);
+				this.w.Write(TS.Ticks);
+			}
+
+			return Task.FromResult<string>(ObjectId);
+		}
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		public override Task EndEntry()
 		{
 			if (this.exportCollection)
 			{

@@ -20,6 +20,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		private XmlWriter output;
 		private bool exportCollection = false;
 		private bool inCollection = false;
+		private bool inMetaData = false;
 
 		/// <summary>
 		/// XML File export
@@ -75,7 +76,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public override Task StartExport()
+		public override Task StartDatabase()
 		{
 			return this.output.WriteStartElementAsync(string.Empty, "Database", Export.ExportNamepace);
 		}
@@ -83,7 +84,24 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public override async Task EndExport()
+		public override async Task EndDatabase()
+		{
+			await this.output.WriteEndElementAsync();
+			await this.UpdateClient(false);
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is started.
+		/// </summary>
+		public override Task StartLedger()
+		{
+			return this.output.WriteStartElementAsync(string.Empty, "Ledger", Export.ExportNamepace);
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is finished.
+		/// </summary>
+		public override async Task EndLedger()
 		{
 			await this.output.WriteEndElementAsync();
 			await this.UpdateClient(false);
@@ -154,6 +172,55 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		}
 
 		/// <summary>
+		/// Is called when a block in a collection is started.
+		/// </summary>
+		/// <param name="BlockID">Block ID</param>
+		public override async Task StartBlock(string BlockID)
+		{
+			if (this.exportCollection)
+			{
+				await this.output.WriteStartElementAsync(string.Empty, "Block", Export.ExportNamepace);
+				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, BlockID);
+			}
+		}
+
+		/// <summary>
+		/// Is called when a block in a collection is finished.
+		/// </summary>
+		public override async Task EndBlock()
+		{
+			if (this.exportCollection)
+			{
+				if (this.inMetaData)
+				{
+					await this.output.WriteEndElementAsync();
+					this.inMetaData = false;
+				}
+
+				await this.output.WriteEndElementAsync();
+			}
+		}
+
+		/// <summary>
+		/// Reports block meta-data.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		public override async Task BlockMetaData(string Key, object Value)
+		{
+			if (this.exportCollection)
+			{
+				if (!this.inMetaData)
+				{
+					await this.output.WriteStartElementAsync(string.Empty, "MetaData", Export.ExportNamepace);
+					this.inMetaData = true;
+				}
+
+				await this.ReportProperty(Key, Value);
+			}
+		}
+
+		/// <summary>
 		/// Is called when an object is started.
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
@@ -174,6 +241,45 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// Is called when an object is finished.
 		/// </summary>
 		public override async Task EndObject()
+		{
+			if (this.exportCollection)
+			{
+				await this.output.WriteEndElementAsync();
+				await this.UpdateClient(false);
+			}
+		}
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		public override async Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		{
+			if (this.exportCollection)
+			{
+				if (this.inMetaData)
+				{
+					await this.output.WriteEndElementAsync();
+					this.inMetaData = false;
+				}
+
+				await this.output.WriteStartElementAsync(string.Empty, EntryType.ToString(), Export.ExportNamepace);
+				await this.output.WriteAttributeStringAsync(string.Empty, "id", string.Empty, ObjectId);
+				await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, TypeName);
+				await this.output.WriteAttributeStringAsync(string.Empty, "ts", string.Empty, XML.Encode(EntryTimestamp));
+			}
+
+			return ObjectId;
+		}
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		public override async Task EndEntry()
 		{
 			if (this.exportCollection)
 			{

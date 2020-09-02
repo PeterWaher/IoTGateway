@@ -2371,7 +2371,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile[] Files = this.Files;
 
-			await Output.StartExport();
+			await Output.StartDatabase();
 			try
 			{
 				foreach (ObjectBTreeFile File in Files)
@@ -2447,13 +2447,13 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await Output.EndExport();
+				await Output.EndDatabase();
 			}
 		}
 
 		private void ReportException(Exception ex, IDatabaseExport Output)
 		{
-			ex = Waher.Events.Log.UnnestException(ex);
+			ex = Log.UnnestException(ex);
 
 			if (ex is AggregateException ex2)
 			{
@@ -2973,6 +2973,8 @@ namespace Waher.Persistence.Files
 					Stop = l;
 			}
 
+			string[] Collections = Database.GetFlaggedCollectionNames();
+
 			if (!Start.HasValue || !Stop.HasValue || Start.Value > Stop.Value)
 			{
 				s = this.GetReportFileName();
@@ -2989,6 +2991,15 @@ namespace Waher.Persistence.Files
 				}
 
 				return await this.Repair(s, XsltPath, (string[])null);
+			}
+			else if (Collections.Length > 0)
+			{
+				s = this.GetReportFileName();
+
+				Log.Notice("Repairing flagged collections.",
+					string.Empty, string.Empty, "AutoRepair", new KeyValuePair<string, object>("Report", s));
+
+				return await this.Repair(s, XsltPath, Collections);
 			}
 			else
 				return new string[0];

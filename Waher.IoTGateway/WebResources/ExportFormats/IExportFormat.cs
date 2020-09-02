@@ -9,7 +9,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 	/// <summary>
 	/// Interface for export formats.
 	/// </summary>
-	public interface IExportFormat : IDatabaseExport, IDisposable
+	public interface IExportFormat : IDatabaseExport, ILedgerExport, IDisposable
 	{
 		/// <summary>
 		/// File name

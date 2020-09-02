@@ -1465,7 +1465,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Task object for synchronization purposes.</returns>
 		public async Task Export(IDatabaseExport Output, string[] CollectionNames)
 		{
-			await Output.StartExport();
+			await Output.StartDatabase();
 			try
 			{
 				ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
@@ -1551,7 +1551,7 @@ namespace Waher.Persistence.MongoDB
 			}
 			finally
 			{
-				await Output.EndExport();
+				await Output.EndDatabase();
 			}
 		}
 

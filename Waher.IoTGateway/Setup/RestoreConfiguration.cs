@@ -254,7 +254,7 @@ namespace Waher.IoTGateway.Setup
 				Overwrite, OnlySelectedCollections, SelectedCollections);
 
 			Response.StatusCode = 200;
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -354,6 +354,24 @@ namespace Waher.IoTGateway.Setup
 							Result.AppendLine(" collection.");
 					}
 
+					if (Import.NrIndices > 0)
+					{
+						Result.Append(Import.NrIndices.ToString());
+						if (Import.NrIndices > 1)
+							Result.AppendLine(" indices.");
+						else
+							Result.AppendLine(" index.");
+					}
+
+					if (Import.NrBlocks > 0)
+					{
+						Result.Append(Import.NrBlocks.ToString());
+						if (Import.NrBlocks > 1)
+							Result.AppendLine(" blocks.");
+						else
+							Result.AppendLine(" block.");
+					}
+
 					if (Import.NrObjects > 0)
 					{
 						Result.Append(Import.NrObjects.ToString());
@@ -361,6 +379,15 @@ namespace Waher.IoTGateway.Setup
 							Result.AppendLine(" objects.");
 						else
 							Result.AppendLine(" object.");
+					}
+
+					if (Import.NrEntries > 0)
+					{
+						Result.Append(Import.NrEntries.ToString());
+						if (Import.NrEntries > 1)
+							Result.AppendLine(" entries.");
+						else
+							Result.AppendLine(" entry.");
 					}
 
 					if (Import.NrProperties > 0)
@@ -485,11 +512,13 @@ namespace Waher.IoTGateway.Setup
 			};
 			XmlReader r = XmlReader.Create(BackupFile, Settings);
 			DateTime LastReport = DateTime.Now;
+			KeyValuePair<string, object> P;
 			bool ImportCollection = !OnlySelectedCollections;
 			bool DatabaseStarted = false;
+			bool LedgerStarted = false;
 			bool CollectionStarted = false;
 			bool IndexStarted = false;
-			bool ObjectStarted = false;
+			bool BlockStarted = false;
 			bool FilesStarted = false;
 			bool FirstFile = true;
 
@@ -513,12 +542,25 @@ namespace Waher.IoTGateway.Setup
 							else
 								ShowStatus(TabID, "Validating database section.");
 
-							await Import.StartExport();
+							await Import.StartDatabase();
 							DatabaseStarted = true;
 							break;
 
+						case "Ledger":
+							if (r.Depth != 1)
+								throw new Exception("Ledger element not expected.");
+
+							if (Overwrite)
+								ShowStatus(TabID, "Restoring ledger section.");
+							else
+								ShowStatus(TabID, "Validating ledger section.");
+
+							await Import.StartLedger();
+							LedgerStarted = true;
+							break;
+
 						case "Collection":
-							if (r.Depth != 2 || !DatabaseStarted)
+							if (r.Depth != 2 || (!DatabaseStarted && !LedgerStarted))
 								throw new Exception("Collection element not expected.");
 
 							if (!r.MoveToAttribute("name"))
@@ -526,16 +568,15 @@ namespace Waher.IoTGateway.Setup
 
 							string CollectionName = r.Value;
 
-							if (ObjectStarted)
-							{
-								await Import.EndObject();
-								ObjectStarted = false;
-							}
-
 							if (IndexStarted)
 							{
 								await Import.EndIndex();
 								IndexStarted = false;
+							}
+							else if (BlockStarted)
+							{
+								await Import.EndBlock();
+								BlockStarted = false;
 							}
 
 							if (CollectionStarted)
@@ -609,13 +650,136 @@ namespace Waher.IoTGateway.Setup
 							break;
 
 						case "Obj":
-							if (r.Depth != 3 || !CollectionStarted)
+							if (r.Depth == 3 && CollectionStarted)
+							{
+								if (IndexStarted)
+								{
+									await Import.EndIndex();
+									IndexStarted = false;
+								}
+
+								using (XmlReader r2 = r.ReadSubtree())
+								{
+									await r2.ReadAsync();
+
+									if (!r2.MoveToFirstAttribute())
+										throw new Exception("Object attributes missing.");
+
+									string ObjectId = null;
+									string TypeName = string.Empty;
+
+									do
+									{
+										switch (r2.LocalName)
+										{
+											case "id":
+												ObjectId = r2.Value;
+												break;
+
+											case "type":
+												TypeName = r2.Value;
+												break;
+
+											case "xmlns":
+												break;
+
+											default:
+												throw new Exception("Unexpected attribute: " + r2.LocalName);
+										}
+									}
+									while (r2.MoveToNextAttribute());
+
+									if (ImportCollection)
+										await Import.StartObject(ObjectId, TypeName);
+
+									while (await r2.ReadAsync())
+									{
+										if (r2.IsStartElement())
+										{
+											P = await ReadValue(r2);
+
+											if (ImportCollection)
+												await Import.ReportProperty(P.Key, P.Value);
+										}
+									}
+								}
+
+								if (ImportCollection)
+									await Import.EndObject();
+							}
+							else
 								throw new Exception("Obj element not expected.");
 
-							if (IndexStarted)
+							break;
+
+						case "Block":
+							if (r.Depth != 3 || !CollectionStarted)
+								throw new Exception("Block element not expected.");
+
+							if (!r.MoveToAttribute("id"))
+								throw new Exception("Block ID missing.");
+
+							string BlockID = r.Value;
+
+							if (ImportCollection)
 							{
-								await Import.EndIndex();
-								IndexStarted = false;
+								await Import.StartBlock(BlockID);
+								BlockStarted = true;
+							}
+							break;
+
+						case "MetaData":
+							if (r.Depth == 4 && BlockStarted)
+							{
+								using (XmlReader r2 = r.ReadSubtree())
+								{
+									await r2.ReadAsync();
+
+									while (await r2.ReadAsync())
+									{
+										if (r2.IsStartElement())
+										{
+											P = await ReadValue(r2);
+
+											if (ImportCollection)
+												await Import.BlockMetaData(P.Key, P.Value);
+										}
+									}
+								}
+							}
+							else
+								throw new Exception("MetaData element not expected.");
+							break;
+
+						case "New":
+						case "Update":
+						case "Delete":
+						case "Clear":
+							if (r.Depth != 4 || !CollectionStarted || !BlockStarted)
+								throw new Exception("Entry element not expected.");
+
+							EntryType EntryType;
+
+							switch (r.LocalName)
+							{
+								case "New":
+									EntryType = EntryType.New;
+									break;
+
+								case "Update":
+									EntryType = EntryType.Update;
+									break;
+
+								case "Delete":
+									EntryType = EntryType.Delete;
+									break;
+
+								case "Clear":
+									EntryType = EntryType.Clear;
+									break;
+
+								default:
+									throw new Exception("Unexpected element: " + r.LocalName);
 							}
 
 							using (XmlReader r2 = r.ReadSubtree())
@@ -625,14 +789,9 @@ namespace Waher.IoTGateway.Setup
 								if (!r2.MoveToFirstAttribute())
 									throw new Exception("Object attributes missing.");
 
-								if (ObjectStarted)
-								{
-									await Import.EndObject();
-									ObjectStarted = false;
-								}
-
 								string ObjectId = null;
 								string TypeName = string.Empty;
+								DateTimeOffset EntryTimestamp = DateTimeOffset.MinValue;
 
 								do
 								{
@@ -646,6 +805,11 @@ namespace Waher.IoTGateway.Setup
 											TypeName = r2.Value;
 											break;
 
+										case "ts":
+											if (!XML.TryParse(r2.Value, out EntryTimestamp))
+												throw new Exception("Invalid Entry Timestamp: " + r2.Value);
+											break;
+
 										case "xmlns":
 											break;
 
@@ -656,16 +820,13 @@ namespace Waher.IoTGateway.Setup
 								while (r2.MoveToNextAttribute());
 
 								if (ImportCollection)
-								{
-									await Import.StartObject(ObjectId, TypeName);
-									ObjectStarted = true;
-								}
+									await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
 
 								while (await r2.ReadAsync())
 								{
 									if (r2.IsStartElement())
 									{
-										KeyValuePair<string, object> P = await ReadValue(r2);
+										P = await ReadValue(r2);
 
 										if (ImportCollection)
 											await Import.ReportProperty(P.Key, P.Value);
@@ -674,23 +835,23 @@ namespace Waher.IoTGateway.Setup
 							}
 
 							if (ImportCollection)
-								await Import.EndObject();
+								await Import.EndEntry();
+
 							break;
 
 						case "Files":
 							if (r.Depth != 1)
 								throw new Exception("Files element not expected.");
 
-							if (ObjectStarted)
-							{
-								await Import.EndObject();
-								ObjectStarted = false;
-							}
-
 							if (IndexStarted)
 							{
 								await Import.EndIndex();
 								IndexStarted = false;
+							}
+							else if (BlockStarted)
+							{
+								await Import.EndBlock();
+								BlockStarted = false;
 							}
 
 							if (CollectionStarted)
@@ -701,8 +862,13 @@ namespace Waher.IoTGateway.Setup
 
 							if (DatabaseStarted)
 							{
-								await Import.EndExport();
+								await Import.EndDatabase();
 								DatabaseStarted = false;
+							}
+							else if (LedgerStarted)
+							{
+								await Import.EndLedger();
+								LedgerStarted = false;
 							}
 
 							if (Overwrite)
@@ -771,17 +937,18 @@ namespace Waher.IoTGateway.Setup
 				ShowReport(TabID, Import, ref LastReport, Overwrite);
 			}
 
-			if (ObjectStarted)
-				await Import.EndObject();
-
 			if (IndexStarted)
 				await Import.EndIndex();
+			else if (BlockStarted)
+				await Import.EndBlock();
 
 			if (CollectionStarted)
 				await Import.EndCollection();
 
 			if (DatabaseStarted)
-				await Import.EndExport();
+				await Import.EndDatabase();
+			else if (LedgerStarted)
+				await Import.EndLedger();
 
 			if (FilesStarted)
 				await Import.EndFiles();
@@ -810,8 +977,14 @@ namespace Waher.IoTGateway.Setup
 			if (Import.NrIndices > 0)
 				ShowStatus(TabID, "NrIndices" + Suffix, Import.NrIndices.ToString() + " indices.");
 
+			if (Import.NrBlocks > 0)
+				ShowStatus(TabID, "NrBlocks" + Suffix, Import.NrBlocks.ToString() + " blocks.");
+
 			if (Import.NrObjects > 0)
 				ShowStatus(TabID, "NrObjects" + Suffix, Import.NrObjects.ToString() + " objects.");
+
+			if (Import.NrEntries > 0)
+				ShowStatus(TabID, "NrEntries" + Suffix, Import.NrEntries.ToString() + " entries.");
 
 			if (Import.NrProperties > 0)
 				ShowStatus(TabID, "NrProperties" + Suffix, Import.NrProperties.ToString() + " properties.");
@@ -1239,6 +1412,9 @@ namespace Waher.IoTGateway.Setup
 				{
 					switch (Command)
 					{
+						case 1:
+							throw new Exception("Obsolete file.");  // 1 is obsolete (previously XMPP Credentials)
+
 						case 2: // Database
 							string CollectionName;
 							string ObjectId;
@@ -1251,7 +1427,7 @@ namespace Waher.IoTGateway.Setup
 							else
 								ShowStatus(TabID, "Validating database section.");
 
-							await Import.StartExport();
+							await Import.StartDatabase();
 
 							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 							{
@@ -1277,7 +1453,7 @@ namespace Waher.IoTGateway.Setup
 											while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
 											{
 												Ascending = r.ReadBoolean();
-											
+
 												if (ImportCollection)
 													await Import.ReportIndexField(FieldName, Ascending);
 											}
@@ -1323,7 +1499,7 @@ namespace Waher.IoTGateway.Setup
 									await Import.EndCollection();
 							}
 
-							await Import.EndExport();
+							await Import.EndDatabase();
 							break;
 
 						case 3: // Files
@@ -1383,6 +1559,105 @@ namespace Waher.IoTGateway.Setup
 							}
 
 							await Import.EndFiles();
+							break;
+
+						case 4:
+							throw new Exception("Export file contains reported errors.");
+
+						case 5:
+							throw new Exception("Export file contains reported exceptions.");
+
+						case 6: // Ledger
+
+							if (Overwrite)
+								ShowStatus(TabID, "Restoring ledger section.");
+							else
+								ShowStatus(TabID, "Validating ledger section.");
+
+							await Import.StartLedger();
+
+							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+							{
+								if (OnlySelectedCollections)
+									ImportCollection = Array.IndexOf(SelectedCollections, CollectionName) >= 0;
+
+								if (ImportCollection)
+								{
+									await Import.StartCollection(CollectionName);
+									CollectionFound(TabID, CollectionName);
+								}
+
+								byte b;
+
+								while ((b = r.ReadByte()) != 0)
+								{
+									switch (b)
+									{
+										case 1:
+											string BlockID = r.ReadString();
+											if (ImportCollection)
+												await Import.StartBlock(BlockID);
+											break;
+
+										case 2:
+											ObjectId = r.ReadString();
+											TypeName = r.ReadString();
+											EntryType EntryType = (EntryType)r.ReadByte();
+											DateTimeKind Kind = (DateTimeKind)r.ReadByte();
+											long Ticks = r.ReadInt64();
+											DateTime DT = new DateTime(Ticks, Kind);
+											Ticks = r.ReadInt64();
+											Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
+											TimeSpan TS = new TimeSpan(Ticks);
+											DateTimeOffset EntryTimestamp = new DateTimeOffset(DT, TS);
+
+											if (ImportCollection)
+												await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+
+											byte PropertyType = r.ReadByte();
+											string PropertyName = r.ReadString();
+											object PropertyValue;
+
+											while (!string.IsNullOrEmpty(PropertyName))
+											{
+												PropertyValue = ReadValue(r, PropertyType);
+
+												if (ImportCollection)
+													await Import.ReportProperty(PropertyName, PropertyValue);
+
+												PropertyType = r.ReadByte();
+												PropertyName = r.ReadString();
+											}
+
+											if (ImportCollection)
+												await Import.EndObject();
+											break;
+
+										case 3:
+											if (ImportCollection)
+												await Import.EndBlock();
+											break;
+
+										case 4:
+											PropertyName = r.ReadString();
+											PropertyType = r.ReadByte();
+											PropertyValue = ReadValue(r, PropertyType);
+
+											await Import.BlockMetaData(PropertyName, PropertyValue);
+											break;
+
+										default:
+											throw new Exception("Unsupported collection section: " + b.ToString());
+									}
+
+									ShowReport(TabID, Import, ref LastReport, Overwrite);
+								}
+
+								if (ImportCollection)
+									await Import.EndCollection();
+							}
+
+							await Import.EndLedger();
 							break;
 
 						default:
@@ -1483,7 +1758,7 @@ namespace Waher.IoTGateway.Setup
 					Ticks = r.ReadInt64();
 					DateTime DT = new DateTime(Ticks, Kind);
 					Ticks = r.ReadInt64();
-					Ticks -= Ticks % 600000000;	// Offsets must be in whole minutes.
+					Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
 					TimeSpan TS = new TimeSpan(Ticks);
 					return new DateTimeOffset(DT, TS);
 

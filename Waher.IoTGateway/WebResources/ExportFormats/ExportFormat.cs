@@ -4,8 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.IoTGateway;
-using Waher.Networking.XMPP;
+using Waher.Persistence;
 
 namespace Waher.IoTGateway.WebResources.ExportFormats
 {
@@ -114,12 +113,22 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public abstract Task StartExport();
+		public abstract Task StartDatabase();
 
 		/// <summary>
 		/// Is called when export of database is finished.
 		/// </summary>
-		public abstract Task EndExport();
+		public abstract Task EndDatabase();
+
+		/// <summary>
+		/// Is called when export of ledger is started.
+		/// </summary>
+		public abstract Task StartLedger();
+
+		/// <summary>
+		/// Is called when export of ledger is finished.
+		/// </summary>
+		public abstract Task EndLedger();
 
 		/// <summary>
 		/// Is called when a collection is started.
@@ -148,6 +157,39 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <param name="FieldName">Name of field.</param>
 		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
 		public abstract Task ReportIndexField(string FieldName, bool Ascending);
+
+		/// <summary>
+		/// Is called when a block in a collection is started.
+		/// </summary>
+		/// <param name="BlockID">Block ID</param>
+		public abstract Task StartBlock(string BlockID);
+
+		/// <summary>
+		/// Is called when a block in a collection is finished.
+		/// </summary>
+		public abstract Task EndBlock();
+
+		/// <summary>
+		/// Reports block meta-data.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		public abstract Task BlockMetaData(string Key, object Value);
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		public abstract Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp);
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		public abstract Task EndEntry();
 
 		/// <summary>
 		/// Is called when an object is started.

@@ -106,7 +106,14 @@ the Analyze button to analyze the database and generate a report.
 <label for="Database">Database contents.</label>
 </p>
 
-<p style="display:{{Export.ExportDatabase ? "block" : "none"}}">
+{{if Waher.Persistence.Ledger.HasProvider then ]]
+<p>
+<input id="Ledger" name="Ledger" type="checkbox" ((Export.ExportLedger ? "checked" : "")) onclick="ToggleSelectCollections()"/>
+<label for="Ledger">Ledger contents.</label>
+</p>
+[[}}
+
+<p style="display:{{Export.ExportDatabase or Export.ExportLedger ? "block" : "none"}}">
 <input type="checkbox" name="OnlySelectedCollections" id="OnlySelectedCollections" onclick="ToggleSelectedCollections()"/>
 <label for="OnlySelectedCollections" title="If only selected collections are to be backed up.">Only backup selected collections.</label>
 </p>
@@ -147,9 +154,10 @@ the Analyze button to analyze the database and generate a report.
 </fieldset>
 
 <p>
-<button type="button" onclick="StartExport();">Backup</button>
-<button type="button" onclick="StartAnalyze(false);">Analyze</button>
-<button type="button" onclick="StartAnalyze(true);">Repair</button>
+<button type="button" onclick="StartExport(false);" title="Uses current settings for daily backups, and performs a backup.">Backup</button>
+<button type="button" onclick="StartExport(true);" title="Exports data using current settings, without changing backup settings.">Export</button>
+<button type="button" onclick="StartAnalyze(false);" title="Analyzes the database for content, inconsistencies and errors.">Analyze</button>
+<button type="button" onclick="StartAnalyze(true);" title="Repairs any inconsistencies and errors found in the database.">Repair</button>
 {{if Configuring then ]]
 <button id='NextButton' type='button' onclick='Next()'>Next</button>
 [[ else ]]

@@ -18,6 +18,7 @@ namespace Waher.IoTGateway.Setup
 	{
 		private readonly List<object> objects = new List<object>();
 		private GenericObject obj = null;
+		private EntryType entryType;
 		private int nrObjectsInBulk = 0;
 		private int nrObjectsFailed = 0;
 
@@ -67,7 +68,7 @@ namespace Waher.IoTGateway.Setup
 		public override async Task StartCollection(string CollectionName)
 		{
 			await base.StartCollection(CollectionName);
-			await Database.Clear(CollectionName);
+			await Database.Provider.Clear(CollectionName);
 			await Database.StartBulk();
 			this.nrObjectsInBulk = 0;
 		}
@@ -82,7 +83,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				try
 				{
-					await Database.Insert(this.objects);
+					await Database.Provider.Insert(this.objects);
 				}
 				catch (Exception ex)
 				{
@@ -104,7 +105,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public override Task EndIndex()
 		{
-			return Database.AddIndex(this.collectionName, this.index.ToArray());
+			return Database.Provider.AddIndex(this.collectionName, this.index.ToArray());
 		}
 
 		/// <summary>
@@ -124,8 +125,6 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public override async Task EndObject()
 		{
-			await base.EndObject();
-
 			if (this.obj != null)
 			{
 				this.objects.Add(this.obj);
@@ -136,7 +135,7 @@ namespace Waher.IoTGateway.Setup
 				{
 					try
 					{
-						await Database.Insert(this.objects);
+						await Database.Provider.Insert(this.objects);
 					}
 					catch (Exception ex)
 					{
@@ -155,6 +154,8 @@ namespace Waher.IoTGateway.Setup
 					}
 				}
 			}
+
+			await base.EndObject();
 		}
 
 		/// <summary>
@@ -212,6 +213,62 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			return base.ReportProperty(PropertyName, PropertyValue);
+		}
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		public override async Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		{
+			ObjectId = await base.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+			this.obj = new GenericObject(this.collectionName, TypeName, string.IsNullOrEmpty(ObjectId) ? Guid.Empty : Guid.Parse(ObjectId));
+			this.entryType = EntryType;
+			return ObjectId;
+		}
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		public override async Task EndEntry()
+		{
+			if (this.entryType == EntryType.Clear)
+				await Database.Provider.Clear(this.collectionName);
+			else if (this.obj != null)
+			{
+				GenericObject Obj2 = await Database.Provider.TryLoadObject<GenericObject>(this.collectionName, this.objectId);
+
+				switch (this.entryType)
+				{
+					case EntryType.New:
+					case EntryType.Update:
+						if (Obj2 is null)
+							await Database.Provider.Insert(this.obj);
+						else if (!Obj2.Equals(this.obj))
+							await Database.Provider.Update(this.obj);
+						break;
+
+					case EntryType.Delete:
+						if (!(Obj2 is null))
+							await Database.Provider.Delete(Obj2);
+						break;
+				}
+
+				this.obj = null;
+				this.nrObjectsInBulk++;
+				if (this.nrObjectsInBulk >= 1000)
+				{
+					await Database.EndBulk();
+					await Database.StartBulk();
+					this.nrObjectsInBulk = 0;
+				}
+			}
+
+			await base.EndEntry();
 		}
 
 		/// <summary>

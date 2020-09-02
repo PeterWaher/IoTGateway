@@ -742,7 +742,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public async static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlagged();
+			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlaggedCollections();
 
 			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData);
 
@@ -804,7 +804,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public async static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlagged();
+			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlaggedCollections();
 
 			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair);
 
@@ -814,7 +814,7 @@ namespace Waher.Persistence
 			return Result;
 		}
 
-		private static KeyValuePair<string, Dictionary<string, FlagSource>>[] GetFlagged()
+		private static KeyValuePair<string, Dictionary<string, FlagSource>>[] GetFlaggedCollections()
 		{
 			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged;
 			int i;
@@ -831,6 +831,23 @@ namespace Waher.Persistence
 			}
 
 			return Flagged;
+		}
+
+		/// <summary>
+		/// Gets the names of the collections that have been flagged as possibly corrupt.
+		/// </summary>
+		/// <returns></returns>
+		public static string[] GetFlaggedCollectionNames()
+		{
+			string[] Result;
+
+			lock (toRepair)
+			{
+				Result = new string[toRepair.Count];
+				toRepair.Keys.CopyTo(Result, 0);
+			}
+
+			return Result;
 		}
 
 		/// <summary>

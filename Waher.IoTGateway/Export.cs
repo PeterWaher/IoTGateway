@@ -230,6 +230,31 @@ namespace Waher.IoTGateway
 		private static bool? exportDatabase = null;
 
 		/// <summary>
+		/// If the ledger should be exported.
+		/// </summary>
+		public static bool ExportLedger
+		{
+			get
+			{
+				if (!exportLedger.HasValue)
+					exportLedger = RuntimeSettings.Get("ExportLedger", false);
+
+				return exportLedger.Value;
+			}
+
+			set
+			{
+				if (exportLedger != value)
+				{
+					exportLedger = value;
+					RuntimeSettings.Set("ExportLedger", exportLedger.Value);
+				}
+			}
+		}
+
+		private static bool? exportLedger = null;
+
+		/// <summary>
 		/// If web content should be exported.
 		/// </summary>
 		public static bool ExportWebContent
@@ -591,7 +616,7 @@ namespace Waher.IoTGateway
 			public string[] Folders;
 		}
 
-		private static Dictionary<string, FolderCategory> folders = new Dictionary<string, FolderCategory>();
+		private static readonly Dictionary<string, FolderCategory> folders = new Dictionary<string, FolderCategory>();
 
 	}
 }

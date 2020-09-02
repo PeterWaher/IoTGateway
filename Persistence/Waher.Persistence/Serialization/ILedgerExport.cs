@@ -1,22 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.Serialization
 {
 	/// <summary>
-	/// Interface for database exports.
+	/// Interface for ledger exports.
 	/// </summary>
-	public interface IDatabaseExport
+	public interface ILedgerExport
 	{
 		/// <summary>
-		/// Is called when export of database is started.
+		/// Is called when export of ledger is started.
 		/// </summary>
-		Task StartDatabase();
+		Task StartLedger();
 
 		/// <summary>
-		/// Is called when export of database is finished.
+		/// Is called when export of ledger is finished.
 		/// </summary>
-		Task EndDatabase();
+		Task EndLedger();
 
 		/// <summary>
 		/// Is called when a collection is started.
@@ -30,34 +31,37 @@ namespace Waher.Persistence.Serialization
 		Task EndCollection();
 
 		/// <summary>
-		/// Is called when an index in a collection is started.
+		/// Is called when a block in a collection is started.
 		/// </summary>
-		Task StartIndex();
+		/// <param name="BlockID">Block ID</param>
+		Task StartBlock(string BlockID);
 
 		/// <summary>
-		/// Is called when an index in a collection is finished.
+		/// Reports block meta-data.
 		/// </summary>
-		Task EndIndex();
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		Task BlockMetaData(string Key, object Value);
 
 		/// <summary>
-		/// Is called when a field in an index is reported.
+		/// Is called when a block in a collection is finished.
 		/// </summary>
-		/// <param name="FieldName">Name of field.</param>
-		/// <param name="Ascending">If the field is sorted using ascending sort order.</param>
-		Task ReportIndexField(string FieldName, bool Ascending);
+		Task EndBlock();
 
 		/// <summary>
-		/// Is called when an object is started.
+		/// Is called when an entry is started.
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
 		/// <returns>Object ID of object, after optional mapping.</returns>
-		Task<string> StartObject(string ObjectId, string TypeName);
+		Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp);
 
 		/// <summary>
-		/// Is called when an object is finished.
+		/// Is called when an entry is finished.
 		/// </summary>
-		Task EndObject();
+		Task EndEntry();
 
 		/// <summary>
 		/// Is called when a property is reported.

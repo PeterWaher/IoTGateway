@@ -2967,6 +2967,12 @@
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.GetFlaggedCollectionNames">
+            <summary>
+            Gets the names of the collections that have been flagged as possibly corrupt.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Waher.Persistence.Database.BeginRepair(System.String)">
             <summary>
             Is called when reparation of a collection is begin.
@@ -4308,6 +4314,14 @@
             </summary>
             <returns>Array of collections.</returns>
         </member>
+        <member name="M:Waher.Persistence.ILedgerProvider.Export(Waher.Persistence.Serialization.ILedgerExport,System.String[])">
+            <summary>
+            Performs an export of the entire ledger.
+            </summary>
+            <param name="Output">Ledger will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
         <member name="T:Waher.Persistence.InconsistencyException">
             <summary>
             Database inconsistency exception. Raised when an inconsistency in the database has been found.
@@ -4452,6 +4466,21 @@
             Gets an array of available collections.
             </summary>
             <returns>Array of collections.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Ledger.Export(Waher.Persistence.Serialization.ILedgerExport)">
+            <summary>
+            Performs an export of the entire ledger.
+            </summary>
+            <param name="Output">Ledger will be output to this interface.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Ledger.Export(Waher.Persistence.Serialization.ILedgerExport,System.String[])">
+            <summary>
+            Performs an export of the entire ledger.
+            </summary>
+            <param name="Output">Ledger will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
         </member>
         <member name="T:Waher.Persistence.LifeCycle.DatabaseModule">
             <summary>
@@ -4643,12 +4672,12 @@
             Interface for database exports.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Serialization.IDatabaseExport.StartExport">
+        <member name="M:Waher.Persistence.Serialization.IDatabaseExport.StartDatabase">
             <summary>
             Is called when export of database is started.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Serialization.IDatabaseExport.EndExport">
+        <member name="M:Waher.Persistence.Serialization.IDatabaseExport.EndDatabase">
             <summary>
             Is called when export of database is finished.
             </summary>
@@ -4708,6 +4737,84 @@
             <param name="Message">Error message.</param>
         </member>
         <member name="M:Waher.Persistence.Serialization.IDatabaseExport.ReportException(System.Exception)">
+            <summary>
+            Is called when an exception has occurred.
+            </summary>
+            <param name="Exception">Exception object.</param>
+        </member>
+        <member name="T:Waher.Persistence.Serialization.ILedgerExport">
+            <summary>
+            Interface for ledger exports.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.StartLedger">
+            <summary>
+            Is called when export of ledger is started.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.EndLedger">
+            <summary>
+            Is called when export of ledger is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.StartCollection(System.String)">
+            <summary>
+            Is called when a collection is started.
+            </summary>
+            <param name="CollectionName">Name of collection</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.EndCollection">
+            <summary>
+            Is called when a collection is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.StartBlock(System.String)">
+            <summary>
+            Is called when a block in a collection is started.
+            </summary>
+            <param name="BlockID">Block ID</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.BlockMetaData(System.String,System.Object)">
+            <summary>
+            Reports block meta-data.
+            </summary>
+            <param name="Key">Meta-data key.</param>
+            <param name="Value">Meta-data value.</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.EndBlock">
+            <summary>
+            Is called when a block in a collection is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.StartEntry(System.String,System.String,Waher.Persistence.EntryType,System.DateTimeOffset)">
+            <summary>
+            Is called when an entry is started.
+            </summary>
+            <param name="ObjectId">ID of object.</param>
+            <param name="TypeName">Type name of object.</param>
+            <param name="EntryType">Type of entry</param>
+            <param name="EntryTimestamp">Timestamp of entry</param>
+            <returns>Object ID of object, after optional mapping.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.EndEntry">
+            <summary>
+            Is called when an entry is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.ReportProperty(System.String,System.Object)">
+            <summary>
+            Is called when a property is reported.
+            </summary>
+            <param name="PropertyName">Property name.</param>
+            <param name="PropertyValue">Property value.</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.ReportError(System.String)">
+            <summary>
+            Is called when an error is reported.
+            </summary>
+            <param name="Message">Error message.</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.ILedgerExport.ReportException(System.Exception)">
             <summary>
             Is called when an exception has occurred.
             </summary>

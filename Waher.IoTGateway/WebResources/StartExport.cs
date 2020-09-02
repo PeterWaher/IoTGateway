@@ -86,9 +86,11 @@ namespace Waher.IoTGateway.WebResources
 					!(Request.DecodeData() is Dictionary<string, object> RequestObj) ||
 					!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile) ||
 					!RequestObj.TryGetValue("Database", out Obj) || !(Obj is bool Database) ||
+					!RequestObj.TryGetValue("Ledger", out Obj) || !(Obj is bool Ledger) ||
 					!RequestObj.TryGetValue("WebContent", out Obj) || !(Obj is bool WebContent) ||
 					!RequestObj.TryGetValue("OnlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections) ||
-					!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections))
+					!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections) ||
+					!RequestObj.TryGetValue("exportOnly", out Obj) || !(Obj is bool ExportOnly))
 				{
 					throw new BadRequestException();
 				}
@@ -109,9 +111,13 @@ namespace Waher.IoTGateway.WebResources
 						exporting = true;
 				}
 
-				Export.ExportType = TypeOfFile;
-				Export.ExportDatabase = Database;
-				Export.ExportWebContent = WebContent;
+				if (!ExportOnly)
+				{
+					Export.ExportType = TypeOfFile;
+					Export.ExportDatabase = Database;
+					Export.ExportLedger = Ledger;
+					Export.ExportWebContent = WebContent;
+				}
 
 				List<string> Folders = new List<string>();
 
@@ -119,14 +125,15 @@ namespace Waher.IoTGateway.WebResources
 				{
 					if (RequestObj.TryGetValue(FolderCategory.CategoryId, out Obj) && Obj is bool b)
 					{
-						await Export.SetExportFolderAsync(FolderCategory.CategoryId, b);
+						if (!ExportOnly)
+							await Export.SetExportFolderAsync(FolderCategory.CategoryId, b);
 
 						if (b)
 							Folders.AddRange(FolderCategory.Folders);
 					}
 				}
 
-				Task _ = DoExport(Exporter.Value, Database, WebContent, Folders.ToArray());
+				Task _ = DoExport(Exporter.Value, Database, Ledger, WebContent, Folders.ToArray());
 
 				Response.StatusCode = 200;
 				Response.ContentType = "text/plain";
@@ -280,15 +287,17 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Output">Export Output</param>
 		/// <param name="Database">If the contents of the database is to be exported.</param>
+		/// <param name="Ledger">If the contents of the ledger is to be exported.</param>
 		/// <param name="WebContent">If web content is to be exported.</param>
 		/// <param name="Folders">Root subfolders to export.</param>
-		public static async Task DoExport(IExportFormat Output, bool Database, bool WebContent, string[] Folders)
+		public static async Task DoExport(IExportFormat Output, bool Database, bool Ledger, bool WebContent, string[] Folders)
 		{
 			try
 			{
 				List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
 				{
-					new KeyValuePair<string, object>("Database", Database)
+					new KeyValuePair<string, object>("Database", Database),
+					new KeyValuePair<string, object>("Ledger", Ledger)
 				};
 
 				foreach (string Folder in Folders)
@@ -309,6 +318,9 @@ namespace Waher.IoTGateway.WebResources
 
 					await Persistence.Database.Export(Output, Output.CollectionNames);
 				}
+
+				if (Ledger && Persistence.Ledger.HasProvider)
+					await Persistence.Ledger.Export(Output, Output.CollectionNames);
 
 				if (WebContent || Folders.Length > 0)
 				{

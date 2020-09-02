@@ -65,5 +65,13 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		Task<string[]> GetCollections();
+
+		/// <summary>
+		/// Performs an export of the entire ledger.
+		/// </summary>
+		/// <param name="Output">Ledger will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Export(ILedgerExport Output, string[] CollectionNames);
 	}
 }

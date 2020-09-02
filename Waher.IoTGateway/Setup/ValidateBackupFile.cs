@@ -47,7 +47,9 @@ namespace Waher.IoTGateway.Setup
 		private readonly int objectIdByteCount;
 		private long nrCollections = 0;
 		private long nrIndices = 0;
+		private long nrBlocks = 0;
 		private long nrObjects = 0;
+		private long nrEntries = 0;
 		private long nrProperties = 0;
 		private long nrFiles = 0;
 		private long nrFileBytes = 0;
@@ -89,9 +91,19 @@ namespace Waher.IoTGateway.Setup
 		public long NrIndices => this.nrIndices;
 
 		/// <summary>
+		/// Number of blocks processed.
+		/// </summary>
+		public long NrBlocks => this.nrBlocks;
+
+		/// <summary>
 		/// Number of objects processed.
 		/// </summary>
 		public long NrObjects => this.nrObjects;
+
+		/// <summary>
+		/// Number of entries processed.
+		/// </summary>
+		public long NrEntries => this.nrEntries;
 
 		/// <summary>
 		/// Number of propeties processed.
@@ -145,17 +157,33 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Is called when export is started.
+		/// Is called when export of database is started.
 		/// </summary>
-		public virtual Task StartExport()
+		public virtual Task StartDatabase()
 		{
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Is called when export is finished.
+		/// Is called when export of database is finished.
 		/// </summary>
-		public virtual Task EndExport()
+		public virtual Task EndDatabase()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is started.
+		/// </summary>
+		public virtual Task StartLedger()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when export of ledger is finished.
+		/// </summary>
+		public virtual Task EndLedger()
 		{
 			return Task.CompletedTask;
 		}
@@ -215,11 +243,48 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Is called when a block in a collection is started.
+		/// </summary>
+		/// <param name="BlockID">Block ID</param>
+		public virtual Task StartBlock(string BlockID)
+		{
+			this.nrBlocks++;
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when a block in a collection is finished.
+		/// </summary>
+		public virtual Task EndBlock()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Reports block meta-data.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		public virtual Task BlockMetaData(string Key, object Value)
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Is called when an object is started.
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
 		public virtual Task<string> StartObject(string ObjectId, string TypeName)
+		{
+			this.objectId = this.MapObjectId(ObjectId);
+			this.typeName = TypeName;
+			this.nrObjects++;
+
+			return Task.FromResult<string>(ObjectId);
+		}
+
+		private string MapObjectId(string ObjectId)
 		{
 			if (this.mapObjectIds)
 			{
@@ -280,17 +345,41 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			this.objectId = ObjectId;
-			this.typeName = TypeName;
-			this.nrObjects++;
-
-			return Task.FromResult<string>(ObjectId);
+			return ObjectId;
 		}
 
 		/// <summary>
 		/// Is called when an object is finished.
 		/// </summary>
 		public virtual Task EndObject()
+		{
+			this.objectId = null;
+			this.typeName = null;
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Is called when an entry is started.
+		/// </summary>
+		/// <param name="ObjectId">ID of object.</param>
+		/// <param name="TypeName">Type name of object.</param>
+		/// <param name="EntryType">Type of entry</param>
+		/// <param name="EntryTimestamp">Timestamp of entry</param>
+		/// <returns>Object ID of object, after optional mapping.</returns>
+		public virtual Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		{
+			this.objectId = this.MapObjectId(ObjectId);
+			this.typeName = TypeName;
+			this.nrEntries++;
+
+			return Task.FromResult<string>(ObjectId);
+		}
+
+		/// <summary>
+		/// Is called when an entry is finished.
+		/// </summary>
+		public virtual Task EndEntry()
 		{
 			this.objectId = null;
 			this.typeName = null;

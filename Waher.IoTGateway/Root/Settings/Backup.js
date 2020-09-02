@@ -1,4 +1,4 @@
-﻿function StartExport()
+﻿function StartExport(ExportOnly)
 {
 	var SelectedCollections = [];
 	var Collections = document.getElementById("Collections");
@@ -21,7 +21,8 @@
 
 	var Request = {
 		"TypeOfFile": document.getElementById("TypeOfFile").value,
-		"selectedCollections": SelectedCollections
+		"selectedCollections": SelectedCollections,
+		"exportOnly": ExportOnly
 	};
 	var ExportContents = document.getElementById("ExportContents");
 	var Elements = ExportContents.elements;
@@ -324,10 +325,12 @@ function StartAnalyze(Repair)
 function ToggleSelectCollections()
 {
 	var CheckBox = document.getElementById("Database");
+	var Ledger = document.getElementById("Ledger");
 	var ExportDatabase = CheckBox.checked;
+	var ExportLedger = Ledger && Ledger.checked;
 
-	var ChcekBox2 = document.getElementById("OnlySelectedCollections");
-	ChcekBox2.parentElement.style.display = ExportDatabase ? "block" : "none";
+	var CheckBox2 = document.getElementById("OnlySelectedCollections");
+	CheckBox2.parentElement.style.display = ExportDatabase || ExportLedger ? "block" : "none";
 }
 
 function ToggleSelectedCollections()

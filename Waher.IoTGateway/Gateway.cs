@@ -485,21 +485,7 @@ namespace Waher.IoTGateway
 
 				Database.CollectionRepaired += Database_CollectionRepaired;
 
-				Type ProviderType = DatabaseProvider.GetType();
-				PropertyInfo AutoRepairReportFolder = ProviderType.GetProperty("AutoRepairReportFolder");
-				if (!(AutoRepairReportFolder is null))
-					AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
-
-				MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
-
-				if (!(MI is null))
-				{
-					Task T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
-					if (T is Task<string[]> StringArrayTask)
-						DatabaseConfiguration.RepairedCollections = await StringArrayTask;
-					else if (!(T is null))
-						await T;
-				}
+				await RepairIfInproperShutdown();
 
 				PersistedEventLog PersistedEventLog = new PersistedEventLog(90, new TimeSpan(4, 15, 0));
 				Log.Register(PersistedEventLog);
@@ -655,7 +641,23 @@ namespace Waher.IoTGateway
 							NeedsCleanup = true;
 						}
 
-						await Configuration.ConfigureSystem();
+						try
+						{
+							await Configuration.ConfigureSystem();
+						}
+						catch (Exception)
+						{
+							await RepairIfInproperShutdown();
+
+							try
+							{
+								await Configuration.ConfigureSystem();
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
 
 						if (NeedsCleanup)
 							await Configuration.CleanupAfterConfiguration(webServer);
@@ -731,7 +733,25 @@ namespace Waher.IoTGateway
 					loggedIn = new LoggedIn(webServer);
 
 					foreach (SystemConfiguration Configuration in configurations)
-						await Configuration.InitSetup(webServer);
+					{
+						try
+						{
+							await Configuration.InitSetup(webServer);
+						}
+						catch (Exception)
+						{
+							await RepairIfInproperShutdown();
+
+							try
+							{
+								await Configuration.InitSetup(webServer);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
 				}
 
 				Types.SetModuleParameter("HTTP", webServer);
@@ -829,7 +849,26 @@ namespace Waher.IoTGateway
 				coapEndpoint = new CoapEndpoint();
 				Types.SetModuleParameter("CoAP", coapEndpoint);
 
-				IDataSource[] Sources = new IDataSource[] { new MeteringTopology() };
+				IDataSource[] Sources;
+
+				try
+				{
+					Sources = new IDataSource[] { new MeteringTopology() };
+				}
+				catch (Exception)
+				{
+					await RepairIfInproperShutdown();
+
+					try
+					{
+						Sources = new IDataSource[] { new MeteringTopology() };
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+						Sources = new IDataSource[0];
+					}
+				}
 
 				if (GetDataSources != null)
 					Sources = await GetDataSources(Sources);
@@ -965,6 +1004,27 @@ namespace Waher.IoTGateway
 					return 1;
 				else
 					return string.Compare(x.GetType().FullName, y.GetType().FullName);
+			}
+		}
+
+		private static async Task RepairIfInproperShutdown()
+		{
+			IDatabaseProvider DatabaseProvider = Database.Provider;
+			Type ProviderType = DatabaseProvider.GetType();
+			PropertyInfo AutoRepairReportFolder = ProviderType.GetProperty("AutoRepairReportFolder");
+			if (!(AutoRepairReportFolder is null))
+				AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
+
+			MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
+
+			if (!(MI is null))
+			{
+				Task T = MI.Invoke(DatabaseProvider, new object[] { Gateway.AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "DbStatXmlToHtml.xslt" }) as Task;
+
+				if (T is Task<string[]> StringArrayTask)
+					DatabaseConfiguration.RepairedCollections = await StringArrayTask;
+				else if (!(T is null))
+					await T;
 			}
 		}
 
@@ -2879,7 +2939,7 @@ namespace Waher.IoTGateway
 			foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
 				Folders.AddRange(FolderCategory.Folders);
 
-			await StartExport.DoExport(Exporter.Value, true, true, Folders.ToArray());
+			await StartExport.DoExport(Exporter.Value, true, false, true, Folders.ToArray());
 
 			long KeepDays = await Export.GetKeepDaysAsync();
 			long KeepMonths = await Export.GetKeepMonthsAsync();

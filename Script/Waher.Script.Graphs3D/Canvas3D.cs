@@ -10,26 +10,26 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class Canvas3D
 	{
-		private byte[] pixels;
-		private float[] zBuffer;
-		private float[] xBuf;
-		private float[] yBuf;
-		private float[] zBuf;
-		private Vector3[] normalBuf;
-		private SKColor[] colorBuf;
+		private readonly byte[] pixels;
+		private readonly float[] zBuffer;
+		private readonly float[] xBuf;
+		private readonly float[] yBuf;
+		private readonly float[] zBuf;
+		private readonly Vector3[] normalBuf;
+		private readonly SKColor[] colorBuf;
 		private float distance = 0;
 		private Vector3 viewerPosition = Vector3.Zero;
 		private Matrix4x4 t;
 		private Vector4 last = Vector4.Zero;
-		private int width;
-		private int height;
-		private int overSampling;
-		private int w;
-		private int h;
-		private int wm1;
-		private int hm1;
-		private int cx;
-		private int cy;
+		private readonly int width;
+		private readonly int height;
+		private readonly int overSampling;
+		private readonly int w;
+		private readonly int h;
+		private readonly int wm1;
+		private readonly int hm1;
+		private readonly int cx;
+		private readonly int cy;
 
 		/// <summary>
 		/// 3D drawing area.
@@ -171,7 +171,7 @@ namespace Waher.Script.Graphs3D
 			using (SKData Data = SKData.CreateCopy(Pixels))
 			{
 				SKImageInfo ImageInfo = new SKImageInfo(this.width, this.height, SKColorType.Rgba8888, SKAlphaType.Premul);
-				return SKImage.FromPixelData(ImageInfo, Data, this.width << 2);
+				return SKImage.FromPixels(ImageInfo, Data, this.width << 2);
 			}
 		}
 
@@ -791,8 +791,6 @@ namespace Waher.Script.Graphs3D
 			}
 
 			float y1 = y0;
-			float x0b = x0;
-			float x1b = x1;
 
 			if (!this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 				return;
@@ -1047,7 +1045,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Shader">Shader.</param>
 		public void Polygons(Vector4[][] Nodes, I3DShader Shader)
 		{
-			int j, d = Nodes.Length;
+			int j, d;
 			int i, c;
 			int MinY = 0;
 			int MaxY = 0;

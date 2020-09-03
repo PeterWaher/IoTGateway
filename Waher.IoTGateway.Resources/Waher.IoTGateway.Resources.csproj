@@ -67,7 +67,10 @@
     <None Remove="Highlight\LICENSE" />
     <None Remove="Highlight\README.md" />
     <None Remove="Highlight\README.ru.md" />
+    <None Remove="Highlight\styles\a11y-dark.css" />
+    <None Remove="Highlight\styles\a11y-light.css" />
     <None Remove="Highlight\styles\agate.css" />
+    <None Remove="Highlight\styles\an-old-hope.css" />
     <None Remove="Highlight\styles\androidstudio.css" />
     <None Remove="Highlight\styles\arduino-light.css" />
     <None Remove="Highlight\styles\arta.css" />
@@ -92,41 +95,64 @@
     <None Remove="Highlight\styles\atelier-seaside-light.css" />
     <None Remove="Highlight\styles\atelier-sulphurpool-dark.css" />
     <None Remove="Highlight\styles\atelier-sulphurpool-light.css" />
+    <None Remove="Highlight\styles\atom-one-dark-reasonable.css" />
+    <None Remove="Highlight\styles\atom-one-dark.css" />
+    <None Remove="Highlight\styles\atom-one-light.css" />
     <None Remove="Highlight\styles\brown-paper.css" />
     <None Remove="Highlight\styles\brown-papersq.png" />
     <None Remove="Highlight\styles\codepen-embed.css" />
     <None Remove="Highlight\styles\color-brewer.css" />
+    <None Remove="Highlight\styles\darcula.css" />
     <None Remove="Highlight\styles\dark.css" />
-    <None Remove="Highlight\styles\darkula.css" />
     <None Remove="Highlight\styles\default.css" />
     <None Remove="Highlight\styles\docco.css" />
+    <None Remove="Highlight\styles\dracula.css" />
     <None Remove="Highlight\styles\far.css" />
     <None Remove="Highlight\styles\foundation.css" />
     <None Remove="Highlight\styles\github-gist.css" />
     <None Remove="Highlight\styles\github.css" />
+    <None Remove="Highlight\styles\gml.css" />
     <None Remove="Highlight\styles\googlecode.css" />
+    <None Remove="Highlight\styles\gradient-dark.css" />
     <None Remove="Highlight\styles\grayscale.css" />
+    <None Remove="Highlight\styles\gruvbox-dark.css" />
+    <None Remove="Highlight\styles\gruvbox-light.css" />
     <None Remove="Highlight\styles\hopscotch.css" />
     <None Remove="Highlight\styles\hybrid.css" />
     <None Remove="Highlight\styles\idea.css" />
     <None Remove="Highlight\styles\ir-black.css" />
+    <None Remove="Highlight\styles\isbl-editor-dark.css" />
+    <None Remove="Highlight\styles\isbl-editor-light.css" />
     <None Remove="Highlight\styles\kimbie.dark.css" />
     <None Remove="Highlight\styles\kimbie.light.css" />
+    <None Remove="Highlight\styles\lightfair.css" />
+    <None Remove="Highlight\styles\lioshi.css" />
     <None Remove="Highlight\styles\magula.css" />
     <None Remove="Highlight\styles\mono-blue.css" />
     <None Remove="Highlight\styles\monokai-sublime.css" />
     <None Remove="Highlight\styles\monokai.css" />
+    <None Remove="Highlight\styles\night-owl.css" />
+    <None Remove="Highlight\styles\nnfx-dark.css" />
+    <None Remove="Highlight\styles\nnfx.css" />
+    <None Remove="Highlight\styles\nord.css" />
     <None Remove="Highlight\styles\obsidian.css" />
+    <None Remove="Highlight\styles\ocean.css" />
     <None Remove="Highlight\styles\paraiso-dark.css" />
     <None Remove="Highlight\styles\paraiso-light.css" />
     <None Remove="Highlight\styles\pojoaque.css" />
     <None Remove="Highlight\styles\pojoaque.jpg" />
+    <None Remove="Highlight\styles\purebasic.css" />
+    <None Remove="Highlight\styles\qtcreator_dark.css" />
+    <None Remove="Highlight\styles\qtcreator_light.css" />
     <None Remove="Highlight\styles\railscasts.css" />
     <None Remove="Highlight\styles\rainbow.css" />
+    <None Remove="Highlight\styles\routeros.css" />
     <None Remove="Highlight\styles\school-book.css" />
     <None Remove="Highlight\styles\school-book.png" />
+    <None Remove="Highlight\styles\shades-of-purple.css" />
     <None Remove="Highlight\styles\solarized-dark.css" />
     <None Remove="Highlight\styles\solarized-light.css" />
+    <None Remove="Highlight\styles\srcery.css" />
     <None Remove="Highlight\styles\sunburst.css" />
     <None Remove="Highlight\styles\tomorrow-night-blue.css" />
     <None Remove="Highlight\styles\tomorrow-night-bright.css" />
@@ -134,7 +160,9 @@
     <None Remove="Highlight\styles\tomorrow-night.css" />
     <None Remove="Highlight\styles\tomorrow.css" />
     <None Remove="Highlight\styles\vs.css" />
+    <None Remove="Highlight\styles\vs2015.css" />
     <None Remove="Highlight\styles\xcode.css" />
+    <None Remove="Highlight\styles\xt256.css" />
     <None Remove="Highlight\styles\zenburn.css" />
     <None Remove="Root\Admin.cssx" />
     <None Remove="Root\Admin.md" />
@@ -314,7 +342,16 @@
     <Content Include="Highlight\README.ru.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\a11y-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\a11y-light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\agate.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\an-old-hope.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\androidstudio.css">
@@ -389,6 +426,15 @@
     <Content Include="Highlight\styles\atelier-sulphurpool-light.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\atom-one-dark-reasonable.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\atom-one-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\atom-one-light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\brown-paper.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -401,16 +447,19 @@
     <Content Include="Highlight\styles\color-brewer.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Highlight\styles\dark.css">
+    <Content Include="Highlight\styles\darcula.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Highlight\styles\darkula.css">
+    <Content Include="Highlight\styles\dark.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\default.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\docco.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\dracula.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\far.css">
@@ -425,10 +474,22 @@
     <Content Include="Highlight\styles\github.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\gml.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\googlecode.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\gradient-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\grayscale.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\gruvbox-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\gruvbox-light.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\hopscotch.css">
@@ -443,10 +504,22 @@
     <Content Include="Highlight\styles\ir-black.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\isbl-editor-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\isbl-editor-light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\kimbie.dark.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\kimbie.light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\lightfair.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\lioshi.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\magula.css">
@@ -461,7 +534,22 @@
     <Content Include="Highlight\styles\monokai.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\night-owl.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\nnfx-dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\nnfx.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\nord.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\obsidian.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\ocean.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\paraiso-dark.css">
@@ -476,10 +564,22 @@
     <Content Include="Highlight\styles\pojoaque.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\purebasic.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\qtcreator_dark.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\qtcreator_light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\railscasts.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\rainbow.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\routeros.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\school-book.css">
@@ -488,10 +588,16 @@
     <Content Include="Highlight\styles\school-book.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\shades-of-purple.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\solarized-dark.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\solarized-light.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\srcery.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\sunburst.css">
@@ -515,7 +621,13 @@
     <Content Include="Highlight\styles\vs.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Highlight\styles\vs2015.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\styles\xcode.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\styles\xt256.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\zenburn.css">

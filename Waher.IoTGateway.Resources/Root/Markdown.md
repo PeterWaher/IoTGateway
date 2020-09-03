@@ -733,6 +733,10 @@ This is transformed into:
 20 GOTO 10
 ```
 
+**Note**: By default, the `default.css` highlight style is used on the page, if syntax highlighting using [highlight.js](https://highlightjs.org/)
+is available. The library is accessible through the `/Highlight` web folder. You can control the style used for highlighting, by including a
+`CSS: /Highlight/style/STYLE_NAME.css` header at the top of the page, where `STYLE_NAME` refers to the actual style to use on the page.
+
 The IoT Gateway provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in
 different ways. The following subsections illustrate such renderings.
 

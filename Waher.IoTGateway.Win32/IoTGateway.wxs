@@ -1011,77 +1011,103 @@
               <Directory Id='HighlightStyles' Name='styles'>
                 <Component Id='HighlightStyles' Guid='28E61421-250F-49DE-A722-12B027F461F8'>
                   <RemoveFolder Id='RemoveHighlightStyles' On='uninstall' />
-                  <File Id='HighlightStyles_agate.css' Name='agate.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\agate.css' Vital='yes' KeyPath='yes'/>
-                  <File Id='HighlightStyles_androidstudio.css' Name='androidstudio.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\androidstudio.css' Vital='yes'/>
-                  <File Id='HighlightStyles_arduino_light.css' Name='arduino-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\arduino-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_arta.css' Name='arta.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\arta.css' Vital='yes'/>
-                  <File Id='HighlightStyles_ascetic.css' Name='ascetic.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\ascetic.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_cave_dark.css' Name='atelier-cave-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-cave-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_cave_light.css' Name='atelier-cave-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-cave-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_dune_dark.css' Name='atelier-dune-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-dune-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_dune_light.css' Name='atelier-dune-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-dune-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_estuary_dark.css' Name='atelier-estuary-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-estuary-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_estuary_light.css' Name='atelier-estuary-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-estuary-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_forest_dark.css' Name='atelier-forest-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-forest-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_forest_light.css' Name='atelier-forest-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-forest-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_heath_dark.css' Name='atelier-heath-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-heath-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_heath_light.css' Name='atelier-heath-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-heath-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_lakeside_dark.css' Name='atelier-lakeside-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-lakeside-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_lakeside_light.css' Name='atelier-lakeside-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-lakeside-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_plateau_dark.css' Name='atelier-plateau-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-plateau-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_plateau_light.css' Name='atelier-plateau-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-plateau-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_savanna_dark.css' Name='atelier-savanna-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-savanna-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_savanna_light.css' Name='atelier-savanna-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-savanna-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_seaside_dark.css' Name='atelier-seaside-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-seaside-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_seaside_light.css' Name='atelier-seaside-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-seaside-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_sulphurpool_dark.css' Name='atelier-sulphurpool-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-sulphurpool-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_atelier_sulphurpool_light.css' Name='atelier-sulphurpool-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-sulphurpool-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_brown_paper.css' Name='brown-paper.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\brown-paper.css' Vital='yes'/>
-                  <File Id='HighlightStyles_brown_papersq.png' Name='brown-papersq.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\brown-papersq.png' Vital='yes'/>
-                  <File Id='HighlightStyles_codepen_embed.css' Name='codepen-embed.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\codepen-embed.css' Vital='yes'/>
-                  <File Id='HighlightStyles_color_brewer.css' Name='color-brewer.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\color-brewer.css' Vital='yes'/>
-                  <File Id='HighlightStyles_dark.css' Name='dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_darkula.css' Name='darkula.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\darkula.css' Vital='yes'/>
-                  <File Id='HighlightStyles_default.css' Name='default.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\default.css' Vital='yes'/>
-                  <File Id='HighlightStyles_docco.css' Name='docco.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\docco.css' Vital='yes'/>
-                  <File Id='HighlightStyles_far.css' Name='far.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\far.css' Vital='yes'/>
-                  <File Id='HighlightStyles_foundation.css' Name='foundation.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\foundation.css' Vital='yes'/>
-                  <File Id='HighlightStyles_github_gist.css' Name='github-gist.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\github-gist.css' Vital='yes'/>
-                  <File Id='HighlightStyles_github.css' Name='github.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\github.css' Vital='yes'/>
-                  <File Id='HighlightStyles_googlecode.css' Name='googlecode.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\googlecode.css' Vital='yes'/>
-                  <File Id='HighlightStyles_grayscale.css' Name='grayscale.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\grayscale.css' Vital='yes'/>
-                  <File Id='HighlightStyles_hopscotch.css' Name='hopscotch.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\hopscotch.css' Vital='yes'/>
-                  <File Id='HighlightStyles_hybrid.css' Name='hybrid.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\hybrid.css' Vital='yes'/>
-                  <File Id='HighlightStyles_idea.css' Name='idea.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\idea.css' Vital='yes'/>
-                  <File Id='HighlightStyles_ir_black.css' Name='ir-black.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\ir-black.css' Vital='yes'/>
-                  <File Id='HighlightStyles_kimbie.dark.css' Name='kimbie.dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\kimbie.dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_kimbie.light.css' Name='kimbie.light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\kimbie.light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_magula.css' Name='magula.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\magula.css' Vital='yes'/>
-                  <File Id='HighlightStyles_mono_blue.css' Name='mono-blue.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\mono-blue.css' Vital='yes'/>
-                  <File Id='HighlightStyles_monokai_sublime.css' Name='monokai-sublime.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\monokai-sublime.css' Vital='yes'/>
-                  <File Id='HighlightStyles_monokai.css' Name='monokai.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\monokai.css' Vital='yes'/>
-                  <File Id='HighlightStyles_obsidian.css' Name='obsidian.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\obsidian.css' Vital='yes'/>
-                  <File Id='HighlightStyles_paraiso_dark.css' Name='paraiso-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\paraiso-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_paraiso_light.css' Name='paraiso-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\paraiso-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_pojoaque.css' Name='pojoaque.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\pojoaque.css' Vital='yes'/>
-                  <File Id='HighlightStyles_pojoaque.jpg' Name='pojoaque.jpg' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\pojoaque.jpg' Vital='yes'/>
-                  <File Id='HighlightStyles_railscasts.css' Name='railscasts.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\railscasts.css' Vital='yes'/>
-                  <File Id='HighlightStyles_rainbow.css' Name='rainbow.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\rainbow.css' Vital='yes'/>
-                  <File Id='HighlightStyles_school_book.css' Name='school-book.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\school-book.css' Vital='yes'/>
-                  <File Id='HighlightStyles_school_book.png' Name='school-book.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\school-book.png' Vital='yes'/>
-                  <File Id='HighlightStyles_solarized_dark.css' Name='solarized-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\solarized-dark.css' Vital='yes'/>
-                  <File Id='HighlightStyles_solarized_light.css' Name='solarized-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\solarized-light.css' Vital='yes'/>
-                  <File Id='HighlightStyles_sunburst.css' Name='sunburst.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\sunburst.css' Vital='yes'/>
-                  <File Id='HighlightStyles_tomorrow_night_blue.css' Name='tomorrow-night-blue.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-blue.css' Vital='yes'/>
-                  <File Id='HighlightStyles_tomorrow_night_bright.css' Name='tomorrow-night-bright.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-bright.css' Vital='yes'/>
-                  <File Id='HighlightStyles_tomorrow_night_eighties.css' Name='tomorrow-night-eighties.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-eighties.css' Vital='yes'/>
-                  <File Id='HighlightStyles_tomorrow_night.css' Name='tomorrow-night.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night.css' Vital='yes'/>
-                  <File Id='HighlightStyles_tomorrow.css' Name='tomorrow.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow.css' Vital='yes'/>
-                  <File Id='HighlightStyles_vs.css' Name='vs.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\vs.css' Vital='yes'/>
-                  <File Id='HighlightStyles_xcode.css' Name='xcode.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\xcode.css' Vital='yes'/>
-                  <File Id='HighlightStyles_zenburn.css' Name='zenburn.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\zenburn.css' Vital='yes'/>
-                  <RemoveFile Id='RemoveHighlightStyles_agate.css' Name='agate.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_androidstudio.css' Name='androidstudio.css' On='uninstall'/>
+                  <File Id='Highlightan_old_hope.css' Name='an-old-hope.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\an-old-hope.css' Vital='yes' KeyPath='yes'/>
+                  <File Id='Highlightarduino_light.css' Name='arduino-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\arduino-light.css' Vital='yes'/>
+                  <File Id='Highlightarta.css' Name='arta.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\arta.css' Vital='yes'/>
+                  <File Id='Highlightascetic.css' Name='ascetic.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\ascetic.css' Vital='yes'/>
+                  <File Id='Highlightatelier_cave_dark.css' Name='atelier-cave-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-cave-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_cave_light.css' Name='atelier-cave-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-cave-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_dune_dark.css' Name='atelier-dune-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-dune-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_dune_light.css' Name='atelier-dune-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-dune-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_estuary_dark.css' Name='atelier-estuary-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-estuary-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_estuary_light.css' Name='atelier-estuary-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-estuary-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_forest_dark.css' Name='atelier-forest-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-forest-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_forest_light.css' Name='atelier-forest-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-forest-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_heath_dark.css' Name='atelier-heath-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-heath-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_heath_light.css' Name='atelier-heath-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-heath-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_lakeside_dark.css' Name='atelier-lakeside-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-lakeside-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_lakeside_light.css' Name='atelier-lakeside-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-lakeside-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_plateau_dark.css' Name='atelier-plateau-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-plateau-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_plateau_light.css' Name='atelier-plateau-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-plateau-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_savanna_dark.css' Name='atelier-savanna-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-savanna-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_savanna_light.css' Name='atelier-savanna-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-savanna-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_seaside_dark.css' Name='atelier-seaside-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-seaside-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_seaside_light.css' Name='atelier-seaside-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-seaside-light.css' Vital='yes'/>
+                  <File Id='Highlightatelier_sulphurpool_dark.css' Name='atelier-sulphurpool-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-sulphurpool-dark.css' Vital='yes'/>
+                  <File Id='Highlightatelier_sulphurpool_light.css' Name='atelier-sulphurpool-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atelier-sulphurpool-light.css' Vital='yes'/>
+                  <File Id='Highlightatom_one_dark.css' Name='atom-one-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atom-one-dark.css' Vital='yes'/>
+                  <File Id='Highlightatom_one_dark_reasonable.css' Name='atom-one-dark-reasonable.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atom-one-dark-reasonable.css' Vital='yes'/>
+                  <File Id='Highlightatom_one_light.css' Name='atom-one-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\atom-one-light.css' Vital='yes'/>
+                  <File Id='Highlightbrown_paper.css' Name='brown-paper.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\brown-paper.css' Vital='yes'/>
+                  <File Id='Highlightbrown_papersq.png' Name='brown-papersq.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\brown-papersq.png' Vital='yes'/>
+                  <File Id='Highlightcodepen_embed.css' Name='codepen-embed.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\codepen-embed.css' Vital='yes'/>
+                  <File Id='Highlightcolor_brewer.css' Name='color-brewer.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\color-brewer.css' Vital='yes'/>
+                  <File Id='Highlightdarcula.css' Name='darcula.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\darcula.css' Vital='yes'/>
+                  <File Id='Highlightdark.css' Name='dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\dark.css' Vital='yes'/>
+                  <File Id='Highlightdefault.css' Name='default.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\default.css' Vital='yes'/>
+                  <File Id='Highlightdocco.css' Name='docco.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\docco.css' Vital='yes'/>
+                  <File Id='Highlightdracula.css' Name='dracula.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\dracula.css' Vital='yes'/>
+                  <File Id='Highlightfar.css' Name='far.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\far.css' Vital='yes'/>
+                  <File Id='Highlightfoundation.css' Name='foundation.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\foundation.css' Vital='yes'/>
+                  <File Id='Highlightgithub.css' Name='github.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\github.css' Vital='yes'/>
+                  <File Id='Highlightgithub_gist.css' Name='github-gist.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\github-gist.css' Vital='yes'/>
+                  <File Id='Highlightgml.css' Name='gml.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\gml.css' Vital='yes'/>
+                  <File Id='Highlightgooglecode.css' Name='googlecode.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\googlecode.css' Vital='yes'/>
+                  <File Id='Highlightgradient_dark.css' Name='gradient-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\gradient-dark.css' Vital='yes'/>
+                  <File Id='Highlightgrayscale.css' Name='grayscale.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\grayscale.css' Vital='yes'/>
+                  <File Id='Highlightgruvbox_dark.css' Name='gruvbox-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\gruvbox-dark.css' Vital='yes'/>
+                  <File Id='Highlightgruvbox_light.css' Name='gruvbox-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\gruvbox-light.css' Vital='yes'/>
+                  <File Id='Highlighthopscotch.css' Name='hopscotch.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\hopscotch.css' Vital='yes'/>
+                  <File Id='Highlighthybrid.css' Name='hybrid.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\hybrid.css' Vital='yes'/>
+                  <File Id='Highlightidea.css' Name='idea.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\idea.css' Vital='yes'/>
+                  <File Id='Highlightir_black.css' Name='ir-black.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\ir-black.css' Vital='yes'/>
+                  <File Id='Highlightisbl_editor_dark.css' Name='isbl-editor-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\isbl-editor-dark.css' Vital='yes'/>
+                  <File Id='Highlightisbl_editor_light.css' Name='isbl-editor-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\isbl-editor-light.css' Vital='yes'/>
+                  <File Id='Highlightkimbie.dark.css' Name='kimbie.dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\kimbie.dark.css' Vital='yes'/>
+                  <File Id='Highlightkimbie.light.css' Name='kimbie.light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\kimbie.light.css' Vital='yes'/>
+                  <File Id='Highlightlightfair.css' Name='lightfair.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\lightfair.css' Vital='yes'/>
+                  <File Id='Highlightlioshi.css' Name='lioshi.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\lioshi.css' Vital='yes'/>
+                  <File Id='Highlightmagula.css' Name='magula.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\magula.css' Vital='yes'/>
+                  <File Id='Highlightmono_blue.css' Name='mono-blue.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\mono-blue.css' Vital='yes'/>
+                  <File Id='Highlightmonokai.css' Name='monokai.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\monokai.css' Vital='yes'/>
+                  <File Id='Highlightmonokai_sublime.css' Name='monokai-sublime.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\monokai-sublime.css' Vital='yes'/>
+                  <File Id='Highlightnight_owl.css' Name='night-owl.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\night-owl.css' Vital='yes'/>
+                  <File Id='Highlightnnfx.css' Name='nnfx.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\nnfx.css' Vital='yes'/>
+                  <File Id='Highlightnnfx_dark.css' Name='nnfx-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\nnfx-dark.css' Vital='yes'/>
+                  <File Id='Highlightnord.css' Name='nord.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\nord.css' Vital='yes'/>
+                  <File Id='Highlightobsidian.css' Name='obsidian.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\obsidian.css' Vital='yes'/>
+                  <File Id='Highlightocean.css' Name='ocean.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\ocean.css' Vital='yes'/>
+                  <File Id='Highlightparaiso_dark.css' Name='paraiso-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\paraiso-dark.css' Vital='yes'/>
+                  <File Id='Highlightparaiso_light.css' Name='paraiso-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\paraiso-light.css' Vital='yes'/>
+                  <File Id='Highlightpojoaque.css' Name='pojoaque.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\pojoaque.css' Vital='yes'/>
+                  <File Id='Highlightpojoaque.jpg' Name='pojoaque.jpg' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\pojoaque.jpg' Vital='yes'/>
+                  <File Id='Highlightpurebasic.css' Name='purebasic.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\purebasic.css' Vital='yes'/>
+                  <File Id='Highlightqtcreator_dark.css' Name='qtcreator_dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\qtcreator_dark.css' Vital='yes'/>
+                  <File Id='Highlightqtcreator_light.css' Name='qtcreator_light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\qtcreator_light.css' Vital='yes'/>
+                  <File Id='Highlightrailscasts.css' Name='railscasts.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\railscasts.css' Vital='yes'/>
+                  <File Id='Highlightrainbow.css' Name='rainbow.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\rainbow.css' Vital='yes'/>
+                  <File Id='Highlightrouteros.css' Name='routeros.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\routeros.css' Vital='yes'/>
+                  <File Id='Highlightschool_book.css' Name='school-book.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\school-book.css' Vital='yes'/>
+                  <File Id='Highlightschool_book.png' Name='school-book.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\school-book.png' Vital='yes'/>
+                  <File Id='Highlightshades_of_purple.css' Name='shades-of-purple.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\shades-of-purple.css' Vital='yes'/>
+                  <File Id='Highlightsolarized_dark.css' Name='solarized-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\solarized-dark.css' Vital='yes'/>
+                  <File Id='Highlightsolarized_light.css' Name='solarized-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\solarized-light.css' Vital='yes'/>
+                  <File Id='Highlightsrcery.css' Name='srcery.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\srcery.css' Vital='yes'/>
+                  <File Id='Highlightsunburst.css' Name='sunburst.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\sunburst.css' Vital='yes'/>
+                  <File Id='Highlighttomorrow.css' Name='tomorrow.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow.css' Vital='yes'/>
+                  <File Id='Highlighttomorrow_night.css' Name='tomorrow-night.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night.css' Vital='yes'/>
+                  <File Id='Highlighttomorrow_night_blue.css' Name='tomorrow-night-blue.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-blue.css' Vital='yes'/>
+                  <File Id='Highlighttomorrow_night_bright.css' Name='tomorrow-night-bright.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-bright.css' Vital='yes'/>
+                  <File Id='Highlighttomorrow_night_eighties.css' Name='tomorrow-night-eighties.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\tomorrow-night-eighties.css' Vital='yes'/>
+                  <File Id='Highlightvs.css' Name='vs.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\vs.css' Vital='yes'/>
+                  <File Id='Highlightvs2015.css' Name='vs2015.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\vs2015.css' Vital='yes'/>
+                  <File Id='Highlightxcode.css' Name='xcode.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\xcode.css' Vital='yes'/>
+                  <File Id='Highlightxt256.css' Name='xt256.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\xt256.css' Vital='yes'/>
+                  <File Id='Highlightzenburn.css' Name='zenburn.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\zenburn.css' Vital='yes'/>
+                  <File Id='Highlighta11y_dark.css' Name='a11y-dark.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\a11y-dark.css' Vital='yes'/>
+                  <File Id='Highlighta11y_light.css' Name='a11y-light.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\a11y-light.css' Vital='yes'/>
+                  <File Id='Highlightagate.css' Name='agate.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\agate.css' Vital='yes'/>
+                  <File Id='Highlightandroidstudio.css' Name='androidstudio.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Highlight\styles\androidstudio.css' Vital='yes'/>
                   <RemoveFile Id='RemoveHighlightStyles_arduino_light.css' Name='arduino-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_arta.css' Name='arta.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_ascetic.css' Name='ascetic.css' On='uninstall'/>
@@ -1105,50 +1131,80 @@
                   <RemoveFile Id='RemoveHighlightStyles_atelier_seaside_light.css' Name='atelier-seaside-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_atelier_sulphurpool_dark.css' Name='atelier-sulphurpool-dark.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_atelier_sulphurpool_light.css' Name='atelier-sulphurpool-light.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_atom_one_dark.css' Name='atom-one-dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_atom_one_dark_reasonable.css' Name='atom-one-dark-reasonable.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_atom_one_light.css' Name='atom-one-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_brown_paper.css' Name='brown-paper.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_brown_papersq.png' Name='brown-papersq.png' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_codepen_embed.css' Name='codepen-embed.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_color_brewer.css' Name='color-brewer.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_darcula.css' Name='darcula.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_dark.css' Name='dark.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_darkula.css' Name='darkula.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_default.css' Name='default.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_docco.css' Name='docco.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_dracula.css' Name='dracula.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_far.css' Name='far.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_foundation.css' Name='foundation.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_github_gist.css' Name='github-gist.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_github.css' Name='github.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_github_gist.css' Name='github-gist.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_gml.css' Name='gml.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_googlecode.css' Name='googlecode.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_gradient_dark.css' Name='gradient-dark.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_grayscale.css' Name='grayscale.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_gruvbox_dark.css' Name='gruvbox-dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_gruvbox_light.css' Name='gruvbox-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_hopscotch.css' Name='hopscotch.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_hybrid.css' Name='hybrid.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_idea.css' Name='idea.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_ir_black.css' Name='ir-black.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_isbl_editor_dark.css' Name='isbl-editor-dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_isbl_editor_light.css' Name='isbl-editor-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_kimbie.dark.css' Name='kimbie.dark.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_kimbie.light.css' Name='kimbie.light.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_lightfair.css' Name='lightfair.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_lioshi.css' Name='lioshi.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_magula.css' Name='magula.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_mono_blue.css' Name='mono-blue.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_monokai_sublime.css' Name='monokai-sublime.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_monokai.css' Name='monokai.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_monokai_sublime.css' Name='monokai-sublime.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_night_owl.css' Name='night-owl.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_nnfx.css' Name='nnfx.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_nnfx_dark.css' Name='nnfx-dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_nord.css' Name='nord.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_obsidian.css' Name='obsidian.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_ocean.css' Name='ocean.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_paraiso_dark.css' Name='paraiso-dark.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_paraiso_light.css' Name='paraiso-light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_pojoaque.css' Name='pojoaque.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_pojoaque.jpg' Name='pojoaque.jpg' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_purebasic.css' Name='purebasic.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_qtcreator_dark.css' Name='qtcreator_dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_qtcreator_light.css' Name='qtcreator_light.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_railscasts.css' Name='railscasts.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_rainbow.css' Name='rainbow.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_routeros.css' Name='routeros.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_school_book.css' Name='school-book.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_school_book.png' Name='school-book.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_shades_of_purple.css' Name='shades-of-purple.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_solarized_dark.css' Name='solarized-dark.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_solarized_light.css' Name='solarized-light.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_srcery.css' Name='srcery.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_sunburst.css' Name='sunburst.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_tomorrow.css' Name='tomorrow.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_tomorrow_night.css' Name='tomorrow-night.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_tomorrow_night_blue.css' Name='tomorrow-night-blue.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_tomorrow_night_bright.css' Name='tomorrow-night-bright.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_tomorrow_night_eighties.css' Name='tomorrow-night-eighties.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_tomorrow_night.css' Name='tomorrow-night.css' On='uninstall'/>
-                  <RemoveFile Id='RemoveHighlightStyles_tomorrow.css' Name='tomorrow.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_vs.css' Name='vs.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_vs2015.css' Name='vs2015.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_xcode.css' Name='xcode.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_xt256.css' Name='xt256.css' On='uninstall'/>
                   <RemoveFile Id='RemoveHighlightStyles_zenburn.css' Name='zenburn.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_a11y_dark.css' Name='a11y-dark.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_a11y_light.css' Name='a11y-light.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_agate.css' Name='agate.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_androidstudio.css' Name='androidstudio.css' On='uninstall'/>
+                  <RemoveFile Id='RemoveHighlightStyles_an_old_hope.css' Name='an-old-hope.css' On='uninstall'/>
                 </Component>
               </Directory>
               <Component Id='Highlight.js' Guid='8B4C24CE-EE67-4258-B67F-6FCAAF9FA189'>

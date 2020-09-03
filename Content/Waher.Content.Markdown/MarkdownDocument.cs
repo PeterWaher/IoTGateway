@@ -4763,6 +4763,8 @@ namespace Waher.Content.Markdown
 					}
 				}
 
+				bool HighlightStyle = false;
+
 				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.metaData)
 				{
 					switch (MetaData.Key)
@@ -4780,6 +4782,7 @@ namespace Waher.Content.Markdown
 						case "PREV":
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
+								
 								Output.Append("<link rel=\"prev\" href=\"");
 								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
@@ -4834,8 +4837,12 @@ namespace Waher.Content.Markdown
 						case "JAVASCRIPT":
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
+								s2 = this.CheckURL(P.Key, null);
+								if (s2.StartsWith("/Highlight/styles/", StringComparison.OrdinalIgnoreCase))
+									HighlightStyle = true;
+
 								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
+								Output.Append(XML.HtmlAttributeEncode(s2));
 								Output.AppendLine("\"></script>");
 							}
 							break;
@@ -4844,7 +4851,9 @@ namespace Waher.Content.Markdown
 
 				if (this.syntaxHighlighting)
 				{
-					Output.AppendLine("<link rel=\"stylesheet\" href=\"/highlight/styles/default.css\">");
+					if (!HighlightStyle)
+						Output.AppendLine("<link rel=\"stylesheet\" href=\"/highlight/styles/default.css\">");
+
 					Output.AppendLine("<script src=\"/highlight/highlight.pack.js\"></script>");
 					Output.AppendLine("<script>hljs.initHighlightingOnLoad();</script>");
 				}

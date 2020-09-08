@@ -439,6 +439,16 @@ namespace Waher.Networking
 			this.stream = null;
 			this.tcpClient.Dispose();
 #endif
+			if (this.HasSniffers)
+			{
+				foreach (ISniffer Sniffer in this.Sniffers)
+				{
+					this.Remove(Sniffer);
+
+					if (Sniffer is IDisposable Disposable)
+						Disposable.Dispose();
+				}
+			}
 		}
 
 		/// <summary>

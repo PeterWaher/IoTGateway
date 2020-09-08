@@ -4828,8 +4828,12 @@ namespace Waher.Content.Markdown
 						case "CSS":
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
+								s2 = this.CheckURL(P.Key, null);
+								if (s2.StartsWith("/Highlight/styles/", StringComparison.OrdinalIgnoreCase))
+									HighlightStyle = true;
+
 								Output.Append("<link rel=\"stylesheet\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
+								Output.Append(XML.HtmlAttributeEncode(s2));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4837,12 +4841,8 @@ namespace Waher.Content.Markdown
 						case "JAVASCRIPT":
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
-								s2 = this.CheckURL(P.Key, null);
-								if (s2.StartsWith("/Highlight/styles/", StringComparison.OrdinalIgnoreCase))
-									HighlightStyle = true;
-
 								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(XML.HtmlAttributeEncode(s2));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"></script>");
 							}
 							break;

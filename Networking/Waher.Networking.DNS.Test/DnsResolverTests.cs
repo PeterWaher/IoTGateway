@@ -118,7 +118,21 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_10_Resolve_Service_Endpoints()
+		public async Task Test_10_Resolve_Service_Endpoint_2()
+		{
+			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-client", "tcp");
+			Console.Out.WriteLine(Endpoint.ToString());
+		}
+
+		[TestMethod]
+		public async Task Test_11_Resolve_Service_Endpoint_3()
+		{
+			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-server", "tcp");
+			Console.Out.WriteLine(Endpoint.ToString());
+		}
+
+		[TestMethod]
+		public async Task Test_12_Resolve_Service_Endpoints()
 		{
 			SRV[] Endpoints = await DnsResolver.LookupServiceEndpoints("jabber.org", "xmpp-client", "tcp");
 			foreach (SRV SRV in Endpoints)
@@ -126,7 +140,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_11_International_Domain_Names()
+		public async Task Test_13_International_Domain_Names()
 		{
 			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("bücher.com");
 			foreach (IPAddress Address in Addresses)
@@ -134,26 +148,26 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_12_Resolve_Mail_Exchange_3()
+		public async Task Test_14_Resolve_Mail_Exchange_3()
 		{
 			await this.TestExchange("waher.se");
 		}
 
 		[TestMethod]
-		public async Task Test_13_Resolve_Mail_Exchange_4()
+		public async Task Test_15_Resolve_Mail_Exchange_4()
 		{
 			await this.TestExchange("cybercity.online");
 		}
 
 		[TestMethod]
-		public async Task Test_14_Resolve_Mail_Exchange_5()
+		public async Task Test_16_Resolve_Mail_Exchange_5()
 		{
 			await this.TestExchange("littlesister.se");
 		}
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_15_Resolve_DNSBL_Lookup_OK_IP()
+		public async Task Test_17_Resolve_DNSBL_Lookup_OK_IP()
 		{
 			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("194.9.95.112"), "zen.spamhaus.org");
 			Assert.IsNull(Reasons);
@@ -161,7 +175,7 @@ namespace Waher.Networking.DNS.Test
 
 		[TestMethod]
 		[Ignore]
-		public async Task Test_16_Resolve_DNSBL_Lookup_Spam_IP()
+		public async Task Test_18_Resolve_DNSBL_Lookup_Spam_IP()
 		{
 			string[] Reasons = await DnsResolver.LookupBlackList(IPAddress.Parse("179.49.7.95"), "zen.spamhaus.org");
 			Assert.IsNotNull(Reasons);
@@ -170,7 +184,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_17_Resolve_Reverse_IP4_Lookup()
+		public async Task Test_19_Resolve_Reverse_IP4_Lookup()
 		{
 			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("90.224.165.60"));
 			foreach (string DomainName in DomainNames)
@@ -178,7 +192,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_18_Resolve_TXT()
+		public async Task Test_20_Resolve_TXT()
 		{
 			string[] Text = await DnsResolver.LookupText("hotmail.com");
 			foreach (string Row in Text)
@@ -186,7 +200,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_19_Resolve_TXT_2()
+		public async Task Test_21_Resolve_TXT_2()
 		{
 			string[] Text = await DnsResolver.LookupText("waher.se");
 			foreach (string Row in Text)
@@ -194,7 +208,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		public async Task Test_20_Resolve_TXT_3()
+		public async Task Test_22_Resolve_TXT_3()
 		{
 			string[] Text = await DnsResolver.LookupText("cybercity.online");
 			foreach (string Row in Text)

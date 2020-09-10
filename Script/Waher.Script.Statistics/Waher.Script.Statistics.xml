@@ -4,6 +4,41 @@
         <name>Waher.Script.Statistics</name>
     </assembly>
     <members>
+        <member name="T:Waher.Script.Statistics.Functions.Analytic.Erf">
+            <summary>
+            Error function erf(z)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Erf.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Error function erf(z)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.Erf.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Erf.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Erf.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Statistics.Functions.Histogram">
             <summary>
             Computes a histogram from a set of data.

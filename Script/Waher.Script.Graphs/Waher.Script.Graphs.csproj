@@ -13,11 +13,11 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing graphs</PackageTags>
-    <AssemblyVersion>1.0.15</AssemblyVersion>
-    <FileVersion>1.0.15</FileVersion>
+    <AssemblyVersion>1.0.16</AssemblyVersion>
+    <FileVersion>1.0.16</FileVersion>
     <NeutralLanguage>English</NeutralLanguage>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.15</Version>
+    <Version>1.0.16</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Graphs\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

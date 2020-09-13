@@ -79,6 +79,7 @@ namespace Waher.Script.Graphs
 			int i, c = X.Dimension;
 			bool HasNull = false;
 			IElement ex, ey;
+			IElement Zero;
 
 			if (c != Y.Dimension)
 				throw new ScriptException("X and Y series must be equally large.");
@@ -101,25 +102,23 @@ namespace Waher.Script.Graphs
 			this.minX = Min.CalcMin(X, null);
 			this.maxX = Max.CalcMax(X, null);
 
-			if (this.showZeroX && this.minX is AbelianGroup Gx)
+			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
-				List<IElement> Elements = new List<IElement> { this.minX, Gx.Zero };
-				this.minX = Min.CalcMin(X.Encapsulate(Elements, null) as IVector, null);
+				Zero = AG.AdditiveIdentity;
 
-				Elements = new List<IElement> { this.maxX, Gx.Zero };
-				this.maxX = Max.CalcMax(X.Encapsulate(Elements, null) as IVector, null);
+				this.minX = Min.CalcMin(new ObjectVector(this.minX, Zero), null);
+				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
 			}
 
 			this.minY = Min.CalcMin(Y, null);
 			this.maxY = Max.CalcMax(Y, null);
 
-			if (this.showZeroY && this.minY is AbelianGroup Gy)
+			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
 			{
-				List<IElement> Elements = new List<IElement> { this.minY, Gy.Zero };
-				this.minY = Min.CalcMin(Y.Encapsulate(Elements, null) as IVector, null);
+				Zero = AG2.AdditiveIdentity;
 
-				Elements = new List<IElement> { this.maxY, Gy.Zero };
-				this.maxY = Max.CalcMax(Y.Encapsulate(Elements, null) as IVector, null);
+				this.minY = Min.CalcMin(new ObjectVector(this.minY, Zero), null);
+				this.maxY = Max.CalcMax(new ObjectVector(this.maxY, Zero), null);
 			}
 
 			if (HasNull)
@@ -166,24 +165,6 @@ namespace Waher.Script.Graphs
 					this.callbacks.AddLast(PlotCallback);
 					this.parameters.AddLast(Parameters);
 				}
-			}
-
-			IElement Zero;
-
-			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
-			{
-				Zero = AG.AdditiveIdentity;
-
-				this.minX = Min.CalcMin(new ObjectVector(this.minX, Zero), null);
-				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
-			}
-
-			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
-			{
-				Zero = AG2.AdditiveIdentity;
-
-				this.minY = Min.CalcMin(new ObjectVector(this.minY, Zero), null);
-				this.maxY = Max.CalcMax(new ObjectVector(this.maxY, Zero), null);
 			}
 		}
 
@@ -522,6 +503,7 @@ namespace Waher.Script.Graphs
 					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal),
 					TextSize = (float)Settings.LabelFontSize
 				};
+				SKRect Bounds = new SKRect();
 				float Size;
 				double MaxSize = 0;
 
@@ -529,7 +511,8 @@ namespace Waher.Script.Graphs
 				{
 					foreach (IElement Label in YLabels.ChildElements)
 					{
-						Size = Font.MeasureText(LabelString(Label, YLabelType));
+						Font.MeasureText(LabelString(Label, YLabelType), ref Bounds);
+						Size = Bounds.Width;
 						if (Size > MaxSize)
 							MaxSize = Size;
 					}
@@ -544,7 +527,8 @@ namespace Waher.Script.Graphs
 				{
 					foreach (IElement Label in XLabels.ChildElements)
 					{
-						Size = Font.MeasureText(LabelString(Label, XLabelType));
+						Font.MeasureText(LabelString(Label, XLabelType), ref Bounds);
+						Size = Bounds.Height;
 						if (Size > MaxSize)
 							MaxSize = Size;
 					}
@@ -606,7 +590,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Font.MeasureText(s = LabelString(Label, YLabelType));
+					Font.MeasureText(s = LabelString(Label, YLabelType), ref Bounds);
 					f = (float)LabelYY[i++];
 
 					if (this.showGrid)
@@ -619,8 +603,8 @@ namespace Waher.Script.Graphs
 
 					if (this.showYAxis)
 					{
-						f += (float)Settings.LabelFontSize * 0.5f;
-						Canvas.DrawText(s, x3 - Size - Settings.MarginLabel, f, Font);
+						f += Bounds.Height * 0.5f;
+						Canvas.DrawText(s, x3 - Bounds.Width - Settings.MarginLabel, f, Font);
 					}
 				}
 
@@ -629,7 +613,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Font.MeasureText(s = LabelString(Label, XLabelType));
+					Font.MeasureText(s = LabelString(Label, XLabelType), ref Bounds);
 					f = (float)LabelXX[i++];
 
 					if (this.showGrid)
@@ -642,6 +626,7 @@ namespace Waher.Script.Graphs
 
 					if (this.showXAxis)
 					{
+						Size = Bounds.Width;
 						f -= Size * 0.5f;
 						if (f < x3)
 							f = x3;
@@ -669,7 +654,8 @@ namespace Waher.Script.Graphs
 
 				if (!string.IsNullOrEmpty(this.title))
 				{
-					Size = Font.MeasureText(this.title);
+					Font.MeasureText(this.title, ref Bounds);
+					Size = Bounds.Width;
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
 
@@ -678,12 +664,13 @@ namespace Waher.Script.Graphs
 					else if (f + Size > x3 + w)
 						f = x3 + w - Size;
 
-					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 1.5 * Settings.LabelFontSize), Font);
+					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 0.1 * Settings.LabelFontSize - Bounds.Top), Font);
 				}
 
 				if (!string.IsNullOrEmpty(this.labelX))
 				{
-					Size = Font.MeasureText(this.labelX);
+					Font.MeasureText(this.labelX, ref Bounds);
+					Size = Bounds.Width;
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
 
@@ -692,12 +679,13 @@ namespace Waher.Script.Graphs
 					else if (f + Size > x3 + w)
 						f = x3 + w - Size;
 
-					Canvas.DrawText(this.labelX, f, (float)(y2 + 0.45 * Settings.LabelFontSize), Font);
+					Canvas.DrawText(this.labelX, f, (float)(Settings.Height - Settings.MarginBottom - 0.1 * Settings.LabelFontSize - Bounds.Height - Bounds.Top), Font);
 				}
 
 				if (!string.IsNullOrEmpty(this.labelY))
 				{
-					Size = Font.MeasureText(this.labelY);
+					Font.MeasureText(this.labelY, ref Bounds);
+					Size = Bounds.Width;
 
 					f = y3 - (y3 - y1 - Size) * 0.5f;
 
@@ -706,7 +694,7 @@ namespace Waher.Script.Graphs
 					else if (f > y3 + h)
 						f = y3 + h;
 
-					Canvas.Translate((float)(Settings.MarginLeft + 0.05 * Settings.LabelFontSize), f);
+					Canvas.Translate((float)(Settings.MarginLeft + 0.1 * Settings.LabelFontSize - Bounds.Top), f);
 					Canvas.RotateDegrees(-90);
 					Canvas.DrawText(this.labelY, 0, 0, Font);
 					Canvas.ResetMatrix();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -136,11 +135,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 			}
 			finally
 			{
-				if (Brush != null)
-					Brush.Dispose();
-
-				if (Path != null)
-					Path.Dispose();
+				Brush?.Dispose();
+				Path?.Dispose();
 			}
 		}
 

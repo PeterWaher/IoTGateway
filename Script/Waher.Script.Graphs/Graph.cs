@@ -448,7 +448,7 @@ namespace Waher.Script.Graphs
 			for (i = 0; i < c; i++)
 				v[i] = i + 0.5;
 
-			return Scale(v, 0, c + 1, Offset, Size);
+			return Scale(v, 0, c, Offset, Size);
 		}
 
 		/// <summary>

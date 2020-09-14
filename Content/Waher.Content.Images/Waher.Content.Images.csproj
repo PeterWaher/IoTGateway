@@ -28,7 +28,7 @@
     <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Images\Waher.Content.Images.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.80.1" />
+    <PackageReference Include="SkiaSharp" Version="2.80.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />

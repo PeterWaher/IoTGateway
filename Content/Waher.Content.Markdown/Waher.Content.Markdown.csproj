@@ -31,7 +31,7 @@ https://waher.se/Markdown.md</Description>
     <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.Markdown\Waher.Content.Markdown.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.80.1" />
+    <PackageReference Include="SkiaSharp" Version="2.80.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />

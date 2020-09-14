@@ -222,12 +222,15 @@
   <Assembly fileName='WindowsBase.dll'/>
   <Assembly fileName='DnsClient.dll'/>
   <Assembly fileName='libSkiaSharp.dll'/>
+  <Assembly fileName='libzstd.dll'/>
   <Assembly fileName='MongoDB.Bson.dll'/>
   <Assembly fileName='MongoDB.Driver.dll'/>
   <Assembly fileName='MongoDB.Driver.Core.dll'/>
   <Assembly fileName='MongoDB.Libmongocrypt.dll'/>
   <Assembly fileName='SharpCompress.dll'/>
   <Assembly fileName='SkiaSharp.dll'/>
+  <Assembly fileName='snappy32.dll'/>
+  <Assembly fileName='snappy64.dll'/>
   <Assembly fileName='Waher.Content.dll'/>
   <Assembly fileName='Waher.Content.Asn1.dll'/>
   <Assembly fileName='Waher.Content.Dsn.dll'/>
@@ -244,6 +247,7 @@
   <Assembly fileName='Waher.Events.Files.dll'/>
   <Assembly fileName='Waher.Events.Persistence.dll'/>
   <Assembly fileName='Waher.Events.Statistics.dll'/>
+  <Assembly fileName='Waher.Events.WindowsEventLog.dll'/>
   <Assembly fileName='Waher.Events.XMPP.dll'/>
   <Assembly fileName='Waher.IoTGateway.dll'/>
   <Assembly fileName='Waher.IoTGateway.Resources.dll'/>
@@ -251,7 +255,7 @@
   <Assembly fileName='Waher.IoTGateway.Svc.dll'/>
   <Assembly fileName='Waher.IoTGateway.Svc.deps.json'/>
   <Assembly fileName='Waher.IoTGateway.Svc.runtimeconfig.json'/>
-  <Assembly fileName='Waher.Events.WindowsEventLog.dll'/>
+  <Assembly fileName='Waher.Layout.Layout2D.dll'/>
   <Assembly fileName='Waher.Networking.dll'/>
   <Assembly fileName='Waher.Networking.Cluster.dll'/>
   <Assembly fileName='Waher.Networking.CoAP.dll'/>

@@ -236,6 +236,7 @@
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.Cluster\Waher.Networking.Cluster.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj" />

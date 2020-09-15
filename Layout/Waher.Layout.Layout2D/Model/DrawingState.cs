@@ -1,5 +1,6 @@
 ﻿using System;
 using SkiaSharp;
+using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
@@ -315,6 +316,32 @@ namespace Waher.Layout.Layout2D.Model
 			SKSize Prev = this.areaSize;
 			this.areaSize = AreaSize;
 			return Prev;
+		}
+
+		/// <summary>
+		/// Pushes new font settings.
+		/// </summary>
+		/// <param name="Font">New font, or null if the current font is to be kept.</param>
+		/// <returns>State backup, to be used in a call to <see cref="Restore"/>.</returns>
+		public FontState Push(Font Font)
+		{
+			if (Font is null)
+				return null;
+			else
+				return new FontState(Font.Text, Font.FontDef);
+		}
+
+		/// <summary>
+		/// Restores font settings, from a previous call to <see cref="Push"/>
+		/// </summary>
+		/// <param name="FontState">Previous font state.</param>
+		public void Restore(FontState FontState)
+		{
+			if (!(FontState is null))
+			{
+				this.text = FontState.Paint;
+				this.font = FontState.Font;
+			}
 		}
 	}
 }

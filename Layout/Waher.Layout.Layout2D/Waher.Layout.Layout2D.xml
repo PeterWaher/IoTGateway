@@ -1896,6 +1896,11 @@
             Degrees
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Label.FontAttribute">
+            <summary>
+            Font
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Label.FromXml(System.Xml.XmlElement)">
             <summary>
             Populates the element (including children) with information from its XML definition.
@@ -1958,6 +1963,11 @@
             Local name of type of element.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Paragraph.FontAttribute">
+            <summary>
+            Font
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
@@ -1968,6 +1978,12 @@
             Populates the element (including children) with information from its XML definition.
             </summary>
             <param name="Input">XML definition.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.ExportAttributes(System.Xml.XmlWriter)">
+            <summary>
+            Exports attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Paragraph.ExportChildren(System.Xml.XmlWriter)">
             <summary>
@@ -2024,6 +2040,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Content.Script.VerticalAlignmentAttribute">
             <summary>
             Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Content.Script.FontAttribute">
+            <summary>
+            Font
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Content.Script.FromXml(System.Xml.XmlElement)">
@@ -2201,6 +2222,19 @@
             </summary>
             <param name="AreaSize">New area size</param>
             <returns>Previous area size</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.Push(Waher.Layout.Layout2D.Model.Fonts.Font)">
+            <summary>
+            Pushes new font settings.
+            </summary>
+            <param name="Font">New font, or null if the current font is to be kept.</param>
+            <returns>State backup, to be used in a call to <see cref="M:Waher.Layout.Layout2D.Model.DrawingState.Restore(Waher.Layout.Layout2D.Model.FontState)"/>.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.Restore(Waher.Layout.Layout2D.Model.FontState)">
+            <summary>
+            Restores font settings, from a previous call to <see cref="M:Waher.Layout.Layout2D.Model.DrawingState.Push(Waher.Layout.Layout2D.Model.Fonts.Font)"/>
+            </summary>
+            <param name="FontState">Previous font state.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicContainer">
             <summary>
@@ -5221,6 +5255,28 @@
             Copies contents (attributes and children) to the destination element.
             </summary>
             <param name="Destination">Destination element</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.FontState">
+            <summary>
+            Drawing state for text.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.FontState.#ctor(SkiaSharp.SKPaint,SkiaSharp.SKFont)">
+            <summary>
+            Drawing state for text.
+            </summary>
+            <param name="Paint">Paint state</param>
+            <param name="Font">Font state</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.FontState.Paint">
+            <summary>
+            Paint state
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.FontState.Font">
+            <summary>
+            Font state
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Fonts.Font">
             <summary>

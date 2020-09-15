@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          background="WhiteBackground" pen="BlackPen"
+          font="WhiteText" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+  <SolidBackground id="Bar" color="{Alpha('Green',128)}"/>
+  <Font id="WhiteText" name="Arial" size="12pt" color="White"/>
+  <Font id="BlackText" name="Arial" size="12pt" color="Black"/>
+  <Grid columns="2">
+    <Cell>
+      <Margins left="0.5em" right="0.5em">
+        <Label text="StartChatSession" x="100%" y="50%" halign="Right" valign="Center" font="BlackText"/>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="3mm" radiusY="3mm" width="70%" height="1cm" fill="Bar">
+          <Margins left="0.5em" right="0.5em">
+            <Label text="7" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="0.5em" right="0.5em">
+        <Label text="RespondToMessage" x="100%" y="50%" halign="Right" valign="Center" font="BlackText"/>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="3mm" radiusY="3mm" width="100%" height="1cm" fill="Bar">
+          <Margins left="0.5em" right="0.5em">
+            <Label text="10" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+  </Grid>
+</Layout2D>

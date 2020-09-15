@@ -4,6 +4,7 @@ using System.Xml;
 using SkiaSharp;
 using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Groups;
 using Waher.Layout.Layout2D.Model.Images;
 using Waher.Layout.Layout2D.Model.Transforms;
@@ -23,6 +24,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		private ExpressionAttribute expression;
 		private EnumAttribute<HorizontalAlignment> halign;
 		private EnumAttribute<VerticalAlignment> valign;
+		private StringAttribute font;
 
 		/// <summary>
 		/// Represents the result of executing script.
@@ -78,6 +80,15 @@ namespace Waher.Layout.Layout2D.Model.Content
 		}
 
 		/// <summary>
+		/// Font
+		/// </summary>
+		public StringAttribute FontAttribute
+		{
+			get => this.font;
+			set => this.font = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
@@ -88,6 +99,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			this.expression = new ExpressionAttribute(Input, "expression");
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
+			this.font = new StringAttribute(Input, "font");
 		}
 
 		/// <summary>
@@ -101,6 +113,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			this.expression?.Export(Output);
 			this.halign?.Export(Output);
 			this.valign?.Export(Output);
+			this.font?.Export(Output);
 		}
 
 		/// <summary>
@@ -127,6 +140,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 				Dest.expression = this.expression?.CopyIfNotPreset();
 				Dest.halign = this.halign?.CopyIfNotPreset();
 				Dest.valign = this.valign?.CopyIfNotPreset();
+				Dest.font = this.font?.CopyIfNotPreset();
 			}
 		}
 
@@ -276,10 +290,23 @@ namespace Waher.Layout.Layout2D.Model.Content
 					this.defined = false;
 			}
 
+			if (!(this.font is null) &&
+				this.fontRef is null &&
+				this.font.TryEvaluate(State.Session, out string FontId) &&
+				this.Document.TryGetElement(FontId, out ILayoutElement E) &&
+				E is Font Font)
+			{
+				this.fontRef = Font;
+			}
+
 			if (!(this.evaluated is null))
 			{
+				FontState Bak = State.Push(this.fontRef);
+
 				if (this.evaluated.MeasureDimensions(State))
 					Relative = true;
+
+				State.Restore(Bak);
 
 				this.Width = this.evaluated.Width;
 				this.Height = this.evaluated.Height;
@@ -298,7 +325,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (!(this.evaluated is null))
 			{
+				FontState Bak = State.Push(this.fontRef);
 				this.evaluated.MeasurePositions(State);
+				State.Restore(Bak);
 
 				this.Left = this.evaluated.Left;
 				this.Top = this.evaluated.Top;
@@ -314,6 +343,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		private Expression parsed;
 		private ILayoutElement evaluated = null;
 		private string cid = null;
+		private Font fontRef = null;
 
 		/// <summary>
 		/// Draws layout entities.
@@ -321,7 +351,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// <param name="State">Current drawing state.</param>
 		public override void Draw(DrawingState State)
 		{
+			FontState Bak = State.Push(this.fontRef);
 			this.evaluated?.Draw(State);
+			State.Restore(Bak);
+
 			base.Draw(State);
 		}
 	}

@@ -269,6 +269,11 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			this.Test("Test_39_Stack");
 		}
-		
+
+		[TestMethod]
+		public void Test_40_HorizontalBars()
+		{
+			this.Test("Test_40_HorizontalBars");
+		}
 	}
 }

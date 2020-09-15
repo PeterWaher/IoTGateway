@@ -960,6 +960,7 @@
         <xs:attribute name="text" type="xs:string" use="required"/>
         <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
         <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
+        <xs:attribute name="font" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -970,6 +971,7 @@
         <xs:attribute name="expression" type="Expression" use="required"/>
         <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
         <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
+        <xs:attribute name="font" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -980,6 +982,7 @@
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
           <xs:group ref="FlowingText"/>
         </xs:sequence>
+        <xs:attribute name="font" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

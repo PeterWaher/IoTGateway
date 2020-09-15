@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
+using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Content.FlowingText;
 
 namespace Waher.Layout.Layout2D.Model.Content
@@ -12,6 +13,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 	public class Paragraph : LayoutArea
 	{
 		private IFlowingText[] text;
+		private StringAttribute font;
 
 		/// <summary>
 		/// Represents a paragraph of flowing text.
@@ -27,6 +29,15 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Local name of type of element.
 		/// </summary>
 		public override string LocalName => "Paragraph";
+
+		/// <summary>
+		/// Font
+		/// </summary>
+		public StringAttribute FontAttribute
+		{
+			get => this.font;
+			set => this.font = value;
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -50,6 +61,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 		{
 			base.FromXml(Input);
 
+			this.font = new StringAttribute(Input, "font");
+
 			List<IFlowingText> Children = new List<IFlowingText>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
@@ -66,6 +79,17 @@ namespace Waher.Layout.Layout2D.Model.Content
 			}
 
 			this.text = Children.ToArray();
+		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportAttributes(XmlWriter Output)
+		{
+			base.ExportAttributes(Output);
+
+			this.font?.Export(Output);
 		}
 
 		/// <summary>
@@ -104,6 +128,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			if (Destination is Paragraph Dest)
 			{
+				Dest.font = this.font?.CopyIfNotPreset();
+				
 				if (!(this.text is null))
 				{
 					int i, c = this.text.Length;

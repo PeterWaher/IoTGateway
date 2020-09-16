@@ -1171,6 +1171,7 @@ In an interactive script environment, clicking on the resulting graphs will zoom
 | `RandomLinearComplementaryHSV([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors complementary in HSV space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearComplementaryHSV(1024,64))` |
 | `RandomLinearRGB([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors in RGB space. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomLinearRGB(1024,64))` |
 | `RandomSingleHue([N[,BandSize[,Seed]]])` | Creates a palette of `N` colors (default=1024) consisting of bands of `BandSize` intermediate colors (default=16) interpolating random colors using a single Hue. The random number generator can be initialized by a `Seed`, if provided, or use a random one. | `TestColorModel(RandomSingleHue(1024,64))` |
+| `TestColorModel(Colors)` | Creates an image of color stripes defined by the vector of colors presented in `Colors`. | `TestColorModel(Palette)` |
 
 #### Complex Fractal functions (Waher.Script.Fractals)
 

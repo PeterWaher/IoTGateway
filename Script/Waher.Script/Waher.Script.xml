@@ -4128,6 +4128,460 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Logging.LogAlert">
+            <summary>
+            Logs an alert event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogAlert.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an alert event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogAlert.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an alert event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogAlert.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogAlert.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogAlert.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogCritical">
+            <summary>
+            Logs a critical event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogCritical.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a critical event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogCritical.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a critical event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogCritical.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogCritical.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogCritical.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogDebug">
+            <summary>
+            Logs a debug event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogDebug.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a debug event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogDebug.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a debug event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogDebug.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogDebug.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogDebug.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogEmergency">
+            <summary>
+            Logs an emergency event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogEmergency.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an emergency event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogEmergency.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an emergency event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogEmergency.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogEmergency.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogEmergency.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogError">
+            <summary>
+            Logs an error event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogError.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an error event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogError.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an error event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogError.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogError.DoLog(System.String)">
+            <summary>
+            Logs error to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogError.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs error to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific error.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogFunction">
+            <summary>
+            Abstract base class for log functions
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogFunction.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Abstract base class for log functions
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogFunction.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Abstract base class for log functions
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogFunction.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogFunction.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogFunction.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogFunction.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogInformational">
+            <summary>
+            Logs an informational event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogInformational.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an informational event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogInformational.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs an informational event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogInformational.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogInformational.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogInformational.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogInformational.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogNotice">
+            <summary>
+            Logs a notice event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogNotice.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a notice event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogNotice.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a notice event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogNotice.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogNotice.DoLog(System.String)">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogNotice.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs information to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific information.</param>
+        </member>
+        <member name="T:Waher.Script.Functions.Logging.LogWarning">
+            <summary>
+            Logs a warning event to the event log.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogWarning.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a warning event to the event log.
+            </summary>
+            <param name="Message">Message</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogWarning.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logs a warning event to the event log.
+            </summary>
+            <param name="Message">Argument.</param>
+            <param name="Tags">Tags</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Logging.LogWarning.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogWarning.DoLog(System.String)">
+            <summary>
+            Logs warning to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Logging.LogWarning.DoLog(System.String,System.String,System.String,System.String,Waher.Events.EventLevel,System.String,System.String,System.String,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Logs warning to the event log.
+            </summary>
+            <param name="Message">Free-text event message.</param>
+            <param name="Object">Object related to the event.</param>
+            <param name="Actor">Actor responsible for the action causing the event.</param>
+            <param name="EventId">Computer-readable Event ID identifying type of even.</param>
+            <param name="Level">Event Level.</param>
+            <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
+            <param name="Module">Module where the event is reported.</param>
+            <param name="StackTrace">Stack Trace of event.</param>
+            <param name="Tags">Variable set of tags providing event-specific warning.</param>
+        </member>
         <member name="T:Waher.Script.Functions.Matries.Identity">
             <summary>
             Creates an identity matrix.

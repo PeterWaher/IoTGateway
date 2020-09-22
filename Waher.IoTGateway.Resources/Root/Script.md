@@ -977,6 +977,31 @@ The following functions are useful to control the runtime execution of the scrip
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
 
+### Logging Functions
+
+The following functions can be used to log information to the event log:
+
+| Function                           | Description                                   | Example                                      |
+|------------------------------------|-----------------------------------------------|----------------------------------------------|
+| `LogInformational(Message[,Tags])` | Logs an informational event to the event log. | `LogInformational("Hello",{Actor:"Kilroy"})` |
+| `LogInformation(Message[,Tags])`   | Same as `LogInformational`.                   | `LogInformation("Hello",{Actor:"Kilroy"})`   |
+| `LogInfo(Message[,Tags])`          | Same as `LogInformational`.                   | `LogInfo("Hello",{Actor:"Kilroy"})`          |
+| `LogNotice(Message[,Tags])`        | Logs a notice event to the event log.         | `LogNotice("Hello",{Actor:"Kilroy"})`        |
+| `LogWarning(Message[,Tags])`       | Logs a warning event to the event log.        | `LogWarning("Hello",{Actor:"Kilroy"})`       |
+| `LogError(Message[,Tags])`         | Logs an error event to the event log.         | `LogError("Hello",{Actor:"Kilroy"})`         |
+| `LogCritical(Message[,Tags])`      | Logs a critical event to the event log.       | `LogCritical("Hello",{Actor:"Kilroy"})`      |
+| `LogAlert(Message[,Tags])`         | Logs an alert event to the event log.         | `LogAlert("Hello",{Actor:"Kilroy"})`         |
+| `LogEmergency(Message[,Tags])`     | Logs an emergency event to the event log.     | `LogEmergency("Hello",{Actor:"Kilroy"})`     |
+| `LogDebug(Message[,Tags])`         | Logs a debug event to the event log.          | `LogDebug("Hello",{Actor:"Kilroy"})`         |
+
+**Note**: The `Message` can be a string message, or an object derived from `Exception`. If such an object any of the following
+interfaces (from the `Waher.Events` namespace), the corresponding attributes will be logged with the message automatically:
+`IEventObject`, `IEventActor`, `IEventId`, `IEventLevel`, `IEventFacility`, `IEventModule` and `IEventTags`.
+
+**Note 2**: The `Tags` argument in the logging functions should be an object-ex-nihilo (or similar object), providing tags as key-value
+pairs. Any tag name can be used, however, the Event log treats the following tag names specially: `Object`, `Actor`, `EventId`, `Level`, 
+`Facility`, `Module`, `StackTrace`.
+
 ### Extensions
 
 The script engine can be extended by modules that are run in the environment. The following subssections list such funcion extensions

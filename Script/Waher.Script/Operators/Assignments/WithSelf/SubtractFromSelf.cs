@@ -5,7 +5,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.WithSelf
 {
 	/// <summary>
 	/// Subtract from self operator.

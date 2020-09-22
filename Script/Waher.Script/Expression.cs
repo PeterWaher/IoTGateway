@@ -768,11 +768,22 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref is null)
-							throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
-
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-						return new AddToSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+						if (!(Ref is null))
+							return new Operators.Assignments.WithSelf.AddToSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new Add(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new Add(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new Add(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new Add(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new Add(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the += operator.", this.pos, this.script);
 					}
 					else
 					{
@@ -786,11 +797,22 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref is null)
-							throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
-
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-						return new SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+						if (!(Ref is null))
+							return new Operators.Assignments.WithSelf.SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new Subtract(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new Subtract(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new Subtract(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new Subtract(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new Subtract(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the -= operator.", this.pos, this.script);
 					}
 					else
 					{
@@ -805,11 +827,22 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref is null)
-							throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
-
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-						return new MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+						if (!(Ref is null))
+							return new Operators.Assignments.WithSelf.MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new Multiply(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new Multiply(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new Multiply(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new Multiply(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new Multiply(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the *= operator.", this.pos, this.script);
 					}
 					else
 					{
@@ -823,11 +856,22 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref is null)
-							throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
-
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-						return new DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+						if (!(Ref is null))
+							return new Operators.Assignments.WithSelf.DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new Divide(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new Divide(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new Divide(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new Divide(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new Divide(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the /= operator.", this.pos, this.script);
 					}
 					else
 					{
@@ -841,11 +885,22 @@ namespace Waher.Script
 					{
 						this.pos++;
 
-						if (Ref is null)
-							throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
-
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-						return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+						if (!(Ref is null))
+							return new Operators.Assignments.WithSelf.PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+						else if (Left is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new Power(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new Power(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new Power(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new Power(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Left is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new Power(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the ^= operator.", this.pos, this.script);
 					}
 					else
 					{
@@ -860,11 +915,22 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							if (Ref is null)
-								throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
-
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-							return new BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+							if (!(Ref is null))
+								return new Operators.Assignments.WithSelf.BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+							else if (Left is NamedMember NamedMember)
+								return new NamedMemberAssignment(NamedMember, new Operators.Binary.And(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is VectorIndex VectorIndex)
+								return new VectorIndexAssignment(VectorIndex, new Operators.Binary.And(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is MatrixIndex MatrixIndex)
+								return new MatrixIndexAssignment(MatrixIndex, new Operators.Binary.And(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is ColumnVector ColumnVector)
+								return new MatrixColumnAssignment(ColumnVector, new Operators.Binary.And(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is RowVector RowVector)
+								return new MatrixRowAssignment(RowVector, new Operators.Binary.And(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else
+								throw new SyntaxException("Invalid use of the &= operator.", this.pos, this.script);
 
 						case '&':
 							this.pos++;
@@ -872,11 +938,22 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								if (Ref is null)
-									throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
-
 								Right = this.AssertRightOperandNotNull(this.ParseStatement());
-								return new LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+								if (!(Ref is null))
+									return new Operators.Assignments.WithSelf.LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+								else if (Left is NamedMember NamedMember)
+									return new NamedMemberAssignment(NamedMember, new Operators.Logical.And(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is VectorIndex VectorIndex)
+									return new VectorIndexAssignment(VectorIndex, new Operators.Logical.And(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is MatrixIndex MatrixIndex)
+									return new MatrixIndexAssignment(MatrixIndex, new Operators.Logical.And(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is ColumnVector ColumnVector)
+									return new MatrixColumnAssignment(ColumnVector, new Operators.Logical.And(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is RowVector RowVector)
+									return new MatrixRowAssignment(RowVector, new Operators.Logical.And(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else
+									throw new SyntaxException("Invalid use of the &&= operator.", this.pos, this.script);
 							}
 							else
 							{
@@ -896,11 +973,22 @@ namespace Waher.Script
 						case '=':
 							this.pos++;
 
-							if (Ref is null)
-								throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
-
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-							return new BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+							if (!(Ref is null))
+								return new Operators.Assignments.WithSelf.BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+							else if (Left is NamedMember NamedMember)
+								return new NamedMemberAssignment(NamedMember, new Operators.Binary.Or(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is VectorIndex VectorIndex)
+								return new VectorIndexAssignment(VectorIndex, new Operators.Binary.Or(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is MatrixIndex MatrixIndex)
+								return new MatrixIndexAssignment(MatrixIndex, new Operators.Binary.Or(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is ColumnVector ColumnVector)
+								return new MatrixColumnAssignment(ColumnVector, new Operators.Binary.Or(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is RowVector RowVector)
+								return new MatrixRowAssignment(RowVector, new Operators.Binary.Or(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else
+								throw new SyntaxException("Invalid use of the |= operator.", this.pos, this.script);
 
 						case '|':
 							this.pos++;
@@ -908,11 +996,22 @@ namespace Waher.Script
 							{
 								this.pos++;
 
-								if (Ref is null)
-									throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
-
 								Right = this.AssertRightOperandNotNull(this.ParseStatement());
-								return new LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+								if (!(Ref is null))
+									return new Operators.Assignments.WithSelf.LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start, this);
+								else if (Left is NamedMember NamedMember)
+									return new NamedMemberAssignment(NamedMember, new Operators.Logical.Or(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is VectorIndex VectorIndex)
+									return new VectorIndexAssignment(VectorIndex, new Operators.Logical.Or(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is MatrixIndex MatrixIndex)
+									return new MatrixIndexAssignment(MatrixIndex, new Operators.Logical.Or(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is ColumnVector ColumnVector)
+									return new MatrixColumnAssignment(ColumnVector, new Operators.Logical.Or(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Left is RowVector RowVector)
+									return new MatrixRowAssignment(RowVector, new Operators.Logical.Or(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else
+									throw new SyntaxException("Invalid use of the ||= operator.", this.pos, this.script);
 							}
 							else
 							{
@@ -934,11 +1033,22 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							if (Ref is null)
-								throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
-
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-							return new ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+							if (!(Ref is null))
+								return new Operators.Assignments.WithSelf.ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start, this);
+							else if (Left is NamedMember NamedMember)
+								return new NamedMemberAssignment(NamedMember, new ShiftLeft(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is VectorIndex VectorIndex)
+								return new VectorIndexAssignment(VectorIndex, new ShiftLeft(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is MatrixIndex MatrixIndex)
+								return new MatrixIndexAssignment(MatrixIndex, new ShiftLeft(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is ColumnVector ColumnVector)
+								return new MatrixColumnAssignment(ColumnVector, new ShiftLeft(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is RowVector RowVector)
+								return new MatrixRowAssignment(RowVector, new ShiftLeft(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else
+								throw new SyntaxException("Invalid use of the <<= operator.", this.pos, this.script);
 						}
 						else
 						{
@@ -961,11 +1071,22 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							if (Ref is null)
-								throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
-
 							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-							return new ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start, this);
+
+							if (!(Ref is null))
+								return new Operators.Assignments.WithSelf.ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start, this);
+							else if (Left is NamedMember NamedMember)
+								return new NamedMemberAssignment(NamedMember, new ShiftRight(NamedMember, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is VectorIndex VectorIndex)
+								return new VectorIndexAssignment(VectorIndex, new ShiftRight(VectorIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is MatrixIndex MatrixIndex)
+								return new MatrixIndexAssignment(MatrixIndex, new ShiftRight(MatrixIndex, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is ColumnVector ColumnVector)
+								return new MatrixColumnAssignment(ColumnVector, new ShiftRight(ColumnVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else if (Left is RowVector RowVector)
+								return new MatrixRowAssignment(RowVector, new ShiftRight(RowVector, Right, Start, this.pos - Start, this), Start, this.pos - Start, this);
+							else
+								throw new SyntaxException("Invalid use of the >>= operator.", this.pos, this.script);
 						}
 						else
 						{
@@ -2162,10 +2283,23 @@ namespace Waher.Script
 					if ((ch = this.PeekNextChar()) == '-')
 					{
 						this.pos++;
-						if (!(this.ParseUnaryPrefixOperator() is VariableReference Ref))
-							throw new SyntaxException("The -- operator can only work on variable references.", this.pos, this.script);
 
-						return new PreDecrement(Ref.VariableName, Start, this.pos - Start, this);
+						ScriptNode Op = this.ParseUnaryPrefixOperator();
+
+						if (Op is VariableReference Ref)
+							return new Operators.Assignments.Pre.PreDecrement(Ref.VariableName, Start, this.pos - Start, this);
+						else if (Op is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new MinusOne(NamedMember, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new MinusOne(VectorIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new MinusOne(MatrixIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new MinusOne(ColumnVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new MinusOne(RowVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the -- operator.", this.pos, this.script);
 					}
 					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
 					{
@@ -2185,10 +2319,23 @@ namespace Waher.Script
 					if ((ch = this.PeekNextChar()) == '+')
 					{
 						this.pos++;
-						if (!(this.ParseUnaryPrefixOperator() is VariableReference Ref))
-							throw new SyntaxException("The ++ operator can only work on variable references.", this.pos, this.script);
 
-						return new PreIncrement(Ref.VariableName, Start, this.pos - Start, this);
+						ScriptNode Op = this.ParseUnaryPrefixOperator();
+
+						if (Op is VariableReference Ref)
+							return new Operators.Assignments.Pre.PreIncrement(Ref.VariableName, Start, this.pos - Start, this);
+						else if (Op is NamedMember NamedMember)
+							return new NamedMemberAssignment(NamedMember, new PlusOne(NamedMember, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is VectorIndex VectorIndex)
+							return new VectorIndexAssignment(VectorIndex, new PlusOne(VectorIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is MatrixIndex MatrixIndex)
+							return new MatrixIndexAssignment(MatrixIndex, new PlusOne(MatrixIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is ColumnVector ColumnVector)
+							return new MatrixColumnAssignment(ColumnVector, new PlusOne(ColumnVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else if (Op is RowVector RowVector)
+							return new MatrixRowAssignment(RowVector, new PlusOne(RowVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+						else
+							throw new SyntaxException("Invalid use of the ++ operator.", this.pos, this.script);
 					}
 					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
 						return this.ParseSuffixOperator();
@@ -2394,17 +2541,35 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '+')
 						{
 							this.pos++;
+
 							Ref = Node as VariableReference;
-							if (Ref is null)
+
+							if (!(Ref is null))
+								Node = new Operators.Assignments.Post.PostIncrement(Ref.VariableName, Start, this.pos - Start, this);
+							else
 							{
-								this.pos -= 2;  // Can be a prefix operator.
-								return Node;
+								if (Node is NamedMember NamedMember)
+									Node = new NamedMemberAssignment(NamedMember, new PlusOne(NamedMember, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is VectorIndex VectorIndex)
+									Node = new VectorIndexAssignment(VectorIndex, new PlusOne(VectorIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is MatrixIndex MatrixIndex)
+									Node = new MatrixIndexAssignment(MatrixIndex, new PlusOne(MatrixIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is ColumnVector ColumnVector)
+									Node = new MatrixColumnAssignment(ColumnVector, new PlusOne(ColumnVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is RowVector RowVector)
+									Node = new MatrixRowAssignment(RowVector, new PlusOne(RowVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else
+								{
+									this.pos -= 2;  // Can be a prefix operator.
+									return Node;
+								}
+
+								Node = new MinusOne(Node, Start, this.pos - Start, this);
 							}
 
 							if (NullCheck)
 								throw new SyntaxException("Null-checked post increment operator not defined.", this.pos, this.script);
 
-							Node = new PostIncrement(Ref.VariableName, Start, this.pos - Start, this);
 							break;
 						}
 						else
@@ -2418,17 +2583,35 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '-')
 						{
 							this.pos++;
+
 							Ref = Node as VariableReference;
-							if (Ref is null)
+
+							if (!(Ref is null))
+								Node = new Operators.Assignments.Post.PostDecrement(Ref.VariableName, Start, this.pos - Start, this);
+							else
 							{
-								this.pos -= 2;  // Can be a prefix operator.
-								return Node;
+								if (Node is NamedMember NamedMember)
+									Node = new NamedMemberAssignment(NamedMember, new MinusOne(NamedMember, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is VectorIndex VectorIndex)
+									Node = new VectorIndexAssignment(VectorIndex, new MinusOne(VectorIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is MatrixIndex MatrixIndex)
+									Node = new MatrixIndexAssignment(MatrixIndex, new MinusOne(MatrixIndex, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is ColumnVector ColumnVector)
+									Node = new MatrixColumnAssignment(ColumnVector, new MinusOne(ColumnVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else if (Node is RowVector RowVector)
+									Node = new MatrixRowAssignment(RowVector, new MinusOne(RowVector, Start, this.pos - Start, this), Start, this.pos - Start, this);
+								else
+								{
+									this.pos -= 2;  // Can be a prefix operator.
+									return Node;
+								}
+
+								Node = new PlusOne(Node, Start, this.pos - Start, this);
 							}
 
 							if (NullCheck)
-								throw new SyntaxException("Null-checked post decrement operator not defined.", this.pos, this.script);
+								throw new SyntaxException("Null-checked post increment operator not defined.", this.pos, this.script);
 
-							Node = new PostDecrement(Ref.VariableName, Start, this.pos - Start, this);
 							break;
 						}
 						else

@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Operators.Logical;
+using Waher.Script.Operators.Binary;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.WithSelf
 {
 	/// <summary>
-	/// Logical Or with self operator.
+	/// Shift self right operator.
 	/// </summary>
-	public class LogicalOrWithSelf : Assignment 
+	public class ShiftSelfRight : Assignment 
 	{
-        private readonly Or or;
+        private readonly ShiftRight shiftRight;
 
         /// <summary>
-        /// Logical Or with self operator.
+        /// Shift self right operator.
         /// </summary>
         /// <param name="VariableName">Variable name..</param>
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public LogicalOrWithSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
+        public ShiftSelfRight(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
 			: base(VariableName, Operand, Start, Length, Expression)
 		{
-            this.or = new Or(new VariableReference(VariableName, true, Start, Length, Expression), Operand, Start, Length, Expression);
+            this.shiftRight = new ShiftRight(new VariableReference(VariableName, true, Start, Length, Expression), Operand, Start, Length, Expression);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Waher.Script.Operators.Assignments
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
 		{
-            IElement Result = this.or.Evaluate(Variables);
+            IElement Result = this.shiftRight.Evaluate(Variables);
             Variables[this.VariableName] = Result;
             return Result;
         }

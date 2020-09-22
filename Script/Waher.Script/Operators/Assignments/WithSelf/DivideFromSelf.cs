@@ -4,24 +4,24 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.WithSelf
 {
 	/// <summary>
-	/// Post-Decrement operator.
+	/// Divide from self operator.
 	/// </summary>
-	public class PostDecrement : ScriptLeafNodeVariableReference
+	public class DivideFromSelf : Assignment 
 	{
 		/// <summary>
-		/// Post-Decrement operator.
+		/// Divide from self operator.
 		/// </summary>
 		/// <param name="VariableName">Variable name..</param>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public PostDecrement(string VariableName, int Start, int Length, Expression Expression)
-			: base(VariableName, Start, Length, Expression)
+		public DivideFromSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
+			: base(VariableName, Operand, Start, Length, Expression)
 		{
 		}
 
@@ -32,21 +32,15 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (!Variables.TryGetVariable(this.variableName, out Variable v))
-				throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
+			if (!Variables.TryGetVariable(this.VariableName, out Variable v))
+				throw new ScriptRuntimeException("Variable not found.", this);
 
-			IElement Value = v.ValueElement;
-			IElement Value2;
+			IElement E = this.op.Evaluate(Variables);
+            E = Operators.Arithmetics.Divide.EvaluateDivision(v.ValueElement, E, this);
 
-			if (Value is DoubleNumber n)
-				Value2 = new DoubleNumber(n.Value - 1);
-			else
-				Value2 = PreDecrement.Decrement(Value, this);
+            Variables[this.VariableName] = E;
 
-            Variables[this.variableName] = Value2;
-
-            return Value;
-		}
-
-	}
+            return E;
+        }
+    }
 }

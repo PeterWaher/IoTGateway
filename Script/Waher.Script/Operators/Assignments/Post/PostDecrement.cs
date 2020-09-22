@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.Post
 {
 	/// <summary>
-	/// Post-Increment operator.
+	/// Post-Decrement operator.
 	/// </summary>
-	public class PostIncrement : ScriptLeafNodeVariableReference
+	public class PostDecrement : ScriptLeafNodeVariableReference
 	{
 		/// <summary>
-		/// Post-Increment operator.
+		/// Post-Decrement operator.
 		/// </summary>
 		/// <param name="VariableName">Variable name..</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public PostIncrement(string VariableName, int Start, int Length, Expression Expression)
+		public PostDecrement(string VariableName, int Start, int Length, Expression Expression)
 			: base(VariableName, Start, Length, Expression)
 		{
 		}
@@ -39,11 +37,11 @@ namespace Waher.Script.Operators.Assignments
 			IElement Value2;
 
 			if (Value is DoubleNumber n)
-				Value2 = new DoubleNumber(n.Value + 1);
+				Value2 = new DoubleNumber(n.Value - 1);
 			else
-				Value2 = PreIncrement.Increment(Value, this);
+				Value2 = Pre.PreDecrement.Decrement(Value, this);
 
-			Variables[this.variableName] = Value2;
+            Variables[this.variableName] = Value2;
 
             return Value;
 		}

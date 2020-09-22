@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.Pre
 {
 	/// <summary>
 	/// Pre-Decrement operator.

@@ -5,22 +5,22 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.WithSelf
 {
 	/// <summary>
-	/// Multiply with self operator.
+	/// Residue from self operator.
 	/// </summary>
-	public class MultiplyWithSelf : Assignment 
+	public class ResidueFromSelf : Assignment 
 	{
 		/// <summary>
-		/// Multiply with self operator.
+		/// Residue from self operator.
 		/// </summary>
 		/// <param name="VariableName">Variable name..</param>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public MultiplyWithSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
+		public ResidueFromSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
 			: base(VariableName, Operand, Start, Length, Expression)
 		{
 		}
@@ -32,11 +32,11 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            if (!Variables.TryGetVariable(this.VariableName, out Variable v))
-                throw new ScriptRuntimeException("Variable not found.", this);
+			if (!Variables.TryGetVariable(this.VariableName, out Variable v))
+				throw new ScriptRuntimeException("Variable not found.", this);
 
-            IElement E = this.op.Evaluate(Variables);
-            E = Operators.Arithmetics.Multiply.EvaluateMultiplication(v.ValueElement, E, this);
+			IElement E = this.op.Evaluate(Variables);
+            E = Operators.Arithmetics.Residue.EvaluateResidue(v.ValueElement, E, this);
 
             Variables[this.VariableName] = E;
 

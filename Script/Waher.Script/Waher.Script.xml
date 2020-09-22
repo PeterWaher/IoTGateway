@@ -13765,6 +13765,42 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="T:Waher.Script.Operators.Arithmetics.MinusOne">
+            <summary>
+            -1 operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            -1 operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Differentiate(System.String,Waher.Script.Variables)">
+            <summary>
+            Differentiates a script node, if possible.
+            </summary>
+            <param name="VariableName">Name of variable to differentiate on.</param>
+            <param name="Variables">Collection of variables.</param>
+            <returns>Differentiated node.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Arithmetics.Multiply">
             <summary>
             Multiplication operator.
@@ -13960,6 +13996,42 @@
             <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Permil.Differentiate(System.String,Waher.Script.Variables)">
+            <summary>
+            Differentiates a script node, if possible.
+            </summary>
+            <param name="VariableName">Name of variable to differentiate on.</param>
+            <param name="Variables">Collection of variables.</param>
+            <returns>Differentiated node.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Arithmetics.PlusOne">
+            <summary>
+            +1 operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            +1 operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Differentiate(System.String,Waher.Script.Variables)">
             <summary>
             Differentiates a script node, if possible.
             </summary>
@@ -14229,28 +14301,6 @@
             <param name="Variables">Collection of variables.</param>
             <returns>Differentiated node.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.AddToSelf">
-            <summary>
-            Add to self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.AddToSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Add to self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.AddToSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.Assignment">
             <summary>
             Assignment operator.
@@ -14272,72 +14322,6 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.Assignment.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.BinaryAndWithSelf">
-            <summary>
-            Binary And with self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.BinaryAndWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Binary And with self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.BinaryAndWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.BinaryOrWithSelf">
-            <summary>
-            Binary Or with self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.BinaryOrWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Binary Or with self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.BinaryOrWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.DivideFromSelf">
-            <summary>
-            Divide from self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.DivideFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Divide from self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.DivideFromSelf.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -14422,50 +14406,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.LogicalAndWithSelf">
-            <summary>
-            Logical And with self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.LogicalAndWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Logical And with self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.LogicalAndWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.LogicalOrWithSelf">
-            <summary>
-            Logical Or with self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.LogicalOrWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Logical Or with self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.LogicalOrWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.MatrixColumnAssignment">
             <summary>
             Matrix Column Assignment operator.
@@ -14532,28 +14472,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.MultiplyWithSelf">
-            <summary>
-            Multiply with self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.MultiplyWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Multiply with self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.MultiplyWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.NamedMemberAssignment">
             <summary>
             Named member Assignment operator.
@@ -14581,12 +14499,12 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.PostDecrement">
+        <member name="T:Waher.Script.Operators.Assignments.Post.PostDecrement">
             <summary>
             Post-Decrement operator.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PostDecrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Operators.Assignments.Post.PostDecrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Post-Decrement operator.
             </summary>
@@ -14595,19 +14513,19 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PostDecrement.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.Post.PostDecrement.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.PostIncrement">
+        <member name="T:Waher.Script.Operators.Assignments.Post.PostIncrement">
             <summary>
             Post-Increment operator.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PostIncrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Operators.Assignments.Post.PostIncrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Post-Increment operator.
             </summary>
@@ -14616,41 +14534,19 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PostIncrement.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.Post.PostIncrement.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.PowerOfSelf">
-            <summary>
-            Power of self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.PowerOfSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Power of self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.PowerOfSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.PreDecrement">
+        <member name="T:Waher.Script.Operators.Assignments.Pre.PreDecrement">
             <summary>
             Pre-Decrement operator.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreDecrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreDecrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Pre-Decrement operator.
             </summary>
@@ -14659,14 +14555,14 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreDecrement.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreDecrement.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreDecrement.Decrement(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreDecrement.Decrement(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Decrements a value.
             </summary>
@@ -14674,12 +14570,12 @@
             <param name="Node">Node performing the evaluation.</param>
             <returns>Decremented value.</returns>
         </member>
-        <member name="T:Waher.Script.Operators.Assignments.PreIncrement">
+        <member name="T:Waher.Script.Operators.Assignments.Pre.PreIncrement">
             <summary>
             Pre-Increment operator.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreIncrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreIncrement.#ctor(System.String,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Pre-Increment operator.
             </summary>
@@ -14688,108 +14584,20 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreIncrement.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreIncrement.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.PreIncrement.Increment(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Operators.Assignments.Pre.PreIncrement.Increment(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Increments a value.
             </summary>
             <param name="Value">Value to increment.</param>
             <param name="Node">Node performing the evaluation.</param>
             <returns>Incremented value.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.ResidueFromSelf">
-            <summary>
-            Residue from self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ResidueFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Residue from self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ResidueFromSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.ShiftSelfLeft">
-            <summary>
-            Shift self left operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ShiftSelfLeft.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Shift self left operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ShiftSelfLeft.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.ShiftSelfRight">
-            <summary>
-            Shift self right operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ShiftSelfRight.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Shift self right operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.ShiftSelfRight.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="T:Waher.Script.Operators.Assignments.SubtractFromSelf">
-            <summary>
-            Subtract from self operator.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.SubtractFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Subtract from self operator.
-            </summary>
-            <param name="VariableName">Variable name..</param>
-            <param name="Operand">Operand.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.SubtractFromSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
         </member>
         <member name="T:Waher.Script.Operators.Assignments.VectorIndexAssignment">
             <summary>
@@ -14807,6 +14615,270 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.VectorIndexAssignment.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.AddToSelf">
+            <summary>
+            Add to self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.AddToSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Add to self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.AddToSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf">
+            <summary>
+            Binary And with self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Binary And with self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf">
+            <summary>
+            Binary Or with self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Binary Or with self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.DivideFromSelf">
+            <summary>
+            Divide from self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.DivideFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Divide from self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.DivideFromSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf">
+            <summary>
+            Logical And with self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logical And with self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf">
+            <summary>
+            Logical Or with self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Logical Or with self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf">
+            <summary>
+            Multiply with self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Multiply with self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.PowerOfSelf">
+            <summary>
+            Power of self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.PowerOfSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Power of self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.PowerOfSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf">
+            <summary>
+            Residue from self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Residue from self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft">
+            <summary>
+            Shift self left operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Shift self left operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight">
+            <summary>
+            Shift self right operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Shift self right operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf">
+            <summary>
+            Subtract from self operator.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf.#ctor(System.String,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Subtract from self operator.
+            </summary>
+            <param name="VariableName">Variable name..</param>
+            <param name="Operand">Operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

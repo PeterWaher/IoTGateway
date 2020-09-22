@@ -5,27 +5,27 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Operators.Binary;
 
-namespace Waher.Script.Operators.Assignments
+namespace Waher.Script.Operators.Assignments.WithSelf
 {
 	/// <summary>
-	/// Binary Or with self operator.
+	/// Binary And with self operator.
 	/// </summary>
-	public class BinaryOrWithSelf : Assignment 
+	public class BinaryAndWithSelf : Assignment 
 	{
-        private readonly Or or;
+        private readonly And and;
 
         /// <summary>
-        /// Binary Or with self operator.
+        /// Binary And with self operator.
         /// </summary>
         /// <param name="VariableName">Variable name..</param>
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public BinaryOrWithSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
+        public BinaryAndWithSelf(string VariableName, ScriptNode Operand, int Start, int Length, Expression Expression)
 			: base(VariableName, Operand, Start, Length, Expression)
 		{
-            this.or = new Or(new VariableReference(VariableName, true, Start, Length, Expression), Operand, Start, Length, Expression);
+            this.and = new And(new VariableReference(VariableName, true, Start, Length, Expression), Operand, Start, Length, Expression);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Waher.Script.Operators.Assignments
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
 		{
-            IElement Result = this.or.Evaluate(Variables);
+            IElement Result = this.and.Evaluate(Variables);
             Variables[this.VariableName] = Result;
             return Result;
         }

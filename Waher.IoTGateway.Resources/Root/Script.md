@@ -642,11 +642,11 @@ In the first example, the function `f`, which takes three parameters, is suppose
 the variables `x` and `y` are assigned the elements of this return vector. In the second example, the `v` is supposed to be a assigned
 a vector. If the result of the function call is not a vector, it is converted to a vector before being assigned to `v`.
 
-There's also a set of aritmethic operators that act directly on a variable value. These are also categorized as assignment operators, and have the same
-[order of presedence][]. These operators are:
+There's also a set of aritmethic operators that act directly on a variable value, an object member or index. These are also categorized as 
+assignment operators, and have the same [order of presedence][]. These operators are:
 
 | Operator                   | Meaning                   | Example                                   |
-|:--------------------------:|:-------------------------|:-----------------------------------------:|
+|:--------------------------:|:--------------------------|:-----------------------------------------:|
 | `+=`                       | Add to variable           | `Variable += Value`                       |
 | `-=`                       | Subtract from variable    | `Variable -= Value`                       |
 | `*=`                       | Multiply to variable      | `Variable *= Value`                       |

@@ -137,6 +137,7 @@
               <File Id='System.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.Primitives.dll' Vital='yes'/>
               <File Id='System.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.ComponentModel.TypeConverter.dll' Vital='yes'/>
               <File Id='System.Configuration.dll' Name='System.Configuration.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Configuration.dll' Vital='yes'/>
+              <File Id='System.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Configuration.ConfigurationManager.dll' Vital='yes'/>
               <File Id='System.Console.dll' Name='System.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Console.dll' Vital='yes'/>
               <File Id='System.Core.dll' Name='System.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Core.dll' Vital='yes'/>
               <File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.Common.dll' Vital='yes'/>
@@ -147,6 +148,7 @@
               <File Id='System.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.dll' Vital='yes'/>
               <File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
               <File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Process.dll' Vital='yes'/>
+              <File Id='System.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.PerformanceCounter.dll' Vital='yes'/>
               <File Id='System.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.StackTrace.dll' Vital='yes'/>
               <File Id='System.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.TextWriterTraceListener.dll' Vital='yes'/>
               <File Id='System.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Tools.dll' Vital='yes'/>
@@ -239,8 +241,10 @@
               <File Id='System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
               <File Id='System.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.OpenSsl.dll' Vital='yes'/>
               <File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
+              <File Id='System.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.ProtectedData.dll' Vital='yes'/>
               <File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
               <File Id='System.Security.dll' Name='System.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.dll' Vital='yes'/>
+              <File Id='System.Security.Permissions.dll' Name='System.Security.Permissions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Permissions.dll' Vital='yes'/>
               <File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.dll' Vital='yes'/>
               <File Id='System.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.Windows.dll' Vital='yes'/>
               <File Id='System.Security.SecureString.dll' Name='System.Security.SecureString.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.SecureString.dll' Vital='yes'/>
@@ -291,6 +295,7 @@
               <RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Configuration.dll' Name='System.Configuration.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Core.dll' Name='System.Core.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll'  On='uninstall' />
@@ -300,6 +305,7 @@
               <RemoveFile Id='RemoveSystem.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll'  On='uninstall' />
@@ -392,9 +398,11 @@
               <RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll'  On='uninstall' />
+              <RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll'  On='uninstall' />
               <RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll'  On='uninstall' />

@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>

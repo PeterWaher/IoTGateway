@@ -55,6 +55,7 @@
   <Assembly fileName='System.ComponentModel.Primitives.dll'/>
   <Assembly fileName='System.ComponentModel.TypeConverter.dll'/>
   <Assembly fileName='System.Configuration.dll'/>
+  <Assembly fileName='System.Configuration.ConfigurationManager.dll'/>
   <Assembly fileName='System.Console.dll'/>
   <Assembly fileName='System.Core.dll'/>
   <Assembly fileName='System.Data.Common.dll'/>
@@ -65,6 +66,7 @@
   <Assembly fileName='System.Diagnostics.EventLog.dll'/>
   <Assembly fileName='System.Diagnostics.FileVersionInfo.dll'/>
   <Assembly fileName='System.Diagnostics.Process.dll'/>
+  <Assembly fileName='System.Diagnostics.PerformanceCounter.dll'/>
   <Assembly fileName='System.Diagnostics.StackTrace.dll'/>
   <Assembly fileName='System.Diagnostics.TextWriterTraceListener.dll'/>
   <Assembly fileName='System.Diagnostics.Tools.dll'/>
@@ -157,8 +159,10 @@
   <Assembly fileName='System.Security.Cryptography.Encoding.dll'/>
   <Assembly fileName='System.Security.Cryptography.OpenSsl.dll'/>
   <Assembly fileName='System.Security.Cryptography.Primitives.dll'/>
+  <Assembly fileName='System.Security.Cryptography.ProtectedData.dll'/>
   <Assembly fileName='System.Security.Cryptography.X509Certificates.dll'/>
   <Assembly fileName='System.Security.dll'/>
+  <Assembly fileName='System.Security.Permissions.dll'/>
   <Assembly fileName='System.Security.Principal.dll'/>
   <Assembly fileName='System.Security.Principal.Windows.dll'/>
   <Assembly fileName='System.Security.SecureString.dll'/>

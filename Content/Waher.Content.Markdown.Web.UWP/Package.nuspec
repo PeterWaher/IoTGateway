@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Content.Markdown.Web.UWP</id>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <title>Waher.Content.Markdown.Web.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -16,7 +16,7 @@
     <tags>networking communication http uwp</tags>
     <dependencies>
       <group targetFramework="UAP10.0">
-        <dependency id="Waher.Content" version="1.0.25"/>
+        <dependency id="Waher.Content" version="1.0.26"/>
         <dependency id="Waher.Content.Emoji" version="1.0.3"/>
         <dependency id="Waher.Content.Markdown" version="1.0.42"/>
         <dependency id="Waher.Networking.HTTP.UWP" version="1.1.2"/>

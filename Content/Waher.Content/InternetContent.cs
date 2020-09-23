@@ -659,12 +659,6 @@ namespace Waher.Content
 							First = true;
 							foreach (IContentConverter C in Converters)
 							{
-								if (First)
-								{
-									Possibilities[To] = NextStep;
-									First = false;
-								}
-
 								NextStep = new ConversionStep()
 								{
 									From = To,
@@ -673,6 +667,12 @@ namespace Waher.Content
 									Prev = Step,
 									Distance = StepDistance
 								};
+
+								if (First)
+								{
+									Possibilities[To] = NextStep;
+									First = false;
+								}
 
 								Queue.AddLast(NextStep);
 							}

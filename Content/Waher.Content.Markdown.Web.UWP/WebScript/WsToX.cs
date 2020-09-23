@@ -53,14 +53,31 @@ namespace Waher.Content.Markdown.Web.WebScript
 		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, string ToContentType,
 			Stream To, Variables Session)
 		{
-			string Script;
+			DateTime TP = File.GetLastWriteTime(FromFileName);
+			Expression Exp = null;
 
-			using (StreamReader rd = new StreamReader(From))
+			lock (parsed)
 			{
-				Script = rd.ReadToEnd();
+				if (parsed.TryGetValue(FromFileName, out KeyValuePair<Expression, DateTime> Rec) && TP == Rec.Value)
+					Exp = Rec.Key;
 			}
 
-			Expression Exp = new Expression(Script);
+			if (!(Exp is null))
+			{
+				string Script;
+
+				using (StreamReader rd = new StreamReader(From))
+				{
+					Script = rd.ReadToEnd();
+				}
+
+				Exp = new Expression(Script);
+
+				lock (parsed)
+				{
+					parsed[FromFileName] = new KeyValuePair<Expression, DateTime>(Exp, TP);
+				}
+			}
 
 			if (Session is null)
 				Session = new Variables();
@@ -75,6 +92,8 @@ namespace Waher.Content.Markdown.Web.WebScript
 
 			return true;
 		}
+
+		private static readonly Dictionary<string, KeyValuePair<Expression, DateTime>> parsed = new Dictionary<string, KeyValuePair<Expression, DateTime>>();
 
 	}
 }

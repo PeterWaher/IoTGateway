@@ -68,7 +68,7 @@ namespace Waher.Content.Posters
 					Content = new ByteArrayContent(EncodedData)
 				})
 				{
-					Request.Content.Headers.ContentType = new MediaTypeHeaderValue(ContentType);
+					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
 					Getters.WebGetter.PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);

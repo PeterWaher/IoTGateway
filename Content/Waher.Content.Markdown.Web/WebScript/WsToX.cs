@@ -62,7 +62,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 					Exp = Rec.Key;
 			}
 
-			if (!(Exp is null))
+			if (Exp is null)
 			{
 				string Script;
 

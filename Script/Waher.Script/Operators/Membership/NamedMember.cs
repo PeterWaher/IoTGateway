@@ -7,6 +7,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -99,8 +100,7 @@ namespace Waher.Script.Operators.Membership
 								this.methods = Methods?.ToArray();
 								if (this.methods is null)
 								{
-									this.property = T.GetRuntimeProperty("Item");
-									if (!(this.property is null))
+									if (VectorIndex.TryGetIndexProperty(T,out this.property, out _))
 										this.nameIndex = new string[] { this.name };
 								}
 							}
@@ -210,8 +210,7 @@ namespace Waher.Script.Operators.Membership
 			if (!(Field is null))
 				return Expression.Encapsulate(Field.GetValue(Instance));
 
-			Property = T.GetRuntimeProperty("Item");
-			if (!(Property is null))
+			if (VectorIndex.TryGetIndexProperty(T, out Property, out _))
 				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
 
 			if (Operand.IsScalar)

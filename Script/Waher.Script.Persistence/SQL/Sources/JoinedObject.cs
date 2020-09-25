@@ -5,6 +5,7 @@ using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
@@ -109,8 +110,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(FI is null))
 					return new Rec() { FI = FI, Left = true };
 
-				PI = this.leftType.GetRuntimeProperty("Item");
-				if (!(PI is null))
+				if (VectorIndex.TryGetIndexProperty(this.leftType, out PI, out _))
 					return new Rec() { PI = PI, Left = true, Indexed = true };
 			}
 
@@ -124,8 +124,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(FI is null))
 					return new Rec() { FI = FI };
 
-				PI = this.rightType.GetRuntimeProperty("Item");
-				if (!(PI is null))
+				if (VectorIndex.TryGetIndexProperty(this.rightType, out PI, out _))
 					return new Rec() { PI = PI, Indexed = true };
 			}
 
@@ -171,7 +170,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return (obj is JoinedObject Obj && 
+			return (obj is JoinedObject Obj &&
 				this.ObjectId == Obj.ObjectId);
 		}
 

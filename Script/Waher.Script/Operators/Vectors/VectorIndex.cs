@@ -68,10 +68,7 @@ namespace Waher.Script.Operators.Vectors
 				}
 
 				Type T = Object.GetType();
-				PropertyInfo ItemProperty = T.GetRuntimeProperty("Item");
-				ParameterInfo[] Parameters = ItemProperty?.GetIndexParameters();
-
-				if (Parameters is null || Parameters.Length != 1)
+				if (!TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
 					throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
 
 				return EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
@@ -86,6 +83,48 @@ namespace Waher.Script.Operators.Vectors
 				return Vector.Encapsulate(Elements, Node);
 			}
 		}
+
+		/// <summary>
+		/// Tries to get a one-dimensional index property of a Type.
+		/// </summary>
+		/// <param name="T">Type</param>
+		/// <param name="PropertyInfo">Property information of index property.</param>
+		/// <param name="Parameters">Parameter definitions of index property.</param>
+		/// <returns>If a one-dimensional index property was found.</returns>
+		public static bool TryGetIndexProperty(Type T, out PropertyInfo PropertyInfo, out ParameterInfo[] Parameters)
+		{
+			lock (indexProperties)
+			{
+				if (indexProperties.TryGetValue(T, out KeyValuePair<PropertyInfo, ParameterInfo[]> P))
+				{
+					PropertyInfo = P.Key;
+					Parameters = P.Value;
+					return true;
+				}
+
+				foreach (PropertyInfo P2 in T.GetRuntimeProperties())
+				{
+					if (P2.Name != "Item")
+						continue;
+
+					Parameters = P2.GetIndexParameters();
+					if (Parameters is null || Parameters.Length != 1)
+						continue;
+
+					indexProperties[T] = new KeyValuePair<PropertyInfo, ParameterInfo[]>(P2, Parameters);
+					PropertyInfo = P2;
+
+					return true;
+				}
+			}
+
+			PropertyInfo = null;
+			Parameters = null;
+
+			return false;
+		}
+
+		private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>> indexProperties = new Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>>();
 
 		private static IElement EvaluateIndex(object Object, Type T, PropertyInfo ItemProperty, ParameterInfo[] Parameters,
 			IElement Index, ScriptNode Node)

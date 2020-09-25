@@ -16,6 +16,18 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <summary>
 		/// Creates a DateTime value.
 		/// </summary>
+		/// <param name="String">String representation to be parsed.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public DateTime(ScriptNode String, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { String }, argumentTypes1Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a DateTime value.
+		/// </summary>
 		/// <param name="Year">Year</param>
 		/// <param name="Month">Month</param>
 		/// <param name="Day">Day</param>
@@ -89,6 +101,10 @@ namespace Waher.Script.Functions.DateAndTime
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			int i, c = Arguments.Length;
+
+			if (c == 1)
+				return new DateTimeValue(System.DateTime.Parse(Arguments[0].AssociatedObjectValue?.ToString()));
+
 			double[] d = new double[c];
 			DoubleNumber n;
 

@@ -16,6 +16,18 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <summary>
 		/// Creates a TimeSpan value.
 		/// </summary>
+		/// <param name="String">String representation to be parsed.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public TimeSpan(ScriptNode String, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { String }, argumentTypes1Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a TimeSpan value.
+		/// </summary>
 		/// <param name="Hours">Hours</param>
 		/// <param name="Minutes">Minutes</param>
 		/// <param name="Seconds">Seconds</param>
@@ -30,6 +42,22 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <summary>
 		/// Creates a TimeSpan value.
 		/// </summary>
+		/// <param name="Days">Days</param>
+		/// <param name="Hours">Hours</param>
+		/// <param name="Minutes">Minutes</param>
+		/// <param name="Seconds">Seconds</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public TimeSpan(ScriptNode Days, ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Days, Hours, Minutes, Seconds }, argumentTypes4Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a TimeSpan value.
+		/// </summary>
+		/// <param name="Days">Days</param>
 		/// <param name="Hours">Hours</param>
 		/// <param name="Minutes">Minutes</param>
 		/// <param name="Seconds">Seconds</param>
@@ -37,8 +65,8 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public TimeSpan(ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, ScriptNode MSeconds, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Hours, Minutes, Seconds, MSeconds }, argumentTypes4Scalar, Start, Length, Expression)
+		public TimeSpan(ScriptNode Days, ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, ScriptNode MSeconds, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Days, Hours, Minutes, Seconds, MSeconds }, argumentTypes5Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -67,6 +95,10 @@ namespace Waher.Script.Functions.DateAndTime
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			int i, c = Arguments.Length;
+
+			if (c == 1)
+				return new ObjectValue(System.TimeSpan.Parse(Arguments[0].AssociatedObjectValue?.ToString()));
+
 			double[] d = new double[c];
 			DoubleNumber n;
 
@@ -86,6 +118,9 @@ namespace Waher.Script.Functions.DateAndTime
 
 				case 4:
 					return new ObjectValue(new System.TimeSpan((int)d[0], (int)d[1], (int)d[2], (int)d[3]));
+
+				case 5:
+					return new ObjectValue(new System.TimeSpan((int)d[0], (int)d[1], (int)d[2], (int)d[3], (int)d[4]));
 
 				default:
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);

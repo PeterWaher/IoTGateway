@@ -7,6 +7,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Membership;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators.Assignments
 {
@@ -68,8 +69,7 @@ namespace Waher.Script.Operators.Assignments
 				}
 				else
 				{
-					Property = Type.GetRuntimeProperty("Item");
-					if (!(Property is null))
+					if (VectorIndex.TryGetIndexProperty(Type, out Property, out _))
 					{
 						Type = Property.PropertyType;
 						if (Type == typeof(object))

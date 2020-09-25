@@ -4024,6 +4024,15 @@
             Creates a DateTime value.
             </summary>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTime.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="String">String representation to be parsed.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.DateTime.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Creates a DateTime value.
@@ -4087,6 +4096,15 @@
             Creates a TimeSpan value.
             </summary>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.TimeSpan.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a TimeSpan value.
+            </summary>
+            <param name="String">String representation to be parsed.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.TimeSpan.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Creates a TimeSpan value.
@@ -4102,6 +4120,19 @@
             <summary>
             Creates a TimeSpan value.
             </summary>
+            <param name="Days">Days</param>
+            <param name="Hours">Hours</param>
+            <param name="Minutes">Minutes</param>
+            <param name="Seconds">Seconds</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.TimeSpan.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a TimeSpan value.
+            </summary>
+            <param name="Days">Days</param>
             <param name="Hours">Hours</param>
             <param name="Minutes">Minutes</param>
             <param name="Seconds">Seconds</param>
@@ -17534,6 +17565,15 @@
             <param name="NullCheck">If null should be returned if left operand is null.</param>
             <param name="Node">Node performing the operation.</param>
             <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorIndex.TryGetIndexProperty(System.Type,System.Reflection.PropertyInfo@,System.Reflection.ParameterInfo[]@)">
+            <summary>
+            Tries to get a one-dimensional index property of a Type.
+            </summary>
+            <param name="T">Type</param>
+            <param name="PropertyInfo">Property information of index property.</param>
+            <param name="Parameters">Parameter definitions of index property.</param>
+            <returns>If a one-dimensional index property was found.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorIndex.EvaluateIndex(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>

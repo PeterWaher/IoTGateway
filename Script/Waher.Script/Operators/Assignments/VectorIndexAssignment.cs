@@ -55,10 +55,7 @@ namespace Waher.Script.Operators.Assignments
 					throw new ScriptRuntimeException("Vector is null.", this);
 
 				Type T = Object.GetType();
-				PropertyInfo ItemProperty = T.GetRuntimeProperty("Item");
-				ParameterInfo[] Parameters = ItemProperty?.GetIndexParameters();
-
-				if (Parameters is null || Parameters.Length != 1)
+				if (!VectorIndex.TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
 					throw new ScriptRuntimeException("Vector element assignment operates on vectors.", this);
 
 				if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))

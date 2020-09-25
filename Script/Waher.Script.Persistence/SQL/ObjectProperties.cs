@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -106,17 +107,15 @@ namespace Waher.Script.Persistence.SQL
 
 				if (PI is null && FI is null)
 				{
-					PI = this.type.GetRuntimeProperty("Item");
-
-					if (PI is null)
-					{
-						this.properties[Name] = null;
-						return false;
-					}
-					else
+					if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
 					{
 						this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 						return true;
+					}
+					else
+					{
+						this.properties[Name] = null;
+						return false;
 					}
 				}
 				else
@@ -163,12 +162,10 @@ namespace Waher.Script.Persistence.SQL
 					{
 						if (this.dictionary is null)
 						{
-							PI = this.type.GetRuntimeProperty("Item");
-
-							if (PI is null)
-								Rec = null;
-							else
+							if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
 								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+							else
+								Rec = null;
 						}
 						else
 							Rec = null;
@@ -262,12 +259,10 @@ namespace Waher.Script.Persistence.SQL
 
 					if (PI is null && FI is null)
 					{
-						PI = this.type.GetRuntimeProperty("Item");
-
-						if (PI is null)
-							Rec = null;
-						else
+						if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
 							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+						else
+							Rec = null;
 					}
 					else
 						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);

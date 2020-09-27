@@ -238,12 +238,12 @@ namespace Waher.IoTGateway.CodeContent
 			if (!File.Exists(SvgFileName))
 			{
 				string TxtFileName = FileName + ".txt";
-				File.WriteAllText(TxtFileName, Graph, Encoding.Default);
+				File.WriteAllText(TxtFileName, Graph, Encoding.UTF8);
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = javaPath,
-					Arguments = "-jar \"" + jarPath + "\" -tsvg -quiet \"" + TxtFileName + "\" \"" + SvgFileName + "\"",
+					Arguments = "-jar \"" + jarPath + "\" -charset UTF-8 -tsvg -quiet \"" + TxtFileName + "\" \"" + SvgFileName + "\"",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,

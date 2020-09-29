@@ -350,6 +350,9 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+				this.Information("CONNECT");
+
 			await this.Write(PacketData, 0, null);
 			this.inputState = 0;
 		}
@@ -567,9 +570,15 @@ namespace Waher.Networking.MQTT
 				{
 					case MqttControlPacketType.CONNECT:
 					default:
+						if (this.HasSniffers)
+							this.Information("CONNECT");
+
 						throw new Exception("Received command from server that is not handled: " + Header.ControlPacketType.ToString());
 
 					case MqttControlPacketType.CONNACK:
+						if (this.HasSniffers)
+							this.Information("CONNACK");
+
 						bool SessionPresent = (Packet.ReadByte() & 1) != 0;
 						byte ReturnCode = Packet.ReadByte();
 
@@ -610,10 +619,16 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.PINGREQ:
+						if (this.HasSniffers)
+							this.Information("PINGREQ");
+
 						await this.PINGRESP();
 						break;
 
 					case MqttControlPacketType.PINGRESP:
+						if (this.HasSniffers)
+							this.Information("PINGRESP");
+
 						EventHandlerAsync h = this.OnPingResponse;
 						if (h != null)
 						{
@@ -631,6 +646,9 @@ namespace Waher.Networking.MQTT
 
 					case MqttControlPacketType.PUBLISH:
 						string Topic = Packet.ReadString();
+
+						if (this.HasSniffers)
+							this.Information("PUBLISH(" + Header.QualityOfService.ToString() + ":" + Topic + ")");
 
 						if (Header.QualityOfService > MqttQualityOfService.AtMostOnce)
 							Header.PacketIdentifier = Packet.ReadUInt16();
@@ -663,6 +681,9 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.PUBACK:
+						if (this.HasSniffers)
+							this.Information("PUBACK");
+
 						this.PacketDelivered(Header.PacketIdentifier);
 						PacketAcknowledgedEventHandler h2 = this.OnPublished;
 						if (h2 != null)
@@ -679,11 +700,17 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.PUBREC:
+						if (this.HasSniffers)
+							this.Information("PUBREC");
+
 						this.PacketDelivered(Header.PacketIdentifier);
 						await this.PUBREL(Header.PacketIdentifier);
 						break;
 
 					case MqttControlPacketType.PUBREL:
+						if (this.HasSniffers)
+							this.Information("PUBREL");
+
 						lock (this.synchObj)
 						{
 							if (this.contentCache.TryGetValue(Header.PacketIdentifier, out Content))
@@ -698,6 +725,9 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.PUBCOMP:
+						if (this.HasSniffers)
+							this.Information("PUBCOMP");
+
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnPublished;
 						if (h2 != null)
@@ -714,6 +744,9 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.SUBACK:
+						if (this.HasSniffers)
+							this.Information("SUBACK");
+
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnSubscribed;
 						if (h2 != null)
@@ -730,6 +763,9 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.UNSUBACK:
+						if (this.HasSniffers)
+							this.Information("UNSUBACK");
+
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnUnsubscribed;
 						if (h2 != null)
@@ -789,6 +825,9 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+				this.Information("PING");
+
 			await this.Write(PacketData, 0, null);
 
 			EventHandlerAsync h = this.OnPing;
@@ -813,6 +852,9 @@ namespace Waher.Networking.MQTT
 			Packet.WriteUInt(0);
 
 			byte[] PacketData = Packet.GetPacket();
+
+			if (this.HasSniffers)
+				this.Information("PINGRESP");
 
 			return this.Write(PacketData, 0, null);
 		}
@@ -999,6 +1041,9 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+				this.Information("PUBLISH(" + QoS.ToString() + ":" + Topic + ")");
+
 			await this.Write(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
@@ -1035,6 +1080,9 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+				this.Information("PUBREC");
+
 			return this.Write(PacketData, 0, null);
 		}
 
@@ -1047,6 +1095,9 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+				this.Information("PUBREL");
+
 			return this.Write(PacketData, PacketIdentifier, null);
 		}
 
@@ -1058,6 +1109,9 @@ namespace Waher.Networking.MQTT
 			Packet.WriteUInt16(PacketIdentifier);
 
 			byte[] PacketData = Packet.GetPacket();
+
+			if (this.HasSniffers)
+				this.Information("PUBCOMP");
 
 			return this.Write(PacketData, 0, null);
 		}
@@ -1123,6 +1177,30 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				sb.Append("SUBSCRIBE(");
+
+				foreach (KeyValuePair<string, MqttQualityOfService> P in Topics)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(", ");
+
+					sb.Append(P.Value.ToString());
+					sb.Append(':');
+					sb.Append(P.Key);
+				}
+
+				sb.Append(')');
+
+				this.Information(sb.ToString());
+			}
+
 			await this.Write(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
@@ -1181,6 +1259,27 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
+			if (this.HasSniffers)
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				sb.Append("UNSUBSCRIBE(");
+
+				foreach (string Topic in Topics)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(", ");
+
+					sb.Append(Topic);
+				}
+
+				sb.Append(')');
+
+				this.Information(sb.ToString());
+			}
 			await this.Write(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
@@ -1203,7 +1302,7 @@ namespace Waher.Networking.MQTT
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
 		public async Task DisposeAsync()
-		{ 
+		{
 			if (this.state == MqttState.Connected)
 				await this.DISCONNECT();
 
@@ -1235,6 +1334,9 @@ namespace Waher.Networking.MQTT
 			byte[] PacketData = Packet.GetPacket();
 
 			TaskCompletionSource<bool> Done = new TaskCompletionSource<bool>();
+
+			if (this.HasSniffers)
+				this.Information("DISCONNECT");
 
 			await this.Write(PacketData, 0, (sender, e) =>
 			{

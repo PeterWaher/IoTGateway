@@ -196,11 +196,8 @@ namespace Waher.Content.Xml.Text
 				}
 				finally
 				{
-					if (ms != null)
-						ms.Dispose();
-
-					if (w != null)
-						w.Dispose();
+					w?.Dispose();
+					ms?.Dispose();
 				}
 
 				return Result;

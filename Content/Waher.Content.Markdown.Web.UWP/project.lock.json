@@ -2523,7 +2523,7 @@
           }
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2544,8 +2544,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -2556,7 +2556,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -2564,13 +2564,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -5175,7 +5175,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5196,8 +5196,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -5208,7 +5208,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -5216,13 +5216,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -7863,7 +7863,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7884,8 +7884,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -7896,7 +7896,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -7904,13 +7904,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -10524,7 +10524,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10545,8 +10545,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -10557,7 +10557,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -10565,13 +10565,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -13221,7 +13221,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13242,8 +13242,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -13254,7 +13254,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -13262,13 +13262,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -15882,7 +15882,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15903,8 +15903,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -15915,7 +15915,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -15923,13 +15923,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -18579,7 +18579,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.0.26": {
+      "Waher.Content/1.0.27": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18600,8 +18600,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Content": "1.0.26",
-          "Waher.Content.Xml": "1.0.10"
+          "Waher.Content": "1.0.27",
+          "Waher.Content.Xml": "1.0.11"
         }
       },
       "Waher.Content.Markdown/1.0.42": {
@@ -18612,7 +18612,7 @@
           "SkiaSharp": "2.80.2",
           "Waher.Content.Emoji": "1.0.3",
           "Waher.Content.Html": "1.0.11",
-          "Waher.Content.Xml": "1.0.10",
+          "Waher.Content.Xml": "1.0.11",
           "Waher.Runtime.Cache": "1.0.3",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Runtime.Text": "1.0.0",
@@ -18620,13 +18620,13 @@
           "Waher.Script.Graphs": "1.0.16"
         }
       },
-      "Waher.Content.Xml/1.0.10": {
+      "Waher.Content.Xml/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "1.0.26",
+          "Waher.Content": "1.0.27",
           "Waher.Runtime.Inventory": "1.0.13",
           "Waher.Script": "1.0.41"
         }
@@ -28752,7 +28752,7 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
-    "Waher.Content/1.0.26": {
+    "Waher.Content/1.0.27": {
       "type": "project",
       "path": "../Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../Waher.Content/Waher.Content.csproj"
@@ -28772,7 +28772,7 @@
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
     },
-    "Waher.Content.Xml/1.0.10": {
+    "Waher.Content.Xml/1.0.11": {
       "type": "project",
       "path": "../Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../Waher.Content.Xml/Waher.Content.Xml.csproj"

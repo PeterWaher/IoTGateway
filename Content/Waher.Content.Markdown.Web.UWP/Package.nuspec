@@ -16,7 +16,7 @@
     <tags>networking communication http uwp</tags>
     <dependencies>
       <group targetFramework="UAP10.0">
-        <dependency id="Waher.Content" version="1.0.26"/>
+        <dependency id="Waher.Content" version="1.0.27"/>
         <dependency id="Waher.Content.Emoji" version="1.0.3"/>
         <dependency id="Waher.Content.Markdown" version="1.0.42"/>
         <dependency id="Waher.Networking.HTTP.UWP" version="1.1.2"/>

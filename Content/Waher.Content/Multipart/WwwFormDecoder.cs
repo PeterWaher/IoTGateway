@@ -85,7 +85,7 @@ namespace Waher.Content.Multipart
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			Dictionary<string, string> Form = new Dictionary<string, string>();
-			string s = Encoding.GetString(Data);
+			string s = CommonTypes.GetString(Data, Encoding);
 			string Key, Value;
 			int i;
 

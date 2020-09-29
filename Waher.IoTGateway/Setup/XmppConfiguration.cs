@@ -829,7 +829,7 @@ namespace Waher.IoTGateway.Setup
 									else
 										Encoding = InternetContent.GetEncoding(CharSet);
 
-									string XmlResponse = Encoding.GetString(Bin);
+									string XmlResponse = CommonTypes.GetString(Bin, Encoding);
 									XmlDocument Doc = new XmlDocument()
 									{
 										PreserveWhitespace = true

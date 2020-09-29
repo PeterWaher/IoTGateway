@@ -37,7 +37,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			string s = Encoding.UTF8.GetString(Content.Data);
+			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
 			Match M = RegEx.Match(s);
 			if (M.Success && CommonTypes.TryParse(M.Groups["Magnitude"].Value, out this.value, out this.nrDecimals))
 			{

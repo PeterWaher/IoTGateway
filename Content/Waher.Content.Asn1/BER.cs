@@ -243,7 +243,7 @@ namespace Waher.Content.Asn1
 				if (Input.Read(Bin, 0, c) != c)
 					throw new EndOfStreamException();
 
-				string s = Encoding.ASCII.GetString(Bin).Trim();
+				string s = CommonTypes.GetString(Bin, Encoding.ASCII).Trim();
 
 				if (!CommonTypes.TryParse(s, out double d))
 					throw new NotSupportedException("Unsupported REAL value.");
@@ -434,7 +434,7 @@ namespace Waher.Content.Asn1
 		/// <returns>BmpString value</returns>
 		public static string DecodeBmpString(Stream Input)
 		{
-			return Encoding.BigEndianUnicode.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.BigEndianUnicode);
 		}
 
 		/// <summary>
@@ -444,7 +444,7 @@ namespace Waher.Content.Asn1
 		/// <returns>IA5String value</returns>
 		public static string DecodeIa5String(Stream Input)
 		{
-			return Encoding.ASCII.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.ASCII);
 		}
 
 		/// <summary>
@@ -454,7 +454,7 @@ namespace Waher.Content.Asn1
 		/// <returns>VisibleString value</returns>
 		public static string DecodeVisibleString(Stream Input)
 		{
-			return Encoding.ASCII.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.ASCII);
 		}
 
 		/// <summary>
@@ -464,7 +464,7 @@ namespace Waher.Content.Asn1
 		/// <returns>Utf8String value</returns>
 		public static string DecodeUtf8String(Stream Input)
 		{
-			return Encoding.UTF8.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8);
 		}
 
 		/// <summary>
@@ -474,7 +474,7 @@ namespace Waher.Content.Asn1
 		/// <returns>UniversalString value</returns>
 		public static string DecodeUniversalString(Stream Input)
 		{
-			return Encoding.UTF32.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF32);
 		}
 
 		/// <summary>
@@ -484,7 +484,7 @@ namespace Waher.Content.Asn1
 		/// <returns>PrintableString value</returns>
 		public static string DecodePrintableString(Stream Input)
 		{
-			return Encoding.ASCII.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.ASCII);
 		}
 
 		/// <summary>
@@ -494,7 +494,7 @@ namespace Waher.Content.Asn1
 		/// <returns>NumericString value</returns>
 		public static string DecodeNumericString(Stream Input)
 		{
-			return Encoding.ASCII.GetString(DecodeOctetString(Input));
+			return CommonTypes.GetString(DecodeOctetString(Input), Encoding.ASCII);
 		}
 
 		/// <summary>
@@ -504,7 +504,7 @@ namespace Waher.Content.Asn1
 		/// <returns>TIME value</returns>
 		public static TimeSpan DecodeTime(Stream Input)
 		{
-			return TimeSpan.Parse(Encoding.UTF8.GetString(DecodeOctetString(Input)));
+			return TimeSpan.Parse(CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8));
 		}
 
 		/// <summary>
@@ -514,7 +514,7 @@ namespace Waher.Content.Asn1
 		/// <returns>DATE value</returns>
 		public static DateTime DecodeDate(Stream Input)
 		{
-			if (!XML.TryParse(Encoding.UTF8.GetString(DecodeOctetString(Input)), out DateTime TP))
+			if (!XML.TryParse(CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8), out DateTime TP))
 				throw new NotSupportedException("Unsupported DATE format.");
 
 			return TP;
@@ -527,7 +527,7 @@ namespace Waher.Content.Asn1
 		/// <returns>TIME-OF-DAY value</returns>
 		public static TimeSpan DecodeTimeOfDay(Stream Input)
 		{
-			return TimeSpan.Parse(Encoding.UTF8.GetString(DecodeOctetString(Input)));
+			return TimeSpan.Parse(CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8));
 		}
 
 		/// <summary>
@@ -537,7 +537,7 @@ namespace Waher.Content.Asn1
 		/// <returns>DATE-TIME value</returns>
 		public static DateTime DecodeDateTime(Stream Input)
 		{
-			if (!XML.TryParse(Encoding.UTF8.GetString(DecodeOctetString(Input)), out DateTime TP))
+			if (!XML.TryParse(CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8), out DateTime TP))
 				throw new NotSupportedException("Unsupported DATE-TIME format.");
 
 			return TP;
@@ -550,7 +550,7 @@ namespace Waher.Content.Asn1
 		/// <returns>DURATION value</returns>
 		public static Duration DecodeDuration(Stream Input)
 		{
-			if (!Duration.TryParse(Encoding.UTF8.GetString(DecodeOctetString(Input)), out Duration D))
+			if (!Duration.TryParse(CommonTypes.GetString(DecodeOctetString(Input), Encoding.UTF8), out Duration D))
 				throw new NotSupportedException("Unsupported DURATION format.");
 
 			return D;

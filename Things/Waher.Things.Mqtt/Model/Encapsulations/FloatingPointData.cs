@@ -32,7 +32,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			string s = Encoding.UTF8.GetString(Content.Data);
+			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
 			if (CommonTypes.TryParse(s, out double x, out this.nrDecimals))
 			{
 				this.value = x;

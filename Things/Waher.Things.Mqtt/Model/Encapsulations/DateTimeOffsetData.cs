@@ -30,7 +30,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			if (CommonTypes.TryParseRfc822(Encoding.UTF8.GetString(Content.Data), out DateTimeOffset Value))
+			if (CommonTypes.TryParseRfc822(CommonTypes.GetString(Content.Data, Encoding.UTF8), out DateTimeOffset Value))
 			{
 				this.value = Value;
 				this.timestamp = DateTime.Now;

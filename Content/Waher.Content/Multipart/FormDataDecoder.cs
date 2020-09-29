@@ -352,7 +352,7 @@ namespace Waher.Content.Multipart
 					return true;
 
 				case "BASE64":
-					string s = Encoding.ASCII.GetString(Encoded);
+					string s = CommonTypes.GetString(Encoded, Encoding.ASCII);
 					Decoded = Convert.FromBase64String(s);
 					return true;
 
@@ -368,7 +368,6 @@ namespace Waher.Content.Multipart
 
 						if (b == (byte)'=' && j + 2 < k)
 						{
-							b = 0;
 							ch = (char)Encoded[++j];
 
 							if (ch >= '0' && ch <= '9')

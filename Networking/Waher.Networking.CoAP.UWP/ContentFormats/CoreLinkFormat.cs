@@ -116,8 +116,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			LinkDocument Doc = Object as LinkDocument;
-			if (Doc is null)
+			if (!(Object is LinkDocument Doc))
 				throw new ArgumentException("Object not a CoRE link document.", nameof(Object));
 
 			if (Encoding is null)

@@ -88,7 +88,7 @@ namespace Waher.Content.Dsn
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string Dsn = (Encoding ?? Encoding.ASCII).GetString(Data);
+			string Dsn = CommonTypes.GetString(Data, Encoding ?? Encoding.ASCII);
 			List<string[]> Sections = new List<string[]>();
 			List<string> Section = new List<string>();
 

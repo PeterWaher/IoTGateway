@@ -8,7 +8,7 @@ namespace Waher.Networking.CoAP.Options
 	/// </summary>
 	public abstract class CoapOptionString : CoapOption
 	{
-		private string value;
+		private readonly string value;
 
 		/// <summary>
 		/// Base class for all string-valued CoAP options.

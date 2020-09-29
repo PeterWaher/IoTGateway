@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
-using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 
@@ -29,7 +28,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			this.value = long.Parse(Encoding.UTF8.GetString(Content.Data));
+			this.value = long.Parse(CommonTypes.GetString(Content.Data, Encoding.UTF8));
 			this.timestamp = DateTime.Now;
 			this.qos = Content.Header.QualityOfService;
 			this.retain = Content.Header.Retain;

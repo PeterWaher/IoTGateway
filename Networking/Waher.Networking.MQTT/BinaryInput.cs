@@ -10,7 +10,7 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	public class BinaryInput
 	{
-		private MemoryStream ms;
+		private readonly MemoryStream ms;
 
 		/// <summary>
 		/// Class that helps deserialize information stored in a binary packet.

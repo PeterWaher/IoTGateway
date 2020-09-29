@@ -227,7 +227,7 @@ namespace Waher.Things.Mqtt.Model
 		{
 			try
 			{
-				string s = Encoding.UTF8.GetString(Content.Data);
+				string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
 
 				if (long.TryParse(s, out long i))
 				{

@@ -37,7 +37,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			{
 				PreserveWhitespace = true
 			};
-			this.xml = Encoding.UTF8.GetString(Content.Data);
+			this.xml = CommonTypes.GetString(Content.Data, Encoding.UTF8);
 			this.value.LoadXml(this.xml);
 			this.timestamp = DateTime.Now;
 			this.qos = Content.Header.QualityOfService;

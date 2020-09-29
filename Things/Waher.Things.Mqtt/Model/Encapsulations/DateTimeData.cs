@@ -30,7 +30,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void DataReported(MqttContent Content)
 		{
-			this.value = DateTime.Parse(Encoding.UTF8.GetString(Content.Data));
+			this.value = DateTime.Parse(CommonTypes.GetString(Content.Data, Encoding.UTF8));
 			this.timestamp = DateTime.Now;
 			this.qos = Content.Header.QualityOfService;
 			this.retain = Content.Header.Retain;

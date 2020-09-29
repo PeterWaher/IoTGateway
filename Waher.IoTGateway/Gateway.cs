@@ -3918,7 +3918,7 @@ namespace Waher.IoTGateway
 						if (Encoding is null)
 							Encoding = System.Text.Encoding.UTF8;
 
-						Markdown = Encoding.GetString(Content);
+						Markdown = CommonTypes.GetString(Content, Encoding);
 						if (IsText)
 						{
 							MarkdownSettings Settings2 = new MarkdownSettings(null, false);

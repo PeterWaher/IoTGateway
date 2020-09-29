@@ -99,7 +99,7 @@ namespace Waher.Content.Xml.Text
 			}
 			else
 			{
-				string s = Encoding.GetString(Data);
+				string s = CommonTypes.GetString(Data, Encoding);
 				Doc.LoadXml(s);
 			}
 

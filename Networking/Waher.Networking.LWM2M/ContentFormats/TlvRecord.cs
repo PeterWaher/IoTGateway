@@ -10,9 +10,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 	/// </summary>
 	public class TlvRecord
 	{
-		private IdentifierType type;
-		private ushort identifier;
-		private byte[] rawValue;
+		private readonly IdentifierType type;
+		private readonly ushort identifier;
+		private readonly byte[] rawValue;
 
 		/// <summary>
 		/// Data representing one TLV record.
@@ -223,7 +223,8 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			if (this.rawValue.Length != 4)
 				throw new InvalidOperationException("Value is not a single precision floating point number.");
 
-			byte[] Bin = this.rawValue;
+			byte[] Bin;
+
 			if (BitConverter.IsLittleEndian)
 			{
 				Bin = new byte[4];
@@ -254,7 +255,8 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			if (this.rawValue.Length != 8)
 				throw new InvalidOperationException("Value is not a double precision floating point number.");
 
-			byte[] Bin = this.rawValue;
+			byte[] Bin;
+
 			if (BitConverter.IsLittleEndian)
 			{
 				Bin = new byte[8];

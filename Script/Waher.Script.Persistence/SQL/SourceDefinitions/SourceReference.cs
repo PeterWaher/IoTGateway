@@ -75,7 +75,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			else if (E is IVector V)
 				return new VectorSource(Name, Alias, V, Source);
 			else
-				throw new ScriptRuntimeException("Data source type not supported.", Source);
+				throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
 		}
 
 		private static IDataSource GetDataSource(VariableReference Source, string Alias, Variables Variables)

@@ -58,14 +58,14 @@ namespace Waher.Script.Abstraction.Elements
         /// </summary>
         /// <param name="Row">Zero-based row index into the matrix.</param>
         /// <returns>Vector element.</returns>
-        IElement GetRow(int Row);
+        IVector GetRow(int Row);
 
         /// <summary>
         /// Gets a column vector from the matrix.
         /// </summary>
         /// <param name="Column">Zero-based column index into the matrix.</param>
         /// <returns>Vector element.</returns>
-        IElement GetColumn(int Column);
+        IVector GetColumn(int Column);
 
         /// <summary>
         /// Gets a row vector from the matrix.

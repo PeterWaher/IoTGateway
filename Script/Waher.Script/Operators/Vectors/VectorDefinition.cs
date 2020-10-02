@@ -54,7 +54,7 @@ namespace Waher.Script.Operators.Vectors
         /// <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
         /// <param name="Node">Script node from where the encapsulation is done.</param>
         /// <returns>Encapsulated vector.</returns>
-        public static IElement Encapsulate(ICollection<IElement> Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
+        public static IVector Encapsulate(ICollection<IElement> Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
         {
             IElement SuperSetExample = null;
             IElement Element2;
@@ -112,7 +112,13 @@ namespace Waher.Script.Operators.Vectors
             }
 
             if (CanEncapsulateAsMatrix && SameDimensions && Columns.HasValue)
-                return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Node);
+			{
+                IMatrix M = Matrices.MatrixDefinition.Encapsulate(Elements, Node);
+                if (M is IVector V)
+                    return V;
+                else
+                    throw new ScriptRuntimeException("Unable to convert matrix to vector.", Node);
+            }
 
             if (!(CommonSuperSet is null))
             {

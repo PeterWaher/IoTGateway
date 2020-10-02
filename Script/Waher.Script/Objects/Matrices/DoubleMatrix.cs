@@ -677,7 +677,7 @@ namespace Waher.Script.Objects.Matrices
         /// </summary>
         /// <param name="Row">Zero-based row index into the matrix.</param>
         /// <returns>Vector element.</returns>
-        public IElement GetRow(int Row)
+        public IVector GetRow(int Row)
         {
             if (Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
@@ -697,7 +697,7 @@ namespace Waher.Script.Objects.Matrices
         /// </summary>
         /// <param name="Column">Zero-based column index into the matrix.</param>
         /// <returns>Vector element.</returns>
-        public IElement GetColumn(int Column)
+        public IVector GetColumn(int Column)
         {
             if (Column < 0 || Column >= this.columns)
                 throw new ScriptException("Index out of bounds.");

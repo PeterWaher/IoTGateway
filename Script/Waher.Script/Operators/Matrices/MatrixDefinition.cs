@@ -47,7 +47,7 @@ namespace Waher.Script.Operators.Matrices
         /// <param name="Rows">Matrix rows.</param>
         /// <param name="Node">Script node from where the encapsulation is done.</param>
         /// <returns>Encapsulated matrix.</returns>
-        public static IElement Encapsulate(ICollection<IElement> Rows, ScriptNode Node)
+        public static IMatrix Encapsulate(ICollection<IElement> Rows, ScriptNode Node)
         {
             LinkedList<IElement> Elements = new LinkedList<IElement>();
             IVectorSpaceElement Vector;
@@ -83,7 +83,13 @@ namespace Waher.Script.Operators.Matrices
             }
 
             if (!Columns.HasValue || Columns.Value < 0)
-                return Operators.Vectors.VectorDefinition.Encapsulate(Rows, false, Node);
+            {
+                IVector V = Vectors.VectorDefinition.Encapsulate(Rows, false, Node);
+                if (V is IMatrix M)
+                    return M;
+                else
+                    throw new ScriptRuntimeException("Unable to convert vector of vectors to matrix.", Node);
+            }
             else
                 return Encapsulate(Elements, Rows.Count, Columns.Value, Node);
         }

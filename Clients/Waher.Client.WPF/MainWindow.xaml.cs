@@ -87,7 +87,7 @@ namespace Waher.Client.WPF
 				typeof(Script.Graphs.Graph).Assembly,
 				typeof(Script.Fractals.FractalGraph).Assembly,
 				typeof(Script.Persistence.Functions.FindObjects).Assembly,
-				typeof(Script.Statistics.Functions.Beta).Assembly,
+				typeof(Script.Statistics.Functions.RandomNumbers.Beta).Assembly,
 				typeof(Security.IUser).Assembly,
 				typeof(Security.EllipticCurves.PrimeFieldCurve).Assembly);
 

@@ -74,12 +74,12 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Beta">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Beta">
             <summary>
             Generates a random number using the beta distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Beta.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Beta.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the beta distribution.
             </summary>
@@ -90,7 +90,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Beta.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Beta.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the beta distribution.
             </summary>
@@ -100,17 +100,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Beta.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Beta.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Beta.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Beta.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Beta.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Beta.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -118,7 +118,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Beta.NextDouble(System.Double,System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Beta.NextDouble(System.Double,System.Double)">
             <summary>
             Gets a beta distributed random value.
             </summary>
@@ -126,12 +126,12 @@
             <param name="Beta">Beta</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Cauchy">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy">
             <summary>
             Generates a random number using the cauchy distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Cauchy.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the cauchy distribution.
             </summary>
@@ -142,7 +142,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Cauchy.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the cauchy distribution.
             </summary>
@@ -152,17 +152,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Cauchy.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Cauchy.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Cauchy.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -170,7 +170,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Cauchy.NextDouble(System.Double,System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Cauchy.NextDouble(System.Double,System.Double)">
             <summary>
             Gets a cauchy distributed random value.
             </summary>
@@ -178,12 +178,12 @@
             <param name="Scale">Scale of distribution.</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Chi2">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Chi2">
             <summary>
             Generates a random number using the chi squared distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Chi2.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the chi squared distribution.
             </summary>
@@ -193,7 +193,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Chi2.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the chi squared distribution.
             </summary>
@@ -202,17 +202,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Chi2.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Chi2.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Chi2.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -220,19 +220,19 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Chi2.NextDouble(System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Chi2.NextDouble(System.Double)">
             <summary>
             Gets a chi squared distributed random value.
             </summary>
             <param name="Degrees">Degrees of freedom.</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Exponential">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Exponential">
             <summary>
             Generates a random number using the exponential distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Exponential.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the exponential distribution.
             </summary>
@@ -242,7 +242,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Exponential.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the exponential distribution.
             </summary>
@@ -251,7 +251,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Exponential.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the exponential distribution.
             </summary>
@@ -259,17 +259,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Exponential.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Exponential.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Exponential.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -277,18 +277,18 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Exponential.NextDouble">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Exponential.NextDouble">
             <summary>
             Gets a exponentially distributed random value. Distribution has a mean of 0 and standard deviation of 1.
             </summary>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Gamma">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Gamma">
             <summary>
             Generates a random number using the gamma distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Gamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the gamma distribution.
             </summary>
@@ -299,7 +299,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Gamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the gamma distribution.
             </summary>
@@ -309,17 +309,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Gamma.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Gamma.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Gamma.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -327,7 +327,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Gamma.NextDouble(System.Double,System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Gamma.NextDouble(System.Double,System.Double)">
             <summary>
             Gets a gamma distributed random value.
             </summary>
@@ -335,12 +335,12 @@
             <param name="Scale">Scale of distribution.</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Laplace">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Laplace">
             <summary>
             Generates a random number using the laplace distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Laplace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the laplace distribution.
             </summary>
@@ -351,7 +351,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Laplace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the laplace distribution.
             </summary>
@@ -361,17 +361,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Laplace.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Laplace.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Laplace.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -379,7 +379,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Laplace.NextDouble(System.Double,System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Laplace.NextDouble(System.Double,System.Double)">
             <summary>
             Gets a laplace distributed random value.
             </summary>
@@ -387,12 +387,12 @@
             <param name="Scale">Scale of distribution.</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Normal">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Normal">
             <summary>
             Generates a random number using the normal distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the normal distribution.
             </summary>
@@ -403,7 +403,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the normal distribution.
             </summary>
@@ -413,7 +413,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the normal distribution.
             </summary>
@@ -422,7 +422,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the normal distribution.
             </summary>
@@ -430,17 +430,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Normal.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Normal.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Normal.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Normal.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -448,18 +448,18 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Normal.NextDouble">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Normal.NextDouble">
             <summary>
             Gets a normally distributed random value. Distribution has a mean of 0 and standard deviation of 1.
             </summary>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.StudentT">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.StudentT">
             <summary>
             Generates a random number using the student-T distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.StudentT.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the student-T distribution.
             </summary>
@@ -469,7 +469,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.StudentT.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the student-T distribution.
             </summary>
@@ -478,17 +478,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.StudentT.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.StudentT.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.StudentT.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -496,19 +496,19 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.StudentT.NextDouble(System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.StudentT.NextDouble(System.Double)">
             <summary>
             Gets a student-T distributed random value.
             </summary>
             <param name="Degrees">Degrees of freedom.</param>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Uniform">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Uniform">
             <summary>
             Generates a random number using the uniform distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the uniform distribution.
             </summary>
@@ -519,7 +519,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the uniform distribution.
             </summary>
@@ -529,7 +529,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the uniform distribution.
             </summary>
@@ -538,7 +538,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the uniform distribution.
             </summary>
@@ -546,17 +546,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Uniform.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Uniform.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -564,24 +564,24 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.NextULong">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.NextULong">
             <summary>
             Gets a random 64-bit unsigned integer.
             </summary>
             <returns>Random value.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Uniform.NextDouble">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Uniform.NextDouble">
             <summary>
             Gets a random value in [0,1).
             </summary>
             <returns>Random value.</returns>
         </member>
-        <member name="T:Waher.Script.Statistics.Functions.Weibull">
+        <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Weibull">
             <summary>
             Generates a random number using the weibull distribution.
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Weibull.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the weibull distribution.
             </summary>
@@ -592,7 +592,7 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Weibull.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Generates a random number using the weibull distribution.
             </summary>
@@ -602,17 +602,17 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Weibull.FunctionName">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.Statistics.Functions.Weibull.DefaultArgumentNames">
+        <member name="P:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Weibull.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -620,7 +620,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Statistics.Functions.Weibull.NextDouble(System.Double,System.Double)">
+        <member name="M:Waher.Script.Statistics.Functions.RandomNumbers.Weibull.NextDouble(System.Double,System.Double)">
             <summary>
             Gets a weibull distributed random value.
             </summary>

@@ -7,7 +7,7 @@ using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
-namespace Waher.Script.Statistics.Functions
+namespace Waher.Script.Statistics.Functions.RandomNumbers
 {
 	/// <summary>
 	/// Generates a random number using the gamma distribution.

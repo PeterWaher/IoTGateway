@@ -53,38 +53,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 
 		private IElement DoSave(object Obj, string FileName, Variables Variables)
 		{
-			if (Obj is IMatrix M)
-			{
-				string[][] Records;
-				string[] Record;
-				int x, y;
-				int Rows = M.Rows;
-				int Cols = M.Columns;
-				IElement Element;
-
-				Records = new string[Rows][];
-
-				for (y = 0; y < Rows; y++)
-				{
-					Record = new string[Cols];
-					Records[y] = Record;
-
-					for (x = 0; x < Cols; x++)
-					{
-						Element = M.GetElement(x, y);
-						Record[x] = Element.ToString();
-					}
-				}
-
-				Obj = Records;
-			}
-			else if (Obj is Graph G)
+			if (Obj is Graph G)
 				Obj = G.CreateBitmap(Variables);
 
 			byte[] Bin = null;
 
 			if (InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType) &&
-				InternetContent.Encodes(Obj, out Grade Grade, out IContentEncoder Encoder, ContentType))
+				InternetContent.Encodes(Obj, out Grade _, out IContentEncoder Encoder, ContentType))
 			{
 				Bin = Encoder.Encode(Obj, System.Text.Encoding.UTF8, out ContentType, ContentType);
 			}

@@ -1390,6 +1390,7 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | Function                        | Description | Example |
 |---------------------------------|-------------|---------|
 | `Md5(Data)`                     | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
+| `RandomBytes(NrBytes)`          | Generates an array of `N` random bytes. | [Example][RandomBytesExample] |
 | `Sha1(Data)`                    | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
 | `Sha1HMac(Data,Key)`            | Calculates a SHA-1 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha1HmacExample] |
 | `Sha2_256(Data)`                | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2256Example] |
@@ -1404,6 +1405,7 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Sha3_512(Data)`                | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
 
 [Md5Example]: Prompt.md?Expression=Md5(Utf8Encode(%22Hello%22))
+[RandomBytesExample]: Prompt.md?Expression=Base64Encode(RandomBytes(128))
 [Sha1Example]: Prompt.md?Expression=Sha1(Utf8Encode(%22Hello%22))
 [Sha1HmacExample]: Prompt.md?Expression=Sha1HMac(Utf8Encode(%22Hello%22),Utf8Encode(%22World%22))
 [Sha2256Example]: Prompt.md?Expression=Sha2_256(Utf8Encode(%22Hello%22))

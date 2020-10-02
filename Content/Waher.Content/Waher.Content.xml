@@ -456,6 +456,20 @@
             <param name="Csv">CSV</param>
             <returns>Parsed content.</returns>
         </member>
+        <member name="M:Waher.Content.CSV.Encode(System.String[][])">
+            <summary>
+            Encodes records as a Comma-separated values string.
+            </summary>
+            <param name="Records">Records</param>
+            <returns>CSV-string</returns>
+        </member>
+        <member name="M:Waher.Content.CSV.Encode(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Encodes a matrix as a Comma-separated values string.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <returns>CSV-string</returns>
+        </member>
         <member name="T:Waher.Content.Duration">
             <summary>
             Represents a duration value, as defined by the xsd:duration data type:
@@ -1928,37 +1942,37 @@
             Disposes of the object, and deletes the temporary file.
             </summary>
         </member>
-        <member name="T:Waher.Content.Text.CsvDecoder">
+        <member name="T:Waher.Content.Text.CsvCodec">
             <summary>
-            CSV decoder.
+            CSV codec.
             </summary>
         </member>
-        <member name="M:Waher.Content.Text.CsvDecoder.#ctor">
+        <member name="M:Waher.Content.Text.CsvCodec.#ctor">
             <summary>
-            CSV decoder.
+            CSV codec.
             </summary>
         </member>
-        <member name="F:Waher.Content.Text.CsvDecoder.CsvContentTypes">
-            <summary>
-            CSV content types.
-            </summary>
-        </member>
-        <member name="F:Waher.Content.Text.CsvDecoder.CsvFileExtensions">
+        <member name="F:Waher.Content.Text.CsvCodec.CsvContentTypes">
             <summary>
             CSV content types.
             </summary>
         </member>
-        <member name="P:Waher.Content.Text.CsvDecoder.ContentTypes">
+        <member name="F:Waher.Content.Text.CsvCodec.CsvFileExtensions">
+            <summary>
+            CSV content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.CsvCodec.ContentTypes">
             <summary>
             Supported content types.
             </summary>
         </member>
-        <member name="P:Waher.Content.Text.CsvDecoder.FileExtensions">
+        <member name="P:Waher.Content.Text.CsvCodec.FileExtensions">
             <summary>
             Supported file extensions.
             </summary>
         </member>
-        <member name="M:Waher.Content.Text.CsvDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+        <member name="M:Waher.Content.Text.CsvCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
             <summary>
             If the decoder decodes an object with a given content type.
             </summary>
@@ -1966,7 +1980,7 @@
             <param name="Grade">How well the decoder decodes the object.</param>
             <returns>If the decoder can decode an object with the given type.</returns>
         </member>
-        <member name="M:Waher.Content.Text.CsvDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+        <member name="M:Waher.Content.Text.CsvCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
             <summary>
             Decodes an object.
             </summary>
@@ -1978,13 +1992,33 @@
             <returns>Decoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
         </member>
-        <member name="M:Waher.Content.Text.CsvDecoder.TryGetContentType(System.String,System.String@)">
+        <member name="M:Waher.Content.Text.CsvCodec.TryGetContentType(System.String,System.String@)">
             <summary>
             Tries to get the content type of an item, given its file extension.
             </summary>
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.CsvCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.CsvCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
         <member name="T:Waher.Content.Text.JsonDecoder">
             <summary>

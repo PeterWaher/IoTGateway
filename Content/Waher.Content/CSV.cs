@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
+using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Comparisons;
 
 namespace Waher.Content
 {
@@ -190,6 +196,118 @@ namespace Waher.Content
 				Records.Add(Fields.ToArray());
 
 			return Records.ToArray();
+		}
+
+		/// <summary>
+		/// Encodes records as a Comma-separated values string.
+		/// </summary>
+		/// <param name="Records">Records</param>
+		/// <returns>CSV-string</returns>
+		public static string Encode(string[][] Records)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First;
+
+			foreach (string[] Record in Records)
+			{
+				First = true;
+
+				foreach (string Field in Record)
+				{
+					bool Comma = false;
+					bool Control = false;
+					bool Quote = false;
+
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
+
+					if (Field is null)
+						continue;
+
+					foreach (char ch in Field)
+					{
+						if (ch == ',')
+							Comma = true;
+						else if (ch == '"')
+							Quote = true;
+						else if (ch < ' ')
+							Control = true;
+					}
+
+					if (Comma || Quote || Control)
+					{
+						string Escaped = Field;
+
+						if (Quote)
+							Escaped = Escaped.Replace("\"", "\\\"");
+
+						if (Control)
+						{
+							Escaped = Escaped.
+								Replace("\a", "\\a").
+								Replace("\b", "\\b").
+								Replace("\f", "\\f").
+								Replace("\n", "\\n").
+								Replace("\r", "\\r").
+								Replace("\t", "\\t").
+								Replace("\v", "\\v");
+						}
+
+						sb.Append('"');
+						sb.Append(Escaped);
+						sb.Append('"');
+					}
+					else
+						sb.Append(Field);
+				}
+
+				sb.AppendLine();
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Encodes a matrix as a Comma-separated values string.
+		/// </summary>
+		/// <param name="Matrix">Matrix</param>
+		/// <returns>CSV-string</returns>
+		public static string Encode(IMatrix Matrix)
+		{
+			List<string[]> Records = new List<string[]>();
+			List<string> Fields = new List<string>();
+
+			if (Matrix is ObjectMatrix M)
+			{
+				if (!(M.ColumnNames is null))
+					Records.Add(M.ColumnNames);
+			}
+
+			int Row, NrRows = Matrix.Rows;
+			int Column, NrColumns = Matrix.Columns;
+			IElement E;
+
+			for (Row = 0; Row < NrRows; Row++)
+			{
+				for (Column = 0; Column < NrColumns; Column++)
+				{
+					E = Matrix.GetElement(Column, Row);
+
+					if (E is StringValue S)
+						Fields.Add(S.Value);
+					else if (E is DoubleNumber D)
+						Fields.Add(CommonTypes.Encode(D.Value));
+					else
+						Fields.Add(E.AssociatedObjectValue?.ToString());
+				}
+
+				Records.Add(Fields.ToArray());
+				Fields.Clear();
+			}
+
+			return Encode(Records.ToArray());
 		}
 
 		#endregion

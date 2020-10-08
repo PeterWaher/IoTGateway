@@ -308,7 +308,7 @@ namespace Waher.Networking.DNS.Communication
 			TP = this.scheduler.Add(DateTime.Now.AddMilliseconds(Timeout), (P) =>
 			{
 				((TaskCompletionSource<DnsMessage>)P).TrySetException(
-					new TimeoutException("No response returned within the given time."));
+					new TimeoutException("No DNS response returned within the given time."));
 			}, Result);
 
 			this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>

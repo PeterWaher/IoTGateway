@@ -892,16 +892,17 @@ The following table lists available string-related functions:
 
 ### Date and Time Functions
 
-| Function                                              | Description                                 | Example                               |
-|-------------------------------------------------------|---------------------------------------------|---------------------------------------|
-| `DateTime(s)`                                         | Parses a Date and Time value from a string. | `DateTime("2016-03-05T14:34:12.302")` |
-| `DateTime(Year,Month,Day)`                            | Creates a Date value.                       | `DateTime(2016,03,05)`                |
-| `DateTime(Year,Month,Day,Hour,Minute,Second)`         | Creates a Date and Time value.              | `DateTime(2016,03,05,19,17,23)`       |
-| `DateTime(Year,Month,Day,Hour,Minute,Second,MSecond)` | Creates a Date and Time value.              | `DateTime(2016,03,05,19,17,23,123)`   |
-| `TimeSpan(s)`                                         | Parses a TimeSpan value from a string.      | `TimeSpan("14:34:12")`                |
-| `TimeSpan(Hour,Minute,Second)`                        | Creates a TimeSpan value.                   | `TimeSpan(14,34,12)`                  |
-| `TimeSpan(Day,Hour,Minute,Second)`                    | Creates a TimeSpan value.                   | `TimeSpan(2,14,34,12)`                |
-| `TimeSpan(Day,Hour,Minute,Second,MSecond)`            | Creates a TimeSpan value.                   | `TimeSpan(2,14,34,12,123)`            |
+| Function                                              | Description                                                           | Example                               |
+|-------------------------------------------------------|-----------------------------------------------------------------------|---------------------------------------|
+| `DateTime(s)`                                         | Parses a Date and Time value from a string.                           | `DateTime("2016-03-05T14:34:12.302")` |
+| `DateTime(Ticks)`                                     | Creates a Date and Time value from the number of ticks it represents. | `DateTime(Now.Ticks)`                 |
+| `DateTime(Year,Month,Day)`                            | Creates a Date value.                                                 | `DateTime(2016,03,05)`                |
+| `DateTime(Year,Month,Day,Hour,Minute,Second)`         | Creates a Date and Time value.                                        | `DateTime(2016,03,05,19,17,23)`       |
+| `DateTime(Year,Month,Day,Hour,Minute,Second,MSecond)` | Creates a Date and Time value.                                        | `DateTime(2016,03,05,19,17,23,123)`   |
+| `TimeSpan(s)`                                         | Parses a TimeSpan value from a string.                                | `TimeSpan("14:34:12")`                |
+| `TimeSpan(Hour,Minute,Second)`                        | Creates a TimeSpan value.                                             | `TimeSpan(14,34,12)`                  |
+| `TimeSpan(Day,Hour,Minute,Second)`                    | Creates a TimeSpan value.                                             | `TimeSpan(2,14,34,12)`                |
+| `TimeSpan(Day,Hour,Minute,Second,MSecond)`            | Creates a TimeSpan value.                                             | `TimeSpan(2,14,34,12,123)`            |
 
 ### Vector Functions
 

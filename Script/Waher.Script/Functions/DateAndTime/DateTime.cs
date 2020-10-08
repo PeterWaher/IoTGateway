@@ -103,7 +103,16 @@ namespace Waher.Script.Functions.DateAndTime
 			int i, c = Arguments.Length;
 
 			if (c == 1)
-				return new DateTimeValue(System.DateTime.Parse(Arguments[0].AssociatedObjectValue?.ToString()));
+			{
+				object Obj = Arguments[0].AssociatedObjectValue;
+
+				if (Obj is long L)
+					return new DateTimeValue(new System.DateTime(L));
+				else if (Obj is double Dbl)
+					return new DateTimeValue(new System.DateTime((long)Dbl));
+				else
+					return new DateTimeValue(System.DateTime.Parse(Obj?.ToString()));
+			}
 
 			double[] d = new double[c];
 			DoubleNumber n;

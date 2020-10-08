@@ -15,7 +15,7 @@
     <copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</copyright>
     <tags>mock networking iot app uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.27"/>
+      <dependency id="Waher.Content" version="1.0.28"/>
       <dependency id="Waher.Content.Xml" version="1.0.11"/>
       <dependency id="Waher.Events" version="1.0.12"/>
       <dependency id="Waher.Networking.UWP" version="1.0.17"/>

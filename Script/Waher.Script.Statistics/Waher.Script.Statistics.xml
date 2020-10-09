@@ -39,6 +39,142 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Statistics.Functions.Analytic.Gamma">
+            <summary>
+            Gamma function Γ(z)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Gamma.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gamma function Γ(z)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.Gamma.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.Gamma.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Gamma.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.Gamma.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma">
+            <summary>
+            Lower Incomplete Gamma function γ(a,z)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Lower Incomplete Gamma function γ(a,z)
+            </summary>
+            <param name="Argument1">a</param>
+            <param name="Argument2">z</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.EvaluateScalar(System.Double,System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.LowerIncompleteGamma.EvaluateScalar(System.Numerics.Complex,System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma">
+            <summary>
+            Upper Incomplete Gamma function Γ(a,z)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Upper Incomplete Gamma function Γ(a,z)
+            </summary>
+            <param name="Argument1">a</param>
+            <param name="Argument2">z</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the function, null is returned.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.EvaluateScalar(System.Double,System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Analytic.UpperIncompleteGamma.EvaluateScalar(System.Numerics.Complex,System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Statistics.Functions.Histogram">
             <summary>
             Computes a histogram from a set of data.
@@ -627,6 +763,87 @@
             <param name="Shape">Shape of distribution.</param>
             <param name="Scale">Scale of distribution.</param>
             <returns>Random value.</returns>
+        </member>
+        <member name="T:Waher.Script.Statistics.StatMath">
+            <summary>
+            Contains Numerical Methods to compute mathematical functions needed for probabilistic computations.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Erf(System.Double)">
+            <summary>
+            Error function erf(x)
+            </summary>
+            <param name="x">Argument</param>
+            <returns>erf(x)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Erf(System.Numerics.Complex)">
+            <summary>
+            Error function erf(z)
+            </summary>
+            <param name="z">Argument</param>
+            <returns>erf(z)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Γ(System.Double)">
+            <summary>
+            Gamma function Γ(x), for real-valued arguments.
+            </summary>
+            <param name="x">Real-valued argument</param>
+            <returns>Γ(x)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Γ(System.Numerics.Complex)">
+            <summary>
+            Gamma function Γ(x), for real-valued arguments.
+            </summary>
+            <param name="z">Real-valued argument</param>
+            <returns>Γ(x)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.γ(System.Double,System.Double)">
+            <summary>
+            Incomplete gamma function γ(a,x)→Γ(a),x→∞
+            </summary>
+            <param name="a">First argument</param>
+            <param name="x">Second argument</param>
+            <returns>γ(a,x)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.γ(System.Numerics.Complex,System.Numerics.Complex)">
+            <summary>
+            Incomplete gamma function γ(a,z)→Γ(a),z→∞
+            </summary>
+            <param name="a">First argument</param>
+            <param name="z">Second argument</param>
+            <returns>γ(a,z)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Γ(System.Double,System.Double)">
+            <summary>
+            Incomplete gamma function Γ(a,x), γ(a,x)+Γ(a,x)=Γ(a)
+            </summary>
+            <param name="a">First argument</param>
+            <param name="x">Second argument</param>
+            <returns>Γ(a,x)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Γ(System.Numerics.Complex,System.Numerics.Complex)">
+            <summary>
+            Incomplete gamma function Γ(a,z), γ(a,z)+Γ(a,z)=Γ(a)
+            </summary>
+            <param name="a">First argument</param>
+            <param name="z">Second argument</param>
+            <returns>Γ(a,z)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Β(System.Double,System.Double)">
+            <summary>
+            Beta-function Β(a,b)
+            </summary>
+            <param name="a">First argument</param>
+            <param name="b">Second argument</param>
+            <returns>Β(a,b)</returns>
+        </member>
+        <member name="M:Waher.Script.Statistics.StatMath.Β(System.Numerics.Complex,System.Numerics.Complex)">
+            <summary>
+            Beta-function Β(a,b)
+            </summary>
+            <param name="a">First argument</param>
+            <param name="b">Second argument</param>
+            <returns>Β(a,b)</returns>
         </member>
     </members>
 </doc>

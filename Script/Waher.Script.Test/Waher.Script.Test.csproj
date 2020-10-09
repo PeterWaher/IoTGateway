@@ -78,6 +78,7 @@
     <Compile Include="ScriptGraphTests.cs" />
     <Compile Include="ScriptParsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatMathTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
@@ -107,6 +108,10 @@
     <ProjectReference Include="..\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
       <Name>Waher.Script.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
+      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
+      <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Xml\Waher.Script.Xml.csproj">
       <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>

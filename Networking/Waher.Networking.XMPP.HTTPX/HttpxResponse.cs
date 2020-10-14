@@ -31,13 +31,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		private P2P.SOCKS5.OutgoingStream socks5Output = null;
 		private int pos;
 		private bool cancelled = false;
+		private byte[] tail = null;
 
 		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From, int MaxChunkSize,
 			InBandBytestreams.IbbClient IbbClient, P2P.SOCKS5.Socks5Proxy Socks5Proxy) : base()
 		{
 			this.client = Client;
 			this.e2e = E2e;
-            this.ibbClient = IbbClient;
+			this.ibbClient = IbbClient;
 			this.socks5Proxy = Socks5Proxy;
 			this.id = Id;
 			this.to = To;
@@ -98,7 +99,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.response.Append(CommonTypes.Encode(this.e2e != null));
 						this.response.Append("'/></data>");
 						this.ReturnResponse();
-                        
+
 						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e);
 						this.socks5Output.OnAbort += this.OnAbort;
 
@@ -181,7 +182,12 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.response = null;
 
 				if (this.chunked.HasValue && !this.chunked.Value)
+				{
+					if (!(this.tail is null))
+						this.response.Append(Convert.ToBase64String(this.tail));
+
 					Resp.Append("</base64></data>");
+				}
 
 				Resp.Append("</resp>");
 
@@ -235,7 +241,38 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 			else
-				this.response.Append(Convert.ToBase64String(Buffer, Offset, NrBytes));
+			{
+				int i = this.tail?.Length ?? 0;
+				int c = i + NrBytes;
+				int d = c % 3;
+
+				if (this.tail is null && d == 0)
+					this.response.Append(Convert.ToBase64String(Buffer, Offset, NrBytes));
+				else
+				{
+					c -= d;
+
+					byte[] Bin = new byte[c];
+					int j;
+
+					if (i > 0)
+						Array.Copy(this.tail, 0, Bin, 0, i);
+
+					Array.Copy(Buffer, Offset, Bin, i, j = c - i);
+
+					if (d == 0)
+						this.tail = null;
+					else
+					{
+						if (this.tail is null || this.tail.Length != d)
+							this.tail = new byte[d];
+
+						Array.Copy(Buffer, Offset + j, this.tail, 0, d);
+					}
+			
+					this.response.Append(Convert.ToBase64String(Bin));
+				}
+			}
 
 			return true;
 		}
@@ -276,7 +313,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			TaskCompletionSource<bool> ChunkSent = new TaskCompletionSource<bool>();
 
 			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
-				string.Empty, string.Empty, (sender,e) =>
+				string.Empty, string.Empty, (sender, e) =>
 				{
 					ChunkSent.TrySetResult(true);
 					return Task.CompletedTask;

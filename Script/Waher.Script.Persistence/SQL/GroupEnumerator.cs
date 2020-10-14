@@ -111,8 +111,21 @@ namespace Waher.Script.Persistence.SQL
 				Type T = o1.GetType();
 				if (T != this.lastType)
 				{
+					List<PropertyInfo> Properties = new List<PropertyInfo>();
+
+					foreach (PropertyInfo PI in T.GetRuntimeProperties())
+					{
+						if (!PI.CanRead || !PI.CanWrite)
+							continue;
+
+						if (PI.GetIndexParameters().Length > 0)
+							continue;
+
+						Properties.Add(PI);
+					}
+
 					this.lastType = T;
-					this.properties = T.GetRuntimeProperties();
+					this.properties = Properties.ToArray();
 					this.fields = T.GetRuntimeFields();
 				}
 
@@ -121,9 +134,6 @@ namespace Waher.Script.Persistence.SQL
 
 				foreach (PropertyInfo PI in this.properties)
 				{
-					if (!PI.CanRead || !PI.CanWrite)
-						continue;
-
 					if (!Aggregated.TryGetValue(PI.Name, out List<object> List))
 					{
 						List = new List<object>();

@@ -122,21 +122,7 @@ namespace Waher.Script.Persistence.SQL
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
-			if (this.orderBy != null)
-			{
-				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
-				{
-					if (Node.Key is VariableReference Ref)
-						OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, Node.Value));
-					else
-					{
-						CalculatedOrder = true;
-						break;
-					}
-				}
-			}
-
-			if (this.groupBy != null && !CalculatedOrder)
+			if (this.groupBy != null)
 			{
 				foreach (ScriptNode Node in this.groupBy)
 				{
@@ -156,6 +142,20 @@ namespace Waher.Script.Persistence.SQL
 						if (!Found)
 							OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, true));
 					}
+					else
+					{
+						CalculatedOrder = true;
+						break;
+					}
+				}
+			}
+
+			if (this.orderBy != null && !CalculatedOrder)
+			{
+				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
+				{
+					if (Node.Key is VariableReference Ref)
+						OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, Node.Value));
 					else
 					{
 						CalculatedOrder = true;

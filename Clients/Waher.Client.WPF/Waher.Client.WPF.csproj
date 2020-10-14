@@ -476,6 +476,10 @@
       <Project>{6055882c-4fbb-4336-98e2-fa7594d6f143}</Project>
       <Name>Waher.Script.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj">
+      <Project>{ec208ca9-1bd1-4492-879d-0f1f818f2729}</Project>
+      <Name>Waher.Script.Cryptography</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
       <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
       <Name>Waher.Script.Fractals</Name>

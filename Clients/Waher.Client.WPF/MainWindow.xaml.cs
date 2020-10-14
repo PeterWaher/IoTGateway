@@ -84,6 +84,7 @@ namespace Waher.Client.WPF
 				typeof(RuntimeSettings).Assembly,
 				typeof(Script.Expression).Assembly,
 				typeof(Script.Content.Functions.Encoding.Decode).Assembly,
+				typeof(Script.Cryptography.Functions.RandomBytes).Assembly,
 				typeof(Script.Graphs.Graph).Assembly,
 				typeof(Script.Fractals.FractalGraph).Assembly,
 				typeof(Script.Persistence.Functions.FindObjects).Assembly,

@@ -272,6 +272,7 @@
               <File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
               <File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.dll' Vital='yes'/>
+							<File Id='Waher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.SHA3.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Client.WPF.application' Name='Waher.Client.WPF.application' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Client.WPF.exe' Name='Waher.Client.WPF.exe' On='uninstall'/>
@@ -316,6 +317,7 @@
               <RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
             </Component>
             <Component Id='MainDebugFiles' Guid='2A936317-68FE-40F9-AC44-4242C32FAAF7'>
@@ -369,6 +371,7 @@
               <File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
               <File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
+							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
               <RemoveFile Id='RemoveWaher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
@@ -420,6 +423,7 @@
               <RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
             </Component>
 						<Directory Id='Graphics' Name='Graphics'>

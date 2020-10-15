@@ -21,7 +21,7 @@ XEP-0118: User Tune</description>
     <copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</copyright>
     <tags>networking communication xmpp pep Personal Eventing XEP-0163 XEP-0080 XEP-0084 XEP-0107 XEP-0108 XEP-0118 user location avatar mood activity tune uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.0.28"/>
+      <dependency id="Waher.Content" version="1.0.29"/>
       <dependency id="Waher.Content.Xml" version="1.0.11"/>
       <dependency id="Waher.Events" version="1.0.12"/>
       <dependency id="Waher.Networking.UWP" version="1.0.17"/>

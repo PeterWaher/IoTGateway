@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content
 {
@@ -702,6 +703,77 @@ namespace Waher.Content
 						}
 
 						Encode(e.Current, Indent, Json);
+					}
+
+					if (!First && Indent.HasValue)
+					{
+						Json.AppendLine();
+						Indent--;
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append(']');
+				}
+				else if (Object is ObjectMatrix M && !(M.ColumnNames is null))
+				{
+					bool First = true;
+
+					Json.Append('[');
+
+					if (Indent.HasValue)
+						Indent++;
+
+					foreach (IElement Element in M.VectorElements)
+					{
+						if (First)
+						{
+							First = false;
+							Encode(M.ColumnNames, Indent, Json);
+						}
+						
+						Json.Append(',');
+
+						if (Indent.HasValue)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
+
+						Encode(Element.AssociatedObjectValue, Indent, Json);
+					}
+
+					if (!First && Indent.HasValue)
+					{
+						Json.AppendLine();
+						Indent--;
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append(']');
+				}
+				else if (Object is IVector V)
+				{
+					bool First = true;
+
+					Json.Append('[');
+
+					if (Indent.HasValue)
+						Indent++;
+
+					foreach (IElement Element in V.VectorElements)
+					{
+						if (First)
+							First = false;
+						else
+							Json.Append(',');
+
+						if (Indent.HasValue)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
+
+						Encode(Element.AssociatedObjectValue, Indent, Json);
 					}
 
 					if (!First && Indent.HasValue)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Text
 {
@@ -126,6 +127,7 @@ namespace Waher.Content.Text
 				}
 				else if (Object is null ||
 					Object is IEnumerable ||
+					Object is IVector ||
 					Object is string ||
 					Object is bool ||
 					Object is decimal ||

@@ -40,8 +40,8 @@ namespace Waher.Content
 			get { return this.conversionGrade; }
 		}
 
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, string ToContentType, 
-            Stream To, Variables Session)
+		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
+			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
 		{
 			Stream Intermediate = null;
 			Stream Intermediate2 = null;
@@ -59,8 +59,8 @@ namespace Waher.Content
 
 					if (i == c - 1)
 					{
-						if (this.sequence[i].Value.Convert(FromType, Intermediate, FromFileName, LocalResourceName, URL, ToContentType,
-							To, Session))
+						if (this.sequence[i].Value.Convert(FromType, Intermediate, FromFileName, LocalResourceName, URL, ref ToContentType,
+							To, Session, PossibleContentTypes))
 						{
 							Dynamic = true;
 						}
@@ -75,7 +75,7 @@ namespace Waher.Content
 							Intermediate2 = new TemporaryFile();
 
 						if (this.sequence[i].Value.Convert(FromType, Intermediate ?? From, FromFileName, LocalResourceName,
-							URL, ToContentType, Intermediate2, Session))
+							URL, ref ToType, Intermediate2, Session))
 						{
 							Dynamic = true;
 						}
@@ -83,9 +83,8 @@ namespace Waher.Content
 						FromFileName = string.Empty;
 						LocalResourceName = string.Empty;
 
-						if (Intermediate != null)
-							Intermediate.Dispose();
-
+						Intermediate?.Dispose();
+						
 						Intermediate = Intermediate2;
 						Intermediate.Position = 0;
 
@@ -95,11 +94,8 @@ namespace Waher.Content
 			}
 			finally
 			{
-				if (Intermediate != null)
-					Intermediate.Dispose();
-
-				if (Intermediate2 != null)
-					Intermediate2.Dispose();
+				Intermediate?.Dispose();
+				Intermediate2?.Dispose();
 			}
 
 			return Dynamic;

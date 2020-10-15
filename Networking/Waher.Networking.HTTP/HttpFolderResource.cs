@@ -224,7 +224,7 @@ namespace Waher.Networking.HTTP
 
 				ex = e.Exception;
 				if (ex is null)
-					return;		// Sent asynchronously from event handler.
+					return;     // Sent asynchronously from event handler.
 			}
 
 			Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
@@ -529,8 +529,25 @@ namespace Waher.Networking.HTTP
 								Request.Session["Response"] = Response;
 							}
 
+							List<string> Alternatives = null;
+							string[] Range = Converter.ToContentTypes;
+
+							foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
+							{
+								if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
+									continue;
+
+								if (Array.IndexOf<string>(Range, AcceptRecord.Item) >= 0)
+								{
+									if (Alternatives is null)
+										Alternatives = new List<string>();
+
+									Alternatives.Add(AcceptRecord.Item);
+								}
+							}
+
 							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false),
-								NewContentType, f2, Request.Session))
+								ref NewContentType, f2, Request.Session, Alternatives?.ToArray()))
 							{
 								Dynamic = true;
 							}

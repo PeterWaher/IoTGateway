@@ -46,11 +46,14 @@ namespace Waher.Content
 		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="URL">URL of resource, if accessed from a web server.</param>
-		/// <param name="ToContentType">Content type of the content to convert to.</param>
+		/// <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
+		/// the converter finds a better option.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
+		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
+		/// Can be null if there are no alternatives.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, string ToContentType, 
-            Stream To, Variables Session);
+		bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, ref string ToContentType, 
+            Stream To, Variables Session, params string[] PossibleContentTypes);
 	}
 }

@@ -30,7 +30,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
-			string ToContentType, Stream To, Variables Session)
+			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
 		{
 			byte[] Data = new byte[From.Length];
 			From.Read(Data, 0, (int)From.Length);

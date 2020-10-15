@@ -46,12 +46,15 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="URL">URL of resource, if accessed from a web server.</param>
-		/// <param name="ToContentType">Content type of the content to convert to.</param>
+		/// <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
+		/// the converter finds a better option.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
+		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
+		/// Can be null if there are no alternatives.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, string ToContentType,
-			Stream To, Variables Session)
+		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL,
+			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
 		{
 			DateTime TP = File.GetLastWriteTime(FromFileName);
 			Expression Exp = null;
@@ -85,7 +88,26 @@ namespace Waher.Content.Markdown.Web.WebScript
 			object Result = Exp.Evaluate(Session);
 
 			if (!InternetContent.Encodes(Result, out Grade _, out IContentEncoder Encoder, ToContentType))
-				throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + ToContentType);
+			{
+				bool AlternativeFound = false;
+
+				if (!(PossibleContentTypes is null))
+				{
+					foreach (string Alternative in PossibleContentTypes)
+					{
+						if (Alternative != ToContentType &&
+							InternetContent.Encodes(Result, out Grade _, out Encoder, Alternative))
+						{
+							ToContentType = Alternative;
+							AlternativeFound = true;
+							break;
+						}
+					}
+				}
+
+				if (!AlternativeFound)
+					throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + ToContentType);
+			}
 
 			byte[] Data = Encoder.Encode(Result, Encoding.UTF8, out string _, ToContentType);
 			To.Write(Data, 0, Data.Length);

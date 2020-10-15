@@ -44,7 +44,7 @@
             Emoji source to use when converting Markdown documents to HTML.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String@,System.IO.Stream,Waher.Script.Variables,System.String[])">
             <summary>
             Performs the actual conversion.
             </summary>
@@ -54,9 +54,12 @@
             Otherwise, the parameter is the empty string.</param>
             <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
             <param name="URL">URL of resource, if accessed from a web server.</param>
-            <param name="ToContentType">Content type of the content to convert to.</param>
+            <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
+            the converter finds a better option.</param>
             <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
             <param name="Session">Session states.</param>
+            <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
+            Can be null if there are no alternatives.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
         <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.HtmlSettings">
@@ -167,7 +170,7 @@
             How well the content is converted.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String@,System.IO.Stream,Waher.Script.Variables,System.String[])">
             <summary>
             Performs the actual conversion.
             </summary>
@@ -177,9 +180,12 @@
             Otherwise, the parameter is the empty string.</param>
             <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
             <param name="URL">URL of resource, if accessed from a web server.</param>
-            <param name="ToContentType">Content type of the content to convert to.</param>
+            <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
+            the converter finds a better option.</param>
             <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
             <param name="Session">Session states.</param>
+            <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
+            Can be null if there are no alternatives.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
         <member name="T:Waher.Networking.HTTP.ScriptExtensions.Page">

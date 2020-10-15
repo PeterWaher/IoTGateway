@@ -892,17 +892,27 @@ The following table lists available string-related functions:
 
 ### Date and Time Functions
 
-| Function                                              | Description                                                           | Example                               |
-|-------------------------------------------------------|-----------------------------------------------------------------------|---------------------------------------|
-| `DateTime(s)`                                         | Parses a Date and Time value from a string.                           | `DateTime("2016-03-05T14:34:12.302")` |
-| `DateTime(Ticks)`                                     | Creates a Date and Time value from the number of ticks it represents. | `DateTime(Now.Ticks)`                 |
-| `DateTime(Year,Month,Day)`                            | Creates a Date value.                                                 | `DateTime(2016,03,05)`                |
-| `DateTime(Year,Month,Day,Hour,Minute,Second)`         | Creates a Date and Time value.                                        | `DateTime(2016,03,05,19,17,23)`       |
-| `DateTime(Year,Month,Day,Hour,Minute,Second,MSecond)` | Creates a Date and Time value.                                        | `DateTime(2016,03,05,19,17,23,123)`   |
-| `TimeSpan(s)`                                         | Parses a TimeSpan value from a string.                                | `TimeSpan("14:34:12")`                |
-| `TimeSpan(Hour,Minute,Second)`                        | Creates a TimeSpan value.                                             | `TimeSpan(14,34,12)`                  |
-| `TimeSpan(Day,Hour,Minute,Second)`                    | Creates a TimeSpan value.                                             | `TimeSpan(2,14,34,12)`                |
-| `TimeSpan(Day,Hour,Minute,Second,MSecond)`            | Creates a TimeSpan value.                                             | `TimeSpan(2,14,34,12,123)`            |
+| Function                                                   | Description                                                                                           | Example                                    |
+|------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `DateTime(s)`                                              | Parses a Date and Time value in unspecified time coordinates from a string.                           | `DateTime("2016-03-05T14:34:12.302")`      |
+| `DateTime(Ticks)`                                          | Creates a Date and Time value in unspecified time coordinates from the number of ticks it represents. | `DateTime(Now.Ticks)`                      |
+| `DateTime(Year,Month,Day)`                                 | Creates a Date value in unspecified time coordinates.                                                 | `DateTime(2016,03,05)`                     |
+| `DateTime(Year,Month,Day,Hour,Minute,Second)`              | Creates a Date and Time value in unspecified time coordinates.                                        | `DateTime(2016,03,05,19,17,23)`            |
+| `DateTime(Year,Month,Day,Hour,Minute,Second,MSecond)`      | Creates a Date and Time value in unspecified time coordinates.                                        | `DateTime(2016,03,05,19,17,23,123)`        |
+| `DateTimeLocal(s)`                                         | Parses a Date and Time value in local time coordinates from a string.                                 | `DateTimeLocal("2016-03-05T14:34:12.302")` |
+| `DateTimeLocal(Ticks)`                                     | Creates a Date and Time value in local time coordinates from the number of ticks it represents.       | `DateTimeLocal(Now.Ticks)`                 |
+| `DateTimeLocal(Year,Month,Day)`                            | Creates a Date value in local time coordinates.                                                       | `DateTimeLocal(2016,03,05)`                |
+| `DateTimeLocal(Year,Month,Day,Hour,Minute,Second)`         | Creates a Date and Time value in local time coordinates.                                              | `DateTimeLocal(2016,03,05,19,17,23)`       |
+| `DateTimeLocal(Year,Month,Day,Hour,Minute,Second,MSecond)` | Creates a Date and Time value in local time coordinates.                                              | `DateTimeLocal(2016,03,05,19,17,23,123)`   |
+| `DateTimeUtc(s)`                                           | Parses a Date and Time value in Universal Time Coordinates from a string.                             | `DateTimeUtc("2016-03-05T14:34:12.302")`   |
+| `DateTimeUtc(Ticks)`                                       | Creates a Date and Time value in Universal Time Coordinates from the number of ticks it represents.   | `DateTimeUtc(Now.Ticks)`                   |
+| `DateTimeUtc(Year,Month,Day)`                              | Creates a Date value in Universal Time Coordinates.                                                   | `DateTimeUtc(2016,03,05)`                  |
+| `DateTimeUtc(Year,Month,Day,Hour,Minute,Second)`           | Creates a Date and Time value in Universal Time Coordinates.                                          | `DateTimeUtc(2016,03,05,19,17,23)`         |
+| `DateTimeUtc(Year,Month,Day,Hour,Minute,Second,MSecond)`   | Creates a Date and Time value in Universal Time Coordinates.                                          | `DateTimeUtc(2016,03,05,19,17,23,123)`     |
+| `TimeSpan(s)`                                              | Parses a TimeSpan value from a string.                                                                | `TimeSpan("14:34:12")`                     |
+| `TimeSpan(Hour,Minute,Second)`                             | Creates a TimeSpan value.                                                                             | `TimeSpan(14,34,12)`                       |
+| `TimeSpan(Day,Hour,Minute,Second)`                         | Creates a TimeSpan value.                                                                             | `TimeSpan(2,14,34,12)`                     |
+| `TimeSpan(Day,Hour,Minute,Second,MSecond)`                 | Creates a TimeSpan value.                                                                             | `TimeSpan(2,14,34,12,123)`                 |
 
 ### Vector Functions
 

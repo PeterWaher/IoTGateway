@@ -7,18 +7,18 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.DateAndTime
 {
 	/// <summary>
-	/// Creates a DateTime value.
+	/// Creates a Local DateTime value.
 	/// </summary>
-	public class DateTime : FunctionMultiVariate
+	public class DateTimeLocal : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Creates a DateTime value.
+		/// Creates a Local DateTime value.
 		/// </summary>
 		/// <param name="String">String representation to be parsed.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DateTime(ScriptNode String, int Start, int Length, Expression Expression)
+		public DateTimeLocal(ScriptNode String, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { String }, argumentTypes1Scalar, Start, Length, Expression)
 		{
 		}
@@ -32,7 +32,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, int Start, int Length, Expression Expression)
+		public DateTimeLocal(ScriptNode Year, ScriptNode Month, ScriptNode Day, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day }, argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second, 
+		public DateTimeLocal(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second, 
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day, Hour, Minute, Second }, argumentTypes6Scalar, Start, Length, Expression)
 		{
@@ -68,7 +68,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second,
+		public DateTimeLocal(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second,
 			ScriptNode MSecond, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day, Hour, Minute, Second, MSecond }, argumentTypes7Scalar, Start, Length, Expression)
 		{
@@ -79,7 +79,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "datetime"; }
+			get { return "datetimelocal"; }
 		}
 
 		/// <summary>
@@ -105,11 +105,17 @@ namespace Waher.Script.Functions.DateAndTime
 				object Obj = Arguments[0].AssociatedObjectValue;
 
 				if (Obj is long L)
-					return new DateTimeValue(new System.DateTime(L));
+					return new DateTimeValue(new System.DateTime(L, DateTimeKind.Local));
 				else if (Obj is double Dbl)
-					return new DateTimeValue(new System.DateTime((long)Dbl));
+					return new DateTimeValue(new System.DateTime((long)Dbl, DateTimeKind.Local));
 				else
-					return new DateTimeValue(System.DateTime.Parse(Obj?.ToString()));
+				{
+					System.DateTime TP = System.DateTime.Parse(Obj?.ToString());
+					if (TP.Kind != DateTimeKind.Local)
+						TP = new System.DateTime(TP.Year, TP.Month, TP.Day, TP.Hour, TP.Minute, TP.Second, TP.Millisecond, DateTimeKind.Local);
+
+					return new DateTimeValue(TP);
+				}
 			}
 
 			double[] d = new double[c];
@@ -127,13 +133,13 @@ namespace Waher.Script.Functions.DateAndTime
 			switch (c)
 			{
 				case 3:
-					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2]));
+					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2], 0, 0, 0, DateTimeKind.Local));
 
 				case 6:
-					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2], (int)d[3], (int)d[4], (int)d[5]));
+					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2], (int)d[3], (int)d[4], (int)d[5], DateTimeKind.Local));
 
 				case 7:
-					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2], (int)d[3], (int)d[4], (int)d[5], (int)d[6]));
+					return new DateTimeValue(new System.DateTime((int)d[0], (int)d[1], (int)d[2], (int)d[3], (int)d[4], (int)d[5], (int)d[6], DateTimeKind.Local));
 
 				default:
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);

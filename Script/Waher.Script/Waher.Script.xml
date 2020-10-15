@@ -4091,6 +4091,150 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.DateTimeLocal">
+            <summary>
+            Creates a Local DateTime value.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeLocal.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Local DateTime value.
+            </summary>
+            <param name="String">String representation to be parsed.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeLocal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeLocal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeLocal.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="MSecond">Millisecond</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeLocal.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeLocal.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeLocal.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.DateAndTime.DateTimeUtc">
+            <summary>
+            Creates a UTC DateTime value.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeUtc.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a UTC DateTime value.
+            </summary>
+            <param name="String">String representation to be parsed.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeUtc.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeUtc.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeUtc.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a DateTime value.
+            </summary>
+            <param name="Year">Year</param>
+            <param name="Month">Month</param>
+            <param name="Day">Day</param>
+            <param name="Hour">Hour</param>
+            <param name="Minute">Minute</param>
+            <param name="Second">Second</param>
+            <param name="MSecond">Millisecond</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeUtc.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.DateAndTime.DateTimeUtc.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTimeUtc.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.DateAndTime.TimeSpan">
             <summary>
             Creates a TimeSpan value.

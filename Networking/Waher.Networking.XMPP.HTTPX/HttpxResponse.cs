@@ -184,7 +184,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.chunked.HasValue && !this.chunked.Value)
 				{
 					if (!(this.tail is null))
-						this.response.Append(Convert.ToBase64String(this.tail));
+						Resp.Append(Convert.ToBase64String(this.tail));
 
 					Resp.Append("</base64></data>");
 				}

@@ -1621,6 +1621,8 @@ namespace Waher.IoTGateway
 
 			Log.Informational("Server shutting down.");
 
+			bool StopInternalProvider = !(internalProvider is null) && Database.Provider != internalProvider;
+
 			stopped = true;
 			try
 			{
@@ -1628,7 +1630,7 @@ namespace Waher.IoTGateway
 
 				Database.CollectionRepaired -= Database_CollectionRepaired;
 
-				if (!(internalProvider is null) && Database.Provider != internalProvider)
+				if (StopInternalProvider)
 					await internalProvider.Stop();
 
 				scheduler?.Dispose();
@@ -1758,7 +1760,7 @@ namespace Waher.IoTGateway
 			{
 				Persistence.LifeCycle.DatabaseModule.Flush().Wait(60000);
 
-				if (!(internalProvider is null) && Database.Provider != internalProvider)
+				if (StopInternalProvider)
 					internalProvider.Flush().Wait(60000);
 			}
 		}

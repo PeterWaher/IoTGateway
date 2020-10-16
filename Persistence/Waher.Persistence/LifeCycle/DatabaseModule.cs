@@ -11,6 +11,9 @@ namespace Waher.Persistence.LifeCycle
 	/// </summary>
 	public class DatabaseModule : IModule
 	{
+		private static IDatabaseProvider databaseProvider = null;
+		private static ILedgerProvider ledgerProvider = null;
+
 		/// <summary>
 		/// Database module.
 		/// </summary>
@@ -39,10 +42,16 @@ namespace Waher.Persistence.LifeCycle
 		public async Task Stop()
 		{
 			if (Database.HasProvider)
-				await Database.Provider.Stop();
+			{
+				databaseProvider = Database.Stop();
+				await databaseProvider.Stop();
+			}
 
 			if (Ledger.HasProvider)
-				await Ledger.Provider.Stop();
+			{
+				ledgerProvider = Ledger.Stop();
+				await ledgerProvider.Stop();
+			}
 		}
 
 		/// <summary>
@@ -55,6 +64,12 @@ namespace Waher.Persistence.LifeCycle
 
 			if (Ledger.HasProvider)
 				await Ledger.Provider.Flush();
+
+			if (!(databaseProvider is null))
+				await databaseProvider.Flush();
+
+			if (!(ledgerProvider is null))
+				await ledgerProvider.Flush();
 		}
 
 	}

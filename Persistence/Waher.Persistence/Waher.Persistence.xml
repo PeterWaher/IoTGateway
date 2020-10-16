@@ -4510,6 +4510,413 @@
             Flushes any remaining data to disk.
             </summary>
         </member>
+        <member name="T:Waher.Persistence.NullDatabaseProvider">
+            <summary>
+            A NULL database.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.#ctor">
+            <summary>
+            A NULL database.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Insert(System.Object)">
+            <summary>
+            Inserts an object into the database.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Insert(System.Object[])">
+            <summary>
+            Inserts a collection of objects into the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Insert(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Inserts a collection of objects into the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Find``1(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Find(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Find(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Update(System.Object)">
+            <summary>
+            Updates an object in the database.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Update(System.Object[])">
+            <summary>
+            Updates a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Delete(System.Object)">
+            <summary>
+            Deletes an object in the database.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Delete(System.Object[])">
+            <summary>
+            Deletes a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Delete(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.FindDelete``1(System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.FindDelete(System.String,System.Int32,System.Int32,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.FindDelete(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.TryLoadObject``1(System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.TryLoadObject``1(System.String,System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Base type.</typeparam>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.TryLoadObject(System.String,System.Object)">
+            <summary>
+            Tries to load an object given its Object ID <paramref name="ObjectId"/> and its collection name <paramref name="CollectionName"/>.
+            </summary>
+            <param name="CollectionName">Name of collection in which the object resides.</param>
+            <param name="ObjectId">Object ID</param>
+            <returns>Loaded object, or null if not found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
+            <summary>
+            Performs an export of the entire database.
+            </summary>
+            <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>public Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Clear(System.String)">
+            <summary>
+            Clears a collection of all objects.
+            </summary>
+            <param name="CollectionName">Name of collection to clear.</param>
+            <returns>public Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <returns>Collections with errors found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
+            <summary>
+            Analyzes the database and repairs it if necessary. Results are exported to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <returns>Collections with errors found and repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Repair">If files should be repaired if corruptions are detected.</param>
+            <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Repair(System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.AddIndex(System.String,System.String[])">
+            <summary>
+            Adds an index to a collection, if one does not already exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.RemoveIndex(System.String,System.String[])">
+            <summary>
+            Removes an index from a collection, if one exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.StartBulk">
+            <summary>
+            Starts bulk-proccessing of data. Must be followed by a call to <see cref="M:Waher.Persistence.NullDatabaseProvider.EndBulk"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.EndBulk">
+            <summary>
+            Ends bulk-processing of data. Must be called once for every call to <see cref="M:Waher.Persistence.NullDatabaseProvider.StartBulk"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Start">
+            <summary>
+            Called when processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Stop">
+            <summary>
+            Called when processing ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Flush">
+            <summary>
+            Persists any pending changes.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.NullDatabaseProvider.ObjectIdByteCount">
+            <summary>
+            Number of bytes used by an Object ID.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetDictionary(System.String)">
+            <summary>
+            Gets a persistent dictionary containing objects in a collection.
+            </summary>
+            <param name="Collection">Collection Name</param>
+            <returns>Persistent dictionary</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetCollections">
+            <summary>
+            Gets an array of available collections.
+            </summary>
+            <returns>Array of collections.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetCollection(System.Type)">
+            <summary>
+            Gets the collection corresponding to a given type.
+            </summary>
+            <param name="Type">Type</param>
+            <returns>Collection name.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetCollection(System.Object)">
+            <summary>
+            Gets the collection corresponding to a given object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Collection name.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.IsLabel(System.String,System.String)">
+            <summary>
+            Checks if a string is a label in a given collection.
+            </summary>
+            <param name="Collection">Name of collection.</param>
+            <param name="Label">Label to check.</param>
+            <returns>If <paramref name="Label"/> is a label in the collection
+            defined by <paramref name="Collection"/>.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetLabels(System.String)">
+            <summary>
+            Gets an array of available labels for a collection.
+            </summary>
+            <returns>Array of labels.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.TryGetObjectId(System.Object,System.Object@)">
+            <summary>
+            Tries to get the Object ID of an object, if it exists.
+            </summary>
+            <param name="Object">Object whose Object ID is of interest.</param>
+            <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
+            <returns>If an Object ID was found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DropCollection(System.String)">
+            <summary>
+            Drops a collection, if it exist.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+        </member>
+        <member name="T:Waher.Persistence.NullLedgerProvider">
+            <summary>
+            A NULL ledger.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.#ctor">
+            <summary>
+            A NULL ledger.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.NewEntry(System.Object)">
+            <summary>
+            Adds an entry to the ledger.
+            </summary>
+            <param name="Object">New object.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.UpdatedEntry(System.Object)">
+            <summary>
+            Updates an entry in the ledger.
+            </summary>
+            <param name="Object">Updated object.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.DeletedEntry(System.Object)">
+            <summary>
+            Deletes an entry in the ledger.
+            </summary>
+            <param name="Object">Deleted object.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.GetEnumerator``1">
+            <summary>
+            Gets an eumerator for objects of type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Type of object entries to enumerate.</typeparam>
+            <returns>Enumerator object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.GetEnumerator(System.String)">
+            <summary>
+            Gets an eumerator for objects in a collection.
+            </summary>
+            <param name="CollectionName">Collection to enumerate.</param>
+            <returns>Enumerator object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Start">
+            <summary>
+            Called when processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Stop">
+            <summary>
+            Called when processing ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Flush">
+            <summary>
+            Persists any pending changes.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.GetCollections">
+            <summary>
+            Gets an array of available collections.
+            </summary>
+            <returns>Array of collections.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Export(Waher.Persistence.Serialization.ILedgerExport,System.String[])">
+            <summary>
+            Performs an export of the entire ledger.
+            </summary>
+            <param name="Output">Ledger will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
         <member name="T:Waher.Persistence.ObjectEventHandler">
             <summary>
             Event handler for object events.

@@ -62,6 +62,13 @@ namespace Waher.Persistence
 			}
 		}
 
+		internal static IDatabaseProvider Stop()
+		{
+			IDatabaseProvider Result = provider;
+			provider = new NullDatabaseProvider();
+			return Result;
+		}
+
 		/// <summary>
 		/// If a database provider is registered.
 		/// </summary>

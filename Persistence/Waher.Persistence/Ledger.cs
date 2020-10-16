@@ -60,6 +60,13 @@ namespace Waher.Persistence
 			}
 		}
 
+		internal static ILedgerProvider Stop()
+		{
+			ILedgerProvider Result = provider;
+			provider = new NullLedgerProvider();
+			return Result;
+		}
+
 		/// <summary>
 		/// If a ledger provider is registered.
 		/// </summary>

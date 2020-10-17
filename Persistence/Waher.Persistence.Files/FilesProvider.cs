@@ -268,7 +268,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
-		{ 
+		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
 				  Encrypted, true, null);
 		}
@@ -1058,6 +1058,20 @@ namespace Waher.Persistence.Files
 			}
 
 			return this.SaveUnsaved();
+		}
+
+		/// <summary>
+		/// Number of current bulk operations.
+		/// </summary>
+		public int BulkCount
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.bulkCount;
+				}
+			}
 		}
 
 		private async Task SaveUnsaved()
@@ -2529,7 +2543,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
 		/// <param name="CollectionNames">If provided, lists collections to be repaired.</param>
 		/// <returns>Collections with errors.</returns>
-		private async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, 
+		private async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair,
 			string[] CollectionNames)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
@@ -3191,6 +3205,11 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task Flush()
 		{
+			lock (this.synchObj)
+			{
+				this.bulkCount = 0;
+			}
+
 			await this.SaveUnsaved();
 
 			WriteTimestamp("Stop.txt");

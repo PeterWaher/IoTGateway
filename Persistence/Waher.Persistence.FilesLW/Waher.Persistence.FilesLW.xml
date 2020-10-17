@@ -388,6 +388,11 @@
             Ends bulk-processing of data. Must be called once for every call to <see cref="M:Waher.Persistence.Files.FilesProvider.StartBulk"/>.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.BulkCount">
+            <summary>
+            Number of current bulk operations.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetNewFileId">
             <summary>
             Gets a new file ID.

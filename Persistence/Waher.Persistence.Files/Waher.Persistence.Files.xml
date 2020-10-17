@@ -516,6 +516,11 @@
             Ends bulk-processing of data. Must be called once for every call to <see cref="M:Waher.Persistence.Files.FilesProvider.StartBulk"/>.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.BulkCount">
+            <summary>
+            Number of current bulk operations.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetNewFileId">
             <summary>
             Gets a new file ID.
@@ -4475,22 +4480,6 @@
             <param name="RecordSizeLimit">Upper size limit of records.</param>
             <param name="GenericSerializer">Generic serializer.</param>
             <param name="Provider">Files database provider.</param>
-        </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Serialize(System.String,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
-            <summary>
-            Serializes a (Key,Value) pair.
-            </summary>
-            <param name="Key">Key</param>
-            <param name="Value">Value</param>
-            <param name="Serializer">Serializer.</param>
-            <returns>Serialized record.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Serialize(System.String)">
-            <summary>
-            Serializes a Key pair.
-            </summary>
-            <param name="Key">Key</param>
-            <returns>Serialized record.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Compare(System.Object,System.Object)">
             <summary>

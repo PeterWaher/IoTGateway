@@ -4615,6 +4615,15 @@
             <exception cref="T:System.ArgumentNullException">key is null</exception>
             <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
         </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.SerializeLocked(System.String,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
+            <summary>
+            Serializes a (Key,Value) pair.
+            </summary>
+            <param name="Key">Key</param>
+            <param name="Value">Value</param>
+            <param name="Serializer">Serializer.</param>
+            <returns>Serialized record.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.StringDictionary.Remove(System.String)">
             <summary>
             Removes the element with the specified key from the System.Collections.IDictionary object.

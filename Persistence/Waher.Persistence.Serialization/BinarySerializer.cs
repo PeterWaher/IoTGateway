@@ -324,6 +324,20 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Writes some bytes to the output.
+		/// </summary>
+		/// <param name="Data">Data to write.</param>
+		/// <param name="Offset">Offset into binary array to start.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		public void WriteRaw(byte[] Data, int Offset, int Count)
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.ms.Write(Data, Offset, Count);
+		}
+
+		/// <summary>
 		/// Serializes a value.
 		/// </summary>
 		/// <param name="Value">Value</param>
@@ -447,6 +461,11 @@ namespace Waher.Persistence.Serialization
 			this.bits = 0;
 			this.bitOffset = 0;
 		}
+
+		/// <summary>
+		/// Current position, exclusing any bits waiting to be written.
+		/// </summary>
+		public int Position => (int)this.ms.Position;
 
 		/// <summary>
 		/// Gets the binary serialization.

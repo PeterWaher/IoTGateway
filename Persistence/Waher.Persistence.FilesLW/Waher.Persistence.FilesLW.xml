@@ -4353,22 +4353,6 @@
             <param name="GenericSerializer">Generic serializer.</param>
             <param name="Provider">Files database provider.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Serialize(System.String,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
-            <summary>
-            Serializes a (Key,Value) pair.
-            </summary>
-            <param name="Key">Key</param>
-            <param name="Value">Value</param>
-            <param name="Serializer">Serializer.</param>
-            <returns>Serialized record.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Serialize(System.String)">
-            <summary>
-            Serializes a Key pair.
-            </summary>
-            <param name="Key">Key</param>
-            <returns>Serialized record.</returns>
-        </member>
         <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.Compare(System.Object,System.Object)">
             <summary>
             Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
@@ -4502,6 +4486,15 @@
             <param name="ReplaceIfExists">If replacement of any existing value is desired.</param>
             <exception cref="T:System.ArgumentNullException">key is null</exception>
             <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+        </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.SerializeLocked(System.String,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
+            <summary>
+            Serializes a (Key,Value) pair.
+            </summary>
+            <param name="Key">Key</param>
+            <param name="Value">Value</param>
+            <param name="Serializer">Serializer.</param>
+            <returns>Serialized record.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.StringDictionary.Remove(System.String)">
             <summary>

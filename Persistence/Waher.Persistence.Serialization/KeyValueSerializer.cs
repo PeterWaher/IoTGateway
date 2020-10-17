@@ -69,6 +69,12 @@ namespace Waher.Persistence.Serialization
 
 			DataType = Reader.ReadBits(6);
 
+			if (DataType == ObjectSerializer.TYPE_MAX)
+			{
+				Reader.SkipVariableLengthUInt64();
+				DataType = Reader.ReadBits(6);
+			}
+
 			switch (DataType.Value)
 			{
 				case ObjectSerializer.TYPE_OBJECT:

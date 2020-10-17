@@ -1083,7 +1083,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task DeleteBlobLocked(byte[] Bin, int Offset)
+		internal async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
@@ -1108,7 +1108,7 @@ namespace Waher.Persistence.Files
 			int i, c;
 			int KeySize = Reader.Position - Offset;
 
-			Reader.SkipVariableLengthUInt64();
+			this.recordHandler.GetFullPayloadSize(Reader);
 			BlobBlockIndex = Reader.ReadUInt32();
 
 			while (BlobBlockIndex != uint.MaxValue)

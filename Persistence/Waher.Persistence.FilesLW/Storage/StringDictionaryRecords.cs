@@ -29,7 +29,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="RecordSizeLimit">Upper size limit of records.</param>
 		/// <param name="GenericSerializer">Generic serializer.</param>
 		/// <param name="Provider">Files database provider.</param>
-		public StringDictionaryRecords(string CollectionName, Encoding Encoding, int RecordSizeLimit, 
+		public StringDictionaryRecords(string CollectionName, Encoding Encoding, int RecordSizeLimit,
 			GenericObjectSerializer GenericSerializer, FilesProvider Provider)
 		{
 			this.collectionName = CollectionName;
@@ -37,36 +37,6 @@ namespace Waher.Persistence.Files.Storage
 			this.recordSizeLimit = RecordSizeLimit;
 			this.genericSerializer = GenericSerializer;
 			this.provider = Provider;
-		}
-
-		/// <summary>
-		/// Serializes a (Key,Value) pair.
-		/// </summary>
-		/// <param name="Key">Key</param>
-		/// <param name="Value">Value</param>
-		/// <param name="Serializer">Serializer.</param>
-		/// <returns>Serialized record.</returns>
-		public byte[] Serialize(string Key, object Value, IObjectSerializer Serializer)
-		{
-			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-
-			Writer.WriteBit(true);
-			Writer.Write(Key);
-			Serializer.Serialize(Writer, true, true, Value);
-
-			return Writer.GetSerialization();
-		}
-
-		/// <summary>
-		/// Serializes a Key pair.
-		/// </summary>
-		/// <param name="Key">Key</param>
-		/// <returns>Serialized record.</returns>
-		public byte[] Serialize(string Key)
-		{
-			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-			Writer.Write(Key);
-			return Writer.GetSerialization();
 		}
 
 		/// <summary>
@@ -136,6 +106,12 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Full payloa size.</returns>
 		public uint GetFullPayloadSize(BinaryDeserializer Reader)
 		{
+			this.GetSize(Reader, out _, out uint Result);
+			return Result;
+		}
+
+		private void GetSize(BinaryDeserializer Reader, out uint Size, out uint FullSize)
+		{ 
 			int Pos = Reader.Position;
 			uint DataType = Reader.ReadBits(6);
 
@@ -247,17 +223,19 @@ namespace Waher.Persistence.Files.Storage
 				case ObjectSerializer.TYPE_ARRAY:
 					throw new Exception("Arrays must be embedded in objects.");
 
+				case ObjectSerializer.TYPE_MAX:		// BLOB
+					FullSize = (uint)Reader.ReadVariableLengthUInt64();
+					Size = (uint)(Reader.Position - Pos + 4);
+					return;
+
 				default:
 					throw new Exception("Object or value expected.");
 			}
 
 			Reader.FlushBits();
 
-			uint Len = (uint)(Reader.Position - Pos);
-
+			FullSize = Size = (uint)(Reader.Position - Pos);
 			Reader.Position = Pos;
-
-			return Len;
 		}
 
 		/// <summary>
@@ -267,11 +245,8 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader)
 		{
-			int Len = (int)this.GetFullPayloadSize(Reader);
-			if (Reader.Position - this.recordStart + Len > this.recordSizeLimit)
-				return 4;
-			else
-				return Len;
+			this.GetSize(Reader, out uint Result, out _);
+			return (int)Result;
 		}
 
 		/// <summary>
@@ -282,11 +257,9 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
 		{
-			int Len = (int)this.GetFullPayloadSize(Reader);
-			if (IsBlob = (Reader.Position - this.recordStart + Len > this.recordSizeLimit))
-				return 4;
-			else
-				return Len;
+			this.GetSize(Reader, out uint Result, out uint FullSize);
+			IsBlob = FullSize > Result;
+			return (int)Result;
 		}
 
 		/// <summary>

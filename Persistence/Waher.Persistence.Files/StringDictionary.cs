@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files
 		private readonly Encoding encoding;
 		private readonly string collectionName;
 		private readonly int timeoutMilliseconds;
+		private readonly int recordSizeLimit;
 
 		/// <summary>
 		/// This class manages a string dictionary in a persisted file.
@@ -41,14 +42,15 @@ namespace Waher.Persistence.Files
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.keyValueSerializer = new KeyValueSerializer(this.provider, this.genericSerializer);
 
+			this.recordSizeLimit = (this.provider.BlockSize - ObjectBTreeFile.BlockHeaderSize) / 2 - 4;
 			this.recordHandler = new StringDictionaryRecords(this.collectionName, this.encoding,
-				(this.provider.BlockSize - ObjectBTreeFile.BlockHeaderSize) / 2 - 4, this.genericSerializer, this.provider);
+				this.recordSizeLimit, this.genericSerializer, this.provider);
 
 			this.dictionaryFile = new ObjectBTreeFile(FileName, this.collectionName, BlobFileName,
 				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
 				this.provider.Encrypted, this.recordHandler);
 
-            if (RetainInMemory)
+			if (RetainInMemory)
 				this.inMemory = new Dictionary<string, object>();
 			else
 				this.inMemory = null;
@@ -144,14 +146,11 @@ namespace Waher.Persistence.Files
 
 			Type Type = value?.GetType() ?? typeof(object);
 			IObjectSerializer Serializer = this.provider.GetObjectSerializer(Type);
-			byte[] Bin = this.recordHandler.Serialize(key, value, Serializer);
-
-			if (Bin.Length > this.dictionaryFile.InlineObjectSizeLimit)
-				throw new ArgumentException("BLOBs not supported.", nameof(value));
 
 			await this.dictionaryFile.LockWrite();
 			try
 			{
+				byte[] Bin = await this.SerializeLocked(key, value, Serializer);
 				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
 				if (!(Info is null))
 					await this.dictionaryFile.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
@@ -177,6 +176,51 @@ namespace Waher.Persistence.Files
 					this.inMemory[key] = value;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Serializes a (Key,Value) pair.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <param name="Value">Value</param>
+		/// <param name="Serializer">Serializer.</param>
+		/// <returns>Serialized record.</returns>
+		private async Task<byte[]> SerializeLocked(string Key, object Value, IObjectSerializer Serializer)
+		{
+			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
+
+			Writer.WriteBit(true);
+			Writer.Write(Key);
+
+			int KeyPos = Writer.Position;
+
+			Serializer.Serialize(Writer, true, true, Value);
+
+			byte[] Bin = Writer.GetSerialization();
+			int c = Bin.Length;
+			if (c <= this.recordSizeLimit)
+				return Bin;
+
+			int FullPayloadLen = c - KeyPos;
+
+			Bin = await this.dictionaryFile.SaveBlobLocked(Bin);
+
+			Writer.Restart();
+			Writer.WriteBit(true);
+			Writer.Write(Key);
+			Writer.WriteBits(ObjectSerializer.TYPE_MAX, 6);
+			Writer.WriteVariableLengthUInt64((uint)FullPayloadLen);
+			Writer.WriteRaw(Bin, Bin.Length - 4, 4);
+
+			Bin = Writer.GetSerialization();
+			c = Bin.Length;
+			if (c >= this.recordSizeLimit)
+			{
+				await this.dictionaryFile.DeleteBlobLocked(Bin, 0);
+				throw new ArgumentException("Key too long.", nameof(Key));
+			}
+
+			return Bin;
 		}
 
 		/// <summary>

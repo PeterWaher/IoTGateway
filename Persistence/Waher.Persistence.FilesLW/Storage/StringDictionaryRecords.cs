@@ -18,23 +18,19 @@ namespace Waher.Persistence.Files.Storage
 		private readonly FilesProvider provider;
 		private readonly Encoding encoding;
 		private readonly string collectionName;
-		private int recordStart;
-		private readonly int recordSizeLimit;
 
 		/// <summary>
 		/// Handles string dictionary entries.
 		/// </summary>
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
-		/// <param name="RecordSizeLimit">Upper size limit of records.</param>
 		/// <param name="GenericSerializer">Generic serializer.</param>
 		/// <param name="Provider">Files database provider.</param>
-		public StringDictionaryRecords(string CollectionName, Encoding Encoding, int RecordSizeLimit,
+		public StringDictionaryRecords(string CollectionName, Encoding Encoding, 
 			GenericObjectSerializer GenericSerializer, FilesProvider Provider)
 		{
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
-			this.recordSizeLimit = RecordSizeLimit;
 			this.genericSerializer = GenericSerializer;
 			this.provider = Provider;
 		}
@@ -80,7 +76,6 @@ namespace Waher.Persistence.Files.Storage
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
 				return null;
 
-			this.recordStart = Reader.Position;
 			return Reader.ReadString();
 		}
 
@@ -94,7 +89,6 @@ namespace Waher.Persistence.Files.Storage
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
 				return false;
 
-			this.recordStart = Reader.Position;
 			Reader.SkipString();
 			return true;
 		}
@@ -225,7 +219,7 @@ namespace Waher.Persistence.Files.Storage
 
 				case ObjectSerializer.TYPE_MAX:		// BLOB
 					FullSize = (uint)Reader.ReadVariableLengthUInt64();
-					Size = (uint)(Reader.Position - Pos + 4);
+					Size = 4;
 					return;
 
 				default:
@@ -281,5 +275,48 @@ namespace Waher.Persistence.Files.Storage
 		{
 			Output.WriteAttributeString("key", ObjectId.ToString());
 		}
+
+		/// <summary>
+		/// Encodes a BLOB reference.
+		/// </summary>
+		/// <param name="BlobReference">Binary BLOB reference.</param>
+		/// <param name="BlobData">Original BLOB data.</param>
+		/// <returns>Encoded BLOB reference.</returns>
+		public byte[] EncodeBlobReference(byte[] BlobReference, byte[] BlobData)
+		{
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, BlobReference, int.MaxValue);
+
+			if (!Reader.ReadBit())
+				return BlobReference;
+
+			string Key = Reader.ReadString();
+			int KeyPos = Reader.Position;
+			int c = BlobData.Length;
+
+			int FullPayloadLen = c - KeyPos;
+
+			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
+
+			Writer.WriteBit(true);
+			Writer.Write(Key);
+			Writer.WriteBits(ObjectSerializer.TYPE_MAX, 6);
+			Writer.WriteVariableLengthUInt64((uint)FullPayloadLen);
+			Writer.WriteRaw(BlobReference, BlobReference.Length - 4, 4);
+
+			return Writer.GetSerialization();
+		}
+
+		/// <summary>
+		/// Gets BLOB information.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="FullPayloadSize">Full payload size.</param>
+		/// <param name="BlobBlockIndex">BLOB block index.</param>
+		public void GetBlobInfo(BinaryDeserializer Reader, out uint FullPayloadSize, out uint BlobBlockIndex)
+		{
+			FullPayloadSize = (uint)Reader.ReadVariableLengthUInt64();
+			BlobBlockIndex = Reader.ReadUInt32();
+		}
+
 	}
 }

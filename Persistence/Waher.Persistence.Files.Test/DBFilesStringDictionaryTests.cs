@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -520,6 +521,31 @@ namespace Waher.Persistence.FilesLW.Test
 
 			for (i = 1; i <= 10000; i++)
 				this.file["Key" + (i & 1023).ToString()] = Last[i & 1023] = this.GetBytes(10000, i);
+
+			Assert.AreEqual(1024, this.file.Count);
+
+			for (i = 0; i <= 1023; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], Last[i]);
+		}
+
+		[TestMethod]
+		public void DBFiles_StringDictionary_19_100000_Random()
+		{
+			Random Rnd = new Random();
+			byte[][] Last = new byte[1024][];
+			byte[] Value;
+			string Key;
+			int i, j;
+
+			for (i = 1; i <= 100000; i++)
+			{
+				j = Rnd.Next(1024);
+				Key = "Key" + j.ToString();
+				Value = new byte[Rnd.Next(20480)];
+				Rnd.NextBytes(Value);
+
+				this.file[Key] = Last[j] = Value;
+			}
 
 			Assert.AreEqual(1024, this.file.Count);
 

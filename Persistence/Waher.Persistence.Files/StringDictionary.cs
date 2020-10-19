@@ -150,9 +150,7 @@ namespace Waher.Persistence.Files
 			{
 				byte[] Bin = this.SerializeLocked(key, value, Serializer);
 				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
-				if (!(Info is null))
-					await this.dictionaryFile.SaveNewObjectLocked(Bin, Info);
-				else
+				if (Info is null)
 				{
 					if (!ReplaceIfExists)
 						throw new ArgumentException("A key with that value already exists.", nameof(key));
@@ -161,6 +159,8 @@ namespace Waher.Persistence.Files
 
 					await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);
 				}
+				else
+					await this.dictionaryFile.SaveNewObjectLocked(Bin, Info);
 			}
 			finally
 			{

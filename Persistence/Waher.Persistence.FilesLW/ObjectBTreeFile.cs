@@ -1089,7 +1089,7 @@ namespace Waher.Persistence.Files
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
 			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
-			LinkedList<KeyValuePair<uint, byte[]>> ReplacementBlocks = new LinkedList<KeyValuePair<uint, byte[]>>();
+			LinkedList<Tuple<uint, int, byte[]>> ReplacementBlocks = new LinkedList<Tuple<uint, int, byte[]>>();
 			Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blobBlockLimit, Offset);
 			uint[] BlocksToRemove;
@@ -1106,7 +1106,8 @@ namespace Waher.Persistence.Files
 			long PhysicalPosition2;
 			int NrRead;
 			int i, c;
-			int KeySize = Reader.Position - Offset;
+			int KeySize1 = Reader.Position - Offset;
+			int KeySize2;
 
 			this.recordHandler.GetFullPayloadSize(Reader);
 			BlobBlockIndex = Reader.ReadUInt32();
@@ -1141,7 +1142,7 @@ namespace Waher.Persistence.Files
 
 				BlocksToRemoveSorted[BlobBlockIndex] = true;
 
-				BlobBlockIndex = BitConverter.ToUInt32(DecryptedBlock, KeySize + 4);
+				BlobBlockIndex = BitConverter.ToUInt32(DecryptedBlock, KeySize1 + 4);
 			}
 
 			c = BlocksToRemoveSorted.Count;
@@ -1180,29 +1181,30 @@ namespace Waher.Persistence.Files
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
 				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-					ReplacementBlocks.AddFirst(new KeyValuePair<uint, byte[]>(BlobBlockIndex, DecryptedBlock));
+					ReplacementBlocks.AddFirst(new Tuple<uint, int, byte[]>(BlobBlockIndex, Reader.Position, DecryptedBlock));
 			}
 
 			i = 0;
-			foreach (KeyValuePair<uint, byte[]> ReplacementBlock in ReplacementBlocks)
+			foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
 			{
 				BlobBlockIndex = BlocksToRemove[i++];   // To
-				Index = ReplacementBlock.Key;           // From
+				Index = ReplacementBlock.Item1;         // From
 
 				TranslationFromTo[Index] = BlobBlockIndex;
 			}
 
 			i = 0;
-			foreach (KeyValuePair<uint, byte[]> ReplacementBlock in ReplacementBlocks)
+			foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
 			{
 				BlobBlockIndex = BlocksToRemove[i++];   // To
 				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
-				Index = ReplacementBlock.Key;           // From
-				DecryptedBlock = ReplacementBlock.Value;
+				Index = ReplacementBlock.Item1;           // From
+				KeySize2 = ReplacementBlock.Item2;
+				DecryptedBlock = ReplacementBlock.Item3;
 
-				Prev = BitConverter.ToUInt32(DecryptedBlock, KeySize);
-				Next = BitConverter.ToUInt32(DecryptedBlock, KeySize + 4);
+				Prev = BitConverter.ToUInt32(DecryptedBlock, KeySize2);
+				Next = BitConverter.ToUInt32(DecryptedBlock, KeySize2 + 4);
 
 				if (Prev == uint.MaxValue)
 				{
@@ -1225,7 +1227,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else if (TranslationFromTo.TryGetValue(Prev, out To))
-					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize, 4);
+					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
 				else
 				{
 					PhysicalPosition2 = ((long)Prev) * this.blobBlockSize;
@@ -1247,7 +1249,7 @@ namespace Waher.Persistence.Files
 					else
 						DecryptedBlock2 = BlobBlock;
 
-					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize + 4, 4);
+					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2 + 4, 4);
 
 					if (this.encrypted)
 					{
@@ -1265,7 +1267,7 @@ namespace Waher.Persistence.Files
 				}
 
 				if (TranslationFromTo.TryGetValue(Next, out To))
-					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize + 4, 4);
+					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
 				else if (Next != uint.MaxValue)
 				{
 					PhysicalPosition2 = ((long)Next) * this.blobBlockSize;
@@ -1287,7 +1289,7 @@ namespace Waher.Persistence.Files
 					else
 						DecryptedBlock2 = BlobBlock;
 
-					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize, 4);
+					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2, 4);
 
 					if (this.encrypted)
 					{
@@ -1418,12 +1420,28 @@ namespace Waher.Persistence.Files
 			Serializer.Serialize(Writer, false, false, Object);
 			Bin = Writer.GetSerialization();
 
-			if (Bin.Length > this.inlineObjectSizeLimit)
-				Bin = await this.SaveBlobLocked(Bin);
-
-			await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+			await this.SaveNewObjectLocked(Bin, Leaf);
 
 			return ObjectId;
+		}
+
+		internal async Task SaveNewObjectLocked(byte[] Bin, BlockInfo Info)
+		{
+			if (Bin.Length > this.inlineObjectSizeLimit)
+			{
+				byte[] BlobReference = await this.SaveBlobLocked(Bin);
+				BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
+
+				if (BlobReference.Length > this.inlineObjectSizeLimit)
+				{
+					await this.DeleteBlobLocked(BlobReference, 0);
+					throw new ArgumentException("Key too long.");
+				}
+
+				Bin = BlobReference;
+			}
+
+			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
 		internal void QueueForSave(object Object, ObjectSerializer Serializer)
@@ -2140,7 +2158,18 @@ namespace Waher.Persistence.Files
 				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
 
 			if (DeleteBlob && Bin.Length > this.inlineObjectSizeLimit)
-				Bin = await this.SaveBlobLocked(Bin);
+			{
+				byte[] BlobReference = await this.SaveBlobLocked(Bin);
+				BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
+
+				if (BlobReference.Length > this.inlineObjectSizeLimit)
+				{
+					await this.DeleteBlobLocked(BlobReference, 0);
+					throw new ArgumentException("Key too long.");
+				}
+
+				Bin = BlobReference;
+			}
 
 			int NewSize = Bin.Length;
 			int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);

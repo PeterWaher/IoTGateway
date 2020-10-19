@@ -4182,6 +4182,14 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.Storage.IndexRecords.EncodeBlobReference(System.Byte[],System.Byte[])">
+            <summary>
+            Encodes a BLOB reference.
+            </summary>
+            <param name="BlobReference">Binary BLOB reference.</param>
+            <param name="BlobData">Original BLOB data.</param>
+            <returns>Encoded BLOB reference.</returns>
+        </member>
         <member name="T:Waher.Persistence.Files.Storage.IRecordHandler">
             <summary>
             Interface for B-tree record handlers.
@@ -4236,6 +4244,14 @@
             </summary>
             <param name="ObjectId">Key to export.</param>
             <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.IRecordHandler.EncodeBlobReference(System.Byte[],System.Byte[])">
+            <summary>
+            Encodes a BLOB reference.
+            </summary>
+            <param name="BlobReference">Binary BLOB reference.</param>
+            <param name="BlobData">Original BLOB data.</param>
+            <returns>Encoded BLOB reference.</returns>
         </member>
         <member name="T:Waher.Persistence.Files.Storage.PrimaryRecords">
             <summary>
@@ -4309,6 +4325,14 @@
             <param name="ObjectId">Key to export.</param>
             <param name="Output">XML Output.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.Storage.PrimaryRecords.EncodeBlobReference(System.Byte[],System.Byte[])">
+            <summary>
+            Encodes a BLOB reference.
+            </summary>
+            <param name="BlobReference">Binary BLOB reference.</param>
+            <param name="BlobData">Original BLOB data.</param>
+            <returns>Encoded BLOB reference.</returns>
+        </member>
         <member name="T:Waher.Persistence.Files.Storage.SequentialGuidGenerator">
             <summary>
             Class that generates sequential, albeit cyclical, GUIDs for use in databases. They are not guaranteed to be
@@ -4343,13 +4367,12 @@
             Handles string dictionary entries.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.#ctor(System.String,System.Text.Encoding,System.Int32,Waher.Persistence.Serialization.GenericObjectSerializer,Waher.Persistence.Files.FilesProvider)">
+        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.#ctor(System.String,System.Text.Encoding,Waher.Persistence.Serialization.GenericObjectSerializer,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Handles string dictionary entries.
             </summary>
             <param name="CollectionName">Name of current collection.</param>
             <param name="Encoding">Encoding to use for text.</param>
-            <param name="RecordSizeLimit">Upper size limit of records.</param>
             <param name="GenericSerializer">Generic serializer.</param>
             <param name="Provider">Files database provider.</param>
         </member>
@@ -4424,6 +4447,22 @@
             </summary>
             <param name="ObjectId">Key</param>
             <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.EncodeBlobReference(System.Byte[],System.Byte[])">
+            <summary>
+            Encodes a BLOB reference.
+            </summary>
+            <param name="BlobReference">Binary BLOB reference.</param>
+            <param name="BlobData">Original BLOB data.</param>
+            <returns>Encoded BLOB reference.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.GetBlobInfo(Waher.Persistence.Serialization.BinaryDeserializer,System.UInt32@,System.UInt32@)">
+            <summary>
+            Gets BLOB information.
+            </summary>
+            <param name="Reader">Binary deserializer object.</param>
+            <param name="FullPayloadSize">Full payload size.</param>
+            <param name="BlobBlockIndex">BLOB block index.</param>
         </member>
         <member name="T:Waher.Persistence.Files.StringDictionary">
             <summary>

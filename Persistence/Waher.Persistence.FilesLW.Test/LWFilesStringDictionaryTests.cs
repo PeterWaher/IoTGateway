@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -90,8 +91,19 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task DBFiles_StringDictionary_01_Set()
 		{
-			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
-			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+			await Test_Set(100);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_02_Set_BLOB()
+		{
+			await Test_Set(100000);
+		}
+
+		private async Task Test_Set(int MaxLen)
+		{
+			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			this.file["Key1"] = "Value1";
 			this.file["Key2"] = "Value2";
@@ -113,11 +125,33 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(this.file["Key6"], ByteArray);
 		}
 
-		[TestMethod]
-		public async Task DBFiles_StringDictionary_02_Add()
+		private byte[] GetBytes(int NrBytes, int Offset)
 		{
-			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
-			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+			byte[] Result = new byte[NrBytes];
+			int i;
+
+			for (i = 0; i < NrBytes; i++)
+				Result[i] = (byte)(i + Offset);
+
+			return Result;
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_03_Add()
+		{
+			await Test_Add(100);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_04_Add_BLOB()
+		{
+			await Test_Add(100000);
+		}
+
+		private async Task Test_Add(int MaxLen)
+		{
+			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			await this.file.AddAsync("Key1", "Value1");
 			await this.file.AddAsync("Key2", "Value2");
@@ -140,12 +174,23 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task DBFiles_StringDictionary_03_Reset()
+		public async Task DBFiles_StringDictionary_05_Reset()
 		{
-			byte[] ByteArray1 = new byte[] { 1, 2, 3, 4, 5 };
-			byte[] ByteArray2 = new byte[] { 6, 7, 8, 9, 0 };
-			Simple Obj1 = DBFilesBTreeTests.CreateSimple(100);
-			Simple Obj2 = DBFilesBTreeTests.CreateSimple(100);
+			await Test_Reset(100);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_06_Reset_BLOB()
+		{
+			await Test_Reset(100000);
+		}
+
+		private async Task Test_Reset(int MaxLen)
+		{
+			byte[] ByteArray1 = this.GetBytes(MaxLen, 0);
+			byte[] ByteArray2 = this.GetBytes(MaxLen, MaxLen);
+			Simple Obj1 = DBFilesBTreeTests.CreateSimple(MaxLen);
+			Simple Obj2 = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			this.file["Key1"] = "Value1_1";
 			this.file["Key2"] = "Value2_1";
@@ -188,25 +233,40 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
-		public async Task DBFiles_StringDictionary_04_Readd()
+		public async Task DBFiles_StringDictionary_07_Readd()
 		{
-			await this.file.AddAsync("Key1", "Value1_1");
-			await this.file.AddAsync("Key2", "Value2_1");
-			await this.file.AddAsync("Key3", "Value3_1");
-			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
-			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
-			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			AssertEx.Same(this.file["Key1"], "Value1_1");
-			AssertEx.Same(this.file["Key2"], "Value2_1");
-			AssertEx.Same(this.file["Key3"], "Value3_1");
+			await this.Test_Readd(100);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException))]
+		public async Task DBFiles_StringDictionary_08_Readd_BLOB()
+		{
+			await this.Test_Readd(100000);
+		}
+
+		private async Task Test_Readd(int MaxLen)
+		{
+			await this.Test_Add(MaxLen);
 			await this.file.AddAsync("Key1", "Value1_2");
 		}
 
 		[TestMethod]
-		public async Task DBFiles_StringDictionary_05_Remove()
+		public async Task DBFiles_StringDictionary_09_Remove()
 		{
-			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
-			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+			await this.Test_Remove(100);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_10_Remove_BLOB()
+		{
+			await this.Test_Remove(100000);
+		}
+
+		private async Task Test_Remove(int MaxLen)
+		{
+			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			await this.file.AddAsync("Key1", "Value1");
 			await this.file.AddAsync("Key2", "Value2");
@@ -268,10 +328,21 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task DBFiles_StringDictionary_06_CopyTo()
+		public async Task DBFiles_StringDictionary_11_CopyTo()
 		{
-			byte[] ByteArray = new byte[] { 1, 2, 3, 4, 5 };
-			Simple Obj = DBFilesBTreeTests.CreateSimple(100);
+			await this.Test_CopyTo(100);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_StringDictionary_12_CopyTo_BLOB()
+		{
+			await this.Test_CopyTo(100000);
+		}
+
+		private async Task Test_CopyTo(int MaxLen)
+		{
+			byte[] ByteArray = this.GetBytes(MaxLen, 0);
+			Simple Obj = DBFilesBTreeTests.CreateSimple(MaxLen);
 
 			this.file["Key1"] = "Value1";
 			this.file["Key2"] = "Value2";
@@ -314,7 +385,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_StringDictionary_07_DataTypes()
+		public void DBFiles_StringDictionary_13_DataTypes()
 		{
 			DateTime DT = DateTime.Now;
 			DateTimeOffset DTO = DateTimeOffset.Now;
@@ -367,7 +438,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async Task DBFiles_StringDictionary_08_ToArray()
+		public async Task DBFiles_StringDictionary_14_ToArray()
 		{
 			this.file["Default"] = 1UL;
 			this.file["ObjectId"] = 2UL;
@@ -400,7 +471,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_StringDictionary_09_10000_Items()
+		public void DBFiles_StringDictionary_15_10000_Items()
 		{
 			int i;
 
@@ -413,6 +484,74 @@ namespace Waher.Persistence.FilesLW.Test
 				AssertEx.Same(this.file["Key" + i.ToString()], i);
 		}
 
-		// TODO: BLOBs
+		[TestMethod]
+		public void DBFiles_StringDictionary_16_10000_Items_BLOB()
+		{
+			int i;
+
+			for (i = 1; i <= 10000; i++)
+				this.file["Key" + i.ToString()] = this.GetBytes(10000, i);
+
+			Assert.AreEqual(10000, this.file.Count);
+
+			for (i = 1; i <= 10000; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], this.GetBytes(10000, i));
+		}
+
+		[TestMethod]
+		public void DBFiles_StringDictionary_17_10000_Replace()
+		{
+			int[] Last = new int[1024];
+			int i;
+
+			for (i = 1; i <= 10000; i++)
+				this.file["Key" + (i & 1023).ToString()] = Last[i & 1023] = i;
+
+			Assert.AreEqual(1024, this.file.Count);
+
+			for (i = 0; i <= 1023; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], Last[i]);
+		}
+
+		[TestMethod]
+		public void DBFiles_StringDictionary_18_10000_Replace_BLOB()
+		{
+			byte[][] Last = new byte[1024][];
+			int i;
+
+			for (i = 1; i <= 10000; i++)
+				this.file["Key" + (i & 1023).ToString()] = Last[i & 1023] = this.GetBytes(10000, i);
+
+			Assert.AreEqual(1024, this.file.Count);
+
+			for (i = 0; i <= 1023; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], Last[i]);
+		}
+
+		[TestMethod]
+		public void DBFiles_StringDictionary_19_100000_Random()
+		{
+			Random Rnd = new Random();
+			byte[][] Last = new byte[1024][];
+			byte[] Value;
+			string Key;
+			int i, j;
+
+			for (i = 1; i <= 100000; i++)
+			{
+				j = Rnd.Next(1024);
+				Key = "Key" + j.ToString();
+				Value = new byte[Rnd.Next(20480)];
+				Rnd.NextBytes(Value);
+
+				this.file[Key] = Last[j] = Value;
+			}
+
+			Assert.AreEqual(1024, this.file.Count);
+
+			for (i = 0; i <= 1023; i++)
+				AssertEx.Same(this.file["Key" + i.ToString()], Last[i]);
+		}
+
 	}
 }

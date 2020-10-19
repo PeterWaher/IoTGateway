@@ -1418,12 +1418,28 @@ namespace Waher.Persistence.Files
 			Serializer.Serialize(Writer, false, false, Object);
 			Bin = Writer.GetSerialization();
 
-			if (Bin.Length > this.inlineObjectSizeLimit)
-				Bin = await this.SaveBlobLocked(Bin);
-
-			await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+			await this.SaveNewObjectLocked(Bin, Leaf);
 
 			return ObjectId;
+		}
+
+		internal async Task SaveNewObjectLocked(byte[] Bin, BlockInfo Info)
+		{
+			if (Bin.Length > this.inlineObjectSizeLimit)
+			{
+				byte[] BlobReference = await this.SaveBlobLocked(Bin);
+				BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
+
+				if (BlobReference.Length > this.inlineObjectSizeLimit)
+				{
+					await this.DeleteBlobLocked(BlobReference, 0);
+					throw new ArgumentException("Key too long.");
+				}
+
+				Bin = BlobReference;
+			}
+
+			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
 		internal void QueueForSave(object Object, ObjectSerializer Serializer)
@@ -2140,7 +2156,18 @@ namespace Waher.Persistence.Files
 				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
 
 			if (DeleteBlob && Bin.Length > this.inlineObjectSizeLimit)
-				Bin = await this.SaveBlobLocked(Bin);
+			{
+				byte[] BlobReference = await this.SaveBlobLocked(Bin);
+				BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
+
+				if (BlobReference.Length > this.inlineObjectSizeLimit)
+				{
+					await this.DeleteBlobLocked(BlobReference, 0);
+					throw new ArgumentException("Key too long.");
+				}
+
+				Bin = BlobReference;
+			}
 
 			int NewSize = Bin.Length;
 			int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);

@@ -62,5 +62,13 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="ObjectId">Key to export.</param>
 		/// <param name="Output">XML Output.</param>
 		void ExportKey(object ObjectId, XmlWriter Output);
+
+		/// <summary>
+		/// Encodes a BLOB reference.
+		/// </summary>
+		/// <param name="BlobReference">Binary BLOB reference.</param>
+		/// <param name="BlobData">Original BLOB data.</param>
+		/// <returns>Encoded BLOB reference.</returns>
+		byte[] EncodeBlobReference(byte[] BlobReference, byte[] BlobData);
 	}
 }

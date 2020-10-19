@@ -2466,5 +2466,16 @@ namespace Waher.Persistence.Files.Storage
 			return c1 - c2;
 		}
 
+		/// <summary>
+		/// Encodes a BLOB reference.
+		/// </summary>
+		/// <param name="BlobReference">Binary BLOB reference.</param>
+		/// <param name="BlobData">Original BLOB data.</param>
+		/// <returns>Encoded BLOB reference.</returns>
+		public byte[] EncodeBlobReference(byte[] BlobReference, byte[] BlobData)
+		{
+			return BlobReference;
+		}
+
 	}
 }

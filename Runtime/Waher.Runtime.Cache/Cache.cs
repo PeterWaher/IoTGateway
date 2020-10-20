@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Waher.Events;
 
@@ -10,7 +12,7 @@ namespace Waher.Runtime.Cache
 	/// </summary>
 	/// <typeparam name="KeyType">Cache key type.</typeparam>
 	/// <typeparam name="ValueType">Cache value type.</typeparam>
-	public class Cache<KeyType, ValueType> : ICache
+	public class Cache<KeyType, ValueType> : ICache, IDictionary<KeyType, ValueType>
 	{
 		private readonly Guid id = Guid.NewGuid();
 		private readonly Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
@@ -207,6 +209,21 @@ namespace Waher.Runtime.Cache
 		}
 
 		/// <summary>
+		/// Keys in cache.
+		/// </summary>
+		public ICollection<KeyType> Keys => this.GetKeys();
+
+		/// <summary>
+		/// Values in cache.
+		/// </summary>
+		public ICollection<ValueType> Values => this.GetValues();
+
+		/// <summary>
+		/// If the dictionary is read-only.
+		/// </summary>
+		public bool IsReadOnly => false;
+
+		/// <summary>
 		/// Gets all available keys in the cache.
 		/// </summary>
 		/// <returns>Array of keys.</returns>
@@ -218,8 +235,29 @@ namespace Waher.Runtime.Cache
 			{
 				Result = new KeyType[this.valuesByKey.Count];
 				this.valuesByKey.Keys.CopyTo(Result, 0);
-				return Result;
 			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets all available values in the cache.
+		/// </summary>
+		/// <returns>Array of values.</returns>
+		public ValueType[] GetValues()
+		{
+			ValueType[] Result;
+			int i = 0;
+
+			lock (this.synchObject)
+			{
+				Result = new ValueType[this.valuesByKey.Count];
+
+				foreach (CacheItem<KeyType, ValueType> Rec in this.valuesByKey.Values)
+					Result[i++] = Rec.Value;
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -397,5 +435,89 @@ namespace Waher.Runtime.Cache
 				this.OnRemoved(Item.Key, Item.Value, RemovedReason.Manual);
 		}
 
+		/// <summary>
+		/// Adds an item to the cache.
+		/// </summary>
+		/// <param name="item">Key and value pair.</param>
+		public void Add(KeyValuePair<KeyType, ValueType> item)
+		{
+			this.Add(item.Key, item.Value);
+		}
+
+		/// <summary>
+		/// Checks if an item (key and value) exists in the cache.
+		/// </summary>
+		/// <param name="item">Key and value pair.</param>
+		/// <returns>If the cache contains the item.</returns>
+		public bool Contains(KeyValuePair<KeyType, ValueType> item)
+		{
+			return this.TryGetValue(item.Key, out ValueType Value) && Value.Equals(item.Value);
+		}
+
+		/// <summary>
+		/// Copies all items in the cache to an array.
+		/// </summary>
+		/// <param name="array">Destination array.</param>
+		/// <param name="arrayIndex">Index to start copying to.</param>
+		public void CopyTo(KeyValuePair<KeyType, ValueType>[] array, int arrayIndex)
+		{
+			lock (this.synchObject)
+			{
+				foreach (CacheItem<KeyType, ValueType> Item in this.valuesByKey.Values)
+					array[arrayIndex++] = new KeyValuePair<KeyType, ValueType>(Item.Key, Item.Value);
+			}
+		}
+
+		/// <summary>
+		/// Returns the contents of the cache as an array.
+		/// </summary>
+		/// <returns>Contents in an array.</returns>
+		public KeyValuePair<KeyType, ValueType>[] ToArray()
+		{
+			KeyValuePair<KeyType, ValueType>[] Result;
+			int i = 0;
+
+			lock (this.synchObject)
+			{
+				Result = new KeyValuePair<KeyType, ValueType>[this.valuesByKey.Count];
+
+				foreach (CacheItem<KeyType, ValueType> Item in this.valuesByKey.Values)
+					Result[i++] = new KeyValuePair<KeyType, ValueType>(Item.Key, Item.Value);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Removes an item from the cache.
+		/// </summary>
+		/// <param name="item">Key and value pair.</param>
+		/// <returns>If the item was found and removed.</returns>
+		public bool Remove(KeyValuePair<KeyType, ValueType> item)
+		{
+			if (this.TryGetValue(item.Key, out ValueType Value) && Value.Equals(item.Value))
+				return this.Remove(item.Key);
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Gets an enumerator of contents in the cache.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		public IEnumerator<KeyValuePair<KeyType, ValueType>> GetEnumerator()
+		{
+			IEnumerable<KeyValuePair<KeyType, ValueType>> Array = this.ToArray();
+			return Array.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Gets an enumerator of contents in the cache.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.ToArray().GetEnumerator();
+		}
 	}
 }

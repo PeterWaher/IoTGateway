@@ -52,11 +52,32 @@
             Number of items in cache
             </summary>
         </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.Keys">
+            <summary>
+            Keys in cache.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.Values">
+            <summary>
+            Values in cache.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.IsReadOnly">
+            <summary>
+            If the dictionary is read-only.
+            </summary>
+        </member>
         <member name="M:Waher.Runtime.Cache.Cache`2.GetKeys">
             <summary>
             Gets all available keys in the cache.
             </summary>
             <returns>Array of keys.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.GetValues">
+            <summary>
+            Gets all available values in the cache.
+            </summary>
+            <returns>Array of values.</returns>
         </member>
         <member name="M:Waher.Runtime.Cache.Cache`2.ContainsKey(`0)">
             <summary>
@@ -96,6 +117,51 @@
             <summary>
             Clears the cache.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Add(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Adds an item to the cache.
+            </summary>
+            <param name="item">Key and value pair.</param>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Contains(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Checks if an item (key and value) exists in the cache.
+            </summary>
+            <param name="item">Key and value pair.</param>
+            <returns>If the cache contains the item.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.CopyTo(System.Collections.Generic.KeyValuePair{`0,`1}[],System.Int32)">
+            <summary>
+            Copies all items in the cache to an array.
+            </summary>
+            <param name="array">Destination array.</param>
+            <param name="arrayIndex">Index to start copying to.</param>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.ToArray">
+            <summary>
+            Returns the contents of the cache as an array.
+            </summary>
+            <returns>Contents in an array.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.Remove(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Removes an item from the cache.
+            </summary>
+            <param name="item">Key and value pair.</param>
+            <returns>If the item was found and removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.GetEnumerator">
+            <summary>
+            Gets an enumerator of contents in the cache.
+            </summary>
+            <returns>Enumerator object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator of contents in the cache.
+            </summary>
+            <returns>Enumerator object.</returns>
         </member>
         <member name="T:Waher.Runtime.Cache.RemovedReason">
             <summary>

@@ -112,6 +112,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			GetClientResponse Rec = await proxy.GetClientAsync(Uri);
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasContentType = false;
+			bool HasHost = false;
 
 			foreach (KeyValuePair<string, string> Header in Headers)
 			{
@@ -119,6 +120,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					case "host":
 						Headers2.Add(new HttpField("Host", Rec.BareJid));
+						HasHost = true;
 						break;
 
 					case "cookie":
@@ -139,6 +141,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!HasContentType)
 				Headers2.Add(new HttpField("Content-Type", ContentType));
+
+			if (!HasHost)
+				Headers2.Add(new HttpField("Host", Uri.Authority));
 
 			MemoryStream Data = new MemoryStream(EncodedData);
 			State State = null;

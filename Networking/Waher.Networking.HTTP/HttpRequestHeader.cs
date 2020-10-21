@@ -437,7 +437,7 @@ namespace Waher.Networking.HTTP
 
 			Result.Append(this.uriScheme);
 			Result.Append("://");
-			Result.Append(this.host.Value);
+			Result.Append(this.host?.Value ?? string.Empty);
 			Result.Append(this.resource);
 
 			if (IncludeQuery && !string.IsNullOrEmpty(this.queryString))

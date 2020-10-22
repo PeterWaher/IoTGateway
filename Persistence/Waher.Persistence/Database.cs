@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 

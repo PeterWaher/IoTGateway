@@ -65,16 +65,6 @@
             File name.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.Files.FileException.Collection">
-            <summary>
-            Collection.
-            </summary>
-        </member>
-        <member name="P:Waher.Persistence.Files.FileException.Tags">
-            <summary>
-            Tags related to the object.
-            </summary>
-        </member>
         <member name="T:Waher.Persistence.Files.CustomKeyHandler">
             <summary>
             Delegate for custom key callback methods.

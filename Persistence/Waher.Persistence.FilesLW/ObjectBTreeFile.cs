@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
@@ -1467,7 +1468,7 @@ namespace Waher.Persistence.Files
 				Leaf = await this.FindLeafNodeLocked(ObjectId);
 
 				if (Leaf is null)
-					throw new FileException("Object with same Object ID already exists.", this.fileName, this.collectionName);
+					throw new KeyAlreadyExistsException("Object with same Object ID already exists.", this.collectionName);
 			}
 			else
 			{

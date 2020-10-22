@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Events;
+using Waher.Persistence.Exceptions;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// Exception related to a file.
 	/// </summary>
-	public class FileException : IOException, IEventObject, IEventTags
+	public class FileException : CollectionException, IEventObject
 	{
 		private readonly string fileName;
-		private readonly string collection;
 
 		/// <summary>
 		/// Exception related to a file.
@@ -20,39 +20,14 @@ namespace Waher.Persistence.Files
 		/// <param name="FileName">File Name</param>
 		/// <param name="Collection">Corresponding collection.</param>
 		public FileException(string Message, string FileName, string Collection)
-			: base(Message)
+			: base(Message, Collection)
 		{
 			this.fileName = FileName;
-			this.collection = Collection;
 		}
 
 		/// <summary>
 		/// File name.
 		/// </summary>
 		public string Object => this.fileName;
-
-		/// <summary>
-		/// Collection.
-		/// </summary>
-		public string Collection => this.collection;
-
-		/// <summary>
-		/// Tags related to the object.
-		/// </summary>
-		public KeyValuePair<string, object>[] Tags
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(this.collection))
-					return new KeyValuePair<string, object>[0];
-				else
-				{
-					return new KeyValuePair<string, object>[]
-					{
-						new KeyValuePair<string, object>("Collection", this.collection)
-					};
-				}
-			}
-		}
 	}
 }

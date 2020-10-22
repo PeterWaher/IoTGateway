@@ -3088,6 +3088,73 @@
             </summary>
             <param name="CollectionName">Name of collection.</param>
         </member>
+        <member name="T:Waher.Persistence.Exceptions.CollectionException">
+            <summary>
+            Exception related to a collection.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Exceptions.CollectionException.#ctor(System.String,System.String)">
+            <summary>
+            Exception related to a collection.
+            </summary>
+            <param name="Message">Exception message</param>
+            <param name="Collection">Corresponding collection.</param>
+        </member>
+        <member name="P:Waher.Persistence.Exceptions.CollectionException.Collection">
+            <summary>
+            Collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Exceptions.CollectionException.Tags">
+            <summary>
+            Tags related to the object.
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.Exceptions.DatabaseException">
+            <summary>
+            Base class for database exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Exceptions.DatabaseException.#ctor(System.String)">
+            <summary>
+            Base class for database exceptions.
+            </summary>
+            <param name="Message">Exception message</param>
+        </member>
+        <member name="M:Waher.Persistence.Exceptions.DatabaseException.#ctor(System.String,System.Exception)">
+            <summary>
+            Base class for database exceptions.
+            </summary>
+            <param name="Message">Exception message</param>
+            <param name="InnerException">Inner exception.</param>
+        </member>
+        <member name="T:Waher.Persistence.Exceptions.InconsistencyException">
+            <summary>
+            Database inconsistency exception. Raised when an inconsistency in the database has been found.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Exceptions.InconsistencyException.#ctor(System.String,System.String)">
+            <summary>
+            Database inconsistency exception. Raised when an inconsistency in the database has been found.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Exceptions.InconsistencyException.Object">
+            <summary>
+            Object identifier related to the object. (Collection)
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.Exceptions.KeyAlreadyExistsException">
+            <summary>
+            An attempt to insert a key was done, but the key was already there.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Exceptions.KeyAlreadyExistsException.#ctor(System.String,System.String)">
+            <summary>
+            An attempt to insert a key was done, but the key was already there.
+            </summary>
+            <param name="Message">Exception message</param>
+            <param name="Collection">Corresponding collection.</param>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterDelegate">
             <summary>
             Delegate for filter callback methods.
@@ -4321,21 +4388,6 @@
             <param name="Output">Ledger will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <returns>Task object for synchronization purposes.</returns>
-        </member>
-        <member name="T:Waher.Persistence.InconsistencyException">
-            <summary>
-            Database inconsistency exception. Raised when an inconsistency in the database has been found.
-            </summary>
-        </member>
-        <member name="M:Waher.Persistence.InconsistencyException.#ctor(System.String,System.String)">
-            <summary>
-            Database inconsistency exception. Raised when an inconsistency in the database has been found.
-            </summary>
-        </member>
-        <member name="P:Waher.Persistence.InconsistencyException.Object">
-            <summary>
-            Object identifier related to the object. (Collection)
-            </summary>
         </member>
         <member name="T:Waher.Persistence.IPersistentDictionary">
             <summary>

@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using Waher.Events;
 
-namespace Waher.Persistence
+namespace Waher.Persistence.Exceptions
 {
 	/// <summary>
 	/// Database inconsistency exception. Raised when an inconsistency in the database has been found.
 	/// </summary>
-	public class InconsistencyException : Exception, IEventObject
+	public class InconsistencyException : DatabaseException, IEventObject
 	{
 		private readonly string collection;
 

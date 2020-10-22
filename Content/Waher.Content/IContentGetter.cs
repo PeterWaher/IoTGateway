@@ -36,6 +36,23 @@ namespace Waher.Content
 		Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
+		/// Gets a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded object.</returns>
+		Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers);
+
+		/// <summary>
 		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>

@@ -43,10 +43,23 @@ namespace Waher.Content.Posters
 		/// <param name="Data">Data to post.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual async Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.PostAsync(Uri, Data, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to post.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public virtual async Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			byte[] Bin = InternetContent.Encode(Data, System.Text.Encoding.UTF8, out string ContentType);
-			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, Bin, ContentType, Headers);
+			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, Bin, ContentType, TimeoutMs, Headers);
 			return InternetContent.Decode(Result.Value, Result.Key, Uri);
 		}
 
@@ -58,7 +71,21 @@ namespace Waher.Content.Posters
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public abstract Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers);
+		public virtual Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.PostAsync(Uri, EncodedData, ContentType, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be posted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public abstract Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
 	}
 }

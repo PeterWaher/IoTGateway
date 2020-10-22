@@ -113,6 +113,22 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <exception cref="InvalidOperationException">No <see cref="HttpxProxy"/> set in the HTTPX <see cref="Types"/> module parameter.</exception>
+		/// <exception cref="ArgumentException">If the <paramref name="Uri"/> parameter is invalid.</exception>
+		/// <exception cref="ConflictException">If an approved presence subscription with the remote entity does not exist.</exception>
+		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
+		/// <exception cref="TimeoutException">If the request times out.</exception>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempFileAsync(Uri, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <exception cref="InvalidOperationException">No <see cref="HttpxProxy"/> set in the HTTPX <see cref="Types"/> module parameter.</exception>

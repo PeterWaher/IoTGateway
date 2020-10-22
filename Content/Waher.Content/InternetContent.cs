@@ -929,6 +929,21 @@ namespace Waher.Content
 		}
 
 		/// <summary>
+		/// Gets a resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Object.</returns>
+		public static Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Getter.GetAsync(Uri, TimeoutMs, Headers);
+		}
+
+		/// <summary>
 		/// Gets a (possibly big) resource, given its URI.
 		/// </summary>
 		/// <param name="Uri">Uniform resource identifier.</param>
@@ -936,7 +951,10 @@ namespace Waher.Content
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public static Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
-			return GetTempFileAsync(Uri, 60000, Headers);
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Getter.GetTempFileAsync(Uri, Headers);
 		}
 
 		/// <summary>
@@ -1106,6 +1124,22 @@ namespace Waher.Content
 		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to post.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Poster.PostAsync(Uri, Data, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
 		/// <param name="EncodedData">Encoded data to be posted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
@@ -1116,6 +1150,23 @@ namespace Waher.Content
 				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, Headers);
+		}
+
+		/// <summary>
+		/// Posts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be posted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
+				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+
+			return Poster.PostAsync(Uri, EncodedData, ContentType, TimeoutMs, Headers);
 		}
 
 		#endregion

@@ -52,11 +52,23 @@ namespace Waher.Content.Getters
 		/// <param name="Uri">URI</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public async Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetAsync(Uri, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Gets a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded object.</returns>
+		public async Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			using (HttpClient HttpClient = new HttpClient()
 			{
-				Timeout = TimeSpan.FromMilliseconds(10000)
+				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
 			})
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
@@ -98,6 +110,17 @@ namespace Waher.Content.Getters
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempFileAsync(Uri, 60000, Headers);
 		}
 
 		/// <summary>

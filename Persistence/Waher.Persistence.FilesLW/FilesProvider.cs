@@ -3195,9 +3195,14 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Called when processing ends.
 		/// </summary>
-		public Task Stop()
+		public async Task Stop()
 		{
-			return Task.CompletedTask;
+			lock (this.synchObj)
+			{
+				this.bulkCount = 0;
+			}
+
+			await this.SaveUnsaved();
 		}
 
 		/// <summary>
@@ -3205,11 +3210,6 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task Flush()
 		{
-			lock (this.synchObj)
-			{
-				this.bulkCount = 0;
-			}
-
 			await this.SaveUnsaved();
 
 			WriteTimestamp("Stop.txt");

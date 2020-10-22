@@ -251,7 +251,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
-			this.output?.SendAsync(Chunk, 0, 5);
+			await this.output.SendAsync(Chunk, 0, 5);
 			if (!await this.output.FlushAsync())
 				return false;
 

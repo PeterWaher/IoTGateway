@@ -352,6 +352,7 @@ namespace Waher.Networking.XMPP
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
 		private bool upgradeToTls = false;
+		private bool disposed = false;
 
 #if WINDOWS_UWP
 		/// <summary>
@@ -705,7 +706,7 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				this.DisposeClient();
+				this.DisposeClient(false);
 
 				this.domain = Domain;
 				this.bareJid = this.fullJid = this.userName + "@" + Domain;
@@ -850,7 +851,7 @@ namespace Waher.Networking.XMPP
 			await this.Error(this, ex);
 
 			this.inputState = -1;
-			this.DisposeClient();
+			this.DisposeClient(false);
 		}
 
 		private async Task Error(object _, Exception Exception)
@@ -1102,6 +1103,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Dispose()
 		{
+			this.disposed = true;
+
 			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
 			{
 				try
@@ -1118,6 +1121,11 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// If the client has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
+
+		/// <summary>
 		/// Closes the connection the hard way. This might disrupt stream processing, but can simulate a lost connection. 
 		/// To close the connection softly, call the <see cref="Dispose"/> method.
 		/// 
@@ -1125,11 +1133,16 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void HardOffline()
 		{
-			this.CleanUp(this, new EventArgs());
+			this.CleanUp(false);
 		}
 
 		private void CleanUp(object Sender, EventArgs e)
 		{
+			this.CleanUp(true);
+		}
+
+		private void CleanUp(bool RaiseEvent)
+		{ 
 			this.State = XmppState.Offline;
 
 			this.authenticationMechanisms?.Clear();
@@ -1147,7 +1160,7 @@ namespace Waher.Networking.XMPP
 			this.secondTimer?.Dispose();
 			this.secondTimer = null;
 
-			this.DisposeClient();
+			this.DisposeClient(RaiseEvent);
 
 			ITextTransportLayer TTL;
 
@@ -1158,7 +1171,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void DisposeClient()
+		private void DisposeClient(bool RaiseEvent)
 		{
 			this.client?.DisposeWhenDone();
 			this.client = null;
@@ -1166,18 +1179,21 @@ namespace Waher.Networking.XMPP
 			if (this.textTransportLayer is IAlternativeTransport AlternativeTransport)
 				AlternativeTransport.CloseSession();
 
-			EventHandler h = this.OnDisposed;
-			if (!(h is null))
+			if (RaiseEvent)
 			{
-				this.OnDisposed = null;
+				EventHandler h = this.OnDisposed;
+				if (!(h is null))
+				{
+					this.OnDisposed = null;
 
-				try
-				{
-					h(this, new EventArgs());
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}

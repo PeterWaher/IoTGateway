@@ -454,8 +454,13 @@ namespace Waher.Content.Multipart
 					Header.Clear();
 					Header.Append("\r\n--");
 					Header.Append(Boundary);
-					Header.Append("\r\nContent-Transfer-Encoding: ");
-					Header.Append(Alternative.TransferEncoding);
+
+					if (!string.IsNullOrEmpty(Alternative.TransferEncoding))
+					{
+						Header.Append("\r\nContent-Transfer-Encoding: ");
+						Header.Append(Alternative.TransferEncoding);
+					}
+
 					Header.Append("\r\nContent-Type: ");
 					Header.Append(Alternative.ContentType);
 

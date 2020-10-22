@@ -14,6 +14,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		protected XmppClient client;
 
+		private bool clientDisposed = false;
+
 		/// <summary>
 		/// Base class for XMPP Extensions.
 		/// </summary>
@@ -22,6 +24,12 @@ namespace Waher.Networking.XMPP
 		{
 			this.client = Client;
 			this.client.RegisterExtension(this);
+			this.client.OnDisposed += Client_OnDisposed;
+		}
+
+		private void Client_OnDisposed(object sender, EventArgs e)
+		{
+			this.clientDisposed = true;
 		}
 
 		/// <summary>
@@ -39,6 +47,11 @@ namespace Waher.Networking.XMPP
 		{
 			get { return this.client; }
 		}
+
+		/// <summary>
+		/// If the client has been disposed.
+		/// </summary>
+		public bool ClientDisposed => this.clientDisposed;
 
 		/// <summary>
 		/// Disposes of the extension.

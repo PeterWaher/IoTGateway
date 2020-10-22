@@ -286,7 +286,6 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			StringBuilder Xml = new StringBuilder();
 			string Key = this.from + " " + this.streamId;
-			bool Found;
 
 			Xml.Append("<chunk xmlns='");
 			Xml.Append(HttpxClient.Namespace);
@@ -296,24 +295,15 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(this.nr.ToString());
 
 			if (Last)
-			{
 				Xml.Append("' last='true");
-
-				lock (activeStreams)
-				{
-					Found = activeStreams.Remove(Key);
-				}
-			}
 			else
 			{
 				lock (activeStreams)
 				{
-					Found = activeStreams.ContainsKey(Key);
+					if (!activeStreams.ContainsKey(Key))	// Has already been removed, if Last=true
+						throw new IOException("Chunked stream not open.");
 				}
 			}
-
-			if (!Found)
-				throw new IOException("Chunked stream not open.");
 
 			Xml.Append("'>");
 

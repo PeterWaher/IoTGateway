@@ -249,7 +249,10 @@ namespace Waher.Networking.XMPP.HTTPX
 					else
 						i = (int)(Len - Pos);
 
-					DataStream.Read(Data, 0, i);
+					if (i != DataStream.Read(Data, 0, i))
+						throw new IOException("Unexpected end of stream.");
+
+					Pos += i;
 
 					Xml.Clear();
 					Xml.Append("<chunk xmlns='");
@@ -258,6 +261,10 @@ namespace Waher.Networking.XMPP.HTTPX
 					Xml.Append(StreamId);
 					Xml.Append("' nr='");
 					Xml.Append(Nr.ToString());
+
+					if (Pos >= Len)
+						Xml.Append("' last='true");
+
 					Xml.Append("'>");
 					Xml.Append(Convert.ToBase64String(Data, 0, i));
 					Xml.Append("</chunk>");

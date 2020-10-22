@@ -770,14 +770,14 @@ namespace Waher.Networking.HTTP
 		/// to the client.
 		/// </summary>
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
-		public Task Return(object Object)
+		public async Task Return(object Object)
 		{
 			if (this.TryEncode(Object, out byte[] Data, out string ContentType))
 			{
 				this.ContentType = ContentType;
 				this.ContentLength = Data.Length;
 
-				Task _ = this.Write(Data);
+				await this.Write(Data);
 			}
 			else
 			{
@@ -785,7 +785,7 @@ namespace Waher.Networking.HTTP
 				this.statusMessage = "Not Acceptable";
 			}
 
-			return this.SendResponse();
+			await this.SendResponse();
 		}
 
 		/// <summary>

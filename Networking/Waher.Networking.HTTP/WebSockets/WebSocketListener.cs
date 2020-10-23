@@ -161,7 +161,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			Response.SetHeader("Connection", "Upgrade");
 			Response.SetHeader("Sec-WebSocket-Accept", ChallengeResponse);
 
-			if (WebSocketProtocol != null)
+			if (!(WebSocketProtocol is null))
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
 
 			Request.clientConnection.Upgrade(Socket);

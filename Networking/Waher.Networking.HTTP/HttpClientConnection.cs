@@ -217,7 +217,7 @@ namespace Waher.Networking.HTTP
 			if (this.dataStream is null)
 			{
 				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
-				if (TransferEncoding != null)
+				if (!(TransferEncoding is null))
 				{
 					if (TransferEncoding.Value == "chunked")
 					{
@@ -233,7 +233,7 @@ namespace Waher.Networking.HTTP
 				else
 				{
 					HttpFieldContentLength ContentLength = this.header.ContentLength;
-					if (ContentLength != null)
+					if (!(ContentLength is null))
 					{
 						long l = ContentLength.ContentLength;
 						if (l < 0)

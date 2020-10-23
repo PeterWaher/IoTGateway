@@ -104,7 +104,7 @@ namespace Waher.Runtime.Language
 		public static async Task<Language> CreateLanguageAsync(string Code, string Name, byte[] Flag, int FlagWidth, int FlagHeight)
 		{
 			Language Result = await GetLanguageAsync(Code);
-			if (Result != null)
+			if (!(Result is null))
 			{
 				bool Updated = false;
 
@@ -120,7 +120,7 @@ namespace Waher.Runtime.Language
 					Updated = true;
 				}
 
-				if (Flag != null)
+				if (!(Flag is null))
 				{
 					Result.Flag = Flag;
 					Result.FlagWidth = FlagWidth;

@@ -379,7 +379,7 @@ namespace Waher.Security.PKCS
 
 		private void EncodeIfDefined(DerEncoder DER, string OID, string Value)
 		{
-			if (Value != null)
+			if (!(Value is null))
 			{
 				DER.StartSET();
 				DER.StartSEQUENCE();

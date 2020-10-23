@@ -58,7 +58,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (Variables != null)
+            if (!(Variables is null))
                 Variables.Push();
 
             try
@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (Variables != null)
+                if (!(Variables is null))
                     Variables.Pop();
             }
         }
@@ -109,7 +109,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Variables Variables = Item.Document.Settings.Variables;
 				string Value;
 				
-				if (Variables != null)
+				if (!(Variables is null))
 				{
 					foreach (string Part in Query.Split('&'))
 					{
@@ -164,7 +164,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (Variables != null)
+            if (!(Variables is null))
                 Variables.Push();
 
             try
@@ -180,7 +180,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (Variables != null)
+                if (!(Variables is null))
                     Variables.Pop();
             }
         }
@@ -198,7 +198,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (Variables != null)
+            if (!(Variables is null))
                 Variables.Push();
 
             try
@@ -211,7 +211,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (Variables != null)
+                if (!(Variables is null))
                     Variables.Pop();
             }
         }
@@ -229,7 +229,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (Variables != null)
+            if (!(Variables is null))
                 Variables.Push();
 
             try
@@ -242,7 +242,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (Variables != null)
+                if (!(Variables is null))
                     Variables.Pop();
             }
         }

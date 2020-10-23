@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP
 		private async Task ConnectionError(Exception ex)
 		{
 			ExceptionEventHandler h = this.OnConnectionError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -195,7 +195,7 @@ namespace Waher.Networking.XMPP
 			this.Exception(ex);
 
 			ExceptionEventHandler h = this.OnError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -275,7 +275,7 @@ namespace Waher.Networking.XMPP
 		private async void RaiseOnStateChanged(XmppState State)
 		{
 			StateChangedEventHandler h = this.OnStateChanged;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -368,7 +368,7 @@ namespace Waher.Networking.XMPP
 		{
 			if (string.IsNullOrEmpty(Xml))
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -968,7 +968,7 @@ namespace Waher.Networking.XMPP
 											}
 										}
 
-										if (Callback != null)
+										if (!(Callback is null))
 										{
 											try
 											{
@@ -1049,7 +1049,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (h != null)
+				if (!(h is null))
 					this.Information(h.GetMethodInfo().Name);
 				else
 				{
@@ -1083,7 +1083,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -1191,7 +1191,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1721,7 +1721,7 @@ namespace Waher.Networking.XMPP
 			XmlOutput.Append("</iq>");
 
 			string IqXml = XmlOutput.ToString();
-			if (PendingRequest != null)
+			if (!(PendingRequest is null))
 				PendingRequest.Xml = IqXml;
 
 			this.BeginWrite(IqXml, null);
@@ -1899,7 +1899,7 @@ namespace Waher.Networking.XMPP
 						break;
 				}
 
-				if (Status != null)
+				if (!(Status is null))
 				{
 					foreach (KeyValuePair<string, string> P in Status)
 					{
@@ -1946,7 +1946,7 @@ namespace Waher.Networking.XMPP
 			PendingRequest PendingRequest;
 			string Id;
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				uint SeqNr = this.GetSeqNr(BareJid, Callback, State, out PendingRequest, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
 				Id = SeqNr.ToString();
@@ -1979,7 +1979,7 @@ namespace Waher.Networking.XMPP
 
 			string PresenceXml = Xml.ToString();
 
-			if (PendingRequest != null)
+			if (!(PendingRequest is null))
 				PendingRequest.Xml = PresenceXml;
 
 			this.BeginWrite(PresenceXml, null);
@@ -2404,7 +2404,7 @@ namespace Waher.Networking.XMPP
 
 		private async Task DeliveryCallback(DeliveryEventHandler Callback, object State, bool Ok)
 		{
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -2664,7 +2664,7 @@ namespace Waher.Networking.XMPP
 
 			this.SendIqResult(e.Id, e.To, e.From, string.Empty);
 
-			if (e2 != null)
+			if (!(e2 is null))
 				this.ProcessMessage(e2);
 
 			return Task.CompletedTask;
@@ -2730,7 +2730,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (Retries != null)
+				if (!(Retries is null))
 				{
 					foreach (PendingRequest Request in Retries)
 					{

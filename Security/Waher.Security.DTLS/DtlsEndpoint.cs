@@ -1209,7 +1209,7 @@ namespace Waher.Security.DTLS
 				else if (this.HasSniffers)
 					this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
 
-				if (Rec != null)
+				if (!(Rec is null))
 				{
 					this.timeouts.Add(DateTime.Now.AddSeconds(State.timeoutSeconds + this.NextDouble()),
 						this.CheckResend, new object[] { State, State.flightNr });

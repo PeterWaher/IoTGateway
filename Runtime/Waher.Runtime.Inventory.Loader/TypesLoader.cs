@@ -82,7 +82,7 @@ namespace Waher.Runtime.Inventory.Loader
 				if (LoadedAssembliesByLocation.ContainsKey(DllFile))
 					continue;
 
-				if (LoadFile != null)
+				if (!(LoadFile is null))
 				{
 					try
 					{

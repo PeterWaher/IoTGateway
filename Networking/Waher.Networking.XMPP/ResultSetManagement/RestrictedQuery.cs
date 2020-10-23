@@ -152,14 +152,14 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 			Xml.Append(NamespaceResultSetManagement);
 			Xml.Append("'>");
 
-			if (After != null)
+			if (!(After is null))
 			{
 				Xml.Append("<after>");
 				Xml.Append(XML.Encode(After));
 				Xml.Append("</after>");
 			}
 
-			if (Before != null)
+			if (!(Before is null))
 			{
 				Xml.Append("<before>");
 				Xml.Append(XML.Encode(Before));

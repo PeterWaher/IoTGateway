@@ -224,7 +224,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						Output.Append("<td>");
 
 						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (Item != null)
+						if (!(Item is null))
 						{
 							if (Item is string s2)
 								Output.Append(FormatText(XML.HtmlValueEncode(s2)));

@@ -184,7 +184,7 @@ namespace Waher.Networking.XMPP.Avatar
 					Request.Append(XML.Encode(ContentType));
 					Request.Append("'>");
 
-					if (Binary != null)
+					if (!(Binary is null))
 						Request.Append(Convert.ToBase64String(Binary));
 
 					Request.Append("</data></query>");
@@ -259,7 +259,7 @@ namespace Waher.Networking.XMPP.Avatar
 					}
 				}
 
-				if (Hash != null)
+				if (!(Hash is null))
 				{
 					Avatar Avatar;
 					string FullJID = e.From;
@@ -275,7 +275,7 @@ namespace Waher.Networking.XMPP.Avatar
 								this.contactAvatars.Remove(BareJID);
 							else if (Avatar is null || Avatar.Hash != Hash)
 							{
-								if (Avatar != null)
+								if (!(Avatar is null))
 									this.contactAvatars[BareJID] = null;
 
 								LoadAvatar = true;
@@ -292,7 +292,7 @@ namespace Waher.Networking.XMPP.Avatar
 					{
 						try
 						{
-							if (Avatar != null)
+							if (!(Avatar is null))
 								await Database.Delete(Avatar);
 							else
 							{
@@ -308,7 +308,7 @@ namespace Waher.Networking.XMPP.Avatar
 											await Database.Delete(Avatar2);
 									}
 
-									if (Avatar != null)
+									if (!(Avatar is null))
 									{
 										lock (this.contactAvatars)
 										{
@@ -404,7 +404,7 @@ namespace Waher.Networking.XMPP.Avatar
 					if (this.contactAvatars.TryGetValue(BareJid, out OldAvatar))
 						this.contactAvatars.Remove(BareJid);
 
-					if (Bin != null)
+					if (!(Bin is null))
 					{
 						if (string.IsNullOrEmpty(Hash))
 							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Bin, 0, 0);
@@ -419,12 +419,12 @@ namespace Waher.Networking.XMPP.Avatar
 
 				AvatarEventHandler h;
 
-				if (OldAvatar != null)
+				if (!(OldAvatar is null))
 				{
 					await Database.Delete(OldAvatar);
 
 					h = this.AvatarRemoved;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -437,12 +437,12 @@ namespace Waher.Networking.XMPP.Avatar
 					}
 				}
 
-				if (NewAvatar != null)
+				if (!(NewAvatar is null))
 				{
 					await Database.Insert(NewAvatar);
 
 					h = this.AvatarAdded;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -456,7 +456,7 @@ namespace Waher.Networking.XMPP.Avatar
 				}
 
 				h = this.AvatarUpdated;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -715,7 +715,7 @@ namespace Waher.Networking.XMPP.Avatar
 				}
 			}
 
-			if (Best != null)
+			if (!(Best is null))
 			{
 				Avatar Avatar = await this.GetAvatarAsync(e.FromBareJID);
 

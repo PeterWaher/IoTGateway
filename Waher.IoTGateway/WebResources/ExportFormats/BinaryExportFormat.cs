@@ -222,9 +222,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 					do
 					{
-						if (PI != null)
+						if (!(PI is null))
 							i = (int)PI.GetValue(this.cs);
-						else if (FI != null)
+						else if (!(FI is null))
 							i = (int)FI.GetValue(this.cs);
 						else
 							i = 0;
@@ -538,13 +538,13 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				if (PropertyValue is null)
 				{
 					this.w.Write(TYPE_NULL);
-					if (PropertyName != null)
+					if (!(PropertyName is null))
 						this.w.Write(PropertyName);
 				}
 				else if (PropertyValue is Enum)
 				{
 					this.w.Write(TYPE_ENUM);
-					if (PropertyName != null)
+					if (!(PropertyName is null))
 						this.w.Write(PropertyName);
 					this.w.Write(PropertyValue.ToString());
 				}
@@ -554,28 +554,28 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 					{
 						case TypeCode.Boolean:
 							this.w.Write(TYPE_BOOLEAN);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((bool)PropertyValue);
 							break;
 
 						case TypeCode.Byte:
 							this.w.Write(TYPE_BYTE);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((byte)PropertyValue);
 							break;
 
 						case TypeCode.Char:
 							this.w.Write(TYPE_CHAR);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((char)PropertyValue);
 							break;
 
 						case TypeCode.DateTime:
 							this.w.Write(TYPE_DATETIME);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 
 							DateTime DT = (DateTime)PropertyValue;
@@ -586,77 +586,77 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Decimal:
 							this.w.Write(TYPE_DECIMAL);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((decimal)PropertyValue);
 							break;
 
 						case TypeCode.Double:
 							this.w.Write(TYPE_DOUBLE);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((double)PropertyValue);
 							break;
 
 						case TypeCode.Int16:
 							this.w.Write(TYPE_INT16);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((short)PropertyValue);
 							break;
 
 						case TypeCode.Int32:
 							this.w.Write(TYPE_INT32);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((int)PropertyValue);
 							break;
 
 						case TypeCode.Int64:
 							this.w.Write(TYPE_INT64);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((long)PropertyValue);
 							break;
 
 						case TypeCode.SByte:
 							this.w.Write(TYPE_SBYTE);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((sbyte)PropertyValue);
 							break;
 
 						case TypeCode.Single:
 							this.w.Write(TYPE_SINGLE);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((float)PropertyValue);
 							break;
 
 						case TypeCode.String:
 							this.w.Write(TYPE_STRING);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((string)PropertyValue);
 							break;
 
 						case TypeCode.UInt16:
 							this.w.Write(TYPE_UINT16);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((ushort)PropertyValue);
 							break;
 
 						case TypeCode.UInt32:
 							this.w.Write(TYPE_UINT32);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((uint)PropertyValue);
 							break;
 
 						case TypeCode.UInt64:
 							this.w.Write(TYPE_UINT64);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							this.w.Write((ulong)PropertyValue);
 							break;
@@ -664,7 +664,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 						case TypeCode.DBNull:
 						case TypeCode.Empty:
 							this.w.Write(TYPE_NULL);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								this.w.Write(PropertyName);
 							break;
 
@@ -672,14 +672,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							if (PropertyValue is TimeSpan TS)
 							{
 								this.w.Write(TYPE_TIMESPAN);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(TS.Ticks);
 							}
 							else if (PropertyValue is DateTimeOffset DTO)
 							{
 								this.w.Write(TYPE_DATETIMEOFFSET);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 
 								DT = DTO.DateTime;
@@ -692,14 +692,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is CaseInsensitiveString CiString)
 							{
 								this.w.Write(TYPE_CI_STRING);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(CiString.Value);
 							}
 							else if (PropertyValue is byte[] Bin)
 							{
 								this.w.Write(TYPE_BYTEARRAY);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(Bin.Length);
 								this.w.Write(Bin);
@@ -707,14 +707,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is Guid Id)
 							{
 								this.w.Write(TYPE_GUID);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(Id.ToByteArray());
 							}
 							else if (PropertyValue is Array A)
 							{
 								this.w.Write(TYPE_ARRAY);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(PropertyValue.GetType().GetElementType().FullName);
 
@@ -725,7 +725,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is GenericObject Obj)
 							{
 								this.w.Write(TYPE_OBJECT);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									this.w.Write(PropertyName);
 								this.w.Write(Obj.TypeName);
 

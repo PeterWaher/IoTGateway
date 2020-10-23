@@ -56,7 +56,7 @@ namespace Waher.Persistence
 		{
 			get
 			{
-				if (provider != null)
+				if (!(provider is null))
 					return provider;
 				else
 					throw new Exception("A database provider has not been registered.");

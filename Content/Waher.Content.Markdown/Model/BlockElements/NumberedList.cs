@@ -158,7 +158,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," + 
 					Settings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
 
-				if (Item != null)
+				if (!(Item is null))
 					Output.WriteValue((Expected = Item.Number).ToString());
 				else
 					Output.WriteValue(Expected.ToString());

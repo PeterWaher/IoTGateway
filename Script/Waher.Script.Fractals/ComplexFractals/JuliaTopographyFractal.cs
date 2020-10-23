@@ -167,7 +167,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
                 throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-            if (f != null)
+            if (!(f is null))
             {
                 return CalcJulia(rc, ic, f, fDef, dr, Variables, Palette, dimx, dimy, this, 
                     this.FractalZoomScript, new object[] { Palette, dimx, dimy, r0, i0, ColorExpression, fDef });
@@ -198,7 +198,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             sb.Append(Expression.ToString(i));
             sb.Append("),");
             
-            if (f != null)
+            if (!(f is null))
                 sb.Append(f.SubExpression);
             else
             {

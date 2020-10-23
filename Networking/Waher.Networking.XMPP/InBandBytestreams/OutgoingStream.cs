@@ -236,7 +236,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			this.opened = true;
 
 			OpenStreamEventHandler h = this.OnOpened;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -295,7 +295,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			this.aborted = true;
 
 			EventHandler h = this.OnAbort;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

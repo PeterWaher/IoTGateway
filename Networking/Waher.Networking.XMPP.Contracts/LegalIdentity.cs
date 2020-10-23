@@ -697,7 +697,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			int Result = 0;
 
-			if (Bin != null)
+			if (!(Bin is null))
 			{
 				int i, c = Bin.Length;
 

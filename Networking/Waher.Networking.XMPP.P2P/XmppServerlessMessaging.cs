@@ -138,7 +138,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.Information("Removing JID from set of recognized JIDs: " + FullJID);
 
 			PeerAddressEventHandler h = this.PeerAddressRemoved;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -230,7 +230,7 @@ namespace Waher.Networking.XMPP.P2P
 				", Local: " + LocalIp + ":" + LocalPort.ToString());
 
 			PeerAddressEventHandler h = this.PeerAddressReceived;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -296,7 +296,7 @@ namespace Waher.Networking.XMPP.P2P
 				Client.Add(Sniffer);*/
 
 			PeerConnectionEventHandler h = this.OnNewXmppClient;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -386,7 +386,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (this.p2pNetwork is null || this.p2pNetwork.State != PeerToPeerNetworkState.Ready)
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -455,7 +455,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				return;
 			}
-			else if (Old != null)
+			else if (!(Old is null))
 			{
 				Old.CallCallbacks();
 				Old.Dispose();
@@ -474,7 +474,7 @@ namespace Waher.Networking.XMPP.P2P
 					this.Exception(ex);
 					Connection = null;
 
-					if (ResynchMethod != null)
+					if (!(ResynchMethod is null))
 					{
 						try
 						{
@@ -525,7 +525,7 @@ namespace Waher.Networking.XMPP.P2P
 					Result.Peer = Connection;
 					Connection.Start((sender, e) =>
 					{
-						if (ResynchMethod != null)
+						if (!(ResynchMethod is null))
 						{
 							try
 							{
@@ -663,7 +663,7 @@ namespace Waher.Networking.XMPP.P2P
 			string LocIp = null;
 			int? LocPort = null;
 
-			if (P2P != null)
+			if (!(P2P is null))
 			{
 				foreach (XmlAttribute Attr in P2P.Attributes)
 				{

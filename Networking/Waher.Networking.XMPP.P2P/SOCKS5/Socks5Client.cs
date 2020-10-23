@@ -133,7 +133,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			else
 			{
 				EventHandler h = this.OnWriteQueueEmpty;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -198,7 +198,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.Information("State changed to " + this.state.ToString());
 
 				EventHandlerAsync h = this.OnStateChange;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -321,7 +321,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (this.state == Socks5State.Connected)
 			{
 				DataReceivedEventHandler h = this.OnDataReceived;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -484,7 +484,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Port |= Buffer[Offset++];
 
 				ResponseEventHandler h = this.OnResponse;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{

@@ -1661,7 +1661,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					CSharp.AppendLine(";");
 
 					CSharp.Append(Indent);
-					CSharp.AppendLine("if (ObjectId != null)");
+					CSharp.AppendLine("if (!(ObjectId is null))");
 
 					CSharp.Append(Indent);
 					CSharp.AppendLine("{");

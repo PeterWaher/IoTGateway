@@ -296,7 +296,7 @@ namespace Waher.Networking.XMPP.Contracts
 					e0 = null;
 			}
 
-			if (e0 != null)
+			if (!(e0 is null))
 			{
 				try
 				{
@@ -327,7 +327,7 @@ namespace Waher.Networking.XMPP.Contracts
 							if (N is XmlElement E2)
 							{
 								ServerKey = EndpointSecurity.ParseE2eKey(E2);
-								if (ServerKey != null)
+								if (!(ServerKey is null))
 									break;
 							}
 						}
@@ -418,7 +418,7 @@ namespace Waher.Networking.XMPP.Contracts
 					e0 = null;
 			}
 
-			if (e0 != null)
+			if (!(e0 is null))
 			{
 				try
 				{
@@ -950,7 +950,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			LegalIdentityEventHandler h = this.IdentityUpdated;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
 
@@ -1844,7 +1844,7 @@ namespace Waher.Networking.XMPP.Contracts
 					break;
 
 				case ContractParts.ExplicitlyDefined:
-					if (Parts != null)
+					if (!(Parts is null))
 					{
 						foreach (Part Part in Parts)
 						{
@@ -2204,7 +2204,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ContractSignedEventHandler h = this.ContractSigned;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string ContractId = XML.Attribute(e.Content, "contractId");
 				string LegalId = XML.Attribute(e.Content, "legalId");
@@ -2444,7 +2444,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ContractReferenceEventHandler h = this.ContractUpdated;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string ContractId = XML.Attribute(e.Content, "contractId");
 
@@ -2468,7 +2468,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ContractReferenceEventHandler h = this.ContractDeleted;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string ContractId = XML.Attribute(e.Content, "contractId");
 
@@ -3742,7 +3742,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			LegalIdentityPetitionEventHandler h = this.PetitionedIdentityReceived;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string LegalId = XML.Attribute(e.Content, "id");
 				string PetitionId = XML.Attribute(e.Content, "pid");
@@ -3797,7 +3797,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			LegalIdentityPetitionResponseEventHandler h = this.PetitionedIdentityResponseReceived;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				bool Response = XML.Attribute(e.Content, "response", false);
@@ -3937,7 +3937,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ContractPetitionEventHandler h = this.PetitionedContractReceived;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string ContractId = XML.Attribute(e.Content, "id");
 				string PetitionId = XML.Attribute(e.Content, "pid");
@@ -3993,7 +3993,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ContractPetitionResponseEventHandler h = this.PetitionedContractResponseReceived;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				string PetitionId = XML.Attribute(e.Content, "pid");
 				bool Response = XML.Attribute(e.Content, "response", false);

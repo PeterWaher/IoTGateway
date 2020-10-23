@@ -149,10 +149,10 @@ namespace Waher.Script.Graphs.Functions.Plots
 			}
 			finally
 			{
-				if (Brush != null)
+				if (!(Brush is null))
 					Brush.Dispose();
 
-				if (Path != null)
+				if (!(Path is null))
 					Path.Dispose();
 			}
 		}

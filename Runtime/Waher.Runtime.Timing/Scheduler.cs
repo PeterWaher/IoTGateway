@@ -99,7 +99,7 @@ namespace Waher.Runtime.Timing
 				}
 			}
 
-			if (ToRemove != null)
+			if (!(ToRemove is null))
 			{
 				foreach (DateTime TP in ToRemove)
 					this.events.Remove(TP);

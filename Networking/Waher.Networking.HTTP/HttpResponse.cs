@@ -854,7 +854,7 @@ namespace Waher.Networking.HTTP
 							break;
 					}
 
-					if (Data != null)
+					if (!(Data is null))
 						return true;
 				}
 			}

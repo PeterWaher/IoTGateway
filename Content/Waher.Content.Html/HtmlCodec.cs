@@ -157,7 +157,7 @@ namespace Waher.Content.Html
 				else if (Object is string s)
 					Html = s;
 
-				if (Html != null)
+				if (!(Html is null))
 				{
 					if (Encoding is null)
 					{

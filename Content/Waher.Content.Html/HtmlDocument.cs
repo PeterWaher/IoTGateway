@@ -660,7 +660,7 @@ namespace Waher.Content.Html
 							sb.Clear();
 							Empty = true;
 
-							if (CurrentElement != null)
+							if (!(CurrentElement is null))
 							{
 								if (CurrentElement.EndPosition < Pos)
 									CurrentElement.EndPosition = Pos;
@@ -677,7 +677,7 @@ namespace Waher.Content.Html
 									while (Loop != null && Loop.Name != s)
 										Loop = Loop.Parent as HtmlElement;
 
-									if (Loop != null)
+									if (!(Loop is null))
 									{
 										Loop = CurrentElement.Parent as HtmlElement;
 

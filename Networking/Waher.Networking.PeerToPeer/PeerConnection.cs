@@ -398,7 +398,7 @@ namespace Waher.Networking.PeerToPeer
 		private void RaiseOnClosed()
 		{
 			EventHandler h = this.OnClosed;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -485,14 +485,14 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 
-					if (FirstPacket != null)
+					if (!(FirstPacket is null))
 						this.lastReceivedPacket = FirstPacketNr;
 				}
 
 				BinaryDataReadEventHandler h = this.OnReceived;
-				if (h != null)
+				if (!(h is null))
 				{
-					if (LostPackets != null)
+					if (!(LostPackets is null))
 					{
 						foreach (KeyValuePair<ushort, byte[]> P in LostPackets)
 						{
@@ -507,7 +507,7 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 
-					if (FirstPacket != null)
+					if (!(FirstPacket is null))
 					{
 						try
 						{
@@ -529,7 +529,7 @@ namespace Waher.Networking.PeerToPeer
 				Array.Copy(Data, 0, Packet, 0, Len);
 
 				BinaryDataReadEventHandler h = this.OnReceived;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{

@@ -204,13 +204,13 @@ namespace Waher.Runtime.Threading
 				}
 			}
 
-			if (List != null)
+			if (!(List is null))
 			{
 				foreach (TaskCompletionSource<bool> T in List)
 					T.TrySetResult(true);
 			}
 
-			if (List2 != null)
+			if (!(List2 is null))
 			{
 				foreach (TaskCompletionSource<bool> T in List2)
 					T.TrySetResult(true);
@@ -291,13 +291,13 @@ namespace Waher.Runtime.Threading
 				}
 			}
 
-			if (List != null)
+			if (!(List is null))
 			{
 				foreach (TaskCompletionSource<bool> T in List)
 					T.TrySetResult(false);
 			}
 
-			if (List2 != null)
+			if (!(List2 is null))
 			{
 				foreach (TaskCompletionSource<bool> T in List2)
 					T.TrySetResult(false);

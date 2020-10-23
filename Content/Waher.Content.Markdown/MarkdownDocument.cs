@@ -417,7 +417,7 @@ namespace Waher.Content.Markdown
 					}
 				}
 
-				if (Result != null)
+				if (!(Result is null))
 				{
 					if (!(Result is string s3))
 					{
@@ -651,7 +651,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (Segments != null)
+					if (!(Segments is null))
 						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
 					if (Segments is null)
@@ -718,7 +718,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (Segments != null)
+					if (!(Segments is null))
 						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
 					if (Segments is null)
@@ -789,7 +789,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (Segments != null)
+					if (!(Segments is null))
 						Segments.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
 
 					if (Segments is null)
@@ -857,7 +857,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (Segments != null)
+					if (!(Segments is null))
 						Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, c)));
 
 					if (Segments is null)
@@ -4581,7 +4581,7 @@ namespace Waher.Content.Markdown
 						sb.Append(P.Key);
 					}
 
-					if (sb != null)
+					if (!(sb is null))
 					{
 						Description = XML.HtmlAttributeEncode(sb.ToString());
 
@@ -4641,7 +4641,7 @@ namespace Waher.Content.Markdown
 					}
 				}
 
-				if (sb != null)
+				if (!(sb is null))
 				{
 					Output.Append("<meta name=\"description\" content=\"");
 					Output.Append(XML.HtmlAttributeEncode(sb.ToString()));

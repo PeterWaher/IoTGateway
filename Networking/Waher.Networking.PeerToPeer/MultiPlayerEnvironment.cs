@@ -314,7 +314,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 
 					MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -537,7 +537,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 
 				MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -575,7 +575,7 @@ namespace Waher.Networking.PeerToPeer
 		protected virtual void GameDataReceived(Player FromPlayer, PeerConnection Connection, byte[] Packet)
 		{
 			GameDataEventHandler h = this.OnGameDataReceived;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -623,7 +623,7 @@ namespace Waher.Networking.PeerToPeer
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			if (Connection != null)
+			if (!(Connection is null))
 				Connection.SendTcp(Packet);
 		}
 
@@ -644,7 +644,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			if (Connection != null)
+			if (!(Connection is null))
 				Connection.SendTcp(Packet);
 		}
 
@@ -682,7 +682,7 @@ namespace Waher.Networking.PeerToPeer
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			if (Connection != null)
+			if (!(Connection is null))
 				Connection.SendUdp(Packet, IncludeNrPreviousPackets);
 		}
 
@@ -705,7 +705,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			if (Connection != null)
+			if (!(Connection is null))
 				Connection.SendUdp(Packet, IncludeNrPreviousPackets);
 		}
 
@@ -728,7 +728,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerDisconnected;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -884,7 +884,7 @@ namespace Waher.Networking.PeerToPeer
 			await Connection.SendTcp(Output.GetPacket());
 
 			MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -961,7 +961,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 
 				MultiPlayerEnvironmentStateChangeEventHandler h = this.OnStateChange;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{

@@ -191,7 +191,7 @@ namespace Waher.Networking.XMPP.DataForms
 				if (this.required)
 					this.error = "Required field.";
 			}
-			else if (Value != null)
+			else if (!(Value is null))
 			{
 				if (this.dataType != null)
 				{

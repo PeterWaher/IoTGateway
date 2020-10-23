@@ -470,7 +470,7 @@ namespace Waher.Networking.HTTP
 					{
 						IContentConverter[] Converters = InternetContent.GetConverters(ContentType);
 
-						if (Converters != null)
+						if (!(Converters is null))
 						{
 							string BestContentType = null;
 							double BestQuality = 0;

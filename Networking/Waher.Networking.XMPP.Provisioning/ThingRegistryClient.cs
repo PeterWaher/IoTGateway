@@ -251,7 +251,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					XmlElement E = e.FirstElement;
 					string OwnerJid = string.Empty;
@@ -369,7 +369,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					XmlElement E = e.FirstElement;
 					string NodeJid = string.Empty;
@@ -425,7 +425,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			ClaimedEventArgs e2 = new ClaimedEventArgs(e, Node, OwnerJid, Public);
 			ClaimedEventHandler h = this.Claimed;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -506,7 +506,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -535,7 +535,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
 			NodeEventHandler h = this.Removed;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -664,7 +664,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					XmlElement E = e.FirstElement;
 					bool Disowned = false;
@@ -749,7 +749,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -824,7 +824,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -861,7 +861,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
 			NodeEventHandler h = this.Disowned;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -972,7 +972,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
 

@@ -515,7 +515,7 @@ namespace Waher.Things.Metering
 		private void RaiseUpdate()
 		{
 			EventHandler h = this.OnUpdate;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

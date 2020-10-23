@@ -119,7 +119,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			TextEventHandler h = this.OnSent;
 			bool Result = true;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -139,7 +139,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			TextEventHandler h = this.OnReceived;
 			bool Result = true;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -282,7 +282,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				sb.Append("' xmlns='");
 				sb.Append(XmppClient.NamespaceClient);
 
-				if (Namespaces != null)
+				if (!(Namespaces is null))
 				{
 					foreach (KeyValuePair<string, string> P in Namespaces)
 					{
@@ -511,7 +511,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 					await this.RaiseOnSent(Packet);
 
-					if (DeliveryCallback != null)
+					if (!(DeliveryCallback is null))
 					{
 						try
 						{

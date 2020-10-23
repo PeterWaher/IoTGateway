@@ -130,7 +130,7 @@ namespace Waher.Things.ControlParameters
 		{
 			ColorReference Value = await this.Get(Node);
 
-			if (Value != null)
+			if (!(Value is null))
 				return Value.ToString();
 			else
 				return string.Empty;

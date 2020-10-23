@@ -152,7 +152,7 @@ namespace Waher.Networking.XMPP.Search
 			if (this.searchForm != null)
 			{
 				Field Field = this.searchForm[Var];
-				if (Field != null)
+				if (!(Field is null))
 					return Field.ValueString;
 			}
 
@@ -166,7 +166,7 @@ namespace Waher.Networking.XMPP.Search
 			if (this.searchForm != null)
 			{
 				Field Field = this.searchForm[Var];
-				if (Field != null)
+				if (!(Field is null))
 					Field.SetValue(Value);
 			}
 
@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP.Search
 				State = State
 			};
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{

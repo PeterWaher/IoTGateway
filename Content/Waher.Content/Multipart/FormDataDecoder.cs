@@ -108,7 +108,7 @@ namespace Waher.Content.Multipart
 		{
 			string Boundary = null;
 
-			if (Fields != null)
+			if (!(Fields is null))
 			{
 				foreach (KeyValuePair<string, string> P in Fields)
 				{
@@ -281,7 +281,7 @@ namespace Waher.Content.Multipart
 
 				EmbeddedContent.Decoded = InternetContent.Decode(EmbeddedContent.ContentType, Data2, BaseUri);
 
-				if (Form != null)
+				if (!(Form is null))
 				{
 					Form[EmbeddedContent.Name] = EmbeddedContent.Decoded;
 
@@ -295,7 +295,7 @@ namespace Waher.Content.Multipart
 						Form[EmbeddedContent.Name + "_FileName"] = EmbeddedContent.FileName;
 				}
 
-				if (List != null)
+				if (!(List is null))
 					List.Add(EmbeddedContent);
 			}
 		}

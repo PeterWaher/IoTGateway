@@ -190,7 +190,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (!string.IsNullOrEmpty(Field.Var))
 							this.fieldsByVar[Field.Var] = Field;
 
-						if (Media != null)
+						if (!(Media is null))
 						{
 							Field = new MediaField(this, Guid.NewGuid().ToString(), string.Empty, false,
 								null, null, string.Empty, new StringDataType(), new BasicValidation(), Media, string.Empty, false, true, false);
@@ -1139,7 +1139,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			DataFormEventHandler h = this.OnRemoteUpdate;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

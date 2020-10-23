@@ -414,7 +414,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.SendIqGet(Address, "<getCertificate xmlns='" + NamespaceProvisioningToken + "'>" +
 				XML.Encode(Token) + "</getCertificate>", async (sender, e) =>
 				{
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						try
 						{
@@ -455,7 +455,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(JID, this.ownerJid, true) == 0) ||
 				string.Compare(JID, this.provisioningServerAddress, true) == 0)
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -588,7 +588,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 						Permitted2.AddLast(Ref);
 					}
-					else if (ToCheck2 != null)
+					else if (!(ToCheck2 is null))
 						ToCheck2.AddLast(Ref);
 				}
 
@@ -626,7 +626,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -700,13 +700,13 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Xml.Append("'>");
 
-				if (ToCheck != null)
+				if (!(ToCheck is null))
 				{
 					foreach (IThingReference Node in ToCheck)
 						this.AppendNode(Xml, Node);
 				}
 
-				if (FieldNames != null)
+				if (!(FieldNames is null))
 				{
 					foreach (string FieldName in FieldNames)
 					{
@@ -783,7 +783,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					if (CanRead)
 					{
-						if (Permitted != null)
+						if (!(Permitted is null))
 							Nodes2 = new List<IThingReference>(Permitted);
 
 						foreach (XmlNode N in E.ChildNodes)
@@ -824,14 +824,14 @@ namespace Waher.Networking.XMPP.Provisioning
 							}
 						}
 					}
-					else if (Permitted != null)
+					else if (!(Permitted is null))
 					{
 						CanRead = true;
 						Jid = RequestFromBareJid;
 						FieldTypes2 = FieldTypes;
 						Nodes2 = new List<IThingReference>(Permitted);
 
-						if (FieldNames != null)
+						if (!(FieldNames is null))
 							Fields2 = new List<string>(FieldNames);
 					}
 				}
@@ -917,7 +917,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -969,13 +969,13 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("'>");
 
 
-				if (ToCheck != null)
+				if (!(ToCheck is null))
 				{
 					foreach (IThingReference Node in ToCheck)
 						this.AppendNode(Xml, Node);
 				}
 
-				if (ParameterNames != null)
+				if (!(ParameterNames is null))
 				{
 					foreach (string ParameterName in ParameterNames)
 					{
@@ -1011,7 +1011,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					if (CanControl)
 					{
-						if (Permitted != null)
+						if (!(Permitted is null))
 							Nodes2 = new List<IThingReference>(Permitted);
 
 						foreach (XmlNode N in E.ChildNodes)
@@ -1052,13 +1052,13 @@ namespace Waher.Networking.XMPP.Provisioning
 							}
 						}
 					}
-					else if (Permitted != null)
+					else if (!(Permitted is null))
 					{
 						CanControl = true;
 						Jid = RequestFromBareJid;
 						Nodes2 = new List<IThingReference>(Permitted);
 
-						if (ParameterNames != null)
+						if (!(ParameterNames is null))
 							ParameterNames2 = new List<string>(ParameterNames);
 					}
 				}
@@ -1094,12 +1094,12 @@ namespace Waher.Networking.XMPP.Provisioning
 			CachedQuery Query = await Database.FindFirstDeleteRest<CachedQuery>(new FilterAnd(
 				new FilterFieldEqualTo("Xml", Xml), new FilterFieldEqualTo("Method", Method)));
 
-			if (Query != null)
+			if (!(Query is null))
 			{
 				Query.LastUsed = DateTime.Now;
 				await Database.Update(Query);
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1152,7 +1152,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			await Database.Insert(Query);
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				e.State = State;
 				await Callback(Sender, e);
@@ -1214,7 +1214,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			IsFriendEventHandler h = this.IsFriendQuestion;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -1272,7 +1272,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			CanReadEventHandler h = this.CanReadQuestion;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -1491,7 +1491,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			CanControlEventHandler h = this.CanControlQuestion;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

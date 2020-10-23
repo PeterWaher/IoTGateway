@@ -391,7 +391,7 @@ namespace Waher.Networking.PeerToPeer
 		protected virtual void PeerConnected(PeerConnection Connection)
 		{
 			PeerConnectedEventHandler h = this.OnPeerConnected;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -465,7 +465,7 @@ namespace Waher.Networking.PeerToPeer
 					if (!this.disposed)
 					{
 						UdpDatagramEvent h = this.OnUdpDatagramReceived;
-						if (h != null)
+						if (!(h is null))
 						{
 							try
 							{
@@ -515,7 +515,7 @@ namespace Waher.Networking.PeerToPeer
 					await this.udpClient.SendAsync(Datagram, Datagram.Length, RemoteEndpoint);
 
 					UdpDatagramEvent h = this.OnUdpDatagramSent;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{

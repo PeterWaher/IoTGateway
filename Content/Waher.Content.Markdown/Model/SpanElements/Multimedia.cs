@@ -168,7 +168,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					}
 				}
 
-				if (Best != null)
+				if (!(Best is null))
 					break;
 			}
 

@@ -36,7 +36,7 @@ namespace Waher.Networking.CoAP.Options
 		{
 			this.value = 0;
 
-			if (Value != null)
+			if (!(Value is null))
 			{
 				int i = 0;
 				int c = Value.Length;

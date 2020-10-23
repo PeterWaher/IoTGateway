@@ -916,7 +916,7 @@ namespace Waher.Networking.XMPP.P2P
 		private Task Peer_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			TextEventHandler h = this.OnSent;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

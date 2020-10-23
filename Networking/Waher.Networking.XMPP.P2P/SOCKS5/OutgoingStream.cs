@@ -312,7 +312,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.aborted = true;
 
 			EventHandler h = this.OnAbort;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

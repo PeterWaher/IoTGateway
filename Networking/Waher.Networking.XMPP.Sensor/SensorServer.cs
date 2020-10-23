@@ -656,7 +656,7 @@ namespace Waher.Networking.XMPP.Sensor
 										}
 									}
 
-									if (ToRemove != null)
+									if (!(ToRemove is null))
 									{
 										foreach (string FieldName in ToRemove)
 											Fields.Remove(FieldName);
@@ -946,7 +946,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Triggered != null)
+			if (!(Triggered is null))
 			{
 				foreach (Subscription Subscription in Triggered)
 					this.TriggerSubscription(Subscription);

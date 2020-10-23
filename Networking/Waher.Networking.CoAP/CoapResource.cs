@@ -75,7 +75,7 @@ namespace Waher.Networking.CoAP
 			get { return this.endpoint; }
 			internal set
 			{
-				if (value != null)
+				if (!(value is null))
 				{
 					if (this.endpoint != null)
 						throw new ArgumentException("Resource already registered.", nameof(Endpoint));
@@ -189,7 +189,7 @@ namespace Waher.Networking.CoAP
 						}
 					}
 
-					if (ToRemove != null)
+					if (!(ToRemove is null))
 					{
 						foreach (string Key2 in ToRemove)
 							this.registrations.Remove(Key2);

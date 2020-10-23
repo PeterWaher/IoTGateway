@@ -944,7 +944,7 @@ namespace Waher.Networking.XMPP.Contracts
 			else
 				Attributes?.Remove("xmlns");
 
-			if (Attributes != null)
+			if (!(Attributes is null))
 			{
 				foreach (KeyValuePair<string, string> Attr in Attributes)
 				{

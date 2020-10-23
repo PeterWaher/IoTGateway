@@ -532,7 +532,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                     else
                         Key = Receiver.Previous.DecryptSecret(EncryptedKey);
 
-                    if (Key != null)
+                    if (!(Key is null))
                     {
                         Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 

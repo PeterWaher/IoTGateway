@@ -283,7 +283,7 @@ namespace Waher.IoTGateway.Setup
 
 		private static void Clear(Dictionary<string, TemporaryFile> Files)
 		{
-			if (Files != null)
+			if (!(Files is null))
 			{
 				lock (Files)
 				{
@@ -1299,7 +1299,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			while (r.MoveToNextAttribute());
 
-			if (ElementType != null)
+			if (!(ElementType is null))
 			{
 				switch (PropertyType)
 				{

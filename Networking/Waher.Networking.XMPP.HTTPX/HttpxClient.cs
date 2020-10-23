@@ -201,7 +201,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			string StreamId = null;
 
-			if (DataStream != null)
+			if (!(DataStream is null))
 			{
 				if (DataStream.Length < this.maxChunkSize)
 				{
@@ -476,7 +476,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
 			{
-				if (PrevData != null)
+				if (!(PrevData is null))
 					await Rec.ChunkReceived(Nr, false, PrevData);
 
 				Nr++;
@@ -496,7 +496,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (e.Reason == InBandBytestreams.CloseReason.Done)
 				{
-					if (PrevData != null)
+					if (!(PrevData is null))
 						await Rec.ChunkReceived(Nr, true, PrevData);
 					else
 						await Rec.ChunkReceived(Nr, true, new byte[0]);
@@ -517,7 +517,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				ClientRec = Rec as ClientChunkRecord;
 
-				if (ClientRec != null)
+				if (!(ClientRec is null))
 				{
 #if LOG_SOCKS5_EVENTS
 					this.client.Information("Accepting SOCKS5 stream from " + e.From);

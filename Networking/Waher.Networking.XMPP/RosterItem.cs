@@ -345,7 +345,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (ToTest != null)
+			if (!(ToTest is null))
 			{
 				foreach (PresenceEventArgs e2 in ToTest)
 				{

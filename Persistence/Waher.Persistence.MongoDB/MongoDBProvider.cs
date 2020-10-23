@@ -253,7 +253,7 @@ namespace Waher.Persistence.MongoDB
 				else
 					Result = null;
 
-				if (Result != null)
+				if (!(Result is null))
 				{
 					this.serializers[Type] = Result;
 					this.serializerAdded.Set();

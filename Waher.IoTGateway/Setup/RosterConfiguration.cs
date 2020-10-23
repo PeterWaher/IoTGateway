@@ -464,7 +464,7 @@ namespace Waher.IoTGateway.Setup
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
 
-			if (Groups != null)
+			if (!(Groups is null))
 			{
 				foreach (string Group in GroupsArray)
 				{

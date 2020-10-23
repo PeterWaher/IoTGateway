@@ -199,7 +199,7 @@ namespace Waher.Script.Fractals.IFS
 			{
 				if (f is DoubleMatrix M)
 				{
-					if (LambdaExpressions != null)
+					if (!(LambdaExpressions is null))
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
 					if (Matrices is null)
@@ -211,7 +211,7 @@ namespace Waher.Script.Fractals.IFS
 				}
 				else if (f is ILambdaExpression Lambda)
 				{
-					if (Matrices != null)
+					if (!(Matrices is null))
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
 					if (LambdaExpressions is null)
@@ -277,7 +277,7 @@ namespace Waher.Script.Fractals.IFS
 			if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
 				throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-			if (Matrices != null)
+			if (!(Matrices is null))
 			{
 				return CalcIfs(xc, yc, dr, N, Matrices.ToArray(), Weights.ToArray(), Colors.ToArray(),
 					dimx, dimy, Seed, this, this.FractalZoomScript,

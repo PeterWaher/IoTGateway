@@ -341,7 +341,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 
 							if (ch == ',')
 							{
-								if (Parameters != null)
+								if (!(Parameters is null))
 									Record.Parameters = Parameters.ToArray();
 
 								Records.Add(Record);
@@ -408,7 +408,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 						Parameters.Add(new KeyValuePair<string, string>(ParameterName, string.Empty));
 					}
 
-					if (Parameters != null)
+					if (!(Parameters is null))
 						Record.Parameters = Parameters.ToArray();
 
 					Records.Add(Record);
@@ -431,7 +431,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 						Parameters.Add(new KeyValuePair<string, string>(ParameterName, ParameterValue));
 					}
 
-					if (Parameters != null)
+					if (!(Parameters is null))
 						Record.Parameters = Parameters.ToArray();
 
 					Records.Add(Record);

@@ -111,7 +111,7 @@ namespace Waher.Content.Html
 						case "og:image":
 						case "og:image:url":
 						case "twitter:image":
-							if (Images != null)
+							if (!(Images is null))
 							{
 								LastImage = null;
 
@@ -124,7 +124,7 @@ namespace Waher.Content.Html
 									}
 								}
 
-								if (LastImage != null)
+								if (!(LastImage is null))
 									break;
 							}
 
@@ -140,12 +140,12 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:image:secure_url":
-							if (LastImage != null)
+							if (!(LastImage is null))
 								LastImage.SecureUrl = Value;
 							break;
 
 						case "og:image:type":
-							if (LastImage != null)
+							if (!(LastImage is null))
 								LastImage.ContentType = Value;
 							break;
 
@@ -161,7 +161,7 @@ namespace Waher.Content.Html
 
 						case "og:image:alt":
 						case "twitter:image:alt":
-							if (LastImage != null)
+							if (!(LastImage is null))
 								LastImage.Description = Value;
 							break;
 
@@ -178,12 +178,12 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:audio:secure_url":
-							if (LastAudio != null)
+							if (!(LastAudio is null))
 								LastAudio.SecureUrl = Value;
 							break;
 
 						case "og:audio:type":
-							if (LastAudio != null)
+							if (!(LastAudio is null))
 								LastAudio.ContentType = Value;
 							break;
 
@@ -229,12 +229,12 @@ namespace Waher.Content.Html
 							break;
 
 						case "og:video:secure_url":
-							if (LastVideo != null)
+							if (!(LastVideo is null))
 								LastVideo.SecureUrl = Value;
 							break;
 
 						case "og:video:type":
-							if (LastVideo != null)
+							if (!(LastVideo is null))
 								LastVideo.ContentType = Value;
 							break;
 

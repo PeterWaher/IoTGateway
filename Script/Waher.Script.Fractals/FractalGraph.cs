@@ -179,7 +179,7 @@ namespace Waher.Script.Fractals
 				TP = System.DateTime.Now;
 				if ((TP - LastPreview).TotalSeconds > 5)
 				{
-					if (Node != null)
+					if (!(Node is null))
 					{
 						LastPreview = TP;
 

@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				else
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{

@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP.Control
 					case "l":
 					case "s":
 					case "t":
-						if (ParameterNames != null)
+						if (!(ParameterNames is null))
 							ParameterNames[XML.Attribute(E, "n")] = true;
 						break;
 
@@ -249,7 +249,7 @@ namespace Waher.Networking.XMPP.Control
 							return;
 						}
 
-						if (ParameterNames != null)
+						if (!(ParameterNames is null))
 						{
 							foreach (Field Field in Form.Fields)
 								ParameterNames[Field.Var] = true;
@@ -637,7 +637,7 @@ namespace Waher.Networking.XMPP.Control
 			{
 				Xml.Append("\">");
 
-				if (Nodes != null)
+				if (!(Nodes is null))
 				{
 					foreach (IThingReference Node in Nodes)
 					{
@@ -660,7 +660,7 @@ namespace Waher.Networking.XMPP.Control
 					}
 				}
 
-				if (ParameterNames != null)
+				if (!(ParameterNames is null))
 				{
 					foreach (string ParameterName in ParameterNames)
 					{
@@ -789,7 +789,7 @@ namespace Waher.Networking.XMPP.Control
 							}
 						}
 
-						if (ToRemove != null)
+						if (!(ToRemove is null))
 						{
 							foreach (string Key in ToRemove)
 								Parameters1.Remove(Key);

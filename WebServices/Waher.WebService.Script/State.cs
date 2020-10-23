@@ -416,7 +416,7 @@ namespace Waher.WebService.Script
 						Html.Append("<td>");
 
 						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (Item != null)
+						if (!(Item is null))
 						{
 							if (Item is string s3)
 								Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));

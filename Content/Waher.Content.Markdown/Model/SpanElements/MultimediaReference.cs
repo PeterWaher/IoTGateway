@@ -51,7 +51,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
-			if (Multimedia != null)
+			if (!(Multimedia is null))
 				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
@@ -79,7 +79,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
-			if (Multimedia != null)
+			if (!(Multimedia is null))
 			{
 				Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children, 
 					this.aloneInParagraph, this.Document);
@@ -95,7 +95,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
-			if (Multimedia != null)
+			if (!(Multimedia is null))
 			{
 				Multimedia.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, Multimedia.Items, this.Children,
 					this.aloneInParagraph, this.Document);

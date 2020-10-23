@@ -157,7 +157,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			ValidateStreamEventHandler h = this.OnOpen;
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId, BlockSize);
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

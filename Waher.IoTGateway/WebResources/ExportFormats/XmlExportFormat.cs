@@ -300,14 +300,14 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				if (PropertyValue is null)
 				{
 					await this.output.WriteStartElementAsync(string.Empty, "Null", Export.ExportNamepace);
-					if (PropertyName != null)
+					if (!(PropertyName is null))
 						await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 					await this.output.WriteEndElementAsync();
 				}
 				else if (PropertyValue is Enum)
 				{
 					await this.output.WriteStartElementAsync(string.Empty, "En", Export.ExportNamepace);
-					if (PropertyName != null)
+					if (!(PropertyName is null))
 						await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 					await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 					await this.output.WriteEndElementAsync();
@@ -318,7 +318,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 					{
 						case TypeCode.Boolean:
 							await this.output.WriteStartElementAsync(string.Empty, "Bl", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, CommonTypes.Encode((bool)PropertyValue));
 							await this.output.WriteEndElementAsync();
@@ -326,7 +326,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Byte:
 							await this.output.WriteStartElementAsync(string.Empty, "B", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -334,7 +334,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Char:
 							await this.output.WriteStartElementAsync(string.Empty, "Ch", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -342,7 +342,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.DateTime:
 							await this.output.WriteStartElementAsync(string.Empty, "DT", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, XML.Encode((DateTime)PropertyValue));
 							await this.output.WriteEndElementAsync();
@@ -350,7 +350,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Decimal:
 							await this.output.WriteStartElementAsync(string.Empty, "Dc", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, CommonTypes.Encode((decimal)PropertyValue));
 							await this.output.WriteEndElementAsync();
@@ -358,7 +358,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Double:
 							await this.output.WriteStartElementAsync(string.Empty, "Db", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, CommonTypes.Encode((double)PropertyValue));
 							await this.output.WriteEndElementAsync();
@@ -366,7 +366,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Int16:
 							await this.output.WriteStartElementAsync(string.Empty, "I2", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -374,7 +374,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Int32:
 							await this.output.WriteStartElementAsync(string.Empty, "I4", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -382,7 +382,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Int64:
 							await this.output.WriteStartElementAsync(string.Empty, "I8", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -390,7 +390,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.SByte:
 							await this.output.WriteStartElementAsync(string.Empty, "I1", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -398,7 +398,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.Single:
 							await this.output.WriteStartElementAsync(string.Empty, "Fl", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, CommonTypes.Encode((float)PropertyValue));
 							await this.output.WriteEndElementAsync();
@@ -410,7 +410,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							{
 								XmlConvert.VerifyXmlChars(s);
 								await this.output.WriteStartElementAsync(string.Empty, "S", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
 								await this.output.WriteEndElementAsync();
@@ -420,7 +420,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 								byte[] Bin = Encoding.UTF8.GetBytes(s);
 								s = Convert.ToBase64String(Bin);
 								await this.output.WriteStartElementAsync(string.Empty, "S64", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
 								await this.output.WriteEndElementAsync();
@@ -429,7 +429,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.UInt16:
 							await this.output.WriteStartElementAsync(string.Empty, "U2", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -437,7 +437,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.UInt32:
 							await this.output.WriteStartElementAsync(string.Empty, "U4", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -445,7 +445,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 						case TypeCode.UInt64:
 							await this.output.WriteStartElementAsync(string.Empty, "U8", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 							await this.output.WriteEndElementAsync();
@@ -454,7 +454,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 						case TypeCode.DBNull:
 						case TypeCode.Empty:
 							await this.output.WriteStartElementAsync(string.Empty, "Null", Export.ExportNamepace);
-							if (PropertyName != null)
+							if (!(PropertyName is null))
 								await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 							await this.output.WriteEndElementAsync();
 							break;
@@ -463,7 +463,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							if (PropertyValue is TimeSpan)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "TS", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 								await this.output.WriteEndElementAsync();
@@ -471,7 +471,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is DateTimeOffset DTO)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "DTO", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, XML.Encode(DTO));
 								await this.output.WriteEndElementAsync();
@@ -483,7 +483,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 								{
 									XmlConvert.VerifyXmlChars(s);
 									await this.output.WriteStartElementAsync(string.Empty, "CIS", Export.ExportNamepace);
-									if (PropertyName != null)
+									if (!(PropertyName is null))
 										await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 									await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
 									await this.output.WriteEndElementAsync();
@@ -493,7 +493,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 									byte[] Bin = Encoding.UTF8.GetBytes(s);
 									s = Convert.ToBase64String(Bin);
 									await this.output.WriteStartElementAsync(string.Empty, "CIS64", Export.ExportNamepace);
-									if (PropertyName != null)
+									if (!(PropertyName is null))
 										await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 									await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, s);
 									await this.output.WriteEndElementAsync();
@@ -502,7 +502,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is byte[] Bin)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "Bin", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 
 								byte[] Buf = null;
@@ -539,7 +539,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is Guid)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "ID", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "v", string.Empty, PropertyValue.ToString());
 								await this.output.WriteEndElementAsync();
@@ -547,7 +547,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is Array A)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "Array", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "elementType", string.Empty, PropertyValue.GetType().GetElementType().FullName);
 
@@ -559,7 +559,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 							else if (PropertyValue is GenericObject Obj)
 							{
 								await this.output.WriteStartElementAsync(string.Empty, "Obj", Export.ExportNamepace);
-								if (PropertyName != null)
+								if (!(PropertyName is null))
 									await this.output.WriteAttributeStringAsync(string.Empty, "n", string.Empty, PropertyName);
 								await this.output.WriteAttributeStringAsync(string.Empty, "type", string.Empty, Obj.TypeName);
 

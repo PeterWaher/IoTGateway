@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				else if (this.streams.ContainsKey(StreamId))
 					StreamId = null;
 
-				if (StreamId != null)
+				if (!(StreamId is null))
 					this.streams[StreamId] = null;
 			}
 
@@ -422,7 +422,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -468,7 +468,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			ValidateStreamEventHandler h = this.OnOpen;
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId);
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

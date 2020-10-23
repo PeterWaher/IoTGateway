@@ -170,7 +170,7 @@ namespace Waher.Networking.UPnP
 							if (!string.IsNullOrEmpty(Headers.Location))
 							{
 								UPnPDeviceLocationEventHandler h = this.OnDeviceFound;
-								if (h != null)
+								if (!(h is null))
 								{
 									DeviceLocation DeviceLocation = new DeviceLocation(this, Headers.SearchTarget, Headers.Server, Headers.Location,
 										Headers.UniqueServiceName, Headers);
@@ -216,7 +216,7 @@ namespace Waher.Networking.UPnP
 			{
 				case "M-SEARCH":
 					NotificationEventHandler h = this.OnSearch;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -231,7 +231,7 @@ namespace Waher.Networking.UPnP
 
 				case "NOTIFY":
 					h = this.OnNotification;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -369,7 +369,7 @@ namespace Waher.Networking.UPnP
 		private void RaiseOnError(Exception ex)
 		{
 			UPnPExceptionEventHandler h = this.OnError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

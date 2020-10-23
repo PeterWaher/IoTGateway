@@ -186,13 +186,13 @@ namespace Waher.Script.Fractals.ComplexFractals
 			if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
 				throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-			if (f != null)
+			if (!(f is null))
 			{
 				return CalcNewton(rc, ic, dr, R, f, fDef, Variables, N, dimx, dimy,
 					this, this.FractalZoomScript,
 					new object[] { dimx, dimy, N, R, fDef });
 			}
-			else if (CoefficientsZ != null)
+			else if (!(CoefficientsZ is null))
 			{
 				return CalcNewton(rc, ic, dr, R, CoefficientsZ, N, dimx, dimy,
 					this, this.FractalZoomScript,

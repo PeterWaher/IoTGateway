@@ -1469,7 +1469,7 @@ namespace Waher.Networking.HTTP
 		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{
 			CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

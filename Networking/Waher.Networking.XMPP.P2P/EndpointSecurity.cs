@@ -92,7 +92,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.serverlessMessaging = ServerlessMessaging;
 			this.contacts = new Dictionary<string, IE2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
 
-			if (LocalEndpoints != null)
+			if (!(LocalEndpoints is null))
 			{
 				this.keys = LocalEndpoints;
 
@@ -294,7 +294,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.oldKeys = this.keys;
 
-				if (Keys != null)
+				if (!(Keys is null))
 				{
 					foreach (IE2eEndpoint E2e in Keys)
 						E2e.Dispose();
@@ -365,7 +365,7 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					IE2eEndpoint Endpoint = ParseE2eKey(E);
 
-					if (Endpoint != null)
+					if (!(Endpoint is null))
 					{
 						if (Endpoints is null)
 							Endpoints = new List<IE2eEndpoint>();
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.P2P
 				IE2eEndpoint[] OldEndpoints = null;
 				int i;
 
-				if (E2E != null)
+				if (!(E2E is null))
 					Endpoints = ParseE2eKeys(E2E);
 
 				if (Endpoints is null)
@@ -449,7 +449,7 @@ namespace Waher.Networking.XMPP.P2P
 					this.contacts[FullJID] = Endpoints.ToArray();
 				}
 
-				if (OldEndpoints != null)
+				if (!(OldEndpoints is null))
 				{
 					foreach (IE2eEndpoint Endpoint in OldEndpoints)
 						Endpoint.Dispose();
@@ -775,7 +775,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(Cipher is null))
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					string Content = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher, out string EndpointReference);
 					if (Content is null)
@@ -827,7 +827,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (PkiSynchronized)
 				{
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						e.State = State;
 						await Callback(Sender, e);
@@ -852,7 +852,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			else
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					e.State = State;
 					await Callback(Sender, e);
@@ -1081,7 +1081,7 @@ namespace Waher.Networking.XMPP.P2P
 				RosterItem Item = Client.GetRosterItem(To);
 				bool Found = false;
 
-				if (Item != null)
+				if (!(Item is null))
 				{
 					foreach (PresenceEventArgs e in Item.Resources)
 					{
@@ -1357,7 +1357,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (e.Ok && e.FirstElement != null)
 					await this.ParseE2e(e.FirstElement, FullJID);
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{

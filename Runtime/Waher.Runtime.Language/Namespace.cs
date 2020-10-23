@@ -94,7 +94,7 @@ namespace Waher.Runtime.Language
 		public async Task<string> GetStringAsync(int Id, string Default)
 		{
 			LanguageString StringObj = await this.GetStringAsync(Id);
-			if (StringObj != null)
+			if (!(StringObj is null))
 				return StringObj.Value;
 
 			StringObj = await this.CreateStringAsync(Id, Default, true);
@@ -140,7 +140,7 @@ namespace Waher.Runtime.Language
 		public async Task<LanguageString> CreateStringAsync(int Id, string Value, bool Untranslated)
 		{
 			LanguageString Result = await this.GetStringAsync(Id);
-			if (Result != null)
+			if (!(Result is null))
 			{
 				if (Result.Value != Value && (!Untranslated || Result.Untranslated))
 				{
@@ -180,7 +180,7 @@ namespace Waher.Runtime.Language
 		public async Task DeleteStringAsync(int Id)
 		{
 			LanguageString s = await this.GetStringAsync(Id);
-			if (s != null)
+			if (!(s is null))
 			{
 				await Database.Delete(s);
 

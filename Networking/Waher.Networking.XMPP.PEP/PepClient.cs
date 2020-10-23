@@ -257,7 +257,7 @@ namespace Waher.Networking.XMPP.PEP
 					}
 				}
 
-				if (PersonalEvent != null)
+				if (!(PersonalEvent is null))
 				{
 					PersonalEventNotificationEventHandler[] Handlers;
 

@@ -246,7 +246,7 @@ namespace Waher.Networking.UPnP
 				foreach (UPnPDevice Device in this.devices)
 				{
 					Result = Device.GetDevice(DeviceType);
-					if (Result != null)
+					if (!(Result is null))
 						break;
 				}
 			}
@@ -272,7 +272,7 @@ namespace Waher.Networking.UPnP
 			foreach (UPnPDevice Device in this.devices)
 			{
 				Result = Device.GetService(ServiceType);
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 			}
 

@@ -221,7 +221,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 
 				DeviceDescriptionDocument Doc = await e.Location.GetDeviceAsync();
-				if (Doc != null)
+				if (!(Doc is null))
 				{
 					UPnPService Service = Doc.GetService("urn:schemas-upnp-org:service:WANIPConnection:1");
 					if (Service is null)
@@ -468,7 +468,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 
 					PeerToPeerNetworkStateChangeEventHandler h = this.OnStateChange;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{

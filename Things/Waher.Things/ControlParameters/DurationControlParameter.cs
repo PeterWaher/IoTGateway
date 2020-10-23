@@ -134,7 +134,7 @@ namespace Waher.Things.ControlParameters
 		{
 			Duration Value = await this.Get(Node);
 
-			if (Value != null)
+			if (!(Value is null))
 				return Value.ToString();
 			else
 				return string.Empty;

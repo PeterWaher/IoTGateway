@@ -89,7 +89,7 @@ namespace Waher.Networking.XMPP.Sensor
 				this.state = NewState;
 
 				SensorDataReadoutStateChangedEventHandler h = this.OnStateChanged;
-				if (h != null)
+				if (!(h is null))
 				{
 					try
 					{
@@ -137,7 +137,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			SensorDataReadoutErrorsReportedEventHandler h = this.OnErrorsReceived;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -165,7 +165,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			SensorDataReadoutFieldsReportedEventHandler h = this.OnFieldsReceived;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

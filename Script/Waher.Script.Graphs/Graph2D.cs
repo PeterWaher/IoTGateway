@@ -725,7 +725,7 @@ namespace Waher.Script.Graphs
 
 				SKImage Result = Surface.Snapshot();
 
-				if (Font != null)
+				if (!(Font is null))
 					Font.Dispose();
 
 				AxisBrush.Dispose();

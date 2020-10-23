@@ -296,7 +296,7 @@ namespace Waher.Runtime.Inventory
 			}
 
 			EventHandler h = OnInvalidated;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -657,7 +657,7 @@ namespace Waher.Runtime.Inventory
 						}
 
 						Namespace = Type.Namespace;
-						if (Namespace != null)
+						if (!(Namespace is null))
 						{
 							if (Namespace == LastNamespace)
 								Types = LastTypes;

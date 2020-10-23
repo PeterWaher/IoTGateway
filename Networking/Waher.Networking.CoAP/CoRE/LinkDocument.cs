@@ -98,14 +98,14 @@ namespace Waher.Networking.CoAP.CoRE
 			char ch;
 
 			Link = this.ParseLinkValue();
-			if (Link != null)
+			if (!(Link is null))
 				Links.Add(Link);
 
 			ch = this.NextNonWhitespaceChar();
 			while (ch == ',')
 			{
 				Link = this.ParseLinkValue();
-				if (Link != null)
+				if (!(Link is null))
 					Links.Add(Link);
 
 				ch = this.NextNonWhitespaceChar();

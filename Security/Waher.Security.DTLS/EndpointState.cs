@@ -170,7 +170,7 @@ namespace Waher.Security.DTLS
 
 		private void Append(byte[] Msg, IncrementalHash H)
 		{
-			if (Msg != null)
+			if (!(Msg is null))
 				H.AppendData(Msg);
 		}
 

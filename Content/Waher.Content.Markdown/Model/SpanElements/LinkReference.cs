@@ -53,7 +53,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
-			if (Multimedia != null)
+			if (!(Multimedia is null))
 				Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children, this.Document);
 			else
 			{
@@ -79,7 +79,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
-			if (Multimedia != null)
+			if (!(Multimedia is null))
 			{
 				Link.GenerateXAML(Output, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children,
 					this.Document);

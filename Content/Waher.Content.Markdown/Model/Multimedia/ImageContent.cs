@@ -309,7 +309,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			lock (synchObject)
 			{
-				if (temporaryFiles != null)
+				if (!(temporaryFiles is null))
 				{
 					foreach (string FileName in temporaryFiles.Keys)
 					{

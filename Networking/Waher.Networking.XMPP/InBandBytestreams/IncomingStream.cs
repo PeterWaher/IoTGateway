@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				await this.syncObject.EndWrite();
 			}
 
-			if (File != null)
+			if (!(File is null))
 			{
 				try
 				{

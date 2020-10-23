@@ -103,7 +103,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 				float x0, y0, x1, y1;
 				int i, c;
 
-				if (PrevPoints != null)
+				if (!(PrevPoints is null))
 				{
 					if ((c = PrevPoints.Length) != Points.Length)
 						PrevPoints = null;

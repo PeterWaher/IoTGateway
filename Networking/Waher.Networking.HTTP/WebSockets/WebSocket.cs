@@ -171,7 +171,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.connection = null;
 
 			EventHandler h = this.Disposed;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -568,7 +568,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					await this.httpResponse.WriteRawAsync(Frame);
 
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						try
 						{

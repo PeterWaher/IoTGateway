@@ -148,7 +148,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 				else if (Object is string s2)
 					s = s2;
 
-				if (s != null)
+				if (!(s is null))
 				{
 					if (Encoding is null)
 					{

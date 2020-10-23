@@ -78,7 +78,7 @@ namespace Waher.Script.Content.Functions.Encoding
 				{
 					i = 0;
 
-					if (Rec != null)
+					if (!(Rec is null))
 					{
 						foreach (string s in Rec)
 						{

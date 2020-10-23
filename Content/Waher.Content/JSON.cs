@@ -520,7 +520,7 @@ namespace Waher.Content
 			if (Indent.HasValue)
 				Indent++;
 
-			if (Object != null)
+			if (!(Object is null))
 			{
 				foreach (KeyValuePair<string, object> Member in Object)
 				{
@@ -546,7 +546,7 @@ namespace Waher.Content
 				}
 			}
 
-			if (AdditionalProperties != null)
+			if (!(AdditionalProperties is null))
 			{
 				foreach (KeyValuePair<string, object> Member in AdditionalProperties)
 				{
@@ -597,7 +597,7 @@ namespace Waher.Content
 			if (Indent.HasValue)
 				Indent++;
 
-			if (Object != null)
+			if (!(Object is null))
 			{
 				foreach (KeyValuePair<string, IElement> Member in Object)
 				{

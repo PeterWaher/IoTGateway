@@ -84,7 +84,7 @@ namespace Waher.Runtime.Cache
 							ToRemove1.AddLast(this.valuesByKey[P.Value]);
 						}
 
-						if (ToRemove1 != null)
+						if (!(ToRemove1 is null))
 						{
 							foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
 							{
@@ -110,7 +110,7 @@ namespace Waher.Runtime.Cache
 							ToRemove2.AddLast(this.valuesByKey[P.Value]);
 						}
 
-						if (ToRemove2 != null)
+						if (!(ToRemove2 is null))
 						{
 							foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
 							{
@@ -122,13 +122,13 @@ namespace Waher.Runtime.Cache
 					}
 				}
 
-				if (ToRemove1 != null)
+				if (!(ToRemove1 is null))
 				{
 					foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
 						this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
 				}
 
-				if (ToRemove2 != null)
+				if (!(ToRemove2 is null))
 				{
 					foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
 						this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
@@ -365,7 +365,7 @@ namespace Waher.Runtime.Cache
 				this.keysByLastUsage[TP] = Key;
 			}
 
-			if (Prev != null)
+			if (!(Prev is null))
 				this.OnRemoved(Key, Prev.Value, Reason);
 		}
 
@@ -373,7 +373,7 @@ namespace Waher.Runtime.Cache
 		{
 			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

@@ -426,7 +426,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			DataSource.OnEvent += this.DataSource_OnEvent;
 
 			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
-			if (ChildSources != null)
+			if (!(ChildSources is null))
 			{
 				foreach (IDataSource Child in ChildSources)
 					this.Register(Child, false);
@@ -634,7 +634,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(NamespaceConcentrator);
 
 				IEnumerable<IDataSource> ChildSources = Rec.Source.ChildSources;
-				if (ChildSources != null)
+				if (!(ChildSources is null))
 				{
 					Xml.Append("'>");
 
@@ -782,7 +782,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append("' sniffable='true");
 
 			IThingReference Parent = Node.Parent;
-			if (Parent != null)
+			if (!(Parent is null))
 			{
 				Xml.Append("' parentId='");
 				Xml.Append(XML.Encode(Parent.NodeId));
@@ -852,7 +852,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				IEnumerable<Parameter> Parameters2 = await Node.GetDisplayableParametersAsync(Language, Caller);
 
-				if (Parameters2 != null)
+				if (!(Parameters2 is null))
 				{
 					foreach (Parameter P in Parameters2)
 						P.Export(Xml);
@@ -863,7 +863,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				IEnumerable<Message> Messages2 = await Node.GetMessagesAsync(Caller);
 
-				if (Messages2 != null)
+				if (!(Messages2 is null))
 				{
 					foreach (Message Msg in Messages2)
 						Msg.Export(Xml);
@@ -1079,7 +1079,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</baseClasses>");
 
-				if (Interfaces != null)
+				if (!(Interfaces is null))
 				{
 					Xml.Append("<interfaces>");
 
@@ -1400,7 +1400,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			if (RootNodes != null)
+			if (!(RootNodes is null))
 			{
 				foreach (INode Node2 in RootNodes)
 				{
@@ -1409,7 +1409,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			if (NodesPerParent != null)
+			if (!(NodesPerParent is null))
 			{
 				foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
 				{
@@ -1491,7 +1491,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			if (RootNodes != null)
+			if (!(RootNodes is null))
 			{
 				Loop = RootNodes.Last;
 				while (Loop != null)
@@ -1503,7 +1503,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			if (NodesPerParent != null)
+			if (!(NodesPerParent is null))
 			{
 				foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
 				{
@@ -2411,7 +2411,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Node is ILifeCycleManagement LifeCycleManagement)
 				this.UnregisterNode(LifeCycleManagement);
 
-			if (Parent != null)
+			if (!(Parent is null))
 				await Parent.RemoveAsync(Node);
 
 			await Node.DestroyAsync();
@@ -3345,7 +3345,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (!Node.HasCommands)
 				{
-					if (CommonCommands != null)
+					if (!(CommonCommands is null))
 						CommonCommands.Clear();
 
 					break;
@@ -3381,7 +3381,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(NamespaceConcentrator);
 			Xml.Append("'>");
 
-			if (CommonCommands != null)
+			if (!(CommonCommands is null))
 			{
 				foreach (ICommand Command in CommonCommands.Keys)
 					await ExportXml(Xml, Command, Language);
@@ -4174,7 +4174,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			foreach (SubscriptionRec Subscription in Subscriptions)
 				this.SendEventMessage(Subscription, Event, ref ToRemove, ref Xml);
 
-			if (ToRemove != null)
+			if (!(ToRemove is null))
 				this.Remove(Rec, ToRemove);
 
 			return Task.CompletedTask;
@@ -4491,7 +4491,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						new FilterFieldGreaterOrEqualTo("Timestamp", GetEventsSince)), "SourceId", "Timestamp"))
 					{
 						this.SendEventMessage(SubscriptionRec, Event, ref ToRemove, ref Xml);
-						if (ToRemove != null)
+						if (!(ToRemove is null))
 						{
 							this.Remove(Rec, ToRemove);
 							break;

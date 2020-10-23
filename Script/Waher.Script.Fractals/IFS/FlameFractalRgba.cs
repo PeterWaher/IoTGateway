@@ -220,7 +220,7 @@ namespace Waher.Script.Fractals.IFS
 
                     CurrentFunction.Add((ILambdaExpression)FlameItem);
                 }
-                else if (FlameItem != null)
+                else if (!(FlameItem is null))
                 {
                     try
                     {

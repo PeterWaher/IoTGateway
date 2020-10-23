@@ -267,7 +267,7 @@ namespace Waher.Networking.MQTT
 		private async Task ConnectionError(object Sender, Exception ex)
 		{
 			MqttExceptionEventHandler h = this.OnConnectionError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -537,7 +537,7 @@ namespace Waher.Networking.MQTT
 						Resend.AddLast(P);
 					}
 
-					if (Resend != null)
+					if (!(Resend is null))
 					{
 						foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
 						{
@@ -547,7 +547,7 @@ namespace Waher.Networking.MQTT
 					}
 				}
 
-				if (Resend != null)
+				if (!(Resend is null))
 				{
 					foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
 						await this.Write(P.Value.Packet, P.Value.PacketIdentifier, P.Value.Callback);
@@ -630,7 +630,7 @@ namespace Waher.Networking.MQTT
 							this.Information("PINGRESP");
 
 						EventHandlerAsync h = this.OnPingResponse;
-						if (h != null)
+						if (!(h is null))
 						{
 							try
 							{
@@ -686,7 +686,7 @@ namespace Waher.Networking.MQTT
 
 						this.PacketDelivered(Header.PacketIdentifier);
 						PacketAcknowledgedEventHandler h2 = this.OnPublished;
-						if (h2 != null)
+						if (!(h2 is null))
 						{
 							try
 							{
@@ -720,7 +720,7 @@ namespace Waher.Networking.MQTT
 						}
 						await this.PUBCOMP(Header.PacketIdentifier);
 
-						if (Content != null)
+						if (!(Content is null))
 							await this.ContentReceived(Content);
 						break;
 
@@ -730,7 +730,7 @@ namespace Waher.Networking.MQTT
 
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnPublished;
-						if (h2 != null)
+						if (!(h2 is null))
 						{
 							try
 							{
@@ -749,7 +749,7 @@ namespace Waher.Networking.MQTT
 
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnSubscribed;
-						if (h2 != null)
+						if (!(h2 is null))
 						{
 							try
 							{
@@ -768,7 +768,7 @@ namespace Waher.Networking.MQTT
 
 						this.PacketDelivered(Header.PacketIdentifier);
 						h2 = this.OnUnsubscribed;
-						if (h2 != null)
+						if (!(h2 is null))
 						{
 							try
 							{
@@ -793,7 +793,7 @@ namespace Waher.Networking.MQTT
 		private async Task Error(Exception ex)
 		{
 			MqttExceptionEventHandler h = this.OnError;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -831,7 +831,7 @@ namespace Waher.Networking.MQTT
 			await this.Write(PacketData, 0, null);
 
 			EventHandlerAsync h = this.OnPing;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -957,7 +957,7 @@ namespace Waher.Networking.MQTT
 		private async void RaiseOnStateChanged(MqttState State)
 		{
 			StateChangedEventHandler h = this.OnStateChanged;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -1209,7 +1209,7 @@ namespace Waher.Networking.MQTT
 		private async Task ContentReceived(MqttContent Content)
 		{
 			ContentReceivedEventHandler h = this.OnContentReceived;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{

@@ -443,7 +443,7 @@ namespace Waher.IoTGateway
 									if (!(DatabaseProvider is null))
 										throw new Exception("Database provider already initiated.");
 
-									if (GetDatabaseProvider != null)
+									if (!(GetDatabaseProvider is null))
 										DatabaseProvider = await GetDatabaseProvider(E);
 									else
 										DatabaseProvider = null;
@@ -609,7 +609,7 @@ namespace Waher.IoTGateway
 				{
 					Configuration.SetStaticInstance(Configuration);
 
-					if (webServer != null)
+					if (!(webServer is null))
 						await Configuration.InitSetup(webServer);
 				}
 
@@ -676,7 +676,7 @@ namespace Waher.IoTGateway
 								SystemConfigurations[s] = SystemConfiguration;
 								SystemConfiguration.SetStaticInstance(SystemConfiguration);
 
-								if (webServer != null)
+								if (!(webServer is null))
 									await SystemConfiguration.InitSetup(webServer);
 							}
 
@@ -701,12 +701,12 @@ namespace Waher.IoTGateway
 
 				configuring = false;
 
-				if (webServer != null)
+				if (!(webServer is null))
 				{
 					webServer.ResourceOverride = null;
 					webServer.ResourceOverrideFilter = null;
 
-					if (SetupResources != null)
+					if (!(SetupResources is null))
 					{
 						foreach (HttpResource Resource in SetupResources)
 							webServer.Unregister(Resource);
@@ -714,7 +714,7 @@ namespace Waher.IoTGateway
 
 					webServer.AddHttpPorts(GetConfigPorts("HTTP"));
 
-					if (certificate != null)
+					if (!(certificate is null))
 					{
 						webServer.AddHttpsPorts(GetConfigPorts("HTTPS"));
 						webServer.UpdateCertificate(certificate);
@@ -722,7 +722,7 @@ namespace Waher.IoTGateway
 				}
 				else
 				{
-					if (certificate != null)
+					if (!(certificate is null))
 						webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
 					else
 						webServer = new HttpServer(GetConfigPorts("HTTP"), null, null);
@@ -785,7 +785,7 @@ namespace Waher.IoTGateway
 				root.AllowTypeConversion();
 
 				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
-				if (FileFolders != null)
+				if (!(FileFolders is null))
 				{
 					foreach (XmlNode N in FileFolders.ChildNodes)
 					{
@@ -800,7 +800,7 @@ namespace Waher.IoTGateway
 				}
 
 				XmlElement VanityResources = Config.DocumentElement["VanityResources"];
-				if (VanityResources != null)
+				if (!(VanityResources is null))
 				{
 					foreach (XmlNode N in VanityResources.ChildNodes)
 					{
@@ -870,7 +870,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				if (GetDataSources != null)
+				if (!(GetDataSources is null))
 					Sources = await GetDataSources(Sources);
 
 				concentratorServer = new ConcentratorServer(xmppClient, thingRegistryClient, provisioningClient, Sources);
@@ -1723,7 +1723,7 @@ namespace Waher.IoTGateway
 				coapEndpoint?.Dispose();
 				coapEndpoint = null;
 
-				if (webServer != null)
+				if (!(webServer is null))
 				{
 					foreach (ISniffer Sniffer in webServer.Sniffers)
 					{
@@ -1982,7 +1982,7 @@ namespace Waher.IoTGateway
 					await CheckBackup();
 
 					EventHandler h = MinuteTick;
-					if (h != null)
+					if (!(h is null))
 					{
 						try
 						{
@@ -2444,7 +2444,7 @@ namespace Waher.IoTGateway
 				new MetaDataNumericTag("V", 1.0)
 			};
 
-			if (GetMetaData != null)
+			if (!(GetMetaData is null))
 				MetaData = await GetMetaData(MetaData);
 
 			thingRegistryClient.RegisterThing(MetaData, async (sender2, e2) =>

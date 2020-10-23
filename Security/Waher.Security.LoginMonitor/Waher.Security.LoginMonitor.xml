@@ -279,5 +279,10 @@
             Checks if last login attempt was a failed login attempt.
             </summary>
         </member>
+        <member name="P:Waher.Security.LoginMonitor.RemoteEndpoint.ArchiveDays">
+            <summary>
+            Number of days to archive field.
+            </summary>
+        </member>
     </members>
 </doc>

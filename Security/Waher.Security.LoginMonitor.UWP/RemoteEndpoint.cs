@@ -10,7 +10,7 @@ namespace Waher.Security.LoginMonitor
 	/// </summary>
 	[CollectionName("RemoteEndpoints")]
 	[TypeName(TypeNameSerialization.None)]
-	[ArchivingTime]
+	[ArchivingTime("ArchiveDays")]
 	[Index("Endpoint", "Created")]
 	public class RemoteEndpoint
 	{
@@ -241,6 +241,17 @@ namespace Waher.Security.LoginMonitor
 			}
 
 			return Tags;
+		}
+
+		/// <summary>
+		/// Number of days to archive field.
+		/// </summary>
+		public int ArchiveDays
+		{
+			get
+			{
+				return this.blocked ? int.MaxValue : 0;
+			}
 		}
 
 	}

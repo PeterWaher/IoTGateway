@@ -638,8 +638,18 @@ namespace Waher.Persistence.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		public override bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
-			GenericObject Obj = (GenericObject)Object;
-			return Obj.TryGetFieldValue(FieldName, out Value);
+			if (Object is GenericObject GenObj)
+				return GenObj.TryGetFieldValue(FieldName, out Value);
+			else if (!(Object is null) && this.returnTypedObjects)
+			{
+				IObjectSerializer Serializer2 = this.context.GetObjectSerializer(Object.GetType());
+				return Serializer2.TryGetFieldValue(FieldName, Object, out Value);
+			}
+			else
+			{
+				Value = null;
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -660,6 +670,11 @@ namespace Waher.Persistence.Serialization
 		{
 			if (Value is GenericObject Obj)
 				return !Obj.ObjectId.Equals(Guid.Empty);
+			else if (!(Value is null) && this.returnTypedObjects)
+			{
+				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Value.GetType()) as ObjectSerializer;
+				return Serializer2?.HasObjectId(Value) ?? false;
+			}
 			else
 				return false;
 		}
@@ -676,6 +691,11 @@ namespace Waher.Persistence.Serialization
 			{
 				Obj.ObjectId = ObjectId;
 				return true;
+			}
+			else if (!(Value is null) && this.returnTypedObjects)
+			{
+				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Value.GetType()) as ObjectSerializer;
+				return Serializer2?.TrySetObjectId(Value, ObjectId) ?? false;
 			}
 			else
 				return false;
@@ -705,6 +725,13 @@ namespace Waher.Persistence.Serialization
 
 				return ObjectId;
 			}
+			else if (!(Value is null) && this.returnTypedObjects)
+			{
+				if (!(this.context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2))
+					throw new Exception("Unable to set Object ID");
+
+				return await Serializer2.GetObjectId(Value, InsertIfNotFound);
+			}
 			else
 				throw new NotSupportedException("Objects of type " + Value.GetType().FullName + " not supported.");
 		}
@@ -726,8 +753,13 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
 		public override string CollectionName(object Object)
 		{
-			if (!(Object is null) && Object is GenericObject Obj)
+			if (Object is GenericObject Obj)
 				return Obj.CollectionName;
+			else if (!(Object is null) && this.returnTypedObjects)
+			{
+				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Object.GetType()) as ObjectSerializer;
+				return Serializer2?.CollectionName(Object) ?? base.CollectionName(Object);
+			}
 			else
 				return base.CollectionName(Object);
 		}

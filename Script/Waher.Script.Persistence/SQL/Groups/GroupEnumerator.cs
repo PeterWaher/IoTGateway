@@ -19,10 +19,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		private readonly Variables variables;
 		private readonly IResultSetEnumerator e;
 		private bool processLast = false;
-		private Type lastType = null;
-		private IEnumerable<PropertyInfo> properties = null;
-		private IEnumerable<FieldInfo> fields = null;
-		private object current = null;
+		private GroupObject current = null;
 		private ObjectProperties objectVariables = null;
 
 		/// <summary>
@@ -61,7 +58,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsync()
 		{
-			Dictionary<string, List<object>> Aggregated = null;
+			List<object> Objects = null;
 			IElement E;
 			object[] Last = null;
 			int i, c = this.groupBy.Length;
@@ -109,93 +106,16 @@ namespace Waher.Script.Persistence.SQL.Groups
 					}
 				}
 
-				o1 = e.Current;
+				if (Objects is null)
+					Objects = new List<object>();
 
-				Type T = o1.GetType();
-				if (T != this.lastType)
-				{
-					List<PropertyInfo> Properties = new List<PropertyInfo>();
-
-					foreach (PropertyInfo PI in T.GetRuntimeProperties())
-					{
-						if (!PI.CanRead || !PI.CanWrite)
-							continue;
-
-						if (PI.GetIndexParameters().Length > 0)
-							continue;
-
-						Properties.Add(PI);
-					}
-
-					this.lastType = T;
-					this.properties = Properties.ToArray();
-					this.fields = T.GetRuntimeFields();
-				}
-
-				if (Aggregated is null)
-					Aggregated = new Dictionary<string, List<object>>();
-
-				foreach (PropertyInfo PI in this.properties)
-				{
-					if (!Aggregated.TryGetValue(PI.Name, out List<object> List))
-					{
-						List = new List<object>();
-						Aggregated[PI.Name] = List;
-					}
-
-					List.Add(PI.GetValue(o1));
-				}
-
-				foreach (FieldInfo FI in this.fields)
-				{
-					if (!Aggregated.TryGetValue(FI.Name, out List<object> List))
-					{
-						List = new List<object>();
-						Aggregated[FI.Name] = List;
-					}
-
-					List.Add(FI.GetValue(o1));
-				}
+				Objects.Add(e.Current);
 			}
 
-			if (Aggregated is null)
+			if (Objects is null)
 				return false;
 
-			Dictionary<string, object> Result = new Dictionary<string, object>();
-			bool First = true;
-
-			foreach (KeyValuePair<string, List<object>> Rec in Aggregated)
-			{
-				object[] A = Rec.Value.ToArray();
-				Result[Rec.Key] = A;
-
-				if (First)
-				{
-					First = false;
-					Result[" First "] = A;
-				}
-			}
-
-			if (!(this.groupNames is null))
-			{
-				for (i = 0; i < c; i++)
-				{
-					ScriptNode Node = this.groupNames[i];
-					if (Node is null)
-						continue;
-
-					if (Node is VariableReference Ref)
-						Result[Ref.VariableName] = Last[i];
-					else
-					{
-						E = this.groupNames[i]?.Evaluate(this.variables);
-						if (!(E is null) && E is StringValue S)
-							Result[S.Value] = Last[i];
-					}
-				}
-			}
-
-			this.current = Result;
+			this.current = new GroupObject(Objects.ToArray(), Last, this.groupNames, this.variables);
 
 			return true;
 		}

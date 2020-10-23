@@ -521,6 +521,37 @@
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.Groups.GroupObject">
+            <summary>
+            Represents a collection of objects grouped together useing a GROUP BY construct.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Groups.GroupObject.#ctor(System.Object[],System.Object[],Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+            <summary>
+            Represents a collection of objects grouped together useing a GROUP BY construct.
+            </summary>
+            <param name="Objects">Objects</param>
+            <param name="GroupByValues">Grouped values that are constant in the group.</param>
+            <param name="GroupNames">Names of the grouped values.</param>
+            <param name="Variables">Current set of variables.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Groups.GroupObject.Item(System.String)">
+            <summary>
+            Access to grouped properties.
+            </summary>
+            <param name="Name">Named property</param>
+            <returns></returns>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Groups.GroupObject.Count">
+            <summary>
+            Number of objects in group.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Groups.GroupObject.Objects">
+            <summary>
+            Objects in group.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.IDataSource">
             <summary>
             Interface for data sources that can be used in SQL statements.
@@ -844,6 +875,14 @@
             <param name="Name">Variable name.</param>
             <param name="Variable">Variable, if found, or null otherwise.</param>
             <returns>If a variable with the corresponding name was found.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.TryGetValue(System.String,System.Object@)">
+            <summary>
+            Tries to get the value, given its variable name.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <param name="Value">Value, if found, or null otherwise.</param>
+            <returns>If a property or variable with the corresponding name was found.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.Add(System.String,System.Object)">
             <summary>

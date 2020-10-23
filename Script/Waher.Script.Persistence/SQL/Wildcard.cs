@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Operators.Assignments;
+using Waher.Script.Persistence.SQL.Groups;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -37,13 +30,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-
-			if (Variables is ObjectProperties Properties &&
-				Properties.Object is Dictionary<string, object> Result &&
-				Result.TryGetValue(" First ", out object First))
-			{
-				return Expression.Encapsulate(First);
-			}
+			if (Variables is ObjectProperties Properties && Properties.Object is GroupObject GroupObject)
+				return Expression.Encapsulate(GroupObject.Objects);
 			else
 				throw new ScriptRuntimeException("Invalid context.", this);
 		}

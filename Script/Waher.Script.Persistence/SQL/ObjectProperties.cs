@@ -217,6 +217,97 @@ namespace Waher.Script.Persistence.SQL
 			return Result;
 		}
 
+		/// <summary>
+		/// Tries to get the value, given its variable name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Value">Value, if found, or null otherwise.</param>
+		/// <returns>If a property or variable with the corresponding name was found.</returns>
+		public bool TryGetValue(string Name, out object Value)
+		{
+			Tuple<PropertyInfo, FieldInfo, bool> Rec;
+
+			if (string.Compare(Name, "this", true) == 0)
+			{
+				Value = this.obj;
+				return true;
+			}
+
+			if (!(this.dictionary is null) && this.dictionary.TryGetValue(Name, out Value))
+				return true;
+
+			lock (this.variables)
+			{
+				if (this.properties is null)
+					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
+
+				if (!this.properties.TryGetValue(Name, out Rec))
+				{
+					PropertyInfo PI = this.type.GetRuntimeProperty(Name);
+					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
+
+					if (PI is null && FI is null)
+					{
+						if (this.dictionary is null)
+						{
+							if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
+								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+							else
+								Rec = null;
+						}
+						else
+							Rec = null;
+					}
+					else
+						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
+
+					this.properties[Name] = Rec;
+				}
+			}
+
+			bool Result = false;
+
+			if (!(Rec is null))
+			{
+				Result = true;  // null may be a valid response. Check variable collections first.
+
+				if (Rec.Item1 is null)
+					Value = Rec.Item2.GetValue(this.obj);
+				else if (Rec.Item3)
+				{
+					try
+					{
+						Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+					}
+					catch (KeyNotFoundException)
+					{
+						Value = null;
+						Result = false;
+					}
+				}
+				else
+					Value = Rec.Item1.GetValue(this.obj);
+
+				if (!(Value is null))
+					return true;
+			}
+
+			if (this.variables2.TryGetVariable(Name, out Variable Variable))
+			{
+				Value = Variable.ValueObject;
+				return true;
+			}
+
+			if (base.TryGetVariable(Name, out Variable))
+			{
+				Value = Variable.ValueObject;
+				return true;
+			}
+
+			Value = null;
+			return Result;
+		}
+
 		private Variable CreateVariable(string Name, object Value)
 		{
 			if (Value is CaseInsensitiveString Cis)

@@ -157,7 +157,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
-						if (!string.IsNullOrEmpty(s) && s != "," && s != "HAVING" && s != "ORDER" && s != "OFFSET")
+						if (!string.IsNullOrEmpty(s) && s != "," && s != ";" && s != "HAVING" && s != "ORDER" && s != "OFFSET")
 						{
 							if (s == "AS")
 								Parser.NextToken();

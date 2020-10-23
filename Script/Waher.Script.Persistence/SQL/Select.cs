@@ -7,6 +7,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Persistence.SQL.Groups;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -64,13 +65,13 @@ namespace Waher.Script.Persistence.SQL
 			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("Columns and ColumnNames must both be null or not null.", nameof(ColumnNames));
 
-			if (this.columns != null && this.columns.Length != this.columnNames.Length)
+			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("Columns and ColumnNames must be of equal length.", nameof(ColumnNames));
 
 			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("GroupBy and GroupByNames must both be null or not null.", nameof(GroupByNames));
 
-			if (this.columns != null && this.columns.Length != this.columnNames.Length)
+			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("GroupBy and GroupByNames must be of equal length.", nameof(GroupByNames));
 		}
 
@@ -97,7 +98,7 @@ namespace Waher.Script.Persistence.SQL
 			int Offset;
 			int i, c;
 
-			if (this.top != null)
+			if (!(this.top is null))
 			{
 				E = this.top.Evaluate(Variables);
 				Top = (int)Expression.ToDouble(E.AssociatedObjectValue);
@@ -107,7 +108,7 @@ namespace Waher.Script.Persistence.SQL
 			else
 				Top = int.MaxValue;
 
-			if (this.offset != null)
+			if (!(this.offset is null))
 			{
 				E = this.offset.Evaluate(Variables);
 				Offset = (int)Expression.ToDouble(E.AssociatedObjectValue);
@@ -122,7 +123,7 @@ namespace Waher.Script.Persistence.SQL
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
-			if (this.groupBy != null)
+			if (!(this.groupBy is null))
 			{
 				foreach (ScriptNode Node in this.groupBy)
 				{
@@ -150,7 +151,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (this.orderBy != null && !CalculatedOrder)
+			if (!(this.orderBy is null) && !CalculatedOrder)
 			{
 				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
 				{
@@ -170,7 +171,7 @@ namespace Waher.Script.Persistence.SQL
 			RecordEnumerator e2;
 			int NrRecords = 0;
 
-			if (this.columns != null)
+			if (!(this.columns is null))
 			{
 				c = this.columns.Length;
 				for (i = 0; i < c; i++)
@@ -191,11 +192,11 @@ namespace Waher.Script.Persistence.SQL
 			else
 				e = await Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 
-			if (this.groupBy != null)
+			if (!(this.groupBy is null))
 			{
 				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames);
 
-				if (this.having != null)
+				if (!(this.having is null))
 					e = new ConditionalEnumerator(e, Variables, this.having);
 			}
 
@@ -203,14 +204,14 @@ namespace Waher.Script.Persistence.SQL
 			{
 				List<KeyValuePair<ScriptNode, bool>> Order = new List<KeyValuePair<ScriptNode, bool>>();
 
-				if (this.orderBy != null)
+				if (!(this.orderBy is null))
 					Order.AddRange(this.orderBy);
 
-				if (this.groupByNames != null)
+				if (!(this.groupByNames is null))
 				{
 					foreach (ScriptNode Group in this.groupByNames)
 					{
-						if (Group != null)
+						if (!(Group is null))
 							Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
 					}
 				}
@@ -262,7 +263,7 @@ namespace Waher.Script.Persistence.SQL
 				Names[P.Value] = P.Key;
 
 			i = 0;
-			if (this.columnNames != null)
+			if (!(this.columnNames is null))
 			{
 				while (i < c)
 				{
@@ -337,7 +338,7 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 				}
 
-				if (this.orderBy != null)
+				if (!(this.orderBy is null))
 				{
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)
@@ -380,7 +381,7 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.offset is null) && !Callback(ref this.offset, State))
 				return false;
 
-			if (this.orderBy != null)
+			if (!(this.orderBy is null))
 			{
 				c = this.orderBy.Length;
 				for (i = 0; i < c; i++)
@@ -414,7 +415,7 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 				}
 
-				if (this.orderBy != null)
+				if (!(this.orderBy is null))
 				{
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)

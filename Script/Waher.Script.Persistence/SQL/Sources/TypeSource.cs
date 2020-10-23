@@ -347,7 +347,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		{
 			private readonly ScriptNode node;
 			private readonly Variables variables;
-			private ObjectProperties properties;
+			private ObjectProperties properties = null;
 
 			public ScriptNodeFilter(ScriptNode Node, Variables Variables)
 			{

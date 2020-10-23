@@ -484,12 +484,12 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="T:Waher.Script.Persistence.SQL.GroupEnumerator">
+        <member name="T:Waher.Script.Persistence.SQL.Groups.GroupEnumerator">
             <summary>
             Enumerator that groups items into groups, and returns aggregated elements.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
+        <member name="M:Waher.Script.Persistence.SQL.Groups.GroupEnumerator.#ctor(Waher.Script.Persistence.SQL.IResultSetEnumerator,Waher.Script.Variables,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[])">
             <summary>
             Enumerator that groups items into groups, and returns aggregated elements.
             </summary>
@@ -498,17 +498,17 @@
             <param name="GroupBy">Group on these fields</param>
             <param name="GroupNames">Names given to grouped fields</param>
         </member>
-        <member name="P:Waher.Script.Persistence.SQL.GroupEnumerator.Current">
+        <member name="P:Waher.Script.Persistence.SQL.Groups.GroupEnumerator.Current">
             <summary>
             <see cref="P:System.Collections.IEnumerator.Current"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.MoveNext">
+        <member name="M:Waher.Script.Persistence.SQL.Groups.GroupEnumerator.MoveNext">
             <summary>
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.MoveNextAsync">
+        <member name="M:Waher.Script.Persistence.SQL.Groups.GroupEnumerator.MoveNextAsync">
             <summary>
             Advances the enumerator to the next element of the collection.
             </summary>
@@ -516,7 +516,7 @@
             the enumerator has passed the end of the collection.</returns>
             <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.GroupEnumerator.Reset">
+        <member name="M:Waher.Script.Persistence.SQL.Groups.GroupEnumerator.Reset">
             <summary>
             <see cref="M:System.Collections.IEnumerator.Reset"/>
             </summary>

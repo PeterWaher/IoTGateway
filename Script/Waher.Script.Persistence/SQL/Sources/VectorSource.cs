@@ -70,7 +70,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			IResultSetEnumerator e = new SynchEnumerator(this.vector.VectorElements.GetEnumerator());
 			int i, c;
 
-			if (Where != null)
+			if (!(Where is null))
 				e = new ConditionalEnumerator(e, Variables, Where);
 
 			if ((c = Order?.Length ?? 0) > 0)

@@ -16,6 +16,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly Assignment[] setOperations;
 		private SourceDefinition source;
 		private ScriptNode where;
+		private ObjectProperties properties = null;
 
 		/// <summary>
 		/// Executes an UPDATE statement against the object database.
@@ -59,10 +60,13 @@ namespace Waher.Script.Persistence.SQL
 
 			while (await e.MoveNextAsync())
 			{
-				ObjectProperties Properties = new ObjectProperties(e.Current, Variables, false);
+				if (this.properties is null)
+					this.properties = new ObjectProperties(e.Current, Variables, false);
+				else
+					this.properties.Object = e.Current;
 
 				foreach (Assignment SetOperation in this.setOperations)
-					SetOperation.Evaluate(Properties);
+					SetOperation.Evaluate(this.properties);
 
 				ToUpdate.AddLast(e.Current);
 				Count++;

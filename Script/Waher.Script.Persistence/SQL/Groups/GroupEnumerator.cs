@@ -7,7 +7,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Persistence.SQL
+namespace Waher.Script.Persistence.SQL.Groups
 {
 	/// <summary>
 	/// Enumerator that groups items into groups, and returns aggregated elements.
@@ -23,6 +23,7 @@ namespace Waher.Script.Persistence.SQL
 		private IEnumerable<PropertyInfo> properties = null;
 		private IEnumerable<FieldInfo> fields = null;
 		private object current = null;
+		private ObjectProperties objectVariables = null;
 
 		/// <summary>
 		/// Enumerator that groups items into groups, and returns aggregated elements.
@@ -61,7 +62,6 @@ namespace Waher.Script.Persistence.SQL
 		public async Task<bool> MoveNextAsync()
 		{
 			Dictionary<string, List<object>> Aggregated = null;
-			ObjectProperties Variables = null;
 			IElement E;
 			object[] Last = null;
 			int i, c = this.groupBy.Length;
@@ -71,7 +71,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				this.processLast = false;
 
-				Variables = new ObjectProperties(e.Current, this.variables);
+				if (this.objectVariables is null)
+					this.objectVariables = new ObjectProperties(e.Current, this.variables);
+				else
+					this.objectVariables.Object = e.Current;
 
 				if (Last is null)
 				{
@@ -79,7 +82,7 @@ namespace Waher.Script.Persistence.SQL
 
 					for (i = 0; i < c; i++)
 					{
-						E = this.groupBy[i].Evaluate(Variables);
+						E = this.groupBy[i].Evaluate(this.objectVariables);
 						Last[i] = E.AssociatedObjectValue;
 					}
 				}
@@ -87,7 +90,7 @@ namespace Waher.Script.Persistence.SQL
 				{
 					for (i = 0; i < c; i++)
 					{
-						E = this.groupBy[i].Evaluate(Variables);
+						E = this.groupBy[i].Evaluate(this.objectVariables);
 
 						o1 = Last[i];
 						o2 = E.AssociatedObjectValue;
@@ -95,7 +98,7 @@ namespace Waher.Script.Persistence.SQL
 						if (o1 is null ^ o2 is null)
 							break;
 
-						if (o1 != null && !o1.Equals(o2))
+						if (!(o1 is null) && !o1.Equals(o2))
 							break;
 					}
 
@@ -173,7 +176,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (this.groupNames != null)
+			if (!(this.groupNames is null))
 			{
 				for (i = 0; i < c; i++)
 				{
@@ -185,8 +188,8 @@ namespace Waher.Script.Persistence.SQL
 						Result[Ref.VariableName] = Last[i];
 					else
 					{
-						E = this.groupNames[i]?.Evaluate(Variables);
-						if (E != null && E is StringValue S)
+						E = this.groupNames[i]?.Evaluate(this.variables);
+						if (!(E is null) && E is StringValue S)
 							Result[S.Value] = Last[i];
 					}
 				}

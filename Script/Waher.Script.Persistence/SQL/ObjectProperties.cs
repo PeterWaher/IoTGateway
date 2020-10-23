@@ -73,7 +73,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with that name exists.</returns>
 		public override bool ContainsVariable(string Name)
 		{
-			if (this.dictionary != null && this.dictionary.ContainsKey(Name))
+			if (!(this.dictionary is null) && this.dictionary.ContainsKey(Name))
 				return true;
 
 			if (this.variables2.ContainsVariable(Name) || base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
@@ -142,7 +142,7 @@ namespace Waher.Script.Persistence.SQL
 				return true;
 			}
 
-			if (this.dictionary != null && this.dictionary.TryGetValue(Name, out object Value))
+			if (!(this.dictionary is null) && this.dictionary.TryGetValue(Name, out object Value))
 			{
 				Variable = this.CreateVariable(Name, Value);
 				return true;
@@ -241,7 +241,7 @@ namespace Waher.Script.Persistence.SQL
 
 			Tuple<PropertyInfo, FieldInfo, bool> Rec;
 
-			if (this.dictionary != null)
+			if (!(this.dictionary is null))
 			{
 				this.dictionary[Name] = Value is IElement Element ? Element.AssociatedObjectValue : Value;
 				return;

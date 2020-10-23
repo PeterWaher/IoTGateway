@@ -16,6 +16,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly ScriptNode conditions;
 		private readonly Variables variables;
 		private readonly IResultSetEnumerator e;
+		private ObjectProperties properties = null;
 
 		/// <summary>
 		/// Enumerator that only returns elements matching a set of conditions.
@@ -67,9 +68,12 @@ namespace Waher.Script.Persistence.SQL
 		{
 			try
 			{
-				ObjectProperties Properties = new ObjectProperties(this.e.Current, this.variables);
+				if (this.properties is null)
+					this.properties = new ObjectProperties(this.e.Current, this.variables);
+				else
+					this.properties.Object = this.e.Current;
 
-				IElement E = this.conditions.Evaluate(Properties);
+				IElement E = this.conditions.Evaluate(this.properties);
 				if (!(E is BooleanValue B) || !B.Value)
 					return false;
 

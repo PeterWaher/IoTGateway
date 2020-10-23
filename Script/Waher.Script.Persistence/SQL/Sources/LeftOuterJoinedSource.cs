@@ -78,6 +78,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			private IResultSetEnumerator right;
 			private JoinedObject current = null;
 			private GenericObject defaultRight = null;
+			private ObjectProperties leftVariables = null;
 
 			public LeftOuterJoinEnumerator(IResultSetEnumerator Left, string LeftName,
 				IDataSource RightSource, string RightName, ScriptNode Conditions,
@@ -156,14 +157,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 					if (!await this.left.MoveNextAsync())
 						return false;
 
-					ObjectProperties LeftVariables = new ObjectProperties(this.left.Current, this.variables);
+					if (this.leftVariables is null)
+						this.leftVariables = new ObjectProperties(this.left.Current, this.variables);
+					else
+						this.leftVariables.Object = this.left.Current;
 
 					if (this.hasLeftName)
-						LeftVariables[this.leftName] = this.left.Current;
+						this.leftVariables[this.leftName] = this.left.Current;
 
-					this.right = await this.rightSource.Find(0, int.MaxValue, this.conditions, LeftVariables,
-						null, this.conditions);
-
+					this.right = await this.rightSource.Find(0, int.MaxValue, this.conditions, this.leftVariables, null, this.conditions);
 					this.rightFirst = true;
 				}
 			}

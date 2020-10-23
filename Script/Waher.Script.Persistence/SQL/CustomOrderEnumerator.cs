@@ -14,6 +14,8 @@ namespace Waher.Script.Persistence.SQL
 	/// </summary>
 	public class CustomOrderEnumerator : IResultSetEnumerator
 	{
+		private readonly Dictionary<Type, ObjectProperties> propertiesX = new Dictionary<Type, ObjectProperties>();
+		private readonly Dictionary<Type, ObjectProperties> propertiesY = new Dictionary<Type, ObjectProperties>();
 		private readonly KeyValuePair<ScriptNode, bool>[] order;
 		private readonly IResultSetEnumerator items;
 		private readonly Variables variables;
@@ -57,9 +59,6 @@ namespace Waher.Script.Persistence.SQL
 				while (await this.items.MoveNextAsync())
 					Items.Add(this.items.Current);
 
-				Dictionary<Type, ObjectProperties> PropertiesX = new Dictionary<Type, ObjectProperties>();
-				Dictionary<Type, ObjectProperties> PropertiesY = new Dictionary<Type, ObjectProperties>();
-
 				Items.Sort((x, y) =>
 				{
 					if (x is null)
@@ -75,20 +74,20 @@ namespace Waher.Script.Persistence.SQL
 					Type Tx = x.GetType();
 					Type Ty = y.GetType();
 
-					if (PropertiesX.TryGetValue(Tx, out ObjectProperties Vx))
+					if (this.propertiesX.TryGetValue(Tx, out ObjectProperties Vx))
 						Vx.Object = x;
 					else
 					{
 						Vx = new ObjectProperties(x, this.variables);
-						PropertiesX[Tx] = Vx;
+						this.propertiesX[Tx] = Vx;
 					}
 
-					if (PropertiesY.TryGetValue(Ty, out ObjectProperties Vy))
+					if (this.propertiesY.TryGetValue(Ty, out ObjectProperties Vy))
 						Vy.Object = y;
 					else
 					{
 						Vy = new ObjectProperties(y, this.variables);
-						PropertiesY[Ty] = Vy;
+						this.propertiesY[Ty] = Vy;
 					}
 
 					int i, j, c = this.order.Length;

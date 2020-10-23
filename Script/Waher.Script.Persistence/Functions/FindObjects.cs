@@ -113,7 +113,7 @@ namespace Waher.Script.Persistence.Functions
 			for (i = 0; i < c; i++)
 				SortOrder[i] = V.GetElement(i).AssociatedObjectValue.ToString();
 
-			if (Filter is null && FilterObj != null)
+			if (Filter is null && !(FilterObj is null))
 			{
 				Expression Exp = new Expression(FilterObj.ToString());
 				Filter = this.Convert(Exp.Root, Variables);

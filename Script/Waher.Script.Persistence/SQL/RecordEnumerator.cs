@@ -17,6 +17,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly Variables variables;
 		private readonly int count;
 		private IElement[] record;
+		private ObjectProperties properties = null;
 
 		/// <summary>
 		/// Enumerator that limits the return set to a maximum number of records.
@@ -65,7 +66,10 @@ namespace Waher.Script.Persistence.SQL
 			object Item = e.Current;
 			IElement Element = Item as IElement;
 
-			ObjectProperties Properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, this.variables);
+			if (this.properties is null)
+				this.properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, this.variables);
+			else
+				this.properties.Object = Element?.AssociatedObjectValue ?? Item;
 
 			if (this.columns is null)
 				this.record = new IElement[1] { Element ?? Expression.Encapsulate(Item) };
@@ -77,7 +81,7 @@ namespace Waher.Script.Persistence.SQL
 				{
 					try
 					{
-						this.record[i] = this.columns[i].Evaluate(Properties);
+						this.record[i] = this.columns[i].Evaluate(this.properties);
 					}
 					catch (Exception ex)
 					{

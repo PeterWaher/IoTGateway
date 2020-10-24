@@ -128,13 +128,13 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;
 			}
 
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.UnregisterIqGetHandler("req", NamespaceSynchronization, this.Clock, true);
 				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronization, this.SourceReq, true);
@@ -376,13 +376,13 @@ namespace Waher.Networking.XMPP.Synchronization
 			if (SpikePosition < 0 || SpikePosition >= WindowSize)
 				throw new ArgumentException("Spike position must lie inside the window.", nameof(SpikePosition));
 
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;
 			}
 
-			if (this.history != null)
+			if (!(this.history is null))
 			{
 				lock (this.history)
 				{
@@ -417,7 +417,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		public void Stop()
 		{
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;

@@ -375,7 +375,7 @@ namespace Waher.Networking.PeerToPeer
 			{
 				this.closed = true;
 
-				if (this.resynchCallback != null)
+				if (!(this.resynchCallback is null))
 				{
 					try
 					{

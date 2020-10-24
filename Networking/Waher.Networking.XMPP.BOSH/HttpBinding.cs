@@ -149,7 +149,7 @@ namespace Waher.Networking.XMPP.BOSH
 			this.xmppClient = null;
 			this.bindingInterface = null;
 
-			if (this.httpClients != null)
+			if (!(this.httpClients is null))
 			{
 				foreach (HttpClient Client in this.httpClients)
 				{
@@ -445,7 +445,7 @@ namespace Waher.Networking.XMPP.BOSH
 		public override void CloseSession()
 		{
 			this.terminated = true;
-			if (this.httpClients != null)
+			if (!(this.httpClients is null))
 			{
 				int i, c = this.httpClients.Length;
 

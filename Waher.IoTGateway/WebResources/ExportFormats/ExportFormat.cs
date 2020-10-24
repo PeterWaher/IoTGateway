@@ -80,7 +80,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public virtual void Dispose()
 		{
-			if (this.fs != null)
+			if (!(this.fs is null))
 			{
 				if (this.fs.CanWrite)
 					this.fs.Flush();

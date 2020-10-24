@@ -39,7 +39,7 @@ namespace Waher.WebService.Script
 		/// </summary>
 		public Task Stop()
 		{
-			if (this.webServer != null)
+			if (!(this.webServer is null))
 			{
 				this.webServer.Unregister(this.instance);
 

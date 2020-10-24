@@ -69,7 +69,7 @@ namespace Waher.Content
 		{
 			base.Dispose(disposing);
 
-			if (this.fileName != null)
+			if (!(this.fileName is null))
 			{
 				if (this.deleteWhenDisposed)
 				{

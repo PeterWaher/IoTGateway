@@ -403,7 +403,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("\"/></clientPublicKey>");
 			}
 
-			if (this.properties != null)
+			if (!(this.properties is null))
 			{
 				foreach (Property P in this.properties)
 				{
@@ -570,7 +570,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.to != DateTime.MaxValue)
 				Response.Add(new KeyValuePair<string, object>("To", this.to));
 
-			if (this.properties != null)
+			if (!(this.properties is null))
 			{
 				foreach (Property P in this.properties)
 					Response.Add(new KeyValuePair<string, object>(P.Name, P.Value));
@@ -588,7 +588,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.properties != null)
+				if (!(this.properties is null))
 				{
 					foreach (Property P in this.properties)
 					{
@@ -627,7 +627,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if ((this.properties is null) ^ (ID.properties is null))
 				return false;
 
-			if (this.properties != null)
+			if (!(this.properties is null))
 			{
 				int i, c = this.properties.Length;
 
@@ -682,7 +682,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Result ^= Result << 5 ^ GetHashCode(this.clientSignature);
 			Result ^= Result << 5 ^ GetHashCode(this.serverSignature);
 
-			if (this.properties != null)
+			if (!(this.properties is null))
 			{
 				int i, c = this.properties.Length;
 

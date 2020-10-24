@@ -56,7 +56,7 @@ namespace Waher.Security.JWT
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.algorithm != null)
+			if (!(this.algorithm is null))
 			{
 				this.algorithm.Dispose();
 				this.algorithm = null;

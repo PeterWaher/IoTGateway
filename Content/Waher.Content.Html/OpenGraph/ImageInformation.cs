@@ -49,7 +49,7 @@ namespace Waher.Content.Html.OpenGraph
 		{
 			int Result = base.GetHashCode();
 
-			if (this.description != null)
+			if (!(this.description is null))
 				Result ^= Result << 5 ^ this.description.GetHashCode();
 
 			return Result;

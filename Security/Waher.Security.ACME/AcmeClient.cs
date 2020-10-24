@@ -81,13 +81,13 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.httpClient != null)
+			if (!(this.httpClient is null))
 			{
 				this.httpClient.Dispose();
 				this.httpClient = null;
 			}
 
-			if (this.jws != null)
+			if (!(this.jws is null))
 			{
 				this.jws.Dispose();
 				this.jws = null;

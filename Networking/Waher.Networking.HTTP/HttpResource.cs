@@ -251,7 +251,7 @@ namespace Waher.Networking.HTTP
 			{
 				case "GET":
 				case "HEAD":
-					if (this.getRanges != null)
+					if (!(this.getRanges is null))
 					{
 						Response.SetHeader("Accept-Ranges", "bytes");
 
@@ -273,13 +273,13 @@ namespace Waher.Networking.HTTP
 						{
 							Response.OnlyHeader = Method == "HEAD";
 
-							if (this.get != null)
+							if (!(this.get is null))
 								await this.get.GET(Request, Response);
 							else
 								await this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
 						}
 					}
-					else if (this.get != null)
+					else if (!(this.get is null))
 					{
 						Response.OnlyHeader = Method == "HEAD";
 						await this.get.GET(Request, Response);
@@ -289,7 +289,7 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "POST":
-					if (this.postRanges != null)
+					if (!(this.postRanges is null))
 					{
 						if (Header.ContentRange != null)
 						{
@@ -301,7 +301,7 @@ namespace Waher.Networking.HTTP
 						}
 						else
 						{
-							if (this.post != null)
+							if (!(this.post is null))
 								await this.post.POST(Request, Response);
 							else
 							{
@@ -318,14 +318,14 @@ namespace Waher.Networking.HTTP
 							}
 						}
 					}
-					else if (this.post != null)
+					else if (!(this.post is null))
 						await this.post.POST(Request, Response);
 					else
 						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
 
 				case "PUT":
-					if (this.putRanges != null)
+					if (!(this.putRanges is null))
 					{
 						if (Header.ContentRange != null)
 						{
@@ -337,7 +337,7 @@ namespace Waher.Networking.HTTP
 						}
 						else
 						{
-							if (this.put != null)
+							if (!(this.put is null))
 								await this.put.PUT(Request, Response);
 							else
 							{
@@ -354,7 +354,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 					}
-					else if (this.put != null)
+					else if (!(this.put is null))
 						await this.put.PUT(Request, Response);
 					else
 						throw new MethodNotAllowedException(this.allowedMethods);

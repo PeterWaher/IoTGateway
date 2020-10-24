@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.Avatar
 			Client.OnRosterItemAdded += Client_OnRosterItemAdded;
 			Client.CustomPresenceXml += Client_CustomPresenceXml;
 
-			if (this.pep != null)
+			if (!(this.pep is null))
 				this.pep.OnUserAvatarMetaData += Pep_OnUserAvatarMetaData;
 
 			byte[] Bin = Resources.LoadResource(typeof(AvatarClient).Namespace + ".Images.DefaultAvatar.png",
@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.Avatar
 			this.client.OnRosterItemAdded -= Client_OnRosterItemAdded;
 			this.client.CustomPresenceXml -= Client_CustomPresenceXml;
 
-			if (this.pep != null)
+			if (!(this.pep is null))
 				this.pep.OnUserAvatarMetaData -= Pep_OnUserAvatarMetaData;
 
 			this.localAvatar = null;
@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP.Avatar
 					this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
 				}
 
-				if (this.pep != null)
+				if (!(this.pep is null))
 				{
 					this.pep.Publish(new UserAvatarImage()
 					{
@@ -692,7 +692,7 @@ namespace Waher.Networking.XMPP.Avatar
 			{
 				e.Stanza.Append("<x xmlns='jabber:x:avatar'><hash>");
 
-				if (this.localAvatar != null)
+				if (!(this.localAvatar is null))
 					e.Stanza.Append(this.localAvatar.Hash);
 
 				e.Stanza.Append("</hash></x>");

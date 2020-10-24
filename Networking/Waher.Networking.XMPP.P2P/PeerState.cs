@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private void AddPeerHandlers()
 		{
-			if (this.peer != null)
+			if (!(this.peer is null))
 			{
 				this.peer.OnSent += Peer_OnSent;
 				this.peer.OnReceived += Peer_OnReceived;
@@ -125,7 +125,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private void RemoveHandlers()
 		{
-			if (this.peer != null)
+			if (!(this.peer is null))
 			{
 				this.peer.OnSent -= Peer_OnSent;
 				this.peer.OnReceived -= Peer_OnReceived;
@@ -723,10 +723,10 @@ namespace Waher.Networking.XMPP.P2P
 				this.CallCallbacks();
 			else if (NewState == XmppState.Error || NewState == XmppState.Offline)
 			{
-				if (this.parent != null)
+				if (!(this.parent is null))
 					this.parent.PeerClosed(this);
 
-				if (this.xmppClient != null)
+				if (!(this.xmppClient is null))
 				{
 					this.xmppClient.Dispose();
 					this.xmppClient = null;
@@ -745,7 +745,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			get
 			{
-				if (this.xmppClient != null)
+				if (!(this.xmppClient is null))
 					return this.xmppClient.State;
 				else
 					return this.state;
@@ -808,7 +808,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void CallCallbacks()
 		{
-			if (this.callbacks != null)
+			if (!(this.callbacks is null))
 			{
 				foreach (KeyValuePair<PeerConnectionEventHandler, object> P in this.callbacks)
 				{
@@ -858,7 +858,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.parent = null;
 			this.peer = null;
 
-			if (this.callbacks != null)
+			if (!(this.callbacks is null))
 				this.CallCallbacks();
 		}
 
@@ -867,7 +867,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public void Close()
 		{
-			if (this.peer != null)
+			if (!(this.peer is null))
 			{
 				try
 				{
@@ -881,7 +881,7 @@ namespace Waher.Networking.XMPP.P2P
 				this.peer = null;
 			}
 
-			if (this.xmppClient != null)
+			if (!(this.xmppClient is null))
 			{
 				foreach (ISniffer Sniffer in this.xmppClient.Sniffers)
 				{
@@ -950,7 +950,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 
-			if (this.peer != null)
+			if (!(this.peer is null))
 			{
 				this.peer.SendTcp(Data, Callback);
 				this.lastActivity = DateTime.Now;

@@ -2665,7 +2665,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>Timepoint of when event was scheduled.</returns>
 		public DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
 		{
-			if (this.scheduler != null)
+			if (!(this.scheduler is null))
 				return this.scheduler.Add(When, Callback, State);
 			else
 				return DateTime.MinValue;

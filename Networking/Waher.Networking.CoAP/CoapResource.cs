@@ -77,7 +77,7 @@ namespace Waher.Networking.CoAP
 			{
 				if (!(value is null))
 				{
-					if (this.endpoint != null)
+					if (!(this.endpoint is null))
 						throw new ArgumentException("Resource already registered.", nameof(Endpoint));
 
 					this.endpoint = value;

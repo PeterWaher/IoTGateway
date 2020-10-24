@@ -43,7 +43,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override void Dispose()
 		{
-			if (this.output != null)
+			if (!(this.output is null))
 			{
 				this.output.Flush();
 				this.output.Close();

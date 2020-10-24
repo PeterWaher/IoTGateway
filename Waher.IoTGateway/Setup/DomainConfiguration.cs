@@ -421,7 +421,7 @@ namespace Waher.IoTGateway.Setup
 					}
 				}
 
-				if (this.alternativeDomains != null)
+				if (!(this.alternativeDomains is null))
 				{
 					foreach (string AltDomainName in this.alternativeDomains)
 					{
@@ -775,7 +775,7 @@ namespace Waher.IoTGateway.Setup
 					if (!string.IsNullOrEmpty(this.domain))
 						Names.Add(this.domain);
 
-					if (this.alternativeDomains != null)
+					if (!(this.alternativeDomains is null))
 					{
 						foreach (string Name in this.alternativeDomains)
 						{

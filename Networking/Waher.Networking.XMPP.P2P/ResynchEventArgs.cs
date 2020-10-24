@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.ok = Ok;
 
-			if (this.callback != null)
+			if (!(this.callback is null))
 			{
 				try
 				{

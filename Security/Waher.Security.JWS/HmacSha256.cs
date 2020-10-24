@@ -46,7 +46,7 @@ namespace Waher.Security.JWS
 		/// </summary>
 		public override void Dispose()
 		{
-			if (this.hmacSHA256 != null)
+			if (!(this.hmacSHA256 is null))
 			{
 				this.hmacSHA256.Dispose();
 				this.hmacSHA256 = null;

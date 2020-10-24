@@ -319,13 +319,13 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Offline;
 
-			if (this.pendingPresenceRequests != null)
+			if (!(this.pendingPresenceRequests is null))
 			{
 				this.pendingPresenceRequests.Dispose();
 				this.pendingPresenceRequests = null;
 			}
 
-			if (this.outputQueue != null)
+			if (!(this.outputQueue is null))
 			{
 				lock (this.outputQueue)
 				{
@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (this.pendingRequestsBySeqNr != null)
+			if (!(this.pendingRequestsBySeqNr is null))
 			{
 				lock (this.synchObject)
 				{

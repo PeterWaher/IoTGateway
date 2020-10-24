@@ -382,7 +382,7 @@ namespace Waher.Networking.HTTP.WebSockets
 							switch (this.controlOpCode)
 							{
 								case WebSocketOpcode.Close:
-									if (this.payload != null)
+									if (!(this.payload is null))
 										this.payload.Position = 0;
 
 									ushort? Code = null;
@@ -428,7 +428,7 @@ namespace Waher.Networking.HTTP.WebSockets
 							this.payload?.Dispose();
 							this.payload = this.payloadBak;
 
-							if (this.payload != null)
+							if (!(this.payload is null))
 								this.state++;
 							else
 								this.state = 0;

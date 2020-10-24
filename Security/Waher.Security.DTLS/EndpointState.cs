@@ -96,7 +96,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.buffer != null)
+			if (!(this.buffer is null))
 			{
 				this.buffer.Dispose();
 				this.buffer = null;

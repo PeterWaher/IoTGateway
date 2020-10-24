@@ -729,7 +729,7 @@ namespace Waher.Networking.HTTP
 		{
 			SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
 
-			if (this.listeners != null)
+			if (!(this.listeners is null))
 			{
 #if WINDOWS_UWP
 				foreach (KeyValuePair<StreamSocketListener, Guid> Listener in this.listeners)
@@ -775,7 +775,7 @@ namespace Waher.Networking.HTTP
 				int? Result = null;
 				int Port;
 
-				if (this.listeners != null)
+				if (!(this.listeners is null))
 				{
 					IPEndPoint IPEndPoint;
 
@@ -1653,7 +1653,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="StatusCode">Status code.</param>
 		public void RequestResponded(HttpRequest Request, int StatusCode)
 		{
-			if (this.currentRequests != null)
+			if (!(this.currentRequests is null))
 			{
 				if (this.currentRequests.TryGetValue(Request, out RequestInfo Info))
 				{
@@ -1705,7 +1705,7 @@ namespace Waher.Networking.HTTP
 
 				this.requestTimeout = value;
 
-				if (this.currentRequests != null)
+				if (!(this.currentRequests is null))
 					this.currentRequests.MaxTimeUnused = value;
 			}
 		}

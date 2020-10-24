@@ -56,13 +56,13 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			this.client.UnregisterIqSetHandler("data", Namespace, this.DataHandler, false);
 			this.client.UnregisterMessageHandler("data", Namespace, this.DataHandler, false);
 
-			if (this.cache != null)
+			if (!(this.cache is null))
 			{
 				this.cache.Dispose();
 				this.cache = null;
 			}
 
-			if (this.output != null)
+			if (!(this.output is null))
 			{
 				lock (this.output)
 				{

@@ -170,7 +170,7 @@ namespace Waher.Content.Markdown.Model
 			if (!Callback(this, State))
 				return false;
 
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				foreach (MarkdownElement E in this.children)
 				{
@@ -200,7 +200,7 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">XML Output.</param>
 		protected virtual void ExportChildren(XmlWriter Output)
 		{
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				foreach (MarkdownElement E in this.children)
 					E.Export(Output);

@@ -73,7 +73,7 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected override void BeforeWrite()
 		{
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				try
 				{
@@ -132,7 +132,7 @@ namespace Waher.Events.Files
 		{
 			base.Dispose();
 
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				this.file.Flush();
 				this.file.Dispose();

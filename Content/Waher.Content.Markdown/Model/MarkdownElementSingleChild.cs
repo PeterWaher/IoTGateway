@@ -50,7 +50,7 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			if (this.child != null)
+			if (!(this.child is null))
 				this.child.GeneratePlainText(Output);
 		}
 
@@ -89,7 +89,7 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">XML Output.</param>
 		protected virtual void ExportChild(XmlWriter Output)
 		{
-			if (this.child != null)
+			if (!(this.child is null))
 				this.child.Export(Output);
 		}
 

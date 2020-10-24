@@ -125,7 +125,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public override async Task EndObject()
 		{
-			if (this.obj != null)
+			if (!(this.obj is null))
 			{
 				this.objects.Add(this.obj);
 				this.obj = null;
@@ -165,7 +165,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="PropertyValue">Property value.</param>
 		public override Task ReportProperty(string PropertyName, object PropertyValue)
 		{
-			if (this.obj != null)
+			if (!(this.obj is null))
 			{
 				if (this.mapObjectIds)
 				{
@@ -238,7 +238,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			if (this.entryType == EntryType.Clear)
 				await Database.Provider.Clear(this.collectionName);
-			else if (this.obj != null)
+			else if (!(this.obj is null))
 			{
 				GenericObject Obj2 = await Database.Provider.TryLoadObject<GenericObject>(this.collectionName, this.objectId);
 

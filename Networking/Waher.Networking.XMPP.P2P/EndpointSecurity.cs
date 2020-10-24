@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.P2P
 			else
 				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
 
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.RegisterHandlers(this.client);
 
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public virtual void Dispose()
 		{
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.OnStateChanged -= Client_OnStateChanged;
 				this.client.OnPresence -= Client_OnPresence;
@@ -241,13 +241,13 @@ namespace Waher.Networking.XMPP.P2P
 				this.client = null;
 			}
 
-			if (this.oldKeys != null)
+			if (!(this.oldKeys is null))
 			{
 				foreach (IE2eEndpoint E2e in this.oldKeys)
 					E2e.Dispose();
 			}
 
-			if (this.keys != null)
+			if (!(this.keys is null))
 			{
 				foreach (IE2eEndpoint E2e in this.keys)
 					E2e.Dispose();

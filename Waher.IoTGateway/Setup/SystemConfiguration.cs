@@ -146,7 +146,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public virtual Task CleanupAfterConfiguration(HttpServer WebServer)
 		{
-			if (this.configResource != null)
+			if (!(this.configResource is null))
 			{
 				WebServer.Unregister(this.configResource);
 				this.configResource = null;

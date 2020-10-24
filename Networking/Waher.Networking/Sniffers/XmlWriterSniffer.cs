@@ -63,7 +63,7 @@ namespace Waher.Networking.Sniffers
 			lock (this.synchObject)
 			{
 				this.BeforeWrite();
-				if (this.output != null)
+				if (!(this.output is null))
 				{
 					try
 					{
@@ -196,7 +196,7 @@ namespace Waher.Networking.Sniffers
 				try
 				{
 					this.BeforeWrite();
-					if (this.output != null)
+					if (!(this.output is null))
 					{
 						try
 						{

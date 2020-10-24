@@ -975,7 +975,7 @@ namespace Waher.Networking.XMPP.DataForms
 					Output.Append("</title>");
 				}
 
-				if (this.pages != null)
+				if (!(this.pages is null))
 				{
 					foreach (Page Page in this.pages)
 						Page.Serialize(Output);
@@ -1186,7 +1186,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 				this.Fields = NewFields.ToArray();
 
-				if (this.pages != null)
+				if (!(this.pages is null))
 				{
 					List<Page> NewPages = new List<Page>();
 

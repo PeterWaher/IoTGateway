@@ -178,7 +178,7 @@ namespace Waher.Content.Markdown
 
 			this.elements = this.ParseBlocks(Blocks, Start, End);
 
-			if (this.toInsert != null)
+			if (!(this.toInsert is null))
 			{
 				foreach (KeyValuePair<int, string> P in this.toInsert)
 					this.markdownText = this.markdownText.Insert(P.Key, P.Value);
@@ -1984,7 +1984,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							case ':':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.NextCharSameRow();
 									switch (State.PeekNextCharSameRow())
@@ -2071,7 +2071,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							case ';':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.NextCharSameRow();
 									if (State.PeekNextCharSameRow() == ')')
@@ -2088,7 +2088,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							case '.':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.NextCharSameRow();
 									if (State.PeekNextCharSameRow() == '<')
@@ -2221,7 +2221,7 @@ namespace Waher.Content.Markdown
 						}
 						else if (ch2 == '_')
 						{
-							if (this.emojiSource != null)
+							if (!(this.emojiSource is null))
 							{
 								State.BackupState();
 								while ((ch2 = State.NextCharSameRow()) == '_')
@@ -2470,7 +2470,7 @@ namespace Waher.Content.Markdown
 							else
 								Text.Append("#.");
 						}
-						else if (this.emojiSource != null)
+						else if (!(this.emojiSource is null))
 						{
 							switch (State.PeekNextCharSameRow())
 							{
@@ -2902,7 +2902,7 @@ namespace Waher.Content.Markdown
 					case '\'':
 						this.AppendAnyText(Elements, Text);
 
-						if (this.emojiSource != null)
+						if (!(this.emojiSource is null))
 							ch2 = State.PeekNextCharSameRow();
 						else
 							ch2 = (char)0;
@@ -3094,7 +3094,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							case '-':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.BackupState();
 									State.NextCharSameRow();
@@ -3118,7 +3118,7 @@ namespace Waher.Content.Markdown
 								break;
 
 							case ')':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
@@ -3404,7 +3404,7 @@ namespace Waher.Content.Markdown
 							else
 								Text.Append(ch);
 						}
-						else if (this.emojiSource != null)
+						else if (!(this.emojiSource is null))
 						{
 							int LeftLevel = 1;
 							while (ch2 == ':')
@@ -3740,7 +3740,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case ';':
-						if (this.emojiSource != null)
+						if (!(this.emojiSource is null))
 						{
 							switch (State.PeekNextCharSameRow())
 							{
@@ -4100,7 +4100,7 @@ namespace Waher.Content.Markdown
 
 							case '0':
 							case 'O':
-								if (this.emojiSource != null)
+								if (!(this.emojiSource is null))
 								{
 									State.BackupState();
 									State.NextCharSameRow();
@@ -5345,7 +5345,7 @@ namespace Waher.Content.Markdown
 			Xml.WriteStartElement("parsedMakdown", "http://waher.se/Schema/Markdown.xsd");
 			Xml.WriteAttributeString("isDynamic", CommonTypes.Encode(this.isDynamic));
 
-			if (this.metaData != null)
+			if (!(this.metaData is null))
 			{
 				Xml.WriteStartElement("metaData");
 
@@ -5373,7 +5373,7 @@ namespace Waher.Content.Markdown
 
 			Xml.WriteEndElement();
 
-			if (this.references != null)
+			if (!(this.references is null))
 			{
 				Xml.WriteStartElement("references");
 
@@ -5390,7 +5390,7 @@ namespace Waher.Content.Markdown
 				Xml.WriteEndElement();
 			}
 
-			if (this.footnoteOrder != null)
+			if (!(this.footnoteOrder is null))
 			{
 				Xml.WriteStartElement("footnotes");
 
@@ -5878,7 +5878,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If the operation was completed.</returns>
 		public bool ForEach(MarkdownElementHandler Callback, object State)
 		{
-			if (this.elements != null)
+			if (!(this.elements is null))
 			{
 				foreach (MarkdownElement E in this.elements)
 				{
@@ -5887,7 +5887,7 @@ namespace Waher.Content.Markdown
 				}
 			}
 
-			if (this.references != null)
+			if (!(this.references is null))
 			{
 				foreach (MarkdownElement E in this.references.Values)
 				{
@@ -5896,7 +5896,7 @@ namespace Waher.Content.Markdown
 				}
 			}
 
-			if (this.footnotes != null)
+			if (!(this.footnotes is null))
 			{
 				foreach (MarkdownElement E in this.footnotes.Values)
 				{

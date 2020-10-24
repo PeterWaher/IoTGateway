@@ -255,13 +255,13 @@ namespace Waher.Networking.XMPP.WebSocket
 				sb.Append("='");
 				sb.Append(XmppClient.NamespaceStream);
 
-				if (this.to != null)
+				if (!(this.to is null))
 				{
 					sb.Append("' to='");
 					sb.Append(XML.Encode(this.to));
 				}
 
-				if (this.from != null)
+				if (!(this.from is null))
 				{
 					sb.Append("' from='");
 					sb.Append(XML.Encode(this.from));
@@ -273,7 +273,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					sb.Append(CommonTypes.Encode(this.version));
 				}
 
-				if (this.language != null)
+				if (!(this.language is null))
 				{
 					sb.Append("' xml:lang='");
 					sb.Append(XML.Encode(this.language));

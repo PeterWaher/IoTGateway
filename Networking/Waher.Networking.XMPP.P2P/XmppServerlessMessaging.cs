@@ -318,7 +318,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.Information("Serverless XMPP connection with " + State.RemoteFullJid + " closed.");
 
-			if (this.peersByFullJid != null)
+			if (!(this.peersByFullJid is null))
 			{
 				lock (this.peersByFullJid)
 				{
@@ -606,7 +606,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.p2pNetwork?.Dispose();
 			this.p2pNetwork = null;
 
-			if (this.peersByFullJid != null)
+			if (!(this.peersByFullJid is null))
 			{
 				PeerState[] States;
 

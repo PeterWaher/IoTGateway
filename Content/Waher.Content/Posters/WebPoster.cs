@@ -74,7 +74,7 @@ namespace Waher.Content.Posters
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 					Response.EnsureSuccessStatusCode();
-
+					
 					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 					string ContentType2 = Response.Content.Headers.ContentType.ToString();
 

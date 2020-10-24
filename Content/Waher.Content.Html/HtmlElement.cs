@@ -93,7 +93,7 @@ namespace Waher.Content.Html
 				int? Start = null;
 				int? End = null;
 
-				if (this.children != null)
+				if (!(this.children is null))
 				{
 					foreach (HtmlNode N in this.children)
 					{
@@ -120,7 +120,7 @@ namespace Waher.Content.Html
 			{
 				StringBuilder sb = new StringBuilder();
 
-				if (this.children != null)
+				if (!(this.children is null))
 				{
 					foreach (HtmlNode N in this.children)
 					{
@@ -146,7 +146,7 @@ namespace Waher.Content.Html
 		{
 			get
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 				{
 					foreach (HtmlNode N in this.children)
 						return this.Document.HtmlText.Substring(this.StartPosition, N.StartPosition - this.StartPosition);
@@ -163,7 +163,7 @@ namespace Waher.Content.Html
 		{
 			get
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 				{
 					foreach (HtmlNode N in this.children)
 						return N.StartPosition - 1;

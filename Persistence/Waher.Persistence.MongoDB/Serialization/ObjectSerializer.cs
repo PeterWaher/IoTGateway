@@ -2443,9 +2443,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			get
 			{
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					return this.objectIdFieldInfo.Name;
-				else if (this.objectIdPropertyInfo != null)
+				else if (!(this.objectIdPropertyInfo is null))
 					return this.objectIdPropertyInfo.Name;
 				else
 					return null;
@@ -2476,9 +2476,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			object OID;
 
-			if (this.objectIdFieldInfo != null)
+			if (!(this.objectIdFieldInfo is null))
 				OID = this.objectIdFieldInfo.GetValue(Value);
-			else if (this.objectIdPropertyInfo != null)
+			else if (!(this.objectIdPropertyInfo is null))
 				OID = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				return false;
@@ -2506,9 +2506,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			object Obj;
 
-			if (this.objectIdFieldInfo != null)
+			if (!(this.objectIdFieldInfo is null))
 				Obj = this.objectIdFieldInfo.GetValue(Value);
-			else if (this.objectIdPropertyInfo != null)
+			else if (!(this.objectIdPropertyInfo is null))
 				Obj = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
@@ -2534,7 +2534,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				ObjectId ObjectId = ObjectId.GenerateNewId();
 				Type MemberType;
 
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					MemberType = this.objectIdFieldInfo.FieldType;
 				else
 					MemberType = this.objectIdPropertyInfo.PropertyType;
@@ -2550,7 +2550,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				else
 					throw new NotSupportedException("Unsupported type for Object ID members: " + MemberType.FullName);
 
-				if (this.objectIdFieldInfo != null)
+				if (!(this.objectIdFieldInfo is null))
 					this.objectIdFieldInfo.SetValue(Value, Obj);
 				else
 					this.objectIdPropertyInfo.SetValue(Value, Obj);

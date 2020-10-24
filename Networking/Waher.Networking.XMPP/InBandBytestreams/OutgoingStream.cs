@@ -181,7 +181,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 				this.isWriting = true;
 
-				if (this.e2e != null)
+				if (!(this.e2e is null))
 					this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), this.BlockAck, Seq);
 				else
 					this.client.SendIqSet(this.to, Xml.ToString(), this.BlockAck, Seq);
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(this.streamId);
 			Xml.Append("'/>");
 
-			if (this.e2e != null)
+			if (!(this.e2e is null))
 				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), null, null);
 			else
 				this.client.SendIqSet(this.to, Xml.ToString(), null, null);

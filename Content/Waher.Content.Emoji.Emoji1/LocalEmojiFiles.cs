@@ -364,7 +364,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.initialized != null)
+			if (!(this.initialized is null))
 			{
 				this.initialized.Dispose();
 				this.initialized = null;

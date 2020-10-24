@@ -1081,7 +1081,7 @@ namespace Waher.Networking.PeerToPeer
 			this.error?.Dispose();
 			this.error = null;
 
-			if (this.remotePlayersByEndpoint != null)
+			if (!(this.remotePlayersByEndpoint is null))
 			{
 				lock (this.remotePlayersByEndpoint)
 				{
@@ -1102,7 +1102,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private async Task CloseMqtt()
 		{
-			if (this.mqttConnection != null)
+			if (!(this.mqttConnection is null))
 			{
 				if (this.mqttConnection.State == MqttState.Connected)
 				{

@@ -200,7 +200,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			private void SearchDone()
 			{
-				if (this.Callback != null)
+				if (!(this.Callback is null))
 				{
 					try
 					{
@@ -301,7 +301,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				proxy = this
 			};
 
-			if (this.e2e != null)
+			if (!(this.e2e is null))
 				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
 			else
 				this.client.SendIqSet(DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);

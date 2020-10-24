@@ -75,10 +75,10 @@ namespace Waher.Runtime.ServiceRegistration
 		{
 			int Result = 0;
 
-			if (this.tag != null)
+			if (!(this.tag is null))
 				Result = this.tag.GetHashCode();
 
-			if (this.value != null)
+			if (!(this.value is null))
 				Result ^= Result << 5 ^ this.value.GetHashCode();
 
 			return Result;

@@ -203,9 +203,9 @@ namespace Waher.Networking.XMPP
         /// <param name="Xml">XML to embed into the response.</param>
         public void IqResult(string Xml)
         {
-            if (this.e2eEncryption != null)
+            if (!(this.e2eEncryption is null))
                 this.e2eEncryption.SendIqResult(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.from, Xml);
-            else if (this.client != null)
+            else if (!(this.client is null))
                 this.client.SendIqResult(this.id, this.from, Xml);
             else
                 this.component.SendIqResult(this.id, this.to, this.from, Xml);
@@ -217,9 +217,9 @@ namespace Waher.Networking.XMPP
         /// <param name="Xml">XML to embed into the response.</param>
         public void IqError(string Xml)
         {
-            if (this.e2eEncryption != null)
+            if (!(this.e2eEncryption is null))
                 this.e2eEncryption.SendIqError(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.from, Xml);
-            else if (this.client != null)
+            else if (!(this.client is null))
                 this.client.SendIqError(this.id, this.from, Xml);
             else
                 this.component.SendIqError(this.id, this.to, this.from, Xml);
@@ -233,9 +233,9 @@ namespace Waher.Networking.XMPP
         {
             try
             {
-                if (this.e2eEncryption != null)
+                if (!(this.e2eEncryption is null))
                     this.e2eEncryption.SendIqError(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.from, ex);
-                else if (this.client != null)
+                else if (!(this.client is null))
                     this.client.SendIqError(this.id, this.from, ex);
                 else
                     this.component.SendIqError(this.id, this.to, this.from, ex);

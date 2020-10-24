@@ -140,7 +140,7 @@ namespace Waher.Security.DTLS
 		{
 			this.disposed = true;
 
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.Client.Shutdown(SocketShutdown.Both);
 				this.client.Dispose();

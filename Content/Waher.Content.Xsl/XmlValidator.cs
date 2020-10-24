@@ -40,7 +40,7 @@ namespace Waher.Content.Xsl
 
 		internal void AssertNoError()
 		{
-			if (this.exception != null)
+			if (!(this.exception is null))
 				throw this.exception;
 		}
 	}

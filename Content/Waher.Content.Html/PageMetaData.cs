@@ -387,7 +387,7 @@ namespace Waher.Content.Html
 			if ((this.localeAlternate is null) ^ (Meta.localeAlternate is null))
 				return false;
 
-			if (this.localeAlternate != null)
+			if (!(this.localeAlternate is null))
 			{
 				if ((c = this.localeAlternate.Length) != Meta.localeAlternate.Length)
 					return false;
@@ -402,7 +402,7 @@ namespace Waher.Content.Html
 			if ((this.images is null) ^ (Meta.images is null))
 				return false;
 
-			if (this.images != null)
+			if (!(this.images is null))
 			{
 				if ((c = this.images.Length) != Meta.images.Length)
 					return false;
@@ -417,7 +417,7 @@ namespace Waher.Content.Html
 			if ((this.audio is null) ^ (Meta.audio is null))
 				return false;
 
-			if (this.audio != null)
+			if (!(this.audio is null))
 			{
 				if ((c = this.audio.Length) != Meta.audio.Length)
 					return false;
@@ -432,7 +432,7 @@ namespace Waher.Content.Html
 			if ((this.video is null) ^ (Meta.video is null))
 				return false;
 
-			if (this.video != null)
+			if (!(this.video is null))
 			{
 				if ((c = this.video.Length) != Meta.video.Length)
 					return false;
@@ -454,46 +454,46 @@ namespace Waher.Content.Html
 		{
 			int Result = 0;
 
-			if (this.title != null)
+			if (!(this.title is null))
 				Result = this.title.GetHashCode();
 
-			if (this.type != null)
+			if (!(this.type is null))
 				Result ^= Result << 5 ^ this.type.GetHashCode();
 
-			if (this.url != null)
+			if (!(this.url is null))
 				Result ^= Result << 5 ^ this.url.GetHashCode();
 
-			if (this.description != null)
+			if (!(this.description is null))
 				Result ^= Result << 5 ^ this.description.GetHashCode();
 
-			if (this.determiner != null)
+			if (!(this.determiner is null))
 				Result ^= Result << 5 ^ this.determiner.GetHashCode();
 
-			if (this.locale != null)
+			if (!(this.locale is null))
 				Result ^= Result << 5 ^ this.locale.GetHashCode();
 
-			if (this.siteName != null)
+			if (!(this.siteName is null))
 				Result ^= Result << 5 ^ this.siteName.GetHashCode();
 
-			if (this.localeAlternate != null)
+			if (!(this.localeAlternate is null))
 			{
 				foreach (string s in this.localeAlternate)
 					Result ^= Result << 5 ^ s.GetHashCode();
 			}
 
-			if (this.images != null)
+			if (!(this.images is null))
 			{
 				foreach (ImageInformation Obj in this.images)
 					Result ^= Result << 5 ^ Obj.GetHashCode();
 			}
 
-			if (this.audio != null)
+			if (!(this.audio is null))
 			{
 				foreach (ImageInformation Obj in this.audio)
 					Result ^= Result << 5 ^ Obj.GetHashCode();
 			}
 
-			if (this.video != null)
+			if (!(this.video is null))
 			{
 				foreach (ImageInformation Obj in this.video)
 					Result ^= Result << 5 ^ Obj.GetHashCode();

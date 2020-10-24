@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		public override void Dispose()
 		{
-			if (this.pubSubClient != null)
+			if (!(this.pubSubClient is null))
 			{
 				this.pubSubClient.ItemNotification -= PubSubClient_ItemNotification;
 				this.PubSubClient.ItemRetracted -= PubSubClient_ItemRetracted;

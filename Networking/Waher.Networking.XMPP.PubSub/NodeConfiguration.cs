@@ -531,16 +531,16 @@ namespace Waher.Networking.XMPP.PubSub
 			if (this.accessModel.HasValue)
 				Fields.Add(new ListSingleField("pubsub#access_model", this.accessModel.Value.ToString()));
 
-			if (this.bodyXsltUrl != null)
+			if (!(this.bodyXsltUrl is null))
 				Fields.Add(new TextSingleField("pubsub#body_xslt", this.bodyXsltUrl));
 
-			if (this.collections != null)
+			if (!(this.collections is null))
 				Fields.Add(new TextMultiField("pubsub#collection", this.collections));
 
-			if (this.contact != null)
+			if (!(this.contact is null))
 				Fields.Add(new TextMultiField("pubsub#contact", this.contact));
 
-			if (this.dataFormXsltUrl != null)
+			if (!(this.dataFormXsltUrl is null))
 				Fields.Add(new TextSingleField("pubsub#dataform_xslt", this.dataFormXsltUrl));
 
 			if (this.deliverNotifications.HasValue)
@@ -555,10 +555,10 @@ namespace Waher.Networking.XMPP.PubSub
 			if (this.childAssociationPolicy.HasValue)
 				Fields.Add(new ListSingleField("pubsub#children_association_policy", this.childAssociationPolicy.Value.ToString()));
 
-			if (this.childAssociationWhitelist != null)
+			if (!(this.childAssociationWhitelist is null))
 				Fields.Add(new JidMultiField("pubsub#children_association_whitelist", this.childAssociationWhitelist));
 
-			if (this.children != null)
+			if (!(this.children is null))
 				Fields.Add(new TextMultiField("pubsub#children", this.children));
 
 			if (this.maxChildren.HasValue)
@@ -597,13 +597,13 @@ namespace Waher.Networking.XMPP.PubSub
 			if (this.publisherModel.HasValue)
 				Fields.Add(new ListSingleField("pubsub#publish_model", this.publisherModel.ToString()));
 
-			if (this.replyRooms != null)
+			if (!(this.replyRooms is null))
 				Fields.Add(new JidMultiField("pubsub#replyroom", this.replyRooms));
 
-			if (this.replyTo != null)
+			if (!(this.replyTo is null))
 				Fields.Add(new JidMultiField("pubsub#replyto", this.replyTo));
 
-			if (this.rosterGroupsAllowed != null)
+			if (!(this.rosterGroupsAllowed is null))
 				Fields.Add(new ListMultiField("pubsub#roster_groups_allowed", this.rosterGroupsAllowed));
 
 			if (this.sendLastPublishedItem.HasValue)
@@ -612,13 +612,13 @@ namespace Waher.Networking.XMPP.PubSub
 			if (this.allowSubscriptions.HasValue)
 				Fields.Add(new BooleanField("pubsub#subscribe", this.allowSubscriptions.Value));
 
-			if (this.title != null)
+			if (!(this.title is null))
 				Fields.Add(new TextSingleField("pubsub#title", this.title));
 
-			if (this.description != null)
+			if (!(this.description is null))
 				Fields.Add(new TextMultiField("pubsub#description", this.description));
 
-			if (this.payloadType != null)
+			if (!(this.payloadType is null))
 				Fields.Add(new TextSingleField("pubsub#type", this.payloadType));
 
 			if (this.notificationType.HasValue)

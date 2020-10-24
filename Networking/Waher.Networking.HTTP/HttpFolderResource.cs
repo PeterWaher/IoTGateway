@@ -620,7 +620,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						if (this.Next != null)
+						if (!(this.Next is null))
 						{
 							long First;
 
@@ -686,14 +686,14 @@ namespace Waher.Networking.HTTP
 
 			public async Task Dispose()
 			{
-				if (this.f != null)
+				if (!(this.f is null))
 				{
 					await this.f.FlushAsync();
 					this.f.Dispose();
 					this.f = null;
 				}
 
-				if (this.Response != null)
+				if (!(this.Response is null))
 				{
 					await this.Response.SendResponse();
 					this.Response.Dispose();

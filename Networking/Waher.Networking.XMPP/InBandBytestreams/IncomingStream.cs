@@ -177,7 +177,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private void DataReceived(byte[] Bin)
 		{
-			if (this.dataCallback != null)
+			if (!(this.dataCallback is null))
 			{
 				try
 				{
@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		internal void Closed(CloseReason Reason)
 		{
-			if (this.closeCallback != null)
+			if (!(this.closeCallback is null))
 			{
 				try
 				{

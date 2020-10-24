@@ -88,7 +88,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.controlServer.OnGetNode += OnGetNode;
 			this.controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
 
-			if (this.thingRegistryClient != null)
+			if (!(this.thingRegistryClient is null))
 			{
 				this.thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
 				this.thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
@@ -279,13 +279,13 @@ namespace Waher.Networking.XMPP.Concentrator
 			foreach (DataSourceRec Rec in Sources)
 				Rec.Source.OnEvent -= this.DataSource_OnEvent;
 
-			if (this.sensorServer != null)
+			if (!(this.sensorServer is null))
 			{
 				this.sensorServer.Dispose();
 				this.sensorServer = null;
 			}
 
-			if (this.controlServer != null)
+			if (!(this.controlServer is null))
 			{
 				this.controlServer.Dispose();
 				this.controlServer = null;

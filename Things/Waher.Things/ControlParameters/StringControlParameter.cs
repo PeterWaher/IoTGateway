@@ -215,7 +215,7 @@ namespace Waher.Things.ControlParameters
 		/// <param name="Node">Node reference, if available.</param>
 		public override Task ExportValidationRules(XmlWriter Output, IThingReference Node)
 		{
-			if (this.options != null)
+			if (!(this.options is null))
 			{
 				int i = 0;
 				int c = this.labels is null ? 0 : this.labels.Length;

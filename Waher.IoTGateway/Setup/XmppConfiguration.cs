@@ -516,7 +516,7 @@ namespace Waher.IoTGateway.Setup
 				this.passwordType = string.Empty;
 			}
 
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.Dispose();
 				this.client = null;

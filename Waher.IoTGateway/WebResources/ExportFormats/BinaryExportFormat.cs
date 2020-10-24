@@ -197,7 +197,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override void Dispose()
 		{
-			if (this.w != null)
+			if (!(this.w is null))
 			{
 				this.w.Flush();
 				this.output.Flush();
@@ -269,7 +269,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// </summary>
 		public override Task End()
 		{
-			if (this.errors != null)
+			if (!(this.errors is null))
 			{
 				this.w.Write((byte)4); // Errors
 
@@ -280,7 +280,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 				this.errors = null;
 			}
 
-			if (this.exceptions != null)
+			if (!(this.exceptions is null))
 			{
 				this.w.Write((byte)5); // Exceptions
 

@@ -1148,7 +1148,7 @@ namespace Waher.Networking.XMPP
 			this.authenticationMechanisms?.Clear();
 			this.compressionMethods?.Clear();
 
-			if (this.pendingRequestsBySeqNr != null)
+			if (!(this.pendingRequestsBySeqNr is null))
 			{
 				lock (this.synchObject)
 				{
@@ -1229,7 +1229,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Password">New password.</param>
 		public void Reconnect(string UserName, string Password)
 		{
-			if (this.textTransportLayer != null)
+			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
 			this.userName = UserName;
@@ -1247,7 +1247,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="PasswordHashMethod">New password hash method.</param>
 		public void Reconnect(string UserName, string PasswordHash, string PasswordHashMethod)
 		{
-			if (this.textTransportLayer != null)
+			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
 			this.userName = UserName;
@@ -1997,7 +1997,7 @@ namespace Waher.Networking.XMPP
 							return false;
 
 						case "failure":
-							if (this.authenticationMethod != null)
+							if (!(this.authenticationMethod is null))
 							{
 								if (this.canRegister && !this.hasRegistered && this.allowedToRegister && !string.IsNullOrEmpty(this.password))
 								{

@@ -35,7 +35,7 @@ namespace Waher.Security.DTLS.Ciphers
 		{
 			base.Dispose();
 
-			if (this.aesCcm != null)
+			if (!(this.aesCcm is null))
 			{
 				this.aesCcm.Dispose();
 				this.aesCcm = null;

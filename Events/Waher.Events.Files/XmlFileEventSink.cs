@@ -183,7 +183,7 @@ namespace Waher.Events.Files
 			if (this.lastFileName != null && this.lastFileName == s)
 				return;
 
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				try
 				{
@@ -242,7 +242,7 @@ namespace Waher.Events.Files
 		{
 			base.Dispose();
 
-			if (this.output != null)
+			if (!(this.output is null))
 			{
 				try
 				{
@@ -261,7 +261,7 @@ namespace Waher.Events.Files
 				}
 			}
 
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				try
 				{

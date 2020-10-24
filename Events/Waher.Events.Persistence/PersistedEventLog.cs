@@ -90,7 +90,7 @@ namespace Waher.Events.Persistence
 		/// <returns>If it was turned off.</returns>
 		public bool TurnOffDailyPurge()
 		{
-			if (this.timer != null)
+			if (!(this.timer is null))
 			{
 				this.timer.Dispose();
 				this.timer = null;

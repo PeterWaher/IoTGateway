@@ -61,7 +61,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.parameters != null)
+				if (!(this.parameters is null))
 					return 3;
 
 				if (!this.item.EndsWith("/*"))

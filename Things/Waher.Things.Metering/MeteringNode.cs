@@ -648,7 +648,7 @@ namespace Waher.Things.Metering
 		{
 			get
 			{
-				if (this.parent != null)
+				if (!(this.parent is null))
 					return this.parent;
 
 				if (this.parentId == Guid.Empty)
@@ -750,7 +750,7 @@ namespace Waher.Things.Metering
 
 		private async Task<MeteringNode> LoadParent()
 		{
-			if (this.parent != null)
+			if (!(this.parent is null))
 				return this.parent;
 
 			if (this.parentId == Guid.Empty)
@@ -820,13 +820,13 @@ namespace Waher.Things.Metering
 			Result.AddLast(new StringParameter("NodeId", await Namespace.GetStringAsync(1, "Node ID"), this.nodeId));
 			Result.AddLast(new StringParameter("Type", await Namespace.GetStringAsync(4, "Type"), await this.GetTypeNameAsync(Language)));
 
-			if (this.parent != null)
+			if (!(this.parent is null))
 				Result.AddLast(new StringParameter("ParentId", await Namespace.GetStringAsync(2, "Parent ID"), this.parent.nodeId));
 
 			if (!this.childrenLoaded)
 				await this.LoadChildren();
 
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				int i;
 
@@ -1168,7 +1168,7 @@ namespace Waher.Things.Metering
 
 			lock (this.synchObject)
 			{
-				if (this.children != null)
+				if (!(this.children is null))
 				{
 					i = this.children.IndexOf(Node);
 					if (i >= 0)
@@ -1207,7 +1207,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public async virtual Task DestroyAsync()
 		{
-			if (this.Parent != null)
+			if (!(this.Parent is null))
 			{
 				if (this.parent.childrenLoaded)
 				{
@@ -1226,7 +1226,7 @@ namespace Waher.Things.Metering
 			if (!this.childrenLoaded)
 				await this.LoadChildren();
 
-			if (this.children != null)
+			if (!(this.children is null))
 			{
 				foreach (MeteringNode Child in this.children)
 				{

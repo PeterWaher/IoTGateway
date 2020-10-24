@@ -542,7 +542,7 @@ namespace Waher.Networking.XMPP.Control
 				}
 			}
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				string[] ParameterNames2 = new string[ParameterNames.Count];
 				ParameterNames.Keys.CopyTo(ParameterNames2, 0);
@@ -810,7 +810,7 @@ namespace Waher.Networking.XMPP.Control
 				Parameters = Left.ToArray();
 			}
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				int i, c = Parameters.Length;
 				string[] ParameterNames = new string[c];

@@ -72,13 +72,13 @@ namespace Waher.Content.Html.OpenGraph
 		{
 			int Result = 0;
 
-			if (this.url != null)
+			if (!(this.url is null))
 				Result = this.url.GetHashCode();
 
-			if (this.secureUrl != null)
+			if (!(this.secureUrl is null))
 				Result ^= Result << 5 ^ this.secureUrl.GetHashCode();
 
-			if (this.contentType != null)
+			if (!(this.contentType is null))
 				Result ^= Result << 5 ^ this.contentType.GetHashCode();
 
 			return Result;

@@ -1030,7 +1030,7 @@ namespace Waher.Networking.XMPP.Contracts
 					break;
 			}
 
-			if (this.roles != null)
+			if (!(this.roles is null))
 			{
 				foreach (Role Role in this.roles)
 				{
@@ -1118,7 +1118,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			NormalizeXml(this.forMachines, Xml, ContractsClient.NamespaceSmartContracts);
 
-			if (this.roles != null)
+			if (!(this.roles is null))
 			{
 				foreach (Role Role in this.roles)
 				{
@@ -1150,7 +1150,7 @@ namespace Waher.Networking.XMPP.Contracts
 					break;
 
 				case ContractParts.ExplicitlyDefined:
-					if (this.parts != null)
+					if (!(this.parts is null))
 					{
 						foreach (Part Part in this.parts)
 						{
@@ -1302,7 +1302,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!string.IsNullOrEmpty(this.templateId))
 				Response.Add(new KeyValuePair<string, object>("Template ID", this.templateId));
 
-			if (this.parameters != null)
+			if (!(this.parameters is null))
 			{
 				foreach (Parameter P in this.parameters)
 					Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue));
@@ -1320,7 +1320,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.parameters != null)
+				if (!(this.parameters is null))
 				{
 					foreach (Parameter P in this.parameters)
 					{

@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 			else if (!(Value is null))
 			{
-				if (this.dataType != null)
+				if (!(this.dataType is null))
 				{
 					List<object> Parsed = new List<object>();
 
@@ -206,7 +206,7 @@ namespace Waher.Networking.XMPP.DataForms
 							Parsed.Add(Obj);
 					}
 
-					if (this.validationMethod != null)
+					if (!(this.validationMethod is null))
 						this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
 				}
 			}
@@ -295,13 +295,13 @@ namespace Waher.Networking.XMPP.DataForms
 					if (this.required)
 						Output.Append("<required/>");
 
-					if (this.dataType != null)
+					if (!(this.dataType is null))
 					{
 						Output.Append("<xdv:validate datatype='");
 						Output.Append(XML.Encode(this.dataType.TypeName));
 						Output.Append("'>");
 
-						if (this.validationMethod != null)
+						if (!(this.validationMethod is null))
 							this.validationMethod.Serialize(Output);
 
 						Output.Append("</xdv:validate>");
@@ -321,7 +321,7 @@ namespace Waher.Networking.XMPP.DataForms
 					}
 				}
 
-				if (this.valueStrings != null)
+				if (!(this.valueStrings is null))
 				{
 					foreach (string Value in this.valueStrings)
 					{
@@ -335,7 +335,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 				if (!ValuesOnly)
 				{
-					if (this.options != null)
+					if (!(this.options is null))
 					{
 						foreach (KeyValuePair<string, string> P in this.options)
 						{
@@ -402,7 +402,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 			int i, c;
 
-			if (this.options != null)
+			if (!(this.options is null))
 			{
 				KeyValuePair<string, string> O1;
 				KeyValuePair<string, string> O2;

@@ -135,13 +135,13 @@ namespace Waher.Security.JWS
 		/// </summary>
 		public override void Dispose()
 		{
-			if (this.rsa != null)
+			if (!(this.rsa is null))
 			{
 				this.rsa.Dispose();
 				this.rsa = null;
 			}
 
-			if (this.sha != null)
+			if (!(this.sha is null))
 			{
 				this.sha.Dispose();
 				this.sha = null;

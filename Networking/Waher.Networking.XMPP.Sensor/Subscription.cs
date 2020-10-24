@@ -222,7 +222,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			bool Trigger = false;
 
-			if (this.fields != null)
+			if (!(this.fields is null))
 			{
 				foreach (Field Field in Values)
 				{

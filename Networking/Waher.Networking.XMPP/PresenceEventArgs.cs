@@ -494,14 +494,14 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.type == PresenceType.Subscribe)
 			{
-				if (this.client != null)
+				if (!(this.client is null))
 					this.client.PresenceSubscriptionAccepted(this.id, this.fromBareJid);
 				else
 					this.component.PresenceSubscriptionAccepted(this.id, this.to, this.fromBareJid);
 			}
 			else if (this.type == PresenceType.Unsubscribe)
 			{
-				if (this.client != null)
+				if (!(this.client is null))
 					this.client.PresenceUnsubscriptionAccepted(this.id, this.fromBareJid);
 				else
 					this.component.PresenceUnsubscriptionAccepted(this.id, this.to, this.fromBareJid);
@@ -518,14 +518,14 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.type == PresenceType.Subscribe)
 			{
-				if (this.client != null)
+				if (!(this.client is null))
 					this.client.PresenceSubscriptionDeclined(this.id, this.fromBareJid);
 				else
 					this.component.PresenceSubscriptionDeclined(this.id, this.to, this.fromBareJid);
 			}
 			else if (this.type == PresenceType.Unsubscribe)
 			{
-				if (this.client != null)
+				if (!(this.client is null))
 					this.client.PresenceUnsubscriptionDeclined(this.id, this.fromBareJid);
 				else
 					this.component.PresenceUnsubscriptionDeclined(this.id, this.to, this.fromBareJid);

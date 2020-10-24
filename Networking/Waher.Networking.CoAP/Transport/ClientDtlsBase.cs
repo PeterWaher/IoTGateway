@@ -14,7 +14,7 @@ namespace Waher.Networking.CoAP.Transport
 
 		public override void Dispose()
 		{
-			if (this.Dtls != null)
+			if (!(this.Dtls is null))
 			{
 				this.Dtls.Dispose();
 				this.Dtls = null;

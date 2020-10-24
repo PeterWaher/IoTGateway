@@ -103,7 +103,7 @@ namespace Waher.IoTGateway.Setup
 
 		internal void UpdateExportFolder(string Folder)
 		{
-			if (this.exportFolder != null)
+			if (!(this.exportFolder is null))
 				this.exportFolder.FolderPath = Folder;
 
 			if (!(Gateway.InternalDatabase is null))
@@ -118,7 +118,7 @@ namespace Waher.IoTGateway.Setup
 
 		internal void UpdateExportKeyFolder(string Folder)
 		{
-			if (this.keyFolder != null)
+			if (!(this.keyFolder is null))
 				this.keyFolder.FolderPath = Folder;
 		}
 

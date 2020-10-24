@@ -28,7 +28,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.firstInterval != null)
+				if (!(this.firstInterval is null))
 					return this.firstInterval;
 
 				string s = this.Value;

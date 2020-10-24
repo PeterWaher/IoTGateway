@@ -250,7 +250,7 @@ namespace Waher.IoTGateway.Setup
 
 			set
 			{
-				if (this.passwordHashes != null)
+				if (!(this.passwordHashes is null))
 					Assert.CallFromSource(approvedSources);
 
 				this.passwordHashes = value;

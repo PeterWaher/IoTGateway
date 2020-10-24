@@ -111,7 +111,7 @@ namespace Waher.Content.Html
 			{
 				if (this.value is null)
 				{
-					if (this.segments != null)
+					if (!(this.segments is null))
 					{
 						StringBuilder sb = new StringBuilder();
 

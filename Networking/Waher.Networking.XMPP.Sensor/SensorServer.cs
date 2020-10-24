@@ -744,7 +744,7 @@ namespace Waher.Networking.XMPP.Sensor
 					}
 
 					LinkedListNode<Subscription> Next, Loop = Subscriptions.First;
-					while (Loop != null)
+					while (!(Loop is null))
 					{
 						Next = Loop.Next;
 

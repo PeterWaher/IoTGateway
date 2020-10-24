@@ -2313,7 +2313,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ExpectedSeqNr++;
 
 					e = Query.PopQueued(ExpectedSeqNr);
-					while (e != null)
+					while (!(e is null))
 					{
 						this.ProcessQueryProgress(Query, e);
 						ExpectedSeqNr++;

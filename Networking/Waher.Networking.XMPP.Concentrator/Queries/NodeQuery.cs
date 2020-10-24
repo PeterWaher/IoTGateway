@@ -467,7 +467,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			{
 				LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (SequenceNr < Loop.Value.Key)
 					{

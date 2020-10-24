@@ -89,7 +89,7 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				while (Packet != null)
+				while (!(Packet is null))
 				{
 					await this.client.SendAsync(Packet, Packet.Length, RemoteEndpoint);
 					if (this.disposed)

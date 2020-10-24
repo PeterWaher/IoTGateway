@@ -58,7 +58,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					await this.Done();
 				else
 				{
-					while (this.chunks != null)
+					while (!(this.chunks is null))
 					{
 						if (this.chunks.Count == 0)
 							this.chunks = null;

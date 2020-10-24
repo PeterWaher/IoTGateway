@@ -2085,7 +2085,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (File.Exists(s))
 				Dependencies[s] = true;
 
-			while (Loop != null)
+			while (!(Loop is null))
 			{
 				LoopInfo = Loop.GetTypeInfo();
 				Dependencies[GetLocation(Loop)] = true;

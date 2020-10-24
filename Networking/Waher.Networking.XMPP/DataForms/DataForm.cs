@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.DataForms
 			if (this.header is null)
 				this.header = new Field[0];
 
-			if (this.hasPages = (Pages != null))
+			if (this.hasPages = (!(Pages is null)))
 				this.pages = Pages.ToArray();
 			else if (this.fields.Length > 0)
 				this.pages = new Page[] { new Page(this, this.title, this.fields) };

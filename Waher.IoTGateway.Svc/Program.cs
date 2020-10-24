@@ -68,7 +68,7 @@ namespace Waher.IoTGateway.Svc
 						w.WriteLine();
 						if (e.ExceptionObject is Exception ex)
 						{
-							while (ex != null)
+							while (!(ex is null))
 							{
 								w.WriteLine(ex.Message);
 								w.WriteLine();

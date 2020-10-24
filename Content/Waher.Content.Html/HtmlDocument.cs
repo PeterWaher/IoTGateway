@@ -1570,7 +1570,7 @@ namespace Waher.Content.Html
 				}
 			}
 
-			while (CurrentElement != null)
+			while (!(CurrentElement is null))
 			{
 				if (CurrentElement.EndPosition < Pos - 1)
 					CurrentElement.EndPosition = Pos - 1;

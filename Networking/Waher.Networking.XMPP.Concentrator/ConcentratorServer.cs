@@ -1239,7 +1239,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(NamespaceConcentrator);
 				Xml.Append("'>");
 
-				while (Node != null)
+				while (!(Node is null))
 				{
 					if (!await Node.CanViewAsync(Caller))
 						break;
@@ -1494,7 +1494,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (!(RootNodes is null))
 			{
 				Loop = RootNodes.Last;
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (!await Loop.Value.MoveDownAsync(Caller))
 						break;
@@ -1508,7 +1508,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (LinkedList<INode> Nodes2 in NodesPerParent.Values)
 				{
 					Loop = Nodes2.Last;
-					while (Loop != null)
+					while (!(Loop is null))
 					{
 						if (!await Loop.Value.MoveDownAsync(Caller))
 							break;

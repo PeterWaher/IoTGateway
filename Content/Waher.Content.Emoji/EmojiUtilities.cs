@@ -2636,7 +2636,7 @@ namespace Waher.Content.Emoji
 				case "woman-kiss-woman": Emoji = Emoji_woman_kiss_woman; break;
 			}
 
-			return (Emoji != null);
+			return (!(Emoji is null));
 		}
 
 		/// <summary>

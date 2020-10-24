@@ -564,7 +564,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						this.writing = true;
 				}
 
-				while (Frame != null)
+				while (!(Frame is null))
 				{
 					await this.httpResponse.WriteRawAsync(Frame);
 

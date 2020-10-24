@@ -57,7 +57,7 @@ namespace Waher.Security.DTLS
 					}
 				}
 			}
-			while (Rec != null);
+			while (!(Rec is null));
 		}
 	}
 }

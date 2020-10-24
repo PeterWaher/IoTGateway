@@ -108,7 +108,7 @@ namespace Waher.Networking.DNS.Communication
 
 			try
 			{
-				while (Message != null)
+				while (!(Message is null))
 				{
 					this.TransmitBinary(Message);
 

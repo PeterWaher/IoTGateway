@@ -538,7 +538,7 @@ namespace Waher.Networking.XMPP.BOSH
 								{
 									LinkedListNode<KeyValuePair<string, EventHandler>> Loop = Queued.Last;
 
-									while (Loop != null)
+									while (!(Loop is null))
 									{
 										this.outputQueue.AddFirst(Loop.Value);
 										Loop = Loop.Previous;

@@ -139,7 +139,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
             MarkdownDocument Loop = Item.Document;
 
-			while (Loop != null)
+			while (!(Loop is null))
             {
                 if (Loop.FileName == FileName)
                     throw new Exception("Circular reference detected.");

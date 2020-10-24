@@ -192,7 +192,7 @@ namespace Waher.Networking.Cluster
 						this.isWriting = true;
 				}
 
-				while (Message != null)
+				while (!(Message is null))
 				{
 					int Len = Message.Length;
 					int NrFragments = (Len + 32767) >> 15;

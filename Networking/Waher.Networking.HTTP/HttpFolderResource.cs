@@ -759,7 +759,7 @@ namespace Waher.Networking.HTTP
 				Progress.BytesLeft = Interval.GetIntervalLength(Progress.TotalLength);
 				Progress.Next = Interval.Next;
 
-				while (Interval != null)
+				while (!(Interval is null))
 				{
 					j = Interval.GetIntervalLength(Progress.TotalLength);
 					if (j > i)

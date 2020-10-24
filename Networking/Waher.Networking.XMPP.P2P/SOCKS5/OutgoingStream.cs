@@ -25,8 +25,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private int id = 0;
 		private readonly int blockSize;
 		private bool isWriting;
-		private bool done;
-		private bool aborted = false;
+		private volatile bool done;
+		private volatile bool aborted = false;
 
 		/// <summary>
 		/// Class managing the transmission of a SOCKS5 bytestream.
@@ -160,7 +160,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				byte[] Block;
 				int i;
 
-				if (this.e2e != null)
+				if (!(this.e2e is null))
 				{
 					Block = new byte[BlockSize];
 					i = 0;
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				this.pos += NrRead;
 
-				if (this.e2e != null)
+				if (!(this.e2e is null))
 				{
 					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block);
 					this.id++;

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Waher.Security.ChaChaPoly
 {
@@ -189,6 +191,28 @@ namespace Waher.Security.ChaChaPoly
                 Result[i] ^= Data[i];
 
             return Result;
+        }
+
+        /// <summary>
+        /// Encrypts or decrypts data.
+        /// </summary>
+        /// <param name="Data">Data to be encrypted or decrypted.</param>
+        /// <param name="Transformed">Transformed data</param>
+        /// <returns>Encrypted or decrypted data.</returns>
+        public async Task EncryptOrDecrypt(Stream Data, Stream Transformed)
+        {
+            byte[] Buf = new byte[65536];
+            int i, c;
+
+            while ((c = await Data.ReadAsync(Buf, 0, 65536)) > 0)
+            {
+                byte[] Result = this.GetBytes(c);
+
+                for (i = 0; i < c; i++)
+                    Result[i] ^= Buf[i];
+
+                await Transformed.WriteAsync(Result, 0, c);
+            }
         }
 
     }

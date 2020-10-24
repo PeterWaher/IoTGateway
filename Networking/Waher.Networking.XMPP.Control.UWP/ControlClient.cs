@@ -692,7 +692,7 @@ namespace Waher.Networking.XMPP.Control
 
 		private void Serialize(StringBuilder Xml, IThingReference[] Nodes)
 		{
-			if (Nodes != null)
+			if (!(Nodes is null))
 			{
 				foreach (IThingReference Node in Nodes)
 				{
@@ -782,7 +782,7 @@ namespace Waher.Networking.XMPP.Control
 					}
 				}
 
-				if (Form != null)
+				if (!(Form is null))
 					Form.State = Nodes;
 			}
 

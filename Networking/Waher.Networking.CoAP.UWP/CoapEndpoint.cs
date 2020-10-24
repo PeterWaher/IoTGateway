@@ -210,13 +210,13 @@ namespace Waher.Networking.CoAP
 			this.users = Users;
 			this.requiredPrivilege = RequiredPrivilege;
 
-			if (CoapPorts != null)
+			if (!(CoapPorts is null))
 			{
 				foreach (int Port in CoapPorts)
 					Ports.AddLast(new KeyValuePair<int, bool>(Port, false));
 			}
 
-			if (CoapsPorts != null)
+			if (!(CoapsPorts is null))
 			{
 				foreach (int Port in CoapsPorts)
 					Ports.AddLast(new KeyValuePair<int, bool>(Port, true));
@@ -799,7 +799,7 @@ namespace Waher.Networking.CoAP
 					this.lastNonMsgId = 0;
 				}
 
-				if (OutgoingMessage != null)
+				if (!(OutgoingMessage is null))
 				{
 					if (OutgoingMessage.token == Token)
 					{
@@ -838,7 +838,7 @@ namespace Waher.Networking.CoAP
 									OutgoingMessage = null;
 							}
 
-							if (OutgoingMessage != null)
+							if (!(OutgoingMessage is null))
 							{
 								lock (this.activeTokens)
 								{
@@ -851,7 +851,7 @@ namespace Waher.Networking.CoAP
 										OutgoingMessage2 = null;
 								}
 
-								if (OutgoingMessage2 != null)
+								if (!(OutgoingMessage2 is null))
 								{
 									IncomingMessage.BaseUri = new Uri(OutgoingMessage.GetUri());
 									OutgoingMessage.ResponseReceived(Client, IncomingMessage);
@@ -884,7 +884,7 @@ namespace Waher.Networking.CoAP
 						OutgoingMessage = null;
 				}
 
-				if (OutgoingMessage != null)
+				if (!(OutgoingMessage is null))
 				{
 					OutgoingMessage.responseReceived = true;
 
@@ -966,7 +966,7 @@ namespace Waher.Networking.CoAP
 						}
 					}
 
-					if (Resource != null)
+					if (!(Resource is null))
 					{
 						CoapOptionObserve ObserveResponse = null;
 
@@ -998,7 +998,7 @@ namespace Waher.Networking.CoAP
 					{
 						CoapMessageEventHandler h = this.OnIncomingRequest;
 
-						if (h != null)
+						if (!(h is null))
 						{
 							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage, null);
 							try
@@ -1526,7 +1526,7 @@ namespace Waher.Networking.CoAP
 						}
 					}
 
-					if (Value != null)
+					if (!(Value is null))
 						ms.Write(Value, 0, Value.Length);
 				}
 			}
@@ -1589,7 +1589,7 @@ namespace Waher.Networking.CoAP
 							Result.Add(Options[j]);
 					}
 				}
-				else if (Result != null)
+				else if (!(Result is null))
 					Result.Add(Option);
 			}
 
@@ -1799,7 +1799,7 @@ namespace Waher.Networking.CoAP
 
 		private void SendMessage(ClientBase Client, bool Encrypted, Message Message)
 		{
-			if (Client != null)
+			if (!(Client is null))
 			{
 				Client.BeginTransmit(Message);
 
@@ -1979,7 +1979,7 @@ namespace Waher.Networking.CoAP
 
 		internal void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State, CoapResource Resource)
 		{
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -2080,7 +2080,7 @@ namespace Waher.Networking.CoAP
 			else
 				sb.Append("/");
 
-			if (UriQuery != null)
+			if (!(UriQuery is null))
 			{
 				bool First = true;
 
@@ -2188,7 +2188,7 @@ namespace Waher.Networking.CoAP
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 				this.GET(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
@@ -2273,7 +2273,7 @@ namespace Waher.Networking.CoAP
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 				this.Observe(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
@@ -2354,7 +2354,7 @@ namespace Waher.Networking.CoAP
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 			{
 				this.UnregisterObservation(EndPoint, Encrypted, Acknowledged, Token,
 					  Credentials, Callback, State, Options);
@@ -2444,7 +2444,7 @@ namespace Waher.Networking.CoAP
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 			{
 				this.POST(EndPoint, Encrypted, Acknowledged, Payload, BlockSize, Credentials,
 					  Callback, State, Options);
@@ -2530,7 +2530,7 @@ namespace Waher.Networking.CoAP
 			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 			{
 				this.PUT(EndPoint, Encrypted, Acknowledged, Payload, BlockSize, Credentials,
 					  Callback, State, Options);
@@ -2617,7 +2617,7 @@ namespace Waher.Networking.CoAP
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
+			if (!(EndPoint is null))
 				this.DELETE(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
@@ -2665,7 +2665,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>Timepoint of when event was scheduled.</returns>
 		public DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
 		{
-			if (this.scheduler != null)
+			if (!(this.scheduler is null))
 				return this.scheduler.Add(When, Callback, State);
 			else
 				return DateTime.MinValue;

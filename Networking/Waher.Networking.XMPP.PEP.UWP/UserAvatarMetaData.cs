@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.PEP
 				Xml.Append(this.Namespace);
 				Xml.Append("'>");
 
-				if (this.references != null)
+				if (!(this.references is null))
 				{
 					foreach (UserAvatarReference Reference in this.references)
 					{
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.PEP
 					}
 				}
 
-				if (this.pointers != null)
+				if (!(this.pointers is null))
 				{
 					foreach (XmlElement Pointer in this.pointers)
 					{

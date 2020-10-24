@@ -90,7 +90,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 			}
 
-			if (Fields != null)
+			if (!(Fields is null))
 				this.fields = Fields.ToArray();
 			else
 				this.fields = null;

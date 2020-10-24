@@ -17,6 +17,7 @@ using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Runtime.Temporary;
 using Waher.Runtime.Settings;
 using Waher.Security;
 using Waher.Security.CallStack;

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.XMPP
@@ -53,6 +55,21 @@ namespace Waher.Networking.XMPP
         /// <param name="Receiver">Remote endpoint performing the decryption.</param>
         /// <returns>Encrypted data</returns>
         byte[] Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver);
+
+        /// <summary>
+        /// Encrypts binary data
+        /// </summary>
+        /// <param name="Id">Id attribute</param>
+        /// <param name="Type">Type attribute</param>
+        /// <param name="From">From attribute</param>
+        /// <param name="To">To attribute</param>
+        /// <param name="Counter">Counter. Can be reset every time a new key is generated.
+        /// A new key must be generated before the counter wraps.</param>
+        /// <param name="Data">Binary data to encrypt</param>
+        /// <param name="Encrypted">Encrypted data will be stored here.</param>
+        /// <param name="Sender">Local endpoint performing the encryption.</param>
+        /// <param name="Receiver">Remote endpoint performing the decryption.</param>
+        Task Encrypt(string Id, string Type, string From, string To, uint Counter, Stream Data, Stream Encrypted, IE2eEndpoint Sender, IE2eEndpoint Receiver);
 
         /// <summary>
         /// Decrypts binary data

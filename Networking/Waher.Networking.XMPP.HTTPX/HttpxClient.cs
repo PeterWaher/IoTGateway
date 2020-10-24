@@ -30,6 +30,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 		private IEndToEndEncryption e2e;
+		private string postResource;
 		private readonly int maxChunkSize;
 
 		/// <summary>
@@ -38,12 +39,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		public HttpxClient(XmppClient Client, int MaxChunkSize)
-			: base(Client)
+			: this(Client, null, MaxChunkSize)
 		{
-			this.e2e = null;
-			this.maxChunkSize = MaxChunkSize;
-
-			HttpxChunks.RegisterChunkReceiver(this.client);
 		}
 
 		/// <summary>
@@ -83,7 +80,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			get { return this.ibbClient; }
 			set
 			{
-				if (this.ibbClient != null)
+				if (!(this.ibbClient is null))
 					this.ibbClient.OnOpen -= this.IbbClient_OnOpen;
 
 				this.ibbClient = value;
@@ -99,12 +96,21 @@ namespace Waher.Networking.XMPP.HTTPX
 			get { return this.socks5Proxy; }
 			set
 			{
-				if (this.socks5Proxy != null)
+				if (!(this.socks5Proxy is null))
 					this.socks5Proxy.OnOpen -= this.Socks5Proxy_OnOpen;
 
 				this.socks5Proxy = value;
 				this.socks5Proxy.OnOpen += this.Socks5Proxy_OnOpen;
 			}
+		}
+
+		/// <summary>
+		/// If responses can be posted to a specific resource.
+		/// </summary>
+		public string PostResource
+		{
+			get => this.postResource;
+			set => this.postResource = value;
 		}
 
 		/// <summary>
@@ -165,7 +171,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
 			Stream DataStream, HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, object State)
 		{
-			// TODO: Local IP & port for quick P2P response (TLS, or POST back, web hook).
+			// TODO: Local IP & port for quick P2P response (TLS).
 
 			StringBuilder Xml = new StringBuilder();
 
@@ -179,10 +185,17 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 			Xml.Append("' maxChunkSize='");
 			Xml.Append(this.maxChunkSize.ToString());
+
+			if (!string.IsNullOrEmpty(this.postResource))
+			{
+				Xml.Append("' post='");
+				Xml.Append(XML.Encode(this.postResource));
+			}
+
 			Xml.Append("' sipub='false' ibb='");
-			Xml.Append(CommonTypes.Encode(this.ibbClient != null));
+			Xml.Append(CommonTypes.Encode(!(this.ibbClient is null)));
 			Xml.Append("' s5='");
-			Xml.Append(CommonTypes.Encode(this.socks5Proxy != null));
+			Xml.Append(CommonTypes.Encode(!(this.socks5Proxy is null)));
 			Xml.Append("' jingle='false'>");
 
 			Xml.Append("<headers xmlns='");
@@ -227,7 +240,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</req>");
 
-			if (this.e2e != null)
+			if (!(this.e2e is null))
 				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
 			else
 				this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
@@ -270,7 +283,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					Xml.Append("</chunk>");
 					Nr++;
 
-					if (this.e2e != null)
+					if (!(this.e2e is null))
 					{
 						this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
 							MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty,
@@ -447,7 +460,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(StreamId);
 			Xml.Append("'/>");
 
-			if (this.e2e != null)
+			if (!(this.e2e is null))
 			{
 				this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
 					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,

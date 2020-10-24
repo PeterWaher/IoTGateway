@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Threading.Tasks;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Security.ChaChaPoly
 {
@@ -54,9 +55,8 @@ namespace Waher.Security.ChaChaPoly
             c += 16;
 
             byte[] Bin = new byte[c];
-            Array.Copy(AdditionalData, 0, Bin, 0, AdditionalData.Length);
+            Array.Copy(AdditionalData, 0, Bin, 0, c = AdditionalData.Length);
 
-            c = AdditionalData.Length;
             i = c & 15;
             if (i != 0)
                 c += 16 - i;
@@ -88,6 +88,78 @@ namespace Waher.Security.ChaChaPoly
             Mac = this.poly1305.CalcMac(Bin);
 
             return Encrypted;
+        }
+
+        /// <summary>
+        /// Encrypts data.
+        /// </summary>
+        /// <param name="Data">Data to be encrypted.</param>
+        /// <param name="Encrypted">Encrypted data will be stored here.</param>
+        /// <param name="AdditionalData">Additional data</param>
+        /// <returns>Message Authentication Code.</returns>
+        public Task<byte[]> Encrypt(Stream Data, Stream Encrypted, byte[] AdditionalData)
+        {
+            return this.Process(Data, Encrypted, AdditionalData, true);
+        }
+
+        private async Task<byte[]> Process(Stream Data, Stream Encrypted, byte[] AdditionalData, bool Encrypting)
+        {
+            await this.chaCha20.EncryptOrDecrypt(Data, Encrypted);
+
+            using (TemporaryStream Temp = new TemporaryStream())
+            {
+                byte[] Padding;
+
+                int i = AdditionalData.Length;
+                await Temp.WriteAsync(AdditionalData, 0, i);
+                i &= 15;
+                if (i != 0)
+                {
+                    i = 16 - i;
+                    Padding = new byte[i];
+                    await Temp.WriteAsync(Padding, 0, i);
+                }
+
+                if (Encrypting)
+                {
+                    Encrypted.Position = 0;
+                    await Encrypted.CopyToAsync(Temp);
+                }
+                else
+                {
+                    Data.Position = 0;
+                    await Data.CopyToAsync(Temp);
+                }
+
+                i = AdditionalData.Length;
+
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+
+                Padding = new byte[4];
+                await Temp.WriteAsync(Padding, 0, 4);
+
+                i = (int)Encrypted.Length;
+
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+                i >>= 8;
+                Temp.WriteByte((byte)i);
+
+                await Temp.WriteAsync(Padding, 0, 4);
+
+                Temp.Position = 0;
+
+                return await this.poly1305.CalcMac(Temp);
+            }
         }
 
         /// <summary>

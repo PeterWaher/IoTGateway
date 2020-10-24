@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.P2P;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -19,6 +19,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private HttpxClient httpxClient;
 		private XmppServerlessMessaging serverlessMessaging;
 		private IHttpxCache httpxCache;
+		private string postResource = null;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 
@@ -57,9 +58,13 @@ namespace Waher.Networking.XMPP.HTTPX
 			IHttpxCache HttpxCache) : base(ResourceName)
 		{
 			this.defaultXmppClient = DefaultXmppClient;
-			this.httpxClient = new HttpxClient(this.defaultXmppClient, MaxChunkSize);
 			this.serverlessMessaging = ServerlessMessaging;
 			this.httpxCache = HttpxCache;
+
+			this.httpxClient = new HttpxClient(this.defaultXmppClient, MaxChunkSize)
+			{
+				PostResource = this.postResource
+			};
 		}
 
 		/// <summary>
@@ -67,10 +72,22 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.httpxClient != null)
+			this.httpxClient?.Dispose();
+			this.httpxClient = null;
+		}
+
+		/// <summary>
+		/// Post resource for responses.
+		/// </summary>
+		public string PostResource
+		{
+			get => this.postResource;
+			set
 			{
-				this.httpxClient.Dispose();
-				this.httpxClient = null;
+				this.postResource = value;
+
+				if (!(this.httpxClient is null))
+					this.httpxClient.PostResource = value;
 			}
 		}
 
@@ -130,7 +147,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				this.ibbClient = value;
 
-				if (this.httpxClient != null)
+				if (!(this.httpxClient is null))
 					this.httpxClient.IbbClient = value;
 			}
 		}
@@ -145,7 +162,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				this.socks5Proxy = value;
 
-				if (this.httpxClient != null)
+				if (!(this.httpxClient is null))
 					this.httpxClient.Socks5Proxy = value;
 			}
 		}
@@ -235,7 +252,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					{
 						// TODO: Select one based on features.
 
-						if (this.serverlessMessaging != null)
+						if (!(this.serverlessMessaging is null))
 						{
 							this.serverlessMessaging.GetPeerConnection(e.From, this.SendP2P, new SendP2pRec()
 							{
@@ -295,7 +312,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				foreach (PresenceEventArgs e in Item.Resources)
 				{
-					if (this.serverlessMessaging != null)
+					if (!(this.serverlessMessaging is null))
 					{
 						this.serverlessMessaging.GetPeerConnection(e.From, (sender, e2) =>
 						{
@@ -418,7 +435,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					LinkedListNode<HttpField> Loop = Headers.First;
 					LinkedListNode<HttpField> Next;
 
-					while (Loop != null)
+					while (!(Loop is null))
 					{
 						Next = Loop.Next;
 
@@ -507,7 +524,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
 					this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
 				{
-					State2.TempOutput = new TemporaryFile();
+					State2.TempOutput = new TemporaryStream();
 				}
 
 				if (e.Data != null)
@@ -585,7 +602,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			public string Pragma = null;
 			public DateTimeOffset? Expires = null;
 			public DateTimeOffset? LastModified = null;
-			public TemporaryFile TempOutput = null;
+			public TemporaryStream TempOutput = null;
 
 			public ReadoutState(HttpResponse Response, string BareJid, string LocalResource)
 			{
@@ -601,7 +618,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					if (this.ETag is null || !this.LastModified.HasValue)
 						return false;
 
-					if (this.CacheControl != null)
+					if (!(this.CacheControl is null))
 					{
 						if ((this.CacheControl.Contains("no-cache") || this.CacheControl.Contains("no-store")))
 							return false;
@@ -635,7 +652,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			public void Dispose()
 			{
-				if (this.TempOutput != null)
+				if (!(this.TempOutput is null))
 				{
 					this.TempOutput.Dispose();
 					this.TempOutput = null;

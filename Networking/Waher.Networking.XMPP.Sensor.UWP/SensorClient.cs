@@ -308,7 +308,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("'>");
 
-			if (Nodes != null)
+			if (!(Nodes is null))
 			{
 				foreach (IThingReference Node in Nodes)
 				{
@@ -331,7 +331,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Fields != null)
+			if (!(Fields is null))
 			{
 				foreach (string Field in Fields)
 				{
@@ -1128,19 +1128,19 @@ namespace Waher.Networking.XMPP.Sensor
 					Xml.Append("' h='true");
 			}
 
-			if (MinInterval != null)
+			if (!(MinInterval is null))
 			{
 				Xml.Append("' minInt='");
 				Xml.Append(MinInterval.ToString());
 			}
 
-			if (MaxInterval != null)
+			if (!(MaxInterval is null))
 			{
 				Xml.Append("' maxInt='");
 				Xml.Append(MaxInterval.ToString());
 			}
 
-			if (MaxAge != null)
+			if (!(MaxAge is null))
 			{
 				Xml.Append("' maxAge='");
 				Xml.Append(MaxAge.ToString());
@@ -1169,7 +1169,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("'>");
 
-			if (Nodes != null)
+			if (!(Nodes is null))
 			{
 				foreach (IThingReference Node in Nodes)
 				{
@@ -1192,7 +1192,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Fields != null)
+			if (!(Fields is null))
 			{
 				foreach (FieldSubscriptionRule Field in Fields)
 				{

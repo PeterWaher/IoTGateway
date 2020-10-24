@@ -187,7 +187,7 @@ namespace Waher.Networking.HTTP.Authentication
 							break;
 					}
 
-					if (ToRemove != null)
+					if (!(ToRemove is null))
 					{
 						foreach (DateTime ExpiryDate in ToRemove)
 							this.nonceByExpiration.Remove(ExpiryDate);

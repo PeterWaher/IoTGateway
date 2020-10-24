@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Waher.Security.ChaChaPoly
 {
@@ -72,6 +74,43 @@ namespace Waher.Security.ChaChaPoly
             {
                 j = Math.Min(c - i, 16);
                 Array.Copy(Data, i, Bin, 0, j);
+                i += j;
+                Bin[j++] = 1;
+                while (j < 17)
+                    Bin[j++] = 0;
+
+                Accumulator = BigInteger.Remainder((Accumulator + new BigInteger(Bin)) * this.r, p);
+            }
+
+            Accumulator += this.s;
+
+            byte[] Result = Accumulator.ToByteArray();
+
+            if (Result.Length != 16)
+                Array.Resize<byte>(ref Result, 16);
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Calculates a message authentication code (MAC).
+        /// </summary>
+        /// <param name="Data">Data</param>
+        /// <returns>MAC</returns>
+        public async Task<byte[]> CalcMac(Stream Data)
+        {
+            long i = 0;
+            long c = Data.Length;
+            byte[] Bin = new byte[17];
+            int j;
+            BigInteger Accumulator = BigInteger.Zero;
+
+            while (i < c)
+            {
+                j = (int)Math.Min(c - i, 16);
+                if (j != await Data.ReadAsync(Bin, 0, j))
+                    throw new IOException("Unexpected end of file.");
+
                 i += j;
                 Bin[j++] = 1;
                 while (j < 17)

@@ -82,7 +82,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					List<string> Capabilities = new List<string>();
 					XmlElement E;
@@ -120,7 +120,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				e.Ok = false;
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -164,7 +164,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "'/>", async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
@@ -180,7 +180,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentrator + "' src='" + XML.Encode(SourceID) + "'/>", async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
@@ -242,7 +242,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Response = false;
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -354,7 +354,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				e.Ok = false;
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -467,7 +467,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				NodeInfo = null;
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -520,7 +520,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							string Id = XML.Attribute(E2, "id");
 							string Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new BooleanParameter(Id, Name, XML.Attribute(E2, "value", false)));
 
 							break;
@@ -532,7 +532,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							string s = XML.Attribute(E2, "value");
 							TryParse(s, out SKColor Value);
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new ColorParameter(Id, Name, Value));
 
 							break;
@@ -540,7 +540,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new DateTimeParameter(Id, Name, XML.Attribute(E2, "value", DateTime.MinValue)));
 
 							break;
@@ -549,7 +549,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new DoubleParameter(Id, Name, XML.Attribute(E2, "value", 0.0)));
 
 							break;
@@ -558,7 +558,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new DurationParameter(Id, Name, XML.Attribute(E2, "value", Duration.Zero)));
 
 							break;
@@ -567,7 +567,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new Int32Parameter(Id, Name, XML.Attribute(E2, "value", 0)));
 
 							break;
@@ -576,7 +576,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new Int64Parameter(Id, Name, XML.Attribute(E2, "value", 0L)));
 
 							break;
@@ -585,7 +585,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new StringParameter(Id, Name, XML.Attribute(E2, "value")));
 
 							break;
@@ -594,7 +594,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (ParameterList != null)
+							if (!(ParameterList is null))
 								ParameterList.Add(new TimeSpanParameter(Id, Name, XML.Attribute(E2, "value", TimeSpan.Zero)));
 
 							break;
@@ -605,7 +605,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Things.DisplayableParameters.MessageType Type = (Things.DisplayableParameters.MessageType)XML.Attribute(E2, "type",
 								Things.DisplayableParameters.MessageType.Information);
 
-							if (MessageList != null)
+							if (!(MessageList is null))
 								MessageList.Add(new Message(Timestamp, Type, EventId, E2.InnerText));
 
 							break;
@@ -709,7 +709,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				NodeInfo = null;
 			}
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{
@@ -767,7 +767,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(SourceID));
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 
-			if (OnlyIfDerivedFrom != null)
+			if (!(OnlyIfDerivedFrom is null))
 			{
 				Xml.Append("'>");
 
@@ -861,7 +861,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1087,7 +1087,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1228,7 +1228,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (FormCallback != null)
+					if (!(FormCallback is null))
 					{
 						try
 						{
@@ -1255,7 +1255,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
 			object State = P[11];
 
-			if (NodeCallback != null)
+			if (!(NodeCallback is null))
 			{
 				try
 				{
@@ -1433,7 +1433,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (FormCallback != null)
+					if (!(FormCallback is null))
 					{
 						try
 						{
@@ -1461,7 +1461,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
 			object State = P[10];
 
-			if (NodeCallback != null)
+			if (!(NodeCallback is null))
 			{
 				try
 				{
@@ -1539,7 +1539,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1767,7 +1767,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{
@@ -1938,7 +1938,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			NodeQueryResponseEventHandler QueryCallback = (NodeQueryResponseEventHandler)P[11];
 			object State = P[12];
 
-			if (CommandCallback != null)
+			if (!(CommandCallback is null))
 				this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, CommandCallback, State);
 			else
 				this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, QueryCallback, State);
@@ -1952,7 +1952,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
 			object State = P[11];
 
-			if (CommandCallback != null)
+			if (!(CommandCallback is null))
 			{
 				try
 				{
@@ -2152,7 +2152,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 			string TagName;
 
-			if (Query != null)
+			if (!(Query is null))
 				TagName = "executeNodeQuery";
 			else
 				TagName = "executeNodeCommand";
@@ -2169,13 +2169,13 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("' command='");
 			Xml.Append(XML.Encode(Command));
 
-			if (Query != null)
+			if (!(Query is null))
 			{
 				Xml.Append("' queryId='");
 				Xml.Append(XML.Encode(Query.QueryId));
 			}
 
-			if (Parameters != null)
+			if (!(Parameters is null))
 			{
 				Xml.Append("'>");
 				Parameters.SerializeSubmit(Xml);
@@ -2204,7 +2204,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				try
 				{
-					if (CommandCallback != null)
+					if (!(CommandCallback is null))
 						await CommandCallback(this, new NodeCommandResponseEventArgs(Parameters, e));
 					else
 						await QueryCallback(this, new NodeQueryResponseEventArgs(Query, Parameters, e));
@@ -2313,7 +2313,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ExpectedSeqNr++;
 
 					e = Query.PopQueued(ExpectedSeqNr);
-					while (e != null)
+					while (!(e is null))
 					{
 						this.ProcessQueryProgress(Query, e);
 						ExpectedSeqNr++;

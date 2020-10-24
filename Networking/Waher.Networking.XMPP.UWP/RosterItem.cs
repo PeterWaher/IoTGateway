@@ -299,7 +299,7 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				if (this.lastPresence != null)
+				if (!(this.lastPresence is null))
 					return this.lastPresence.From;
 				else
 					return string.Empty;
@@ -345,7 +345,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (ToTest != null)
+			if (!(ToTest is null))
 			{
 				foreach (PresenceEventArgs e2 in ToTest)
 				{

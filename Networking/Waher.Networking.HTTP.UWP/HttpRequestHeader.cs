@@ -171,7 +171,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a query parameter with the given name was found.</returns>
 		public bool TryGetQueryParameter(string QueryParameter, out string Value)
 		{
-			if (this.query != null)
+			if (!(this.query is null))
 				return this.query.TryGetValue(QueryParameter, out Value);
 			else
 			{
@@ -399,7 +399,7 @@ namespace Waher.Networking.HTTP
 				if (this.ContentLength != null && this.ContentLength.ContentLength > 0)
 					return true;
 
-				if (this.TransferEncoding != null)
+				if (!(this.TransferEncoding is null))
 					return true;
 
 				return false;

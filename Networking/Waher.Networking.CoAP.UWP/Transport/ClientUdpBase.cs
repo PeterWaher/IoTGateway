@@ -74,7 +74,7 @@ namespace Waher.Networking.CoAP.Transport
 
 			try
 			{
-				while (Message != null)
+				while (!(Message is null))
 				{
 					this.Endpoint.TransmitBinary(Message.encoded);
 

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
+using Waher.Runtime.Temporary;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -22,6 +25,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private readonly string id;
 		private readonly string to;
 		private readonly string from;
+		private readonly string postResource;
 		private readonly int maxChunkSize;
 		private bool? chunked = null;
 		private int nr = 0;
@@ -29,15 +33,17 @@ namespace Waher.Networking.XMPP.HTTPX
 		private byte[] chunk = null;
 		private InBandBytestreams.OutgoingStream ibbOutput = null;
 		private P2P.SOCKS5.OutgoingStream socks5Output = null;
+		private TemporaryStream tempFile;
 		private int pos;
 		private bool cancelled = false;
 		private byte[] tail = null;
 
 		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From, int MaxChunkSize,
-			InBandBytestreams.IbbClient IbbClient, P2P.SOCKS5.Socks5Proxy Socks5Proxy) : base()
+			string PostResource, InBandBytestreams.IbbClient IbbClient, P2P.SOCKS5.Socks5Proxy Socks5Proxy) : base()
 		{
 			this.client = Client;
 			this.e2e = E2e;
+			this.postResource = PostResource;
 			this.ibbClient = IbbClient;
 			this.socks5Proxy = Socks5Proxy;
 			this.id = Id;
@@ -87,16 +93,26 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (this.chunked.HasValue)
 			{
-				if (this.chunked.Value)
+				if (!string.IsNullOrEmpty(this.postResource))
+				{
+					this.tempFile = new TemporaryStream();
+					this.response.Append("<data><sha256");
+					this.response.Append(" e2e='");
+					this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
+					this.response.Append("'>");
+
+					this.chunked = false;
+				}
+				else if (this.chunked.Value)
 				{
 					this.streamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
-					if (this.socks5Proxy != null)
+					if (!(this.socks5Proxy is null))
 					{
 						this.response.Append("<data><s5 sid='");
 						this.response.Append(this.streamId);
 						this.response.Append("' e2e='");
-						this.response.Append(CommonTypes.Encode(this.e2e != null));
+						this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
 						this.response.Append("'/></data>");
 						this.ReturnResponse();
 
@@ -105,7 +121,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						await this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
 					}
-					else if (this.ibbClient != null)
+					else if (!(this.ibbClient is null))
 					{
 						this.response.Append("<data><ibb sid='");
 						this.response.Append(this.streamId);
@@ -161,9 +177,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					activeStreams.Remove(this.from + " " + this.streamId);
 				}
 
-				if (this.socks5Output != null)
+				if (!(this.socks5Output is null))
 					await this.socks5Output.Close();
-				else if (this.ibbOutput != null)
+				else if (!(this.ibbOutput is null))
 					await this.ibbOutput.Close();
 				else
 					await this.SendChunk(true);
@@ -176,31 +192,100 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.AssertNotCancelled();
 
-			if (this.response != null)
+			if (!(this.response is null))
 			{
 				StringBuilder Resp = this.response;
 				this.response = null;
 
 				if (this.chunked.HasValue && !this.chunked.Value)
 				{
-					if (!(this.tail is null))
-						Resp.Append(Convert.ToBase64String(this.tail));
+					if (!string.IsNullOrEmpty(this.postResource))
+					{
+						this.tempFile.Position = 0;
+						byte[] Digest = Hashes.ComputeSHA256Hash(this.tempFile);
+						Resp.Append(Convert.ToBase64String(Digest));
+						Resp.Append("</sha256></data>");
 
-					Resp.Append("</base64></data>");
+						Task.Run(() => SendPost(this.to, this.tempFile, this.postResource, this.client, this.e2e));
+
+						this.tempFile = null;
+					}
+					else
+					{
+						if (!(this.tail is null))
+							Resp.Append(Convert.ToBase64String(this.tail));
+
+						Resp.Append("</base64></data>");
+					}
 				}
 
 				Resp.Append("</resp>");
 
-				if (this.e2e != null)
+				if (!(this.e2e is null))
 					this.e2e.SendIqResult(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.to, Resp.ToString());
 				else
 					this.client.SendIqResult(this.id, this.to, Resp.ToString());
 			}
 		}
 
+		private static async Task SendPost(string To, TemporaryStream File, string Resource, XmppClient Client, IEndToEndEncryption E2e)
+		{
+			TemporaryStream Encrypted = null;
+
+			try
+			{
+				using (HttpClient HttpClient = new HttpClient()
+				{
+					Timeout = TimeSpan.FromMilliseconds(60000)
+				})
+				{
+					File.Position = 0;
+
+					using (HttpRequestMessage Request = new HttpRequestMessage()
+					{
+						RequestUri = new Uri(Resource),
+						Method = HttpMethod.Post
+					})
+					{
+						if (!(E2e is null))
+						{
+							Encrypted = new TemporaryStream();
+
+							if (!await E2e.Encrypt(Resource, "POST", Client.FullJID, To, File, Encrypted))
+							{
+								Client.Error("Unable to encrypt response back to recipient.");
+								return;
+							}
+
+							File.Dispose();
+							File = Encrypted;
+							Encrypted = null;
+
+							File.Position = 0;
+						}
+
+						Request.Content.Headers.ContentType = new MediaTypeHeaderValue("binary");
+						Request.Content = new StreamContent(File);
+
+						HttpResponseMessage Response = await HttpClient.SendAsync(Request);
+						Response.EnsureSuccessStatusCode();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Client.Exception(ex);
+			}
+			finally
+			{
+				File.Dispose();
+				Encrypted?.Dispose();
+			}
+		}
+
 		public override Task<ulong> DecodeAsync(byte[] Buffer, int Offset, int NrRead)
 		{
-			throw new InternalServerErrorException();   // Will not be called.
+			throw new NotSupportedException();   // Will not be called.
 		}
 
 		public override async Task<bool> EncodeAsync(byte[] Buffer, int Offset, int NrBytes)
@@ -209,9 +294,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (this.chunked.Value)
 			{
-				if (this.socks5Output != null)
+				if (!(this.socks5Output is null))
 					await this.socks5Output.Write(Buffer, Offset, NrBytes);
-				else if (this.ibbOutput != null)
+				else if (!(this.ibbOutput is null))
 					await this.ibbOutput.Write(Buffer, Offset, NrBytes);
 				else
 				{
@@ -240,6 +325,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					}
 				}
 			}
+			else if (!(this.tempFile is null))
+				await this.tempFile.WriteAsync(Buffer, Offset, NrBytes);
 			else
 			{
 				int i = this.tail?.Length ?? 0;
@@ -269,7 +356,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						Array.Copy(Buffer, Offset + j, this.tail, 0, d);
 					}
-			
+
 					this.response.Append(Convert.ToBase64String(Bin));
 				}
 			}
@@ -300,7 +387,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				lock (activeStreams)
 				{
-					if (!activeStreams.ContainsKey(Key))	// Has already been removed, if Last=true
+					if (!activeStreams.ContainsKey(Key))    // Has already been removed, if Last=true
 						throw new IOException("Chunked stream not open.");
 				}
 			}
@@ -314,17 +401,28 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			TaskCompletionSource<bool> ChunkSent = new TaskCompletionSource<bool>();
 
-			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
-				string.Empty, string.Empty, (sender, e) =>
-				{
-					ChunkSent.TrySetResult(true);
-					return Task.CompletedTask;
-				}, null);
+			if (!(this.e2e is null))
+			{
+				this.e2e.SendMessage(this.client, E2ETransmission.IgnoreIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal, string.Empty,
+					this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, this.MessageSent, ChunkSent);
+			}
+			else
+			{
+				this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+					string.Empty, string.Empty, this.MessageSent, ChunkSent);
+			}
 
 			await Task.WhenAny(ChunkSent.Task, Task.Delay(1000));    // Limit read speed to rate at which messages can be sent to the network.
 
 			this.nr++;
 			this.pos = 0;
+		}
+
+		private Task MessageSent(object Sender, DeliveryEventArgs e)
+		{
+			TaskCompletionSource<bool> ChunkSent = (TaskCompletionSource<bool>)e.State;
+			ChunkSent.TrySetResult(true);
+			return Task.CompletedTask;
 		}
 
 		public override async Task<bool> FlushAsync()
@@ -365,6 +463,17 @@ namespace Waher.Networking.XMPP.HTTPX
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			this.tempFile?.Dispose();
+			this.tempFile = null;
+
+			base.Dispose();
 		}
 	}
 }

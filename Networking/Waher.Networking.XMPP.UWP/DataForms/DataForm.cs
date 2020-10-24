@@ -190,7 +190,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (!string.IsNullOrEmpty(Field.Var))
 							this.fieldsByVar[Field.Var] = Field;
 
-						if (Media != null)
+						if (!(Media is null))
 						{
 							Field = new MediaField(this, Guid.NewGuid().ToString(), string.Empty, false,
 								null, null, string.Empty, new StringDataType(), new BasicValidation(), Media, string.Empty, false, true, false);
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.DataForms
 			if (this.header is null)
 				this.header = new Field[0];
 
-			if (this.hasPages = (Pages != null))
+			if (this.hasPages = (!(Pages is null)))
 				this.pages = Pages.ToArray();
 			else if (this.fields.Length > 0)
 				this.pages = new Page[] { new Page(this, this.title, this.fields) };
@@ -975,7 +975,7 @@ namespace Waher.Networking.XMPP.DataForms
 					Output.Append("</title>");
 				}
 
-				if (this.pages != null)
+				if (!(this.pages is null))
 				{
 					foreach (Page Page in this.pages)
 						Page.Serialize(Output);
@@ -1139,7 +1139,7 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			DataFormEventHandler h = this.OnRemoteUpdate;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -1186,7 +1186,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 				this.Fields = NewFields.ToArray();
 
-				if (this.pages != null)
+				if (!(this.pages is null))
 				{
 					List<Page> NewPages = new List<Page>();
 

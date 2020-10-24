@@ -2,7 +2,7 @@
 using System.IO;
 using Waher.Events;
 
-namespace Waher.Content
+namespace Waher.Runtime.Temporary
 {
 	/// <summary>
 	/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.

@@ -205,7 +205,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			lock (this.result)
 			{
-				if (this.currentSection != null)
+				if (!(this.currentSection is null))
 				{
 					Table2 = new QueryTable(this.currentSection, Table);
 
@@ -303,7 +303,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			lock (this.result)
 			{
-				if (this.currentSection != null)
+				if (!(this.currentSection is null))
 				{
 					Obj = new QueryObject(this.currentSection, Object);
 
@@ -344,7 +344,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			lock (this.result)
 			{
-				if (this.currentSection != null)
+				if (!(this.currentSection is null))
 				{
 					Section = new QuerySection(this.currentSection, Header);
 
@@ -444,7 +444,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			get
 			{
 				QueryItem[] Result = this.resultFixed;
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				lock (this.result)
@@ -467,7 +467,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			{
 				LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
 
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					if (SequenceNr < Loop.Value.Key)
 					{

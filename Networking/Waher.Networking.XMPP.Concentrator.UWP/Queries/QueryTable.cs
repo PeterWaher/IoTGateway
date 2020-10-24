@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			get
 			{
 				Record[] Result = this.recordsFixed;
-				if (Result != null)
+				if (!(Result is null))
 					return Result;
 
 				lock (this.records)

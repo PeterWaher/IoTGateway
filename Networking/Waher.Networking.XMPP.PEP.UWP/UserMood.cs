@@ -479,7 +479,7 @@ namespace Waher.Networking.XMPP.PEP
 					Xml.Append("/>");
 				}
 
-				if (this.text != null)
+				if (!(this.text is null))
 				{
 					Xml.Append("<text>");
 					Xml.Append(XML.Encode(this.text));

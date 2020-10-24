@@ -118,7 +118,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		{
 			get
 			{
-				if (this.dynamicElements != null)
+				if (!(this.dynamicElements is null))
 				{
 					this.staticElements = this.dynamicElements.ToArray();
 					this.dynamicElements = null;
@@ -188,7 +188,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// </summary>
 		public override void Sort()
 		{
-			if (this.dynamicElements != null)
+			if (!(this.dynamicElements is null))
 			{
 				this.dynamicElements.Sort(this.OrderElements);
 

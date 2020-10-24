@@ -190,13 +190,13 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				if (this.element != null)
+				if (!(this.element is null))
 					return this.element;
 
 				foreach (XmlNode N in this.response.ChildNodes)
 				{
 					this.element = N as XmlElement;
-					if (this.element != null)
+					if (!(this.element is null))
 						return this.element;
 				}
 

@@ -28,7 +28,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			get
 			{
-				if (this.firstInterval != null)
+				if (!(this.firstInterval is null))
 					return this.firstInterval;
 
 				string s = this.Value;
@@ -71,7 +71,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 						return null;
 
 					Interval = new ByteRangeInterval(First, Last);
-					if (Prev != null)
+					if (!(Prev is null))
 						Prev.Next = Interval;
 					else
 						FirstInterval = Interval;

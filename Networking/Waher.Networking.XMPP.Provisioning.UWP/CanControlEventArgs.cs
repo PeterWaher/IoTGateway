@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 			}
 
-			if (Parameters != null)
+			if (!(Parameters is null))
 				this.parameters = Parameters.ToArray();
 		}
 

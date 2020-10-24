@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 
 		internal override void Serialize(StringBuilder Output)
 		{
-			if (this.additional != null)
+			if (!(this.additional is null))
 				this.additional.Serialize(Output);
 
 			Output.Append("<list-range");
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <param name="Strings">String values.</param>
 		public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
 		{
-			if (this.additional != null)
+			if (!(this.additional is null))
 				this.additional.Validate(Field, DataType, Parsed, Strings);
 
 			if (Strings.Length < this.min)

@@ -128,13 +128,13 @@ namespace Waher.Networking.HTTP
 				Output.Append(this.maxAgeSeconds.Value.ToString());
 			}
 
-			if (this.domain != null)
+			if (!(this.domain is null))
 			{
 				Output.Append("; Domain=");
 				Output.Append(this.domain);
 			}
 
-			if (this.path != null)
+			if (!(this.path is null))
 			{
 				Output.Append("; Path=");
 				Output.Append(this.path);

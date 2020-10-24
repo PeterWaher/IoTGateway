@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using Waher.Security;
-using Waher.Security.ChaChaPoly;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 {
@@ -56,6 +54,22 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             Array.Copy(Mac, 0, Encrypted, c, 16);
 
             return Encrypted;
+        }
+
+        /// <summary>
+        /// Encrypts binary data
+        /// </summary>
+        /// <param name="Data">Data to encrypt.</param>
+        /// <param name="Encrypted">Encrypted data will be stored here.</param>
+        /// <param name="Key">Encryption Key</param>
+        /// <param name="IV">Initiation Vector</param>
+        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        public override async Task Encrypt(Stream Data, Stream Encrypted, byte[] Key, byte[] IV, byte[] AssociatedData)
+        {
+            Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
+
+            byte[] Mac = await Acp.Encrypt(Data, Encrypted, AssociatedData);
+            await Encrypted.WriteAsync(Mac, 0, 16);
         }
 
         /// <summary>

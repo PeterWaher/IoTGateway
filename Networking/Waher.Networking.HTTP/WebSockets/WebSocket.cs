@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.WebSockets
 {
@@ -311,7 +311,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						else if (this.payload is null)
 						{
 							if (!this.fin || this.payloadLen >= 65536)
-								this.payload = new TemporaryFile();
+								this.payload = new TemporaryStream();
 							else if (this.payloadLen > 0)
 								this.payload = new MemoryStream(new byte[this.payloadLen]);
 						}

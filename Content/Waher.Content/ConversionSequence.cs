@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Temporary;
 using Waher.Script;
 
 namespace Waher.Content
@@ -72,7 +72,7 @@ namespace Waher.Content
 						if (UseMemoryStreams)
 							Intermediate2 = new MemoryStream();
 						else
-							Intermediate2 = new TemporaryFile();
+							Intermediate2 = new TemporaryStream();
 
 						if (this.sequence[i].Value.Convert(FromType, Intermediate ?? From, FromFileName, LocalResourceName,
 							URL, ref ToType, Intermediate2, Session))

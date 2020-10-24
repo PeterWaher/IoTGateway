@@ -436,6 +436,9 @@ namespace Waher.Networking.HTTP
 						this.httpServer.RequestResponded(this.httpRequest, 0);
 				}
 			}
+
+			this.transferEncoding?.Dispose();
+			this.transferEncoding = null;
 		}
 
 		/// <summary>

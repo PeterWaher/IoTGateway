@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.WebSockets
 {
@@ -171,7 +171,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.connection = null;
 
 			EventHandler h = this.Disposed;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -311,7 +311,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						else if (this.payload is null)
 						{
 							if (!this.fin || this.payloadLen >= 65536)
-								this.payload = new TemporaryFile();
+								this.payload = new TemporaryStream();
 							else if (this.payloadLen > 0)
 								this.payload = new MemoryStream(new byte[this.payloadLen]);
 						}
@@ -382,7 +382,7 @@ namespace Waher.Networking.HTTP.WebSockets
 							switch (this.controlOpCode)
 							{
 								case WebSocketOpcode.Close:
-									if (this.payload != null)
+									if (!(this.payload is null))
 										this.payload.Position = 0;
 
 									ushort? Code = null;
@@ -428,7 +428,7 @@ namespace Waher.Networking.HTTP.WebSockets
 							this.payload?.Dispose();
 							this.payload = this.payloadBak;
 
-							if (this.payload != null)
+							if (!(this.payload is null))
 								this.state++;
 							else
 								this.state = 0;
@@ -564,11 +564,11 @@ namespace Waher.Networking.HTTP.WebSockets
 						this.writing = true;
 				}
 
-				while (Frame != null)
+				while (!(Frame is null))
 				{
 					await this.httpResponse.WriteRawAsync(Frame);
 
-					if (Callback != null)
+					if (!(Callback is null))
 					{
 						try
 						{

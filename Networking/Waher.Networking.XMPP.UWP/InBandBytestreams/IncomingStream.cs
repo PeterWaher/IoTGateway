@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
 using Waher.Runtime.Threading;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
@@ -35,7 +34,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	{
 		private DataReceivedEventHandler dataCallback;
 		private StreamClosedEventHandler closeCallback;
-		private TemporaryFile tempFile = null;
+		private TemporaryStream tempStream = null;
 		private MultiReadSingleWriteObject syncObject = new MultiReadSingleWriteObject();
 		private readonly object state;
 		private int expectedSeq = 0;
@@ -63,8 +62,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// </summary>
 		public void Dispose()
 		{
-			this.tempFile?.Dispose();
-			this.tempFile = null;
+			this.tempStream?.Dispose();
+			this.tempStream = null;
 
 			this.syncObject?.Dispose();
 			this.syncObject = null;
@@ -89,12 +88,12 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		internal bool BlocksMissing
 		{
-			get { return this.tempFile != null; }
+			get { return this.tempStream != null; }
 		}
 
 		internal async Task<bool> DataReceived(byte[] Data, int Seq)
 		{
-			TemporaryFile File;
+			TemporaryStream File;
 
 			if (!await this.syncObject.TryBeginWrite(10000))
 				throw new TimeoutException();
@@ -107,33 +106,33 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				{
 					long ExpectedPos = (Seq - this.expectedSeq) * this.blockSize;
 
-					if (this.tempFile is null)
-						this.tempFile = new TemporaryFile();
+					if (this.tempStream is null)
+						this.tempStream = new TemporaryStream();
 
-					if (this.tempFile.Length < ExpectedPos)
+					if (this.tempStream.Length < ExpectedPos)
 					{
 						byte[] Block = new byte[this.blockSize];
 						int Len;
 
-						this.tempFile.Position = this.tempFile.Length;
+						this.tempStream.Position = this.tempStream.Length;
 
-						while (this.tempFile.Length < ExpectedPos)
+						while (this.tempStream.Length < ExpectedPos)
 						{
-							Len = (int)Math.Min(ExpectedPos - this.tempFile.Length, this.blockSize);
-							await this.tempFile.WriteAsync(Block, 0, Len);
+							Len = (int)Math.Min(ExpectedPos - this.tempStream.Length, this.blockSize);
+							await this.tempStream.WriteAsync(Block, 0, Len);
 						}
 					}
 					else
-						this.tempFile.Position = ExpectedPos;
+						this.tempStream.Position = ExpectedPos;
 
-					await this.tempFile.WriteAsync(Data, 0, Data.Length);
+					await this.tempStream.WriteAsync(Data, 0, Data.Length);
 
 					return true;
 				}
 				else
 				{
-					File = this.tempFile;
-					this.tempFile = null;
+					File = this.tempStream;
+					this.tempStream = null;
 					this.expectedSeq++;
 				}
 			}
@@ -142,7 +141,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				await this.syncObject.EndWrite();
 			}
 
-			if (File != null)
+			if (!(File is null))
 			{
 				try
 				{
@@ -177,7 +176,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private void DataReceived(byte[] Bin)
 		{
-			if (this.dataCallback != null)
+			if (!(this.dataCallback is null))
 			{
 				try
 				{
@@ -192,7 +191,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		internal void Closed(CloseReason Reason)
 		{
-			if (this.closeCallback != null)
+			if (!(this.closeCallback is null))
 			{
 				try
 				{

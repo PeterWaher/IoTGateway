@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
@@ -14,7 +13,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	public class OutgoingStream : IDisposable
 	{
 		private Socks5Client client;
-		private TemporaryFile tempFile;
+		private TemporaryStream tempStream;
 		private MultiReadSingleWriteObject syncObject;
 		private readonly IEndToEndEncryption e2e;
 		private readonly string sid;
@@ -46,7 +45,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.e2e = E2E;
 			this.isWriting = false;
 			this.done = false;
-			this.tempFile = new TemporaryFile();
+			this.tempStream = new TemporaryStream();
 		}
 
 		/// <summary>
@@ -105,8 +104,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.aborted = true;
 
-			this.tempFile?.Dispose();
-			this.tempFile = null;
+			this.tempStream?.Dispose();
+			this.tempStream = null;
 
 			this.syncObject?.Dispose();
 			this.syncObject = null;
@@ -129,7 +128,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Count">Number of bytes to start.</param>
 		public async Task Write(byte[] Data, int Offset, int Count)
 		{
-			if (this.tempFile is null || this.aborted || this.done)
+			if (this.tempStream is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
 			if (!await this.syncObject.TryBeginWrite(10000))
@@ -137,10 +136,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			try
 			{
-				this.tempFile.Position = this.tempFile.Length;
-				await this.tempFile.WriteAsync(Data, Offset, Count);
+				this.tempStream.Position = this.tempStream.Length;
+				await this.tempStream.WriteAsync(Data, Offset, Count);
 
-				if (this.client != null && !this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
+				if (this.client != null && !this.isWriting && this.tempStream.Length - this.pos >= this.blockSize)
 					await this.WriteBlockLocked();
 			}
 			finally
@@ -151,7 +150,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private async Task WriteBlockLocked()
 		{
-			int BlockSize = (int)Math.Min(this.tempFile.Length - this.pos, this.blockSize);
+			int BlockSize = (int)Math.Min(this.tempStream.Length - this.pos, this.blockSize);
 
 			if (BlockSize == 0)
 				await this.SendClose();
@@ -174,8 +173,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Block[1] = (byte)BlockSize;
 				}
 
-				this.tempFile.Position = this.pos;
-				int NrRead = this.tempFile.Read(Block, i, BlockSize);
+				this.tempStream.Position = this.pos;
+				int NrRead = this.tempStream.Read(Block, i, BlockSize);
 				if (NrRead < BlockSize)
 				{
 					await this.Close();
@@ -212,7 +211,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private async void WriteQueueEmpty(object Sender, EventArgs e)
 		{
-			if (this.tempFile is null)
+			if (this.tempStream is null)
 				return;
 
 			if (!await this.syncObject.TryBeginWrite(10000))
@@ -223,7 +222,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				if (this.aborted)
 					return;
 
-				long NrLeft = this.tempFile.Length - this.pos;
+				long NrLeft = this.tempStream.Length - this.pos;
 
 				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
 					await this.WriteBlockLocked();
@@ -250,15 +249,15 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Client.OnWriteQueueEmpty += this.WriteQueueEmpty;
 			this.client = Client;
 
-			if (!(this.tempFile is null))
+			if (!(this.tempStream is null))
 			{
 				if (!await this.syncObject.TryBeginWrite(10000))
 					throw new TimeoutException();
 
 				try
 				{
-					if (!this.isWriting && (this.tempFile.Length - this.pos >= this.blockSize ||
-						(this.done && this.tempFile.Length > this.pos)))
+					if (!this.isWriting && (this.tempStream.Length - this.pos >= this.blockSize ||
+						(this.done && this.tempStream.Length > this.pos)))
 					{
 						await this.WriteBlockLocked();
 					}
@@ -277,7 +276,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.done = true;
 
-			if (!(this.tempFile is null))
+			if (!(this.tempStream is null))
 			{
 				if (!await this.syncObject.TryBeginWrite(10000))
 					throw new TimeoutException();
@@ -286,7 +285,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					if (this.client != null && !this.isWriting)
 					{
-						if (this.tempFile.Length > this.pos)
+						if (this.tempStream.Length > this.pos)
 							await this.WriteBlockLocked();
 						else
 							await this.SendClose();

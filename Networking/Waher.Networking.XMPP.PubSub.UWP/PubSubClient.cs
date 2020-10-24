@@ -353,7 +353,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(Name));
 			Xml.Append("'/>");
 
-			if (Configuration != null)
+			if (!(Configuration is null))
 			{
 				Xml.Append("<configure>");
 				Configuration.SerializeSubmit(Xml);
@@ -843,7 +843,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/>");
 
-			if (Options != null)
+			if (!(Options is null))
 			{
 				Xml.Append("<options node='");
 				Xml.Append(XML.Encode(NodeName));
@@ -1962,7 +1962,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("</items>");
 			}
 
-			if (Page != null)
+			if (!(Page is null))
 				Page.Append(Xml);
 
 			Xml.Append("</pubsub>");

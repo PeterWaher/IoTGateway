@@ -93,7 +93,7 @@ namespace Waher.Networking.HTTP
 
 		private void AssertHeaderOpen()
 		{
-			if (this.transferEncoding != null)
+			if (!(this.transferEncoding is null))
 				throw new Exception("Response header written, and cannot be changed.");
 		}
 
@@ -339,13 +339,13 @@ namespace Waher.Networking.HTTP
 			if (this.contentLength.HasValue)
 				Headers.Add(new KeyValuePair<string, string>("Content-Length", this.contentLength.Value.ToString()));
 
-			if (this.customHeaders != null)
+			if (!(this.customHeaders is null))
 			{
 				foreach (KeyValuePair<string, string> P in this.customHeaders)
 					Headers.Add(P);
 			}
 
-			if (this.cookies != null)
+			if (!(this.cookies is null))
 			{
 				foreach (Cookie Cookie in this.cookies)
 					Headers.Add(new KeyValuePair<string, string>("Set-Cookie", Cookie.ToString()));
@@ -371,7 +371,7 @@ namespace Waher.Networking.HTTP
 				case "CONTENT-LENGTH": return this.contentLength.HasValue ? this.contentLength.Value.ToString() : null;
 
 				case "SET-COOKIE":
-					if (this.cookies != null)
+					if (!(this.cookies is null))
 					{
 						foreach (Cookie Cookie in this.cookies)
 							return Cookie.ToString();
@@ -380,7 +380,7 @@ namespace Waher.Networking.HTTP
 					return null;
 
 				default:
-					if (this.customHeaders != null)
+					if (!(this.customHeaders is null))
 					{
 						foreach (KeyValuePair<string, string> P in this.customHeaders)
 						{
@@ -436,6 +436,9 @@ namespace Waher.Networking.HTTP
 						this.httpServer.RequestResponded(this.httpRequest, 0);
 				}
 			}
+
+			this.transferEncoding?.Dispose();
+			this.transferEncoding = null;
 		}
 
 		/// <summary>
@@ -503,7 +506,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.responseSent = true;
 
-				if (this.httpServer != null)
+				if (!(this.httpServer is null))
 					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
 
 				if (this.transferEncoding is null)
@@ -725,7 +728,7 @@ namespace Waher.Networking.HTTP
 						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0, this.clientConnection);
 					}
 
-					if (this.customHeaders != null)
+					if (!(this.customHeaders is null))
 					{
 						foreach (KeyValuePair<string, string> P in this.customHeaders)
 						{
@@ -736,7 +739,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					if (this.cookies != null)
+					if (!(this.cookies is null))
 					{
 						foreach (Cookie Cookie in this.cookies)
 						{
@@ -854,7 +857,7 @@ namespace Waher.Networking.HTTP
 							break;
 					}
 
-					if (Data != null)
+					if (!(Data is null))
 						return true;
 				}
 			}
@@ -1005,7 +1008,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="Exception">If a response stream has already been set.</exception>
 		public void SetResponseStream(Stream ResponseStream)
 		{
-			if (this.responseStream != null)
+			if (!(this.responseStream is null))
 				throw new Exception("Response stream already set.");
 
 			this.responseStream = new BinaryOutputStream(ResponseStream);

@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Search
 				if (!string.IsNullOrEmpty(this.instructions))
 					return this.instructions;
 
-				if (this.searchForm != null)
+				if (!(this.searchForm is null))
 					return XmppClient.Concat(this.searchForm.Instructions);
 
 				return string.Empty;
@@ -149,10 +149,10 @@ namespace Waher.Networking.XMPP.Search
 			if (!string.IsNullOrEmpty(FixedValue))
 				return FixedValue;
 
-			if (this.searchForm != null)
+			if (!(this.searchForm is null))
 			{
 				Field Field = this.searchForm[Var];
-				if (Field != null)
+				if (!(Field is null))
 					return Field.ValueString;
 			}
 
@@ -163,10 +163,10 @@ namespace Waher.Networking.XMPP.Search
 		{
 			FixedValue = Value;
 
-			if (this.searchForm != null)
+			if (!(this.searchForm is null))
 			{
 				Field Field = this.searchForm[Var];
-				if (Field != null)
+				if (!(Field is null))
 					Field.SetValue(Value);
 			}
 
@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP.Search
 				State = State
 			};
 
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{

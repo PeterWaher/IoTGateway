@@ -75,13 +75,13 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.dtls != null)
+			if (!(this.dtls is null))
 			{
 				this.dtls.Dispose();
 				this.dtls = null;
 			}
 
-			if (this.udp != null)
+			if (!(this.udp is null))
 			{
 				this.udp.Dispose();
 				this.udp = null;

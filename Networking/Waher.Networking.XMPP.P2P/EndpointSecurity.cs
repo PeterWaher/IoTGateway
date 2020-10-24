@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -552,6 +553,32 @@ namespace Waher.Networking.XMPP.P2P
 
 			uint Counter = LocalEndpoint.GetNextCounter();
 			return LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, LocalEndpoint, RemoteEndpoint);
+		}
+
+		/// <summary>
+		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// </summary>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Encrypted">Encrypted data will be stored here.</param>
+		/// <returns>If encryption was possible to the recipient.</returns>
+		public virtual async Task<bool> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted)
+		{
+			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
+			if (RemoteEndpoint is null)
+				return false;
+
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
+			if (LocalEndpoint is null)
+				return false;
+
+			uint Counter = LocalEndpoint.GetNextCounter();
+			await LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Encrypted, LocalEndpoint, RemoteEndpoint);
+
+			return true;
 		}
 
 		/// <summary>

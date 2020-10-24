@@ -38,7 +38,7 @@ namespace Waher.Security.DTLS
 						Rec = null;
 				}
 
-				if (Rec != null)
+				if (!(Rec is null))
 				{
 					if (Successful)
 						DtlsOverUdp.DTLS.SendApplicationData(Rec.Item1, this.RemoteEndpoint);
@@ -57,7 +57,7 @@ namespace Waher.Security.DTLS
 					}
 				}
 			}
-			while (Rec != null);
+			while (!(Rec is null));
 		}
 	}
 }

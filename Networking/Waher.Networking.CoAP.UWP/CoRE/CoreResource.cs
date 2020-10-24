@@ -63,7 +63,7 @@ namespace Waher.Networking.CoAP.CoRE
 				if (!Resource.WellKnownCoRE)
 					continue;
 
-				if (Filter != null)
+				if (!(Filter is null))
 				{
 					Include = true;
 

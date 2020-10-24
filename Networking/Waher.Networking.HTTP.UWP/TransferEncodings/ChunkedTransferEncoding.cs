@@ -122,7 +122,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 							if (!(this.output is null) && !await this.output.SendAsync(Data, i, this.chunkSize))
 								this.transferError = true;
 
-							if (this.clientConnection != null)
+							if (!(this.clientConnection is null))
 								this.clientConnection.Server.DataTransmitted(this.chunkSize);
 							
 							i += this.chunkSize;
@@ -135,7 +135,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 							if (!(this.output is null) && !await this.output.SendAsync(Data, i, j))
 								this.transferError = true;
 
-							if (this.clientConnection != null)
+							if (!(this.clientConnection is null))
 								this.clientConnection.Server.DataTransmitted(j);
 							
 							this.chunkSize -= j;
@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 		private async Task<bool> WriteChunk(bool Flush)
 		{
-			if (this.output != null)
+			if (!(this.output is null))
 			{
 				string s = this.pos.ToString("X") + "\r\n";
 				byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
@@ -213,7 +213,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				if (Flush)
 					await this.output.FlushAsync();
 
-				if (this.clientConnection != null)
+				if (!(this.clientConnection is null))
 				{
 					this.clientConnection.Server.DataTransmitted(Len + 2);
 					this.clientConnection.TransmitBinary(Chunk);
@@ -255,7 +255,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			if (!await this.output.FlushAsync())
 				return false;
 
-			if (this.clientConnection != null)
+			if (!(this.clientConnection is null))
 			{
 				this.clientConnection.Server.DataTransmitted(5);
 				this.clientConnection.TransmitBinary(Chunk);

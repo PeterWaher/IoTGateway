@@ -714,7 +714,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetTempFileAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -722,7 +722,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.Getters.WebGetter.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -894,7 +894,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetTempFileAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -902,7 +902,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.IContentGetter.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.IContentGetter.GetTempStreamAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
             </summary>
@@ -1179,7 +1179,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
         </member>
-        <member name="M:Waher.Content.InternetContent.GetTempFileAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.InternetContent.GetTempStreamAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, given its URI.
             </summary>
@@ -1187,7 +1187,7 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
-        <member name="M:Waher.Content.InternetContent.GetTempFileAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+        <member name="M:Waher.Content.InternetContent.GetTempStreamAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
             Gets a (possibly big) resource, given its URI.
             </summary>
@@ -2008,49 +2008,6 @@
             <param name="Assembly">Assembly containing the resource.</param>
             <returns>Certificate.</returns>
             <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
-        </member>
-        <member name="T:Waher.Content.TemporaryFile">
-            <summary>
-            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-            </summary>
-        </member>
-        <member name="F:Waher.Content.TemporaryFile.DefaultBufferSize">
-            <summary>
-            Default buffer size, in bytes.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.TemporaryFile.#ctor">
-            <summary>
-            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.TemporaryFile.#ctor(System.String)">
-            <summary>
-            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-            </summary>
-            <param name="FileName">Name of temporary file. Call <see cref="M:System.IO.Path.GetTempFileName"/> to get a new temporary file name.</param>
-        </member>
-        <member name="M:Waher.Content.TemporaryFile.#ctor(System.String,System.Int32)">
-            <summary>
-            Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-            </summary>
-            <param name="FileName">Name of temporary file. Call <see cref="M:System.IO.Path.GetTempFileName"/> to get a new temporary file name.</param>
-            <param name="BufferSize">Buffer size.</param>
-        </member>
-        <member name="P:Waher.Content.TemporaryFile.FileName">
-            <summary>
-            File Name.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.TemporaryFile.DeleteWhenDisposed">
-            <summary>
-            Delete file when object is disposed.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.TemporaryFile.Dispose(System.Boolean)">
-            <summary>
-            Disposes of the object, and deletes the temporary file.
-            </summary>
         </member>
         <member name="T:Waher.Content.Text.CsvCodec">
             <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Security.Cryptography;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
@@ -74,6 +75,20 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         {
             Security.ChaChaPoly.ChaCha20 ChaCha20 = new Security.ChaChaPoly.ChaCha20(Key, 1, IV);
             return ChaCha20.EncryptOrDecrypt(Data);
+        }
+
+        /// <summary>
+        /// Encrypts binary data
+        /// </summary>
+        /// <param name="Data">Data to encrypt.</param>
+        /// <param name="Encrypted">Encrypted data will be stored here.</param>
+        /// <param name="Key">Encryption Key</param>
+        /// <param name="IV">Initiation Vector</param>
+        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        public override Task Encrypt(Stream Data, Stream Encrypted, byte[] Key, byte[] IV, byte[] AssociatedData)
+        {
+            Security.ChaChaPoly.ChaCha20 ChaCha20 = new Security.ChaChaPoly.ChaCha20(Key, 1, IV);
+            return ChaCha20.EncryptOrDecrypt(Data, Encrypted);
         }
 
         /// <summary>

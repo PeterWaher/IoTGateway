@@ -89,7 +89,7 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				while (Packet != null)
+				while (!(Packet is null))
 				{
 					await this.client.SendAsync(Packet, Packet.Length, RemoteEndpoint);
 					if (this.disposed)
@@ -140,7 +140,7 @@ namespace Waher.Security.DTLS
 		{
 			this.disposed = true;
 
-			if (this.client != null)
+			if (!(this.client is null))
 			{
 				this.client.Client.Shutdown(SocketShutdown.Both);
 				this.client.Dispose();

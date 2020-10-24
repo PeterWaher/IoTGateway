@@ -10,6 +10,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
+using Waher.Runtime.Temporary;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -221,7 +222,7 @@ namespace Waher.Networking.HTTP
 				{
 					if (TransferEncoding.Value == "chunked")
 					{
-						this.dataStream = new TemporaryFile();
+						this.dataStream = new TemporaryStream();
 						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null);
 					}
 					else
@@ -245,7 +246,7 @@ namespace Waher.Networking.HTTP
 						if (l <= MaxInmemoryMessageSize)
 							this.dataStream = new MemoryStream((int)l);
 						else
-							this.dataStream = new TemporaryFile();
+							this.dataStream = new TemporaryStream();
 
 						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null);
 					}

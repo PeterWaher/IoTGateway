@@ -118,7 +118,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 			Xml.Append(RestrictedQuery.NamespaceResultSetManagement);
 			Xml.Append("'>");
 
-			if (First != null)
+			if (!(First is null))
 			{
 				Xml.Append("<first");
 
@@ -134,7 +134,7 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 				Xml.Append("</first>");
 			}
 
-			if (Last != null)
+			if (!(Last is null))
 			{
 				Xml.Append("<last>");
 				Xml.Append(XML.Encode(Last));

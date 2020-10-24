@@ -296,6 +296,7 @@
   <Assembly fileName='Waher.Runtime.ServiceRegistration.dll'/>
   <Assembly fileName='Waher.Runtime.Settings.dll'/>
   <Assembly fileName='Waher.Runtime.Text.dll'/>
+  <Assembly fileName='Waher.Runtime.Temporary.dll'/>
   <Assembly fileName='Waher.Runtime.Threading.dll'/>
   <Assembly fileName='Waher.Runtime.Timing.dll'/>
   <Assembly fileName='Waher.Script.dll'/>

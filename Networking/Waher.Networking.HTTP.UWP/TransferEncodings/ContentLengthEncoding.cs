@@ -64,7 +64,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="NrBytes">Number of bytes to encode.</param>
 		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
-			if (this.clientConnection != null)
+			if (!(this.clientConnection is null))
 			{
 				int c = (int)Math.Min(this.bytesLeft, NrBytes);
 

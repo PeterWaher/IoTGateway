@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -82,9 +83,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <returns>Decoded object.</returns>
 		public async Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			KeyValuePair<string, TemporaryFile> Rec = await this.GetTempFileAsync(Uri, TimeoutMs, Headers);
+			KeyValuePair<string, TemporaryStream> Rec = await this.GetTempStreamAsync(Uri, TimeoutMs, Headers);
 			string ContentType = Rec.Key;
-			TemporaryFile File = Rec.Value;
+			TemporaryStream File = Rec.Value;
 
 			try
 			{
@@ -120,9 +121,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.GetTempFileAsync(Uri, 60000, Headers);
+			return this.GetTempStreamAsync(Uri, 60000, Headers);
 		}
 
 		/// <summary>
@@ -137,7 +138,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (proxy is null)
 			{
@@ -198,7 +199,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						if (e.HasData)
 						{
-							State.File = new TemporaryFile();
+							State.File = new TemporaryStream();
 
 							if (!(e.Data is null))
 							{
@@ -228,10 +229,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				if (State.StatusCode >= 200 && State.StatusCode < 300)
 				{
-					TemporaryFile Result = State.File;
+					TemporaryStream Result = State.File;
 					State.File = null;
 
-					return new KeyValuePair<string, TemporaryFile>(State.HttpResponse?.ContentType, Result);
+					return new KeyValuePair<string, TemporaryStream>(State.HttpResponse?.ContentType, Result);
 				}
 				else
 				{
@@ -327,7 +328,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private class State
 		{
 			public HttpResponse HttpResponse = null;
-			public TemporaryFile File = null;
+			public TemporaryStream File = null;
 			public TaskCompletionSource<bool> Done = new TaskCompletionSource<bool>();
 			public string StatusMessage = string.Empty;
 			public int StatusCode = 0;

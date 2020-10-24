@@ -297,7 +297,7 @@ namespace Waher.Networking.XMPP.Sensor
 			SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
 				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
 					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
@@ -617,7 +617,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
 					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
@@ -656,7 +656,7 @@ namespace Waher.Networking.XMPP.Sensor
 										}
 									}
 
-									if (ToRemove != null)
+									if (!(ToRemove is null))
 									{
 										foreach (string FieldName in ToRemove)
 											Fields.Remove(FieldName);
@@ -744,7 +744,7 @@ namespace Waher.Networking.XMPP.Sensor
 					}
 
 					LinkedListNode<Subscription> Next, Loop = Subscriptions.First;
-					while (Loop != null)
+					while (!(Loop is null))
 					{
 						Next = Loop.Next;
 
@@ -946,7 +946,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Triggered != null)
+			if (!(Triggered is null))
 			{
 				foreach (Subscription Subscription in Triggered)
 					this.TriggerSubscription(Subscription);

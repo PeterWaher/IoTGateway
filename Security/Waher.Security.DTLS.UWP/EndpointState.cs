@@ -96,7 +96,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.buffer != null)
+			if (!(this.buffer is null))
 			{
 				this.buffer.Dispose();
 				this.buffer = null;
@@ -170,7 +170,7 @@ namespace Waher.Security.DTLS
 
 		private void Append(byte[] Msg, IncrementalHash H)
 		{
-			if (Msg != null)
+			if (!(Msg is null))
 				H.AppendData(Msg);
 		}
 

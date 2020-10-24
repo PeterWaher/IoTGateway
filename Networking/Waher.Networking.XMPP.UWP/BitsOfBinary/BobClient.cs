@@ -175,7 +175,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 
 			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
-				if (Callback != null)
+				if (!(Callback is null))
 				{
 					try
 					{

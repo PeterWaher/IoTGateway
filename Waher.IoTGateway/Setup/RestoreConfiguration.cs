@@ -18,6 +18,7 @@ using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Language;
+using Waher.Runtime.Temporary;
 using Waher.Script;
 
 namespace Waher.IoTGateway.Setup

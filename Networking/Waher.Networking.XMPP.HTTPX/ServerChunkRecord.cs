@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -15,7 +12,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal HttpRequest request;
 		internal IEndToEndEncryption e2e;
 		internal SortedDictionary<int, Chunk> chunks = null;
-		internal TemporaryFile file;
+		internal TemporaryStream file;
 		internal string id;
 		internal string from;
 		internal string to;
@@ -28,7 +25,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal bool jingle;
 
 		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request,
-			IEndToEndEncryption E2e, string EndpointReference, TemporaryFile File, int MaxChunkSize, bool Sipub, bool Ibb,
+			IEndToEndEncryption E2e, string EndpointReference, TemporaryStream File, int MaxChunkSize, bool Sipub, bool Ibb,
 			bool Socks5, bool Jingle)
 			: base()
 		{
@@ -101,7 +98,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private Task Done()
 		{
 			return this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
-				this.ibb, this.s5);
+				null, this.ibb, this.s5);
 		}
 
 		internal override Task Fail(string Message)

@@ -171,26 +171,26 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.timeouts != null)
+			if (!(this.timeouts is null))
 			{
 				this.timeouts.Dispose();
 				this.timeouts = null;
 			}
 
-			if (this.states != null)
+			if (!(this.states is null))
 			{
 				this.states.Clear();
 				this.states.Dispose();
 				this.states = null;
 			}
 
-			if (this.communicationLayer != null)
+			if (!(this.communicationLayer is null))
 			{
 				this.communicationLayer.PacketReceived -= this.DataReceived;
 				this.communicationLayer = null;
 			}
 
-			if (this.rnd != null)
+			if (!(this.rnd is null))
 			{
 				this.rnd.Dispose();
 				this.rnd = null;
@@ -1017,7 +1017,7 @@ namespace Waher.Security.DTLS
 				Log.Critical(ex);
 			}
 
-			if (this.states != null)
+			if (!(this.states is null))
 				this.states.Remove(State.remoteEndpoint);
 		}
 
@@ -1040,7 +1040,7 @@ namespace Waher.Security.DTLS
 				Log.Critical(ex);
 			}
 
-			if (this.states != null)
+			if (!(this.states is null))
 				this.states.Remove(State.remoteEndpoint);
 		}
 
@@ -1209,7 +1209,7 @@ namespace Waher.Security.DTLS
 				else if (this.HasSniffers)
 					this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
 
-				if (Rec != null)
+				if (!(Rec is null))
 				{
 					this.timeouts.Add(DateTime.Now.AddSeconds(State.timeoutSeconds + this.NextDouble()),
 						this.CheckResend, new object[] { State, State.flightNr });

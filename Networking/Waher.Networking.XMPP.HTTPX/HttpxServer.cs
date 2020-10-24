@@ -3,11 +3,11 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Runtime.Temporary;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -95,6 +95,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			string Resource = XML.Attribute(e.Query, "resource");
 			string Version = XML.Attribute(e.Query, "version");
 			int MaxChunkSize = XML.Attribute(e.Query, "maxChunkSize", 0);
+			string PostResource = XML.Attribute(e.Query, "post");
 			bool Sipub = XML.Attribute(e.Query, "sipub", true);
 			bool Ibb = XML.Attribute(e.Query, "ibb", true);
 			bool Socks5 = XML.Attribute(e.Query, "s5", true);
@@ -162,7 +163,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									break;
 
 								case "chunkedBase64":
-									TemporaryFile file = new TemporaryFile();
+									TemporaryStream file = new TemporaryStream();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
 										new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference, file, 
@@ -194,11 +195,11 @@ namespace Waher.Networking.XMPP.HTTPX
 				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", this.server.VanityResources, HeaderFields.ToArray());
 
 			await this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference,
-				MaxChunkSize, Ibb, Socks5);
+				MaxChunkSize, PostResource, Ibb, Socks5);
 		}
 
-		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference,
-            int MaxChunkSize, bool Ibb, bool Socks5)
+		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, 
+			string EndpointReference, int MaxChunkSize, string PostResource, bool Ibb, bool Socks5)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
 			bool Result;
@@ -274,7 +275,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 					}
 
-					await this.ExecuteRequest(E2e, EndpointReference, Id, From, To, MaxChunkSize, Ibb, Socks5, Request, Resource);
+					await this.ExecuteRequest(E2e, EndpointReference, Id, From, To, MaxChunkSize, PostResource, Ibb, Socks5, Request, Resource);
 					return;
 				}
 				else
@@ -324,14 +325,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		private async Task ExecuteRequest(IEndToEndEncryption E2e, string EndpointReference, string Id, string From, string To, 
-            int MaxChunkSize, bool Ibb, bool Socks5, HttpRequest Request, HttpResource Resource)
+            int MaxChunkSize, string PostResource, bool Ibb, bool Socks5, HttpRequest Request, HttpResource Resource)
 		{
 			HttpResponse Response = null;
 
 			try
 			{
-				Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, From, To, MaxChunkSize, Ibb ? this.ibbClient : null, 
-					Socks5 ? this.socks5Proxy : null), this.server, Request);
+				Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, From, To, MaxChunkSize, PostResource,
+					Ibb ? this.ibbClient : null, Socks5 ? this.socks5Proxy : null), this.server, Request);
 
 				await Resource.Execute(this.server, Request, Response);
 			}
@@ -357,7 +358,7 @@ namespace Waher.Networking.XMPP.HTTPX
             string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, 
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null), this.server, Request)
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null, null), this.server, Request)
 			{
 				StatusCode = Code,
 				StatusMessage = Message,

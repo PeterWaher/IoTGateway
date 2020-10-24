@@ -182,7 +182,7 @@ namespace Waher.Networking.XMPP.Abuse
                 }
 
                 IqResultEventHandlerAsync h = this.OnSearchSupportResponse;
-                if (h != null)
+                if (!(h is null))
                 {
                     try
                     {
@@ -287,7 +287,7 @@ namespace Waher.Networking.XMPP.Abuse
                     }
                 }
 
-                if (Callback != null)
+                if (!(Callback is null))
                 {
                     BlockListEventArgs e2 = new BlockListEventArgs(e, JIDs.ToArray(), State);
 
@@ -382,7 +382,7 @@ namespace Waher.Networking.XMPP.Abuse
 
         private async Task CallCallback(IqResultEventHandlerAsync Callback, object State, IqResultEventArgs e)
         {
-            if (Callback != null)
+            if (!(Callback is null))
             {
                 try
                 {

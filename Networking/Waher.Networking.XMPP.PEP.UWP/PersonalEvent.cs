@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="Value">Optional value.</param>
 		protected void Append(StringBuilder Xml, string LocalName, string Value)
 		{
-			if (Value != null)
+			if (!(Value is null))
 			{
 				Xml.Append('<');
 				Xml.Append(LocalName);

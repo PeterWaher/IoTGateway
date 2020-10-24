@@ -37,6 +37,17 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		}
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			this.timeoutTimer?.Dispose();
+			this.timeoutTimer = null;
+
+			base.Dispose();
+		}
+
+		/// <summary>
 		/// Waits for all of the data to be returned.
 		/// </summary>
 		/// <param name="TimeoutMilliseconds">Maximum time to wait, in milliseconds</param>

@@ -96,7 +96,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.aes != null)
+			if (!(this.aes is null))
 			{
 				this.aes.Dispose();
 				this.aes = null;

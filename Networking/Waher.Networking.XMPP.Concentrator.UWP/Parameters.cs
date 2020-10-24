@@ -377,7 +377,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (string.IsNullOrEmpty(SectionLabel))
 				{
-					if (TextAttributes != null)
+					if (!(TextAttributes is null))
 					{
 						foreach (TextAttribute TextAttr in TextAttributes)
 						{
@@ -394,7 +394,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Page.Add(new FieldReference(Parameters, Field.Var));
 
-					if (TextAttributes != null)
+					if (!(TextAttributes is null))
 					{
 						foreach (TextAttribute TextAttr in TextAttributes)
 						{
@@ -423,7 +423,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Page.Add(Section);
 					}
 
-					if (TextAttributes != null)
+					if (!(TextAttributes is null))
 					{
 						foreach (TextAttribute TextAttr in TextAttributes)
 						{
@@ -440,7 +440,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Section.Add(new FieldReference(Parameters, Field.Var));
 
-					if (TextAttributes != null)
+					if (!(TextAttributes is null))
 					{
 						foreach (TextAttribute TextAttr in TextAttributes)
 						{
@@ -479,7 +479,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Parameters.Title = Title;
 			Parameters.Fields = Fields.ToArray();
 
-			if (Pages != null)
+			if (!(Pages is null))
 			{
 				Pages.Sort(OrderPages);
 

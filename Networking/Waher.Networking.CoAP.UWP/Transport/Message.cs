@@ -35,7 +35,7 @@ namespace Waher.Networking.CoAP.Transport
 		{
 			this.responseReceived = true;
 
-			if (this.callback != null)
+			if (!(this.callback is null))
 			{
 				try
 				{
@@ -63,7 +63,7 @@ namespace Waher.Networking.CoAP.Transport
 			{
 				List<CoapOption> Options = new List<CoapOption>();
 
-				if (this.options != null)
+				if (!(this.options is null))
 				{
 					foreach (CoapOption Option in this.options)
 					{
@@ -97,7 +97,7 @@ namespace Waher.Networking.CoAP.Transport
 			int? Port = null;
 			string Path = null;
 
-			if (this.options != null)
+			if (!(this.options is null))
 			{
 				foreach (CoapOption Option in this.options)
 				{

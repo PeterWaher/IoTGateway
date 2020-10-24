@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				this.sensorServer.Remove(this);
 
-				if (this.momentaryFields != null)
+				if (!(this.momentaryFields is null))
 				{
 					foreach (KeyValuePair<ThingReference, List<Field>> Thing in this.momentaryFields)
 						this.sensorServer.NewMomentaryValues(Thing.Key, Thing.Value, this.RemoteJID);
@@ -240,7 +240,7 @@ namespace Waher.Networking.XMPP.Sensor
 			bool Checked;
 			bool Empty = true;
 
-			if (Fields != null)
+			if (!(Fields is null))
 			{
 				foreach (Field Field in Fields)
 				{
@@ -312,7 +312,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			if (Errors != null)
+			if (!(Errors is null))
 			{
 				foreach (ThingError Error in Errors)
 				{

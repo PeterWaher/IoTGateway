@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Content.Getters
 {
@@ -118,9 +118,9 @@ namespace Waher.Content.Getters
 		/// <param name="Uri">URI</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.GetTempFileAsync(Uri, 60000, Headers);
+			return this.GetTempStreamAsync(Uri, 60000, Headers);
 		}
 
 		/// <summary>
@@ -130,7 +130,7 @@ namespace Waher.Content.Getters
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryFile>> GetTempFileAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			using (HttpClient HttpClient = new HttpClient()
 			{
@@ -149,7 +149,7 @@ namespace Waher.Content.Getters
 					Response.EnsureSuccessStatusCode();
 
 					string ContentType = Response.Content.Headers.ContentType.ToString();
-					TemporaryFile File = new TemporaryFile();
+					TemporaryStream File = new TemporaryStream();
 					try
 					{
 						await Response.Content.CopyToAsync(File);
@@ -162,7 +162,7 @@ namespace Waher.Content.Getters
 						ExceptionDispatchInfo.Capture(ex).Throw();
 					}
 
-					return new KeyValuePair<string, TemporaryFile>(ContentType, File);
+					return new KeyValuePair<string, TemporaryStream>(ContentType, File);
 				}
 			}
 		}

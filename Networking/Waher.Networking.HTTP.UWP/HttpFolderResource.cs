@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Runtime.Temporary;
 using Waher.Script;
 
 namespace Waher.Networking.HTTP
@@ -470,7 +470,7 @@ namespace Waher.Networking.HTTP
 					{
 						IContentConverter[] Converters = InternetContent.GetConverters(ContentType);
 
-						if (Converters != null)
+						if (!(Converters is null))
 						{
 							string BestContentType = null;
 							double BestQuality = 0;
@@ -620,7 +620,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						if (this.Next != null)
+						if (!(this.Next is null))
 						{
 							long First;
 
@@ -686,14 +686,14 @@ namespace Waher.Networking.HTTP
 
 			public async Task Dispose()
 			{
-				if (this.f != null)
+				if (!(this.f is null))
 				{
 					await this.f.FlushAsync();
 					this.f.Dispose();
 					this.f = null;
 				}
 
-				if (this.Response != null)
+				if (!(this.Response is null))
 				{
 					await this.Response.SendResponse();
 					this.Response.Dispose();
@@ -759,7 +759,7 @@ namespace Waher.Networking.HTTP
 				Progress.BytesLeft = Interval.GetIntervalLength(Progress.TotalLength);
 				Progress.Next = Interval.Next;
 
-				while (Interval != null)
+				while (!(Interval is null))
 				{
 					j = Interval.GetIntervalLength(Progress.TotalLength);
 					if (j > i)

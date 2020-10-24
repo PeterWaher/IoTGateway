@@ -149,11 +149,11 @@ namespace Waher.Networking.XMPP.BOSH
 			this.xmppClient = null;
 			this.bindingInterface = null;
 
-			if (this.httpClients != null)
+			if (!(this.httpClients is null))
 			{
 				foreach (HttpClient Client in this.httpClients)
 				{
-					if (Client != null)
+					if (!(Client is null))
 						Client.Dispose();
 				}
 
@@ -166,7 +166,7 @@ namespace Waher.Networking.XMPP.BOSH
 			TextEventHandler h = this.OnSent;
 			bool Result = true;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP.BOSH
 			TextEventHandler h = this.OnReceived;
 			bool Result = true;
 
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -445,7 +445,7 @@ namespace Waher.Networking.XMPP.BOSH
 		public override void CloseSession()
 		{
 			this.terminated = true;
-			if (this.httpClients != null)
+			if (!(this.httpClients is null))
 			{
 				int i, c = this.httpClients.Length;
 
@@ -534,11 +534,11 @@ namespace Waher.Networking.XMPP.BOSH
 									this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
 								}
 
-								if (Queued != null)
+								if (!(Queued is null))
 								{
 									LinkedListNode<KeyValuePair<string, EventHandler>> Loop = Queued.Last;
 
-									while (Loop != null)
+									while (!(Loop is null))
 									{
 										this.outputQueue.AddFirst(Loop.Value);
 										Loop = Loop.Previous;
@@ -594,7 +594,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					Xml.Append("'>");
 
-					if (Queued != null)
+					if (!(Queued is null))
 					{
 						foreach (KeyValuePair<string, EventHandler> P in Queued)
 						{
@@ -615,12 +615,12 @@ namespace Waher.Networking.XMPP.BOSH
 						}
 					}
 
-					if (Packet != null)
+					if (!(Packet is null))
 					{
 						await this.RaiseOnSent(Packet);
 						Xml.Append(Packet);
 
-						if (DeliveryCallback != null)
+						if (!(DeliveryCallback is null))
 						{
 							try
 							{
@@ -817,25 +817,25 @@ namespace Waher.Networking.XMPP.BOSH
 						sb.Append("='");
 						sb.Append(XmppClient.NamespaceStream);
 
-						if (To != null)
+						if (!(To is null))
 						{
 							sb.Append("' to='");
 							sb.Append(XML.Encode(To));
 						}
 
-						if (From != null)
+						if (!(From is null))
 						{
 							sb.Append("' from='");
 							sb.Append(XML.Encode(From));
 						}
 
-						if (Version != null)
+						if (!(Version is null))
 						{
 							sb.Append("' version='");
 							sb.Append(XML.Encode(Version));
 						}
 
-						if (Language != null)
+						if (!(Language is null))
 						{
 							sb.Append("' xml:lang='");
 							sb.Append(XML.Encode(Language));
@@ -844,7 +844,7 @@ namespace Waher.Networking.XMPP.BOSH
 						sb.Append("' xmlns='");
 						sb.Append(XmppClient.NamespaceClient);
 
-						if (Namespaces != null)
+						if (!(Namespaces is null))
 						{
 							foreach (KeyValuePair<string, string> P in Namespaces)
 							{
@@ -869,7 +869,7 @@ namespace Waher.Networking.XMPP.BOSH
 				}
 			}
 
-			if (Xml != null)
+			if (!(Xml is null))
 				return this.RaiseOnReceived(Xml);
 			else
 				return Task.FromResult<bool>(true);

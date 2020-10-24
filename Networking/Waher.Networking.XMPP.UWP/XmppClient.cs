@@ -535,7 +535,7 @@ namespace Waher.Networking.XMPP
 
 				IAlternativeTransport Best = Types.FindBest<IAlternativeTransport, Uri>(URI, alternativeBindingMechanisms);
 
-				if (Best != null)
+				if (!(Best is null))
 				{
 					IAlternativeTransport AlternativeTransport = Best.Instantiate(URI, this, new XmppBindingInterface(this));
 					this.textTransportLayer = AlternativeTransport;
@@ -1048,7 +1048,7 @@ namespace Waher.Networking.XMPP
 							ToUnavail.AddRange(Resources);
 						}
 
-						if (ToUnavail != null)
+						if (!(ToUnavail is null))
 						{
 							foreach (PresenceEventArgs e in ToUnavail)
 								this.Unavail(e);
@@ -1061,7 +1061,7 @@ namespace Waher.Networking.XMPP
 		private async void RaiseOnStateChanged(XmppState State)
 		{
 			StateChangedEventHandler h = this.OnStateChanged;
-			if (h != null)
+			if (!(h is null))
 			{
 				try
 				{
@@ -1148,7 +1148,7 @@ namespace Waher.Networking.XMPP
 			this.authenticationMechanisms?.Clear();
 			this.compressionMethods?.Clear();
 
-			if (this.pendingRequestsBySeqNr != null)
+			if (!(this.pendingRequestsBySeqNr is null))
 			{
 				lock (this.synchObject)
 				{
@@ -1229,7 +1229,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Password">New password.</param>
 		public void Reconnect(string UserName, string Password)
 		{
-			if (this.textTransportLayer != null)
+			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
 			this.userName = UserName;
@@ -1247,7 +1247,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="PasswordHashMethod">New password hash method.</param>
 		public void Reconnect(string UserName, string PasswordHash, string PasswordHashMethod)
 		{
-			if (this.textTransportLayer != null)
+			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
 			this.userName = UserName;
@@ -1997,7 +1997,7 @@ namespace Waher.Networking.XMPP
 							return false;
 
 						case "failure":
-							if (this.authenticationMethod != null)
+							if (!(this.authenticationMethod is null))
 							{
 								if (this.canRegister && !this.hasRegistered && this.allowedToRegister && !string.IsNullOrEmpty(this.password))
 								{
@@ -2167,9 +2167,9 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (MessageHandler != null)
+				if (!(MessageHandler is null))
 					this.Information(MessageHandler.GetMethodInfo().Name);
-				else if (FormHandler != null)
+				else if (!(FormHandler is null))
 					this.Information(FormHandler.GetMethodInfo().Name);
 				else
 				{
@@ -2203,7 +2203,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (MessageHandler != null)
+				if (!(MessageHandler is null))
 				{
 					try
 					{
@@ -2214,7 +2214,7 @@ namespace Waher.Networking.XMPP
 						this.Exception(ex);
 					}
 				}
-				else if (FormHandler != null)
+				else if (!(FormHandler is null))
 				{
 					try
 					{
@@ -3879,7 +3879,7 @@ namespace Waher.Networking.XMPP
 			XmlOutput.Append("</iq>");
 
 			string IqXml = XmlOutput.ToString();
-			if (PendingRequest != null)
+			if (!(PendingRequest is null))
 				PendingRequest.Xml = IqXml;
 
 			this.BeginWrite(IqXml, null);
@@ -4007,17 +4007,17 @@ namespace Waher.Networking.XMPP
 									};
 
 									Field Field = Form["username"];
-									if (Field != null)
+									if (!(Field is null))
 										Field.SetValue(this.userName);
 
 									Field = Form["password"];
-									if (Field != null)
+									if (!(Field is null))
 										Field.SetValue(this.password);
 									break;
 							}
 						}
 
-						if (Form != null)
+						if (!(Form is null))
 						{
 							this.Information("OnRegistrationForm()");
 							DataFormEventHandler h = this.OnRegistrationForm;
@@ -4041,14 +4041,14 @@ namespace Waher.Networking.XMPP
 
 							Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
 
-							if (UserName != null)
+							if (!(UserName is null))
 							{
 								Xml.Append("<username>");
 								Xml.Append(XML.Encode(this.userName));
 								Xml.Append("</username>");
 							}
 
-							if (Password != null)
+							if (!(Password is null))
 							{
 								Xml.Append("<password>");
 								Xml.Append(XML.Encode(this.password));
@@ -4248,15 +4248,15 @@ namespace Waher.Networking.XMPP
 									};
 
 									Field Field = Form["username"];
-									if (Field != null)
+									if (!(Field is null))
 										Field.SetValue(this.userName);
 
 									Field = Form["old_password"];
-									if (Field != null)
+									if (!(Field is null))
 										Field.SetValue(this.password);
 
 									Field = Form["password"];
-									if (Field != null)
+									if (!(Field is null))
 										Field.SetValue(NewPassword);
 
 									this.Information("OnChangePasswordForm()");
@@ -4789,7 +4789,7 @@ namespace Waher.Networking.XMPP
 						break;
 				}
 
-				if (Status != null)
+				if (!(Status is null))
 				{
 					foreach (KeyValuePair<string, string> P in Status)
 					{
@@ -4899,7 +4899,7 @@ namespace Waher.Networking.XMPP
 		public void RequestPresenceSubscription(string BareJid, string CustomXml)
 		{
 			RosterItem Item = this.GetRosterItem(BareJid);
-			if (Item != null)
+			if (!(Item is null))
 				Item.PendingSubscription = PendingSubscription.Subscribe;
 
 			StringBuilder Xml = new StringBuilder();
@@ -4934,7 +4934,7 @@ namespace Waher.Networking.XMPP
 		public void RequestPresenceUnsubscription(string BareJid)
 		{
 			RosterItem Item = this.GetRosterItem(BareJid);
-			if (Item != null)
+			if (!(Item is null))
 				Item.PendingSubscription = PendingSubscription.Unsubscribe;
 
 			StringBuilder Xml = new StringBuilder();
@@ -4985,7 +4985,7 @@ namespace Waher.Networking.XMPP
 			}
 
 			RosterItem Item = this.GetRosterItem(BareJid);
-			if (Item != null)
+			if (!(Item is null))
 			{
 				switch (Item.State)
 				{
@@ -5487,7 +5487,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			if (Form != null)
+			if (!(Form is null))
 			{
 				DynamicDataFormEventHandlerAsync h = this.OnDynamicFormUpdated;
 				if (!(h is null))
@@ -5777,7 +5777,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("'/>");
 
-			if (E2eEncryption != null)
+			if (!(E2eEncryption is null))
 			{
 				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
 					this.ServiceDiscoveryResponse, new object[] { Callback, State, CacheResponse });
@@ -6016,7 +6016,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("'/>");
 
-			if (E2eEncryption != null)
+			if (!(E2eEncryption is null))
 			{
 				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
 					this.ServiceItemsDiscoveryResponse, new object[] { Callback, State, CacheResponse });
@@ -6202,7 +6202,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(NamespaceSoftwareVersion);
 			Xml.Append("'/>");
 
-			if (E2eEncryption != null)
+			if (!(E2eEncryption is null))
 			{
 				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
 					this.SoftwareVersionResponse, new object[] { Callback, State });
@@ -6351,7 +6351,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(NamespaceSearch);
 			Xml.Append("'/>");
 
-			if (E2eEncryption != null)
+			if (!(E2eEncryption is null))
 			{
 				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
 					this.SearchFormResponse, new object[] { FormCallback, ResultCallback, State });
@@ -6368,7 +6368,7 @@ namespace Waher.Networking.XMPP
 			object State = P[2];
 			List<Item> Items = new List<Item>();
 
-			if (FormCallback != null)
+			if (!(FormCallback is null))
 			{
 				DataForm SearchForm = null;
 				string Instructions = null;
@@ -6420,25 +6420,25 @@ namespace Waher.Networking.XMPP
 								List<Field> Fields = new List<Field>();
 								string Tooltip = "Use asterisks (*) to do wildcard searches.";
 
-								if (First != null)
+								if (!(First is null))
 								{
 									Fields.Add(new TextSingleField(null, "first", "First name:", false, new string[] { First }, null,
 										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
 								}
 
-								if (Last != null)
+								if (!(Last is null))
 								{
 									Fields.Add(new TextSingleField(null, "last", "Last name:", false, new string[] { Last }, null,
 										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
 								}
 
-								if (Nick != null)
+								if (!(Nick is null))
 								{
 									Fields.Add(new TextSingleField(null, "nick", "Nick name:", false, new string[] { Nick }, null,
 										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
 								}
 
-								if (EMail != null)
+								if (!(EMail is null))
 								{
 									Fields.Add(new TextSingleField(null, "email", "e-Mail:", false, new string[] { EMail }, null,
 										Tooltip, new StringDataType(), new BasicValidation(), string.Empty, false, false, false));
@@ -6458,7 +6458,7 @@ namespace Waher.Networking.XMPP
 					State = State
 				};
 
-				if (SearchForm != null)
+				if (!(SearchForm is null))
 					SearchForm.State = new object[] { ResultCallback, State, e2 };
 
 				try
@@ -6797,7 +6797,7 @@ namespace Waher.Networking.XMPP
 
 			this.SendIqResult(e.Id, e.From, string.Empty);
 
-			if (e2 != null)
+			if (!(e2 is null))
 				this.ProcessMessage(e2);
 
 			return Task.CompletedTask;
@@ -6886,7 +6886,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (Retries != null)
+				if (!(Retries is null))
 				{
 					foreach (PendingRequest Request in Retries)
 					{

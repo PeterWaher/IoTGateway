@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.XMPP
@@ -43,18 +44,30 @@ namespace Waher.Networking.XMPP
 		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
 		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data);
 
-        /// <summary>
-        /// Decrypts binary data received from an XMPP client out of band.
-        /// </summary>
-        /// <param name="EndpointReference">Endpoint reference.</param>
-        /// <param name="Id">ID Attribute.</param>
-        /// <param name="Type">Type Attribute.</param>
-        /// <param name="From">From attribute.</param>
-        /// <param name="To">To attribute.</param>
-        /// <param name="Data">Data to decrypt.</param>
-        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
-        /// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-        byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+		/// <summary>
+		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// </summary>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Encrypted">Encrypted data will be stored here.</param>
+		/// <returns>If encryption was possible to the recipient.</returns>
+		Task<bool> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted);
+
+		/// <summary>
+		/// Decrypts binary data received from an XMPP client out of band.
+		/// </summary>
+		/// <param name="EndpointReference">Endpoint reference.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
+		byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
             IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>

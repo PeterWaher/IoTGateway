@@ -237,7 +237,10 @@ namespace Waher.Script.Xml
 					if (Parser.NextChar() != '=')
 						throw Parser.SyntaxError("= expected.");
 
+					bool Bak = Parser.CanSkipWhitespace;
+					Parser.CanSkipWhitespace = false;
 					ScriptNode Node = Parser.ParsePowers();
+					Parser.CanSkipWhitespace = Bak;
 
 					if (Attributes is null)
 						Attributes = new List<XmlScriptAttribute>();

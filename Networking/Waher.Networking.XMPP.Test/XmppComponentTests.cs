@@ -207,11 +207,8 @@ namespace Waher.Networking.XMPP.Test
 		[TestCleanup]
 		public virtual void TearDown()
 		{
-			if (this.client != null)
-				this.client.Dispose();
-
-			if (this.component != null)
-				this.component.Dispose();
+			this.client?.Dispose();
+			this.component?.Dispose();
 
 			if (this.clientEx != null)
 				throw new TargetInvocationException(this.clientEx);

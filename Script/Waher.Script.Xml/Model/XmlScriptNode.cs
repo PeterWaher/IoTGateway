@@ -54,7 +54,13 @@ namespace Waher.Script.Xml.Model
 			if (Element is StringValue S)
 				return S.Value;
 			else
-				return Expression.ToString(Element.AssociatedObjectValue);
+			{
+				object Value = Element.AssociatedObjectValue;
+				if (Value is null)
+					return null;
+				else
+					return Expression.ToString(Element.AssociatedObjectValue);
+			}
 		}
 	}
 }

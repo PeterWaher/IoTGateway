@@ -62,7 +62,9 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			Parent.SetAttribute(this.Name, EvaluateString(this.node, Variables));
+			string s = EvaluateString(this.node, Variables);
+			if (!(s is null))
+				Parent.SetAttribute(this.Name, s);
 		}
 	}
 }

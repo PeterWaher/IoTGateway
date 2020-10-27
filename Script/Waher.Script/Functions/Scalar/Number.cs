@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -96,6 +97,20 @@ namespace Waher.Script.Functions.Scalar
         public override IElement EvaluateScalar(IElement Argument, Variables Variables)
         {
             return this.EvaluateScalar(Argument.ToString(), Variables);
+        }
+
+        /// <summary>
+        /// Performs a pattern match operation.
+        /// </summary>
+        /// <param name="CheckAgainst">Value to check against.</param>
+        /// <param name="AlreadyFound">Variables already identified.</param>
+        /// <returns>Pattern match result</returns>
+        public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+        {
+            if (!(CheckAgainst is DoubleNumber) && !(CheckAgainst is ComplexNumber))
+                return PatternMatchResult.NoMatch;
+
+            return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
         }
     }
 }

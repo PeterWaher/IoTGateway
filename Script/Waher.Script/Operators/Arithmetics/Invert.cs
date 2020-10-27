@@ -78,5 +78,23 @@ namespace Waher.Script.Operators.Arithmetics
 					Start, Len, Expression));
 		}
 
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst is EuclidianDomainElement E))
+				return PatternMatchResult.NoMatch;
+
+			IElement Inv = E.AssociatedEuclidianDomain.Divide(E.One, E);
+			if (Inv is null)
+				return PatternMatchResult.NoMatch;
+
+			return this.op.PatternMatch(Inv, AlreadyFound);
+		}
+
 	}
 }

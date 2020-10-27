@@ -630,6 +630,8 @@ A variable assignment is defined using the `:=` operator. Example:
 
 	Variable := Value
 
+#### Assignment, Pattern Matching
+
 If the left side is not a variable reference, a pattern matching algorithm is employed that tries to assign all implicitly available variable references
 by comparing both sides. 
 
@@ -637,10 +639,13 @@ Examples:
 
 	[x,y]:=f(a,b,c)
 	v[]:=f(a,b,c)
+	{"name":Str(Required(Name)),"age":Required(Range(Int(Age),0,100)),"profession":Optional(Str(Profession))}:=Obj
 
 In the first example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, 
 the variables `x` and `y` are assigned the elements of this return vector. In the second example, the `v` is supposed to be a assigned
 a vector. If the result of the function call is not a vector, it is converted to a vector before being assigned to `v`.
+
+#### Special Assignment Operators
 
 There's also a set of aritmethic operators that act directly on a variable value, an object member or index. These are also categorized as 
 assignment operators, and have the same [order of presedence][]. These operators are:
@@ -850,7 +855,11 @@ The following table lists available scalar functions:
 | `Boolean(x)` | Converts `x` to a boolean value.          | `Boolean('true')` |
 | `Ceiling(z)` | Round `z` up to closest integer.          | `Ceiling(pi)`     |
 | `Ceil(z)`    | Alias for `Ceiling(z)`.                   | `Ceil(-1)`        |
+| `Dbl(x)`     | Alias for `Double(x)`                     | `Dbl("3.14")`     |
+| `Double(x)`  | Converts `x` to a double value.           | `Double(pi)`      |
 | `Floor(z)`   | Round `z` down to closest integer.        | `Floor(pi)`       |
+| `Int(x)`     | Alias for `Integer(x)`                    | `Int(pi)`         |
+| `Integer(x)` | Round `x` down to closest integer.        | `Integer(pi)`     |
 | `Max(x,y)`   | Largest of `x` and `y`.                   | `Max(10,a)`       |
 | `Min(x,y)`   | Smallest of `x` and `y`.                  | `Min(10,a)`       |
 | `Num(x)`     | Alias for `Number(x)`.                    | `Num('100')`      |
@@ -976,22 +985,24 @@ The following functions generate transformation matrices:
 
 The following functions are useful to control the runtime execution of the script:
 
-| Function | Description | Example |
-|----------|-------------|---------|
+| Function                 | Description | Example |
+|--------------------------|-------------|---------|
 | `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments. | `Create(System.String,'-',80)` |
-| `Delete(x)` | Alias for `Destroy(x)`. | `Delete(x)` |
-| `Destroy(x)` | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
-| `Error(Msg)` | Throws an error/exception. | `Error('Something went wrong.')` |
-| `Exception(Msg)` | Alias for `Error(Msg)`. | `Exception('Something went wrong.')` |
-| `Exists(f)` | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
-| `Fields(x)` | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values. | `Properties(Ans)` |
-| `Methods(x)` | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. | `Methods(Ans)` |
-| `Print(Msg)` | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
-| `PrintLine(Msg)` | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
-| `PrintLn(Msg)` | Alias for `PrintLine(Msg)`. | `PrintLine(x)` |
-| `Properties(x)` | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values. | `Properties(Ans)` |
-| `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
-| `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
+| `Delete(x)`              | Alias for `Destroy(x)`. | `Delete(x)` |
+| `Destroy(x)`             | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
+| `Error(Msg)`             | Throws an error/exception. | `Error('Something went wrong.')` |
+| `Exception(Msg)`         | Alias for `Error(Msg)`. | `Exception('Something went wrong.')` |
+| `Exists(f)`              | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
+| `Fields(x)`              | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values. | `Properties(Ans)` |
+| `Methods(x)`             | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. | `Methods(Ans)` |
+| `Optional(f)`            | Declares `f` as optional. Useful in pattern matching. | `Optional(x)` |
+| `Print(Msg)`             | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
+| `PrintLine(Msg)`         | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
+| `PrintLn(Msg)`           | Alias for `PrintLine(Msg)`. | `PrintLine(x)` |
+| `Properties(x)`          | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values. | `Properties(Ans)` |
+| `Remove(Var)`            | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
+| `Required(f)`            | Makes sure `f` is defined. If not, an exception is thrown. Can be used in pattern matching. | `Required(x)` |
+| `Return(x)`              | Returns from the current function scope with the value `x`. | `return(Result)` |
 
 ### Logging Functions
 

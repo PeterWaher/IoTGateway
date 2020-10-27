@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -93,6 +93,20 @@ namespace Waher.Script.Functions.Scalar
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
 			return new StringValue(Argument.ToString());
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst is StringValue S))
+				return PatternMatchResult.NoMatch;
+
+			return this.Argument.PatternMatch(S, AlreadyFound);
 		}
 	}
 }

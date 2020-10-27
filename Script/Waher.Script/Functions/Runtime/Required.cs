@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Functions.Scalar
+namespace Waher.Script.Functions.Runtime
 {
     /// <summary>
-    /// Floor(x)
+    /// Makes sure an expression is defined. Otherwise, an exception is thrown.
     /// </summary>
-    public class Floor : FunctionOneScalarVariable
+    public class Required : FunctionOneVariable
     {
         /// <summary>
-        /// Floor(x)
+        /// Makes sure an expression is defined. Otherwise, an exception is thrown.
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-		/// <param name="Expression">Expression containing script.</param>
-        public Floor(ScriptNode Argument, int Start, int Length, Expression Expression)
+        /// <param name="Expression">Expression containing script.</param>
+        public Required(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
         }
@@ -29,29 +30,32 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string FunctionName
         {
-            get { return "floor"; }
+            get { return "required"; }
         }
 
         /// <summary>
-        /// Evaluates the function on a scalar argument.
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override IElement Evaluate(Variables Variables)
+        {
+            IElement E = this.Argument.Evaluate(Variables);
+            if (E is ObjectValue O && O.Value is null)
+                throw new ScriptRuntimeException("Not defined.", this);
+
+            return E;
+        }
+
+        /// <summary>
+        /// Evaluates the function.
         /// </summary>
         /// <param name="Argument">Function argument.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument, Variables Variables)
+		public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return new DoubleNumber(Math.Floor(Argument));
-        }
-
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(Complex Argument, Variables Variables)
-        {
-            return new ComplexNumber(new Complex(Math.Floor(Argument.Real), Math.Floor(Argument.Imaginary)));
+            return Argument;
         }
 
         /// <summary>
@@ -61,28 +65,11 @@ namespace Waher.Script.Functions.Scalar
         /// <param name="AlreadyFound">Variables already identified.</param>
         /// <returns>Pattern match result</returns>
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
-        {
-            if (CheckAgainst is DoubleNumber N)
-            {
-                double d = N.Value;
-                if (Math.Truncate(d) != d)
-                    return PatternMatchResult.NoMatch;
-            }
-            else if (CheckAgainst is ComplexNumber Z)
-            {
-                Complex z = Z.Value;
-                double d = z.Real;
-                if (Math.Truncate(d) != d)
-                    return PatternMatchResult.NoMatch;
-
-                d = z.Imaginary;
-                if (Math.Truncate(d) != d)
-                    return PatternMatchResult.NoMatch;
-            }
-            else
+		{
+            if (CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null)
                 return PatternMatchResult.NoMatch;
 
             return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
-        }
-    }
+		}
+	}
 }

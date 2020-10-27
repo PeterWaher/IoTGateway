@@ -11,6 +11,7 @@ namespace Waher.Script.Operators
 	public class ObjectExNihilo : ScriptNode
 	{
 		private readonly LinkedList<KeyValuePair<string, ScriptNode>> members;
+		private Dictionary<string, ScriptNode> quick = null;
 
 		/// <summary>
 		/// Creates an object from nothing.
@@ -155,5 +156,50 @@ namespace Waher.Script.Operators
 			return Result;
 		}
 
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst is ObjectValue Obj) ||
+				!(Obj.AssociatedObjectValue is Dictionary<string, IElement> Object))
+			{
+				return PatternMatchResult.NoMatch;
+			}
+
+			if (this.quick is null)
+			{
+				Dictionary<string, ScriptNode> Quick = new Dictionary<string, ScriptNode>();
+
+				foreach (KeyValuePair<string, ScriptNode> N in this.members)
+					Quick[N.Key] = N.Value;
+
+				this.quick = Quick;
+			}
+
+			foreach (KeyValuePair<string, IElement> P in Object)
+			{
+				if (!(this.quick.ContainsKey(P.Key)))
+					return PatternMatchResult.NoMatch;
+			}
+
+			PatternMatchResult Result;
+
+			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+			{
+				if (Object.TryGetValue(P.Key, out IElement E))
+					Result = P.Value.PatternMatch(E, AlreadyFound);
+				else
+					Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
+
+				if (Result != PatternMatchResult.Match)
+					return Result;
+			}
+
+			return PatternMatchResult.Match;
+		}
 	}
 }

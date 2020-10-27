@@ -9,18 +9,18 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.Scalar
 {
     /// <summary>
-    /// Boolean(x)
+    /// Double(x)
     /// </summary>
-    public class Boolean : FunctionOneScalarVariable
+    public class Double : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Boolean(x)
+        /// Double(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public Boolean(ScriptNode Argument, int Start, int Length, Expression Expression)
+        public Double(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
         }
@@ -30,7 +30,7 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string FunctionName
         {
-            get { return "boolean"; }
+            get { return "double"; }
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string[] Aliases
         {
-            get { return new string[] { "bool" }; }
+            get { return new string[] { "dbl" }; }
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
-            return new BooleanValue(Argument != 0);
+            return new DoubleNumber(Argument);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new BooleanValue(Argument != Complex.Zero);
+            return new ComplexNumber(Argument.Real);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(bool Argument, Variables Variables)
         {
-            return new BooleanValue(Argument);
+            return new DoubleNumber(Argument ? 1 : 0);
         }
 
         /// <summary>
@@ -82,27 +82,19 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-			Argument = Argument.ToLower();
-
-			bool Value;
-
-			if (Argument == "1" || Argument == "true" || Argument == "yes" || Argument == "on")
-				Value = true;
-			else if (Argument == "0" || Argument == "false" || Argument == "no" || Argument == "off")
-				Value = false;
+			if (double.TryParse(Argument.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+				return new DoubleNumber(d);
 			else
-				throw new ScriptException("Not a boolean value.");
-
-            return new BooleanValue(Value);
+				throw new ScriptException("Not a double-precision floating point number.");
 		}
 
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override IElement EvaluateScalar(IElement Argument, Variables Variables)
         {
             return this.EvaluateScalar(Argument.ToString(), Variables);
         }
@@ -115,10 +107,10 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Pattern match result</returns>
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
-            if (!(CheckAgainst is BooleanValue B))
+            if (!(CheckAgainst is DoubleNumber N))
                 return PatternMatchResult.NoMatch;
 
-            return this.Argument.PatternMatch(B, AlreadyFound);
+            return this.Argument.PatternMatch(N, AlreadyFound);
         }
     }
 }

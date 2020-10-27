@@ -540,45 +540,23 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data</param>
+		/// <param name="EndpointReference">Endpoint used for encryption.</param>
 		/// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
-		public virtual byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data)
+		public virtual byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference)
 		{
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
+			{
+				EndpointReference = null;
+				return null;
+			}
+
+			EndpointReference = this.FindLocalEndpoint(RemoteEndpoint);
+			if (EndpointReference is null)
 				return null;
 
-			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
-			if (LocalEndpoint is null)
-				return null;
-
-			uint Counter = LocalEndpoint.GetNextCounter();
-			return LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, LocalEndpoint, RemoteEndpoint);
-		}
-
-		/// <summary>
-		/// Encrypts binary data that can be sent to an XMPP client out of band.
-		/// </summary>
-		/// <param name="Id">ID Attribute.</param>
-		/// <param name="Type">Type Attribute.</param>
-		/// <param name="From">From attribute.</param>
-		/// <param name="To">To attribute.</param>
-		/// <param name="Data">Data to encrypt.</param>
-		/// <param name="Encrypted">Encrypted data will be stored here.</param>
-		/// <returns>If encryption was possible to the recipient.</returns>
-		public virtual async Task<bool> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted)
-		{
-			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
-			if (RemoteEndpoint is null)
-				return false;
-
-			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
-			if (LocalEndpoint is null)
-				return false;
-
-			uint Counter = LocalEndpoint.GetNextCounter();
-			await LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Encrypted, LocalEndpoint, RemoteEndpoint);
-
-			return true;
+			uint Counter = EndpointReference.GetNextCounter();
+			return EndpointReference.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, EndpointReference, RemoteEndpoint);
 		}
 
 		/// <summary>
@@ -646,6 +624,61 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// </summary>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Encrypted">Encrypted data will be stored here.</param>
+		/// <returns>If encryption was possible, a reference to the endpoint performing the encryption, null otherwise.</returns>
+		public virtual async Task<IE2eEndpoint> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted)
+		{
+			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
+			if (RemoteEndpoint is null)
+				return null;
+
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
+			if (LocalEndpoint is null)
+				return null;
+
+			uint Counter = LocalEndpoint.GetNextCounter();
+			await LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Encrypted, LocalEndpoint, RemoteEndpoint);
+
+			return LocalEndpoint;
+		}
+
+		/// <summary>
+		/// Decrypts binary data received from an XMPP client out of band.
+		/// </summary>
+		/// <param name="EndpointReference">Endpoint reference.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
+		public virtual async Task<Stream> Decrypt(string EndpointReference, string Id, string Type, string From, string To, Stream Data,
+			IE2eSymmetricCipher SymmetricCipher)
+		{
+			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
+			if (RemoteEndpoint is null)
+				return null;
+
+			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
+			if (LocalEndpoint is null)
+				return null;
+
+			IE2eSymmetricCipher Cipher = LocalEndpoint.DefaultSymmetricCipher;
+			if (!(SymmetricCipher is null) && Cipher.GetType() != SymmetricCipher.GetType())
+				Cipher = SymmetricCipher;
+
+			return await Cipher.Decrypt(Id, Type, From, To, Data, RemoteEndpoint, LocalEndpoint);
 		}
 
 		/// <summary>
@@ -777,6 +810,29 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Tries to get a symmetric cipher from a reference.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Cipher">Symmetric cipher, if found.</param>
+		/// <returns>If a symmetric cipher was found with the given name.</returns>
+		public virtual bool TryGetSymmetricCipher(string LocalName, string Namespace, out IE2eSymmetricCipher Cipher)
+		{
+			if (Namespace == IoTHarmonizationE2E)
+			{
+				switch (LocalName)
+				{
+					case "aes": Cipher = this.aes; return true;
+					case "acp": Cipher = this.acp; return true;
+					case "cha": Cipher = this.cha; return true;
+				}
+			}
+
+			Cipher = null;
+			return false;
+		}
+
+		/// <summary>
 		/// Response handler for E2E encrypted iq stanzas
 		/// </summary>
 		/// <param name="Sender">Sender of event</param>
@@ -788,17 +844,9 @@ namespace Waher.Networking.XMPP.P2P
 			object[] P = (object[])e.State;
 			IqResultEventHandlerAsync Callback = (IqResultEventHandlerAsync)P[0];
 			object State = P[1];
-			IE2eSymmetricCipher Cipher = null;
-
-			if (!(E is null) && E.NamespaceURI == IoTHarmonizationE2E)
-			{
-				switch (E.LocalName)
-				{
-					case "aes": Cipher = this.aes; break;
-					case "acp": Cipher = this.acp; break;
-					case "cha": Cipher = this.cha; break;
-				}
-			}
+			
+			if (!this.TryGetSymmetricCipher(E.LocalName, E.NamespaceURI, out IE2eSymmetricCipher Cipher))
+				Cipher = null;
 
 			if (!(Cipher is null))
 			{
@@ -960,7 +1008,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
 			Client.ProcessIqGet(e2);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -998,7 +1046,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
 			Client.ProcessIqSet(e2);
-		
+
 			return Task.CompletedTask;
 		}
 

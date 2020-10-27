@@ -1480,7 +1480,7 @@
             <param name="FullJid">Full JID of endpoint.</param>
             <returns>Available E2E options for endpoint.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(System.String,System.String,System.String,System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.IE2eEndpoint@)">
             <summary>
             Encrypts binary data for transmission to an endpoint.
             </summary>
@@ -1489,6 +1489,7 @@
             <param name="From">From attribute</param>
             <param name="To">To attribute</param>
             <param name="Data">Binary data</param>
+            <param name="EndpointReference">Endpoint used for encryption.</param>
             <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(System.String,System.String,System.String,System.String,System.String,System.Byte[],Waher.Networking.XMPP.IE2eSymmetricCipher)">
@@ -1503,6 +1504,31 @@
             <param name="Data">Binary data</param>
             <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
             <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(System.String,System.String,System.String,System.String,System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Encrypts binary data that can be sent to an XMPP client out of band.
+            </summary>
+            <param name="Id">ID Attribute.</param>
+            <param name="Type">Type Attribute.</param>
+            <param name="From">From attribute.</param>
+            <param name="To">To attribute.</param>
+            <param name="Data">Data to encrypt.</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <returns>If encryption was possible, a reference to the endpoint performing the encryption, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(System.String,System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Networking.XMPP.IE2eSymmetricCipher)">
+            <summary>
+            Decrypts binary data received from an XMPP client out of band.
+            </summary>
+            <param name="EndpointReference">Endpoint reference.</param>
+            <param name="Id">ID Attribute.</param>
+            <param name="Type">Type Attribute.</param>
+            <param name="From">From attribute.</param>
+            <param name="To">To attribute.</param>
+            <param name="Data">Data to decrypt.</param>
+            <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+            <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Encrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.String,System.Text.StringBuilder)">
             <summary>
@@ -1530,6 +1556,15 @@
             <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
             <param name="EndpointReference">Endpoint reference</param>
             <returns>Decrypted XML.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetSymmetricCipher(System.String,System.String,Waher.Networking.XMPP.IE2eSymmetricCipher@)">
+            <summary>
+            Tries to get a symmetric cipher from a reference.
+            </summary>
+            <param name="LocalName">Local Name</param>
+            <param name="Namespace">Namespace</param>
+            <param name="Cipher">Symmetric cipher, if found.</param>
+            <returns>If a symmetric cipher was found with the given name.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqResult(System.Object,Waher.Networking.XMPP.IqResultEventArgs)">
             <summary>
@@ -2563,6 +2598,26 @@
             <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
             <returns>Decrypted Data</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.Encrypt(System.IO.Stream,System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Data to encrypt.</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.AeadChaCha20Poly1305.Decrypt(System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256">
             <summary>
             Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
@@ -2611,7 +2666,7 @@
             A new key must be generated before the counter wraps.</param>
             <returns>Initiation vector.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GetEncryptedLength(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GetEncryptedLength(System.Int64)">
             <summary>
             Calculates the minimum size of encrypted data, given the size of the content.
             </summary>
@@ -2629,6 +2684,26 @@
             <returns>Encrypted Data</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Encrypt(System.IO.Stream,System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Data to encrypt.</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Decrypt(System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Decrypts binary data
             </summary>
@@ -2702,6 +2777,26 @@
             <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
             <returns>Decrypted Data</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.Encrypt(System.IO.Stream,System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Data to encrypt.</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.Decrypt(System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.ChaCha20.GenerateKey">
             <summary>
             Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.
@@ -2756,7 +2851,7 @@
             A new key must be generated before the counter wraps.</param>
             <returns>Initiation vector.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GetEncryptedLength(System.Int32)">
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.GetEncryptedLength(System.Int64)">
             <summary>
             Calculates the minimum size of encrypted data, given the size of the content.
             </summary>
@@ -2774,6 +2869,26 @@
             <returns>Encrypted Data</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Data">Binary Data</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+            <returns>Decrypted Data</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.IO.Stream,System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Data">Data to encrypt.</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <param name="Key">Encryption Key</param>
+            <param name="IV">Initiation Vector</param>
+            <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.IO.Stream,System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Decrypts binary data
             </summary>
@@ -2815,7 +2930,35 @@
             <param name="Data">Binary data to decrypt</param>
             <param name="Sender">Remote endpoint performing the encryption.</param>
             <param name="Receiver">Local endpoint performing the decryption.</param>
-            <returns>Decrypted data</returns>
+            <returns>Decrypted data, if able, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.String,System.String,System.String,System.String,System.UInt32,System.IO.Stream,System.IO.Stream,Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Encrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Counter">Counter. Can be reset every time a new key is generated.
+            A new key must be generated before the counter wraps.</param>
+            <param name="Data">Binary data to encrypt</param>
+            <param name="Encrypted">Encrypted data will be stored here.</param>
+            <param name="Sender">Local endpoint performing the encryption.</param>
+            <param name="Receiver">Remote endpoint performing the decryption.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Decrypt(System.String,System.String,System.String,System.String,System.IO.Stream,Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
+            <summary>
+            Decrypts binary data
+            </summary>
+            <param name="Id">Id attribute</param>
+            <param name="Type">Type attribute</param>
+            <param name="From">From attribute</param>
+            <param name="To">To attribute</param>
+            <param name="Data">Binary data to decrypt</param>
+            <param name="Sender">Remote endpoint performing the encryption.</param>
+            <param name="Receiver">Local endpoint performing the decryption.</param>
+            <returns>Decrypted data, if able, null otherwise.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.E2eSymmetricCipher.Encrypt(System.String,System.String,System.String,System.String,System.UInt32,System.Byte[],System.Text.StringBuilder,Waher.Networking.XMPP.IE2eEndpoint,Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>

@@ -1,4 +1,4 @@
-﻿#define	LOG_SOCKS5_EVENTS
+﻿#define LOG_SOCKS5_EVENTS
 
 using System;
 using System.IO;
@@ -9,6 +9,11 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
+using Waher.Runtime.Temporary;
+using Waher.Runtime.Threading;
+using Waher.Security;
+using Waher.Events;
+using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -30,7 +35,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 		private IEndToEndEncryption e2e;
-		private string postResource;
+		private IPostResource postResource;
 		private readonly int maxChunkSize;
 
 		/// <summary>
@@ -107,7 +112,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// If responses can be posted to a specific resource.
 		/// </summary>
-		public string PostResource
+		public IPostResource PostResource
 		{
 			get => this.postResource;
 			set => this.postResource = value;
@@ -174,6 +179,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			// TODO: Local IP & port for quick P2P response (TLS).
 
 			StringBuilder Xml = new StringBuilder();
+			ResponseState ResponseState = new ResponseState()
+			{
+				Callback = Callback,
+				DataCallback = DataCallback,
+				State = State
+			};
 
 			Xml.Append("<req xmlns='");
 			Xml.Append(Namespace);
@@ -186,10 +197,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("' maxChunkSize='");
 			Xml.Append(this.maxChunkSize.ToString());
 
-			if (!string.IsNullOrEmpty(this.postResource))
+			if (!(this.postResource is null))
 			{
+				string Resource = this.postResource.GetUrl(this.ResponsePostbackHandler, ResponseState);
+
 				Xml.Append("' post='");
-				Xml.Append(XML.Encode(this.postResource));
+				Xml.Append(XML.Encode(Resource));
+
+				ResponseState.PreparePostBackCall(this.e2e, Resource);
 			}
 
 			Xml.Append("' sipub='false' ibb='");
@@ -241,9 +256,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("</req>");
 
 			if (!(this.e2e is null))
-				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
+				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), this.ResponseHandler, ResponseState, 60000, 0);
 			else
-				this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
+				this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, ResponseState, 60000, 0);
 
 			if (!string.IsNullOrEmpty(StreamId))
 			{
@@ -298,6 +313,186 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		private class ResponseState : IDisposable
+		{
+			public HttpxResponseEventHandler Callback;
+			public HttpxResponseDataEventHandler DataCallback;
+			public HttpxResponseEventArgs HttpxResponse = null;
+			public object State;
+
+			private string sha256 = null;
+			private string id = null;
+			private string from = null;
+			private string to = null;
+			private string endpointReference = null;
+			private string symmetricCipherReference = null;
+			private Stream data = null;
+			private bool e2e = false;
+			private bool disposeData = false;
+			private bool disposed = false;
+			private IEndToEndEncryption endpointSecurity;
+			private MultiReadSingleWriteObject synchObj = null;
+
+			public void PreparePostBackCall(IEndToEndEncryption EndpointSecurity, string Id)
+			{
+				this.synchObj = new MultiReadSingleWriteObject();
+				this.endpointSecurity = EndpointSecurity;
+				this.id = Id;
+			}
+
+			public async Task DataReceived(object Sender, Stream Data, string From, string To, string EndpointReference, string SymmetricCipherReference)
+			{
+				if (this.disposed)
+					return;
+
+				await this.synchObj.TryBeginWrite(60000);
+				try
+				{
+					this.from = From;
+					this.to = To;
+					this.endpointReference = EndpointReference;
+					this.symmetricCipherReference = SymmetricCipherReference;
+
+					if (this.sha256 is null)
+					{
+						this.data = new TemporaryStream();
+						await Data.CopyToAsync(this.data);
+						this.disposeData = true;
+					}
+					else
+						await this.CheckData(Sender, Data);
+				}
+				finally
+				{
+					await this.synchObj.EndWrite();
+				}
+			}
+
+			public async Task Sha256Received(object Sender, string Sha256, bool E2e)
+			{
+				if (this.disposed)
+					return;
+
+				await this.synchObj.TryBeginWrite(60000);
+				try
+				{
+					if (this.data is null)
+					{
+						this.sha256 = Sha256;
+						this.e2e = E2e;
+					}
+					else
+						await this.CheckData(Sender, this.data);
+				}
+				finally
+				{
+					await this.synchObj.EndWrite();
+				}
+			}
+
+			private async Task CheckData(object Sender, Stream Data)
+			{
+				try
+				{
+					Data.Position = 0;
+
+					if (this.e2e)
+					{
+						int i = this.symmetricCipherReference.IndexOf('#');
+						string CipherLocalName;
+						string CipherNamespace;
+
+						if (i < 0)
+						{
+							CipherLocalName = this.symmetricCipherReference;
+							CipherNamespace = string.Empty;
+						}
+						else
+						{
+							CipherLocalName = this.symmetricCipherReference.Substring(i + 1);
+							CipherNamespace = this.symmetricCipherReference.Substring(0, i);
+						}
+
+						if (!this.endpointSecurity.TryGetSymmetricCipher(CipherLocalName, CipherNamespace, out IE2eSymmetricCipher SymmetricCipher))
+							return;
+
+						Stream Decrypted = await this.endpointSecurity.Decrypt(this.endpointReference, this.id, "POST", this.from, this.to, Data, SymmetricCipher);
+						if (Decrypted is null)
+							return;
+
+						if (this.disposeData)
+							this.data?.Dispose();
+
+						this.data = Data = Decrypted;
+						this.disposeData = true;
+					}
+
+					byte[] Digest = Hashes.ComputeSHA256Hash(Data);
+					string DigestBase64 = Convert.ToBase64String(Digest);
+
+					if (DigestBase64 == this.sha256)
+						await this.DataOk(Sender, Data);
+				}
+				finally
+				{
+					this.Dispose();
+				}
+			}
+
+			private async Task DataOk(object Sender, Stream Data)
+			{
+				long Count = Data.Length;
+				int BufSize = (int)Math.Min(65536, Count);
+				byte[] Buf = new byte[BufSize];
+
+				Data.Position = 0;
+
+				while (Count > 0)
+				{
+					if (Count < BufSize)
+					{
+						Array.Resize<byte>(ref Buf, (int)Count);
+						BufSize = (int)Count;
+					}
+
+					if (BufSize != await Data.ReadAsync(Buf, 0, BufSize))
+						throw new IOException("Unexpected end of file.");
+
+					Count -= BufSize;
+
+					try
+					{
+						this.DataCallback?.Invoke(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+
+			public void Dispose()
+			{
+				if (!this.disposed)
+				{
+					this.disposed = true;
+					this.synchObj?.Dispose();
+
+					if (this.disposeData)
+					{
+						this.data?.Dispose();
+						this.data = null;
+					}
+				}
+			}
+		}
+
+		private Task ResponsePostbackHandler(object Sender, PostBackEventArgs e)
+		{
+			ResponseState ResponseState = (ResponseState)e.State;
+			return ResponseState.DataReceived(this, e.Data, e.From, e.To, e.EndpointReference, e.SymmetricCipherReference);
+		}
+
 		private async Task ResponseHandler(object Sender, IqResultEventArgs e)
 		{
 			XmlElement E = e.FirstElement;
@@ -305,10 +500,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			string StatusMessage;
 			double Version;
 			int StatusCode;
-			object[] P = (object[])e.State;
-			HttpxResponseEventHandler Callback = (HttpxResponseEventHandler)P[0];
-			HttpxResponseDataEventHandler DataCallback = (HttpxResponseDataEventHandler)P[1];
-			object State = P[2];
+			ResponseState ResponseState = (ResponseState)e.State;
 			byte[] Data = null;
 			bool HasData = false;
 			bool DisposeResponse = true;
@@ -374,9 +566,11 @@ namespace Waher.Networking.XMPP.HTTPX
 									case "chunkedBase64":
 										string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 
+										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, null);
+
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, false, null, null));
+											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
+											StreamId, e.From, e.To, false, null, null));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -385,9 +579,11 @@ namespace Waher.Networking.XMPP.HTTPX
 									case "ibb":
 										StreamId = XML.Attribute((XmlElement)N2, "sid");
 
+										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, null);
+
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, false, null, null));
+											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
+											StreamId, e.From, e.To, false, null, null));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -397,9 +593,23 @@ namespace Waher.Networking.XMPP.HTTPX
 										StreamId = XML.Attribute((XmlElement)N2, "sid");
 										bool E2e = XML.Attribute((XmlElement)N2, "e2e", false);
 
+										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, null);
+
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
-											Response, DataCallback, State, StreamId, e.From, e.To, E2e, e.E2eReference, e.E2eSymmetricCipher));
+											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
+											StreamId, e.From, e.To, E2e, e.E2eReference, e.E2eSymmetricCipher));
+
+										DisposeResponse = false;
+										HasData = true;
+										break;
+
+									case "sha256":
+										E2e = XML.Attribute((XmlElement)N2, "e2e", false);
+										string DigestBase64 = N2.InnerText;
+
+										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, null);
+
+										Task _ = Task.Run(() => ResponseState.Sha256Received(this, DigestBase64, E2e));
 
 										DisposeResponse = false;
 										HasData = true;
@@ -426,11 +636,12 @@ namespace Waher.Networking.XMPP.HTTPX
 				Response = new HttpResponse();
 			}
 
-			HttpxResponseEventArgs e2 = new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, HasData, Data);
+			HttpxResponseEventArgs e2 = ResponseState.HttpxResponse ??
+				new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, HasData, Data);
 
 			try
 			{
-				await Callback(this, e2);
+				await ResponseState.Callback(this, e2);
 			}
 			catch (Exception)
 			{
@@ -439,7 +650,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			finally
 			{
 				if (DisposeResponse)
+				{
 					Response.Dispose();
+					ResponseState.Dispose();
+				}
 			}
 		}
 
@@ -535,8 +749,8 @@ namespace Waher.Networking.XMPP.HTTPX
 #if LOG_SOCKS5_EVENTS
 					this.client.Information("Accepting SOCKS5 stream from " + e.From);
 #endif
-					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId, 
-                        ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
+					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId,
+						ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
 				}
 			}
 
@@ -550,25 +764,25 @@ namespace Waher.Networking.XMPP.HTTPX
 			public string From;
 			public string To;
 			public string EndpointReference;
-            public IE2eSymmetricCipher SymmetricCipher;
-            public int State = 0;
+			public IE2eSymmetricCipher SymmetricCipher;
+			public int State = 0;
 			public int BlockSize;
 			public int BlockPos;
 			public int Nr = 0;
 			public byte[] Block;
 			public bool E2e;
 
-			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e, string EndpointReference, 
-                IE2eSymmetricCipher SymmetricCipher)
+			public Socks5Receiver(string Key, string StreamId, string From, string To, bool E2e, string EndpointReference,
+				IE2eSymmetricCipher SymmetricCipher)
 			{
 				this.Key = Key;
 				this.StreamId = StreamId;
 				this.From = From;
 				this.To = To;
 				this.E2e = E2e;
-                this.EndpointReference = EndpointReference;
-                this.SymmetricCipher = SymmetricCipher;
-            }
+				this.EndpointReference = EndpointReference;
+				this.SymmetricCipher = SymmetricCipher;
+			}
 		}
 
 		private async Task Socks5DataReceived(object Sender, P2P.SOCKS5.DataReceivedEventArgs e)

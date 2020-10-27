@@ -57,6 +57,19 @@ namespace Waher.Networking.XMPP
         byte[] Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver);
 
         /// <summary>
+        /// Decrypts binary data
+        /// </summary>
+        /// <param name="Id">Id attribute</param>
+        /// <param name="Type">Type attribute</param>
+        /// <param name="From">From attribute</param>
+        /// <param name="To">To attribute</param>
+        /// <param name="Data">Binary data to decrypt</param>
+        /// <param name="Sender">Remote endpoint performing the encryption.</param>
+        /// <param name="Receiver">Local endpoint performing the decryption.</param>
+        /// <returns>Decrypted data, if able, null otherwise.</returns>
+        byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver);
+
+        /// <summary>
         /// Encrypts binary data
         /// </summary>
         /// <param name="Id">Id attribute</param>
@@ -81,8 +94,8 @@ namespace Waher.Networking.XMPP
         /// <param name="Data">Binary data to decrypt</param>
         /// <param name="Sender">Remote endpoint performing the encryption.</param>
         /// <param name="Receiver">Local endpoint performing the decryption.</param>
-        /// <returns>Decrypted data</returns>
-        byte[] Decrypt(string Id, string Type, string From, string To, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver);
+        /// <returns>Decrypted data, if able, null otherwise.</returns>
+        Task<Stream> Decrypt(string Id, string Type, string From, string To, Stream Data, IE2eEndpoint Sender, IE2eEndpoint Receiver);
 
         /// <summary>
         /// Encrypts Binary data

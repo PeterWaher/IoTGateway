@@ -91,6 +91,30 @@ namespace Waher.Security.ChaChaPoly
         }
 
         /// <summary>
+        /// Decrypt data.
+        /// </summary>
+        /// <param name="Data">Data to be encrypted.</param>
+        /// <param name="AdditionalData">Additional data</param>
+        /// <param name="Mac">Message Authentication Code.</param>
+        /// <returns>Decrypted data, if successful, null otherwise.</returns>
+        public byte[] Decrypt(byte[] Data, byte[] AdditionalData, byte[] Mac)
+        {
+            byte[] Decrypted = this.Process(Data, AdditionalData, false, out byte[] Mac2);
+
+            int i, c = Mac2.Length;
+            if (c != Mac.Length)
+                return null;
+
+            for (i = 0; i < c; i++)
+            {
+                if (Mac[i] != Mac2[i])
+                    return null;
+            }
+
+            return Decrypted;
+        }
+
+        /// <summary>
         /// Encrypts data.
         /// </summary>
         /// <param name="Data">Data to be encrypted.</param>
@@ -169,21 +193,33 @@ namespace Waher.Security.ChaChaPoly
         /// <param name="AdditionalData">Additional data</param>
         /// <param name="Mac">Message Authentication Code.</param>
         /// <returns>Decrypted data, if successful, null otherwise.</returns>
-        public byte[] Decrypt(byte[] Data, byte[] AdditionalData, byte[] Mac)
+        public async Task<Stream> Decrypt(Stream Data, byte[] AdditionalData, byte[] Mac)
         {
-            byte[] Decrypted = this.Process(Data, AdditionalData, false, out byte[] Mac2);
+            TemporaryStream Decrypted = new TemporaryStream();
 
-            int i, c = Mac2.Length;
-            if (c != Mac.Length)
-                return null;
-
-            for (i = 0; i < c; i++)
+            try
             {
-                if (Mac[i] != Mac2[i])
-                    return null;
-            }
+                byte[] Mac2 = await this.Process(Data, Decrypted, AdditionalData, false);
 
-            return Decrypted;
+                int i, c = Mac2.Length;
+                if (c != Mac.Length)
+                    return null;
+
+                for (i = 0; i < c; i++)
+                {
+                    if (Mac[i] != Mac2[i])
+                        return null;
+                }
+
+                TemporaryStream Result = Decrypted;
+                Decrypted = null;
+
+                return Result;
+            }
+            finally
+			{
+                Decrypted?.Dispose();
+			}
         }
 
     }

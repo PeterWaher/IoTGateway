@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Temporary;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
@@ -78,6 +80,19 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         }
 
         /// <summary>
+        /// Decrypts binary data
+        /// </summary>
+        /// <param name="Data">Binary Data</param>
+        /// <param name="Key">Encryption Key</param>
+        /// <param name="IV">Initiation Vector</param>
+        /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+        /// <returns>Decrypted Data</returns>
+        public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+        {
+            return this.Encrypt(Data, Key, IV, AssociatedData);
+        }
+
+        /// <summary>
         /// Encrypts binary data
         /// </summary>
         /// <param name="Data">Data to encrypt.</param>
@@ -99,9 +114,23 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// <param name="IV">Initiation Vector</param>
         /// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
         /// <returns>Decrypted Data</returns>
-        public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+        public override async Task<Stream> Decrypt(Stream Data, byte[] Key, byte[] IV, byte[] AssociatedData)
         {
-            return this.Encrypt(Data, Key, IV, AssociatedData);
+            TemporaryStream Decrypted = new TemporaryStream();
+
+            try
+            {
+                Security.ChaChaPoly.ChaCha20 ChaCha20 = new Security.ChaChaPoly.ChaCha20(Key, 1, IV);
+                await ChaCha20.EncryptOrDecrypt(Data, Decrypted);
+
+                return Decrypted;
+            }
+            catch (Exception ex)
+            {
+                Decrypted.Dispose();
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                return null;
+            }
         }
 
         /// <summary>

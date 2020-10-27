@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private HttpxClient httpxClient;
 		private XmppServerlessMessaging serverlessMessaging;
 		private IHttpxCache httpxCache;
-		private string postResource = null;
+		private IPostResource postResource = null;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 
@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// Post resource for responses.
 		/// </summary>
-		public string PostResource
+		public IPostResource PostResource
 		{
 			get => this.postResource;
 			set

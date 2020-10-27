@@ -34,15 +34,13 @@ namespace Waher.Networking.XMPP
 	public interface IEndToEndEncryption : IDisposable
 	{
 		/// <summary>
-		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// Tries to get a symmetric cipher from a reference.
 		/// </summary>
-		/// <param name="Id">ID Attribute.</param>
-		/// <param name="Type">Type Attribute.</param>
-		/// <param name="From">From attribute.</param>
-		/// <param name="To">To attribute.</param>
-		/// <param name="Data">Data to encrypt.</param>
-		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
-		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data);
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Cipher">Symmetric cipher, if found.</param>
+		/// <returns>If a symmetric cipher was found with the given name.</returns>
+		bool TryGetSymmetricCipher(string LocalName, string Namespace, out IE2eSymmetricCipher Cipher);
 
 		/// <summary>
 		/// Encrypts binary data that can be sent to an XMPP client out of band.
@@ -52,9 +50,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">From attribute.</param>
 		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to encrypt.</param>
-		/// <param name="Encrypted">Encrypted data will be stored here.</param>
-		/// <returns>If encryption was possible to the recipient.</returns>
-		Task<bool> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted);
+		/// <param name="EndpointReference">Endpoint used for encryption.</param>
+		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
+		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference);
 
 		/// <summary>
 		/// Decrypts binary data received from an XMPP client out of band.
@@ -68,6 +66,32 @@ namespace Waher.Networking.XMPP
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
 		byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+			IE2eSymmetricCipher SymmetricCipher);
+
+		/// <summary>
+		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// </summary>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Encrypted">Encrypted data will be stored here.</param>
+		/// <returns>If encryption was possible, a reference to the endpoint performing the encryption, null otherwise.</returns>
+		Task<IE2eEndpoint> Encrypt(string Id, string Type, string From, string To, Stream Data, Stream Encrypted);
+
+		/// <summary>
+		/// Decrypts binary data received from an XMPP client out of band.
+		/// </summary>
+		/// <param name="EndpointReference">Endpoint reference.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
+		Task<Stream> Decrypt(string EndpointReference, string Id, string Type, string From, string To, Stream Data, 
             IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>

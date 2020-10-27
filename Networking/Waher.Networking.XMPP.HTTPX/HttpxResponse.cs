@@ -10,6 +10,7 @@ using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -228,7 +229,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private static async Task SendPost(string To, TemporaryStream File, string Resource, XmppClient Client, IEndToEndEncryption E2e)
+		private static async Task SendPost(string To, TemporaryStream File, string Resource, XmppClient Client,
+			IEndToEndEncryption E2e)
 		{
 			TemporaryStream Encrypted = null;
 
@@ -251,11 +253,35 @@ namespace Waher.Networking.XMPP.HTTPX
 						{
 							Encrypted = new TemporaryStream();
 
-							if (!await E2e.Encrypt(Resource, "POST", Client.FullJID, To, File, Encrypted))
+							IE2eEndpoint EndpointReference = await E2e.Encrypt(Resource, "POST", Client.FullJID, To, File, Encrypted);
+							if (EndpointReference is null)
 							{
 								Client.Error("Unable to encrypt response back to recipient.");
 								return;
 							}
+
+							StringBuilder sb = new StringBuilder();
+
+							if (EndpointReference.Namespace != EndpointSecurity.IoTHarmonizationE2E)
+							{
+								sb.Append(EndpointReference.Namespace);
+								sb.Append('#');
+							}
+							
+							sb.Append(EndpointReference.LocalName);
+							sb.Append(':');
+
+							IE2eSymmetricCipher SymmetricCipher = EndpointReference.DefaultSymmetricCipher;
+
+							if (SymmetricCipher.Namespace != EndpointSecurity.IoTHarmonizationE2E)
+							{
+								sb.Append(SymmetricCipher.Namespace);
+								sb.Append('#');
+							}
+
+							sb.Append(SymmetricCipher.LocalName);
+
+							Request.Content.Headers.Add("Referer", sb.ToString());
 
 							File.Dispose();
 							File = Encrypted;
@@ -265,10 +291,12 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 
 						Request.Content.Headers.ContentType = new MediaTypeHeaderValue("binary");
+						Request.Content.Headers.Add("From", Client.FullJID);
+						Request.Content.Headers.Add("Origin", To);
 						Request.Content = new StreamContent(File);
 
-						HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-						Response.EnsureSuccessStatusCode();
+						HttpResponseMessage Response2 = await HttpClient.SendAsync(Request);
+						Response2.EnsureSuccessStatusCode();
 					}
 				}
 			}

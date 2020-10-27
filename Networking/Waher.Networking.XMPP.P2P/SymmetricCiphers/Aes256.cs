@@ -120,6 +120,27 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		}
 
 		/// <summary>
+		/// Decrypts binary data
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Key">Encryption Key</param>
+		/// <param name="IV">Initiation Vector</param>
+		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
+		/// <returns>Decrypted Data</returns>
+		public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		{
+			lock (this.aes)
+			{
+				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
+				{
+					Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
+				}
+			}
+
+			return base.Decrypt(Data, Key, IV, AssociatedData);
+		}
+
+		/// <summary>
 		/// Encrypts binary data
 		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
@@ -142,29 +163,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 					Aes = this.aes.CreateEncryptor(Key, IV);
 				}
 
-				long l = PreEncrypt.Length;
-				byte[] Input = new byte[65536];
-				byte[] Output = new byte[65536];
-				int j;
-
-				while (l > 0)
-				{
-					j = (int)Math.Min(65536, l);
-					if (await Data.ReadAsync(Input, 0, j) != j)
-						throw new IOException("Unexpected end of file.");
-
-					l -= j;
-					if (l <= 0)
-					{
-						Output = Aes.TransformFinalBlock(Input, 0, j);
-						await Encrypted.WriteAsync(Output, 0, Output.Length);
-					}
-					else
-					{
-						j = Aes.TransformBlock(Input, 0, j, Output, 0);
-						await Encrypted.WriteAsync(Output, 0, j);
-					}
-				}
+				await Crypto.CryptoTransform(Aes, PreEncrypt, Encrypted);
 			}
 			finally
 			{
@@ -181,19 +180,28 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="IV">Initiation Vector</param>
 		/// <param name="AssociatedData">Any associated data used for authenticated encryption (AEAD).</param>
 		/// <returns>Decrypted Data</returns>
-		public override byte[] Decrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData)
+		public override async Task<Stream> Decrypt(Stream Data, byte[] Key, byte[] IV, byte[] AssociatedData)
 		{
-			lock (this.aes)
+			ICryptoTransform Aes = null;
+			TemporaryStream Decrypted = new TemporaryStream();
+
+			try
 			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
+				lock (this.aes)
 				{
-					Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
+					Aes = this.aes.CreateDecryptor(Key, IV);
 				}
+
+				await Crypto.CryptoTransform(Aes, Data, Decrypted);
+
+				return await base.Decrypt(Decrypted, Key, IV, AssociatedData);
 			}
-
-			return base.Decrypt(Data, Key, IV, AssociatedData);
+			finally
+			{
+				Decrypted.Dispose();
+				Aes?.Dispose();
+			}
 		}
-
 
 		/// <summary>
 		/// Generates a new key. Used when the asymmetric cipher cannot calculate a shared secret.

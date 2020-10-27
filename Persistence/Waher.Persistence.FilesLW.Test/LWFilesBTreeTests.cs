@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Runtime.Inventory;
@@ -451,7 +451,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(FileException))]
+		[ExpectedException(typeof(KeyAlreadyExistsException))]
 		public async Task DBFiles_BTree_Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);

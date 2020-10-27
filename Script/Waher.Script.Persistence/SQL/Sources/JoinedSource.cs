@@ -199,6 +199,20 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			if (Where is null)
 				return Null;
+			else if (Where is Operators.Comparisons.Range Range)
+			{
+				if (Range.LeftInclusive)
+					Op1 = new Operators.Comparisons.LesserThanOrEqualTo(Range.LeftOperand, Range.MiddleOperand, Range.Start, Range.Length, Range.Expression);
+				else
+					Op1 = new Operators.Comparisons.LesserThan(Range.LeftOperand, Range.MiddleOperand, Range.Start, Range.Length, Range.Expression);
+
+				if (Range.RightInclusive)
+					Op2 = new Operators.Comparisons.GreaterThanOrEqualTo(Range.MiddleOperand, Range.RightOperand, Range.Start, Range.Length, Range.Expression);
+				else
+					Op2 = new Operators.Comparisons.GreaterThan(Range.MiddleOperand, Range.RightOperand, Range.Start, Range.Length, Range.Expression);
+
+				return await Reduce(Source, Source2, new Operators.Logical.And(Op1, Op2, Range.Start, Range.Length, Range.Expression), Mask);
+			}
 			else if (Where is BinaryOperator BinOp)
 			{
 				P1 = await Reduce(Source, Source2, BinOp.LeftOperand, Mask);

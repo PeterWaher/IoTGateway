@@ -531,6 +531,13 @@ objects such as sets, vectors, arrays, matrices, etc.
 **Note 2**: If regular expressions contain named groups, variables with the corresponding names will be set to the contents of the corresponding
 groups if the regular expression matches the string.
 
+#### Range operators
+
+You can combine two of the `<` and `<=`, or `>` and `>=` to create range operators. Examples:
+
+	10 < x <= 20
+	100 >= y >= 0
+
 ### Membership operators
 
 There are various different membership operators. All have the same [order of presedence][].
@@ -639,7 +646,7 @@ Examples:
 
 	[x,y]:=f(a,b,c)
 	v[]:=f(a,b,c)
-	{"name":Str(Required(Name)),"age":Required(Range(Int(Age),0,100)),"profession":Optional(Str(Profession))}:=Obj
+	{"name":Str(Required(Name)),"age":Required(0 <= Int(Age) <= 100)),"profession":Optional(Str(Profession))}:=Obj
 
 In the first example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, 
 the variables `x` and `y` are assigned the elements of this return vector. In the second example, the `v` is supposed to be a assigned

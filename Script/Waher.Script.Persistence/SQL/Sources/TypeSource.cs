@@ -204,7 +204,33 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (Conditions is null)
 				return null;
 
-			if (Conditions is BinaryOperator Bin)
+			if (Conditions is TernaryOperator Tercery)
+			{
+				if (Conditions is Operators.Comparisons.Range Range &&
+					Range.MiddleOperand is VariableReference Ref)
+				{
+					ScriptNode LO = Reduce(Range.LeftOperand, Name);
+					ScriptNode RO = Reduce(Range.RightOperand, Name);
+					string FieldName = Ref.VariableName;
+					object Min = LO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+					object Max = RO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+
+					Filter[] Filters = new Filter[2];
+
+					if (Range.LeftInclusive)
+						Filters[0] = new FilterFieldGreaterOrEqualTo(Ref.VariableName, Min);
+					else
+						Filters[0] = new FilterFieldGreaterThan(Ref.VariableName, Min);
+
+					if (Range.RightInclusive)
+						Filters[1] = new FilterFieldLesserOrEqualTo(Ref.VariableName, Max);
+					else
+						Filters[1] = new FilterFieldLesserThan(Ref.VariableName, Max);
+
+					return new FilterAnd(Filters);
+				}
+			}
+			else if (Conditions is BinaryOperator Bin)
 			{
 				ScriptNode LO = Reduce(Bin.LeftOperand, Name);
 				ScriptNode RO = Reduce(Bin.RightOperand, Name);

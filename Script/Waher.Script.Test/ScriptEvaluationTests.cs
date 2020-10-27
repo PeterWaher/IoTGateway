@@ -13,12 +13,12 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class ScriptEvaluationTests
 	{
-		private double a = 5;
-		private double b = 6;
-		private double c = 7;
-		private bool p = true;
-		private bool q = false;
-		private bool r = true;
+		private readonly double a = 5;
+		private readonly double b = 6;
+		private readonly double c = 7;
+		private readonly bool p = true;
+		private readonly bool q = false;
+		private readonly bool r = true;
 
 		private void Test(string Script, object ExpectedValue)
 		{
@@ -39,20 +39,18 @@ namespace Waher.Script.Test
 			Expression Exp = new Expression(Script);
 			object Result = Exp.Evaluate(v);
 
-			if (Result is BooleanMatrix)
-				Result = ((BooleanMatrix)Result).Values;
-			else if (Result is DoubleMatrix)
-				Result = ((DoubleMatrix)Result).Values;
-			else if (Result is ComplexMatrix)
-				Result = ((ComplexMatrix)Result).Values;
-			else if (Result is ObjectMatrix)
-				Result = ((ObjectMatrix)Result).Values;
+			if (Result is BooleanMatrix BM)
+				Result = BM.Values;
+			else if (Result is DoubleMatrix DM)
+				Result = DM.Values;
+			else if (Result is ComplexMatrix CM)
+				Result = CM.Values;
+			else if (Result is ObjectMatrix OM)
+				Result = OM.Values;
 
-			if (Result is Dictionary<string, IElement> && ExpectedValue is Dictionary<string, IElement>)
+			if (Result is Dictionary<string, IElement> R && 
+				ExpectedValue is Dictionary<string, IElement> E)
 			{
-				Dictionary<string, IElement> R = (Dictionary<string, IElement>)Result;
-				Dictionary<string, IElement> E = (Dictionary<string, IElement>)ExpectedValue;
-
 				AssertEqual(E.Count, R.Count, Script);
 
 				foreach (KeyValuePair<string, IElement> P in E)
@@ -433,6 +431,14 @@ namespace Waher.Script.Test
 			this.Test("a .=== b", false);
 			this.Test("a .<> b", true);
 			this.Test("a .!= b", true);
+			this.Test("a <= b <= c", true);
+			this.Test("a <= b < c", true);
+			this.Test("a < b <= c", true);
+			this.Test("a < b < c", true);
+			this.Test("a >= b >= c", false);
+			this.Test("a > b >= c", false);
+			this.Test("a >= b > c", false);
+			this.Test("a > b > c", false);
 		}
 
 		[TestMethod]
@@ -1155,6 +1161,25 @@ namespace Waher.Script.Test
 			this.Test("v:=1..100;[[x,y]:x in v,(y:=floor(sqrt(x)))^2=x]", new double[,] { { 1, 1 },{ 4, 2 }, { 9, 3 }, { 16, 4 },{ 25, 5 },{ 36, 6 },{ 49, 7 },{ 64, 8 },{ 81, 9 },{ 100, 10 } });
 			this.Test("X:=1..2;Y:=5..7;P:=[[x,y]:x in X, y in Y]", new double[,] { { 1, 5 }, { 2, 5 }, { 1, 6 }, { 2, 6 }, { 1, 7 }, { 2, 7 } });
 			this.Test("M:=Identity(2);[Reverse(Row):Row in M]", new double[,] { { 0, 1 }, { 1, 0 } });
+		}
+
+		[TestMethod]
+		public void Parsing_Test_58_PatternMatching()
+		{
+			this.Test("x>5:=b", 6);
+			this.Test("x>=5:=b", 6);
+			this.Test("7>x:=b", 6);
+			this.Test("7>=x:=b", 6);
+
+			this.Test("x<7:=b", 6);
+			this.Test("x<=7:=b", 6);
+			this.Test("5<x:=b", 6);
+			this.Test("5<=x:=b", 6);
+
+			this.Test("5<x<7:=b", 6);
+			this.Test("5<=x<7:=b", 6);
+			this.Test("5<x<=7:=b", 6);
+			this.Test("5<=x<=7:=b", 6);
 		}
 
 	}

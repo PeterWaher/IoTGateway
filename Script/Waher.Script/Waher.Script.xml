@@ -15515,6 +15515,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.EqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Comparisons.EqualToElementWise">
             <summary>
             Element-Wise Equal To.
@@ -15563,6 +15571,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.GreaterThan.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Comparisons.GreaterThanOrEqualTo">
             <summary>
             Greater Than Or Equal To.
@@ -15586,6 +15602,14 @@
             <param name="Right">Right value.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.GreaterThanOrEqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Comparisons.IdenticalTo">
             <summary>
@@ -15657,6 +15681,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.LesserThan.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Comparisons.LesserThanOrEqualTo">
             <summary>
             Lesser Than Or Equal To.
@@ -15680,6 +15712,14 @@
             <param name="Right">Right value.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.LesserThanOrEqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Comparisons.ExpressionTransform">
             <summary>
@@ -15739,6 +15779,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.NotEqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Comparisons.NotEqualToElementWise">
             <summary>
             Element-Wise Not Equal To.
@@ -15786,6 +15834,49 @@
             <param name="Right">Right value.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
+        </member>
+        <member name="T:Waher.Script.Operators.Comparisons.Range">
+            <summary>
+            Range operator
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Range.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Boolean,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Range operator
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Middle">Middle operand.</param>
+            <param name="Right">Right operand.</param>
+            <param name="LeftInclusive">If the value specified by <paramref name="Left"/> is included in the range.</param>
+            <param name="RightInclusive">If the value specified by <paramref name="Right"/> is included in the range.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Operators.Comparisons.Range.LeftInclusive">
+            <summary>
+            If the value specified by <see cref="!:Left"/> is included in the range.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Operators.Comparisons.Range.RightInclusive">
+            <summary>
+            If the value specified by <see cref="!:Right"/> is included in the range.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Range.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Range.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Conditional.DoWhile">
             <summary>

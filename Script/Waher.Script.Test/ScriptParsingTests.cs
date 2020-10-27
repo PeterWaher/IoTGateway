@@ -158,6 +158,14 @@ namespace Waher.Script.Test
 			this.Test("a .=== b");
 			this.Test("a .<> b");
 			this.Test("a .!= b");
+			this.Test("a <= b <= c");
+			this.Test("a <= b < c");
+			this.Test("a < b <= c");
+			this.Test("a < b < c");
+			this.Test("a >= b >= c");
+			this.Test("a > b >= c");
+			this.Test("a >= b > c");
+			this.Test("a > b > c");
 		}
 
 		[TestMethod]

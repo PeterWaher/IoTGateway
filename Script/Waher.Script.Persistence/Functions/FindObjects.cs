@@ -159,46 +159,65 @@ namespace Waher.Script.Persistence.Functions
 				return new FilterOr(this.Convert(Or2.LeftOperand, Variables), this.Convert(Or2.RightOperand, Variables));
 			else if (Node is Not Not)
 				return new FilterNot(this.Convert(Not.Operand, Variables));
-			else if (Node is EqualTo)
+			else if (Node is EqualTo EQ)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(EQ, Variables, out FieldName, out Value);
 				return new FilterFieldEqualTo(FieldName, Value);
 			}
-			else if (Node is NotEqualTo)
+			else if (Node is NotEqualTo NEQ)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(NEQ, Variables, out FieldName, out Value);
 				return new FilterFieldNotEqualTo(FieldName, Value);
 			}
-			else if (Node is LesserThan)
+			else if (Node is LesserThan LT)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(LT, Variables, out FieldName, out Value);
 				return new FilterFieldLesserThan(FieldName, Value);
 			}
-			else if (Node is GreaterThan)
+			else if (Node is GreaterThan GT)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(GT, Variables, out FieldName, out Value);
 				return new FilterFieldGreaterThan(FieldName, Value);
 			}
-			else if (Node is LesserThanOrEqualTo)
+			else if (Node is LesserThanOrEqualTo LTE)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(LTE, Variables, out FieldName, out Value);
 				return new FilterFieldLesserOrEqualTo(FieldName, Value);
 			}
-			else if (Node is GreaterThanOrEqualTo)
+			else if (Node is GreaterThanOrEqualTo GTE)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
+				this.CheckBinaryOperator(GTE, Variables, out FieldName, out Value);
 				return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+			}
+			else if (Node is Range Range)
+			{
+				this.CheckTernaryOperator(Range, Variables, out FieldName, 
+					out object Min, out object Max);
+
+				Filter[] Filters = new Filter[2];
+
+				if (Range.LeftInclusive)
+					Filters[0] = new FilterFieldGreaterOrEqualTo(FieldName, Min);
+				else
+					Filters[0] = new FilterFieldGreaterThan(FieldName, Min);
+
+				if (Range.RightInclusive)
+					Filters[1] = new FilterFieldLesserOrEqualTo(FieldName, Max);
+				else
+					Filters[1] = new FilterFieldLesserThan(FieldName, Max);
+
+				return new FilterAnd(Filters);
 			}
 			else if (Node is Like)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx= TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx = TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterFieldLikeRegEx(FieldName, RegEx);
 			}
 			else if (Node is NotLike)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx= TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx = TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 			}
 			else
@@ -214,5 +233,14 @@ namespace Waher.Script.Persistence.Functions
 			Value = Operator.RightOperand.Evaluate(Variables).AssociatedObjectValue;
 		}
 
+		private void CheckTernaryOperator(TernaryOperator Operator, Variables Variables, out string FieldName, out object Left, out object Right)
+		{
+			if (!(Operator.MiddleOperand is VariableReference v))
+				throw new ScriptRuntimeException("Middle operands in ternary filter operators need to be a variable references, as they refer to field names.", this);
+
+			FieldName = v.VariableName;
+			Left = Operator.LeftOperand.Evaluate(Variables).AssociatedObjectValue;
+			Right = Operator.RightOperand.Evaluate(Variables).AssociatedObjectValue;
+		}
 	}
 }

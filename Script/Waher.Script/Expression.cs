@@ -28,6 +28,7 @@ using Waher.Script.Operators.Vectors;
 using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
+using System.Linq.Expressions;
 
 namespace Waher.Script
 {
@@ -1579,7 +1580,12 @@ namespace Waher.Script
 							else
 							{
 								Right = this.AssertRightOperandNotNull(this.ParseShifts());
-								Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+								if (Left is LesserThan LT)
+									Left = new Range(LT.LeftOperand, LT.RightOperand, Right, false, true, LT.Start, Right.Start + Right.Length - LT.Start, this);
+								else if (Left is LesserThanOrEqualTo LTE)
+									Left = new Range(LTE.LeftOperand, LTE.RightOperand, Right, true, true, LTE.Start, Right.Start + Right.Length - LTE.Start, this);
+								else
+									Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
 							}
 						}
 						else if (ch == '>')
@@ -1611,7 +1617,12 @@ namespace Waher.Script
 						else
 						{
 							Right = this.AssertRightOperandNotNull(this.ParseShifts());
-							Left = new LesserThan(Left, Right, Start, this.pos - Start, this);
+							if (Left is LesserThan LT)
+								Left = new Range(LT.LeftOperand, LT.RightOperand, Right, false, false, LT.Start, Right.Start + Right.Length - LT.Start, this);
+							else if (Left is LesserThanOrEqualTo LTE)
+								Left = new Range(LTE.LeftOperand, LTE.RightOperand, Right, true, false, LTE.Start, Right.Start + Right.Length - LTE.Start, this);
+							else
+								Left = new LesserThan(Left, Right, Start, this.pos - Start, this);
 						}
 						break;
 
@@ -1621,7 +1632,12 @@ namespace Waher.Script
 						{
 							this.pos++;
 							Right = this.AssertRightOperandNotNull(this.ParseShifts());
-							Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+							if (Left is GreaterThan GT)
+								Left = new Range(Right, GT.RightOperand, GT.LeftOperand, true, false, GT.Start, Right.Start + Right.Length - GT.Start, this);
+							else if (Left is GreaterThanOrEqualTo GTE)
+								Left = new Range(Right, GTE.RightOperand, GTE.LeftOperand, true, true, GTE.Start, Right.Start + Right.Length - GTE.Start, this);
+							else
+								Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
 						}
 						else if (ch == '>')
 						{
@@ -1631,7 +1647,12 @@ namespace Waher.Script
 						else
 						{
 							Right = this.AssertRightOperandNotNull(this.ParseShifts());
-							Left = new GreaterThan(Left, Right, Start, this.pos - Start, this);
+							if (Left is GreaterThan GT)
+								Left = new Range(Right, GT.RightOperand, GT.LeftOperand, false, false, GT.Start, Right.Start + Right.Length - GT.Start, this);
+							else if (Left is GreaterThanOrEqualTo GTE)
+								Left = new Range(Right, GTE.RightOperand, GTE.LeftOperand, false, true, GTE.Start, Right.Start + Right.Length - GTE.Start, this);
+							else
+								Left = new GreaterThan(Left, Right, Start, this.pos - Start, this);
 						}
 						break;
 
@@ -1679,13 +1700,27 @@ namespace Waher.Script
 					case '≤':
 						this.pos++;
 						Right = this.AssertRightOperandNotNull(this.ParseShifts());
-						Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+						{
+							if (Left is LesserThan LT)
+								Left = new Range(LT.LeftOperand, LT.RightOperand, Right, false, true, LT.Start, Right.Start + Right.Length - LT.Start, this);
+							else if (Left is LesserThanOrEqualTo LTE)
+								Left = new Range(LTE.LeftOperand, LTE.RightOperand, Right, true, true, LTE.Start, Right.Start + Right.Length - LTE.Start, this);
+							else
+								Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+						}
 						break;
 
 					case '≥':
 						this.pos++;
 						Right = this.AssertRightOperandNotNull(this.ParseShifts());
-						Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+						{
+							if (Left is GreaterThan GT)
+								Left = new Range(Right, GT.RightOperand, GT.LeftOperand, true, false, GT.Start, Right.Start + Right.Length - GT.Start, this);
+							else if (Left is GreaterThanOrEqualTo GTE)
+								Left = new Range(Right, GTE.RightOperand, GTE.LeftOperand, true, true, GTE.Start, Right.Start + Right.Length - GTE.Start, this);
+							else
+								Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start, this);
+						}
 						break;
 
 					case '!':

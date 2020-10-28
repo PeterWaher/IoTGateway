@@ -43,5 +43,27 @@ namespace Waher.Script.Operators.Comparisons
             else
                 return BooleanValue.True;
         }
+
+        /// <summary>
+        /// Performs a pattern match operation.
+        /// </summary>
+        /// <param name="CheckAgainst">Value to check against.</param>
+        /// <param name="AlreadyFound">Variables already identified.</param>
+        /// <returns>Pattern match result</returns>
+        public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+        {
+            switch (base.PatternMatch(CheckAgainst, AlreadyFound))
+            {
+                case PatternMatchResult.Match:
+                    return PatternMatchResult.NoMatch;
+
+                case PatternMatchResult.NoMatch: 
+                    return PatternMatchResult.Match;
+
+                case PatternMatchResult.Unknown: 
+                default:
+                    return PatternMatchResult.Unknown;
+            }
+        }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -63,35 +62,7 @@ namespace Waher.Script.Operators.Comparisons
 			if (!(h is null))
 				sr = h(sr);
 
-			lock (this.synchObject)
-            {
-                if (this.lastExpression is null || sr != this.lastExpression)
-                {
-                    this.lastExpression = sr;
-                    this.regex = new Regex(sr, RegexOptions.Singleline);
-
-                    List<string> Names = null;
-
-					foreach (string s in this.regex.GetGroupNames())
-					{
-						if (!int.TryParse(s, out int i))
-						{
-							if (Names is null)
-								Names = new List<string>();
-
-							Names.Add(s);
-						}
-					}
-
-					if (Names is null)
-                        this.groupNames = null;
-                    else
-                        this.groupNames = Names.ToArray();
-                }
-
-                M = this.regex.Match(sl);
-                GroupNames = this.groupNames;
-            }
+            M = this.Matches(sl, sr, out GroupNames);
 
             if (M.Success)
             {
@@ -119,10 +90,108 @@ namespace Waher.Script.Operators.Comparisons
             return BooleanValue.False;
         }
 
+        /// <summary>
+        /// Checks a value against a regular expression.
+        /// </summary>
+        /// <param name="Value">Value</param>
+        /// <param name="Expression">Regular expression</param>
+        /// <param name="GroupNames">Group name values resulting from the matching.</param>
+        /// <returns>If there was a match or not.</returns>
+        protected Match Matches(string Value, string Expression, out string[] GroupNames)
+        {
+            lock (this.synchObject)
+            {
+                if (this.lastExpression is null || Expression != this.lastExpression)
+                {
+                    this.lastExpression = Expression;
+                    this.regex = new Regex(Expression, RegexOptions.Singleline);
+
+                    List<string> Names = null;
+
+                    foreach (string s in this.regex.GetGroupNames())
+                    {
+                        if (!int.TryParse(s, out int i))
+                        {
+                            if (Names is null)
+                                Names = new List<string>();
+
+                            Names.Add(s);
+                        }
+                    }
+
+                    if (Names is null)
+                        this.groupNames = null;
+                    else
+                        this.groupNames = Names.ToArray();
+                }
+
+                GroupNames = this.groupNames;
+             
+                return this.regex.Match(Value);
+            }
+        }
+
         private Regex regex = null;
         private string[] groupNames = null;
         private string lastExpression = null;
         private readonly object synchObject = new object();
+
+        /// <summary>
+        /// Performs a pattern match operation.
+        /// </summary>
+        /// <param name="CheckAgainst">Value to check against.</param>
+        /// <param name="AlreadyFound">Variables already identified.</param>
+        /// <returns>Pattern match result</returns>
+        public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+        {
+            if (!(CheckAgainst is StringValue SL))
+                return PatternMatchResult.NoMatch;
+
+            if (this.right is ConstantElement RightConstant &&
+                RightConstant.Constant is StringValue SR)
+            {
+                string sr = SR.Value;
+
+                ExpressionTransform h = this.TransformExpression;
+                if (!(h is null))
+                    sr = h(sr);
+
+                Match M = this.Matches(SL.Value, sr, out string[] GroupNames);
+
+                if (M.Success)
+                {
+                    if (!(GroupNames is null))
+                    {
+                        foreach (string GroupName in GroupNames)
+                        {
+                            Group G = M.Groups[GroupName];
+                            if (G.Success)
+                            {
+                                string Value = G.Value;
+                                object ObjValue;
+
+                                if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+                                    ObjValue = d;
+                                else
+                                    ObjValue = Value;
+
+                                if (AlreadyFound.TryGetValue(GroupName, out IElement E) &&
+                                    !E.AssociatedObjectValue.Equals(ObjValue))
+								{
+                                    return PatternMatchResult.NoMatch;
+								}
+
+                                AlreadyFound[GroupName] = Expression.Encapsulate(ObjValue);
+                            }
+                        }
+                    }
+
+                    return this.left.PatternMatch(CheckAgainst, AlreadyFound);
+                }
+            }
+
+            return PatternMatchResult.NoMatch;
+        }
 
     }
 }

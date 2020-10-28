@@ -504,26 +504,26 @@ There are two shift operators, apart from the assignment versions. Both have the
 
 There are various different comparison operators. All have the same [order of presedence][].
 
-| Operator   | Description                       | Example            |
-|:----------:|:----------------------------------|:------------------:|
-| `<=`       | Lesser than or equal to           | `a <= b`           |
-| `<`        | Lesser than                       | `a < b`            |
-| `>=`       | Greater than or equal to          | `a >= b`           |
-| `>`        | Greater than                      | `a > b`            |
-| `=`        | Equal to                          | `a = b`            |
-| `==`       | Equal to                          | `a == b`           |
-| `===`      | Identical to                      | `a === b`          |
-| `<>`       | Not Equal to                      | `a <> b`           |
-| `!=`       | Not Equal to                      | `a != b`           |
-| `LIKE`     | Matches regular expression        | `a LIKE regex`     |
-| `NOT LIKE` | Does not match regular expression | `a NOT LIKE regex` |
-| `NOTLIKE`  | Does not match regular expression | `a NOTLIKE regex`  |
-| `UNLIKE`   | Does not match regular expression | `a UNLIKE regex`   |
-| `.=`       | Equal to (element-wise)           | `a .= b`           |
-| `.==`      | Equal to (element-wise)           | `a .== b`          |
-| `.===`     | Identical to (element-wise)       | `a .=== b`         |
-| `.<>`      | Not Equal to (element-wise)       | `a .<> b`          |
-| `.!=`      | Not Equal to (element-wise)       | `a .!= b`          |
+| Operator   | Description                       | In Pattern Matching  | Example            |
+|:----------:|:----------------------------------|:---------------------|:------------------:|
+| `<=`       | Lesser than or equal to           | Asserts valid range. | `a <= b`           |
+| `<`        | Lesser than                       | Asserts valid range. | `a < b`            |
+| `>=`       | Greater than or equal to          | Asserts valid range. | `a >= b`           |
+| `>`        | Greater than                      | Asserts valid range. | `a > b`            |
+| `=`        | Equal to                          | Asserts valid range. | `a = b`            |
+| `==`       | Equal to                          | Asserts valid range. | `a == b`           |
+| `===`      | Identical to                      |                      | `a === b`          |
+| `<>`       | Not Equal to                      | Asserts valid range. | `a <> b`           |
+| `!=`       | Not Equal to                      | Asserts valid range. | `a != b`           |
+| `LIKE`     | Matches regular expression        | Asserts valid range. | `a LIKE regex`     |
+| `NOT LIKE` | Does not match regular expression | Asserts valid range. | `a NOT LIKE regex` |
+| `NOTLIKE`  | Does not match regular expression | Asserts valid range. | `a NOTLIKE regex`  |
+| `UNLIKE`   | Does not match regular expression | Asserts valid range. | `a UNLIKE regex`   |
+| `.=`       | Equal to (element-wise)           |                      | `a .= b`           |
+| `.==`      | Equal to (element-wise)           |                      | `a .== b`          |
+| `.===`     | Identical to (element-wise)       |                      | `a .=== b`         |
+| `.<>`      | Not Equal to (element-wise)       |                      | `a .<> b`          |
+| `.!=`      | Not Equal to (element-wise)       |                      | `a .!= b`          |
 
 **Note**: Element-wise variant of operators only exist for equality or non-equality operators, since these are also defined when comparing encapsulating
 objects such as sets, vectors, arrays, matrices, etc.
@@ -537,6 +537,7 @@ You can combine two of the `<` and `<=`, or `>` and `>=` to create range operato
 
 	10 < x <= 20
 	100 >= y >= 0
+	{"name":Str(Required(Name)),"age":Required(0 <= Int(Age) <= 100)),"profession":Optional(Str(Profession))}:=Obj
 
 ### Membership operators
 
@@ -646,6 +647,7 @@ Examples:
 
 	[x,y]:=f(a,b,c)
 	v[]:=f(a,b,c)
+	[[a11,a12],[a21,a22]]:=Identity(2)
 	{"name":Str(Required(Name)),"age":Required(0 <= Int(Age) <= 100)),"profession":Optional(Str(Profession))}:=Obj
 
 In the first example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, 
@@ -855,26 +857,26 @@ A corresponding set of hyperbolic functions also exists:
 
 The following table lists available scalar functions:
 
-| Function     | Description                               | Example           |
-|--------------|-------------------------------------------|-------------------|
-| `Abs(z)`     | Absolute value (or magnitude of) `z`      | `Abs(-1)`         |
-| `Bool(x)`    | Alias for `Boolean`.                      | `Bool('true')`    |
-| `Boolean(x)` | Converts `x` to a boolean value.          | `Boolean('true')` |
-| `Ceiling(z)` | Round `z` up to closest integer.          | `Ceiling(pi)`     |
-| `Ceil(z)`    | Alias for `Ceiling(z)`.                   | `Ceil(-1)`        |
-| `Dbl(x)`     | Alias for `Double(x)`                     | `Dbl("3.14")`     |
-| `Double(x)`  | Converts `x` to a double value.           | `Double(pi)`      |
-| `Floor(z)`   | Round `z` down to closest integer.        | `Floor(pi)`       |
-| `Int(x)`     | Alias for `Integer(x)`                    | `Int(pi)`         |
-| `Integer(x)` | Round `x` down to closest integer.        | `Integer(pi)`     |
-| `Max(x,y)`   | Largest of `x` and `y`.                   | `Max(10,a)`       |
-| `Min(x,y)`   | Smallest of `x` and `y`.                  | `Min(10,a)`       |
-| `Num(x)`     | Alias for `Number(x)`.                    | `Num('100')`      |
-| `Number(x)`  | Converts `x` to a number.                 | `Number('100')`   |
-| `Round(z)`   | Round `z` up or down to closest integer.  | `Round(pi)`       |
-| `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | `Sign(pi)`        |
-| `Str(x)`     | Alias for `String(x)`.                    | `Str(100)`        |
-| `String(x)`  | Converts `x` to a string.                 | String(100)`      |
+| Function     | Description                               | In Pattern Matching                                     | Example           |
+|--------------|-------------------------------------------|---------------------------------------------------------|-------------------|
+| `Abs(z)`     | Absolute value (or magnitude of) `z`      | Asserts `z` is non-negative.                            | `Abs(-1)`                |
+| `Bool(x)`    | Alias for `Boolean`.                      | Asserts `z` is a Boolean.                               | `Bool('true')`    |
+| `Boolean(x)` | Converts `x` to a boolean value.          | Asserts `z` is a Boolean.                               | `Boolean('true')` |
+| `Ceiling(z)` | Round `z` up to closest integer.          | Asserts `z` is an Integer.                              | `Ceiling(pi)`     |
+| `Ceil(z)`    | Alias for `Ceiling(z)`.                   | Asserts `z` is an Integer.                              | `Ceil(-1)`        |
+| `Dbl(x)`     | Alias for `Double(x)`                     | Asserts `z` is a double.precision floating-point value. | `Dbl("3.14")`     |
+| `Double(x)`  | Converts `x` to a double value.           | Asserts `z` is a double.precision floating-point value. | `Double(pi)`      |
+| `Floor(z)`   | Round `z` down to closest integer.        | Asserts `z` is an Integer.                              | `Floor(pi)`       |
+| `Int(x)`     | Alias for `Integer(x)`                    | Asserts `z` is an Integer.                              | `Int(pi)`         |
+| `Integer(x)` | Round `x` down to closest integer.        | Asserts `z` is an Integer.                              | `Integer(pi)`     |
+| `Max(x,y)`   | Largest of `x` and `y`.                   |                                                         | `Max(10,a)`       |
+| `Min(x,y)`   | Smallest of `x` and `y`.                  |                                                         | `Min(10,a)`       |
+| `Num(x)`     | Alias for `Number(x)`.                    | Asserts `z` is a number.                                | `Num('100')`      |
+| `Number(x)`  | Converts `x` to a number.                 | Asserts `z` is a number.                                | `Number('100')`   |
+| `Round(z)`   | Round `z` up or down to closest integer.  | Asserts `z` is an Integer.                              | `Round(pi)`       |
+| `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | Asserts `z` is -1, 0 or 1.                              | `Sign(pi)`        |
+| `Str(x)`     | Alias for `String(x)`.                    | Asserts `z` is a string.                                | `Str(100)`        |
+| `String(x)`  | Converts `x` to a string.                 | Asserts `z` is a string.                                | String(100)`      |
 
 ### Complex Functions
 
@@ -992,24 +994,24 @@ The following functions generate transformation matrices:
 
 The following functions are useful to control the runtime execution of the script:
 
-| Function                 | Description | Example |
-|--------------------------|-------------|---------|
-| `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments. | `Create(System.String,'-',80)` |
-| `Delete(x)`              | Alias for `Destroy(x)`. | `Delete(x)` |
-| `Destroy(x)`             | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
-| `Error(Msg)`             | Throws an error/exception. | `Error('Something went wrong.')` |
-| `Exception(Msg)`         | Alias for `Error(Msg)`. | `Exception('Something went wrong.')` |
-| `Exists(f)`              | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
-| `Fields(x)`              | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values. | `Properties(Ans)` |
-| `Methods(x)`             | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. | `Methods(Ans)` |
-| `Optional(f)`            | Declares `f` as optional. Useful in pattern matching. | `Optional(x)` |
-| `Print(Msg)`             | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
-| `PrintLine(Msg)`         | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
-| `PrintLn(Msg)`           | Alias for `PrintLine(Msg)`. | `PrintLine(x)` |
-| `Properties(x)`          | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values. | `Properties(Ans)` |
-| `Remove(Var)`            | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
-| `Required(f)`            | Makes sure `f` is defined. If not, an exception is thrown. Can be used in pattern matching. | `Required(x)` |
-| `Return(x)`              | Returns from the current function scope with the value `x`. | `return(Result)` |
+| Function                 | Description                                                                                                                                                                                                                                | In Pattern Matching                                    | Example |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|---------|
+| `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments.                                                    |                                                        | `Create(System.String,'-',80)` |
+| `Delete(x)`              | Alias for `Destroy(x)`.                                                                                                                                                                                                                    |                                                        | `Delete(x)` |
+| `Destroy(x)`             | Destroys the value `x`. If the function references a variable, the variable is also removed.                                                                                                                                               |                                                        | `Destroy(x)` |
+| `Error(Msg)`             | Throws an error/exception.                                                                                                                                                                                                                 |                                                        | `Error('Something went wrong.')` |
+| `Exception(Msg)`         | Alias for `Error(Msg)`.                                                                                                                                                                                                                    |                                                        | `Exception('Something went wrong.')` |
+| `Exists(f)`              | Checks if the expression defined by `f` is valid or not.                                                                                                                                                                                   |                                                        | `Exists(x)` |
+| `Fields(x)`              | If `x` is a type, `Fields(x)` returns a vector of field names. If `x` is not a type, `Fields(x)` returns a matrix containing field names and values.                                                                                       |                                                        | `Properties(Ans)` |
+| `Methods(x)`             | If `x` is a type, `Methods(x)` returns a vector of methods represented as strings. If `x` is not a type, `Methods(x)` returns a matrix containing method names and lambda functions that can be used to execute the corresponding methods. |                                                        | `Methods(Ans)` |
+| `Optional(f)`            | Declares `f` as optional. Useful in pattern matching.                                                                                                                                                                                      | Any variables in `f` are assigned null if not defined. | `Optional(x)` |
+| `Print(Msg)`             | Prints a message to the current console output (which is defined in the variables collection).                                                                                                                                             |                                                        | `Print(x)` |
+| `PrintLine(Msg)`         | Prints a message followed by a newline to the current console output.                                                                                                                                                                      |                                                        | `PrintLine(x)` |
+| `PrintLn(Msg)`           | Alias for `PrintLine(Msg)`.                                                                                                                                                                                                                |                                                        | `PrintLine(x)` |
+| `Properties(x)`          | If `x` is a type, `Properties(x)` returns a vector of property names. If `x` is not a type, `Properties(x)` returns a matrix containing property names and values.                                                                         |                                                        | `Properties(Ans)` |
+| `Remove(Var)`            | Removes the varable `Var` without destroying its contents.                                                                                                                                                                                 |                                                        | `Remove(x)` |
+| `Required(f)`            | Makes sure `f` is defined. If not, an exception is thrown. Can be used in pattern matching.                                                                                                                                                | Asserts `f` is defined (and not null).                 | `Required(x)` |
+| `Return(x)`              | Returns from the current function scope with the value `x`.                                                                                                                                                                                |                                                        | `return(Result)` |
 
 ### Logging Functions
 

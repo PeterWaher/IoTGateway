@@ -15757,6 +15757,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Like.Matches(System.String,System.String,System.String[]@)">
+            <summary>
+            Checks a value against a regular expression.
+            </summary>
+            <param name="Value">Value</param>
+            <param name="Expression">Regular expression</param>
+            <param name="GroupNames">Group name values resulting from the matching.</param>
+            <returns>If there was a match or not.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Like.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Comparisons.NotEqualTo">
             <summary>
             Not Equal To.
@@ -15834,6 +15851,14 @@
             <param name="Right">Right value.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.NotLike.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
+            <summary>
+            Performs a pattern match operation.
+            </summary>
+            <param name="CheckAgainst">Value to check against.</param>
+            <param name="AlreadyFound">Variables already identified.</param>
+            <returns>Pattern match result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Comparisons.Range">
             <summary>

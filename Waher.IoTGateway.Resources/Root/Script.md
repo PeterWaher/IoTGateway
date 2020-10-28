@@ -2078,19 +2078,7 @@ optional fields to XML using pattern matching:
 
 The resulting XML would look like:
 
-{Req:={
-	"name":"Kalle",
-	"age":50,
-	"profession":"Bus Driver"
-};
-{
-	"name":Str(Name),
-	"age":0<=Int(Age)<=100,
-	"profession":Str(Profession),
-	"remarks":Optional(Str(Remarks))
-}:=Req;
-<Claim name=Name age=Age profession=Profession remarks=Remarks xmlns="https://example.org/Test"/>}
-
+	<Claim name="Kalle" age="50" profession="Bus Driver" xmlns="https://example.org/Test"/>
 
 =========================================================================================================================================================
 

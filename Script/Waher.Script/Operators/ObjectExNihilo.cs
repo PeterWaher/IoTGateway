@@ -164,12 +164,9 @@ namespace Waher.Script.Operators
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is ObjectValue Obj) ||
-				!(Obj.AssociatedObjectValue is Dictionary<string, IElement> Object))
-			{
+			if (!(CheckAgainst is ObjectValue Obj))
 				return PatternMatchResult.NoMatch;
-			}
-
+			
 			if (this.quick is null)
 			{
 				Dictionary<string, ScriptNode> Quick = new Dictionary<string, ScriptNode>();
@@ -180,23 +177,45 @@ namespace Waher.Script.Operators
 				this.quick = Quick;
 			}
 
-			foreach (KeyValuePair<string, IElement> P in Object)
-			{
-				if (!(this.quick.ContainsKey(P.Key)))
-					return PatternMatchResult.NoMatch;
-			}
-
 			PatternMatchResult Result;
 
-			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+			if (Obj.AssociatedObjectValue is Dictionary<string, IElement> Object)
 			{
-				if (Object.TryGetValue(P.Key, out IElement E))
-					Result = P.Value.PatternMatch(E, AlreadyFound);
-				else
-					Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
+				foreach (KeyValuePair<string, IElement> P in Object)
+				{
+					if (!(this.quick.ContainsKey(P.Key)))
+						return PatternMatchResult.NoMatch;
+				}
 
-				if (Result != PatternMatchResult.Match)
-					return Result;
+				foreach (KeyValuePair<string, ScriptNode> P in this.members)
+				{
+					if (Object.TryGetValue(P.Key, out IElement E))
+						Result = P.Value.PatternMatch(E, AlreadyFound);
+					else
+						Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
+
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
+			}
+			else if (Obj.AssociatedObjectValue is Dictionary<string, object> Object2)
+			{
+				foreach (KeyValuePair<string, object> P in Object2)
+				{
+					if (!(this.quick.ContainsKey(P.Key)))
+						return PatternMatchResult.NoMatch;
+				}
+
+				foreach (KeyValuePair<string, ScriptNode> P in this.members)
+				{
+					if (Object2.TryGetValue(P.Key, out object E))
+						Result = P.Value.PatternMatch(Expression.Encapsulate(E), AlreadyFound);
+					else
+						Result = P.Value.PatternMatch(ObjectValue.Null, AlreadyFound);
+
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
 			}
 
 			return PatternMatchResult.Match;

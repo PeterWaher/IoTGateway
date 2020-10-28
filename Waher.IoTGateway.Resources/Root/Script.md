@@ -2059,6 +2059,39 @@ use operators with a lower priority than for powers, you need to use the parenth
 		<b value=(2+x)/>
 	</a>
 
+Script-based attributes are not output to the final XML, if the script returns `null`.
+This makes it easy to define optional attributes. Example, here converting JSON with
+optional fields to XML using pattern matching:
+
+	Req:={
+		"name":"Kalle",
+		"age":50,
+		"profession":"Bus Driver"
+	};
+	{
+		"name":Str(Name),
+		"age":0<=Int(Age)<=100,
+		"profession":Str(Profession),
+		"remarks":Optional(Str(Remarks))
+	}:=Req;
+	<Claim name=Name age=Age profession=Profession remarks=Remarks xmlns="https://example.org/Test"/>
+
+The resulting XML would look like:
+
+{Req:={
+	"name":"Kalle",
+	"age":50,
+	"profession":"Bus Driver"
+};
+{
+	"name":Str(Name),
+	"age":0<=Int(Age)<=100,
+	"profession":Str(Profession),
+	"remarks":Optional(Str(Remarks))
+}:=Req;
+<Claim name=Name age=Age profession=Profession remarks=Remarks xmlns="https://example.org/Test"/>}
+
+
 =========================================================================================================================================================
 
 Interaction with .NET Code Behind classes

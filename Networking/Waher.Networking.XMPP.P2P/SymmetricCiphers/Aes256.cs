@@ -194,6 +194,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 				await Crypto.CryptoTransform(Aes, Data, Decrypted);
 
+				Decrypted.Position = 0;
 				return await base.Decrypt(Decrypted, Key, IV, AssociatedData);
 			}
 			finally

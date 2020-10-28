@@ -35,6 +35,9 @@ namespace Waher.Security
 				throw new ArgumentException("Invalid buffer size.", nameof(BufferSize));
 
 			long l = Source.Length;
+
+			BufferSize = (int)Math.Min(l, BufferSize);
+
 			byte[] Input = new byte[BufferSize];
 			byte[] Output = new byte[BufferSize];
 			int j;

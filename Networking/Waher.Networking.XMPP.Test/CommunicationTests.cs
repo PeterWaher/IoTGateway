@@ -68,12 +68,13 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            this.PrepareClient1(this.client1);
-
             this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
             this.client1.OnConnectionError += Client_OnConnectionError1;
 			this.client1.OnError += Client_OnError1;
 			this.client1.OnStateChanged += Client_OnStateChanged1;
+
+			this.PrepareClient1(this.client1);
+
 			this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
@@ -87,12 +88,13 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            this.PrepareClient2(this.client2);
-
             //this.client2.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
             this.client2.OnConnectionError += Client_OnConnectionError2;
 			this.client2.OnError += Client_OnError2;
 			this.client2.OnStateChanged += Client_OnStateChanged2;
+			
+            this.PrepareClient2(this.client2);
+			
 			this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
 			this.client2.Connect();
 

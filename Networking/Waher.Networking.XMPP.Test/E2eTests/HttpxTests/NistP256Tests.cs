@@ -2,14 +2,14 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.P2P.E2E;
 
-namespace Waher.Networking.XMPP.Test.E2eTests
+namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
     [TestClass]
-    public class NistP224Tests : XmppE2eTests 
+    public class NistP256Tests : XmppHttpxTests
     {
         public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
         {
-            return new NistP224Endpoint(Cipher);
+            return new NistP256Endpoint(Cipher);
         }
 
     }

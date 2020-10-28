@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							sb.Append(SymmetricCipher.LocalName);
 
-							Request.Content.Headers.Add("Referer", sb.ToString());
+							Request.Headers.Add("Referer", sb.ToString());
 
 							File.Dispose();
 							File = Encrypted;

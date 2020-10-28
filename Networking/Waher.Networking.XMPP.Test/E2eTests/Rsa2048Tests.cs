@@ -1,13 +1,6 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
 {

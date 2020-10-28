@@ -522,7 +522,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                 }
 
                 await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
-                i = Encrypted.Length;
+                i = TempEncrypted.Length;
 
                 if (i > uint.MaxValue)
                     throw new NotSupportedException("Too large.");

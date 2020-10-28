@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Networking.HTTP;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
-using Waher.Networking.XMPP.StreamErrors;
 using Waher.Runtime.Cache;
 
-namespace Waher.Networking.XMPP.Test
+namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
 	[TestClass]
-	public class XmppHttpxTests : CommunicationTests
+	public abstract class XmppHttpxTests : E2eTests
 	{
 		private HttpServer webServer;
 		private HttpxClient httpxClient1;
@@ -46,13 +46,16 @@ namespace Waher.Networking.XMPP.Test
 		public override void PrepareClient1(XmppClient Client)
 		{
 			base.PrepareClient1(Client);
-			this.httpxClient1 = new HttpxClient(Client, 8192);
+			this.httpxClient1 = new HttpxClient(Client, this.endpointSecurity1, 8192);
+
+			foreach (ISniffer Sniffer in Client.Sniffers)
+				this.webServer.Add(Sniffer);
 		}
 
 		public override void PrepareClient2(XmppClient Client)
 		{
 			base.PrepareClient2(Client);
-			this.httpxClient2 = new HttpxClient(Client, 8192);
+			this.httpxClient2 = new HttpxClient(Client, this.endpointSecurity2, 8192);
 			this.httpxServer = new HttpxServer(Client, this.webServer, 8192);
 		}
 
@@ -73,6 +76,11 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void HTTPX_Test_01_GET()
 		{
+			this.DoGet(1);
+		}
+
+		private void DoGet(int Nr)
+		{ 
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done2 = new ManualResetEvent(false);
@@ -83,7 +91,7 @@ namespace Waher.Networking.XMPP.Test
 			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
 				(sender, e) =>
 				{
-					if (e.Ok && e.HasData && e.State.Equals(1))
+					if (e.Ok && e.HasData && e.State.Equals(Nr))
 					{
 						ms = new MemoryStream();
 
@@ -106,70 +114,28 @@ namespace Waher.Networking.XMPP.Test
 					{
 						object Decoded = InternetContent.Decode(ContentType, ms.ToArray(), null);
 
-						if (Decoded is string s && s == "World" && e.State.Equals(1))
+						if (Decoded is string s && s == "World" && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
 					}
 
 					return Task.CompletedTask;
-				}, 1);
+				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 120000), "Data not returned.");
 		}
 
 		[TestMethod]
 		public void HTTPX_Test_02_GET_PostBack()
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
 			PostBack PostBack = new PostBack();
-			MemoryStream ms = null;
-			string ContentType = null;
 
 			this.webServer.Register(PostBack);
 			this.httpxClient1.PostResource = PostBack;
 
-			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
-				(sender, e) =>
-				{
-					if (e.Ok && e.HasData && e.State.Equals(2))
-					{
-						ms = new MemoryStream();
-
-						if (!(e.Data is null))
-							ms.Write(e.Data, 0, e.Data.Length);
-
-						ContentType = e.HttpResponse.ContentType;
-						Done1.Set();
-					}
-					else
-						Error1.Set();
-
-					return Task.CompletedTask;
-				},
-				(sender, e) =>
-				{
-					ms?.Write(e.Data, 0, e.Data.Length);
-
-					if (e.Last)
-					{
-						object Decoded = InternetContent.Decode(ContentType, ms.ToArray(), null);
-
-						if (Decoded is string s && s == "World" && e.State.Equals(2))
-							Done2.Set();
-						else
-							Error2.Set();
-					}
-
-					return Task.CompletedTask;
-				}, 2);
-
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000), "Data not returned.");
+			this.DoGet(2);
 		}
 
 		private class PostBack : HttpSynchronousResource, IPostResource, IHttpPostMethod

@@ -345,7 +345,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.disposed)
 					return;
 
-				await this.synchObj.TryBeginWrite(60000);
+				if (!await this.synchObj.TryBeginWrite(60000))
+					throw new IOException("Unable to get access to HTTPX client.");
 				try
 				{
 					this.from = From;
@@ -373,15 +374,14 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.disposed)
 					return;
 
-				await this.synchObj.TryBeginWrite(60000);
+				if (!await this.synchObj.TryBeginWrite(60000))
+					throw new IOException("Unable to get access to HTTPX client.");
 				try
 				{
-					if (this.data is null)
-					{
-						this.sha256 = Sha256;
-						this.e2e = E2e;
-					}
-					else
+					this.sha256 = Sha256;
+					this.e2e = E2e;
+
+					if (!(this.data is null))
 						await this.CheckData(Sender, this.data);
 				}
 				finally
@@ -427,6 +427,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.disposeData = true;
 					}
 
+					Data.Position = 0;
 					byte[] Digest = Hashes.ComputeSHA256Hash(Data);
 					string DigestBase64 = Convert.ToBase64String(Digest);
 
@@ -460,13 +461,16 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					Count -= BufSize;
 
-					try
+					if (!(this.DataCallback is null))
 					{
-						this.DataCallback?.Invoke(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
+						try
+						{
+							await this.DataCallback(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
 				}
 			}

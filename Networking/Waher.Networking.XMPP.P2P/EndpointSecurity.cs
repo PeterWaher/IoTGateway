@@ -818,7 +818,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If a symmetric cipher was found with the given name.</returns>
 		public virtual bool TryGetSymmetricCipher(string LocalName, string Namespace, out IE2eSymmetricCipher Cipher)
 		{
-			if (Namespace == IoTHarmonizationE2E)
+			if (string.IsNullOrEmpty(Namespace) || Namespace == IoTHarmonizationE2E)
 			{
 				switch (LocalName)
 				{

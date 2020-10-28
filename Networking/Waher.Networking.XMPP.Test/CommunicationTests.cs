@@ -247,11 +247,8 @@ namespace Waher.Networking.XMPP.Test
 
 		public virtual void DisposeClients()
 		{
-			if (this.client1 != null)
-				this.client1.Dispose();
-
-			if (this.client2 != null)
-				this.client2.Dispose();
+			this.client1?.Dispose();
+			this.client2?.Dispose();
 
 			if (this.ex1 != null)
 				throw new TargetInvocationException(this.ex1);

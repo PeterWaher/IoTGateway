@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj" />

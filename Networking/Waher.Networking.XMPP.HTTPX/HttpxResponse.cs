@@ -203,11 +203,14 @@ namespace Waher.Networking.XMPP.HTTPX
 					if (!string.IsNullOrEmpty(this.postResource))
 					{
 						this.tempFile.Position = 0;
+
 						byte[] Digest = Hashes.ComputeSHA256Hash(this.tempFile);
+						TemporaryStream Data = this.tempFile;
+
 						Resp.Append(Convert.ToBase64String(Digest));
 						Resp.Append("</sha256></data>");
 
-						Task.Run(() => SendPost(this.to, this.tempFile, this.postResource, this.client, this.e2e));
+						Task.Run(() => SendPost(this.to, Data, this.postResource, this.client, this.e2e));
 
 						this.tempFile = null;
 					}
@@ -290,10 +293,10 @@ namespace Waher.Networking.XMPP.HTTPX
 							File.Position = 0;
 						}
 
-						Request.Content.Headers.ContentType = new MediaTypeHeaderValue("binary");
-						Request.Content.Headers.Add("From", Client.FullJID);
-						Request.Content.Headers.Add("Origin", To);
 						Request.Content = new StreamContent(File);
+						Request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+						Request.Content.Headers.Add("Origin", To);
+						Request.Headers.Add("From", Client.FullJID);
 
 						HttpResponseMessage Response2 = await HttpClient.SendAsync(Request);
 						Response2.EnsureSuccessStatusCode();

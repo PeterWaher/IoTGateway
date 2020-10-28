@@ -2586,6 +2586,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -5222,6 +5223,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -7894,6 +7896,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -10539,6 +10542,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -13220,6 +13224,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -15865,6 +15870,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }
@@ -18546,6 +18552,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
+          "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Runtime.Threading": "1.0.0",
           "Waher.Security": "1.0.0"
         }

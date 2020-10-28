@@ -37,6 +37,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			Types.Initialize(
 				typeof(XmppClient).Assembly,
+				typeof(InternetContent).Assembly,
 				typeof(BOSH.HttpBinding).Assembly,
 				typeof(WebSocket.WebSocketBinding).Assembly,
 				typeof(P2P.EndpointSecurity).Assembly);

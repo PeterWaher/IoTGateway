@@ -86,6 +86,10 @@ namespace Waher.Networking.XMPP.Test
 					if (e.Ok && e.HasData && e.State.Equals(1))
 					{
 						ms = new MemoryStream();
+
+						if (!(e.Data is null))
+							ms.Write(e.Data, 0, e.Data.Length);
+
 						ContentType = e.HttpResponse.ContentType;
 						Done1.Set();
 					}
@@ -132,27 +136,13 @@ namespace Waher.Networking.XMPP.Test
 			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
 				(sender, e) =>
 				{
-					if (e.Ok)
-						Done1.Set();
-					else
-						Error1.Set();
-
-					return Task.CompletedTask;
-				},
-				(sender, e) =>
-				{
-					if (e.Last)
-						Done2.Set();
-
-					return Task.CompletedTask;
-				}, 1);
-
-			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
-				(sender, e) =>
-				{
 					if (e.Ok && e.HasData && e.State.Equals(2))
 					{
 						ms = new MemoryStream();
+
+						if (!(e.Data is null))
+							ms.Write(e.Data, 0, e.Data.Length);
+
 						ContentType = e.HttpResponse.ContentType;
 						Done1.Set();
 					}

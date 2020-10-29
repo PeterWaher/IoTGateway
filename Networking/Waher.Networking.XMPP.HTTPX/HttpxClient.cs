@@ -204,7 +204,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				Xml.Append("' post='");
 				Xml.Append(XML.Encode(Resource));
 
-				ResponseState.PreparePostBackCall(this.e2e, Resource);
+				ResponseState.PreparePostBackCall(this.e2e, Resource, this.client);
 			}
 
 			Xml.Append("' sipub='false' ibb='");
@@ -327,26 +327,32 @@ namespace Waher.Networking.XMPP.HTTPX
 			private string endpointReference = null;
 			private string symmetricCipherReference = null;
 			private Stream data = null;
+			private XmppClient client;
 			private bool e2e = false;
 			private bool disposeData = false;
 			private bool disposed = false;
 			private IEndToEndEncryption endpointSecurity;
 			private MultiReadSingleWriteObject synchObj = null;
 
-			public void PreparePostBackCall(IEndToEndEncryption EndpointSecurity, string Id)
+			public void PreparePostBackCall(IEndToEndEncryption EndpointSecurity, string Id, XmppClient Client)
 			{
 				this.synchObj = new MultiReadSingleWriteObject();
 				this.endpointSecurity = EndpointSecurity;
 				this.id = Id;
+				this.client = Client;
 			}
 
-			public async Task DataReceived(object Sender, Stream Data, string From, string To, string EndpointReference, string SymmetricCipherReference)
+			public async Task PostDataReceived(object Sender, Stream Data, string From, string To, string EndpointReference, string SymmetricCipherReference)
 			{
 				if (this.disposed)
 					return;
 
 				if (!await this.synchObj.TryBeginWrite(60000))
-					throw new IOException("Unable to get access to HTTPX client.");
+				{
+					this.client.Error("Unable to get access to HTTPX client. Dropping posted response.");
+					return;
+				}
+
 				try
 				{
 					this.from = From;
@@ -359,9 +365,14 @@ namespace Waher.Networking.XMPP.HTTPX
 						this.data = new TemporaryStream();
 						await Data.CopyToAsync(this.data);
 						this.disposeData = true;
+
+						this.client.Information("HTTP(S) POST received. Waiting for HTTPX response.");
 					}
 					else
-						await this.CheckData(Sender, Data);
+					{
+						this.client.Information("HTTP(S) POST received.");
+						await this.CheckPostedData(Sender, Data);
+					}
 				}
 				finally
 				{
@@ -375,14 +386,18 @@ namespace Waher.Networking.XMPP.HTTPX
 					return;
 
 				if (!await this.synchObj.TryBeginWrite(60000))
-					throw new IOException("Unable to get access to HTTPX client.");
+				{
+					this.client.Error("Unable to get access to HTTPX client. Dropping posted response.");
+					return;
+				}
+
 				try
 				{
 					this.sha256 = Sha256;
 					this.e2e = E2e;
 
 					if (!(this.data is null))
-						await this.CheckData(Sender, this.data);
+						await this.CheckPostedData(Sender, this.data);
 				}
 				finally
 				{
@@ -390,7 +405,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			private async Task CheckData(object Sender, Stream Data)
+			private async Task CheckPostedData(object Sender, Stream Data)
 			{
 				try
 				{
@@ -414,11 +429,17 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 
 						if (!this.endpointSecurity.TryGetSymmetricCipher(CipherLocalName, CipherNamespace, out IE2eSymmetricCipher SymmetricCipher))
+						{
+							this.client.Error("Symmetric cipher not understood: " + this.symmetricCipherReference);
 							return;
+						}
 
 						Stream Decrypted = await this.endpointSecurity.Decrypt(this.endpointReference, this.id, "POST", this.from, this.to, Data, SymmetricCipher);
 						if (Decrypted is null)
+						{
+							this.client.Error("Unable to decrypt POSTed payload. Endpoint: " + this.endpointReference + ", Id: " + this.id + ", Type: POST, From: " + this.from + ", To: " + this.to + ", Cipher: " + this.symmetricCipherReference);
 							return;
+						}
 
 						if (this.disposeData)
 							this.data?.Dispose();
@@ -432,46 +453,47 @@ namespace Waher.Networking.XMPP.HTTPX
 					string DigestBase64 = Convert.ToBase64String(Digest);
 
 					if (DigestBase64 == this.sha256)
-						await this.DataOk(Sender, Data);
+					{
+						this.client.Information("POSTed response validated and accepted.");
+
+						long Count = Data.Length;
+						int BufSize = (int)Math.Min(65536, Count);
+						byte[] Buf = new byte[BufSize];
+
+						Data.Position = 0;
+
+						while (Count > 0)
+						{
+							if (Count < BufSize)
+							{
+								Array.Resize<byte>(ref Buf, (int)Count);
+								BufSize = (int)Count;
+							}
+
+							if (BufSize != await Data.ReadAsync(Buf, 0, BufSize))
+								throw new IOException("Unexpected end of file.");
+
+							Count -= BufSize;
+
+							if (!(this.DataCallback is null))
+							{
+								try
+								{
+									await this.DataCallback(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+							}
+						}
+					}
+					else
+						this.client.Error("Dropping POSTed response, as SHA-256 digest did not match reported digest in response.");
 				}
 				finally
 				{
 					this.Dispose();
-				}
-			}
-
-			private async Task DataOk(object Sender, Stream Data)
-			{
-				long Count = Data.Length;
-				int BufSize = (int)Math.Min(65536, Count);
-				byte[] Buf = new byte[BufSize];
-
-				Data.Position = 0;
-
-				while (Count > 0)
-				{
-					if (Count < BufSize)
-					{
-						Array.Resize<byte>(ref Buf, (int)Count);
-						BufSize = (int)Count;
-					}
-
-					if (BufSize != await Data.ReadAsync(Buf, 0, BufSize))
-						throw new IOException("Unexpected end of file.");
-
-					Count -= BufSize;
-
-					if (!(this.DataCallback is null))
-					{
-						try
-						{
-							await this.DataCallback(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}
 				}
 			}
 
@@ -494,7 +516,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private Task ResponsePostbackHandler(object Sender, PostBackEventArgs e)
 		{
 			ResponseState ResponseState = (ResponseState)e.State;
-			return ResponseState.DataReceived(this, e.Data, e.From, e.To, e.EndpointReference, e.SymmetricCipherReference);
+			return ResponseState.PostDataReceived(this, e.Data, e.From, e.To, e.EndpointReference, e.SymmetricCipherReference);
 		}
 
 		private async Task ResponseHandler(object Sender, IqResultEventArgs e)

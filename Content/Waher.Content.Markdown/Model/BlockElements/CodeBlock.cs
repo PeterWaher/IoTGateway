@@ -52,6 +52,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.indentString = this.indent <= 0 ? string.Empty : new string('\t', this.indent);
 			this.language = Language;
 			this.handler = GetHandler(this.language);
+			this.handler?.Register(Document);
 		}
 
 		private static ICodeContent[] codeContents = null;

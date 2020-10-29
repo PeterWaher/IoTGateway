@@ -271,9 +271,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result is null)
 				return;
 
+			GeneratePlainText(Result, Output, this.aloneInParagraph);
+		}
+
+		/// <summary>
+		/// Generates plain text from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">HTML output.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		public static void GeneratePlainText(object Result, StringBuilder Output, bool AloneInParagraph)
+		{ 
 			Output.Append(Result.ToString());
 
-			if (this.aloneInParagraph)
+			if (AloneInParagraph)
 			{
 				Output.AppendLine();
 				Output.AppendLine();
@@ -291,11 +302,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result is null)
 				return;
 
+			GenerateXAML(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
+		}
+
+		/// <summary>
+		/// Generates WPF XAML from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">HTML output.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		/// <param name="XamlSettings">XAML Settings</param>
+		public static void GenerateXAML(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
+			Variables Variables, XamlSettings XamlSettings)
+		{ 
 			string s;
 
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(this.variables))
+				using (SKImage Bmp = G.CreateBitmap(Variables))
 				{
 					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
 					{
@@ -324,13 +350,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				if (ex is AggregateException ex2)
 				{
-					XamlSettings Settings = this.Document.Settings.XamlSettings;
-
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
 						Output.WriteStartElement("TextBlock");
 						Output.WriteAttributeString("TextWrapping", "Wrap");
-						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+						Output.WriteAttributeString("Margin", XamlSettings.ParagraphMargins);
 
 						if (TextAlignment != TextAlignment.Left)
 							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
@@ -342,13 +366,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 				else
 				{
-					if (this.aloneInParagraph)
+					if (AloneInParagraph)
 					{
-						XamlSettings Settings = this.Document.Settings.XamlSettings;
-
 						Output.WriteStartElement("TextBlock");
 						Output.WriteAttributeString("TextWrapping", "Wrap");
-						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+						Output.WriteAttributeString("Margin", XamlSettings.ParagraphMargins);
 						if (TextAlignment != TextAlignment.Left)
 							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 					}
@@ -362,20 +384,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else
 			{
-				if (this.aloneInParagraph)
+				if (AloneInParagraph)
 				{
-					XamlSettings Settings = this.Document.Settings.XamlSettings;
-
 					Output.WriteStartElement("TextBlock");
 					Output.WriteAttributeString("TextWrapping", "Wrap");
-					Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+					Output.WriteAttributeString("Margin", XamlSettings.ParagraphMargins);
 					if (TextAlignment != TextAlignment.Left)
 						Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 				}
 
 				Output.WriteValue(Result.ToString());
 
-				if (this.aloneInParagraph)
+				if (AloneInParagraph)
 					Output.WriteEndElement();
 			}
 		}
@@ -391,12 +411,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result is null)
 				return;
 
-			XamlSettings Settings = this.Document.Settings.XamlSettings;
+			GenerateXamarinForms(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
+		}
+
+		/// <summary>
+		/// Generates WPF XAML from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">HTML output.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		/// <param name="XamlSettings">XAML Settings</param>
+		public static void GenerateXamarinForms(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
+			Variables Variables, XamlSettings XamlSettings)
+		{ 
 			string s;
 
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(this.variables))
+				using (SKImage Bmp = G.CreateBitmap(Variables))
 				{
 					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
 					{
@@ -427,7 +461,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
 						Output.WriteStartElement("Label");
 						Output.WriteAttributeString("LineBreakMode", "WordWrap");
 						Output.WriteAttributeString("TextColor", "Red");
@@ -438,8 +472,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				}
 				else
 				{
-					if (this.aloneInParagraph)
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+					if (AloneInParagraph)
+						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
 
 					Output.WriteStartElement("Label");
 					Output.WriteAttributeString("LineBreakMode", "WordWrap");
@@ -447,21 +481,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.WriteValue(ex.Message);
 					Output.WriteEndElement();
 
-					if (this.aloneInParagraph)
+					if (AloneInParagraph)
 						Output.WriteEndElement();
 				}
 			}
 			else
 			{
-				if (this.aloneInParagraph)
-					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+				if (AloneInParagraph)
+					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
 
 				Output.WriteStartElement("Label");
 				Output.WriteAttributeString("LineBreakMode", "WordWrap");
 				Output.WriteValue(Result.ToString());
 				Output.WriteEndElement();
 
-				if (this.aloneInParagraph)
+				if (AloneInParagraph)
 					Output.WriteEndElement();
 			}
 		}

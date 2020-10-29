@@ -1,13 +1,12 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
-using Waher.Content.Xml;
+using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
-using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
@@ -15,50 +14,15 @@ using Waher.Security;
 namespace Waher.IoTGateway.CodeContent
 {
 	/// <summary>
-	/// Class managing 2D XML Layout integration into Markdown documents.
+	/// Class managing asynchronous script execution in Markdown documents.
 	/// </summary>
-	public class XmlLayout : ICodeContent
+	public class AsyncScript : ICodeContent
 	{
-		private static string layoutFolder = null;
-
 		/// <summary>
 		/// Class managing 2D XML Layout integration into Markdown documents.
 		/// </summary>
-		public XmlLayout()
+		public AsyncScript()
 		{
-			layoutFolder = Path.Combine(Gateway.RootFolder, "Layout");
-
-			if (!Directory.Exists(layoutFolder))
-				Directory.CreateDirectory(layoutFolder);
-
-			DeleteOldFiles(null);
-		}
-
-		private static void DeleteOldFiles(object P)
-		{
-			DateTime Old = DateTime.Now.AddDays(-7);
-			int Count = 0;
-
-			foreach (string FileName in Directory.GetFiles(layoutFolder, "*.*"))
-			{
-				if (File.GetLastAccessTime(FileName) < Old)
-				{
-					try
-					{
-						File.Delete(FileName);
-						Count++;
-					}
-					catch (Exception ex)
-					{
-						Log.Error("Unable to delete old file: " + ex.Message, FileName);
-					}
-				}
-			}
-
-			if (Count > 0)
-				Log.Informational(Count.ToString() + " old file(s) deleted.", layoutFolder);
-
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
 		}
 
 		/// <summary>
@@ -72,13 +36,10 @@ namespace Waher.IoTGateway.CodeContent
 			if (i > 0)
 				Language = Language.Substring(0, i).TrimEnd();
 
-			switch (Language.ToLower())
-			{
-				case "layout":
-					return Grade.Excellent;
-			}
-
-			return Grade.NotAtAll;
+			if (Language.ToLower() == "async")
+				return Grade.Excellent;
+			else
+				return Grade.NotAtAll;
 		}
 
 		/// <summary>
@@ -87,7 +48,22 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Document">Document containing the instance.</param>
 		public void Register(MarkdownDocument Document)
 		{
-			// Do nothing.
+			if (!Document.TryGetMetaData("JAVASCRIPT", out KeyValuePair<string, bool>[] Values) ||
+				!this.Contains(Values, "/Events.js"))
+			{
+				Document.AddMetaData("JAVASCRIPT", "/Events.js");
+			}
+		}
+
+		private bool Contains(KeyValuePair<string, bool>[] Values, string Value)
+		{
+			foreach (KeyValuePair<string,bool> P in Values)
+			{
+				if (string.Compare(P.Key, Value, true) == 0)
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -116,98 +92,63 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
-			if (FileName is null)
-				return false;
+			string LoadingText;
+			int i = Language.IndexOf(':');
+			if (i > 0)
+				LoadingText = Language.Substring(i + 1).Trim();
+			else
+				LoadingText = "&#8987;";
 
-			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
-			if (!FileName.StartsWith("/"))
-				FileName = "/" + FileName;
+			string Id = Hashes.BinaryToString(Gateway.NextBytes(32));
 
-			Output.Append("<figure>");
-			Output.Append("<img src=\"");
-			Output.Append(XML.HtmlAttributeEncode(FileName));
+			Output.Append("<div id=\"id");
+			Output.Append(Id);
+			Output.Append("\">");
+			Output.Append(LoadingText);
+			Output.AppendLine("</div>");
+			Output.Append("<script type=\"text/javascript\">LoadContent(\"");
+			Output.Append(Id);
+			Output.AppendLine("\");</script>");
 
-			if (!string.IsNullOrEmpty(Title))
-			{
-				Output.Append("\" alt=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = new Variables();
+			Document.Settings.Variables.CopyTo(Variables);
 
-				Output.Append("\" title=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
-			}
-
-			Output.Append("\" class=\"aloneUnsized\"/>");
-
-			if (!string.IsNullOrEmpty(Title))
-			{
-				Output.Append("<figcaption>");
-				Output.Append(XML.HtmlValueEncode(Title));
-				Output.Append("</figcaption>");
-			}
-
-			Output.AppendLine("</figure>");
+			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, Id));
 
 			return true;
 		}
 
-		private string GetFileName(string Language, string[] Rows, out string Title)
+		private Expression BuildExpression(string[] Rows)
 		{
 			StringBuilder sb = new StringBuilder();
 
 			foreach (string Row in Rows)
 				sb.AppendLine(Row);
 
-			string Xml = sb.ToString();
-			int i = Language.IndexOf(':');
+			return new Expression(sb.ToString());
+		}
 
-			if (i > 0)
+		private object Evaluate(Expression Script, Variables Variables)
+		{
+			try
 			{
-				Title = Language.Substring(i + 1).Trim();
-				Language = Language.Substring(0, i).TrimEnd();
+				return Script.Evaluate(Variables);
 			}
-			else
-				Title = string.Empty;
-
-			sb.Append(Language);
-
-			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
-
-			string LayoutFolder = Path.Combine(Gateway.RootFolder, "Layout");
-			string FileName = Path.Combine(LayoutFolder, Hash);
-			string PngFileName = FileName + ".png";
-
-			if (!File.Exists(PngFileName))
+			catch (Exception ex)
 			{
-				try
-				{
-					XmlDocument Doc = new XmlDocument();
-					Doc.LoadXml(Xml);
-
-					Layout2DDocument LayoutDoc = new Layout2DDocument(Doc);
-					RenderSettings Settings = new RenderSettings()
-					{
-						ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
-					};
-
-					using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
-					{
-						using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
-						{
-							using (FileStream fs = File.Create(PngFileName))
-							{
-								Data.SaveTo(fs);
-							}
-						}
-					}
-				}
-				catch (Exception)
-				{
-					return null;
-				}
+				return Log.UnnestException(ex);
 			}
+		}
 
-			return PngFileName;
+		private Task Evaluate(Expression Script, Variables Variables, string Id)
+		{
+			object Result = this.Evaluate(Script, Variables);
+
+			StringBuilder Html = new StringBuilder();
+			InlineScript.GenerateHTML(Result, Html, true, Variables);
+
+			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()));
 		}
 
 		/// <summary>
@@ -221,8 +162,11 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title);
-			Output.AppendLine(Title);
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = Document.Settings.Variables;
+			object Result = this.Evaluate(Script, Variables);
+
+			InlineScript.GeneratePlainText(Result, Output, true);
 
 			return true;
 		}
@@ -239,17 +183,11 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
-			if (FileName is null)
-				return false;
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = Document.Settings.Variables;
+			object Result = this.Evaluate(Script, Variables);
 
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
-
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
-
-			Output.WriteEndElement();
+			InlineScript.GenerateXAML(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
 
 			return true;
 		}
@@ -266,13 +204,11 @@ namespace Waher.IoTGateway.CodeContent
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string _);
-			if (FileName is null)
-				return false;
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = Document.Settings.Variables;
+			object Result = this.Evaluate(Script, Variables);
 
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
-			Output.WriteEndElement();
+			InlineScript.GenerateXamarinForms(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
 
 			return true;
 		}

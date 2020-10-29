@@ -237,24 +237,6 @@ function CheckServerInstance(ID)
 		Reload(null);
 }
 
-var TabID;
-var ServerID = "";
-var EventCheckingEnabled = true;
-
-try
-{
-	if (window.name.length === 36)
-		TabID = window.name;
-	else
-		TabID = window.name = CreateGUID();
-}
-catch (e)
-{
-	TabID = CreateGUID();
-}
-
-CheckEvents(TabID);
-
 function POST(Content, Resource)
 {
 	if (Resource === undefined)
@@ -288,3 +270,59 @@ function POST(Content, Resource)
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.send(JSON.stringify({ "tab": TabID, "data": Content }));
 }
+
+function LoadContent(Id)
+{
+	if (ContentQueue === null)
+	{
+		ContentQueue = [];
+
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function ()
+		{
+			if (xhttp.readyState === 4)
+			{
+				if (xhttp.status === 200)
+				{
+					var Div = document.getElementById("id" + Id);
+					Div.innerHTML = xhttp.responseText;
+				}
+				else
+					ShowError(xhttp);
+
+				if (ContentQueue.lenght === 0)
+					ContentQueue = null;
+				else
+				{
+					Id = ContentQueue.shift();
+					xhttp.open("GET", "/ClientEvents/" + Id, true);
+					xhttp.send("");
+				}
+			};
+		}
+
+		xhttp.open("GET", "/ClientEvents/" + Id, true);
+		xhttp.send("");
+	}
+	else
+		ContentQueue.push(Id);
+}
+
+var ContentQueue = null;
+var TabID;
+var ServerID = "";
+var EventCheckingEnabled = true;
+
+try
+{
+	if (window.name.length === 36)
+		TabID = window.name;
+	else
+		TabID = window.name = CreateGUID();
+}
+catch (e)
+{
+	TabID = CreateGUID();
+}
+
+CheckEvents(TabID);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
@@ -16,6 +17,8 @@ using Waher.Events;
 using Waher.Script;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Waher.Content.Markdown
 {
@@ -33,6 +36,10 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
 	{
+		private static readonly Dictionary<string, DateTime> lastExecuted = new Dictionary<string, DateTime>();
+		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
+		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
+
 		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private readonly Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumbers = null;
@@ -56,6 +63,7 @@ namespace Waher.Content.Markdown
 		private bool includesTableOfContents = false;
 		private bool isDynamic = false;
 		private bool? allowScriptTag = null;
+		private Task asyncTasks = Task.CompletedTask;
 
 		/// <summary>
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -209,9 +217,6 @@ namespace Waher.Content.Markdown
 				return this.markdownText;
 			}
 		}
-
-		internal static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
-		internal static Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// Preprocesses markdown text.
@@ -436,8 +441,6 @@ namespace Waher.Content.Markdown
 			return Markdown;
 		}
 
-		private static readonly Dictionary<string, DateTime> lastExecuted = new Dictionary<string, DateTime>();
-
 		internal void CheckException(Exception ex)
 		{
 			CheckException(ex, this.transparentExceptionTypes);
@@ -605,7 +608,7 @@ namespace Waher.Content.Markdown
 					for (i = Block.Start; i <= Block.End; i++)
 						Comment[i] = Block.Rows[i].Substring(2);
 
-					Elements.AddLast(new CommentBlock(this,Comment));
+					Elements.AddLast(new CommentBlock(this, Comment));
 					continue;
 				}
 				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true, true) || this.IsUnderline(Block.Rows[0], '*', true, true)))
@@ -4782,7 +4785,7 @@ namespace Waher.Content.Markdown
 						case "PREV":
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
-								
+
 								Output.Append("<link rel=\"prev\" href=\"");
 								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
@@ -5439,6 +5442,23 @@ namespace Waher.Content.Markdown
 		public bool TryGetMetaData(string Key, out KeyValuePair<string, bool>[] Value)
 		{
 			return this.metaData.TryGetValue(Key.ToUpper(), out Value);
+		}
+
+		/// <summary>
+		/// Adds meta-data to the document.
+		/// </summary>
+		/// <param name="Key">Key name</param>
+		/// <param name="Value">Meta-data value.</param>
+		public void AddMetaData(string Key, string Value)
+		{
+			if (this.metaData.TryGetValue(Key, out KeyValuePair<string, bool>[] Records))
+			{
+				List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
+				Values.AddRange(Records);
+				Values.Add(new KeyValuePair<string, bool>(Value.Trim(), Value.EndsWith("  ")));
+			}
+			else
+				this.metaData[Key] = new KeyValuePair<string, bool>[] { new KeyValuePair<string, bool>(Value.Trim(), Value.EndsWith("  ")) };
 		}
 
 		/// <summary>
@@ -6324,6 +6344,15 @@ namespace Waher.Content.Markdown
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Queues an asynchronous task to be executed.
+		/// </summary>
+		/// <param name="Action">Action</param>
+		public void QueueAsyncTask(Func<Task> Action)
+		{
+			this.asyncTasks = this.asyncTasks.ContinueWith(Prev => Task.Run(Action)).Unwrap();
 		}
 
 		// TODO: Footnotes in included markdown files.

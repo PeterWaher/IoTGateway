@@ -19,6 +19,12 @@ namespace Waher.Content.Markdown.Model
 		Grade Supports(string Language);
 
 		/// <summary>
+		/// Is called on the object when an instance of the element has been created in a document.
+		/// </summary>
+		/// <param name="Document">Document containing the instance.</param>
+		void Register(MarkdownDocument Document);
+
+		/// <summary>
 		/// If HTML is handled.
 		/// </summary>
 		bool HandlesHTML

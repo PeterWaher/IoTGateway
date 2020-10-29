@@ -149,6 +149,15 @@ namespace Waher.IoTGateway.CodeContent
 		}
 
 		/// <summary>
+		/// Is called on the object when an instance of the element has been created in a document.
+		/// </summary>
+		/// <param name="Document">Document containing the instance.</param>
+		public void Register(MarkdownDocument Document)
+		{
+			// Do nothing.
+		}
+
+		/// <summary>
 		/// If HTML is handled.
 		/// </summary>
 		public bool HandlesHTML => true;

@@ -450,6 +450,13 @@
             <param name="Value">(Value,linebreak)-pairs corresponding to the key, if found, null otherwise.</param>
             <returns>If the meta-data key was found.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.AddMetaData(System.String,System.String)">
+            <summary>
+            Adds meta-data to the document.
+            </summary>
+            <param name="Key">Key name</param>
+            <param name="Value">Meta-data value.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GetMetaData(System.String)">
             <summary>
             Gets the meta-data values given a meta-data key. If meta-data is not found, an empty array is returned.
@@ -706,6 +713,12 @@
             <param name="Previous">Previous version</param>
             <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
             <returns>Difference document</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.QueueAsyncTask(System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            Queues an asynchronous task to be executed.
+            </summary>
+            <param name="Action">Action</param>
         </member>
         <member name="T:Waher.Content.Markdown.MarkdownSettings">
             <summary>
@@ -2955,6 +2968,12 @@
             <param name="Language">Language.</param>
             <returns>How well the handler supports the content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.ICodeContent.Register(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Is called on the object when an instance of the element has been created in a document.
+            </summary>
+            <param name="Document">Document containing the instance.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesHTML">
             <summary>
             If HTML is handled.
@@ -4953,6 +4972,14 @@
             </summary>
             <param name="Output">Plain text will be output here.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GeneratePlainText(System.Object,System.Text.StringBuilder,System.Boolean)">
+            <summary>
+            Generates plain text from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">HTML output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
             Generates WPF XAML for the markdown element.
@@ -4960,12 +4987,34 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXAML(System.Object,System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.Boolean,Waher.Script.Variables,Waher.Content.Markdown.XamlSettings)">
+            <summary>
+            Generates WPF XAML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">HTML output.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+            <param name="XamlSettings">XAML Settings</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateXamarinForms(System.Object,System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.Boolean,Waher.Script.Variables,Waher.Content.Markdown.XamlSettings)">
+            <summary>
+            Generates WPF XAML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">HTML output.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+            <param name="XamlSettings">XAML Settings</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineScript.InlineSpanElement">
             <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -41,8 +42,10 @@ namespace Waher.IoTGateway
 	/// of the server, to retrieve any events it might push to the client. Events include a Type and a Data element. The Type is translated into
 	/// a Javascript function name. Data is passed to the function, as a parameter. The Data parameter can be either a string, or a JSON object.
 	/// You can use the static JSON class available in the Waher.Content library to encode and decode JSON.
+	/// 
+	/// ReportAsynchronousResult() allows you to report asynchronously evaluated results back to clients.
 	/// </summary>
-	public class ClientEvents : HttpAsynchronousResource, IHttpPostMethod
+	public class ClientEvents : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
 	{
 		/// <summary>
 		/// Resource managing asynchronous events to web clients.
@@ -55,31 +58,55 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => true;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
 		/// </summary>
-		public bool AllowsPOST
+		public bool AllowsPOST => true;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			get { return true; }
+			if (string.IsNullOrEmpty(Request.SubPath))
+				throw new BadRequestException();
+
+			ContentQueue Queue;
+			string Id = Request.SubPath.Substring(1);
+
+			lock (requestsByContentID)
+			{
+				if (requestsByContentID.TryGetValue(Id, out Queue))
+					requestsByContentID.Remove(Id);
+				else
+				{
+					requestsByContentID[Id] = new ContentQueue(Id)
+					{
+						Response = Response
+					};
+
+					return;
+				}
+			}
+
+			Response.ContentType = Queue.ContentType;
+			await Response.Write(Queue.Content, 0, Queue.Content.Length);
+			await Response.SendResponse();
 		}
 
 		/// <summary>
@@ -339,8 +366,9 @@ namespace Waher.IoTGateway
 		}
 
 
-		private static readonly Cache<string, TabQueue> eventsByTabID = GetQueueCache();
-		private static readonly Cache<string, TabQueue> timeoutByTabID = GetTimeoutCache();
+		private static readonly Cache<string, TabQueue> eventsByTabID = GetTabQueueCache();
+		private static readonly Cache<string, TabQueue> timeoutByTabID = GetTabTimeoutCache();
+		private static readonly Cache<string, ContentQueue> requestsByContentID = GetContentCache();
 		private static readonly Dictionary<string, string> locationByTabID = new Dictionary<string, string>();
 		private static readonly Dictionary<string, object> usersByTabID = new Dictionary<string, object>();
 		private static readonly Dictionary<string, Dictionary<string, (string, string, string)[]>> tabIdsByLocation =
@@ -348,7 +376,7 @@ namespace Waher.IoTGateway
 		private static readonly Dictionary<Type, Dictionary<object, Dictionary<string, (string, string, string)[]>>> tabIdsByUser =
 			new Dictionary<Type, Dictionary<object, Dictionary<string, (string, string, string)[]>>>();
 
-		private static Cache<string, TabQueue> GetTimeoutCache()
+		private static Cache<string, TabQueue> GetTabTimeoutCache()
 		{
 			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(20));
 			Result.Removed += TimeoutCacheItem_Removed;
@@ -382,7 +410,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static Cache<string, TabQueue> GetQueueCache()
+		private static Cache<string, TabQueue> GetTabQueueCache()
 		{
 			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
 			Result.Removed += QueueCacheItem_Removed;
@@ -442,11 +470,81 @@ namespace Waher.IoTGateway
 					{
 						if (TabIDs.Remove(TabID) && TabIDs.Count == 0 &&
 							UserObjects.Remove(User) && UserObjects.Count == 0)
-						{ 
+						{
 							tabIdsByUser.Remove(UserType);
 						}
 					}
 				}
+			}
+		}
+
+		private static Cache<string, ContentQueue> GetContentCache()
+		{
+			Cache<string, ContentQueue> Result = new Cache<string, ContentQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(60));
+			Result.Removed += ContentCacheItem_Removed;
+			return Result;
+		}
+
+		private static async void ContentCacheItem_Removed(object Sender, CacheItemEventArgs<string, ContentQueue> e)
+		{
+			if (e.Reason != RemovedReason.Manual)
+			{
+				try
+				{
+					HttpResponse Response = e.Value.Response;
+
+					Response.ContentType = "text/plain";
+					await Response.Write("Request took too long to complete.");
+					await Response.SendResponse();
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Reports asynchronously evaluated result back to a client.
+		/// </summary>
+		/// <param name="Id">Content ID</param>
+		/// <param name="ContentType">Content-Type of result.</param>
+		/// <param name="Result">Binary encoding of result.</param>
+		public static async Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result)
+		{
+			try
+			{
+				ContentQueue Queue;
+
+				lock (requestsByContentID)
+				{
+					if (requestsByContentID.TryGetValue(Id, out Queue))
+					{
+						if (Queue.Response is null)
+							return;
+
+						requestsByContentID.Remove(Id);
+					}
+					else
+					{
+						Queue = new ContentQueue(Id)
+						{
+							ContentType = ContentType,
+							Content = Result
+						};
+
+						requestsByContentID[Id] = Queue;
+						return;
+					}
+				}
+
+				Queue.Response.ContentType = ContentType;
+				await Queue.Response.Write(Result, 0, Result.Length);
+				await Queue.Response.SendResponse();
+			}
+			catch (Exception)
+			{
+				// Ignore
 			}
 		}
 
@@ -975,6 +1073,19 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		private class ContentQueue
+		{
+			public string ContentID;
+			public string ContentType;
+			public HttpResponse Response = null;
+			public byte[] Content = null;
+
+			public ContentQueue(string ID)
+			{
+				this.ContentID = ID;
+			}
+		}
+
 		/// <summary>
 		/// Puses an event to a set of Tabs, given their Tab IDs.
 		/// </summary>
@@ -1120,7 +1231,6 @@ namespace Waher.IoTGateway
 				Log.Critical(ex);
 			}
 		}
-
 
 	}
 }

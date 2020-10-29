@@ -1730,6 +1730,14 @@ Script
 [Script](Script.md) can be used to make your markdown pages dynamic. The following sections describe different options. For more information
 about script, see the [Script reference](Script.md). You can also use the [Prompt](Prompt.md) to experiment with script syntax.
 
+Script in Markdown can be processed in three different ways:
+
+1. **Inline processing**: The script is evaluated as part of rendering, and the result presented in the place of the script.
+2. **Pre-processing**: Script is evaluated prior to rendering the page for display. This allows script to modify the structure of the
+Markdown document.
+3. **Asynchronous processing*: Long-running script can be run asynchronously. This means the page is rendered and returned to the client.
+When the script is evaluated, it is returned to the client, which inserts it in the place of the script.
+
 ### Inline script
 
 [Script](Script.md) can be embedded inline in a block, between curly braces `{` and `}`. The result is then presented in the final output.
@@ -1824,6 +1832,32 @@ for each y in 1..15 do
 		]] ((x*y)) |[[;
 )		
 }}
+
+### Asynchronous processing of script
+
+It is possible to execute script on the page asynchronously as well. This is done by adding a *Code Block* of type `async`.
+The `async` can be succeeded by a colon (`:`) and some text that will be displayed while the script is being executed and the
+result loaded to the client. Example:
+
+	```async:The content takes 30 seconds to be generated
+    Thread.Sleep(30000);
+	GraphWidth:=800;
+	GraphHeight:=400;
+	x:=-10..10|0.1;
+	y:=sin(5*x)*exp(-(x^2/10));
+	plot2dcurve(x,y)
+	```
+
+This generates (reload if result has already been returned):
+
+```async:The content takes 30 seconds to be generated
+Thread.Sleep(30000);
+GraphWidth:=800;
+GraphHeight:=400;
+x:=-10..10|0.1;
+y:=sin(5*x)*exp(-(x^2/10));
+plot2dcurve(x,y)
+```
 
 ### Sessions and variables
 

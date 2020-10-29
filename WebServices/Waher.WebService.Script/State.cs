@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -93,7 +94,7 @@ namespace Waher.WebService.Script
 			if (!(this.response?.HeaderSent ?? true))
 			{
 				this.previewing = true;
-				this.SendResponse(e.Preview, true);
+				Task.Run(() => this.SendResponse(e.Preview, true));
 			}
 		}
 
@@ -186,7 +187,7 @@ namespace Waher.WebService.Script
 						expressions.Remove(this.tag);
 					}
 
-					this.SendResponse(Result, false);
+					await this.SendResponse(Result, false);
 				}
 
 				this.variables.CopyTo(this.request.Session);
@@ -200,7 +201,8 @@ namespace Waher.WebService.Script
 						expressions.Remove(this.tag);
 					}
 
-					this.SendResponse(new ObjectValue(new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use.")),
+					await this.SendResponse(new ObjectValue(
+						new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use.")),
 						false);
 				}
 			}
@@ -283,7 +285,7 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		internal void SendResponse(IElement Result, bool More)
+		internal async Task SendResponse(IElement Result, bool More)
 		{
 			this.variables["Ans"] = Result;
 
@@ -449,8 +451,8 @@ namespace Waher.WebService.Script
 			this.response.ContentType = "text/html; charset=utf-8";
 			this.response.ContentLength = Bin.Length;	// To avoid chunked transfer.
 			this.response.SetHeader("X-More", More ? "1" : "0");
-			this.response.Write(Bin);
-			this.response.SendResponse();
+			await this.response.Write(Bin);
+			await this.response.SendResponse();
 			this.response.Dispose();
 		}
 

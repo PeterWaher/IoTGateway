@@ -50,13 +50,13 @@ Support for other extensions is provided by separate nuget packages. See: https:
       <dependency id="Waher.Content" version="1.0.29"/>
       <dependency id="Waher.Content.Xml" version="1.0.11"/>
       <dependency id="Waher.Events" version="1.0.12"/>
-      <dependency id="Waher.Networking.UWP" version="1.0.17"/>
+      <dependency id="Waher.Networking.UWP" version="1.0.18"/>
       <dependency id="Waher.Persistence" version="1.0.20"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.4"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.13"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Runtime.Temporary" version="1.0.0"/>
-      <dependency id="Waher.Runtime.Threading" version="1.0.0"/>
-      <dependency id="Waher.Security" version="1.0.6"/>
+      <dependency id="Waher.Runtime.Threading" version="1.0.1"/>
+      <dependency id="Waher.Security" version="1.0.7"/>
     </dependencies>
   </metadata>
   <files>

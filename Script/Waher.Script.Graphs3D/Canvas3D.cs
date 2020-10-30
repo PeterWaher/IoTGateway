@@ -1608,8 +1608,6 @@ namespace Waher.Script.Graphs3D
 			Vector3[] vs;
 			bool First = true;
 
-			FrontShader?.Transform(this);
-			BackShader?.Transform(this);
 			Nodes = (Vector4[][])Nodes.Clone();
 
 			d = Nodes.Length;

@@ -73,7 +73,7 @@ namespace Waher.Script.Graphs3D
 			if (this.singleSource)
 			{
 				this.source = LightSources[0];
-				this.sourcePosition = this.source.TransformedPosition;
+				this.sourcePosition = this.source.Position;
 
 				PhongIntensity I = this.source.Diffuse;
 
@@ -195,7 +195,7 @@ namespace Waher.Script.Graphs3D
 					Specular = Source.Specular;
 					Diffuse = Source.Diffuse;
 
-					L = Vector3.Normalize(Source.TransformedPosition - P);
+					L = Vector3.Normalize(Source.Position - P);
 					d = Vector3.Dot(L, Normal);
 
 					if (d >= 0)
@@ -512,7 +512,7 @@ namespace Waher.Script.Graphs3D
 						Specular = Source.Specular;
 						Diffuse = Source.Diffuse;
 
-						L = Vector3.Normalize(Source.TransformedPosition - P);
+						L = Vector3.Normalize(Source.Position - P);
 						d = Vector3.Dot(L, Normal);
 
 						if (d >= 0)
@@ -637,26 +637,6 @@ namespace Waher.Script.Graphs3D
 
 					Colors[i] = new SKColor(R2, G2, B2, A2);
 				}
-			}
-		}
-
-		/// <summary>
-		/// Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
-		/// </summary>
-		/// <param name="Canvas">3D Canvas</param>
-		public void Transform(Canvas3D Canvas)
-		{
-			this.viewerPosition = Canvas3D.ToVector3(Canvas.ViewerPosition);
-
-			if (this.singleSource)
-			{
-				this.source.Transform(Canvas);
-				this.sourcePosition = this.source.TransformedPosition;
-			}
-			else
-			{
-				foreach (PhongLightSource Source in this.sources)
-					Source.Transform(Canvas);
 			}
 		}
 

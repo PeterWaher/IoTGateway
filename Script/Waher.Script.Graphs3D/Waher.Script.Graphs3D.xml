@@ -512,12 +512,6 @@
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.ConstantColor.Transform(Waher.Script.Graphs3D.Canvas3D)">
-            <summary>
-            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
-            </summary>
-            <param name="Canvas">3D Canvas</param>
-        </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Canvas3D">
             <summary>
             Generates a <see cref="T:Waher.Script.Graphs3D.Canvas3D"/> object.
@@ -808,12 +802,6 @@
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.I3DShader.Transform(Waher.Script.Graphs3D.Canvas3D)">
-            <summary>
-            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
-            </summary>
-            <param name="Canvas">3D Canvas</param>
-        </member>
         <member name="T:Waher.Script.Graphs3D.PhongIntensity">
             <summary>
             Contains information about the intensity of a light component, as used in the Phong reflection model.
@@ -879,17 +867,6 @@
             <summary>
             Position of light source..
             </summary>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongLightSource.TransformedPosition">
-            <summary>
-            Transformed position of light source..
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.PhongLightSource.Transform(Waher.Script.Graphs3D.Canvas3D)">
-            <summary>
-            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
-            </summary>
-            <param name="Canvas">3D Canvas</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongMaterial">
             <summary>
@@ -996,12 +973,6 @@
             <param name="Normals">Normal vectors.</param>
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.PhongShader.Transform(Waher.Script.Graphs3D.Canvas3D)">
-            <summary>
-            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
-            </summary>
-            <param name="Canvas">3D Canvas</param>
         </member>
     </members>
 </doc>

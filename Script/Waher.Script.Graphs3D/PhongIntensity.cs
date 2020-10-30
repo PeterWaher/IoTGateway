@@ -10,10 +10,10 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class PhongIntensity
 	{
-		private float red;
-		private float green;
-		private float blue;
-		private float alpha;
+		private readonly float red;
+		private readonly float green;
+		private readonly float blue;
+		private readonly float alpha;
 
 		/// <summary>
 		/// Contains information about the intensity of a light component, as used in the Phong reflection model.

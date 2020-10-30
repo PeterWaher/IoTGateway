@@ -11,7 +11,7 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	class ConstantColor : I3DShader
 	{
-		private SKColor color;
+		private readonly SKColor color;
 
 		/// <summary>
 		/// Shader returning a constant color.

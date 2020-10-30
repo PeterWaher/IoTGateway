@@ -10,14 +10,14 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class PhongMaterial
 	{
-		private float ambientReflectionConstantFront;
-		private float diffuseReflectionConstantFront;
-		private float specularReflectionConstantFront;
-		private float shininessFront;
-		private float ambientReflectionConstantBack;
-		private float diffuseReflectionConstantBack;
-		private float specularReflectionConstantBack;
-		private float shininessBack;
+		private readonly float ambientReflectionConstantFront;
+		private readonly float diffuseReflectionConstantFront;
+		private readonly float specularReflectionConstantFront;
+		private readonly float shininessFront;
+		private readonly float ambientReflectionConstantBack;
+		private readonly float diffuseReflectionConstantBack;
+		private readonly float specularReflectionConstantBack;
+		private readonly float shininessBack;
 
 		/// <summary>
 		/// Contains information about a material, as used in the Phong reflection model.

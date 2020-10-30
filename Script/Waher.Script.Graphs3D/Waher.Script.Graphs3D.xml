@@ -345,6 +345,34 @@
             <param name="TextSize">Text size.</param>
             <param name="Color">Text color.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Box(System.Numerics.Vector4,System.Numerics.Vector4,Waher.Script.Graphs3D.I3DShader)">
+            <summary>
+            Draws a box, with sides parallell to the x, y and z axis.
+            </summary>
+            <param name="Corner1">First corner</param>
+            <param name="Corner2">Second corner</param>
+            <param name="Shader">Shader.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Box(System.Numerics.Vector3,System.Numerics.Vector3,Waher.Script.Graphs3D.I3DShader)">
+            <summary>
+            Draws a box, with sides parallell to the x, y and z axis.
+            </summary>
+            <param name="Corner1">First corner</param>
+            <param name="Corner2">Second corner</param>
+            <param name="Shader">Shader.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Box(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,Waher.Script.Graphs3D.I3DShader)">
+            <summary>
+            Draws a box, with sides parallell to the x, y and z axis.
+            </summary>
+            <param name="x1">X-axis of first corner.</param>
+            <param name="y1">Y-axis of first corner.</param>
+            <param name="z1">Z-axis of first corner.</param>
+            <param name="x2">X-axis of second corner.</param>
+            <param name="y2">Y-axis of second corner.</param>
+            <param name="z2">Z-axis of second corner.</param>
+            <param name="Shader">Shader.</param>
+        </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
             Shader returning a constant color.

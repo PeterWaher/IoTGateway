@@ -2147,5 +2147,60 @@ namespace Waher.Script.Graphs3D
 
 		#endregion
 
+		#region Box
+
+		/// <summary>
+		/// Draws a box, with sides parallell to the x, y and z axis.
+		/// </summary>
+		/// <param name="Corner1">First corner</param>
+		/// <param name="Corner2">Second corner</param>
+		/// <param name="Shader">Shader.</param>
+		public void Box(Vector4 Corner1, Vector4 Corner2, I3DShader Shader)
+		{
+			this.Box(ToVector3(Corner1), ToVector3(Corner2), Shader);
+		}
+
+		/// <summary>
+		/// Draws a box, with sides parallell to the x, y and z axis.
+		/// </summary>
+		/// <param name="Corner1">First corner</param>
+		/// <param name="Corner2">Second corner</param>
+		/// <param name="Shader">Shader.</param>
+		public void Box(Vector3 Corner1, Vector3 Corner2, I3DShader Shader)
+		{
+			this.Box(Corner1.X, Corner1.Y, Corner1.Z, Corner2.X, Corner2.Y, Corner2.Z, Shader);
+		}
+
+		/// <summary>
+		/// Draws a box, with sides parallell to the x, y and z axis.
+		/// </summary>
+		/// <param name="x1">X-axis of first corner.</param>
+		/// <param name="y1">Y-axis of first corner.</param>
+		/// <param name="z1">Z-axis of first corner.</param>
+		/// <param name="x2">X-axis of second corner.</param>
+		/// <param name="y2">Y-axis of second corner.</param>
+		/// <param name="z2">Z-axis of second corner.</param>
+		/// <param name="Shader">Shader.</param>
+		public void Box(float x1, float y1, float z1, float x2, float y2, float z2, I3DShader Shader)
+		{
+			Vector4 P0 = new Vector4(x1, y1, z1, 1);
+			Vector4 P1 = new Vector4(x1, y1, z2, 1);
+			Vector4 P2 = new Vector4(x2, y1, z2, 1);
+			Vector4 P3 = new Vector4(x2, y1, z1, 1);
+			Vector4 P4 = new Vector4(x1, y2, z1, 1);
+			Vector4 P5 = new Vector4(x1, y2, z2, 1);
+			Vector4 P6 = new Vector4(x2, y2, z2, 1);
+			Vector4 P7 = new Vector4(x2, y2, z1, 1);
+
+			this.Polygon(new Vector4[] { P0, P1, P2, P3 }, Shader, false);
+			this.Polygon(new Vector4[] { P7, P6, P5, P4 }, Shader, false);
+			this.Polygon(new Vector4[] { P5, P6, P2, P1 }, Shader, false);
+			this.Polygon(new Vector4[] { P4, P5, P1, P0 }, Shader, false);
+			this.Polygon(new Vector4[] { P6, P7, P3, P2 }, Shader, false);
+			this.Polygon(new Vector4[] { P0, P3, P7, P4 }, Shader, false);
+		}
+
+		#endregion
+
 	}
 }

@@ -357,21 +357,7 @@ namespace Waher.Script.Test
 
 		private void DrawCube(Canvas3D Canvas, I3DShader Shader)
 		{
-			Vector4 P0 = new Vector4(-500, -500, 1000, 1);
-			Vector4 P1 = new Vector4(-500, -500, 2000, 1);
-			Vector4 P2 = new Vector4(500, -500, 2000, 1);
-			Vector4 P3 = new Vector4(500, -500, 1000, 1);
-			Vector4 P4 = new Vector4(-500, 500, 1000, 1);
-			Vector4 P5 = new Vector4(-500, 500, 2000, 1);
-			Vector4 P6 = new Vector4(500, 500, 2000, 1);
-			Vector4 P7 = new Vector4(500, 500, 1000, 1);
-
-			Canvas.Polygon(new Vector4[] { P0, P1, P2, P3 }, Shader, false);
-			Canvas.Polygon(new Vector4[] { P7, P6, P5, P4 }, Shader, false);
-			Canvas.Polygon(new Vector4[] { P5, P6, P2, P1 }, Shader, false);
-			Canvas.Polygon(new Vector4[] { P4, P5, P1, P0 }, Shader, false);
-			Canvas.Polygon(new Vector4[] { P6, P7, P3, P2 }, Shader, false);
-			Canvas.Polygon(new Vector4[] { P0, P3, P7, P4 }, Shader, false);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 		}
 
 		// TODO: Clip

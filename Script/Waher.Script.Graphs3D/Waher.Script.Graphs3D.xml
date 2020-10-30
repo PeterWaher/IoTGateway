@@ -22,6 +22,11 @@
             Oversampling provides a means to achieve anti-aliasing in the rendered result.</param>
             <param name="BackgroundColor">Background color</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Clear">
+            <summary>
+            Clears the canvas.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmap">
             <summary>
             Creates a bitmap from the pixels in the canvas.
@@ -91,6 +96,15 @@
             <param name="Degrees">Degrees</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateX(System.Single,System.Object)">
+            <summary>
+            Rotates the world around an axis parallel to the X-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateX(System.Single,System.Numerics.Vector3)">
             <summary>
             Rotates the world around an axis parallel to the X-axis, going through
@@ -105,6 +119,15 @@
             Rotates the world around the Y-axis.
             </summary>
             <param name="Degrees">Degrees</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateY(System.Single,System.Object)">
+            <summary>
+            Rotates the world around an axis parallel to the Y-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateY(System.Single,System.Numerics.Vector3)">
@@ -123,6 +146,15 @@
             <param name="Degrees">Degrees</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateZ(System.Single,System.Object)">
+            <summary>
+            Rotates the world around an axis parallel to the Z-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateZ(System.Single,System.Numerics.Vector3)">
             <summary>
             Rotates the world around an axis parallel to the Z-axis, going through
@@ -137,6 +169,14 @@
             Scales the world
             </summary>
             <param name="Scale">Scale</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Object)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="Scale">Scale</param>
+            <param name="CenterPoint">Center point.</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Numerics.Vector3)">
@@ -154,6 +194,16 @@
             <param name="ScaleX">Scale along X-axis.</param>
             <param name="ScaleY">Scale along Y-axis.</param>
             <param name="ScaleZ">Scale along Z-axis.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Single,System.Single,System.Object)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="ScaleX">Scale along X-axis.</param>
+            <param name="ScaleY">Scale along Y-axis.</param>
+            <param name="ScaleZ">Scale along Z-axis.</param>
+            <param name="CenterPoint">Center point.</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
@@ -373,6 +423,63 @@
             <param name="z2">Z-axis of second corner.</param>
             <param name="Shader">Shader.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.RecommendedBitmapSize">
+            <summary>
+            The recommended bitmap size of the graph, if such is available, or null if not.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Equals(System.Object)">
+            <summary>
+            Compares the element to another.
+            </summary>
+            <param name="obj">Other element to compare against.</param>
+            <returns>If elements are equal.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetHashCode">
+            <summary>
+            Calculates a hash code of the element.
+            </summary>
+            <returns>Hash code.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToPhongIntensity(System.Object)">
+            <summary>
+            Converts an object to a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Phong intensity object.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
             Shader returning a constant color.
@@ -410,6 +517,270 @@
             Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
             </summary>
             <param name="Canvas">3D Canvas</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Canvas3D">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.Canvas3D"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Canvas3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.Canvas3D"/> object.
+            </summary>
+            <param name="Width">Width of canvas.</param>
+            <param name="Height">Height of canvas.</param>
+            <param name="Oversampling">Oversampling.</param>
+            <param name="BackgroupColor">Background color.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Canvas3D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Canvas3D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Canvas3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Shading.ConstantColor">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.ConstantColor"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Color">Color tha will be converted to an intensity object.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.ConstantColor"/> object.
+            </summary>
+            <param name="Red">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="Green">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="Blue">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.ConstantColor"/> object.
+            </summary>
+            <param name="Red">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="Green">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="Blue">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Alpha">Larger for surfaces that are smoother and more mirror-like.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.ConstantColor.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Color">Color tha will be converted to an intensity object.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Red">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="Green">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="Blue">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Red">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="Green">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="Blue">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Alpha">Larger for surfaces that are smoother and more mirror-like.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongIntensity.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Shading.PhongLightSource">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongLightSource"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongLightSource.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Diffuse">Diffuse light.</param>
+            <param name="Specular">Specular light.</param>
+            <param name="Position">Light source position.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongLightSource.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongLightSource.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongLightSource.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongMaterial"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongMaterial"/> object.
+            </summary>
+            <param name="AmbientReflectionConstant">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="DiffuseReflectionConstant">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="SpecularReflectionConstant">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Shininess">Larger for surfaces that are smoother and more mirror-like.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongMaterial"/> object.
+            </summary>
+            <param name="AmbientReflectionConstantFront">Ratio of reflection of the ambient term present in all points in the scene rendered, front side.</param>
+            <param name="DiffuseReflectionConstantFront">Ratio of reflection of the diffuse term of incoming light, front side.</param>
+            <param name="SpecularReflectionConstantFront">Ratio of reflection of the specular term of incoming light, front side.</param>
+            <param name="ShininessFront">Larger for surfaces that are smoother and more mirror-like, front side.</param>
+            <param name="AmbientReflectionConstantBack">Ratio of reflection of the ambient term present in all points in the scene rendered, back side.</param>
+            <param name="DiffuseReflectionConstantBack">Ratio of reflection of the diffuse term of incoming light, back side.</param>
+            <param name="SpecularReflectionConstantBack">Ratio of reflection of the specular term of incoming light, back side.</param>
+            <param name="ShininessBack">Larger for surfaces that are smoother and more mirror-like, back side.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Shading.PhongShader">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongShader"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongShader.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Diffuse">Diffuse light.</param>
+            <param name="Specular">Specular light.</param>
+            <param name="Position">Light source position.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongShader.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongShader.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongShader.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>

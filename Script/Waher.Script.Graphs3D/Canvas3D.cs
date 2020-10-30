@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Numerics;
 using SkiaSharp;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Graphs;
 
 namespace Waher.Script.Graphs3D
 {
 	/// <summary>
 	/// 3D drawing area.
 	/// </summary>
-	public class Canvas3D
+	public class Canvas3D : Graph
 	{
+		private readonly Guid id = Guid.NewGuid();
 		private readonly byte[] pixels;
 		private readonly float[] zBuffer;
 		private readonly float[] xBuf;
@@ -17,6 +20,7 @@ namespace Waher.Script.Graphs3D
 		private readonly float[] zBuf;
 		private readonly Vector3[] normalBuf;
 		private readonly SKColor[] colorBuf;
+		private readonly SKColor backgroundColor;
 		private Vector4 viewerPosition;
 		private Matrix4x4 projectionTransformation;
 		private Matrix4x4 modelTransformation;
@@ -63,13 +67,10 @@ namespace Waher.Script.Graphs3D
 			this.hm1 = this.h - 1;
 			this.cx = this.w / 2;
 			this.cy = this.h / 2;
+			this.backgroundColor = BackgroundColor;
 			this.ResetTransforms();
 
-			int i, j, c = this.w * this.h;
-			byte R = BackgroundColor.Red;
-			byte G = BackgroundColor.Green;
-			byte B = BackgroundColor.Blue;
-			byte A = BackgroundColor.Alpha;
+			int c = this.w * this.h;
 
 			this.pixels = new byte[c * 4];
 			this.zBuffer = new float[c];
@@ -78,6 +79,17 @@ namespace Waher.Script.Graphs3D
 			this.zBuf = new float[this.w];
 			this.normalBuf = new Vector3[this.w];
 			this.colorBuf = new SKColor[this.w];
+
+			this.ClearPixels();
+		}
+
+		private void ClearPixels()
+		{
+			byte R = this.backgroundColor.Red;
+			byte G = this.backgroundColor.Green;
+			byte B = this.backgroundColor.Blue;
+			byte A = this.backgroundColor.Alpha;
+			int i, j, c = this.w * this.h;
 
 			for (i = j = 0; i < c; i++)
 			{
@@ -88,6 +100,23 @@ namespace Waher.Script.Graphs3D
 
 				this.zBuffer[i] = float.MaxValue;
 			}
+		}
+
+		/// <summary>
+		/// Clears the canvas.
+		/// </summary>
+		public void Clear()
+		{
+			this.pixels.Initialize();
+			this.zBuffer.Initialize();
+			this.xBuf.Initialize();
+			this.yBuf.Initialize();
+			this.zBuf.Initialize();
+			this.normalBuf.Initialize();
+			this.colorBuf.Initialize();
+
+			this.ResetTransforms();
+			this.ClearPixels();
 		}
 
 		#region Colors
@@ -304,6 +333,18 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Degrees">Degrees</param>
 		/// <param name="CenterPoint">Center point.</param>
 		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateX(float Degrees, object CenterPoint)
+		{
+			return RotateX(Degrees, ToVector3(CenterPoint));
+		}
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the X-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
 		public Matrix4x4 RotateX(float Degrees, Vector3 CenterPoint)
 		{
 			Matrix4x4 Prev = this.modelTransformation;
@@ -321,6 +362,18 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 Prev = this.modelTransformation;
 			this.modelTransformation = Matrix4x4.CreateRotationY(Degrees * degToRad) * this.modelTransformation;
 			return Prev;
+		}
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the Y-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateY(float Degrees, object CenterPoint)
+		{
+			return RotateY(Degrees, ToVector3(CenterPoint));
 		}
 
 		/// <summary>
@@ -356,6 +409,18 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Degrees">Degrees</param>
 		/// <param name="CenterPoint">Center point.</param>
 		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateZ(float Degrees, object CenterPoint)
+		{
+			return RotateZ(Degrees, ToVector3(CenterPoint));
+		}
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the Z-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
 		public Matrix4x4 RotateZ(float Degrees, Vector3 CenterPoint)
 		{
 			Matrix4x4 Prev = this.modelTransformation;
@@ -373,6 +438,17 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 Prev = this.modelTransformation;
 			this.modelTransformation = Matrix4x4.CreateScale(Scale) * this.modelTransformation;
 			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="Scale">Scale</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float Scale, object CenterPoint)
+		{
+			return this.Scale(Scale, ToVector3(CenterPoint));
 		}
 
 		/// <summary>
@@ -400,6 +476,19 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 Prev = this.modelTransformation;
 			this.modelTransformation = Matrix4x4.CreateScale(ScaleX, ScaleY, ScaleZ) * this.modelTransformation;
 			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="ScaleX">Scale along X-axis.</param>
+		/// <param name="ScaleY">Scale along Y-axis.</param>
+		/// <param name="ScaleZ">Scale along Z-axis.</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float ScaleX, float ScaleY, float ScaleZ, object CenterPoint)
+		{
+			return this.Scale(ScaleX, ScaleY, ScaleZ, ToVector3(CenterPoint));
 		}
 
 		/// <summary>
@@ -1279,6 +1368,35 @@ namespace Waher.Script.Graphs3D
 			return new Vector3(P.X * d, P.Y * d, P.Z * d);
 		}
 
+		internal static Vector3 ToVector3(object Object)
+		{
+			if (Object is Vector3 Vector3)
+				return Vector3;
+			else if (Object is Vector4 Vector4)
+				return ToVector3(Vector4);
+			else
+			{
+				if (!(Object is double[] V))
+				{
+					if (Object is Objects.VectorSpaces.DoubleVector V2)
+						V = V2.Values;
+					else
+						V = null;
+				}
+
+				if (!(V is null))
+				{
+					switch (V.Length)
+					{
+						case 3: return new Vector3((float)V[0], (float)V[1], (float)V[2]);
+						case 4: return ToVector3(new Vector4((float)V[0], (float)V[1], (float)V[2], (float)V[3]));
+					}
+				}
+
+				throw new NotSupportedException("Unable to convert argument to a Vector3 object instance.");
+			}
+		}
+
 		internal static Vector4 ToPoint(Vector3 P)
 		{
 			return new Vector4(P.X, P.Y, P.Z, 1);
@@ -1742,7 +1860,7 @@ namespace Waher.Script.Graphs3D
 				}
 				else
 				{
-					this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0, 
+					this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0,
 						ToUInt(Rec.shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n)));
 				}
 			}
@@ -2198,6 +2316,98 @@ namespace Waher.Script.Graphs3D
 			this.Polygon(new Vector4[] { P4, P5, P1, P0 }, Shader, false);
 			this.Polygon(new Vector4[] { P6, P7, P3, P2 }, Shader, false);
 			this.Polygon(new Vector4[] { P0, P3, P7, P4 }, Shader, false);
+		}
+
+		#endregion
+
+		#region Graph interface
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		{
+			States = null;
+			return this.GetBitmap();
+		}
+
+		/// <summary>
+		/// Gets script corresponding to a point in a generated bitmap representation of the graph.
+		/// </summary>
+		/// <param name="X">X-Coordinate.</param>
+		/// <param name="Y">Y-Coordinate.</param>
+		/// <param name="States">State objects for the generated bitmap.</param>
+		/// <returns>Script.</returns>
+		public override string GetBitmapClickScript(double X, double Y, object[] States)
+		{
+			return string.Empty;
+		}
+
+		/// <summary>
+		/// The recommended bitmap size of the graph, if such is available, or null if not.
+		/// </summary>
+		public override Tuple<int, int> RecommendedBitmapSize
+		{
+			get { return new Tuple<int, int>(this.width, this.height); }
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the left.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Compares the element to another.
+		/// </summary>
+		/// <param name="obj">Other element to compare against.</param>
+		/// <returns>If elements are equal.</returns>
+		public override bool Equals(object obj)
+		{
+			return obj is Canvas3D Canvas3D && this.id.Equals(Canvas3D.id);
+		}
+
+		/// <summary>
+		/// Calculates a hash code of the element.
+		/// </summary>
+		/// <returns>Hash code.</returns>
+		public override int GetHashCode()
+		{
+			return this.id.GetHashCode();
+		}
+
+		/// <summary>
+		/// Converts an object to a <see cref="PhongIntensity"/> object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Phong intensity object.</returns>
+		public static PhongIntensity ToPhongIntensity(object Object)
+		{
+			if (Object is PhongIntensity PhongIntensity)
+				return PhongIntensity;
+			else
+			{
+				SKColor Color = ToColor(Object);
+				return new PhongIntensity(Color.Red, Color.Green, Color.Blue, Color.Alpha);
+			}
 		}
 
 		#endregion

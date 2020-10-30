@@ -20,6 +20,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Waher.Script.Lab
 {
@@ -125,6 +126,7 @@ namespace Waher.Script.Lab
 		{
 			Expression Exp;
 			TextBlock ScriptBlock;
+			UIElement ResultBlock = null;
 
 			try
 			{
@@ -162,6 +164,12 @@ namespace Waher.Script.Lab
 				{
 					IElement Ans;
 
+					Exp.OnPreview += (sender2, e2) =>
+					{
+						this.Dispatcher.Invoke(() =>
+							ResultBlock = this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
+					};
+
 					try
 					{
 						Ans = Exp.Root.Evaluate(this.variables);
@@ -177,77 +185,8 @@ namespace Waher.Script.Lab
 
 					this.variables["Ans"] = Ans;
 
-					this.Dispatcher.Invoke(() =>
-					{
-						if (Ans is Graph G)
-						{
-							using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
-							{
-								this.AddImageBlock(ScriptBlock, Bmp, G, States);
-							}
-						}
-						else if (Ans.AssociatedObjectValue is SKImage Img)
-							this.AddImageBlock(ScriptBlock, Img, null, null);
-						else if (Ans.AssociatedObjectValue is Exception ex)
-						{
-							ex = Log.UnnestException(ex);
-
-							if (ex is AggregateException ex2)
-							{
-								foreach (Exception ex3 in ex2.InnerExceptions)
-									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold);
-							}
-							else
-								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold);
-						}
-						else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
-						{
-							StringBuilder Markdown = new StringBuilder();
-
-							foreach (string s2 in M.ColumnNames)
-							{
-								Markdown.Append("| ");
-								Markdown.Append(MarkdownDocument.Encode(s2));
-							}
-
-							Markdown.AppendLine(" |");
-
-							foreach (string s2 in M.ColumnNames)
-								Markdown.Append("|---");
-
-							Markdown.AppendLine("|");
-
-							int x, y;
-
-							for (y = 0; y < M.Rows; y++)
-							{
-								for (x = 0; x < M.Columns; x++)
-								{
-									Markdown.Append("| ");
-
-									object Item = M.GetElement(x, y).AssociatedObjectValue;
-									if (Item != null)
-									{
-										if (!(Item is string s2))
-											s2 = Expression.ToString(Item);
-
-										s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-										Markdown.Append(MarkdownDocument.Encode(s2));
-									}
-								}
-
-								Markdown.AppendLine(" |");
-							}
-
-							MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), GetMarkdownSettings());
-							string XAML = Doc.GenerateXAML();
-
-							if (XamlReader.Parse(XAML) is UIElement Parsed)
-								this.AddBlock(ScriptBlock, Parsed);
-						}
-						else
-							this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal);
-					});
+					this.Dispatcher.Invoke(() => 
+						ResultBlock = this.ShowResult(ResultBlock, Ans, ScriptBlock));
 				}
 				catch (Exception ex)
 				{
@@ -259,6 +198,88 @@ namespace Waher.Script.Lab
 				}
 			});
 		}
+
+		private UIElement ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
+		{
+			if (Ans is Graph G)
+			{
+				using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
+				{
+					return this.AddImageBlock(ScriptBlock, Bmp, G, States, ResultBlock);
+				}
+			}
+			else if (Ans.AssociatedObjectValue is SKImage Img)
+				return this.AddImageBlock(ScriptBlock, Img, null, null, ResultBlock);
+			else if (Ans.AssociatedObjectValue is Exception ex)
+			{
+				UIElement Last = ResultBlock ?? ScriptBlock;
+
+				ex = Log.UnnestException(ex);
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+						Last = this.AddTextBlock(Last, ex3.Message, Colors.Red, FontWeights.Bold, null);
+				}
+				else
+					Last = this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ResultBlock);
+
+				return Last;
+			}
+			else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+			{
+				StringBuilder Markdown = new StringBuilder();
+
+				foreach (string s2 in M.ColumnNames)
+				{
+					Markdown.Append("| ");
+					Markdown.Append(MarkdownDocument.Encode(s2));
+				}
+
+				Markdown.AppendLine(" |");
+
+				foreach (string _ in M.ColumnNames)
+					Markdown.Append("|---");
+
+				Markdown.AppendLine("|");
+
+				int x, y;
+
+				for (y = 0; y < M.Rows; y++)
+				{
+					for (x = 0; x < M.Columns; x++)
+					{
+						Markdown.Append("| ");
+
+						object Item = M.GetElement(x, y).AssociatedObjectValue;
+						if (Item != null)
+						{
+							if (!(Item is string s2))
+								s2 = Expression.ToString(Item);
+
+							s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+							Markdown.Append(MarkdownDocument.Encode(s2));
+						}
+					}
+
+					Markdown.AppendLine(" |");
+				}
+
+				MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), GetMarkdownSettings());
+				string XAML = Doc.GenerateXAML();
+
+				if (XamlReader.Parse(XAML) is UIElement Parsed)
+				{
+					this.AddBlock(ScriptBlock, Parsed);
+					return Parsed;
+				}
+
+				return null;
+			}
+			else
+				return this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, ResultBlock);
+		}
+
 		public static MarkdownSettings GetMarkdownSettings()
 		{
 			return new MarkdownSettings(null, false)
@@ -271,25 +292,30 @@ namespace Waher.Script.Lab
 			};
 		}
 
-		private TextBlock AddTextBlock(TextBlock ScriptBlock, string s, Color cl, FontWeight FontWeight)
+		private TextBlock AddTextBlock(UIElement ScriptBlock, string s, Color cl, FontWeight FontWeight, UIElement ResultBlock)
 		{
-			TextBlock ResultBlock = new TextBlock()
+			if (ResultBlock is TextBlock TextBlock)
+				TextBlock.Text = s;
+			else
 			{
-				Text = s,
-				FontFamily = new FontFamily("Courier New"),
-				Foreground = new SolidColorBrush(cl),
-				TextWrapping = TextWrapping.Wrap,
-				FontWeight = FontWeight
-			};
+				TextBlock = new TextBlock()
+				{
+					Text = s,
+					FontFamily = new FontFamily("Courier New"),
+					Foreground = new SolidColorBrush(cl),
+					TextWrapping = TextWrapping.Wrap,
+					FontWeight = FontWeight
+				};
 
-			ResultBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+				TextBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
 
-			this.AddBlock(ScriptBlock, ResultBlock);
+				this.AddBlock(ScriptBlock, TextBlock);
+			}
 
-			return ResultBlock;
+			return TextBlock;
 		}
 
-		private UIElement AddBlock(TextBlock ScriptBlock, UIElement ResultBlock)
+		private UIElement AddBlock(UIElement ScriptBlock, UIElement ResultBlock)
 		{
 			if (ScriptBlock is null)
 				this.HistoryPanel.Children.Add(ResultBlock);
@@ -307,7 +333,7 @@ namespace Waher.Script.Lab
 			this.Input.Focus();
 		}
 
-		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image, Graph Graph, object[] States)
+		private UIElement AddImageBlock(TextBlock ScriptBlock, SKImage Image, Graph Graph, object[] States, UIElement ResultBlock)
 		{
 			BitmapImage BitmapImage;
 			byte[] Bin;
@@ -326,17 +352,29 @@ namespace Waher.Script.Lab
 				ms.Dispose();
 			}
 
-			Image ImageBlock = new Image()
+			if (ResultBlock is Image ImageBlock)
 			{
-				Source = BitmapImage,
-				Width = Image.Width,
-				Height = Image.Height,
-				Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
-			};
+				ImageBlock.Source = BitmapImage;
+				ImageBlock.Width = Image.Width;
+				ImageBlock.Height = Image.Height;
+				ImageBlock.Tag = Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States);
+			}
+			else
+			{
+				ImageBlock = new Image()
+				{
+					Source = BitmapImage,
+					Width = Image.Width,
+					Height = Image.Height,
+					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
+				};
 
-			ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+				ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
 
-			this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
+				this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
+			}
+
+			return ImageBlock;
 		}
 
 		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -426,7 +464,7 @@ namespace Waher.Script.Lab
 
 		internal void Print(string Output)
 		{
-			this.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal));
+			this.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null));
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -436,24 +474,24 @@ namespace Waher.Script.Lab
 			try
 			{
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (Value != null && Value is int)
-					this.Left = (int)Value;
+				if (Value != null && Value is int L)
+					this.Left = L;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (Value != null && Value is int)
-					this.Top = (int)Value;
+				if (Value != null && Value is int T)
+					this.Top = T;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (Value != null && Value is int)
-					this.Width = (int)Value;
+				if (Value != null && Value is int W)
+					this.Width = W;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (Value != null && Value is int)
-					this.Height = (int)Value;
+				if (Value != null && Value is int H)
+					this.Height = H;
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (Value != null && Value is string)
-					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), (string)Value);
+				if (Value != null && Value is string s)
+					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), s);
 			}
 			catch (Exception ex)
 			{

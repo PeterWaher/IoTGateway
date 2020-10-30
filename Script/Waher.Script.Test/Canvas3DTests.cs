@@ -260,25 +260,25 @@ namespace Waher.Script.Test
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateX(30, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateX(120, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(-250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateX(210, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateX(500, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			this.Save(Canvas, "11.png");
 		}
@@ -296,25 +296,25 @@ namespace Waher.Script.Test
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateY(30, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateY(120, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(-250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateY(210, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateY(500, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			this.Save(Canvas, "12.png");
 		}
@@ -332,32 +332,27 @@ namespace Waher.Script.Test
 			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(30, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, 250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(120, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(-250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(210, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			Canvas.ModelTransformation = Bak;
 			Canvas.Translate(250, -250, 0);
 			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
 			Canvas.RotateZ(500, new Vector3(0, 0, 1500));
-			this.DrawCube(Canvas, Shader);
+			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			this.Save(Canvas, "13.png");
-		}
-
-		private void DrawCube(Canvas3D Canvas, I3DShader Shader)
-		{
-			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 		}
 
 		// TODO: Clip

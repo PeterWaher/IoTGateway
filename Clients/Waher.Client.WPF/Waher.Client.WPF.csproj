@@ -484,6 +484,10 @@
       <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
       <Name>Waher.Script.Fractals</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj">
+      <Project>{a0be2c7f-2272-468c-8b4a-05a246d5aaf3}</Project>
+      <Name>Waher.Script.Graphs3D</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>

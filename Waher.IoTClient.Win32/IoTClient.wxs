@@ -268,6 +268,7 @@
 							<File Id='Waher.Script.Content.dll' Name='Waher.Script.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Content.dll' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Fractals.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.dll' Vital='yes'/>
+							<File Id='Waher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
               <File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
               <File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
@@ -314,6 +315,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Content.dll' Name='Waher.Script.Content.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
@@ -368,6 +370,7 @@
 							<File Id='Waher.Script.Content.pdb' Name='Waher.Script.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Content.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Fractals.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
               <File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
               <File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
@@ -420,6 +423,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Content.pdb' Name='Waher.Script.Content.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>

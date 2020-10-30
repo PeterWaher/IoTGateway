@@ -17,9 +17,9 @@ namespace Waher.Script.Graphs3D
 		private readonly float[] zBuf;
 		private readonly Vector3[] normalBuf;
 		private readonly SKColor[] colorBuf;
-		private float distance = 0;
-		private Vector3 viewerPosition = Vector3.Zero;
-		private Matrix4x4 t;
+		private Vector3 viewerPosition;
+		private Matrix4x4 projectionTransformation;
+		private Matrix4x4 modelTransformation;
 		private Vector4 last = Vector4.Zero;
 		private readonly int width;
 		private readonly int height;
@@ -30,6 +30,7 @@ namespace Waher.Script.Graphs3D
 		private readonly int hm1;
 		private readonly int cx;
 		private readonly int cy;
+		private float distance;
 
 		/// <summary>
 		/// 3D drawing area.
@@ -39,10 +40,10 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Width">Width of area, in pixels.</param>
 		/// <param name="Height">Height of area, in pixels.</param>
-		/// <param name="Oversampling">Number of subpixels for each generated pixel.
+		/// <param name="OverSampling">Number of subpixels for each generated pixel.
 		/// Oversampling provides a means to achieve anti-aliasing in the rendered result.</param>
 		/// <param name="BackgroundColor">Background color</param>
-		public Canvas3D(int Width, int Height, int Oversampling, SKColor BackgroundColor)
+		public Canvas3D(int Width, int Height, int OverSampling, SKColor BackgroundColor)
 		{
 			if (Width <= 0)
 				throw new ArgumentOutOfRangeException("Width must be a positive integer.", nameof(Width));
@@ -50,14 +51,14 @@ namespace Waher.Script.Graphs3D
 			if (Height <= 0)
 				throw new ArgumentOutOfRangeException("Height must be a positive integer.", nameof(Height));
 
-			if (Oversampling <= 0)
-				throw new ArgumentOutOfRangeException("Oversampling must be a positive integer.", nameof(Oversampling));
+			if (OverSampling <= 0)
+				throw new ArgumentOutOfRangeException("Oversampling must be a positive integer.", nameof(OverSampling));
 
 			this.width = Width;
 			this.height = Height;
-			this.overSampling = Oversampling;
-			this.w = Width * Oversampling;
-			this.h = Height * Oversampling;
+			this.overSampling = OverSampling;
+			this.w = Width * OverSampling;
+			this.h = Height * OverSampling;
 			this.wm1 = this.w - 1;
 			this.hm1 = this.h - 1;
 			this.cx = this.w / 2;
@@ -177,7 +178,7 @@ namespace Waher.Script.Graphs3D
 
 		#endregion
 
-		#region Transforms
+		#region Projection Transformations
 
 		/// <summary>
 		/// Resets any transforms.
@@ -186,55 +187,57 @@ namespace Waher.Script.Graphs3D
 		{
 			this.distance = 0;
 			this.viewerPosition = new Vector3(this.cx, this.cy, 0);
-			this.t = new Matrix4x4(this.overSampling, 0, 0, 0, 0, this.overSampling, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+			this.projectionTransformation = Matrix4x4.CreateTranslation(this.cx, this.cy, 0);
+			this.projectionTransformation = Matrix4x4.CreateScale(-this.overSampling, this.overSampling, 1) * this.projectionTransformation;
+			this.modelTransformation = Matrix4x4.Identity;
 		}
 
 		/// <summary>
-		/// Multiplies a projection matrix (along the Z-axis) to the current transformation.
+		/// Current projection transformation matrix.
 		/// </summary>
-		/// <param name="Distance">Distance between projection plane and camera.</param>
-		public void ProjectZ(float Distance)
+		public Matrix4x4 ProjectionTransformation
 		{
-			if (Distance <= 0)
-				throw new ArgumentOutOfRangeException("Invalid camera distance.", nameof(Distance));
-
-			this.distance = Distance;
-			this.viewerPosition = new Vector3(this.cx, this.cy, -this.distance);
+			get => this.projectionTransformation;
+			set => this.projectionTransformation = value;
 		}
 
 		/// <summary>
-		/// Distance from projection plane.
+		/// Applies a perspective projection.
 		/// </summary>
-		public float Distance => this.distance;
+		/// <param name="NearPlaneDistance">Distance between near projection plane and camera.</param>
+		/// <param name="FarPlaneDistance">Distance between far projection plane and camera.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Perspective(float NearPlaneDistance, float FarPlaneDistance)
+		{
+			if (NearPlaneDistance <= 0)
+				throw new ArgumentOutOfRangeException("Invalid camera distance.", nameof(NearPlaneDistance));
+
+			if (FarPlaneDistance <= NearPlaneDistance)
+				throw new ArgumentOutOfRangeException("Invalid camera distance.", nameof(FarPlaneDistance));
+
+			Matrix4x4 Prev = this.projectionTransformation;
+			this.projectionTransformation = Matrix4x4.CreatePerspective(1, 1, NearPlaneDistance, FarPlaneDistance) * this.projectionTransformation;
+			this.distance = NearPlaneDistance;
+			this.viewerPosition = new Vector3(this.cx, this.cy, -this.distance);
+
+			return Prev;
+		}
 
 		/// <summary>
-		/// Viewer position.
+		/// Viewer position
 		/// </summary>
 		public Vector3 ViewerPosition => this.viewerPosition;
 
 		/// <summary>
-		/// Transforms a world coordinate to a display coordinate.
+		/// Transforms coordinates to screen coordinates.
 		/// </summary>
 		/// <param name="Point">Point.</param>
 		/// <returns>Transformed point.</returns>
-		public Vector4 Transform(Vector4 Point)
+		public Vector3 Project(Vector4 Point)
 		{
-			float x, y;
-
-			Point = Vector4.Transform(Point, this.t);
-			if (this.distance > 0)
-			{
-				float d = this.distance / (Point.Z + this.distance);
-				x = this.cx + (int)(Point.X * d + 0.5f);
-				y = this.cy - (int)(Point.Y * d + 0.5f);
-			}
-			else
-			{
-				x = this.cx + (int)(Point.X + 0.5f);
-				y = this.cy - (int)(Point.Y + 0.5f);
-			}
-
-			return new Vector4(x, y, Point.Z, 1);
+			Vector4 v = Vector4.Transform(Point, this.projectionTransformation);
+			float d = 1f / v.W;
+			return new Vector3(v.X * d, v.Y * d, v.Z * d);
 		}
 
 		/// <summary>
@@ -242,24 +245,190 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Point">Point.</param>
 		/// <returns>Transformed point.</returns>
-		public Vector3 Transform(Vector3 Point)
+		public Vector3 Project(Vector3 Point)
 		{
-			float x, y;
+			return Vector3.Transform(Point, this.projectionTransformation);
+		}
 
-			Point = Vector3.Transform(Point, this.t);
-			if (this.distance > 0)
-			{
-				float d = this.distance / (Point.Z + this.distance);
-				x = this.cx + (int)(Point.X * d + 0.5f);
-				y = this.cy - (int)(Point.Y * d + 0.5f);
-			}
-			else
-			{
-				x = this.cx + (int)(Point.X + 0.5f);
-				y = this.cy - (int)(Point.Y + 0.5f);
-			}
+		#endregion
 
-			return new Vector3(x, y, Point.Z);
+		#region Model Transformations
+
+		/// <summary>
+		/// Current model transformation matrix.
+		/// </summary>
+		public Matrix4x4 ModelTransformation
+		{
+			get => this.modelTransformation;
+			set => this.modelTransformation = value;
+		}
+
+		/// <summary>
+		/// Transforms a world coordinate to a display coordinate.
+		/// </summary>
+		/// <param name="Point">Point.</param>
+		/// <returns>Transformed point.</returns>
+		public Vector4 ModelTransform(Vector4 Point)
+		{
+			return Vector4.Transform(Point, this.modelTransformation);
+		}
+
+		/// <summary>
+		/// Transforms a world coordinate to a display coordinate.
+		/// </summary>
+		/// <param name="Point">Point.</param>
+		/// <returns>Transformed point.</returns>
+		public Vector3 ModelTransform(Vector3 Point)
+		{
+			return Vector3.Transform(Point, this.modelTransformation);
+		}
+
+		/// <summary>
+		/// Rotates the world around the X-axis.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateX(float Degrees)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationX(Degrees * degToRad) * this.modelTransformation;
+			return Prev;
+		}
+
+		private const float degToRad = (float)(Math.PI / 180);
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the X-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateX(float Degrees, Vector3 CenterPoint)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationX(Degrees * degToRad, CenterPoint) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Rotates the world around the Y-axis.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateY(float Degrees)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationY(Degrees * degToRad) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the Y-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateY(float Degrees, Vector3 CenterPoint)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationY(Degrees * degToRad, CenterPoint) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Rotates the world around the Z-axis.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateZ(float Degrees)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationZ(Degrees * degToRad) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Rotates the world around an axis parallel to the Z-axis, going through
+		/// the center point <paramref name="CenterPoint"/>.
+		/// </summary>
+		/// <param name="Degrees">Degrees</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 RotateZ(float Degrees, Vector3 CenterPoint)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateRotationZ(Degrees * degToRad, CenterPoint) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="Scale">Scale</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float Scale)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateScale(Scale) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="Scale">Scale</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float Scale, Vector3 CenterPoint)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateScale(Scale, CenterPoint) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="ScaleX">Scale along X-axis.</param>
+		/// <param name="ScaleY">Scale along Y-axis.</param>
+		/// <param name="ScaleZ">Scale along Z-axis.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float ScaleX, float ScaleY, float ScaleZ)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateScale(ScaleX, ScaleY, ScaleZ) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Scales the world
+		/// </summary>
+		/// <param name="ScaleX">Scale along X-axis.</param>
+		/// <param name="ScaleY">Scale along Y-axis.</param>
+		/// <param name="ScaleZ">Scale along Z-axis.</param>
+		/// <param name="CenterPoint">Center point.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Scale(float ScaleX, float ScaleY, float ScaleZ, Vector3 CenterPoint)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateScale(ScaleX, ScaleY, ScaleZ, CenterPoint) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Translates the world.
+		/// </summary>
+		/// <param name="DeltaX">Movement along the X-axis.</param>
+		/// <param name="DelayY">Movement along the Y-axis.</param>
+		/// <param name="DeltaZ">Movement along the Z-axis.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Translate(float DeltaX, float DelayY, float DeltaZ)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateTranslation(DeltaX, DelayY, DeltaZ) * this.modelTransformation;
+			return Prev;
 		}
 
 		#endregion
@@ -283,85 +452,72 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Color">Color.</param>
 		public void Plot(Vector4 Point, uint Color)
 		{
-			int x, y;
-
 			this.last = Point;
 
-			Point = Vector4.Transform(Point, this.t);
-			if (Point.Z >= 0)
-			{
-				if (this.distance > 0)
-				{
-					float d = this.distance / (Point.Z + this.distance);
-					x = this.cx + (int)(Point.X * d + 0.5f);
-					y = this.cy - (int)(Point.Y * d + 0.5f);
-				}
-				else
-				{
-					x = this.cx + (int)(Point.X + 0.5f);
-					y = this.cy - (int)(Point.Y + 0.5f);
-				}
-
-				if (x >= 0 && x < this.w && y >= 0 && y < this.h)
-					this.Plot(x, y, Point.Z, Color);
-			}
+			Vector4 WorldPoint = this.ModelTransform(Point);
+			Vector3 ScreenPoint = this.Project(WorldPoint);
+			if (ScreenPoint.Z >= 0)
+				this.Plot((int)(ScreenPoint.X + 0.5f), (int)(ScreenPoint.Y + 0.5f), WorldPoint.Z, Color);
 		}
 
 		private void Plot(int x, int y, float z, uint Color)
 		{
-			int p = y * this.w + x;
-
-			if (z >= 0 && z < this.zBuffer[p])
+			if (x >= 0 && x < this.w && y >= 0 && y < this.h)
 			{
-				this.zBuffer[p] = z;
+				int p = y * this.w + x;
 
-				p <<= 2;
-
-				byte A = (byte)(Color >> 24);
-				if (A == 255)
+				if (z >= 0 && z < this.zBuffer[p])
 				{
-					this.pixels[p++] = (byte)Color;
-					Color >>= 8;
-					this.pixels[p++] = (byte)Color;
-					Color >>= 8;
-					this.pixels[p++] = (byte)Color;
-					Color >>= 8;
-					this.pixels[p] = (byte)Color;
-				}
-				else
-				{
-					byte R = (byte)Color;
-					byte G = (byte)(Color >> 8);
-					byte B = (byte)(Color >> 16);
-					byte R2 = this.pixels[p++];
-					byte G2 = this.pixels[p++];
-					byte B2 = this.pixels[p++];
-					byte A2 = this.pixels[p];
-					byte R3, G3, B3, A3;
+					this.zBuffer[p] = z;
 
-					if (A2 == 255)
+					p <<= 2;
+
+					byte A = (byte)(Color >> 24);
+					if (A == 255)
 					{
-						R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
-						G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
-						B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
-						A3 = 255;
+						this.pixels[p++] = (byte)Color;
+						Color >>= 8;
+						this.pixels[p++] = (byte)Color;
+						Color >>= 8;
+						this.pixels[p++] = (byte)Color;
+						Color >>= 8;
+						this.pixels[p] = (byte)Color;
 					}
 					else
 					{
-						R2 = (byte)((R2 * A2 + 128) / 255);
-						G2 = (byte)((G2 * A2 + 128) / 255);
-						B2 = (byte)((B2 * A2 + 128) / 255);
+						byte R = (byte)Color;
+						byte G = (byte)(Color >> 8);
+						byte B = (byte)(Color >> 16);
+						byte R2 = this.pixels[p++];
+						byte G2 = this.pixels[p++];
+						byte B2 = this.pixels[p++];
+						byte A2 = this.pixels[p];
+						byte R3, G3, B3, A3;
 
-						R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
-						G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
-						B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
-						A3 = (byte)(255 - (((255 - A) * (255 - A2) + 128) / 255));
+						if (A2 == 255)
+						{
+							R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
+							G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
+							B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+							A3 = 255;
+						}
+						else
+						{
+							R2 = (byte)((R2 * A2 + 128) / 255);
+							G2 = (byte)((G2 * A2 + 128) / 255);
+							B2 = (byte)((B2 * A2 + 128) / 255);
+
+							R3 = (byte)(((R * A + R2 * (255 - A)) + 128) / 255);
+							G3 = (byte)(((G * A + G2 * (255 - A)) + 128) / 255);
+							B3 = (byte)(((B * A + B2 * (255 - A)) + 128) / 255);
+							A3 = (byte)(255 - (((255 - A) * (255 - A2) + 128) / 255));
+						}
+
+						this.pixels[p--] = A3;
+						this.pixels[p--] = B3;
+						this.pixels[p--] = G3;
+						this.pixels[p] = R3;
 					}
-
-					this.pixels[p--] = A3;
-					this.pixels[p--] = B3;
-					this.pixels[p--] = G3;
-					this.pixels[p] = R3;
 				}
 			}
 		}
@@ -575,43 +731,30 @@ namespace Waher.Script.Graphs3D
 		{
 			this.last = P1;
 
-			P0 = Vector4.Transform(P0, this.t);
-			P1 = Vector4.Transform(P1, this.t);
+			Vector4 WP0 = this.ModelTransform(P0);
+			Vector4 WP1 = this.ModelTransform(P1);
+			Vector3 SP0 = this.Project(WP0);
+			Vector3 SP1 = this.Project(WP1);
 
 			// TODO: Clip z=0
 
 			float x0, y0, z0;
 			float x1, y1, z1;
-			float temp;
 
-			if (this.distance > 0)
-			{
-				z0 = P0.Z;
-				temp = this.distance / (z0 + this.distance);
-				x0 = this.cx + P0.X * temp;
-				y0 = this.cy - P0.Y * temp;
+			x0 = SP0.X;
+			y0 = SP0.Y;
+			z0 = SP0.Z;
 
-				z1 = P1.Z;
-				temp = 1.0f / (z1 + this.distance);
-				x1 = this.cx + P1.X * this.distance * temp;
-				y1 = this.cy - P1.Y * this.distance * temp;
-			}
-			else
-			{
-				x0 = this.cx + P0.X;
-				y0 = this.cy - P0.Y;
-				z0 = P0.Z;
-				x1 = this.cx + P1.X;
-				y1 = this.cy - P1.Y;
-				z1 = P1.Z;
-			}
-
+			x1 = SP1.X;
+			y1 = SP1.Y;
+			z1 = SP1.Z;
 
 			if (this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 			{
 				float dx = x1 - x0;
 				float dy = y1 - y0;
 				float dz;
+				float temp;
 
 				this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0, Color);
 
@@ -900,7 +1043,11 @@ namespace Waher.Script.Graphs3D
 
 		private static Vector3 ToVector3(Vector4 P)
 		{
-			return new Vector3(P.X, P.Y, P.Z);
+			if (P.W == 1 || P.W == 0)
+				return new Vector3(P.X, P.Y, P.Z);
+
+			float d = 1f / P.W;
+			return new Vector3(P.X * d, P.Y * d, P.Z * d);
 		}
 
 		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
@@ -1050,31 +1197,40 @@ namespace Waher.Script.Graphs3D
 			int MinY = 0;
 			int MaxY = 0;
 			int Y;
-			Vector4 P;
-			Vector4[] v;
+			Vector4 WP;
+			Vector3 SP;
+			Vector4[] v, vw;
+			Vector3[] vs;
 			bool First = true;
 
 			Shader.Transform(this);
 			Nodes = (Vector4[][])Nodes.Clone();
 
 			d = Nodes.Length;
+
+			Vector4[][] World = new Vector4[d][];
+			Vector3[][] Screen = new Vector3[d][];
+
 			for (j = 0; j < d; j++)
 			{
-				v = (Vector4[])Nodes[j].Clone();
-				Nodes[j] = v;
-
+				v = Nodes[j];
 				c = v.Length;
+
 				if (c < 3)
 					continue;
 
+				vw = new Vector4[c];
+				World[j] = vw;
+
+				vs = new Vector3[c];
+				Screen[j] = vs;
+
 				for (i = 0; i < c; i++)
 				{
-					v[i] = P = Vector4.Transform(v[i], this.t);
+					vw[i] = WP = this.ModelTransform(v[i]);
+					vs[i] = SP = this.Project(WP);
 
-					if (this.distance > 0)
-						Y = (int)(this.cy - P.Y * this.distance / (P.Z + this.distance) + 0.5f);
-					else
-						Y = (int)(this.cy - P.Y + 0.5f);
+					Y = (int)(SP.Y + 0.5f);
 
 					if (First)
 					{
@@ -1101,38 +1257,34 @@ namespace Waher.Script.Graphs3D
 			int NrRecs = MaxY - MinY + 1;
 			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
 			ScanLineRec Rec;
-			Vector4 Last;
-			Vector4 Current;
+			Vector4 LastWorld;
+			Vector4 CurrentWorld;
+			Vector3 LastScreen;
+			Vector3 CurrentScreen;
 			Vector3 N;
 			float x0, y0, z0;
 			float x1, y1, z1;
-			float w;
 			float dx, dy, dz;
 			int iy0, iy1;
 
 			for (j = 0; j < d; j++)
 			{
-				v = Nodes[j];
-				c = v.Length;
+				vw = World[j];
+				vs = Screen[j];
+				c = vw.Length;
 
 				if (c < 3)
 					continue;
 
-				Last = v[c - 2];
-				Current = v[c - 1];
+				//LastWorld = vw[c - 2];
+				CurrentWorld = vw[c - 1];
+				LastScreen = vs[c - 2];
+				CurrentScreen = vs[c - 1];
 
-				N = CalcNormal(ToVector3(v[0]), ToVector3(v[1]), ToVector3(Current));
+				N = CalcNormal(ToVector3(vw[0]), ToVector3(vw[1]), ToVector3(CurrentWorld));
 
-				if (this.distance > 0)
-				{
-					y0 = this.cy - Last.Y * this.distance / (Last.Z + this.distance);
-					y1 = this.cy - Current.Y * this.distance / (Current.Z + this.distance);
-				}
-				else
-				{
-					y0 = this.cy - Last.Y;
-					y1 = this.cy - Current.Y;
-				}
+				y0 = LastScreen.Y;
+				y1 = CurrentScreen.Y;
 
 				iy0 = (int)(y0 + 0.5f);
 				iy1 = (int)(y1 + 0.5f);
@@ -1142,31 +1294,19 @@ namespace Waher.Script.Graphs3D
 
 				for (i = 0; i < c; i++)
 				{
-					Last = Current;
-					Current = v[i];
+					LastWorld = CurrentWorld;
+					CurrentWorld = vw[i];
 
-					if (this.distance > 0)
-					{
-						w = this.distance / (Last.Z + this.distance);
-						x0 = this.cx + Last.X * w;
-						y0 = this.cy - Last.Y * w;
-						z0 = Last.Z;
+					LastScreen = CurrentScreen;
+					CurrentScreen = vs[i];
 
-						w = this.distance / (Current.Z + this.distance);
-						x1 = this.cx + Current.X * w;
-						y1 = this.cy - Current.Y * w;
-						z1 = Current.Z;
-					}
-					else
-					{
-						x0 = this.cx + Last.X;
-						y0 = this.cy - Last.Y;
-						z0 = Last.Z;
+					x0 = LastScreen.X;
+					y0 = LastScreen.Y;
+					z0 = LastWorld.Z;
 
-						x1 = this.cx + Current.X;
-						y1 = this.cy - Current.Y;
-						z1 = Current.Z;
-					}
+					x1 = CurrentScreen.X;
+					y1 = CurrentScreen.Y;
+					z1 = CurrentWorld.Z;
 
 					if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 						continue;
@@ -1589,17 +1729,10 @@ namespace Waher.Script.Graphs3D
 			}
 			finally
 			{
-				if (Paint != null)
-					Paint.Dispose();
-
-				if (Path != null)
-					Path.Dispose();
-
-				if (Simple != null)
-					Simple.Dispose();
-
-				if (e != null)
-					e.Dispose();
+				Paint?.Dispose();
+				Path?.Dispose();
+				Simple?.Dispose();
+				e?.Dispose();
 			}
 		}
 

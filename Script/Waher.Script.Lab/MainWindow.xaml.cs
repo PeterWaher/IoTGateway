@@ -269,10 +269,7 @@ namespace Waher.Script.Lab
 				string XAML = Doc.GenerateXAML();
 
 				if (XamlReader.Parse(XAML) is UIElement Parsed)
-				{
-					this.AddBlock(ScriptBlock, Parsed);
-					return Parsed;
-				}
+					return this.AddBlock(ScriptBlock, Parsed);
 
 				return null;
 			}

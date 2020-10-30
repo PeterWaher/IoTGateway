@@ -67,6 +67,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			Waher.Script.Expression Exp;
 			TextBlock ScriptBlock;
+			UIElement ResultBlock = null;
 
 			try
 			{
@@ -101,6 +102,12 @@ namespace Waher.Client.WPF.Controls
 				{
 					IElement Ans;
 
+					Exp.OnPreview += (sender2, e2) =>
+					{
+						this.Dispatcher.Invoke(() =>
+							ResultBlock = this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
+					};
+
 					try
 					{
 						Ans = Exp.Root.Evaluate(this.variables);
@@ -118,91 +125,7 @@ namespace Waher.Client.WPF.Controls
 
 					MainWindow.UpdateGui(() =>
 					{
-						try
-						{
-							if (Ans is Graph G)
-							{
-								using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
-								{
-									this.AddImageBlock(ScriptBlock, Bmp, G, States);
-								}
-							}
-							else if (Ans.AssociatedObjectValue is SKImage Img)
-								this.AddImageBlock(ScriptBlock, Img, null, null);
-							else if (Ans.AssociatedObjectValue is Exception ex)
-							{
-								ex = Log.UnnestException(ex);
-
-								if (ex is AggregateException ex2)
-								{
-									foreach (Exception ex3 in ex2.InnerExceptions)
-										ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold, ex3);
-								}
-								else
-									this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ex);
-							}
-							else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
-							{
-								StringBuilder Markdown = new StringBuilder();
-
-								foreach (string s2 in M.ColumnNames)
-								{
-									Markdown.Append("| ");
-									Markdown.Append(MarkdownDocument.Encode(s2));
-								}
-
-								Markdown.AppendLine(" |");
-
-								foreach (string s2 in M.ColumnNames)
-									Markdown.Append("|---");
-
-								Markdown.AppendLine("|");
-
-								int x, y;
-
-								for (y = 0; y < M.Rows; y++)
-								{
-									for (x = 0; x < M.Columns; x++)
-									{
-										Markdown.Append("| ");
-
-										object Item = M.GetElement(x, y).AssociatedObjectValue;
-										if (Item != null)
-										{
-											if (!(Item is string s2))
-												s2 = Waher.Script.Expression.ToString(Item);
-
-											s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-											Markdown.Append(MarkdownDocument.Encode(s2));
-										}
-									}
-
-									Markdown.AppendLine(" |");
-								}
-
-								MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), ChatView.GetMarkdownSettings());
-								string XAML = Doc.GenerateXAML();
-
-								if (XamlReader.Parse(XAML) is UIElement Parsed)
-									this.AddBlock(ScriptBlock, Parsed);
-							}
-							else
-								this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, true);
-						}
-						catch (Exception ex)
-						{
-							ex = Log.UnnestException(ex);
-							Ans = new ObjectValue(ex);
-							this.variables["Ans"] = Ans;
-
-							if (ex is AggregateException ex2)
-							{
-								foreach (Exception ex3 in ex2.InnerExceptions)
-									ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold, ex3);
-							}
-							else
-								this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ex);
-						}
+						ResultBlock = this.ShowResult(ResultBlock, Ans, ScriptBlock);
 					});
 				}
 				catch (Exception ex)
@@ -213,24 +136,129 @@ namespace Waher.Client.WPF.Controls
 			});
 		}
 
-		private TextBlock AddTextBlock(TextBlock ScriptBlock, string s, Color cl, FontWeight Weight, object Tag)
+		private UIElement ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
 		{
-			TextBlock ResultBlock = new TextBlock()
+			try
 			{
-				Text = s,
-				FontFamily = new FontFamily("Courier New"),
-				Foreground = new SolidColorBrush(cl),
-				TextWrapping = TextWrapping.Wrap,
-				FontWeight = Weight,
-				Tag = Tag
-			};
+				if (Ans is Graph G)
+				{
+					using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
+					{
+						return this.AddImageBlock(ScriptBlock, Bmp, G, States, ResultBlock);
+					}
+				}
+				else if (Ans.AssociatedObjectValue is SKImage Img)
+					return this.AddImageBlock(ScriptBlock, Img, null, null, ResultBlock);
+				else if (Ans.AssociatedObjectValue is Exception ex)
+				{
+					UIElement Last = ResultBlock ?? ScriptBlock;
 
-			this.AddBlock(ScriptBlock, ResultBlock);
+					ex = Log.UnnestException(ex);
 
-			return ResultBlock;
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+							Last = this.AddTextBlock(Last, ex3.Message, Colors.Red, FontWeights.Bold, null, ex3);
+					}
+					else
+						Last = this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ResultBlock, ex);
+
+					return Last;
+				}
+				else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+				{
+					StringBuilder Markdown = new StringBuilder();
+
+					foreach (string s2 in M.ColumnNames)
+					{
+						Markdown.Append("| ");
+						Markdown.Append(MarkdownDocument.Encode(s2));
+					}
+
+					Markdown.AppendLine(" |");
+
+					foreach (string s2 in M.ColumnNames)
+						Markdown.Append("|---");
+
+					Markdown.AppendLine("|");
+
+					int x, y;
+
+					for (y = 0; y < M.Rows; y++)
+					{
+						for (x = 0; x < M.Columns; x++)
+						{
+							Markdown.Append("| ");
+
+							object Item = M.GetElement(x, y).AssociatedObjectValue;
+							if (Item != null)
+							{
+								if (!(Item is string s2))
+									s2 = Waher.Script.Expression.ToString(Item);
+
+								s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+								Markdown.Append(MarkdownDocument.Encode(s2));
+							}
+						}
+
+						Markdown.AppendLine(" |");
+					}
+
+					MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), ChatView.GetMarkdownSettings());
+					string XAML = Doc.GenerateXAML();
+
+					if (XamlReader.Parse(XAML) is UIElement Parsed)
+						return this.AddBlock(ScriptBlock, Parsed);
+
+					return null;
+				}
+				else
+					return this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, ResultBlock, Ans);
+			}
+			catch (Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+				Ans = new ObjectValue(ex);
+				this.variables["Ans"] = Ans;
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+						ScriptBlock = this.AddTextBlock(ScriptBlock, ex3.Message, Colors.Red, FontWeights.Bold, null, ex3);
+				}
+				else
+					this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ResultBlock, ex);
+
+				return null;
+			}
 		}
 
-		private UIElement AddBlock(TextBlock ScriptBlock, UIElement ResultBlock)
+		private TextBlock AddTextBlock(UIElement ScriptBlock, string s, Color cl, FontWeight Weight, UIElement ResultBlock, object Tag)
+		{
+			if (ResultBlock is TextBlock TextBlock)
+			{
+				TextBlock.Text = s;
+				TextBlock.Tag = Tag;
+			}
+			else
+			{
+				TextBlock = new TextBlock()
+				{
+					Text = s,
+					FontFamily = new FontFamily("Courier New"),
+					Foreground = new SolidColorBrush(cl),
+					TextWrapping = TextWrapping.Wrap,
+					FontWeight = Weight,
+					Tag = Tag
+				};
+
+				this.AddBlock(ScriptBlock, TextBlock);
+			}
+
+			return TextBlock;
+		}
+
+		private UIElement AddBlock(UIElement ScriptBlock, UIElement ResultBlock)
 		{
 			if (ScriptBlock is null)
 				this.HistoryPanel.Children.Add(ResultBlock);
@@ -248,7 +276,7 @@ namespace Waher.Client.WPF.Controls
 			e.Handled = true;
 		}
 
-		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image, Graph Graph, object[] States)
+		private UIElement AddImageBlock(UIElement ScriptBlock, SKImage Image, Graph Graph, object[] States, UIElement ResultBlock)
 		{
 			BitmapImage BitmapImage;
 			byte[] Bin;
@@ -267,17 +295,29 @@ namespace Waher.Client.WPF.Controls
 				ms.Dispose();
 			}
 
-			Image ImageBlock = new Image()
+			if (ResultBlock is Image ImageBlock)
 			{
-				Source = BitmapImage,
-				Width = Image.Width,
-				Height = Image.Height,
-				Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
-			};
+				ImageBlock.Source = BitmapImage;
+				ImageBlock.Width = Image.Width;
+				ImageBlock.Height = Image.Height;
+				ImageBlock.Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States);
+			}
+			else
+			{
+				ImageBlock = new Image()
+				{
+					Source = BitmapImage,
+					Width = Image.Width,
+					Height = Image.Height,
+					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
+				};
 
-			ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+				ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
 
-			this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
+				this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
+			}
+
+			return ImageBlock;
 		}
 
 		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -367,7 +407,7 @@ namespace Waher.Client.WPF.Controls
 
 		internal void Print(string Output)
 		{
-			MainWindow.UpdateGui(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, false));
+			MainWindow.UpdateGui(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null, false));
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)
@@ -567,15 +607,15 @@ namespace Waher.Client.WPF.Controls
 							break;
 
 						case "Error":
-							this.AddTextBlock(null, E.InnerText, Colors.Red, FontWeights.Bold, new Exception(E.InnerText));
+							this.AddTextBlock(null, E.InnerText, Colors.Red, FontWeights.Bold, null, new Exception(E.InnerText));
 							break;
 
 						case "Result":
-							this.AddTextBlock(null, E.InnerText, Colors.Red, FontWeights.Normal, true);
+							this.AddTextBlock(null, E.InnerText, Colors.Red, FontWeights.Normal, null, true);
 							break;
 
 						case "Print":
-							this.AddTextBlock(null, E.InnerText, Colors.Blue, FontWeights.Normal, false);
+							this.AddTextBlock(null, E.InnerText, Colors.Blue, FontWeights.Normal, null, false);
 							break;
 
 						case "Image":

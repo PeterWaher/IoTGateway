@@ -27,14 +27,14 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_01_Plot()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			int t;
 
 			for (t = 0; t < 1000000; t++)
 			{
-				double x = t * Math.Sin(t / 10000.0) / 5000.0;
-				double y = t * Math.Cos(t / 20000.0) / 5000.0;
-				double z = t / 10000.0;
+				double x = t * Math.Sin(t / 10000.0) / 2500.0;
+				double y = t * Math.Cos(t / 20000.0) / 2500.0;
+				double z = t / 5000.0;
 				Vector4 P = new Vector4((float)x, (float)y, (float)z, 1);
 				Canvas.Plot(P, SKColors.Red);
 			}
@@ -45,7 +45,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_02_Line()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			this.DrawCurve(Canvas);
 			this.Save(Canvas, "02.png");
 		}
@@ -56,9 +56,9 @@ namespace Waher.Script.Test
 
 			for (t = 0; t < 10000; t++)
 			{
-				double x = t * Math.Sin(t / 100.0) / 50.0;
-				double y = t * Math.Cos(t / 200.0) / 50.0;
-				double z = t / 100.0;
+				double x = t * Math.Sin(t / 100.0) / 25.0;
+				double y = t * Math.Cos(t / 200.0) / 25.0;
+				double z = t / 50.0;
 				Vector4 P = new Vector4((float)x, (float)y, (float)z, 1);
 
 				if (t == 0)
@@ -71,7 +71,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_03_Oversampling()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
 			this.DrawCurve(Canvas);
 			this.Save(Canvas, "03.png");
 		}
@@ -79,22 +79,22 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_04_Perspective()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawWireframeCube(Canvas);
 			this.Save(Canvas, "04.png");
 		}
 
 		private void DrawWireframeCube(Canvas3D Canvas)
 		{
-			Vector4 P0 = new Vector4(-200, -200, 100, 1);
-			Vector4 P1 = new Vector4(-200, -200, 300, 1);
-			Vector4 P2 = new Vector4(200, -200, 300, 1);
-			Vector4 P3 = new Vector4(200, -200, 100, 1);
-			Vector4 P4 = new Vector4(-200, 200, 100, 1);
-			Vector4 P5 = new Vector4(-200, 200, 300, 1);
-			Vector4 P6 = new Vector4(200, 200, 300, 1);
-			Vector4 P7 = new Vector4(200, 200, 100, 1);
+			Vector4 P0 = new Vector4(-500, -500, 1000, 1);
+			Vector4 P1 = new Vector4(-500, -500, 2000, 1);
+			Vector4 P2 = new Vector4(500, -500, 2000, 1);
+			Vector4 P3 = new Vector4(500, -500, 1000, 1);
+			Vector4 P4 = new Vector4(-500, 500, 1000, 1);
+			Vector4 P5 = new Vector4(-500, 500, 2000, 1);
+			Vector4 P6 = new Vector4(500, 500, 2000, 1);
+			Vector4 P7 = new Vector4(500, 500, 1000, 1);
 
 			Canvas.PolyLine(new Vector4[] { P0, P1, P2, P3, P0 }, SKColors.Red);
 			Canvas.PolyLine(new Vector4[] { P4, P5, P6, P7, P4 }, SKColors.Red);
@@ -107,22 +107,22 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_05_Polygon()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawCube(Canvas);
 			this.Save(Canvas, "05.png");
 		}
 
 		private void DrawCube(Canvas3D Canvas)
 		{
-			Vector4 P0 = new Vector4(-200, -200, 100, 1);
-			Vector4 P1 = new Vector4(-200, -200, 300, 1);
-			Vector4 P2 = new Vector4(200, -200, 300, 1);
-			Vector4 P3 = new Vector4(200, -200, 100, 1);
-			Vector4 P4 = new Vector4(-200, 200, 100, 1);
-			Vector4 P5 = new Vector4(-200, 200, 300, 1);
-			Vector4 P6 = new Vector4(200, 200, 300, 1);
-			Vector4 P7 = new Vector4(200, 200, 100, 1);
+			Vector4 P0 = new Vector4(-500, -500, 1000, 1);
+			Vector4 P1 = new Vector4(-500, -500, 2000, 1);
+			Vector4 P2 = new Vector4(500, -500, 2000, 1);
+			Vector4 P3 = new Vector4(500, -500, 1000, 1);
+			Vector4 P4 = new Vector4(-500, 500, 1000, 1);
+			Vector4 P5 = new Vector4(-500, 500, 2000, 1);
+			Vector4 P6 = new Vector4(500, 500, 2000, 1);
+			Vector4 P7 = new Vector4(500, 500, 1000, 1);
 
 			Canvas.Polygon(new Vector4[] { P0, P1, P2, P3 }, new SKColor(255, 0, 0, 128));
 			Canvas.Polygon(new Vector4[] { P4, P5, P6, P7 }, new SKColor(255, 0, 0, 128));
@@ -135,8 +135,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_06_ZBuffer()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawPlanes(Canvas);
 			this.Save(Canvas, "06.png");
 		}
@@ -145,37 +145,36 @@ namespace Waher.Script.Test
 		{
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-200, 100, 100, 1),
-				new Vector4(-200, 100, 300, 1),
-				new Vector4(200, 100, 300, 1),
-				new Vector4(200, 100, 100, 1)
+				new Vector4(-500, 100, 1000, 1),
+				new Vector4(-500, 100, 2000, 1),
+				new Vector4(500, 100, 2000, 1),
+				new Vector4(500, 100, 1000, 1)
 			}, SKColors.Red);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(100, -200, 100, 1),
-				new Vector4(100, -200, 300, 1),
-				new Vector4(100, 200, 300, 1),
-				new Vector4(100, 200, 100, 1)
+				new Vector4(100, -500, 1000, 1),
+				new Vector4(100, -500, 2000, 1),
+				new Vector4(100, 500, 2000, 1),
+				new Vector4(100, 500, 1000, 1)
 			}, SKColors.Green);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-200, -200, 200, 1),
-				new Vector4(200, -200, 200, 1),
-				new Vector4(200, 200, 200, 1),
-				new Vector4(-200, 200, 200, 1),
+				new Vector4(-500, -500, 1500, 1),
+				new Vector4(500, -500, 1500, 1),
+				new Vector4(500, 500, 1500, 1),
+				new Vector4(-500, 500, 1500, 1),
 			}, new SKColor(0, 0, 255, 64));
 		}
 
 		[TestMethod]
 		public void Canvas3D_Test_07_Text()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawPlanes(Canvas);
-			//Canvas.Text("d", new Vector4(-100, -100, 150, 1), "Tahoma", 100, SKColors.BlueViolet);
-			Canvas.Text("Hello World!", new Vector4(-200, -100, 150, 1), "Tahoma", 100, SKColors.BlueViolet);
+			Canvas.Text("Hello World!", new Vector4(-400, 50, 1150, 1), "Tahoma", 150, SKColors.BlueViolet);
 
 			this.Save(Canvas, "07.png");
 		}
@@ -183,8 +182,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_08_PhongShading_NoOversampling()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 1, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawThreePlanes(Canvas);
 			this.Save(Canvas, "08.png");
 		}
@@ -192,8 +191,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_09_PhongShading_Oversampling_2()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 2, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 2, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawThreePlanes(Canvas);
 			this.Save(Canvas, "09.png");
 		}
@@ -201,8 +200,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_10_PhongShading_Oversampling_3()
 		{
-			Canvas3D Canvas = new Canvas3D(640, 480, 3, SKColors.White);
-			Canvas.ProjectZ(500);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
 			this.DrawThreePlanes(Canvas);
 			this.Save(Canvas, "10.png");
 		}
@@ -220,35 +219,135 @@ namespace Waher.Script.Test
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-200, 200, 300, 1),
-				new Vector4(200, 200, 300, 1),
-				new Vector4(200, -200, 300, 1),
-				new Vector4(-200, -200, 300, 1)
+				new Vector4(-500, 500, 2000, 1),
+				new Vector4(500, 500, 2000, 1),
+				new Vector4(500, -500, 2000, 1),
+				new Vector4(-500, -500, 2000, 1)
 			}, Shader);
 			
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-200, 200, 100, 1),
-				new Vector4(-200, 200, 300, 1),
-				new Vector4(-200, -200, 300, 1),
-				new Vector4(-200, -200, 100, 1)
+				new Vector4(-500, 500, 1000, 1),
+				new Vector4(-500, 500, 2000, 1),
+				new Vector4(-500, -500, 2000, 1),
+				new Vector4(-500, -500, 1000, 1)
 			}, Shader);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-200, -200, 300, 1),
-				new Vector4(200, -200, 300, 1),
-				new Vector4(200, -200, 100, 1),
-				new Vector4(-200, -200, 100, 1)
+				new Vector4(-500, -500, 2000, 1),
+				new Vector4(500, -500, 2000, 1),
+				new Vector4(500, -500, 1000, 1),
+				new Vector4(-500, -500, 1000, 1)
 			}, Shader);
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_11_Rotate_X()
+		{
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
+
+			this.DrawThreePlanes(Canvas);
+
+			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateX(30, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateX(120, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(-250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateX(210, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateX(500, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			this.Save(Canvas, "11.png");
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_12_Rotate_Y()
+		{
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
+
+			this.DrawThreePlanes(Canvas);
+
+			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateY(30, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateY(120, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(-250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateY(210, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateY(500, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			this.Save(Canvas, "12.png");
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_13_Rotate_Z()
+		{
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
+
+			this.DrawThreePlanes(Canvas);
+
+			Matrix4x4 Bak = Canvas.Translate(-250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateZ(30, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, 250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateZ(120, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(-250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateZ(210, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			Canvas.ModelTransformation = Bak;
+			Canvas.Translate(250, -250, 0);
+			Canvas.Scale(0.25f, new Vector3(0, 0, 1500));
+			Canvas.RotateZ(500, new Vector3(0, 0, 1500));
+			this.DrawCube(Canvas);
+
+			this.Save(Canvas, "13.png");
 		}
 
 		// TODO: Clip
 		// TODO: Light / Phong shading with multiple light sources
 		// TODO: Proper interpolation of z
 		// TODO: Light arithmetic in un-projected coordinates.
-		// TODO: Fix glitches in polygon rendering. Example: letter "d", no oversampling. (See test 7)
-		//			Probably due to roundoff errors at last pixel when drawing edges
 		// TODO: Culling
 	}
 }

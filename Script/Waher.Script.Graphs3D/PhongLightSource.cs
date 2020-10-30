@@ -11,8 +11,8 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class PhongLightSource
 	{
-		private PhongIntensity diffuse;
-		private PhongIntensity specular;
+		private readonly PhongIntensity diffuse;
+		private readonly PhongIntensity specular;
 		private Vector3 position;
 		private Vector3 transformedPosition;
 
@@ -57,7 +57,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Canvas">3D Canvas</param>
 		public void Transform(Canvas3D Canvas)
 		{
-			this.transformedPosition = Canvas.Transform(this.position);
+			this.transformedPosition = Canvas.ModelTransform(this.position);
 		}
 	}
 }

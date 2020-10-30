@@ -12,36 +12,35 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class PhongShader : I3DShader
 	{
-		private PhongLightSource[] sources;
-		private PhongLightSource source;
+		private readonly PhongLightSource[] sources;
+		private readonly PhongLightSource source;
 		private Vector3 sourcePosition;
 		private Vector3 viewerPosition;
-		private float sourceDiffuseRed;
-		private float sourceDiffuseGreen;
-		private float sourceDiffuseBlue;
-		private float sourceDiffuseAlpha;
-		private float sourceSpecularRed;
-		private float sourceSpecularGreen;
-		private float sourceSpecularBlue;
-		private float sourceSpecularAlpha;
-		private float ambientRedFront;
-		private float ambientGreenFront;
-		private float ambientBlueFront;
-		private float ambientAlphaFront;
-		private float ambientRedBack;
-		private float ambientGreenBack;
-		private float ambientBlueBack;
-		private float ambientAlphaBack;
-		private float ambientReflectionConstantFront;
-		private float diffuseReflectionConstantFront;
-		private float specularReflectionConstantFront;
-		private float shininessFront;
-		private float ambientReflectionConstantBack;
-		private float diffuseReflectionConstantBack;
-		private float specularReflectionConstantBack;
-		private float shininessBack;
-		private float distance;
-		private int nrSources;
+		private readonly float sourceDiffuseRed;
+		private readonly float sourceDiffuseGreen;
+		private readonly float sourceDiffuseBlue;
+		private readonly float sourceDiffuseAlpha;
+		private readonly float sourceSpecularRed;
+		private readonly float sourceSpecularGreen;
+		private readonly float sourceSpecularBlue;
+		private readonly float sourceSpecularAlpha;
+		private readonly float ambientRedFront;
+		private readonly float ambientGreenFront;
+		private readonly float ambientBlueFront;
+		private readonly float ambientAlphaFront;
+		private readonly float ambientRedBack;
+		private readonly float ambientGreenBack;
+		private readonly float ambientBlueBack;
+		private readonly float ambientAlphaBack;
+		private readonly float ambientReflectionConstantFront;
+		private readonly float diffuseReflectionConstantFront;
+		private readonly float specularReflectionConstantFront;
+		private readonly float shininessFront;
+		private readonly float ambientReflectionConstantBack;
+		private readonly float diffuseReflectionConstantBack;
+		private readonly float specularReflectionConstantBack;
+		private readonly float shininessBack;
+		private readonly int nrSources;
 
 		/// <summary>
 		/// The Phong Shader uses the Phong Reflection model to generate colors.
@@ -61,7 +60,6 @@ namespace Waher.Script.Graphs3D
 			this.diffuseReflectionConstantBack = -Material.DiffuseReflectionConstantBack;
 			this.specularReflectionConstantBack = Material.SpecularReflectionConstantBack;
 			this.shininessBack = Material.ShininessBack;
-			this.distance = 0;
 
 			this.sources = LightSources;
 			this.nrSources = LightSources.Length;
@@ -581,7 +579,6 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Canvas">3D Canvas</param>
 		public void Transform(Canvas3D Canvas)
 		{
-			this.distance = Canvas.Distance;
 			this.viewerPosition = Canvas.ViewerPosition;
 
 			if (this.nrSources == 1)

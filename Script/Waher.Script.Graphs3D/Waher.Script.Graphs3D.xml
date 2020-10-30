@@ -1,0 +1,608 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Graphs3D</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Graphs3D.Canvas3D">
+            <summary>
+            3D drawing area.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.#ctor(System.Int32,System.Int32,System.Int32,SkiaSharp.SKColor)">
+            <summary>
+            3D drawing area.
+            
+            By default, the camera is looking along the z-axis, with no projection, and no scaling.
+            The center of the canvas is located at origo.
+            </summary>
+            <param name="Width">Width of area, in pixels.</param>
+            <param name="Height">Height of area, in pixels.</param>
+            <param name="OverSampling">Number of subpixels for each generated pixel.
+            Oversampling provides a means to achieve anti-aliasing in the rendered result.</param>
+            <param name="BackgroundColor">Background color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmap">
+            <summary>
+            Creates a bitmap from the pixels in the canvas.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ResetTransforms">
+            <summary>
+            Resets any transforms.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.ProjectionTransformation">
+            <summary>
+            Current projection transformation matrix.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Perspective(System.Single,System.Single)">
+            <summary>
+            Applies a perspective projection.
+            </summary>
+            <param name="NearPlaneDistance">Distance between near projection plane and camera.</param>
+            <param name="FarPlaneDistance">Distance between far projection plane and camera.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.ViewerPosition">
+            <summary>
+            Viewer position
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Project(System.Numerics.Vector4)">
+            <summary>
+            Transforms coordinates to screen coordinates.
+            </summary>
+            <param name="Point">Point.</param>
+            <returns>Transformed point.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Project(System.Numerics.Vector3)">
+            <summary>
+            Transforms a world coordinate to a display coordinate.
+            </summary>
+            <param name="Point">Point.</param>
+            <returns>Transformed point.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.ModelTransformation">
+            <summary>
+            Current model transformation matrix.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ModelTransform(System.Numerics.Vector4)">
+            <summary>
+            Transforms a world coordinate to a display coordinate.
+            </summary>
+            <param name="Point">Point.</param>
+            <returns>Transformed point.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ModelTransform(System.Numerics.Vector3)">
+            <summary>
+            Transforms a world coordinate to a display coordinate.
+            </summary>
+            <param name="Point">Point.</param>
+            <returns>Transformed point.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateX(System.Single)">
+            <summary>
+            Rotates the world around the X-axis.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateX(System.Single,System.Numerics.Vector3)">
+            <summary>
+            Rotates the world around an axis parallel to the X-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateY(System.Single)">
+            <summary>
+            Rotates the world around the Y-axis.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateY(System.Single,System.Numerics.Vector3)">
+            <summary>
+            Rotates the world around an axis parallel to the Y-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateZ(System.Single)">
+            <summary>
+            Rotates the world around the Z-axis.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.RotateZ(System.Single,System.Numerics.Vector3)">
+            <summary>
+            Rotates the world around an axis parallel to the Z-axis, going through
+            the center point <paramref name="CenterPoint"/>.
+            </summary>
+            <param name="Degrees">Degrees</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="Scale">Scale</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Numerics.Vector3)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="Scale">Scale</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Single,System.Single)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="ScaleX">Scale along X-axis.</param>
+            <param name="ScaleY">Scale along Y-axis.</param>
+            <param name="ScaleZ">Scale along Z-axis.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Scale(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+            <summary>
+            Scales the world
+            </summary>
+            <param name="ScaleX">Scale along X-axis.</param>
+            <param name="ScaleY">Scale along Y-axis.</param>
+            <param name="ScaleZ">Scale along Z-axis.</param>
+            <param name="CenterPoint">Center point.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Translate(System.Single,System.Single,System.Single)">
+            <summary>
+            Translates the world.
+            </summary>
+            <param name="DeltaX">Movement along the X-axis.</param>
+            <param name="DelayY">Movement along the Y-axis.</param>
+            <param name="DeltaZ">Movement along the Z-axis.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Plot(System.Numerics.Vector4,SkiaSharp.SKColor)">
+            <summary>
+            Plots a point on the 3D-canvas.
+            </summary>
+            <param name="Point">Point to plot.</param>
+            <param name="Color">Color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Plot(System.Numerics.Vector4,System.UInt32)">
+            <summary>
+            Plots a point on the 3D-canvas.
+            </summary>
+            <param name="Point">Point to plot.</param>
+            <param name="Color">Color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Line(System.Numerics.Vector4,System.Numerics.Vector4,SkiaSharp.SKColor)">
+            <summary>
+            Draws a line between P0 and P1.
+            </summary>
+            <param name="P0">Point 1.</param>
+            <param name="P1">Point 2.</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Line(System.Numerics.Vector4,System.Numerics.Vector4,System.UInt32)">
+            <summary>
+            Draws a line between P0 and P1.
+            </summary>
+            <param name="P0">Point 1.</param>
+            <param name="P1">Point 2.</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.MoveTo(System.Numerics.Vector4)">
+            <summary>
+            Moves to a point.
+            </summary>
+            <param name="Point">Point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.LineTo(System.Numerics.Vector4,SkiaSharp.SKColor)">
+            <summary>
+            Draws a line to <paramref name="Point"/> from the last endpoint.
+            </summary>
+            <param name="Point">Point.</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.LineTo(System.Numerics.Vector4,System.UInt32)">
+            <summary>
+            Draws a line to <paramref name="Point"/> from the last endpoint.
+            </summary>
+            <param name="Point">Point.</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.PolyLine(System.Numerics.Vector4[],SkiaSharp.SKColor)">
+            <summary>
+            Draws lines between a set of nodes.
+            </summary>
+            <param name="Nodes">Nodes</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.PolyLine(System.Numerics.Vector4[],System.UInt32)">
+            <summary>
+            Draws lines between a set of nodes.
+            </summary>
+            <param name="Nodes">Nodes</param>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],SkiaSharp.SKColor,System.Boolean)">
+            <summary>
+            Draws a closed polygon.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Color">Color</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Color"/> is used on both sides.
+            If false, <paramref name="Color"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
+            <summary>
+            Draws a closed polygon.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Shader">Shader.</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Shader"/> is used on both sides.
+            If false, <paramref name="Shader"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],SkiaSharp.SKColor,System.Boolean)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Color">Color</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Color"/> is used on both sides.
+            If false, <paramref name="Color"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Shader">Shader.</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Shader"/> is used on both sides.
+            If false, <paramref name="Shader"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,Waher.Script.Graphs3D.I3DShader)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="FrontShader">Front side Shader.</param>
+            <param name="BackShader">Back side Shader.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Text(System.String,System.Numerics.Vector4,System.String,System.Single,SkiaSharp.SKColor)">
+            <summary>
+            Draws text on the canvas.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="Start">Start position.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="TextSize">Text size.</param>
+            <param name="Color">Text color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Text(System.String,System.Numerics.Vector4,System.String,SkiaSharp.SKFontStyleWeight,System.Single,SkiaSharp.SKColor)">
+            <summary>
+            Draws text on the canvas.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="Start">Start position.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="TextSize">Text size.</param>
+            <param name="Color">Text color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Text(System.String,System.Numerics.Vector4,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,System.Single,SkiaSharp.SKColor)">
+            <summary>
+            Draws text on the canvas.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="Start">Start position.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="TextSize">Text size.</param>
+            <param name="Color">Text color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Text(System.String,System.Numerics.Vector4,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,SkiaSharp.SKFontStyleSlant,System.Single,SkiaSharp.SKColor)">
+            <summary>
+            Draws text on the canvas.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="Start">Start position.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="Slant">Font slant.</param>
+            <param name="TextSize">Text size.</param>
+            <param name="Color">Text color.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.ConstantColor">
+            <summary>
+            Shader returning a constant color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.#ctor(SkiaSharp.SKColor)">
+            <summary>
+            Shader returning a constant color.
+            </summary>
+            <param name="Color">Color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+            <summary>
+            Gets a color for a position.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Z">Z-coordinate.</param>
+            <param name="Normal">Surface normal vector.</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+            <summary>
+            Gets an array of colors.
+            </summary>
+            <param name="X">X-coordinates.</param>
+            <param name="Y">Y-coordinates.</param>
+            <param name="Z">Z-coordinates.</param>
+            <param name="Normals">Normal vectors.</param>
+            <param name="N">Number of coordinates.</param>
+            <param name="Colors">Where color values will be stored.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.Transform(Waher.Script.Graphs3D.Canvas3D)">
+            <summary>
+            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+            </summary>
+            <param name="Canvas">3D Canvas</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.I3DShader">
+            <summary>
+            Interface for 3D shaders.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+            <summary>
+            Gets a color for a position.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Z">Z-coordinate.</param>
+            <param name="Normal">Surface normal vector.</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+            <summary>
+            Gets an array of colors.
+            </summary>
+            <param name="X">X-coordinates.</param>
+            <param name="Y">Y-coordinates.</param>
+            <param name="Z">Z-coordinates.</param>
+            <param name="Normals">Normal vectors.</param>
+            <param name="N">Number of coordinates.</param>
+            <param name="Colors">Where color values will be stored.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.I3DShader.Transform(Waher.Script.Graphs3D.Canvas3D)">
+            <summary>
+            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+            </summary>
+            <param name="Canvas">3D Canvas</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.PhongIntensity">
+            <summary>
+            Contains information about the intensity of a light component, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongIntensity.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Contains information about the intensity of a light component, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+            <param name="Red">Red intensity.</param>
+            <param name="Green">Green intensity.</param>
+            <param name="Blue">Blue intensity.</param>
+            <param name="Alpha">Alpha intensity.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongIntensity.Red">
+            <summary>
+            Red intensity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongIntensity.Green">
+            <summary>
+            Green intensity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongIntensity.Blue">
+            <summary>
+            Blue intensity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongIntensity.Alpha">
+            <summary>
+            Alpha intensity.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.PhongLightSource">
+            <summary>
+            Contains information about a light source, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongLightSource.#ctor(Waher.Script.Graphs3D.PhongIntensity,Waher.Script.Graphs3D.PhongIntensity,System.Numerics.Vector3)">
+            <summary>
+            Contains information about a light source, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+            <param name="Diffuse">Diffuse intensity.</param>
+            <param name="Specular">Specular intensity.</param>
+            <param name="Position">Position of light source.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongLightSource.Diffuse">
+            <summary>
+            Diffuse intensity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongLightSource.Specular">
+            <summary>
+            Specular intensity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongLightSource.Position">
+            <summary>
+            Position of light source..
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongLightSource.TransformedPosition">
+            <summary>
+            Transformed position of light source..
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongLightSource.Transform(Waher.Script.Graphs3D.Canvas3D)">
+            <summary>
+            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+            </summary>
+            <param name="Canvas">3D Canvas</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.PhongMaterial">
+            <summary>
+            Contains information about a material, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongMaterial.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Contains information about a material, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+            <param name="AmbientReflectionConstant">Ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="DiffuseReflectionConstant">Ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="SpecularReflectionConstant">Ratio of reflection of the specular term of incoming light.</param>
+            <param name="Shininess">Larger for surfaces that are smoother and more mirror-like.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongMaterial.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Contains information about a material, as used in the Phong reflection model.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+            <param name="AmbientReflectionConstantFront">Front side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="DiffuseReflectionConstantFront">Front side ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="SpecularReflectionConstantFront">Front side ratio of reflection of the specular term of incoming light.</param>
+            <param name="ShininessFront">Front side shininess coefficient.</param>
+            <param name="AmbientReflectionConstantBack">Back side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
+            <param name="DiffuseReflectionConstantBack">Back side ratio of reflection of the diffuse term of incoming light.</param>
+            <param name="SpecularReflectionConstantBack">Back side ratio of reflection of the specular term of incoming light.</param>
+            <param name="ShininessBack">Back side shininess coefficient.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.AmbientReflectionConstantFront">
+            <summary>
+            Front-side ratio of reflection of the ambient term present in all points in the scene rendered.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.DiffuseReflectionConstantFront">
+            <summary>
+            Front-side ratio of reflection of the diffuse term of incoming light.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.SpecularReflectionConstantFront">
+            <summary>
+            Front-side ratio of reflection of the specular term of incoming light.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.ShininessFront">
+            <summary>
+            Front-side shininess coefficient.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.AmbientReflectionConstantBack">
+            <summary>
+            Back-side ratio of reflection of the ambient term present in all points in the scene rendered.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.DiffuseReflectionConstantBack">
+            <summary>
+            Back-side ratio of reflection of the diffuse term of incoming light.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.SpecularReflectionConstantBack">
+            <summary>
+            Back-side ratio of reflection of the specular term of incoming light.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.ShininessBack">
+            <summary>
+            Back-side shininess coefficient.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.PhongShader">
+            <summary>
+            The Phong Shader uses the Phong Reflection model to generate colors.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongShader.#ctor(Waher.Script.Graphs3D.PhongMaterial,Waher.Script.Graphs3D.PhongIntensity,Waher.Script.Graphs3D.PhongLightSource[])">
+            <summary>
+            The Phong Shader uses the Phong Reflection model to generate colors.
+            https://en.wikipedia.org/wiki/Phong_reflection_model
+            </summary>
+            <param name="Material">Surface material.</param>
+            <param name="Ambient">Ambient intensity.</param>
+            <param name="LightSources">Light sources.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+            <summary>
+            Gets a color for a position.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Z">Z-coordinate.</param>
+            <param name="Normal">Surface normal vector.</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+            <summary>
+            Gets an array of colors.
+            </summary>
+            <param name="X">X-coordinates.</param>
+            <param name="Y">Y-coordinates.</param>
+            <param name="Z">Z-coordinates.</param>
+            <param name="Normals">Normal vectors.</param>
+            <param name="N">Number of coordinates.</param>
+            <param name="Colors">Where color values will be stored.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongShader.Transform(Waher.Script.Graphs3D.Canvas3D)">
+            <summary>
+            Transforms any coordinates according to current settings in <paramref name="Canvas"/>.
+            </summary>
+            <param name="Canvas">3D Canvas</param>
+        </member>
+    </members>
+</doc>

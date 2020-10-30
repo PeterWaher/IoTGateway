@@ -17,7 +17,7 @@ namespace Waher.Script.Graphs3D
 		private readonly float[] zBuf;
 		private readonly Vector3[] normalBuf;
 		private readonly SKColor[] colorBuf;
-		private Vector3 viewerPosition;
+		private Vector4 viewerPosition;
 		private Matrix4x4 projectionTransformation;
 		private Matrix4x4 modelTransformation;
 		private Vector4 last = Vector4.Zero;
@@ -186,7 +186,7 @@ namespace Waher.Script.Graphs3D
 		public void ResetTransforms()
 		{
 			this.distance = 0;
-			this.viewerPosition = new Vector3(this.cx, this.cy, 0);
+			this.viewerPosition = new Vector4(0, 0, 0, 1);
 			this.projectionTransformation = Matrix4x4.CreateTranslation(this.cx, this.cy, 0);
 			this.projectionTransformation = Matrix4x4.CreateScale(-this.overSampling, this.overSampling, 1) * this.projectionTransformation;
 			this.modelTransformation = Matrix4x4.Identity;
@@ -218,7 +218,7 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 Prev = this.projectionTransformation;
 			this.projectionTransformation = Matrix4x4.CreatePerspective(1, 1, NearPlaneDistance, FarPlaneDistance) * this.projectionTransformation;
 			this.distance = NearPlaneDistance;
-			this.viewerPosition = new Vector3(this.cx, this.cy, -this.distance);
+			this.viewerPosition = new Vector4(0, 0, -this.distance, 1);
 
 			return Prev;
 		}
@@ -226,7 +226,7 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Viewer position
 		/// </summary>
-		public Vector3 ViewerPosition => this.viewerPosition;
+		public Vector4 ViewerPosition => this.viewerPosition;
 
 		/// <summary>
 		/// Transforms coordinates to screen coordinates.
@@ -1041,13 +1041,23 @@ namespace Waher.Script.Graphs3D
 
 		#region Polygon
 
-		private static Vector3 ToVector3(Vector4 P)
+		internal static Vector3 ToVector3(Vector4 P)
 		{
 			if (P.W == 1 || P.W == 0)
 				return new Vector3(P.X, P.Y, P.Z);
 
 			float d = 1f / P.W;
 			return new Vector3(P.X * d, P.Y * d, P.Z * d);
+		}
+
+		internal static Vector4 ToPoint(Vector3 P)
+		{
+			return new Vector4(P.X, P.Y, P.Z, 1);
+		}
+
+		internal static Vector4 ToVector(Vector3 P)
+		{
+			return new Vector4(P.X, P.Y, P.Z, 0);
 		}
 
 		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
@@ -1160,9 +1170,15 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Nodes">Nodes.</param>
 		/// <param name="Color">Color</param>
-		public void Polygon(Vector4[] Nodes, SKColor Color)
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Color"/> is used on both sides.
+		/// If false, <paramref name="Color"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygon(Vector4[] Nodes, SKColor Color, bool TwoSided)
 		{
-			this.Polygons(new Vector4[][] { Nodes }, new ConstantColor(Color));
+			this.Polygons(new Vector4[][] { Nodes }, new ConstantColor(Color), TwoSided);
 		}
 
 		/// <summary>
@@ -1170,9 +1186,15 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Nodes">Nodes.</param>
 		/// <param name="Shader">Shader.</param>
-		public void Polygon(Vector4[] Nodes, I3DShader Shader)
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Shader"/> is used on both sides.
+		/// If false, <paramref name="Shader"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygon(Vector4[] Nodes, I3DShader Shader, bool TwoSided)
 		{
-			this.Polygons(new Vector4[][] { Nodes }, Shader);
+			this.Polygons(new Vector4[][] { Nodes }, Shader, TwoSided);
 		}
 
 		/// <summary>
@@ -1180,9 +1202,15 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Nodes">Nodes.</param>
 		/// <param name="Color">Color</param>
-		public void Polygons(Vector4[][] Nodes, SKColor Color)
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Color"/> is used on both sides.
+		/// If false, <paramref name="Color"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygons(Vector4[][] Nodes, SKColor Color, bool TwoSided)
 		{
-			this.Polygons(Nodes, new ConstantColor(Color));
+			this.Polygons(Nodes, new ConstantColor(Color), TwoSided);
 		}
 
 		/// <summary>
@@ -1190,7 +1218,24 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		/// <param name="Nodes">Nodes.</param>
 		/// <param name="Shader">Shader.</param>
-		public void Polygons(Vector4[][] Nodes, I3DShader Shader)
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Shader"/> is used on both sides.
+		/// If false, <paramref name="Shader"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygons(Vector4[][] Nodes, I3DShader Shader, bool TwoSided)
+		{
+			this.Polygons(Nodes, Shader, TwoSided ? Shader : null);
+		}
+
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="FrontShader">Front side Shader.</param>
+		/// <param name="BackShader">Back side Shader.</param>
+		public void Polygons(Vector4[][] Nodes, I3DShader FrontShader, I3DShader BackShader)
 		{
 			int j, d;
 			int i, c;
@@ -1203,7 +1248,8 @@ namespace Waher.Script.Graphs3D
 			Vector3[] vs;
 			bool First = true;
 
-			Shader.Transform(this);
+			FrontShader?.Transform(this);
+			BackShader?.Transform(this);
 			Nodes = (Vector4[][])Nodes.Clone();
 
 			d = Nodes.Length;
@@ -1262,6 +1308,7 @@ namespace Waher.Script.Graphs3D
 			Vector3 LastScreen;
 			Vector3 CurrentScreen;
 			Vector3 N;
+			I3DShader Shader;
 			float x0, y0, z0;
 			float x1, y1, z1;
 			float dx, dy, dz;
@@ -1282,6 +1329,14 @@ namespace Waher.Script.Graphs3D
 				CurrentScreen = vs[c - 1];
 
 				N = CalcNormal(ToVector3(vw[0]), ToVector3(vw[1]), ToVector3(CurrentWorld));
+
+				if (Vector3.Dot(N, ToVector3(vw[0] - this.viewerPosition)) >= 0)
+					Shader = FrontShader;
+				else
+					Shader = BackShader;
+
+				if (Shader is null)
+					continue;   // Culled
 
 				y0 = LastScreen.Y;
 				y1 = CurrentScreen.Y;
@@ -1335,7 +1390,7 @@ namespace Waher.Script.Graphs3D
 
 						while (iy0 <= iy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0, N);
+							this.AddNode(Recs, MinY, x0, iy0, z0, N, Shader);
 
 							iy0++;
 							x0 += dx;
@@ -1353,7 +1408,7 @@ namespace Waher.Script.Graphs3D
 
 						while (iy0 >= iy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0, N);
+							this.AddNode(Recs, MinY, x0, iy0, z0, N, Shader);
 
 							iy0--;
 							x0 -= dx;
@@ -1374,19 +1429,22 @@ namespace Waher.Script.Graphs3D
 				if (Rec.nodes != null)
 				{
 					First = true;
+					Shader = null;
 
 					x0 = z0 = 0;
-					foreach (KeyValuePair<float, float> Rec2 in Rec.nodes)
+					foreach (Tuple<float, float, I3DShader> Rec2 in Rec.nodes)
 					{
 						if (First)
 						{
 							First = false;
-							x0 = Rec2.Key;
-							z0 = Rec2.Value;
+							x0 = Rec2.Item1;
+							z0 = Rec2.Item2;
+							Shader = Rec2.Item3;
 						}
 						else
 						{
-							this.ScanLine(x0, Y, z0, Rec2.Key, Rec2.Value, Rec.n, Shader);
+							Shader = Rec2.Item3;
+							this.ScanLine(x0, Y, z0, Rec2.Item1, Rec2.Item2, Rec.n, Shader);
 							First = true;
 						}
 					}
@@ -1395,13 +1453,14 @@ namespace Waher.Script.Graphs3D
 						this.Plot((int)(x0 + 0.5f), Y, z0, ToUInt(Shader.GetColor(x0, Y, z0, Rec.n)));
 				}
 				else if (Rec.x1.HasValue)
-					this.ScanLine(Rec.x0, Y, Rec.z0, Rec.x1.Value, Rec.z1.Value, Rec.n, Shader);
+					this.ScanLine(Rec.x0, Y, Rec.z0, Rec.x1.Value, Rec.z1.Value, Rec.n, Rec.shader);
 				else
-					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Shader.GetColor(Rec.x0, Y, Rec.z0, Rec.n)));
+					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Rec.shader.GetColor(Rec.x0, Y, Rec.z0, Rec.n)));
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z, Vector3 N)
+		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z,
+			Vector3 N, I3DShader Shader)
 		{
 			int i = (int)(y + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
@@ -1412,7 +1471,8 @@ namespace Waher.Script.Graphs3D
 				{
 					x0 = x,
 					z0 = z,
-					n = N
+					n = N,
+					shader = Shader
 				};
 			}
 			else if (!Rec.x1.HasValue)
@@ -1428,32 +1488,33 @@ namespace Waher.Script.Graphs3D
 				{
 					Rec.x1 = x;
 					Rec.z1 = z;
+					Rec.shader = Shader;
 				}
 			}
 			else
 			{
 				if (Rec.nodes is null)
 				{
-					Rec.nodes = new LinkedList<KeyValuePair<float, float>>();
-					Rec.nodes.AddLast(new KeyValuePair<float, float>(Rec.x0, Rec.z0));
-					Rec.nodes.AddLast(new KeyValuePair<float, float>(Rec.x1.Value, Rec.z1.Value));
+					Rec.nodes = new LinkedList<Tuple<float, float, I3DShader>>();
+					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(Rec.x0, Rec.z0, Rec.shader));
+					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(Rec.x1.Value, Rec.z1.Value, Rec.shader));
 				}
 
-				LinkedListNode<KeyValuePair<float, float>> Loop = Rec.nodes.First;
-				LinkedListNode<KeyValuePair<float, float>> Prev = null;
+				LinkedListNode<Tuple<float, float, I3DShader>> Loop = Rec.nodes.First;
+				LinkedListNode<Tuple<float, float, I3DShader>> Prev = null;
 
-				while (Loop != null && Loop.Value.Key < x)
+				while (Loop != null && Loop.Value.Item1 < x)
 				{
 					Prev = Loop;
 					Loop = Loop.Next;
 				}
 
 				if (Loop is null)
-					Rec.nodes.AddLast(new KeyValuePair<float, float>(x, z));
+					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(x, z, Shader));
 				else if (Prev is null)
-					Rec.nodes.AddFirst(new KeyValuePair<float, float>(x, z));
+					Rec.nodes.AddFirst(new Tuple<float, float, I3DShader>(x, z, Shader));
 				else
-					Rec.nodes.AddAfter(Prev, new KeyValuePair<float, float>(x, z));
+					Rec.nodes.AddAfter(Prev, new Tuple<float, float, I3DShader>(x, z, Shader));
 			}
 		}
 
@@ -1463,8 +1524,9 @@ namespace Waher.Script.Graphs3D
 			public float z0;
 			public float? x1;
 			public float? z1;
-			public LinkedList<KeyValuePair<float, float>> nodes;
+			public LinkedList<Tuple<float, float, I3DShader>> nodes;
 			public Vector3 n;
+			public I3DShader shader;
 		}
 
 		#endregion
@@ -1579,7 +1641,7 @@ namespace Waher.Script.Graphs3D
 							{
 								if (v.Count > 0)
 								{
-									this.Polygons(v.ToArray(), Color);
+									this.Polygons(v.ToArray(), Color, true);
 									v.Clear();
 								}
 
@@ -1725,7 +1787,7 @@ namespace Waher.Script.Graphs3D
 				}
 
 				if (v.Count > 0)
-					this.Polygons(v.ToArray(), Color);
+					this.Polygons(v.ToArray(), Color, true);
 			}
 			finally
 			{

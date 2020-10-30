@@ -26,6 +26,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.3\Waher.Script.Graphs3D.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.xml</DocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />

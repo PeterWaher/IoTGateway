@@ -579,7 +579,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Canvas">3D Canvas</param>
 		public void Transform(Canvas3D Canvas)
 		{
-			this.viewerPosition = Canvas.ViewerPosition;
+			this.viewerPosition = Canvas3D.ToVector3(Canvas.ViewerPosition);
 
 			if (this.nrSources == 1)
 			{

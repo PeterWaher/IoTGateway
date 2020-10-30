@@ -218,7 +218,6 @@ namespace Waher.Script.Test
 					new PhongIntensity(Color.Red, Color.Green, Color.Blue, 255),
 					new PhongIntensity(255, 255, 255, 255),
 					new Vector3(1000, 1000, 0)));
-					//new Vector3(400, 400, 50)));
 		}
 
 		private void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader)
@@ -376,9 +375,7 @@ namespace Waher.Script.Test
 		}
 
 		// TODO: Clip
-		// TODO: Light / Phong shading with multiple light sources
+		// TODO: Test Light / Phong shading with multiple light sources
 		// TODO: Proper interpolation of z
-		// TODO: Light arithmetic in un-projected coordinates.
-		// TODO: Culling
 	}
 }

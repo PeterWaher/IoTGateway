@@ -41,6 +41,9 @@ namespace Waher.Script.Graphs3D
 		private readonly float specularReflectionConstantBack;
 		private readonly float shininessBack;
 		private readonly int nrSources;
+		private readonly bool hasSpecularReflectionConstantFront;
+		private readonly bool hasSpecularReflectionConstantBack;
+		private readonly bool singleSource;
 
 		/// <summary>
 		/// The Phong Shader uses the Phong Reflection model to generate colors.
@@ -55,15 +58,19 @@ namespace Waher.Script.Graphs3D
 			this.ambientReflectionConstantFront = Material.AmbientReflectionConstantFront;
 			this.diffuseReflectionConstantFront = Material.DiffuseReflectionConstantFront;
 			this.specularReflectionConstantFront = Material.SpecularReflectionConstantFront;
+			this.hasSpecularReflectionConstantFront = this.specularReflectionConstantFront != 0;
 			this.shininessFront = Material.ShininessFront;
 			this.ambientReflectionConstantBack = Material.AmbientReflectionConstantBack;
 			this.diffuseReflectionConstantBack = -Material.DiffuseReflectionConstantBack;
 			this.specularReflectionConstantBack = Material.SpecularReflectionConstantBack;
+			this.hasSpecularReflectionConstantBack = this.specularReflectionConstantBack != 0;
 			this.shininessBack = Material.ShininessBack;
 
 			this.sources = LightSources;
 			this.nrSources = LightSources.Length;
-			if (this.nrSources == 1)
+			this.singleSource = this.nrSources == 1;
+
+			if (this.singleSource)
 			{
 				this.source = LightSources[0];
 				this.sourcePosition = this.source.TransformedPosition;
@@ -113,103 +120,131 @@ namespace Waher.Script.Graphs3D
 			float Blue;
 			float Alpha;
 
-			V = Vector3.Normalize(this.viewerPosition - P);
-
-			if (this.nrSources == 1)
+			if (this.singleSource)
 			{
 				L = Vector3.Normalize(this.sourcePosition - P);
 				d = Vector3.Dot(L, Normal);
-				R = 2 * d * Normal - L;
-				d2 = Math.Abs(Vector3.Dot(R, V));
 
-				if (Vector3.Dot(Normal, V) >= 0)
+				if (d >= 0)
 				{
 					d *= this.diffuseReflectionConstantFront;
-					d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
 
 					Red = this.ambientRedFront;
 					Green = this.ambientGreenFront;
 					Blue = this.ambientBlueFront;
 					Alpha = this.ambientAlphaFront;
+
+					if (this.hasSpecularReflectionConstantFront)
+					{
+						R = 2 * d * Normal - L;
+						V = Vector3.Normalize(this.viewerPosition - P);
+						d2 = Math.Abs(Vector3.Dot(R, V));
+						d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+
+						Red += d2 * this.sourceSpecularRed;
+						Green += d2 * this.sourceSpecularGreen;
+						Blue += d2 * this.sourceSpecularBlue;
+						Alpha += d2 * this.sourceSpecularAlpha;
+					}
 				}
 				else
 				{
 					d *= this.diffuseReflectionConstantBack;
-					d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
 
 					Red = this.ambientRedBack;
 					Green = this.ambientGreenBack;
 					Blue = this.ambientBlueBack;
 					Alpha = this.ambientAlphaBack;
+
+					if (this.hasSpecularReflectionConstantBack)
+					{
+						R = 2 * d * Normal - L;
+						V = Vector3.Normalize(this.viewerPosition - P);
+						d2 = Math.Abs(Vector3.Dot(R, V));
+						d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
+
+						Red += d2 * this.sourceSpecularRed;
+						Green += d2 * this.sourceSpecularGreen;
+						Blue += d2 * this.sourceSpecularBlue;
+						Alpha += d2 * this.sourceSpecularAlpha;
+					}
 				}
 
 				Red += d * this.sourceDiffuseRed;
 				Green += d * this.sourceDiffuseGreen;
 				Blue += d * this.sourceDiffuseBlue;
 				Alpha += d * this.sourceDiffuseAlpha;
-
-				Red += d2 * this.sourceSpecularRed;
-				Green += d2 * this.sourceSpecularGreen;
-				Blue += d2 * this.sourceSpecularBlue;
-				Alpha += d2 * this.sourceSpecularAlpha;
 			}
 			else
 			{
-				Vector3 P2;
 				PhongLightSource Source;
-				PhongIntensity I;
+				PhongIntensity Specular;
+				PhongIntensity Diffuse;
 				int j;
-				bool Front = Vector3.Dot(Normal, V) >= 0;
 
-				if (Front)
-				{
-					Red = this.ambientRedFront;
-					Green = this.ambientGreenFront;
-					Blue = this.ambientBlueFront;
-					Alpha = this.ambientAlphaFront;
-				}
+				Red = Green = Blue = Alpha = 0;
+
+				if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
+					V = Vector3.Normalize(this.viewerPosition - P);
 				else
-				{
-					Red = this.ambientRedBack;
-					Green = this.ambientGreenBack;
-					Blue = this.ambientBlueBack;
-					Alpha = this.ambientAlphaBack;
-				}
+					V = Vector3.Zero;
 
 				for (j = 0; j < this.nrSources; j++)
 				{
 					Source = this.sources[j];
-					P2 = Source.TransformedPosition;
+					Specular = Source.Specular;
+					Diffuse = Source.Diffuse;
 
-					L = Vector3.Normalize(P2 - P);
+					L = Vector3.Normalize(Source.TransformedPosition - P);
 					d = Vector3.Dot(L, Normal);
-					R = 2 * d * Normal - P2;
-					d2 = Math.Abs(Vector3.Dot(R, V));
 
-					if (Front)
+					if (d >= 0)
 					{
 						d *= this.diffuseReflectionConstantFront;
-						d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+
+						Red += this.ambientRedFront;
+						Green += this.ambientGreenFront;
+						Blue += this.ambientBlueFront;
+						Alpha += this.ambientAlphaFront;
+
+						if (this.hasSpecularReflectionConstantFront)
+						{
+							R = 2 * d * Normal - L;
+							d2 = Math.Abs(Vector3.Dot(R, V));
+							d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+
+							Red += d2 * Specular.Red;
+							Green += d2 * Specular.Green;
+							Blue += d2 * Specular.Blue;
+							Alpha += d2 * Specular.Alpha;
+						}
 					}
 					else
 					{
 						d *= this.diffuseReflectionConstantBack;
-						d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
+
+						Red = this.ambientRedBack;
+						Green = this.ambientGreenBack;
+						Blue = this.ambientBlueBack;
+						Alpha = this.ambientAlphaBack;
+
+						if (this.hasSpecularReflectionConstantBack)
+						{
+							R = 2 * d * Normal - L;
+							d2 = Math.Abs(Vector3.Dot(R, V));
+							d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
+
+							Red += d2 * Specular.Red;
+							Green += d2 * Specular.Green;
+							Blue += d2 * Specular.Blue;
+							Alpha += d2 * Specular.Alpha;
+						}
 					}
 
-					I = Source.Diffuse;
-
-					Red += d * I.Red;
-					Green += d * I.Green;
-					Blue += d * I.Blue;
-					Alpha += d * I.Alpha;
-
-					I = Source.Specular;
-
-					Red += d2 * I.Red;
-					Green += d2 * I.Green;
-					Blue += d2 * I.Blue;
-					Alpha += d2 * I.Alpha;
+					Red += d * Diffuse.Red;
+					Green += d * Diffuse.Green;
+					Blue += d * Diffuse.Blue;
+					Alpha += d * Diffuse.Alpha;
 				}
 			}
 
@@ -221,7 +256,7 @@ namespace Waher.Script.Graphs3D
 				R2 = 0;
 			else if (Red > 255)
 			{
-				Rest = (int)(Red - 255 + 0.5f);
+				Rest = (int)(Red - 254.5f);
 				R2 = 255;
 			}
 			else
@@ -231,7 +266,7 @@ namespace Waher.Script.Graphs3D
 				G2 = 0;
 			else if (Green > 255)
 			{
-				Rest += (int)(Green - 255 + 0.5f);
+				Rest += (int)(Green - 254.5f);
 				G2 = 255;
 			}
 			else
@@ -241,7 +276,7 @@ namespace Waher.Script.Graphs3D
 				B2 = 0;
 			else if (Blue > 255)
 			{
-				Rest += (int)(Blue - 255 + 0.5f);
+				Rest += (int)(Blue - 254.5f);
 				B2 = 255;
 			}
 			else
@@ -315,57 +350,74 @@ namespace Waher.Script.Graphs3D
 			int Rest;
 			int k;
 
-			if (this.nrSources == 1)
+			if (this.singleSource)
 			{
 				for (i = 0; i < N; i++)
 				{
 					P.X = X[i];
 					P.Y = Y[i];
 					P.Z = Z[i];
-					L = Vector3.Normalize(this.sourcePosition - P);
-					d = Vector3.Dot(L, Normal = Normals[i]);
-					R = 2 * d * Normal - L;
-					V = Vector3.Normalize(this.viewerPosition - P);
-					d2 = Math.Abs(Vector3.Dot(R, V));
+					Normal = Normals[i];
 
-					if (Vector3.Dot(Normal, V) >= 0)
+					L = Vector3.Normalize(this.sourcePosition - P);
+					d = Vector3.Dot(L, Normal);
+
+					if (d >= 0)
 					{
 						d *= this.diffuseReflectionConstantFront;
-						d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
 
 						Red = this.ambientRedFront;
 						Green = this.ambientGreenFront;
 						Blue = this.ambientBlueFront;
 						Alpha = this.ambientAlphaFront;
+
+						if (this.hasSpecularReflectionConstantFront)
+						{
+							R = 2 * d * Normal - L;
+							V = Vector3.Normalize(this.viewerPosition - P);
+							d2 = Math.Abs(Vector3.Dot(R, V));
+							d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+
+							Red += d2 * this.sourceSpecularRed;
+							Green += d2 * this.sourceSpecularGreen;
+							Blue += d2 * this.sourceSpecularBlue;
+							Alpha += d2 * this.sourceSpecularAlpha;
+						}
 					}
 					else
 					{
 						d *= this.diffuseReflectionConstantBack;
-						d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
 
 						Red = this.ambientRedBack;
 						Green = this.ambientGreenBack;
 						Blue = this.ambientBlueBack;
 						Alpha = this.ambientAlphaBack;
+
+						if (this.hasSpecularReflectionConstantBack)
+						{
+							R = 2 * d * Normal - L;
+							V = Vector3.Normalize(this.viewerPosition - P);
+							d2 = Math.Abs(Vector3.Dot(R, V));
+							d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
+
+							Red += d2 * this.sourceSpecularRed;
+							Green += d2 * this.sourceSpecularGreen;
+							Blue += d2 * this.sourceSpecularBlue;
+							Alpha += d2 * this.sourceSpecularAlpha;
+						}
 					}
 
 					Red += d * this.sourceDiffuseRed;
 					Green += d * this.sourceDiffuseGreen;
 					Blue += d * this.sourceDiffuseBlue;
 					Alpha += d * this.sourceDiffuseAlpha;
-
-					Red += d2 * this.sourceSpecularRed;
-					Green += d2 * this.sourceSpecularGreen;
-					Blue += d2 * this.sourceSpecularBlue;
-					Alpha += d2 * this.sourceSpecularAlpha;
-
 					Rest = 0;
 
 					if (Red < 0)
 						R2 = 0;
 					else if (Red > 255)
 					{
-						Rest = (int)(Red - 255 + 0.5f);
+						Rest = (int)(Red - 254.5f);
 						R2 = 255;
 					}
 					else
@@ -375,7 +427,7 @@ namespace Waher.Script.Graphs3D
 						G2 = 0;
 					else if (Green > 255)
 					{
-						Rest += (int)(Green - 255 + 0.5f);
+						Rest += (int)(Green - 254.5f);
 						G2 = 255;
 					}
 					else
@@ -385,7 +437,7 @@ namespace Waher.Script.Graphs3D
 						B2 = 0;
 					else if (Blue > 255)
 					{
-						Rest += (int)(Blue - 255 + 0.5f);
+						Rest += (int)(Blue - 254.5f);
 						B2 = 255;
 					}
 					else
@@ -430,16 +482,14 @@ namespace Waher.Script.Graphs3D
 						}
 					}
 
-					Colors[i] = new SKColor(R2, B2, G2, A2);
+					Colors[i] = new SKColor(R2, G2, B2, A2);
 				}
 			}
 			else
 			{
-				Vector3 P2;
 				PhongLightSource Source;
-				PhongIntensity I;
-				bool Front;
-				float DiffuseC, SpecularC, ShininessC;
+				PhongIntensity Specular;
+				PhongIntensity Diffuse;
 				int j;
 
 				for (i = 0; i < N; i++)
@@ -448,53 +498,70 @@ namespace Waher.Script.Graphs3D
 					P.Y = Y[i];
 					P.Z = Z[i];
 					Normal = Normals[i];
-					V = Vector3.Normalize(this.viewerPosition - P);
 
-					if (Front = (Vector3.Dot(Normal, V) >= 0))
-					{
-						Red = this.ambientRedFront;
-						Green = this.ambientGreenFront;
-						Blue = this.ambientBlueFront;
-						Alpha = this.ambientAlphaFront;
-						DiffuseC = this.diffuseReflectionConstantFront;
-						SpecularC = this.specularReflectionConstantFront;
-						ShininessC = this.shininessFront;
-					}
+					Red = Green = Blue = Alpha = 0;
+
+					if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
+						V = Vector3.Normalize(this.viewerPosition - P);
 					else
-					{
-						Red = this.ambientRedBack;
-						Green = this.ambientGreenBack;
-						Blue = this.ambientBlueBack;
-						Alpha = this.ambientAlphaBack;
-						DiffuseC = this.diffuseReflectionConstantBack;
-						SpecularC = this.specularReflectionConstantBack;
-						ShininessC = this.shininessBack;
-					}
+						V = Vector3.Zero;
 
 					for (j = 0; j < this.nrSources; j++)
 					{
 						Source = this.sources[j];
-						P2 = Source.TransformedPosition;
+						Specular = Source.Specular;
+						Diffuse = Source.Diffuse;
 
-						L = Vector3.Normalize(P2 - P);
+						L = Vector3.Normalize(Source.TransformedPosition - P);
 						d = Vector3.Dot(L, Normal);
-						R = 2 * d * Normal - P2;
-						d *= DiffuseC;
-						d2 = SpecularC * (float)Math.Pow(Math.Abs(Vector3.Dot(R, V)), ShininessC);
 
-						I = Source.Diffuse;
+						if (d >= 0)
+						{
+							d *= this.diffuseReflectionConstantFront;
 
-						Red += d * I.Red;
-						Green += d * I.Green;
-						Blue += d * I.Blue;
-						Alpha += d * I.Alpha;
+							Red += this.ambientRedFront;
+							Green += this.ambientGreenFront;
+							Blue += this.ambientBlueFront;
+							Alpha += this.ambientAlphaFront;
 
-						I = Source.Specular;
+							if (this.hasSpecularReflectionConstantFront)
+							{
+								R = 2 * d * Normal - L;
+								d2 = Math.Abs(Vector3.Dot(R, V));
+								d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
 
-						Red += d2 * I.Red;
-						Green += d2 * I.Green;
-						Blue += d2 * I.Blue;
-						Alpha += d2 * I.Alpha;
+								Red += d2 * Specular.Red;
+								Green += d2 * Specular.Green;
+								Blue += d2 * Specular.Blue;
+								Alpha += d2 * Specular.Alpha;
+							}
+						}
+						else
+						{
+							d *= this.diffuseReflectionConstantBack;
+
+							Red = this.ambientRedBack;
+							Green = this.ambientGreenBack;
+							Blue = this.ambientBlueBack;
+							Alpha = this.ambientAlphaBack;
+
+							if (this.hasSpecularReflectionConstantBack)
+							{
+								R = 2 * d * Normal - L;
+								d2 = Math.Abs(Vector3.Dot(R, V));
+								d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
+
+								Red += d2 * Specular.Red;
+								Green += d2 * Specular.Green;
+								Blue += d2 * Specular.Blue;
+								Alpha += d2 * Specular.Alpha;
+							}
+						}
+
+						Red += d * Diffuse.Red;
+						Green += d * Diffuse.Green;
+						Blue += d * Diffuse.Blue;
+						Alpha += d * Diffuse.Alpha;
 					}
 
 					Rest = 0;
@@ -503,7 +570,7 @@ namespace Waher.Script.Graphs3D
 						R2 = 0;
 					else if (Red > 255)
 					{
-						Rest = (int)(Red - 255 + 0.5f);
+						Rest = (int)(Red - 254.5f);
 						R2 = 255;
 					}
 					else
@@ -513,7 +580,7 @@ namespace Waher.Script.Graphs3D
 						G2 = 0;
 					else if (Green > 255)
 					{
-						Rest += (int)(Green - 255 + 0.5f);
+						Rest += (int)(Green - 254.5f);
 						G2 = 255;
 					}
 					else
@@ -523,7 +590,7 @@ namespace Waher.Script.Graphs3D
 						B2 = 0;
 					else if (Blue > 255)
 					{
-						Rest += (int)(Blue - 255 + 0.5f);
+						Rest += (int)(Blue - 254.5f);
 						B2 = 255;
 					}
 					else
@@ -568,7 +635,7 @@ namespace Waher.Script.Graphs3D
 						}
 					}
 
-					Colors[i] = new SKColor(R2, B2, G2, A2);
+					Colors[i] = new SKColor(R2, G2, B2, A2);
 				}
 			}
 		}
@@ -581,7 +648,7 @@ namespace Waher.Script.Graphs3D
 		{
 			this.viewerPosition = Canvas3D.ToVector3(Canvas.ViewerPosition);
 
-			if (this.nrSources == 1)
+			if (this.singleSource)
 			{
 				this.source.Transform(Canvas);
 				this.sourcePosition = this.source.TransformedPosition;

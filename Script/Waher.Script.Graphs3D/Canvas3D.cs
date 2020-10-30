@@ -526,12 +526,12 @@ namespace Waher.Script.Graphs3D
 
 		#region Lines
 
-		private bool ClipLine(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
+		private bool ClipLine(ref float x0, ref float y0, ref float z0,
+			ref float x1, ref float y1, ref float z1)
 		{
 			byte Mask0 = 0;
 			byte Mask1 = 0;
 			float Delta;
-			float Delta2;
 
 			if (x0 < 0)
 				Mask0 |= 1;
@@ -563,9 +563,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 1) != 0)
 			{
-				Delta = x1 - x0;    // Must be non-zero, or masks would have common bit.
-				y0 -= x0 * (y1 - y0) / Delta;
-				z0 -= x0 * (z1 - z0) / Delta;
+				Delta = x0 / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
+				y0 -= (y1 - y0) * Delta;
+				z0 -= (z1 - z0) * Delta;
 				x0 = 0;
 
 				Mask0 &= 254;
@@ -580,9 +580,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 1) != 0)
 			{
-				Delta = x0 - x1;    // Must be non-zero, or masks would have common bit.
-				y1 -= x1 * (y0 - y1) / Delta;
-				z1 -= x1 * (z0 - z1) / Delta;
+				Delta = x1 / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
+				y1 -= (y0 - y1) * Delta;
+				z1 -= (z0 - z1) * Delta;
 				x1 = 0;
 
 				Mask1 &= 254;
@@ -599,9 +599,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 4) != 0)
 			{
-				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
-				x0 -= y0 * (x1 - x0) / Delta;
-				z0 -= y0 * (z1 - z0) / Delta;
+				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 -= (x1 - x0) * Delta;
+				z0 -= (z1 - z0) * Delta;
 				y0 = 0;
 
 				Mask0 &= 251;
@@ -616,9 +616,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 4) != 0)
 			{
-				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
-				x1 -= y1 * (x0 - x1) / Delta;
-				z1 -= y1 * (z0 - z1) / Delta;
+				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 -= (x0 - x1) * Delta;
+				z1 -= (z0 - z1) * Delta;
 				y1 = 0;
 
 				Mask1 &= 251;
@@ -635,10 +635,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 2) != 0)
 			{
-				Delta = x1 - x0;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.wm1 - x0;
-				y0 += Delta2 * (y1 - y0) / Delta;
-				z0 += Delta2 * (z1 - z0) / Delta;
+				Delta = (this.wm1 - x0) / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
+				y0 += (y1 - y0) * Delta;
+				z0 += (z1 - z0) * Delta;
 				x0 = this.wm1;
 
 				Mask0 &= 253;
@@ -653,10 +652,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 2) != 0)
 			{
-				Delta = x0 - x1;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.wm1 - x1;
-				y1 += Delta2 * (y0 - y1) / Delta;
-				z1 += Delta2 * (z0 - z1) / Delta;
+				Delta = (this.wm1 - x1) / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
+				y1 += (y0 - y1) * Delta;
+				z1 += (z0 - z1) * Delta;
 				x1 = this.wm1;
 
 				Mask1 &= 253;
@@ -673,10 +671,9 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 8) != 0)
 			{
-				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.hm1 - y0;
-				x0 += Delta2 * (x1 - x0) / Delta;
-				z0 += Delta2 * (z1 - z0) / Delta;
+				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 += (x1 - x0) * Delta;
+				z0 += (z1 - z0) * Delta;
 				y0 = this.hm1;
 
 				Mask0 &= 247;
@@ -691,10 +688,216 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 8) != 0)
 			{
-				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.hm1 - y1;
-				x1 += Delta2 * (x0 - x1) / Delta;
-				z1 += Delta2 * (z0 - z1) / Delta;
+				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 += (x0 - x1) * Delta;
+				z1 += (z0 - z1) * Delta;
+				y1 = this.hm1;
+
+				Mask1 &= 247;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			return ((Mask0 | Mask1) == 0);
+		}
+
+
+		private bool ClipLine(ref float x0, ref float y0, ref float z0,
+			ref float rx0, ref float ry0, ref float rz0,
+			ref float x1, ref float y1, ref float z1,
+			ref float rx1, ref float ry1, ref float rz1)
+		{
+			byte Mask0 = 0;
+			byte Mask1 = 0;
+			float Delta;
+
+			if (x0 < 0)
+				Mask0 |= 1;
+			else if (x0 > this.wm1)
+				Mask0 |= 2;
+
+			if (y0 < 0)
+				Mask0 |= 4;
+			else if (y0 > this.hm1)
+				Mask0 |= 8;
+
+			if (x1 < 0)
+				Mask1 |= 1;
+			else if (x1 > this.wm1)
+				Mask1 |= 2;
+
+			if (y1 < 0)
+				Mask1 |= 4;
+			else if (y1 > this.hm1)
+				Mask1 |= 8;
+
+			if (Mask0 == 0 && Mask1 == 0)
+				return true;
+
+			if ((Mask0 & Mask1) != 0)
+				return false;
+
+			// Left edge:
+
+			if ((Mask0 & 1) != 0)
+			{
+				Delta = x0 / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
+				y0 -= (y1 - y0) * Delta;
+				z0 -= (z1 - z0) * Delta;
+				rx0 -= (rx1 - rx0) * Delta;
+				ry0 -= (ry1 - ry0) * Delta;
+				rz0 -= (rz1 - rz0) * Delta;
+				x0 = 0;
+
+				Mask0 &= 254;
+				if (y0 < 0)
+					Mask0 |= 4;
+				else if (y0 > this.hm1)
+					Mask0 |= 8;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 1) != 0)
+			{
+				Delta = x1 / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
+				y1 -= (y0 - y1) * Delta;
+				z1 -= (z0 - z1) * Delta;
+				rx1 -= (rx0 - rx1) * Delta;
+				ry1 -= (ry0 - ry1) * Delta;
+				rz1 -= (rz0 - rz1) * Delta;
+				x1 = 0;
+
+				Mask1 &= 254;
+				if (y1 < 0)
+					Mask1 |= 4;
+				else if (y1 > this.hm1)
+					Mask1 |= 8;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			// Top edge:
+
+			if ((Mask0 & 4) != 0)
+			{
+				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 -= (x1 - x0) * Delta;
+				z0 -= (z1 - z0) * Delta;
+				rx0 -= (rx1 - rx0) * Delta;
+				ry0 -= (ry1 - ry0) * Delta;
+				rz0 -= (rz1 - rz0) * Delta;
+				y0 = 0;
+
+				Mask0 &= 251;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 4) != 0)
+			{
+				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 -= (x0 - x1) * Delta;
+				z1 -= (z0 - z1) * Delta;
+				rx1 -= (rx0 - rx1) * Delta;
+				ry1 -= (ry0 - ry1) * Delta;
+				rz1 -= (rz0 - rz1) * Delta;
+				y1 = 0;
+
+				Mask1 &= 251;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			// Right edge:
+
+			if ((Mask0 & 2) != 0)
+			{
+				Delta = (this.wm1 - x0) / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
+				y0 += (y1 - y0) * Delta;
+				z0 += (z1 - z0) * Delta;
+				rx0 += (rx1 - rx0) * Delta;
+				ry0 += (ry1 - ry0) * Delta;
+				rz0 += (rz1 - rz0) * Delta;
+				x0 = this.wm1;
+
+				Mask0 &= 253;
+				if (y0 < 0)
+					Mask0 |= 4;
+				else if (y0 > this.hm1)
+					Mask0 |= 8;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 2) != 0)
+			{
+				Delta = (this.wm1 - x1) / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
+				y1 += (y0 - y1) * Delta;
+				z1 += (z0 - z1) * Delta;
+				rx1 += (rx0 - rx1) * Delta;
+				ry1 += (ry0 - ry1) * Delta;
+				rz1 += (rz0 - rz1) * Delta;
+				x1 = this.wm1;
+
+				Mask1 &= 253;
+				if (y1 < 0)
+					Mask1 |= 4;
+				else if (y1 > this.hm1)
+					Mask1 |= 8;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			// Bottom edge:
+
+			if ((Mask0 & 8) != 0)
+			{
+				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 += (x1 - x0) * Delta;
+				z0 += (z1 - z0) * Delta;
+				rx0 += (rx1 - rx0) * Delta;
+				ry0 += (ry1 - ry0) * Delta;
+				rz0 += (rz1 - rz0) * Delta;
+				y0 = this.hm1;
+
+				Mask0 &= 247;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 8) != 0)
+			{
+				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 += (x0 - x1) * Delta;
+				z1 += (z0 - z1) * Delta;
+				rx1 += (rx0 - rx1) * Delta;
+				ry1 += (ry0 - ry1) * Delta;
+				rz1 += (rz0 - rz1) * Delta;
 				y1 = this.hm1;
 
 				Mask1 &= 247;
@@ -918,47 +1121,70 @@ namespace Waher.Script.Graphs3D
 
 		#region Scan Lines
 
-		private void ScanLine(float x0, float y0, float z0, float x1, float z1, Vector3 Normal, I3DShader Shader)
+		private void ScanLine(
+			float sx0, float sy0, float sz0,
+			float wx0, float wy0, float wz0,
+			float sx1, float sz1,
+			float wx1, float wy1, float wz1,
+			Vector3 Normal, I3DShader Shader)
 		{
 			float Delta;
 
-			if (x1 < x0)
+			if (sx1 < sx0)
 			{
-				Delta = x0;
-				x0 = x1;
-				x1 = Delta;
+				Delta = sx0;
+				sx0 = sx1;
+				sx1 = Delta;
 
-				Delta = z0;
-				z0 = z1;
-				z1 = Delta;
+				Delta = sz0;
+				sz0 = sz1;
+				sz1 = Delta;
+
+				Delta = wx0;
+				wx0 = wx1;
+				wx1 = Delta;
+
+				Delta = wy0;
+				wy0 = wy1;
+				wy1 = Delta;
+
+				Delta = wz0;
+				wz0 = wz1;
+				wz1 = Delta;
 			}
 
-			float y1 = y0;
+			float sy1 = sy0;
 
-			if (!this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
-				return;
-
-			if (x0 == x1)
+			if (!this.ClipLine(
+				ref sx0, ref sy0, ref sz0, ref wx0, ref wy0, ref wz0,
+				ref sx1, ref sy1, ref sz1, ref wx1, ref wy1, ref wz1))
 			{
-				if (z0 < z1)
+				return;
+			}
+
+			if (sx0 == sx1)
+			{
+				if (wz0 < wz1)
 				{
-					this.Plot((int)(x0 + 0.5f), (int)(y0 + 0.5f), z0,
-						ToUInt(Shader.GetColor(x0, y0, z0, Normal)));
+					this.Plot((int)(sx0 + 0.5f), (int)(sy0 + 0.5f), wz0,
+						ToUInt(Shader.GetColor(wx0, wy0, wz0, Normal)));
 				}
 				else
 				{
-					this.Plot((int)(x1 + 0.5f), (int)(y0 + 0.5f), z1,
-						ToUInt(Shader.GetColor(x1, y0, z1, Normal)));
+					this.Plot((int)(sx1 + 0.5f), (int)(sy1 + 0.5f), wz1,
+						ToUInt(Shader.GetColor(wx1, wy1, wz1, Normal)));
 				}
 			}
 			else
 			{
-				int ix0 = (int)(x0 + 0.5f);
-				int ix1 = (int)(x1 + 0.5f);
-				float dx = (x1 - x0);
-				float dz = (z1 - z0) / dx;
+				int isx0 = (int)(sx0 + 0.5f);
+				int isx1 = (int)(sx1 + 0.5f);
+				float dsx = 1 / (sx1 - sx0);
+				float dwxdsx = (wx1 - wx0) * dsx;
+				float dwydsx = (wy1 - wy0) * dsx;
+				float dwzdsx = (wz1 - wz0) * dsx;
 				int i = 0;
-				int p = (int)(y0 + 0.5f) * this.w + ix0;
+				int p = (int)(sy0 + 0.5f) * this.w + isx0;
 				int p4 = p << 2;
 				int c;
 				SKColor cl;
@@ -966,13 +1192,16 @@ namespace Waher.Script.Graphs3D
 				byte R2, G2, B2, A2;
 				byte R3, G3, B3, A3;
 
-				while (ix0 <= ix1)
+				while (isx0 <= isx1)
 				{
-					this.xBuf[i] = ix0++;
-					this.yBuf[i] = y0;      // TODO: Correct y and z values. Take projection into account.
-					this.zBuf[i] = z0;
+					this.xBuf[i] = wx0;
+					this.yBuf[i] = wy0;
+					this.zBuf[i] = wz0;
 					this.normalBuf[i++] = Normal;
-					z0 += dz;
+					wx0 += dwxdsx;
+					wy0 += dwydsx;
+					wz0 += dwzdsx;
+					isx0++;
 				}
 
 				c = i;
@@ -980,11 +1209,11 @@ namespace Waher.Script.Graphs3D
 
 				for (i = 0; i < c; i++)
 				{
-					z0 = this.zBuf[i];
+					wz0 = this.zBuf[i];
 
-					if (z0 > 0 && z0 < this.zBuffer[p])
+					if (wz0 > 0 && wz0 < this.zBuffer[p])
 					{
-						this.zBuffer[p++] = z0;
+						this.zBuffer[p++] = wz0;
 
 						cl = this.colorBuf[i];
 
@@ -1065,12 +1294,15 @@ namespace Waher.Script.Graphs3D
 			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
 		}
 
-		private bool ClipTopBottom(ref float x0, ref float y0, ref float z0, ref float x1, ref float y1, ref float z1)
+		private bool ClipTopBottom(
+			ref float x0, ref float y0, ref float z0,
+			ref float rx0, ref float ry0, ref float rz0,
+			ref float x1, ref float y1, ref float z1,
+			ref float rx1, ref float ry1, ref float rz1)
 		{
 			byte Mask0 = 0;
 			byte Mask1 = 0;
 			float Delta;
-			float Delta2;
 
 			if (y0 < 0)
 				Mask0 |= 4;
@@ -1092,9 +1324,12 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 4) != 0)
 			{
-				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
-				x0 -= y0 * (x1 - x0) / Delta;
-				z0 -= y0 * (z1 - z0) / Delta;
+				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 -= (x1 - x0) * Delta;
+				z0 -= (z1 - z0) * Delta;
+				rx0 -= (rx1 - rx0) * Delta;
+				ry0 -= (ry1 - ry0) * Delta;
+				rz0 -= (rz1 - rz0) * Delta;
 				y0 = 0;
 
 				Mask0 &= 251;
@@ -1109,9 +1344,12 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 4) != 0)
 			{
-				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
-				x1 -= y1 * (x0 - x1) / Delta;
-				z1 -= y1 * (z0 - z1) / Delta;
+				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 -= (x0 - x1) * Delta;
+				z1 -= (z0 - z1) * Delta;
+				rx1 -= (rx0 - rx1) * Delta;
+				ry1 -= (ry0 - ry1) * Delta;
+				rz1 -= (rz0 - rz1) * Delta;
 				y1 = 0;
 
 				Mask1 &= 251;
@@ -1128,10 +1366,12 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask0 & 8) != 0)
 			{
-				Delta = y1 - y0;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.hm1 - y0;
-				x0 += Delta2 * (x1 - x0) / Delta;
-				z0 += Delta2 * (z1 - z0) / Delta;
+				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 += (x1 - x0) * Delta;
+				z0 += (z1 - z0) * Delta;
+				rx0 += (rx1 - rx0) * Delta;
+				ry0 += (ry1 - ry0) * Delta;
+				rz0 += (rz1 - rz0) * Delta;
 				y0 = this.hm1;
 
 				Mask0 &= 247;
@@ -1146,10 +1386,12 @@ namespace Waher.Script.Graphs3D
 
 			if ((Mask1 & 8) != 0)
 			{
-				Delta = y0 - y1;    // Must be non-zero, or masks would have common bit.
-				Delta2 = this.hm1 - y1;
-				x1 += Delta2 * (x0 - x1) / Delta;
-				z1 += Delta2 * (z0 - z1) / Delta;
+				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 += (x0 - x1) * Delta;
+				z1 += (z0 - z1) * Delta;
+				rx1 += (rx0 - rx1) * Delta;
+				ry1 += (ry0 - ry1) * Delta;
+				rz1 += (rz0 - rz1) * Delta;
 				y1 = this.hm1;
 
 				Mask1 &= 247;
@@ -1309,10 +1551,13 @@ namespace Waher.Script.Graphs3D
 			Vector3 CurrentScreen;
 			Vector3 N;
 			I3DShader Shader;
-			float x0, y0, z0;
-			float x1, y1, z1;
-			float dx, dy, dz;
-			int iy0, iy1;
+			float sx0, sy0, sz0;
+			float sx1, sy1, sz1;
+			float wx0, wy0, wz0;
+			float wx1, wy1, wz1;
+			float invdsy, dsxdsy, dszdsy;
+			float dwxdsy, dwydsy, dwzdsy;
+			int isy0, isy1;
 
 			for (j = 0; j < d; j++)
 			{
@@ -1338,14 +1583,14 @@ namespace Waher.Script.Graphs3D
 				if (Shader is null)
 					continue;   // Culled
 
-				y0 = LastScreen.Y;
-				y1 = CurrentScreen.Y;
+				sy0 = LastScreen.Y;
+				sy1 = CurrentScreen.Y;
 
-				iy0 = (int)(y0 + 0.5f);
-				iy1 = (int)(y1 + 0.5f);
+				isy0 = (int)(sy0 + 0.5f);
+				isy1 = (int)(sy1 + 0.5f);
 
 				int LastDir;
-				int Dir = Math.Sign(iy1 - iy0);
+				int Dir = Math.Sign(isy1 - isy0);
 
 				for (i = 0; i < c; i++)
 				{
@@ -1355,64 +1600,93 @@ namespace Waher.Script.Graphs3D
 					LastScreen = CurrentScreen;
 					CurrentScreen = vs[i];
 
-					x0 = LastScreen.X;
-					y0 = LastScreen.Y;
-					z0 = LastWorld.Z;
+					sx0 = LastScreen.X;
+					sy0 = LastScreen.Y;
+					sz0 = LastScreen.Z;
 
-					x1 = CurrentScreen.X;
-					y1 = CurrentScreen.Y;
-					z1 = CurrentWorld.Z;
+					sx1 = CurrentScreen.X;
+					sy1 = CurrentScreen.Y;
+					sz1 = CurrentScreen.Z;
 
-					if (!this.ClipTopBottom(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
+					wx0 = LastWorld.X;
+					wy0 = LastWorld.Y;
+					wz0 = LastWorld.Z;
+
+					wx1 = CurrentWorld.X;
+					wy1 = CurrentWorld.Y;
+					wz1 = CurrentWorld.Z;
+
+					if (!this.ClipTopBottom(
+						ref sx0, ref sy0, ref sz0,
+						ref wx0, ref wy0, ref wz0,
+						ref sx1, ref sy1, ref sz1,
+						ref wx1, ref wy1, ref wz1))
+					{
 						continue;
+					}
 
-					iy0 = (int)(y0 + 0.5f);
-					iy1 = (int)(y1 + 0.5f);
+					isy0 = (int)(sy0 + 0.5f);
+					isy1 = (int)(sy1 + 0.5f);
 
 					LastDir = Dir;
-					Dir = Math.Sign(iy1 - iy0);
+					Dir = Math.Sign(isy1 - isy0);
 
 					if (Dir == 0)
 						continue;
 
-					dy = y1 - y0;
-					dx = (x1 - x0) / dy;
-					dz = (z1 - z0) / dy;
+					invdsy = 1 / (sy1 - sy0);
+					dsxdsy = (sx1 - sx0) * invdsy;
+					dszdsy = (sz1 - sz0) * invdsy;
+					dwxdsy = (wx1 - wx0) * invdsy;
+					dwydsy = (wy1 - wy0) * invdsy;
+					dwzdsy = (wz1 - wz0) * invdsy;
 
 					if (Dir > 0)
 					{
 						if (Dir == LastDir)
 						{
-							iy0++;
-							x0 += dx;
-							z0 += dz;
+							isy0++;
+							sx0 += dsxdsy;
+							sz0 += dszdsy;
+							wx0 += dwxdsy;
+							wy0 += dwydsy;
+							wz0 += dwzdsy;
 						}
 
-						while (iy0 <= iy1)
+						while (isy0 <= isy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0, N, Shader);
+							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
 
-							iy0++;
-							x0 += dx;
-							z0 += dz;
+							isy0++;
+							sx0 += dsxdsy;
+							sz0 += dszdsy;
+							wx0 += dwxdsy;
+							wy0 += dwydsy;
+							wz0 += dwzdsy;
 						}
 					}
 					else
 					{
 						if (Dir == LastDir)
 						{
-							iy0--;
-							x0 -= dx;
-							z0 -= dz;
+							isy0--;
+							sx0 -= dsxdsy;
+							sz0 -= dszdsy;
+							wx0 -= dwxdsy;
+							wy0 -= dwydsy;
+							wz0 -= dwzdsy;
 						}
 
-						while (iy0 >= iy1)
+						while (isy0 >= isy1)
 						{
-							this.AddNode(Recs, MinY, x0, iy0, z0, N, Shader);
+							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
 
-							iy0--;
-							x0 -= dx;
-							z0 -= dz;
+							isy0--;
+							sx0 -= dsxdsy;
+							sz0 -= dszdsy;
+							wx0 -= dwxdsy;
+							wy0 -= dwydsy;
+							wz0 -= dwzdsy;
 						}
 					}
 				}
@@ -1426,106 +1700,179 @@ namespace Waher.Script.Graphs3D
 
 				Y = i + MinY;
 
-				if (Rec.nodes != null)
+				if (!(Rec.segments is null))
 				{
 					First = true;
 					Shader = null;
 
-					x0 = z0 = 0;
-					foreach (Tuple<float, float, I3DShader> Rec2 in Rec.nodes)
+					sx0 = sz0 = wx0 = wy0 = wz0 = 0;
+					foreach (ScanLineSegment Rec2 in Rec.segments)
 					{
 						if (First)
 						{
 							First = false;
-							x0 = Rec2.Item1;
-							z0 = Rec2.Item2;
-							Shader = Rec2.Item3;
+							sx0 = Rec2.sx;
+							sz0 = Rec2.sz;
+							wx0 = Rec2.wx;
+							wy0 = Rec2.wy;
+							wz0 = Rec2.wz;
+							Shader = Rec2.shader;
 						}
 						else
 						{
-							Shader = Rec2.Item3;
-							this.ScanLine(x0, Y, z0, Rec2.Item1, Rec2.Item2, Rec.n, Shader);
+							Shader = Rec2.shader;
+							this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0,
+								Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz,
+								Rec.n, Shader);
+
 							First = true;
 						}
 					}
 
 					if (!First)
-						this.Plot((int)(x0 + 0.5f), Y, z0, ToUInt(Shader.GetColor(x0, Y, z0, Rec.n)));
+					{
+						this.Plot((int)(sx0 + 0.5f), Y, sz0,
+							ToUInt(Shader.GetColor(wx0, wy0, wz0, Rec.n)));
+					}
 				}
-				else if (Rec.x1.HasValue)
-					this.ScanLine(Rec.x0, Y, Rec.z0, Rec.x1.Value, Rec.z1.Value, Rec.n, Rec.shader);
+				else if (Rec.has2)
+				{
+					this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0,
+						Rec.sx1, Rec.sz1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n, Rec.shader);
+				}
 				else
-					this.Plot((int)(Rec.x0 + 0.5f), Y, Rec.z0, ToUInt(Rec.shader.GetColor(Rec.x0, Y, Rec.z0, Rec.n)));
+				{
+					this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0, 
+						ToUInt(Rec.shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n)));
+				}
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float x, float y, float z,
-			Vector3 N, I3DShader Shader)
+		private void AddNode(ScanLineRec[] Records, int MinY, float sx, float sy, float sz,
+			float wx, float wy, float wz, Vector3 N, I3DShader Shader)
 		{
-			int i = (int)(y + 0.5f) - MinY;
+			int i = (int)(sy + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
 
 			if (Rec is null)
 			{
 				Records[i] = new ScanLineRec()
 				{
-					x0 = x,
-					z0 = z,
+					sx0 = sx,
+					sz0 = sz,
+					wx0 = wx,
+					wy0 = wy,
+					wz0 = wz,
+					has2 = false,
 					n = N,
 					shader = Shader
 				};
 			}
-			else if (!Rec.x1.HasValue)
+			else if (!Rec.has2)
 			{
-				if (x < Rec.x0)
+				if (sx < Rec.sx0)
 				{
-					Rec.x1 = Rec.x0;
-					Rec.z1 = Rec.z0;
-					Rec.x0 = x;
-					Rec.z0 = z;
+					Rec.sx1 = Rec.sx0;
+					Rec.sz1 = Rec.sz0;
+					Rec.wx1 = Rec.wx0;
+					Rec.wy1 = Rec.wy0;
+					Rec.wz1 = Rec.wz0;
+					Rec.sx0 = sx;
+					Rec.sz0 = sz;
+					Rec.wx0 = wx;
+					Rec.wy0 = wy;
+					Rec.wz0 = wz;
 				}
 				else
 				{
-					Rec.x1 = x;
-					Rec.z1 = z;
-					Rec.shader = Shader;
+					Rec.sx1 = sx;
+					Rec.sz1 = sz;
+					Rec.wx1 = wx;
+					Rec.wy1 = wy;
+					Rec.wz1 = wz;
 				}
+
+				Rec.shader = Shader;
+				Rec.has2 = true;
 			}
 			else
 			{
-				if (Rec.nodes is null)
+				if (Rec.segments is null)
 				{
-					Rec.nodes = new LinkedList<Tuple<float, float, I3DShader>>();
-					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(Rec.x0, Rec.z0, Rec.shader));
-					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(Rec.x1.Value, Rec.z1.Value, Rec.shader));
+					Rec.segments = new LinkedList<ScanLineSegment>();
+					Rec.segments.AddLast(new ScanLineSegment()
+					{
+						sx = Rec.sx0,
+						sz = Rec.sz0,
+						wx = Rec.wx0,
+						wy = Rec.wy0,
+						wz = Rec.wz0,
+						shader = Rec.shader
+					});
+					Rec.segments.AddLast(new ScanLineSegment()
+					{
+						sx = Rec.sx1,
+						sz = Rec.sz1,
+						wx = Rec.wx1,
+						wy = Rec.wy1,
+						wz = Rec.wz1,
+						shader = Rec.shader
+					});
 				}
 
-				LinkedListNode<Tuple<float, float, I3DShader>> Loop = Rec.nodes.First;
-				LinkedListNode<Tuple<float, float, I3DShader>> Prev = null;
+				LinkedListNode<ScanLineSegment> Loop = Rec.segments.First;
+				LinkedListNode<ScanLineSegment> Prev = null;
 
-				while (Loop != null && Loop.Value.Item1 < x)
+				while (!(Loop is null) && Loop.Value.sx < sx)
 				{
 					Prev = Loop;
 					Loop = Loop.Next;
 				}
 
+				ScanLineSegment Segment = new ScanLineSegment()
+				{
+					sx = sx,
+					sz = sz,
+					wx = wx,
+					wy = wy,
+					wz = wz,
+					shader = Rec.shader
+				};
+
 				if (Loop is null)
-					Rec.nodes.AddLast(new Tuple<float, float, I3DShader>(x, z, Shader));
+					Rec.segments.AddLast(Segment);
 				else if (Prev is null)
-					Rec.nodes.AddFirst(new Tuple<float, float, I3DShader>(x, z, Shader));
+					Rec.segments.AddFirst(Segment);
 				else
-					Rec.nodes.AddAfter(Prev, new Tuple<float, float, I3DShader>(x, z, Shader));
+					Rec.segments.AddAfter(Prev, Segment);
 			}
 		}
 
 		private class ScanLineRec
 		{
-			public float x0;
-			public float z0;
-			public float? x1;
-			public float? z1;
-			public LinkedList<Tuple<float, float, I3DShader>> nodes;
+			public float sx0;
+			public float sz0;
+			public float wx0;
+			public float wy0;
+			public float wz0;
+			public float sx1;
+			public float sz1;
+			public float wx1;
+			public float wy1;
+			public float wz1;
+			public bool has2;
+			public LinkedList<ScanLineSegment> segments;
 			public Vector3 n;
+			public I3DShader shader;
+		}
+
+		private class ScanLineSegment
+		{
+			public float sx;
+			public float sz;
+			public float wx;
+			public float wy;
+			public float wz;
 			public I3DShader shader;
 		}
 

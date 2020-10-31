@@ -1769,7 +1769,7 @@ namespace Waher.Script.Graphs3D
 							wz0 += dwzdsy;
 						}
 
-						while (isy0 <= isy1)
+						while (isy0 < isy1)
 						{
 							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
 
@@ -1793,7 +1793,7 @@ namespace Waher.Script.Graphs3D
 							wz0 -= dwzdsy;
 						}
 
-						while (isy0 >= isy1)
+						while (isy0 > isy1)
 						{
 							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
 
@@ -1805,6 +1805,8 @@ namespace Waher.Script.Graphs3D
 							wz0 -= dwzdsy;
 						}
 					}
+
+					this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N, Shader);
 				}
 			}
 

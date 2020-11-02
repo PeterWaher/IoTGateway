@@ -15,7 +15,6 @@ namespace Waher.Script.Graphs3D
 		private readonly PhongLightSource[] sources;
 		private readonly PhongLightSource source;
 		private Vector3 sourcePosition;
-		private Vector3 viewerPosition;
 		private readonly float sourceDiffuseRed;
 		private readonly float sourceDiffuseGreen;
 		private readonly float sourceDiffuseBlue;
@@ -44,6 +43,7 @@ namespace Waher.Script.Graphs3D
 		private readonly bool hasSpecularReflectionConstantFront;
 		private readonly bool hasSpecularReflectionConstantBack;
 		private readonly bool singleSource;
+		private readonly bool opaque;
 
 		/// <summary>
 		/// The Phong Shader uses the Phong Reflection model to generate colors.
@@ -98,6 +98,27 @@ namespace Waher.Script.Graphs3D
 			this.ambientGreenBack = this.ambientReflectionConstantBack * Ambient.Green;
 			this.ambientBlueBack = this.ambientReflectionConstantBack * Ambient.Blue;
 			this.ambientAlphaBack = this.ambientReflectionConstantBack * Ambient.Alpha;
+
+			if (this.ambientAlphaBack < 255 ||
+				this.ambientAlphaFront < 255 ||
+				this.sourceDiffuseAlpha < 255 ||
+				this.sourceSpecularAlpha < 255)
+			{
+				this.opaque = false;
+			}
+			else
+			{
+				this.opaque = true;
+			
+				foreach (PhongLightSource Source in this.sources)
+				{
+					if (!Source.Opaque)
+					{
+						this.opaque = false;
+						break;
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -107,8 +128,9 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Y">Y-coordinate.</param>
 		/// <param name="Z">Z-coordinate.</param>
 		/// <param name="Normal">Surface normal vector.</param>
+		/// <param name="Canvas">Current canvas.</param>
 		/// <returns>Color</returns>
-		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal)
+		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal, Canvas3D Canvas)
 		{
 			Vector3 L;
 			Vector3 R;
@@ -137,7 +159,7 @@ namespace Waher.Script.Graphs3D
 					if (this.hasSpecularReflectionConstantFront)
 					{
 						R = 2 * d * Normal - L;
-						V = Vector3.Normalize(this.viewerPosition - P);
+						V = Vector3.Normalize(Canvas.ViewerPosition - P);
 						d2 = Math.Abs(Vector3.Dot(R, V));
 						d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
 
@@ -159,7 +181,7 @@ namespace Waher.Script.Graphs3D
 					if (this.hasSpecularReflectionConstantBack)
 					{
 						R = 2 * d * Normal - L;
-						V = Vector3.Normalize(this.viewerPosition - P);
+						V = Vector3.Normalize(Canvas.ViewerPosition - P);
 						d2 = Math.Abs(Vector3.Dot(R, V));
 						d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
 
@@ -185,7 +207,7 @@ namespace Waher.Script.Graphs3D
 				Red = Green = Blue = Alpha = 0;
 
 				if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
-					V = Vector3.Normalize(this.viewerPosition - P);
+					V = Vector3.Normalize(Canvas.ViewerPosition - P);
 				else
 					V = Vector3.Zero;
 
@@ -333,7 +355,9 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Normals">Normal vectors.</param>
 		/// <param name="N">Number of coordinates.</param>
 		/// <param name="Colors">Where color values will be stored.</param>
-		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N, SKColor[] Colors)
+		/// <param name="Canvas">Current canvas.</param>
+		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N,
+			SKColor[] Colors, Canvas3D Canvas)
 		{
 			int i;
 			Vector3 L;
@@ -374,7 +398,7 @@ namespace Waher.Script.Graphs3D
 						if (this.hasSpecularReflectionConstantFront)
 						{
 							R = 2 * d * Normal - L;
-							V = Vector3.Normalize(this.viewerPosition - P);
+							V = Vector3.Normalize(Canvas.ViewerPosition - P);
 							d2 = Math.Abs(Vector3.Dot(R, V));
 							d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
 
@@ -395,8 +419,8 @@ namespace Waher.Script.Graphs3D
 
 						if (this.hasSpecularReflectionConstantBack)
 						{
-							R = 2 * d * Normal - L;
-							V = Vector3.Normalize(this.viewerPosition - P);
+							R = 2 * d * -Normal - L;
+							V = Vector3.Normalize(Canvas.ViewerPosition - P);
 							d2 = Math.Abs(Vector3.Dot(R, V));
 							d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
 
@@ -502,7 +526,7 @@ namespace Waher.Script.Graphs3D
 					Red = Green = Blue = Alpha = 0;
 
 					if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
-						V = Vector3.Normalize(this.viewerPosition - P);
+						V = Vector3.Normalize(Canvas.ViewerPosition - P);
 					else
 						V = Vector3.Zero;
 
@@ -639,6 +663,11 @@ namespace Waher.Script.Graphs3D
 				}
 			}
 		}
+
+		/// <summary>
+		/// If shader is 100% opaque.
+		/// </summary>
+		public bool Opaque => this.opaque;
 
 	}
 }

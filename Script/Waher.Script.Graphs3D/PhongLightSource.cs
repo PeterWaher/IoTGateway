@@ -43,5 +43,10 @@ namespace Waher.Script.Graphs3D
 		/// Position of light source..
 		/// </summary>
 		public Vector3 Position => this.position;
+
+		/// <summary>
+		/// If shader is 100% opaque.
+		/// </summary>
+		public bool Opaque => this.diffuse.Opaque && this.specular.Opaque;
 	}
 }

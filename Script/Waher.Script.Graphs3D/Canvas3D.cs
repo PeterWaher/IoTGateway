@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Functions.Analytic;
 using Waher.Script.Graphs;
 
 namespace Waher.Script.Graphs3D
@@ -21,7 +23,7 @@ namespace Waher.Script.Graphs3D
 		private readonly Vector3[] normalBuf;
 		private readonly SKColor[] colorBuf;
 		private readonly SKColor backgroundColor;
-		private Vector4 viewerPosition;
+		private Vector3 viewerPosition;
 		private Matrix4x4 projectionTransformation;
 		private Matrix4x4 modelTransformation;
 		private Vector4 last = Vector4.Zero;
@@ -207,6 +209,98 @@ namespace Waher.Script.Graphs3D
 
 		#endregion
 
+		#region Graph interface
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		{
+			States = null;
+			return this.GetBitmap();
+		}
+
+		/// <summary>
+		/// Gets script corresponding to a point in a generated bitmap representation of the graph.
+		/// </summary>
+		/// <param name="X">X-Coordinate.</param>
+		/// <param name="Y">Y-Coordinate.</param>
+		/// <param name="States">State objects for the generated bitmap.</param>
+		/// <returns>Script.</returns>
+		public override string GetBitmapClickScript(double X, double Y, object[] States)
+		{
+			return string.Empty;
+		}
+
+		/// <summary>
+		/// The recommended bitmap size of the graph, if such is available, or null if not.
+		/// </summary>
+		public override Tuple<int, int> RecommendedBitmapSize
+		{
+			get { return new Tuple<int, int>(this.width, this.height); }
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the left.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
+		{
+			return null;
+		}
+
+		/// <summary>
+		/// Compares the element to another.
+		/// </summary>
+		/// <param name="obj">Other element to compare against.</param>
+		/// <returns>If elements are equal.</returns>
+		public override bool Equals(object obj)
+		{
+			return obj is Canvas3D Canvas3D && this.id.Equals(Canvas3D.id);
+		}
+
+		/// <summary>
+		/// Calculates a hash code of the element.
+		/// </summary>
+		/// <returns>Hash code.</returns>
+		public override int GetHashCode()
+		{
+			return this.id.GetHashCode();
+		}
+
+		/// <summary>
+		/// Converts an object to a <see cref="PhongIntensity"/> object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Phong intensity object.</returns>
+		public static PhongIntensity ToPhongIntensity(object Object)
+		{
+			if (Object is PhongIntensity PhongIntensity)
+				return PhongIntensity;
+			else
+			{
+				SKColor Color = ToColor(Object);
+				return new PhongIntensity(Color.Red, Color.Green, Color.Blue, Color.Alpha);
+			}
+		}
+
+		#endregion
+
 		#region Projection Transformations
 
 		/// <summary>
@@ -215,7 +309,7 @@ namespace Waher.Script.Graphs3D
 		public void ResetTransforms()
 		{
 			this.distance = 0;
-			this.viewerPosition = new Vector4(0, 0, 0, 1);
+			this.viewerPosition = new Vector3(0, 0, 0);
 			this.projectionTransformation = Matrix4x4.CreateTranslation(this.cx, this.cy, 0);
 			this.projectionTransformation = Matrix4x4.CreateScale(-this.overSampling, this.overSampling, 1) * this.projectionTransformation;
 			this.modelTransformation = Matrix4x4.Identity;
@@ -247,7 +341,7 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 Prev = this.projectionTransformation;
 			this.projectionTransformation = Matrix4x4.CreatePerspective(1, 1, NearPlaneDistance, FarPlaneDistance) * this.projectionTransformation;
 			this.distance = NearPlaneDistance;
-			this.viewerPosition = new Vector4(0, 0, -this.distance, 1);
+			this.viewerPosition = new Vector3(0, 0, -this.distance);
 
 			return Prev;
 		}
@@ -255,7 +349,7 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Viewer position
 		/// </summary>
-		public Vector4 ViewerPosition => this.viewerPosition;
+		public Vector3 ViewerPosition => this.viewerPosition;
 
 		/// <summary>
 		/// Transforms coordinates to screen coordinates.
@@ -509,6 +603,18 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Translates the world.
 		/// </summary>
+		/// <param name="Delta">Movement vector.</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 Translate(Vector3 Delta)
+		{
+			Matrix4x4 Prev = this.modelTransformation;
+			this.modelTransformation = Matrix4x4.CreateTranslation(Delta) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Translates the world.
+		/// </summary>
 		/// <param name="DeltaX">Movement along the X-axis.</param>
 		/// <param name="DelayY">Movement along the Y-axis.</param>
 		/// <param name="DeltaZ">Movement along the Z-axis.</param>
@@ -517,6 +623,61 @@ namespace Waher.Script.Graphs3D
 		{
 			Matrix4x4 Prev = this.modelTransformation;
 			this.modelTransformation = Matrix4x4.CreateTranslation(DeltaX, DelayY, DeltaZ) * this.modelTransformation;
+			return Prev;
+		}
+
+		/// <summary>
+		/// Places the observer at the point (<paramref name="PositionX"/>, <paramref name="PositionY"/>, <paramref name="PositionZ"/>), looking at
+		/// the point (<paramref name="TargetX"/>, <paramref name="TargetY"/>, <paramref name="TargetZ"/>), with upwards pointing in the direction of
+		/// (<paramref name="UpX"/>, <paramref name="UpY"/>, <paramref name="UpZ"/>) (as a vector, from the position of the observer).
+		/// </summary>
+		/// <param name="PositionX">X-Coordinte of position point of the observer.</param>
+		/// <param name="PositionY">Y-Coordinte of position point of the observer.</param>
+		/// <param name="PositionZ">Z-Coordinte of position point of the observer.</param>
+		/// <param name="TargetX">X-Coordinate of point being observed.</param>
+		/// <param name="TargetY">Y-Coordinate of point being observed.</param>
+		/// <param name="TargetZ">Z-Coordinate of point being observed.</param>
+		/// <param name="UpX">X-Coordinate of vector pointing in the direction of up, from the 
+		/// point of the observer (<paramref name="PositionX"/>).</param>
+		/// <param name="UpY">Y-Coordinate of vector pointing in the direction of up, from the 
+		/// point of the observer (<paramref name="PositionY"/>).</param>
+		/// <param name="UpZ">Z-Coordinate of vector pointing in the direction of up, from the 
+		/// point of the observer (<paramref name="PositionZ"/>).</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 LookAt(float PositionX, float PositionY, float PositionZ,
+			float TargetX, float TargetY, float TargetZ, float UpX, float UpY, float UpZ)
+		{
+			return this.LookAt(new Vector3(PositionX, PositionY, PositionZ),
+				new Vector3(TargetX, TargetY, TargetZ), new Vector3(UpX, UpY, UpZ));
+		}
+
+		/// <summary>
+		/// Places the observer at the point <paramref name="Position"/>, looking at
+		/// the point <paramref name="Target"/>, with upwards pointing in the direction of
+		/// <paramref name="Up"/> (as a vector, from the position of the observer).
+		/// </summary>
+		/// <param name="Position">Position point of the observer.</param>
+		/// <param name="Target">Point being observed.</param>
+		/// <param name="Up">Vector pointing in the direction of up, from the 
+		/// point of the observer (<paramref name="Position"/>).</param>
+		/// <returns>Previous model transformation matrix.</returns>
+		public Matrix4x4 LookAt(Vector3 Position, Vector3 Target, Vector3 Up)
+		{
+			// Matrix4x4.CreateLookAt is strange. Perform own linear algebra, flipping axes:
+
+			Vector3 V = Vector3.Normalize(Target - Position);           // Maps to Z, after transform
+			Vector3 U = Vector3.Normalize(Up - Vector3.Dot(V, Up) * V); // Maps to Y, after transform
+			Vector3 R = Vector3.Cross(V, U);                            // Maps to X, after transform
+
+			Matrix4x4 Prev = this.modelTransformation;
+			Matrix4x4 M = new Matrix4x4(
+				R.X, U.X, V.X, 0,
+				R.Y, U.Y, V.Y, 0,
+				R.Z, U.Z, V.Z, 0,
+				0, 0, 0, 1);
+			this.modelTransformation = M * this.modelTransformation;
+			this.Translate(-Position);
+
 			return Prev;
 		}
 
@@ -1035,11 +1196,11 @@ namespace Waher.Script.Graphs3D
 
 			x0 = SP0.X;
 			y0 = SP0.Y;
-			z0 = SP0.Z;
+			z0 = WP0.Z;
 
 			x1 = SP1.X;
 			y1 = SP1.Y;
-			z1 = SP1.Z;
+			z1 = WP1.Z;
 
 			if (this.ClipLine(ref x0, ref y0, ref z0, ref x1, ref y1, ref z1))
 			{
@@ -1256,12 +1417,12 @@ namespace Waher.Script.Graphs3D
 				if (wz0 < wz1)
 				{
 					this.Plot((int)(sx0 + 0.5f), (int)(sy0 + 0.5f), wz0,
-						ToUInt(Shader.GetColor(wx0, wy0, wz0, Normal)));
+						ToUInt(Shader.GetColor(wx0, wy0, wz0, Normal, this)));
 				}
 				else
 				{
 					this.Plot((int)(sx1 + 0.5f), (int)(sy1 + 0.5f), wz1,
-						ToUInt(Shader.GetColor(wx1, wy1, wz1, Normal)));
+						ToUInt(Shader.GetColor(wx1, wy1, wz1, Normal, this)));
 				}
 			}
 			else
@@ -1294,7 +1455,7 @@ namespace Waher.Script.Graphs3D
 				}
 
 				c = i;
-				Shader.GetColors(this.xBuf, this.yBuf, this.zBuf, this.normalBuf, c, this.colorBuf);
+				Shader.GetColors(this.xBuf, this.yBuf, this.zBuf, this.normalBuf, c, this.colorBuf, this);
 
 				for (i = 0; i < c; i++)
 				{
@@ -1599,23 +1760,22 @@ namespace Waher.Script.Graphs3D
 		{
 			int j, d;
 			int i, c;
+			int k, l;
 			int MinY = 0;
 			int MaxY = 0;
 			int Y;
 			Vector4 WP;
-			Vector3 SP;
-			Vector4[] v, vw;
-			Vector3[] vs;
+			Vector3 WP3, SP;
+			Vector4[] v;
+			Vector3[] vw, vs;
 			bool First = true;
-
-			Nodes = (Vector4[][])Nodes.Clone();
 
 			d = Nodes.Length;
 
-			Vector4[][] World = new Vector4[d][];
+			Vector3[][] World = new Vector3[d][];
 			Vector3[][] Screen = new Vector3[d][];
 
-			for (j = 0; j < d; j++)
+			for (j = l = 0; j < d; j++)
 			{
 				v = Nodes[j];
 				c = v.Length;
@@ -1623,16 +1783,19 @@ namespace Waher.Script.Graphs3D
 				if (c < 3)
 					continue;
 
-				vw = new Vector4[c];
-				World[j] = vw;
-
+				vw = new Vector3[c];
 				vs = new Vector3[c];
-				Screen[j] = vs;
 
-				for (i = 0; i < c; i++)
+				for (i = k = 0; i < c; i++)
 				{
-					vw[i] = WP = this.ModelTransform(v[i]);
-					vs[i] = SP = this.Project(WP);
+					WP = this.ModelTransform(v[i]);
+					WP3 = ToVector3(WP);
+
+					if (k > 0 && WP3 == vw[k - 1])
+						continue;   // Removing duplicate points, to avoid problems when calculating normals.
+
+					vw[k] = WP3;
+					vs[k++] = SP = this.Project(WP);
 
 					Y = (int)(SP.Y + 0.5f);
 
@@ -1646,7 +1809,24 @@ namespace Waher.Script.Graphs3D
 					else if (Y > MaxY)
 						MaxY = Y;
 				}
+
+				if (k > 1 && vw[0] == vw[k - 1])
+					k--;
+
+				if (k < 3)
+					continue;
+
+				if (k != c)
+				{
+					Array.Resize<Vector3>(ref vw, k);
+					Array.Resize<Vector3>(ref vs, k);
+				}
+
+				World[l] = vw;
+				Screen[l++] = vs;
 			}
+
+			d = l;
 
 			if (MaxY < 0)
 				return;
@@ -1659,10 +1839,15 @@ namespace Waher.Script.Graphs3D
 				MaxY = this.hm1;
 
 			int NrRecs = MaxY - MinY + 1;
-			ScanLineRec[] Recs = new ScanLineRec[NrRecs];
+			ScanLineRec[][] Recs2 = new ScanLineRec[2][]
+			{
+				FrontShader is null ? null : new ScanLineRec[NrRecs],
+				BackShader is null ? null : new ScanLineRec[NrRecs],
+			};
+			ScanLineRec[] Recs;
 			ScanLineRec Rec;
-			Vector4 LastWorld;
-			Vector4 CurrentWorld;
+			Vector3 LastWorld;
+			Vector3 CurrentWorld;
 			Vector3 LastScreen;
 			Vector3 CurrentScreen;
 			Vector3 N;
@@ -1681,22 +1866,19 @@ namespace Waher.Script.Graphs3D
 				vs = Screen[j];
 				c = vw.Length;
 
-				if (c < 3)
-					continue;
-
 				//LastWorld = vw[c - 2];
 				CurrentWorld = vw[c - 1];
 				LastScreen = vs[c - 2];
 				CurrentScreen = vs[c - 1];
 
-				N = CalcNormal(ToVector3(vw[0]), ToVector3(vw[1]), ToVector3(CurrentWorld));
+				N = CalcNormal(vw[0], vw[1], CurrentWorld);
 
-				if (Vector3.Dot(N, ToVector3(vw[0] - this.viewerPosition)) >= 0)
-					Shader = FrontShader;
+				if (Vector3.Dot(N, this.viewerPosition - vw[0]) >= 0)
+					Recs = Recs2[0];
 				else
-					Shader = BackShader;
+					Recs = Recs2[1];
 
-				if (Shader is null)
+				if (Recs is null)
 					continue;   // Culled
 
 				sy0 = LastScreen.Y;
@@ -1771,7 +1953,7 @@ namespace Waher.Script.Graphs3D
 
 						while (isy0 < isy1)
 						{
-							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
+							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N);
 
 							isy0++;
 							sx0 += dsxdsy;
@@ -1780,6 +1962,8 @@ namespace Waher.Script.Graphs3D
 							wy0 += dwydsy;
 							wz0 += dwzdsy;
 						}
+
+						this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
 					}
 					else
 					{
@@ -1793,81 +1977,97 @@ namespace Waher.Script.Graphs3D
 							wz0 -= dwzdsy;
 						}
 
-						while (isy0 > isy1)
+						if (isy1 < isy0)
 						{
-							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N, Shader);
+							while (isy1 < isy0)
+							{
+								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
 
-							isy0--;
-							sx0 -= dsxdsy;
-							sz0 -= dszdsy;
-							wx0 -= dwxdsy;
-							wy0 -= dwydsy;
-							wz0 -= dwzdsy;
+								isy1++;
+								sx1 += dsxdsy;
+								sz1 += dszdsy;
+								wx1 += dwxdsy;
+								wy1 += dwydsy;
+								wz1 += dwzdsy;
+							}
+
+							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N);
 						}
+						else
+							this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
 					}
-
-					this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N, Shader);
 				}
 			}
 
-			for (i = 0; i < NrRecs; i++)
+			for (j = 0; j < 2; j++)
 			{
-				Rec = Recs[i];
-				if (Rec is null)
+				Recs = Recs2[j];
+				if (Recs is null)
 					continue;
 
-				Y = i + MinY;
+				Shader = j == 0 ? FrontShader : BackShader;
 
-				if (!(Rec.segments is null))
+				for (i = 0; i < NrRecs; i++)
 				{
-					First = true;
-					Shader = null;
+					Rec = Recs[i];
+					if (Rec is null)
+						continue;
 
-					sx0 = sz0 = wx0 = wy0 = wz0 = 0;
-					foreach (ScanLineSegment Rec2 in Rec.segments)
+					Y = i + MinY;
+
+					if (!(Rec.segments is null))
 					{
-						if (First)
-						{
-							First = false;
-							sx0 = Rec2.sx;
-							sz0 = Rec2.sz;
-							wx0 = Rec2.wx;
-							wy0 = Rec2.wy;
-							wz0 = Rec2.wz;
-							Shader = Rec2.shader;
-						}
-						else
-						{
-							Shader = Rec2.shader;
-							this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0,
-								Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz,
-								Rec.n, Shader);
+						First = true;
 
-							First = true;
+						sx0 = sz0 = wx0 = wy0 = wz0 = 0;
+						N = Vector3.Zero;
+
+						foreach (ScanLineSegment Rec2 in Rec.segments)
+						{
+							if (First)
+							{
+								First = false;
+								sx0 = Rec2.sx;
+								sz0 = Rec2.sz;
+								wx0 = Rec2.wx;
+								wy0 = Rec2.wy;
+								wz0 = Rec2.wz;
+								N = Rec2.n;
+							}
+							else
+							{
+								this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0,
+									Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz,
+									Rec2.n, Shader);
+								// TODO: Interpolation of normals from N to Rec2.n
+
+								First = true;
+							}
+						}
+
+						if (!First)
+						{
+							this.Plot((int)(sx0 + 0.5f), Y, sz0,
+								ToUInt(Shader.GetColor(wx0, wy0, wz0, N, this)));
 						}
 					}
-
-					if (!First)
+					else if (Rec.has2)
 					{
-						this.Plot((int)(sx0 + 0.5f), Y, sz0,
-							ToUInt(Shader.GetColor(wx0, wy0, wz0, Rec.n)));
+						this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0,
+							Rec.sx1, Rec.sz1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n1, Shader);
+						// TODO: Interpolation of normals from Rec.n0 to Rec.n1
 					}
-				}
-				else if (Rec.has2)
-				{
-					this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0,
-						Rec.sx1, Rec.sz1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n, Rec.shader);
-				}
-				else
-				{
-					this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0,
-						ToUInt(Rec.shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n)));
+					else
+					{
+						this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0,
+							ToUInt(Shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0, this)));
+					}
 				}
 			}
 		}
 
 		private void AddNode(ScanLineRec[] Records, int MinY, float sx, float sy, float sz,
-			float wx, float wy, float wz, Vector3 N, I3DShader Shader)
+			float wx, float wy, float wz, Vector3 N)
 		{
 			int i = (int)(sy + 0.5f) - MinY;
 			ScanLineRec Rec = Records[i];
@@ -1882,8 +2082,7 @@ namespace Waher.Script.Graphs3D
 					wy0 = wy,
 					wz0 = wz,
 					has2 = false,
-					n = N,
-					shader = Shader
+					n0 = N
 				};
 			}
 			else if (!Rec.has2)
@@ -1895,11 +2094,13 @@ namespace Waher.Script.Graphs3D
 					Rec.wx1 = Rec.wx0;
 					Rec.wy1 = Rec.wy0;
 					Rec.wz1 = Rec.wz0;
+					Rec.n1 = Rec.n0;
 					Rec.sx0 = sx;
 					Rec.sz0 = sz;
 					Rec.wx0 = wx;
 					Rec.wy0 = wy;
 					Rec.wz0 = wz;
+					Rec.n0 = N;
 				}
 				else
 				{
@@ -1908,9 +2109,9 @@ namespace Waher.Script.Graphs3D
 					Rec.wx1 = wx;
 					Rec.wy1 = wy;
 					Rec.wz1 = wz;
+					Rec.n1 = N;
 				}
 
-				Rec.shader = Shader;
 				Rec.has2 = true;
 			}
 			else
@@ -1918,6 +2119,7 @@ namespace Waher.Script.Graphs3D
 				if (Rec.segments is null)
 				{
 					Rec.segments = new LinkedList<ScanLineSegment>();
+
 					Rec.segments.AddLast(new ScanLineSegment()
 					{
 						sx = Rec.sx0,
@@ -1925,8 +2127,9 @@ namespace Waher.Script.Graphs3D
 						wx = Rec.wx0,
 						wy = Rec.wy0,
 						wz = Rec.wz0,
-						shader = Rec.shader
+						n = Rec.n0
 					});
+
 					Rec.segments.AddLast(new ScanLineSegment()
 					{
 						sx = Rec.sx1,
@@ -1934,7 +2137,7 @@ namespace Waher.Script.Graphs3D
 						wx = Rec.wx1,
 						wy = Rec.wy1,
 						wz = Rec.wz1,
-						shader = Rec.shader
+						n = Rec.n1
 					});
 				}
 
@@ -1954,7 +2157,7 @@ namespace Waher.Script.Graphs3D
 					wx = wx,
 					wy = wy,
 					wz = wz,
-					shader = Rec.shader
+					n = N
 				};
 
 				if (Loop is null)
@@ -1980,8 +2183,7 @@ namespace Waher.Script.Graphs3D
 			public float wz1;
 			public bool has2;
 			public LinkedList<ScanLineSegment> segments;
-			public Vector3 n;
-			public I3DShader shader;
+			public Vector3 n0, n1;
 		}
 
 		private class ScanLineSegment
@@ -1991,7 +2193,7 @@ namespace Waher.Script.Graphs3D
 			public float wx;
 			public float wy;
 			public float wz;
-			public I3DShader shader;
+			public Vector3 n;
 		}
 
 		#endregion
@@ -2310,107 +2512,88 @@ namespace Waher.Script.Graphs3D
 			Vector4 P6 = new Vector4(x2, y2, z2, 1);
 			Vector4 P7 = new Vector4(x2, y2, z1, 1);
 
-			this.Polygon(new Vector4[] { P0, P1, P2, P3 }, Shader, false);
-			this.Polygon(new Vector4[] { P7, P6, P5, P4 }, Shader, false);
-			this.Polygon(new Vector4[] { P5, P6, P2, P1 }, Shader, false);
-			this.Polygon(new Vector4[] { P4, P5, P1, P0 }, Shader, false);
-			this.Polygon(new Vector4[] { P6, P7, P3, P2 }, Shader, false);
-			this.Polygon(new Vector4[] { P0, P3, P7, P4 }, Shader, false);
+			bool TwoSided = !Shader.Opaque;
+
+			this.Polygon(new Vector4[] { P0, P3, P2, P1 }, Shader, TwoSided);
+			this.Polygon(new Vector4[] { P7, P4, P5, P6 }, Shader, TwoSided);
+			this.Polygon(new Vector4[] { P5, P1, P2, P6 }, Shader, TwoSided);
+			this.Polygon(new Vector4[] { P4, P0, P1, P5 }, Shader, TwoSided);
+			this.Polygon(new Vector4[] { P6, P2, P3, P7 }, Shader, TwoSided);
+			this.Polygon(new Vector4[] { P0, P4, P7, P3 }, Shader, TwoSided);
 		}
 
 		#endregion
 
-		#region Graph interface
+		#region Ellipsoid
 
 		/// <summary>
-		/// Creates a bitmap of the graph.
+		/// Draws an ellipsoid, with axes parallell to the x, y and z axis.
 		/// </summary>
-		/// <param name="Settings">Graph settings.</param>
-		/// <param name="States">State objects that contain graph-specific information about its inner states.
-		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
-		/// <returns>Bitmap</returns>
-		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		/// <param name="Center">Center-point</param>
+		/// <param name="Radius">Radius vectors</param>
+		/// <param name="Facets">Number of facets to use to (at least), to draw ellipsoid</param>
+		/// <param name="Shader">Shader.</param>
+		public void Ellipsoid(Vector3 Center, Vector3 Radius, int Facets, I3DShader Shader)
 		{
-			States = null;
-			return this.GetBitmap();
+			this.Ellipsoid(Center.X, Center.Y, Center.Z, Radius.X, Radius.Y, Radius.Z, Facets, Shader);
 		}
 
 		/// <summary>
-		/// Gets script corresponding to a point in a generated bitmap representation of the graph.
+		/// Draws an ellipsoid, with axes parallell to the x, y and z axis.
 		/// </summary>
-		/// <param name="X">X-Coordinate.</param>
-		/// <param name="Y">Y-Coordinate.</param>
-		/// <param name="States">State objects for the generated bitmap.</param>
-		/// <returns>Script.</returns>
-		public override string GetBitmapClickScript(double X, double Y, object[] States)
+		/// <param name="cx">Center-point X-coordinate.</param>
+		/// <param name="cy">Center-point Y-coordinate.</param>
+		/// <param name="cz">Center-point Z-coordinate.</param>
+		/// <param name="rx">Radius along X-axis.</param>
+		/// <param name="ry">Radius along Y-axis.</param>
+		/// <param name="rz">Radius along Z-axis.</param>
+		/// <param name="Facets">Number of facets to use to (at least), to draw ellipsoid</param>
+		/// <param name="Shader">Shader.</param>
+		public void Ellipsoid(float cx, float cy, float cz, float rx, float ry, float rz, int Facets, I3DShader Shader)
 		{
-			return string.Empty;
-		}
+			int N = (int)Math.Ceiling(Math.Sqrt(2 * Facets));
+			if ((N & 1) == 1)
+				N++;
+			int N2 = N / 2;
+			int a, b;
 
-		/// <summary>
-		/// The recommended bitmap size of the graph, if such is available, or null if not.
-		/// </summary>
-		public override Tuple<int, int> RecommendedBitmapSize
-		{
-			get { return new Tuple<int, int>(this.width, this.height); }
-		}
+			float[,] x = new float[N, N2 + 1];
+			float[,] y = new float[N, N2 + 1];
+			float[,] z = new float[N, N2 + 1];
 
-		/// <summary>
-		/// Tries to add an element to the current element, from the left.
-		/// </summary>
-		/// <param name="Element">Element to add.</param>
-		/// <returns>Result, if understood, null otherwise.</returns>
-		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
-		{
-			return null;
-		}
-
-		/// <summary>
-		/// Tries to add an element to the current element, from the right.
-		/// </summary>
-		/// <param name="Element">Element to add.</param>
-		/// <returns>Result, if understood, null otherwise.</returns>
-		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
-		{
-			return null;
-		}
-
-		/// <summary>
-		/// Compares the element to another.
-		/// </summary>
-		/// <param name="obj">Other element to compare against.</param>
-		/// <returns>If elements are equal.</returns>
-		public override bool Equals(object obj)
-		{
-			return obj is Canvas3D Canvas3D && this.id.Equals(Canvas3D.id);
-		}
-
-		/// <summary>
-		/// Calculates a hash code of the element.
-		/// </summary>
-		/// <returns>Hash code.</returns>
-		public override int GetHashCode()
-		{
-			return this.id.GetHashCode();
-		}
-
-		/// <summary>
-		/// Converts an object to a <see cref="PhongIntensity"/> object.
-		/// </summary>
-		/// <param name="Object">Object</param>
-		/// <returns>Phong intensity object.</returns>
-		public static PhongIntensity ToPhongIntensity(object Object)
-		{
-			if (Object is PhongIntensity PhongIntensity)
-				return PhongIntensity;
-			else
+			for (a = 0; a < N; a++)
 			{
-				SKColor Color = ToColor(Object);
-				return new PhongIntensity(Color.Red, Color.Green, Color.Blue, Color.Alpha);
+				double φ = a * Math.PI / N2;
+
+				for (b = 0; b <= N2; b++)
+				{
+					double θ = b * Math.PI / N2;
+					double sinθ = Math.Sin(θ);
+
+					x[a, b] = (float)(cx + rx * sinθ * Math.Cos(φ));
+					y[a, b] = (float)(cy + ry * Math.Cos(θ));
+					z[a, b] = (float)(cz + rz * sinθ * Math.Sin(φ));
+				}
+			}
+
+			int pa, pb;
+			bool TwoSided = !Shader.Opaque;
+
+			for (a = 0, pa = N - 1; a < N; pa = a++)
+			{
+				for (b = 1, pb = 0; b <= N2; pb = b++)
+				{
+					this.Polygon(new Vector4[]
+					{
+						new Vector4(x[pa, pb], y[pa, pb], z[pa, pb], 1),
+						new Vector4(x[a, pb], y[a, pb], z[a, pb], 1),
+						new Vector4(x[a, b], y[a, b], z[a, b], 1),
+						new Vector4(x[pa, b], y[pa, b], z[pa, b], 1)
+					}, Shader, TwoSided);
+				}
 			}
 		}
 
 		#endregion
-
 	}
 }

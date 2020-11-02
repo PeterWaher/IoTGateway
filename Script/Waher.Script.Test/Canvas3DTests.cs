@@ -215,35 +215,40 @@ namespace Waher.Script.Test
 				new PhongMaterial(1, 2, 0, 10),
 				new PhongIntensity(64, 64, 64, 255),
 				new PhongLightSource(
-					new PhongIntensity(Color.Red, Color.Green, Color.Blue, 255),
+					new PhongIntensity(Color.Red, Color.Green, Color.Blue, Color.Alpha),
 					new PhongIntensity(255, 255, 255, 255),
 					new Vector3(1000, 1000, 0)));
 		}
 
 		private void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader)
 		{
+			this.DrawThreePlanes(Canvas, Shader, -500, -500, 2000);
+		}
+
+		private void DrawThreePlanes(Canvas3D Canvas, I3DShader Shader, float x, float y, float z)
+		{
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, 500, 2000, 1),
-				new Vector4(500, 500, 2000, 1),
-				new Vector4(500, -500, 2000, 1),
-				new Vector4(-500, -500, 2000, 1)
-			}, Shader, true);
-			
-			Canvas.Polygon(new Vector4[]
-			{
-				new Vector4(-500, 500, 1000, 1),
-				new Vector4(-500, 500, 2000, 1),
-				new Vector4(-500, -500, 2000, 1),
-				new Vector4(-500, -500, 1000, 1)
+				new Vector4(-500, 500, z, 1),
+				new Vector4(500, 500, z, 1),
+				new Vector4(500, -500, z, 1),
+				new Vector4(-500, -500, z, 1)
 			}, Shader, true);
 
 			Canvas.Polygon(new Vector4[]
 			{
-				new Vector4(-500, -500, 2000, 1),
-				new Vector4(500, -500, 2000, 1),
-				new Vector4(500, -500, 1000, 1),
-				new Vector4(-500, -500, 1000, 1)
+				new Vector4(x, 500, 1000, 1),
+				new Vector4(x, 500, 2000, 1),
+				new Vector4(x, -500, 2000, 1),
+				new Vector4(x, -500, 1000, 1)
+			}, Shader, true);
+
+			Canvas.Polygon(new Vector4[]
+			{
+				new Vector4(-500, y, 2000, 1),
+				new Vector4(500, y, 2000, 1),
+				new Vector4(500, y, 1000, 1),
+				new Vector4(-500, y, 1000, 1)
 			}, Shader, true);
 		}
 
@@ -353,6 +358,22 @@ namespace Waher.Script.Test
 			Canvas.Box(-500, -500, 1000, 500, 500, 2000, Shader);
 
 			this.Save(Canvas, "13.png");
+		}
+
+		[TestMethod]
+		public void Canvas3D_Test_14_Ellipsoid()
+		{
+			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas.Perspective(200, 2000);
+			Canvas.LookAt(-200, 500, 0, 0, 0, 1500, 0, 1, 0);
+
+			I3DShader Shader = this.GetPhongShader(SKColors.Orange);
+			Canvas.Ellipsoid(0, 0, 1500, 400, 400, 400, 1000, Shader);
+
+			Shader = this.GetPhongShader(new SKColor(0, 0, 255, 64));
+			this.DrawThreePlanes(Canvas, Shader, 0, 0, 1500);
+
+			this.Save(Canvas, "14.png");
 		}
 
 		// TODO: Clip

@@ -29,8 +29,9 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Y">Y-coordinate.</param>
 		/// <param name="Z">Z-coordinate.</param>
 		/// <param name="Normal">Surface normal vector.</param>
+		/// <param name="Canvas">Current canvas.</param>
 		/// <returns>Color</returns>
-		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal)
+		public SKColor GetColor(float X, float Y, float Z, Vector3 Normal, Canvas3D Canvas)
 		{
 			return this.color;
 		}
@@ -44,12 +45,19 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Normals">Normal vectors.</param>
 		/// <param name="N">Number of coordinates.</param>
 		/// <param name="Colors">Where color values will be stored.</param>
-		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N, SKColor[] Colors)
+		/// <param name="Canvas">Current canvas.</param>
+		public void GetColors(float[] X, float[] Y, float[] Z, Vector3[] Normals, int N,
+			SKColor[] Colors, Canvas3D Canvas)
 		{
 			int i;
 
 			for (i = 0; i < N; i++)
 				Colors[i] = this.color;
 		}
+
+		/// <summary>
+		/// If shader is 100% opaque.
+		/// </summary>
+		public bool Opaque => this.color.Alpha == 255;
 	}
 }

@@ -33,6 +33,63 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.RecommendedBitmapSize">
+            <summary>
+            The recommended bitmap size of the graph, if such is available, or null if not.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Equals(System.Object)">
+            <summary>
+            Compares the element to another.
+            </summary>
+            <param name="obj">Other element to compare against.</param>
+            <returns>If elements are equal.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetHashCode">
+            <summary>
+            Calculates a hash code of the element.
+            </summary>
+            <returns>Hash code.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToPhongIntensity(System.Object)">
+            <summary>
+            Converts an object to a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Phong intensity object.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.ResetTransforms">
             <summary>
             Resets any transforms.
@@ -216,6 +273,13 @@
             <param name="CenterPoint">Center point.</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Translate(System.Numerics.Vector3)">
+            <summary>
+            Translates the world.
+            </summary>
+            <param name="Delta">Movement vector.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Translate(System.Single,System.Single,System.Single)">
             <summary>
             Translates the world.
@@ -223,6 +287,38 @@
             <param name="DeltaX">Movement along the X-axis.</param>
             <param name="DelayY">Movement along the Y-axis.</param>
             <param name="DeltaZ">Movement along the Z-axis.</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.LookAt(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Places the observer at the point (<paramref name="PositionX"/>, <paramref name="PositionY"/>, <paramref name="PositionZ"/>), looking at
+            the point (<paramref name="TargetX"/>, <paramref name="TargetY"/>, <paramref name="TargetZ"/>), with upwards pointing in the direction of
+            (<paramref name="UpX"/>, <paramref name="UpY"/>, <paramref name="UpZ"/>) (as a vector, from the position of the observer).
+            </summary>
+            <param name="PositionX">X-Coordinte of position point of the observer.</param>
+            <param name="PositionY">Y-Coordinte of position point of the observer.</param>
+            <param name="PositionZ">Z-Coordinte of position point of the observer.</param>
+            <param name="TargetX">X-Coordinate of point being observed.</param>
+            <param name="TargetY">Y-Coordinate of point being observed.</param>
+            <param name="TargetZ">Z-Coordinate of point being observed.</param>
+            <param name="UpX">X-Coordinate of vector pointing in the direction of up, from the 
+            point of the observer (<paramref name="PositionX"/>).</param>
+            <param name="UpY">Y-Coordinate of vector pointing in the direction of up, from the 
+            point of the observer (<paramref name="PositionY"/>).</param>
+            <param name="UpZ">Z-Coordinate of vector pointing in the direction of up, from the 
+            point of the observer (<paramref name="PositionZ"/>).</param>
+            <returns>Previous model transformation matrix.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.LookAt(System.Numerics.Vector3,System.Numerics.Vector3,System.Numerics.Vector3)">
+            <summary>
+            Places the observer at the point <paramref name="Position"/>, looking at
+            the point <paramref name="Target"/>, with upwards pointing in the direction of
+            <paramref name="Up"/> (as a vector, from the position of the observer).
+            </summary>
+            <param name="Position">Position point of the observer.</param>
+            <param name="Target">Point being observed.</param>
+            <param name="Up">Vector pointing in the direction of up, from the 
+            point of the observer (<paramref name="Position"/>).</param>
             <returns>Previous model transformation matrix.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Plot(System.Numerics.Vector4,SkiaSharp.SKColor)">
@@ -423,62 +519,27 @@
             <param name="z2">Z-axis of second corner.</param>
             <param name="Shader">Shader.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Ellipsoid(System.Numerics.Vector3,System.Numerics.Vector3,System.Int32,Waher.Script.Graphs3D.I3DShader)">
             <summary>
-            Creates a bitmap of the graph.
+            Draws an ellipsoid, with axes parallell to the x, y and z axis.
             </summary>
-            <param name="Settings">Graph settings.</param>
-            <param name="States">State objects that contain graph-specific information about its inner states.
-            These can be used in calls back to the graph object to make actions on the generated graph.</param>
-            <returns>Bitmap</returns>
+            <param name="Center">Center-point</param>
+            <param name="Radius">Radius vectors</param>
+            <param name="Facets">Number of facets to use to (at least), to draw ellipsoid</param>
+            <param name="Shader">Shader.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Ellipsoid(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Int32,Waher.Script.Graphs3D.I3DShader)">
             <summary>
-            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            Draws an ellipsoid, with axes parallell to the x, y and z axis.
             </summary>
-            <param name="X">X-Coordinate.</param>
-            <param name="Y">Y-Coordinate.</param>
-            <param name="States">State objects for the generated bitmap.</param>
-            <returns>Script.</returns>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.Canvas3D.RecommendedBitmapSize">
-            <summary>
-            The recommended bitmap size of the graph, if such is available, or null if not.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
-            <summary>
-            Tries to add an element to the current element, from the left.
-            </summary>
-            <param name="Element">Element to add.</param>
-            <returns>Result, if understood, null otherwise.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
-            <summary>
-            Tries to add an element to the current element, from the right.
-            </summary>
-            <param name="Element">Element to add.</param>
-            <returns>Result, if understood, null otherwise.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.Equals(System.Object)">
-            <summary>
-            Compares the element to another.
-            </summary>
-            <param name="obj">Other element to compare against.</param>
-            <returns>If elements are equal.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetHashCode">
-            <summary>
-            Calculates a hash code of the element.
-            </summary>
-            <returns>Hash code.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToPhongIntensity(System.Object)">
-            <summary>
-            Converts an object to a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> object.
-            </summary>
-            <param name="Object">Object</param>
-            <returns>Phong intensity object.</returns>
+            <param name="cx">Center-point X-coordinate.</param>
+            <param name="cy">Center-point Y-coordinate.</param>
+            <param name="cz">Center-point Z-coordinate.</param>
+            <param name="rx">Radius along X-axis.</param>
+            <param name="ry">Radius along Y-axis.</param>
+            <param name="rz">Radius along Z-axis.</param>
+            <param name="Facets">Number of facets to use to (at least), to draw ellipsoid</param>
+            <param name="Shader">Shader.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
@@ -491,7 +552,7 @@
             </summary>
             <param name="Color">Color</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3,Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets a color for a position.
             </summary>
@@ -499,9 +560,10 @@
             <param name="Y">Y-coordinate.</param>
             <param name="Z">Z-coordinate.</param>
             <param name="Normal">Surface normal vector.</param>
+            <param name="Canvas">Current canvas.</param>
             <returns>Color</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[],Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets an array of colors.
             </summary>
@@ -511,6 +573,12 @@
             <param name="Normals">Normal vectors.</param>
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
+            <param name="Canvas">Current canvas.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.ConstantColor.Opaque">
+            <summary>
+            If shader is 100% opaque.
+            </summary>
         </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Canvas3D">
             <summary>
@@ -776,12 +844,81 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Vectors.Vector3">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Vector3"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Vectors.Vector3.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Vector3"/> object.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Z">Z-coordinate.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Vectors.Vector3.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Vectors.Vector3.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Vectors.Vector3.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Vectors.Vector4">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Vector4"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Vectors.Vector4.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Vector4"/> object.
+            </summary>
+            <param name="X">Homogeneous X-coordinate.</param>
+            <param name="Y">Homogeneous Y-coordinate.</param>
+            <param name="Z">Homogeneous Z-coordinate.</param>
+            <param name="W">Homogeneous W-coordinate.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Vectors.Vector4.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Vectors.Vector4.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Vectors.Vector4.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>
             Interface for 3D shaders.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3,Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets a color for a position.
             </summary>
@@ -789,9 +926,10 @@
             <param name="Y">Y-coordinate.</param>
             <param name="Z">Z-coordinate.</param>
             <param name="Normal">Surface normal vector.</param>
+            <param name="Canvas">Current canvas.</param>
             <returns>Color</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+        <member name="M:Waher.Script.Graphs3D.I3DShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[],Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets an array of colors.
             </summary>
@@ -801,6 +939,12 @@
             <param name="Normals">Normal vectors.</param>
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
+            <param name="Canvas">Current canvas.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.I3DShader.Opaque">
+            <summary>
+            If shader is 100% opaque.
+            </summary>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongIntensity">
             <summary>
@@ -838,6 +982,11 @@
             Alpha intensity.
             </summary>
         </member>
+        <member name="P:Waher.Script.Graphs3D.PhongIntensity.Opaque">
+            <summary>
+            If shader is 100% opaque.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Graphs3D.PhongLightSource">
             <summary>
             Contains information about a light source, as used in the Phong reflection model.
@@ -866,6 +1015,11 @@
         <member name="P:Waher.Script.Graphs3D.PhongLightSource.Position">
             <summary>
             Position of light source..
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongLightSource.Opaque">
+            <summary>
+            If shader is 100% opaque.
             </summary>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongMaterial">
@@ -953,7 +1107,7 @@
             <param name="Ambient">Ambient intensity.</param>
             <param name="LightSources">Light sources.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3)">
+        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3,Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets a color for a position.
             </summary>
@@ -961,9 +1115,10 @@
             <param name="Y">Y-coordinate.</param>
             <param name="Z">Z-coordinate.</param>
             <param name="Normal">Surface normal vector.</param>
+            <param name="Canvas">Current canvas.</param>
             <returns>Color</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[])">
+        <member name="M:Waher.Script.Graphs3D.PhongShader.GetColors(System.Single[],System.Single[],System.Single[],System.Numerics.Vector3[],System.Int32,SkiaSharp.SKColor[],Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets an array of colors.
             </summary>
@@ -973,6 +1128,12 @@
             <param name="Normals">Normal vectors.</param>
             <param name="N">Number of coordinates.</param>
             <param name="Colors">Where color values will be stored.</param>
+            <param name="Canvas">Current canvas.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongShader.Opaque">
+            <summary>
+            If shader is 100% opaque.
+            </summary>
         </member>
     </members>
 </doc>

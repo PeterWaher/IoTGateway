@@ -50,5 +50,10 @@ namespace Waher.Script.Graphs3D
 		/// Alpha intensity.
 		/// </summary>
 		public float Alpha => this.alpha;
+
+		/// <summary>
+		/// If shader is 100% opaque.
+		/// </summary>
+		public bool Opaque => this.alpha >= 255;
 	}
 }

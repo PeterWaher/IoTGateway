@@ -23,25 +23,16 @@ namespace Waher.Script.Graphs3D
 		private readonly float sourceSpecularGreen;
 		private readonly float sourceSpecularBlue;
 		private readonly float sourceSpecularAlpha;
-		private readonly float ambientRedFront;
-		private readonly float ambientGreenFront;
-		private readonly float ambientBlueFront;
-		private readonly float ambientAlphaFront;
-		private readonly float ambientRedBack;
-		private readonly float ambientGreenBack;
-		private readonly float ambientBlueBack;
-		private readonly float ambientAlphaBack;
-		private readonly float ambientReflectionConstantFront;
-		private readonly float diffuseReflectionConstantFront;
-		private readonly float specularReflectionConstantFront;
-		private readonly float shininessFront;
-		private readonly float ambientReflectionConstantBack;
-		private readonly float diffuseReflectionConstantBack;
-		private readonly float specularReflectionConstantBack;
-		private readonly float shininessBack;
+		private readonly float ambientRed;
+		private readonly float ambientGreen;
+		private readonly float ambientBlue;
+		private readonly float ambientAlpha;
+		private readonly float ambientReflectionConstant;
+		private readonly float diffuseReflectionConstant;
+		private readonly float specularReflectionConstant;
+		private readonly float shininess;
 		private readonly int nrSources;
-		private readonly bool hasSpecularReflectionConstantFront;
-		private readonly bool hasSpecularReflectionConstantBack;
+		private readonly bool hasSpecularReflectionConstant;
 		private readonly bool singleSource;
 		private readonly bool opaque;
 
@@ -55,16 +46,11 @@ namespace Waher.Script.Graphs3D
 		public PhongShader(PhongMaterial Material, PhongIntensity Ambient,
 			params PhongLightSource[] LightSources)
 		{
-			this.ambientReflectionConstantFront = Material.AmbientReflectionConstantFront;
-			this.diffuseReflectionConstantFront = Material.DiffuseReflectionConstantFront;
-			this.specularReflectionConstantFront = Material.SpecularReflectionConstantFront;
-			this.hasSpecularReflectionConstantFront = this.specularReflectionConstantFront != 0;
-			this.shininessFront = Material.ShininessFront;
-			this.ambientReflectionConstantBack = Material.AmbientReflectionConstantBack;
-			this.diffuseReflectionConstantBack = -Material.DiffuseReflectionConstantBack;
-			this.specularReflectionConstantBack = Material.SpecularReflectionConstantBack;
-			this.hasSpecularReflectionConstantBack = this.specularReflectionConstantBack != 0;
-			this.shininessBack = Material.ShininessBack;
+			this.ambientReflectionConstant = Material.AmbientReflectionConstant;
+			this.diffuseReflectionConstant = Material.DiffuseReflectionConstant;
+			this.specularReflectionConstant = Material.SpecularReflectionConstant;
+			this.hasSpecularReflectionConstant = this.specularReflectionConstant != 0;
+			this.shininess = Material.Shininess;
 
 			this.sources = LightSources;
 			this.nrSources = LightSources.Length;
@@ -90,17 +76,12 @@ namespace Waher.Script.Graphs3D
 				this.sourceSpecularAlpha = I.Alpha;
 			}
 
-			this.ambientRedFront = this.ambientReflectionConstantFront * Ambient.Red;
-			this.ambientGreenFront = this.ambientReflectionConstantFront * Ambient.Green;
-			this.ambientBlueFront = this.ambientReflectionConstantFront * Ambient.Blue;
-			this.ambientAlphaFront = this.ambientReflectionConstantFront * Ambient.Alpha;
-			this.ambientRedBack = this.ambientReflectionConstantBack * Ambient.Red;
-			this.ambientGreenBack = this.ambientReflectionConstantBack * Ambient.Green;
-			this.ambientBlueBack = this.ambientReflectionConstantBack * Ambient.Blue;
-			this.ambientAlphaBack = this.ambientReflectionConstantBack * Ambient.Alpha;
+			this.ambientRed = this.ambientReflectionConstant * Ambient.Red;
+			this.ambientGreen = this.ambientReflectionConstant * Ambient.Green;
+			this.ambientBlue = this.ambientReflectionConstant * Ambient.Blue;
+			this.ambientAlpha = this.ambientReflectionConstant * Ambient.Alpha;
 
-			if (this.ambientAlphaBack < 255 ||
-				this.ambientAlphaFront < 255 ||
+			if (this.ambientAlpha < 255 ||
 				this.sourceDiffuseAlpha < 255 ||
 				this.sourceSpecularAlpha < 255)
 			{
@@ -147,55 +128,33 @@ namespace Waher.Script.Graphs3D
 				L = Vector3.Normalize(this.sourcePosition - P);
 				d = Vector3.Dot(L, Normal);
 
+				Red = this.ambientRed;
+				Green = this.ambientGreen;
+				Blue = this.ambientBlue;
+				Alpha = this.ambientAlpha;
+
 				if (d >= 0)
 				{
-					d *= this.diffuseReflectionConstantFront;
+					d *= this.diffuseReflectionConstant;
 
-					Red = this.ambientRedFront;
-					Green = this.ambientGreenFront;
-					Blue = this.ambientBlueFront;
-					Alpha = this.ambientAlphaFront;
-
-					if (this.hasSpecularReflectionConstantFront)
+					if (this.hasSpecularReflectionConstant)
 					{
 						R = 2 * d * Normal - L;
 						V = Vector3.Normalize(Canvas.ViewerPosition - P);
 						d2 = Math.Abs(Vector3.Dot(R, V));
-						d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+						d2 = this.specularReflectionConstant * (float)Math.Pow(d2, this.shininess);
 
 						Red += d2 * this.sourceSpecularRed;
 						Green += d2 * this.sourceSpecularGreen;
 						Blue += d2 * this.sourceSpecularBlue;
 						Alpha += d2 * this.sourceSpecularAlpha;
 					}
+
+					Red += d * this.sourceDiffuseRed;
+					Green += d * this.sourceDiffuseGreen;
+					Blue += d * this.sourceDiffuseBlue;
+					Alpha += d * this.sourceDiffuseAlpha;
 				}
-				else
-				{
-					d *= this.diffuseReflectionConstantBack;
-
-					Red = this.ambientRedBack;
-					Green = this.ambientGreenBack;
-					Blue = this.ambientBlueBack;
-					Alpha = this.ambientAlphaBack;
-
-					if (this.hasSpecularReflectionConstantBack)
-					{
-						R = 2 * d * Normal - L;
-						V = Vector3.Normalize(Canvas.ViewerPosition - P);
-						d2 = Math.Abs(Vector3.Dot(R, V));
-						d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
-
-						Red += d2 * this.sourceSpecularRed;
-						Green += d2 * this.sourceSpecularGreen;
-						Blue += d2 * this.sourceSpecularBlue;
-						Alpha += d2 * this.sourceSpecularAlpha;
-					}
-				}
-
-				Red += d * this.sourceDiffuseRed;
-				Green += d * this.sourceDiffuseGreen;
-				Blue += d * this.sourceDiffuseBlue;
-				Alpha += d * this.sourceDiffuseAlpha;
 			}
 			else
 			{
@@ -206,7 +165,7 @@ namespace Waher.Script.Graphs3D
 
 				Red = Green = Blue = Alpha = 0;
 
-				if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
+				if (this.hasSpecularReflectionConstant)
 					V = Vector3.Normalize(Canvas.ViewerPosition - P);
 				else
 					V = Vector3.Zero;
@@ -220,53 +179,32 @@ namespace Waher.Script.Graphs3D
 					L = Vector3.Normalize(Source.Position - P);
 					d = Vector3.Dot(L, Normal);
 
+					Red += this.ambientRed;
+					Green += this.ambientGreen;
+					Blue += this.ambientBlue;
+					Alpha += this.ambientAlpha;
+
 					if (d >= 0)
 					{
-						d *= this.diffuseReflectionConstantFront;
+						d *= this.diffuseReflectionConstant;
 
-						Red += this.ambientRedFront;
-						Green += this.ambientGreenFront;
-						Blue += this.ambientBlueFront;
-						Alpha += this.ambientAlphaFront;
-
-						if (this.hasSpecularReflectionConstantFront)
+						if (this.hasSpecularReflectionConstant)
 						{
 							R = 2 * d * Normal - L;
 							d2 = Math.Abs(Vector3.Dot(R, V));
-							d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+							d2 = this.specularReflectionConstant * (float)Math.Pow(d2, this.shininess);
 
 							Red += d2 * Specular.Red;
 							Green += d2 * Specular.Green;
 							Blue += d2 * Specular.Blue;
 							Alpha += d2 * Specular.Alpha;
 						}
+
+						Red += d * Diffuse.Red;
+						Green += d * Diffuse.Green;
+						Blue += d * Diffuse.Blue;
+						Alpha += d * Diffuse.Alpha;
 					}
-					else
-					{
-						d *= this.diffuseReflectionConstantBack;
-
-						Red = this.ambientRedBack;
-						Green = this.ambientGreenBack;
-						Blue = this.ambientBlueBack;
-						Alpha = this.ambientAlphaBack;
-
-						if (this.hasSpecularReflectionConstantBack)
-						{
-							R = 2 * d * Normal - L;
-							d2 = Math.Abs(Vector3.Dot(R, V));
-							d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
-
-							Red += d2 * Specular.Red;
-							Green += d2 * Specular.Green;
-							Blue += d2 * Specular.Blue;
-							Alpha += d2 * Specular.Alpha;
-						}
-					}
-
-					Red += d * Diffuse.Red;
-					Green += d * Diffuse.Green;
-					Blue += d * Diffuse.Blue;
-					Alpha += d * Diffuse.Alpha;
 				}
 			}
 
@@ -386,55 +324,34 @@ namespace Waher.Script.Graphs3D
 					L = Vector3.Normalize(this.sourcePosition - P);
 					d = Vector3.Dot(L, Normal);
 
+					Red = this.ambientRed;
+					Green = this.ambientGreen;
+					Blue = this.ambientBlue;
+					Alpha = this.ambientAlpha;
+
 					if (d >= 0)
 					{
-						d *= this.diffuseReflectionConstantFront;
+						d *= this.diffuseReflectionConstant;
 
-						Red = this.ambientRedFront;
-						Green = this.ambientGreenFront;
-						Blue = this.ambientBlueFront;
-						Alpha = this.ambientAlphaFront;
-
-						if (this.hasSpecularReflectionConstantFront)
+						if (this.hasSpecularReflectionConstant)
 						{
 							R = 2 * d * Normal - L;
 							V = Vector3.Normalize(Canvas.ViewerPosition - P);
 							d2 = Math.Abs(Vector3.Dot(R, V));
-							d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+							d2 = this.specularReflectionConstant * (float)Math.Pow(d2, this.shininess);
 
 							Red += d2 * this.sourceSpecularRed;
 							Green += d2 * this.sourceSpecularGreen;
 							Blue += d2 * this.sourceSpecularBlue;
 							Alpha += d2 * this.sourceSpecularAlpha;
 						}
-					}
-					else
-					{
-						d *= this.diffuseReflectionConstantBack;
 
-						Red = this.ambientRedBack;
-						Green = this.ambientGreenBack;
-						Blue = this.ambientBlueBack;
-						Alpha = this.ambientAlphaBack;
-
-						if (this.hasSpecularReflectionConstantBack)
-						{
-							R = 2 * d * -Normal - L;
-							V = Vector3.Normalize(Canvas.ViewerPosition - P);
-							d2 = Math.Abs(Vector3.Dot(R, V));
-							d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
-
-							Red += d2 * this.sourceSpecularRed;
-							Green += d2 * this.sourceSpecularGreen;
-							Blue += d2 * this.sourceSpecularBlue;
-							Alpha += d2 * this.sourceSpecularAlpha;
-						}
+						Red += d * this.sourceDiffuseRed;
+						Green += d * this.sourceDiffuseGreen;
+						Blue += d * this.sourceDiffuseBlue;
+						Alpha += d * this.sourceDiffuseAlpha;
 					}
 
-					Red += d * this.sourceDiffuseRed;
-					Green += d * this.sourceDiffuseGreen;
-					Blue += d * this.sourceDiffuseBlue;
-					Alpha += d * this.sourceDiffuseAlpha;
 					Rest = 0;
 
 					if (Red < 0)
@@ -525,7 +442,7 @@ namespace Waher.Script.Graphs3D
 
 					Red = Green = Blue = Alpha = 0;
 
-					if (this.hasSpecularReflectionConstantFront || this.hasSpecularReflectionConstantBack)
+					if (this.hasSpecularReflectionConstant)
 						V = Vector3.Normalize(Canvas.ViewerPosition - P);
 					else
 						V = Vector3.Zero;
@@ -539,53 +456,32 @@ namespace Waher.Script.Graphs3D
 						L = Vector3.Normalize(Source.Position - P);
 						d = Vector3.Dot(L, Normal);
 
+						Red += this.ambientRed;
+						Green += this.ambientGreen;
+						Blue += this.ambientBlue;
+						Alpha += this.ambientAlpha;
+
 						if (d >= 0)
 						{
-							d *= this.diffuseReflectionConstantFront;
+							d *= this.diffuseReflectionConstant;
 
-							Red += this.ambientRedFront;
-							Green += this.ambientGreenFront;
-							Blue += this.ambientBlueFront;
-							Alpha += this.ambientAlphaFront;
-
-							if (this.hasSpecularReflectionConstantFront)
+							if (this.hasSpecularReflectionConstant)
 							{
 								R = 2 * d * Normal - L;
 								d2 = Math.Abs(Vector3.Dot(R, V));
-								d2 = this.specularReflectionConstantFront * (float)Math.Pow(d2, this.shininessFront);
+								d2 = this.specularReflectionConstant * (float)Math.Pow(d2, this.shininess);
 
 								Red += d2 * Specular.Red;
 								Green += d2 * Specular.Green;
 								Blue += d2 * Specular.Blue;
 								Alpha += d2 * Specular.Alpha;
 							}
+
+							Red += d * Diffuse.Red;
+							Green += d * Diffuse.Green;
+							Blue += d * Diffuse.Blue;
+							Alpha += d * Diffuse.Alpha;
 						}
-						else
-						{
-							d *= this.diffuseReflectionConstantBack;
-
-							Red = this.ambientRedBack;
-							Green = this.ambientGreenBack;
-							Blue = this.ambientBlueBack;
-							Alpha = this.ambientAlphaBack;
-
-							if (this.hasSpecularReflectionConstantBack)
-							{
-								R = 2 * d * Normal - L;
-								d2 = Math.Abs(Vector3.Dot(R, V));
-								d2 = this.specularReflectionConstantBack * (float)Math.Pow(d2, this.shininessBack);
-
-								Red += d2 * Specular.Red;
-								Green += d2 * Specular.Green;
-								Blue += d2 * Specular.Blue;
-								Alpha += d2 * Specular.Alpha;
-							}
-						}
-
-						Red += d * Diffuse.Red;
-						Green += d * Diffuse.Green;
-						Blue += d * Diffuse.Blue;
-						Alpha += d * Diffuse.Alpha;
 					}
 
 					Rest = 0;

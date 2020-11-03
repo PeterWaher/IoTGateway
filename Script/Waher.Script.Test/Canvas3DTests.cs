@@ -379,14 +379,12 @@ namespace Waher.Script.Test
 			this.Save(Canvas, "14.png");
 		}
 
-		// TODO: Clip
+		// TODO: Clip Z
 		// TODO: Test Light / Phong shading with multiple light sources
-		// TODO: Proper interpolation of z
-		// TODO: Sort transparent polygons
-		// TODO: Kolla om det är snabbare att arbeta med Vector3 direkt, än med de 3 koefficienterna separat.
-		// TODO: text-bugg
-		// TODO: Front/Back in shader
 		// TODO: Specular lighting
+		// TODO: Sort transparent polygons
+		// TODO: Check if quicker to work with Vector3 directly, than with 3 separate coordinate values.
+		// TODO: text-bugg
 		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
 	}

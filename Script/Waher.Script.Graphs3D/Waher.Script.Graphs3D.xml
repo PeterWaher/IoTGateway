@@ -841,22 +841,6 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
-            <summary>
-            Generates a <see cref="T:Waher.Script.Graphs3D.PhongMaterial"/> object.
-            </summary>
-            <param name="AmbientReflectionConstantFront">Ratio of reflection of the ambient term present in all points in the scene rendered, front side.</param>
-            <param name="DiffuseReflectionConstantFront">Ratio of reflection of the diffuse term of incoming light, front side.</param>
-            <param name="SpecularReflectionConstantFront">Ratio of reflection of the specular term of incoming light, front side.</param>
-            <param name="ShininessFront">Larger for surfaces that are smoother and more mirror-like, front side.</param>
-            <param name="AmbientReflectionConstantBack">Ratio of reflection of the ambient term present in all points in the scene rendered, back side.</param>
-            <param name="DiffuseReflectionConstantBack">Ratio of reflection of the diffuse term of incoming light, back side.</param>
-            <param name="SpecularReflectionConstantBack">Ratio of reflection of the specular term of incoming light, back side.</param>
-            <param name="ShininessBack">Larger for surfaces that are smoother and more mirror-like, back side.</param>
-            <param name="Start">Start position in script expression.</param>
-            <param name="Length">Length of expression covered by node.</param>
-            <param name="Expression">Expression.</param>
-        </member>
         <member name="P:Waher.Script.Graphs3D.Functions.Shading.PhongMaterial.FunctionName">
             <summary>
             Name of the function
@@ -1103,58 +1087,24 @@
             <param name="SpecularReflectionConstant">Ratio of reflection of the specular term of incoming light.</param>
             <param name="Shininess">Larger for surfaces that are smoother and more mirror-like.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.PhongMaterial.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.AmbientReflectionConstant">
             <summary>
-            Contains information about a material, as used in the Phong reflection model.
-            https://en.wikipedia.org/wiki/Phong_reflection_model
-            </summary>
-            <param name="AmbientReflectionConstantFront">Front side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
-            <param name="DiffuseReflectionConstantFront">Front side ratio of reflection of the diffuse term of incoming light.</param>
-            <param name="SpecularReflectionConstantFront">Front side ratio of reflection of the specular term of incoming light.</param>
-            <param name="ShininessFront">Front side shininess coefficient.</param>
-            <param name="AmbientReflectionConstantBack">Back side ratio of reflection of the ambient term present in all points in the scene rendered.</param>
-            <param name="DiffuseReflectionConstantBack">Back side ratio of reflection of the diffuse term of incoming light.</param>
-            <param name="SpecularReflectionConstantBack">Back side ratio of reflection of the specular term of incoming light.</param>
-            <param name="ShininessBack">Back side shininess coefficient.</param>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.AmbientReflectionConstantFront">
-            <summary>
-            Front-side ratio of reflection of the ambient term present in all points in the scene rendered.
+            Ratio of reflection of the ambient term present in all points in the scene rendered.
             </summary>
         </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.DiffuseReflectionConstantFront">
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.DiffuseReflectionConstant">
             <summary>
-            Front-side ratio of reflection of the diffuse term of incoming light.
+            Ratio of reflection of the diffuse term of incoming light.
             </summary>
         </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.SpecularReflectionConstantFront">
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.SpecularReflectionConstant">
             <summary>
-            Front-side ratio of reflection of the specular term of incoming light.
+            Ratio of reflection of the specular term of incoming light.
             </summary>
         </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.ShininessFront">
+        <member name="P:Waher.Script.Graphs3D.PhongMaterial.Shininess">
             <summary>
-            Front-side shininess coefficient.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.AmbientReflectionConstantBack">
-            <summary>
-            Back-side ratio of reflection of the ambient term present in all points in the scene rendered.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.DiffuseReflectionConstantBack">
-            <summary>
-            Back-side ratio of reflection of the diffuse term of incoming light.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.SpecularReflectionConstantBack">
-            <summary>
-            Back-side ratio of reflection of the specular term of incoming light.
-            </summary>
-        </member>
-        <member name="P:Waher.Script.Graphs3D.PhongMaterial.ShininessBack">
-            <summary>
-            Back-side shininess coefficient.
+            Shininess coefficient.
             </summary>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongShader">

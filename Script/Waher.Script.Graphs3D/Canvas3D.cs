@@ -2095,6 +2095,7 @@ namespace Waher.Script.Graphs3D
 			Vector3 dNdsy = Vector3.Zero;
 			int isy0, isy1;
 			float step;
+			bool Front;
 
 			for (j = 0; j < d; j++)
 			{
@@ -2109,7 +2110,7 @@ namespace Waher.Script.Graphs3D
 
 				N = CalcNormal(vw[0], vw[1], CurrentWorld);
 
-				if (Vector3.Dot(N, this.viewerPosition - vw[0]) >= 0)
+				if (Front = (Vector3.Dot(N, this.viewerPosition - vw[0]) >= 0))
 					Recs = Recs2[0];
 				else
 					Recs = Recs2[1];
@@ -2189,10 +2190,10 @@ namespace Waher.Script.Graphs3D
 					if (Dir == 0)
 					{
 						this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-							InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+							InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
 
 						this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-							InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
+							InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
 					}
 					else
 					{
@@ -2210,7 +2211,7 @@ namespace Waher.Script.Graphs3D
 							if (Dir != LastDir && LastDir != 0)
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
 							}
 
 							isy0++;
@@ -2226,7 +2227,7 @@ namespace Waher.Script.Graphs3D
 							while (isy0 < isy1)
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
 
 								isy0++;
 								sx0 += dsxdsy;
@@ -2239,7 +2240,7 @@ namespace Waher.Script.Graphs3D
 							}
 
 							this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
+								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
 						}
 						else    // Dir < 0
 						{
@@ -2261,7 +2262,7 @@ namespace Waher.Script.Graphs3D
 								Vector3 CurrentNormal2 = CurrentNormal;
 
 								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front);
 
 								isy1++;
 								step = isy1 - sy1;
@@ -2276,7 +2277,7 @@ namespace Waher.Script.Graphs3D
 								while (isy1 < isy0)
 								{
 									this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
+										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front);
 
 									isy1++;
 									sx1 += dsxdsy;
@@ -2289,12 +2290,12 @@ namespace Waher.Script.Graphs3D
 								}
 
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
 							}
 							else
 							{
 								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
 							}
 						}
 					}
@@ -2366,10 +2367,13 @@ namespace Waher.Script.Graphs3D
 		}
 
 		private void AddNode(ScanLineRec[] Records, int MinY, float sx, int isy,
-			float wx, float wy, float wz, Vector3 N)
+			float wx, float wy, float wz, Vector3 N, bool Front)
 		{
 			int i = isy - MinY;
 			ScanLineRec Rec = Records[i];
+
+			if (!Front)
+				N = -N;
 
 			if (Rec is null)
 			{

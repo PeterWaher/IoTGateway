@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using SkiaSharp;
 
 namespace Waher.Script.Graphs3D

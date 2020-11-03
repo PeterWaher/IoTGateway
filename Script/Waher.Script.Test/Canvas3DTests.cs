@@ -387,5 +387,93 @@ namespace Waher.Script.Test
 		// TODO: text-bug
 		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
+		/* Test script:
+
+SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
+SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
+foreach Angle in 0..360|0.5 do
+(
+	C:=Canvas3D(480,320,1,"LightGray");
+	C.Perspective(200, 2000);
+	C.RotateX(Angle,[0,0,1500]);
+	C.RotateY(2*Angle,[0,0,1500]);
+	C.RotateZ(3*Angle,[0,0,1500]);
+	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
+	C.Box(-300,-300,1200,300,300,1800,SR);
+	Preview(C)
+)
+
+
+SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
+SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
+foreach Angle in 0..360|0.5 do
+(
+	C:=Canvas3D(480,320,1,"LightGray");
+	C.Perspective(200, 2000);
+	C.RotateX(Angle,[0,0,1500]);
+	C.RotateY(2*Angle,[0,0,1500]);
+	C.RotateZ(3*Angle,[0,0,1500]);
+	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
+	C.Box(-300,-300,1200,300,300,1800,SR);
+	Preview(C)
+)
+
+SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
+SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
+foreach Angle in 0..360|0.5 do
+(
+	C:=Canvas3D(480,320,1,"LightGray");
+	C.Perspective(200, 2000);
+	C.RotateX(Angle,[0,0,1500]);
+	C.RotateY(2*Angle,[0,0,1500]);
+	C.RotateZ(3*Angle,[0,0,1500]);
+	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
+	C.Polygon([Vector4(-500,0,1000,1),Vector4(500,0,1000,1),Vector4(500,0,2000,1),Vector4(-500,0,2000,1)],SR,true);
+	C.Polygon([Vector4(0,-500,1000,1),Vector4(0,500,1000,1),Vector4(0,500,2000,1),Vector4(0,-500,2000,1)],SR,true);
+	C.Polygon([Vector4(-500,-500,1500,1),Vector4(500,-500,1500,1),Vector4(500,500,1500,1),Vector4(-500,500,1500,1)],SR,true);
+	Preview(C)
+)
+
+
+
+SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Red",PhongIntensity("White"),[1000, 1000, 0]));
+SG:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Green",PhongIntensity("White"),[1000, 1000, 0]));
+SB:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
+SY:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Yellow",PhongIntensity("White"),[1000, 1000, 0]));
+C:=Canvas3D(480,320,1,"LightGray");
+
+foreach Angle in 0..720|0.5 do
+(
+	C.Clear();
+	C.Perspective(200, 2000);
+
+	M:=C.Translate(-200,200,0);
+	C.Scale(0.5,[0,0,1300]);
+	C.RotateX(Angle,[0,0,1300]);
+	C.Box(-300,-300,1000,300,300,1600,SR);
+
+	C.ModelTransformation:=M;
+	C.Translate(200,200,0);
+	C.Scale(0.5,[0,0,1300]);
+	C.RotateY(Angle,[0,0,1300]);
+	C.Box(-300,-300,1000,300,300,1600,SG);
+
+	C.ModelTransformation:=M;
+	C.Translate(-200,-200,0);
+	C.Scale(0.5,[0,0,1300]);
+	C.RotateZ(Angle,[0,0,1300]);
+	C.Box(-300,-300,1000,300,300,1600,SB);
+
+	C.ModelTransformation:=M;
+	C.Translate(200,-200,0);
+	C.Scale(0.5,[0,0,1300]);
+	C.RotateX(Angle,[0,0,1300]);
+	C.RotateY(2*Angle,[0,0,1300]);
+	C.RotateZ(3*Angle,[0,0,1300]);
+	C.Box(-300,-300,1000,300,300,1600,SY);
+
+	Preview(C)
+)
+		 */
 	}
 }

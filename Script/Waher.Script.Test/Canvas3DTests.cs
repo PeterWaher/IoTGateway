@@ -384,7 +384,7 @@ namespace Waher.Script.Test
 		// TODO: Specular lighting
 		// TODO: Sort transparent polygons
 		// TODO: Check if quicker to work with Vector3 directly, than with 3 separate coordinate values.
-		// TODO: text-bugg
+		// TODO: text-bug
 		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
 	}

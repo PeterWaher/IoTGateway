@@ -386,7 +386,6 @@ namespace Waher.Script.Test
 		// TODO: Kolla om det är snabbare att arbeta med Vector3 direkt, än med de 3 koefficienterna separat.
 		// TODO: text-bugg
 		// TODO: Front/Back in shader
-		// TODO: ta bort sz
 		// TODO: Specular lighting
 		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 

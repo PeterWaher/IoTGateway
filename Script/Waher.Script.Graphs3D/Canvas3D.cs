@@ -955,9 +955,9 @@ namespace Waher.Script.Graphs3D
 		}
 
 
-		private bool ClipLine(ref float x0, ref float y0, ref float z0,
+		private bool ClipLine(ref float x0, ref float y0,
 			ref float rx0, ref float ry0, ref float rz0,
-			ref float x1, ref float y1, ref float z1,
+			ref float x1, ref float y1,
 			ref float rx1, ref float ry1, ref float rz1)
 		{
 			byte Mask0 = 0;
@@ -996,7 +996,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = x0 / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
 				y0 -= (y1 - y0) * Delta;
-				z0 -= (z1 - z0) * Delta;
 				rx0 -= (rx1 - rx0) * Delta;
 				ry0 -= (ry1 - ry0) * Delta;
 				rz0 -= (rz1 - rz0) * Delta;
@@ -1016,7 +1015,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = x1 / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
 				y1 -= (y0 - y1) * Delta;
-				z1 -= (z0 - z1) * Delta;
 				rx1 -= (rx0 - rx1) * Delta;
 				ry1 -= (ry0 - ry1) * Delta;
 				rz1 -= (rz0 - rz1) * Delta;
@@ -1038,7 +1036,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 -= (x1 - x0) * Delta;
-				z0 -= (z1 - z0) * Delta;
 				rx0 -= (rx1 - rx0) * Delta;
 				ry0 -= (ry1 - ry0) * Delta;
 				rz0 -= (rz1 - rz0) * Delta;
@@ -1058,7 +1055,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 -= (x0 - x1) * Delta;
-				z1 -= (z0 - z1) * Delta;
 				rx1 -= (rx0 - rx1) * Delta;
 				ry1 -= (ry0 - ry1) * Delta;
 				rz1 -= (rz0 - rz1) * Delta;
@@ -1080,7 +1076,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.wm1 - x0) / (x1 - x0);    // Divisor is non-zero, or masks would have common bit.
 				y0 += (y1 - y0) * Delta;
-				z0 += (z1 - z0) * Delta;
 				rx0 += (rx1 - rx0) * Delta;
 				ry0 += (ry1 - ry0) * Delta;
 				rz0 += (rz1 - rz0) * Delta;
@@ -1100,7 +1095,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.wm1 - x1) / (x0 - x1);    // Divisor is non-zero, or masks would have common bit.
 				y1 += (y0 - y1) * Delta;
-				z1 += (z0 - z1) * Delta;
 				rx1 += (rx0 - rx1) * Delta;
 				ry1 += (ry0 - ry1) * Delta;
 				rz1 += (rz0 - rz1) * Delta;
@@ -1122,7 +1116,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 += (x1 - x0) * Delta;
-				z0 += (z1 - z0) * Delta;
 				rx0 += (rx1 - rx0) * Delta;
 				ry0 += (ry1 - ry0) * Delta;
 				rz0 += (rz1 - rz0) * Delta;
@@ -1142,7 +1135,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 += (x0 - x1) * Delta;
-				z1 += (z0 - z1) * Delta;
 				rx1 += (rx0 - rx1) * Delta;
 				ry1 += (ry0 - ry1) * Delta;
 				rz1 += (rz0 - rz1) * Delta;
@@ -1370,8 +1362,8 @@ namespace Waher.Script.Graphs3D
 		#region Scan Lines
 
 		private void ScanLine(
-			float sx0, float sy0, float sz0, float wx0, float wy0, float wz0, Vector3 N0,
-			float sx1, float sz1, float wx1, float wy1, float wz1, Vector3 N1, I3DShader Shader)
+			float sx0, float sy0, float wx0, float wy0, float wz0, Vector3 N0,
+			float sx1, float wx1, float wy1, float wz1, Vector3 N1, I3DShader Shader)
 		{
 			float Delta;
 
@@ -1380,10 +1372,6 @@ namespace Waher.Script.Graphs3D
 				Delta = sx0;
 				sx0 = sx1;
 				sx1 = Delta;
-
-				Delta = sz0;
-				sz0 = sz1;
-				sz1 = Delta;
 
 				Delta = wx0;
 				wx0 = wx1;
@@ -1401,8 +1389,8 @@ namespace Waher.Script.Graphs3D
 			float sy1 = sy0;
 
 			if (!this.ClipLine(
-				ref sx0, ref sy0, ref sz0, ref wx0, ref wy0, ref wz0,
-				ref sx1, ref sy1, ref sz1, ref wx1, ref wy1, ref wz1))
+				ref sx0, ref sy0, ref wx0, ref wy0, ref wz0,
+				ref sx1, ref sy1, ref wx1, ref wy1, ref wz1))
 			{
 				return;
 			}
@@ -1609,9 +1597,9 @@ namespace Waher.Script.Graphs3D
 		}
 
 		private bool ClipTopBottom(
-			ref float x0, ref float y0, ref float z0,
+			ref float x0, ref float y0, 
 			ref float rx0, ref float ry0, ref float rz0,
-			ref float x1, ref float y1, ref float z1,
+			ref float x1, ref float y1, 
 			ref float rx1, ref float ry1, ref float rz1)
 		{
 			byte Mask0 = 0;
@@ -1640,7 +1628,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 -= (x1 - x0) * Delta;
-				z0 -= (z1 - z0) * Delta;
 				rx0 -= (rx1 - rx0) * Delta;
 				ry0 -= (ry1 - ry0) * Delta;
 				rz0 -= (rz1 - rz0) * Delta;
@@ -1660,7 +1647,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 -= (x0 - x1) * Delta;
-				z1 -= (z0 - z1) * Delta;
 				rx1 -= (rx0 - rx1) * Delta;
 				ry1 -= (ry0 - ry1) * Delta;
 				rz1 -= (rz0 - rz1) * Delta;
@@ -1682,7 +1668,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 += (x1 - x0) * Delta;
-				z0 += (z1 - z0) * Delta;
 				rx0 += (rx1 - rx0) * Delta;
 				ry0 += (ry1 - ry0) * Delta;
 				rz0 += (rz1 - rz0) * Delta;
@@ -1702,7 +1687,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 += (x0 - x1) * Delta;
-				z1 += (z0 - z1) * Delta;
 				rx1 += (rx0 - rx1) * Delta;
 				ry1 += (ry0 - ry1) * Delta;
 				rz1 += (rz0 - rz1) * Delta;
@@ -1722,9 +1706,9 @@ namespace Waher.Script.Graphs3D
 		}
 
 		private bool ClipTopBottom(
-			ref float x0, ref float y0, ref float z0,
+			ref float x0, ref float y0, 
 			ref float rx0, ref float ry0, ref float rz0, ref Vector3 rN0,
-			ref float x1, ref float y1, ref float z1,
+			ref float x1, ref float y1, 
 			ref float rx1, ref float ry1, ref float rz1, ref Vector3 rN1)
 		{
 			byte Mask0 = 0;
@@ -1753,7 +1737,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 -= (x1 - x0) * Delta;
-				z0 -= (z1 - z0) * Delta;
 				rx0 -= (rx1 - rx0) * Delta;
 				ry0 -= (ry1 - ry0) * Delta;
 				rz0 -= (rz1 - rz0) * Delta;
@@ -1774,7 +1757,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 -= (x0 - x1) * Delta;
-				z1 -= (z0 - z1) * Delta;
 				rx1 -= (rx0 - rx1) * Delta;
 				ry1 -= (ry0 - ry1) * Delta;
 				rz1 -= (rz0 - rz1) * Delta;
@@ -1797,7 +1779,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
 				x0 += (x1 - x0) * Delta;
-				z0 += (z1 - z0) * Delta;
 				rx0 += (rx1 - rx0) * Delta;
 				ry0 += (ry1 - ry0) * Delta;
 				rz0 += (rz1 - rz0) * Delta;
@@ -1818,7 +1799,6 @@ namespace Waher.Script.Graphs3D
 			{
 				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
 				x1 += (x0 - x1) * Delta;
-				z1 += (z0 - z1) * Delta;
 				rx1 += (rx0 - rx1) * Delta;
 				ry1 += (ry0 - ry1) * Delta;
 				rz1 += (rz0 - rz1) * Delta;
@@ -2106,11 +2086,11 @@ namespace Waher.Script.Graphs3D
 			Vector3 CurrentScreen;
 			Vector3 N;
 			I3DShader Shader;
-			float sx0, sy0, sz0;
-			float sx1, sy1, sz1;
+			float sx0, sy0;
+			float sx1, sy1;
 			float wx0, wy0, wz0;
 			float wx1, wy1, wz1;
-			float invdsy, dsxdsy, dszdsy;
+			float invdsy, dsxdsy;
 			float dwxdsy, dwydsy, dwzdsy;
 			Vector3 dNdsy = Vector3.Zero;
 			int isy0, isy1;
@@ -2169,11 +2149,9 @@ namespace Waher.Script.Graphs3D
 
 					sx0 = LastScreen.X;
 					sy0 = LastScreen.Y;
-					sz0 = LastScreen.Z;
 
 					sx1 = CurrentScreen.X;
 					sy1 = CurrentScreen.Y;
-					sz1 = CurrentScreen.Z;
 
 					wx0 = LastWorld.X;
 					wy0 = LastWorld.Y;
@@ -2186,10 +2164,8 @@ namespace Waher.Script.Graphs3D
 					if (InterpolateNormals)
 					{
 						if (!this.ClipTopBottom(
-							ref sx0, ref sy0, ref sz0,
-							ref wx0, ref wy0, ref wz0, ref LastNormal,
-							ref sx1, ref sy1, ref sz1,
-							ref wx1, ref wy1, ref wz1, ref CurrentNormal))
+							ref sx0, ref sy0, ref wx0, ref wy0, ref wz0, ref LastNormal,
+							ref sx1, ref sy1, ref wx1, ref wy1, ref wz1, ref CurrentNormal))
 						{
 							continue;
 						}
@@ -2197,10 +2173,8 @@ namespace Waher.Script.Graphs3D
 					else
 					{
 						if (!this.ClipTopBottom(
-							ref sx0, ref sy0, ref sz0,
-							ref wx0, ref wy0, ref wz0,
-							ref sx1, ref sy1, ref sz1,
-							ref wx1, ref wy1, ref wz1))
+							ref sx0, ref sy0, ref wx0, ref wy0, ref wz0,
+							ref sx1, ref sy1, ref wx1, ref wy1, ref wz1))
 						{
 							continue;
 						}
@@ -2214,17 +2188,16 @@ namespace Waher.Script.Graphs3D
 
 					if (Dir == 0)
 					{
-						this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+						this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 							InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 
-						this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+						this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
 							InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
 					}
 					else
 					{
 						invdsy = 1 / (sy1 - sy0);
 						dsxdsy = (sx1 - sx0) * invdsy;
-						dszdsy = (sz1 - sz0) * invdsy;
 						dwxdsy = (wx1 - wx0) * invdsy;
 						dwydsy = (wy1 - wy0) * invdsy;
 						dwzdsy = (wz1 - wz0) * invdsy;
@@ -2236,14 +2209,13 @@ namespace Waher.Script.Graphs3D
 						{
 							if (Dir != LastDir && LastDir != 0)
 							{
-								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 							}
 
 							isy0++;
 							step = isy0 - sy0;
 							sx0 += step * dsxdsy;
-							sz0 += step * dszdsy;
 							wx0 += step * dwxdsy;
 							wy0 += step * dwydsy;
 							wz0 += step * dwzdsy;
@@ -2253,12 +2225,11 @@ namespace Waher.Script.Graphs3D
 
 							while (isy0 < isy1)
 							{
-								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 
 								isy0++;
 								sx0 += dsxdsy;
-								sz0 += dszdsy;
 								wx0 += dwxdsy;
 								wy0 += dwydsy;
 								wz0 += dwzdsy;
@@ -2267,7 +2238,7 @@ namespace Waher.Script.Graphs3D
 									LastNormal += dNdsy;
 							}
 
-							this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+							this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
 								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
 						}
 						else    // Dir < 0
@@ -2277,7 +2248,6 @@ namespace Waher.Script.Graphs3D
 								isy0--;
 								step = sy0 - isy0;
 								sx0 -= step * dsxdsy;
-								sz0 -= step * dszdsy;
 								wx0 -= step * dwxdsy;
 								wy0 -= step * dwydsy;
 								wz0 -= step * dwzdsy;
@@ -2290,13 +2260,12 @@ namespace Waher.Script.Graphs3D
 							{
 								Vector3 CurrentNormal2 = CurrentNormal;
 
-								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
 									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
 
 								isy1++;
 								step = isy1 - sy1;
 								sx1 += step * dsxdsy;
-								sz1 += step * dszdsy;
 								wx1 += step * dwxdsy;
 								wy1 += step * dwydsy;
 								wz1 += step * dwzdsy;
@@ -2306,12 +2275,11 @@ namespace Waher.Script.Graphs3D
 
 								while (isy1 < isy0)
 								{
-									this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+									this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
 										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
 
 									isy1++;
 									sx1 += dsxdsy;
-									sz1 += dszdsy;
 									wx1 += dwxdsy;
 									wy1 += dwydsy;
 									wz1 += dwzdsy;
@@ -2320,12 +2288,12 @@ namespace Waher.Script.Graphs3D
 										CurrentNormal2 += dNdsy;
 								}
 
-								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 							}
 							else
 							{
-								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
 									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
 							}
 						}
@@ -2353,7 +2321,7 @@ namespace Waher.Script.Graphs3D
 					{
 						First = true;
 
-						sx0 = sz0 = wx0 = wy0 = wz0 = 0;
+						sx0 = wx0 = wy0 = wz0 = 0;
 						N = Vector3.Zero;
 
 						foreach (ScanLineSegment Rec2 in Rec.segments)
@@ -2362,7 +2330,6 @@ namespace Waher.Script.Graphs3D
 							{
 								First = false;
 								sx0 = Rec2.sx;
-								sz0 = Rec2.sz;
 								wx0 = Rec2.wx;
 								wy0 = Rec2.wy;
 								wz0 = Rec2.wz;
@@ -2370,8 +2337,8 @@ namespace Waher.Script.Graphs3D
 							}
 							else
 							{
-								this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0, N,
-									Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz, Rec2.n,
+								this.ScanLine(sx0, Y, wx0, wy0, wz0, N,
+									Rec2.sx, Rec2.wx, Rec2.wy, Rec2.wz, Rec2.n,
 									Shader);
 
 								First = true;
@@ -2386,8 +2353,8 @@ namespace Waher.Script.Graphs3D
 					}
 					else if (Rec.has2)
 					{
-						this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0,
-							Rec.sx1, Rec.sz1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n1, Shader);
+						this.ScanLine(Rec.sx0, Y, Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0,
+							Rec.sx1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n1, Shader);
 					}
 					else
 					{
@@ -2398,7 +2365,7 @@ namespace Waher.Script.Graphs3D
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float sx, int isy, float sz,
+		private void AddNode(ScanLineRec[] Records, int MinY, float sx, int isy,
 			float wx, float wy, float wz, Vector3 N)
 		{
 			int i = isy - MinY;
@@ -2409,7 +2376,6 @@ namespace Waher.Script.Graphs3D
 				Records[i] = new ScanLineRec()
 				{
 					sx0 = sx,
-					sz0 = sz,
 					wx0 = wx,
 					wy0 = wy,
 					wz0 = wz,
@@ -2422,13 +2388,11 @@ namespace Waher.Script.Graphs3D
 				if (sx < Rec.sx0)
 				{
 					Rec.sx1 = Rec.sx0;
-					Rec.sz1 = Rec.sz0;
 					Rec.wx1 = Rec.wx0;
 					Rec.wy1 = Rec.wy0;
 					Rec.wz1 = Rec.wz0;
 					Rec.n1 = Rec.n0;
 					Rec.sx0 = sx;
-					Rec.sz0 = sz;
 					Rec.wx0 = wx;
 					Rec.wy0 = wy;
 					Rec.wz0 = wz;
@@ -2437,7 +2401,6 @@ namespace Waher.Script.Graphs3D
 				else
 				{
 					Rec.sx1 = sx;
-					Rec.sz1 = sz;
 					Rec.wx1 = wx;
 					Rec.wy1 = wy;
 					Rec.wz1 = wz;
@@ -2455,7 +2418,6 @@ namespace Waher.Script.Graphs3D
 					Rec.segments.AddLast(new ScanLineSegment()
 					{
 						sx = Rec.sx0,
-						sz = Rec.sz0,
 						wx = Rec.wx0,
 						wy = Rec.wy0,
 						wz = Rec.wz0,
@@ -2465,7 +2427,6 @@ namespace Waher.Script.Graphs3D
 					Rec.segments.AddLast(new ScanLineSegment()
 					{
 						sx = Rec.sx1,
-						sz = Rec.sz1,
 						wx = Rec.wx1,
 						wy = Rec.wy1,
 						wz = Rec.wz1,
@@ -2485,7 +2446,6 @@ namespace Waher.Script.Graphs3D
 				ScanLineSegment Segment = new ScanLineSegment()
 				{
 					sx = sx,
-					sz = sz,
 					wx = wx,
 					wy = wy,
 					wz = wz,
@@ -2504,12 +2464,10 @@ namespace Waher.Script.Graphs3D
 		private class ScanLineRec
 		{
 			public float sx0;
-			public float sz0;
 			public float wx0;
 			public float wy0;
 			public float wz0;
 			public float sx1;
-			public float sz1;
 			public float wx1;
 			public float wy1;
 			public float wz1;
@@ -2521,7 +2479,6 @@ namespace Waher.Script.Graphs3D
 		private class ScanLineSegment
 		{
 			public float sx;
-			public float sz;
 			public float wx;
 			public float wy;
 			public float wz;

@@ -371,7 +371,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					else
 					{
 						this.client.Information("HTTP(S) POST received.");
-						await this.CheckPostedData(Sender, Data);
+						string Msg = await this.CheckPostedData(Sender, Data);
+						if (!string.IsNullOrEmpty(Msg))
+							throw new BadRequestException(Msg);
 					}
 				}
 				finally
@@ -405,17 +407,19 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			private async Task CheckPostedData(object Sender, Stream Data)
+			private async Task<string> CheckPostedData(object Sender, Stream Data)
 			{
 				try
 				{
+					string CipherLocalName;
+					string CipherNamespace;
+					string Msg;
+
 					Data.Position = 0;
 
 					if (this.e2e)
 					{
 						int i = this.symmetricCipherReference.IndexOf('#');
-						string CipherLocalName;
-						string CipherNamespace;
 
 						if (i < 0)
 						{
@@ -430,15 +434,30 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						if (!this.endpointSecurity.TryGetSymmetricCipher(CipherLocalName, CipherNamespace, out IE2eSymmetricCipher SymmetricCipher))
 						{
-							this.client.Error("Symmetric cipher not understood: " + this.symmetricCipherReference);
-							return;
+							this.client.Error(Msg = "Symmetric cipher not understood: " + this.symmetricCipherReference);
+							return Msg;
 						}
 
 						Stream Decrypted = await this.endpointSecurity.Decrypt(this.endpointReference, this.id, "POST", this.from, this.to, Data, SymmetricCipher);
 						if (Decrypted is null)
 						{
-							this.client.Error("Unable to decrypt POSTed payload. Endpoint: " + this.endpointReference + ", Id: " + this.id + ", Type: POST, From: " + this.from + ", To: " + this.to + ", Cipher: " + this.symmetricCipherReference);
-							return;
+							StringBuilder sb = new StringBuilder();
+
+							sb.Append("Unable to decrypt POSTed payload. Endpoint: ");
+							sb.Append(this.endpointReference);
+							sb.Append(", Id: ");
+							sb.Append(this.id);
+							sb.Append(", Type: POST, From: ");
+							sb.Append(this.from);
+							sb.Append(", To: ");
+							sb.Append(this.to);
+							sb.Append(", Cipher: ");
+							sb.Append(this.symmetricCipherReference);
+							sb.Append(", Bytes: ");
+							sb.Append(Data.Length.ToString());
+
+							this.client.Error(Msg = sb.ToString());
+							return Msg;
 						}
 
 						if (this.disposeData)
@@ -489,12 +508,17 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 					}
 					else
-						this.client.Error("Dropping POSTed response, as SHA-256 digest did not match reported digest in response.");
+					{
+						this.client.Error(Msg = "Dropping POSTed response, as SHA-256 digest did not match reported digest in response.");
+						return Msg;
+					}
 				}
 				finally
 				{
 					this.Dispose();
 				}
+
+				return null;
 			}
 
 			public void Dispose()

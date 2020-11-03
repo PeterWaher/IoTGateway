@@ -244,6 +244,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					Timeout = TimeSpan.FromMilliseconds(60000)
 				})
 				{
+					long DataLen = File.Length;
+
 					File.Position = 0;
 
 					using (HttpRequestMessage Request = new HttpRequestMessage()
@@ -252,6 +254,8 @@ namespace Waher.Networking.XMPP.HTTPX
 						Method = HttpMethod.Post
 					})
 					{
+						string Referer = null;
+
 						if (!(E2e is null))
 						{
 							Encrypted = new TemporaryStream();
@@ -284,7 +288,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							sb.Append(SymmetricCipher.LocalName);
 
-							Request.Headers.Add("Referer", sb.ToString());
+							Request.Headers.Add("Referer", Referer = sb.ToString());
 
 							File.Dispose();
 							File = Encrypted;
@@ -299,7 +303,38 @@ namespace Waher.Networking.XMPP.HTTPX
 						Request.Headers.Add("From", Client.FullJID);
 
 						HttpResponseMessage Response2 = await HttpClient.SendAsync(Request);
-						Response2.EnsureSuccessStatusCode();
+						if (!Response2.IsSuccessStatusCode)
+						{
+							StringBuilder Msg = new StringBuilder();
+
+							Msg.Append("Report server responded with error: ");
+							Msg.Append(await Response2.Content.ReadAsStringAsync());
+
+							if (!(E2e is null))
+							{
+								Msg.Append(" Referer: ");
+								Msg.Append(Referer);
+								Msg.Append(", Id: ");
+								Msg.Append(Resource);
+								Msg.Append(", Type: POST, From: ");
+								Msg.Append(Client.FullJID);
+								Msg.Append(", To: ");
+								Msg.Append(To);
+
+								if (!(E2e is null))
+								{
+									Msg.Append(", Unencrypted bytes: ");
+									Msg.Append(DataLen.ToString());
+									Msg.Append(", Encrypted bytes: ");
+								}
+								else
+									Msg.Append(", Bytes: ");
+
+								Msg.Append(File.Length.ToString());
+							}
+
+							Client.Error(Msg.ToString());
+						}
 					}
 				}
 			}

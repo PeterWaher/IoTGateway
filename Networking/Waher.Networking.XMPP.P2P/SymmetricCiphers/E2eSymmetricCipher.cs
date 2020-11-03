@@ -245,7 +245,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             }
             while (i >= 0x80);
 
-            if (c < 0 || c + i > Data.Length)
+            if (c < 0 || c + Data.Position > Data.Length)
                 return null;
 
             TemporaryStream Decrypted = new TemporaryStream();
@@ -303,7 +303,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                 Key = this.GenerateKey();
                 EncryptedKey = Receiver.EncryptSecret(Key);
                 l = EncryptedKey.Length;
-                c += l + 1;
+                c += l + 2;
             }
 
             Encrypted = this.Encrypt(Data, Key, IV, AssociatedData);
@@ -316,6 +316,8 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                 Signature = Sender.Sign(Data);
                 k = Signature.Length;
                 c += k + 1;
+                if (k >= 128)
+                    c++;
             }
             else
             {
@@ -326,7 +328,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             Block = new byte[c];
 
             if (k > 0)
-                Block[j++] = (byte)k;
+			{
+                if (k < 128)
+                    Block[j++] = (byte)k;
+                else
+                {
+                    Block[j++] = (byte)(k | 128);
+                    Block[j++] = (byte)(k >> 7);
+                }
+            }
 
             if (l > 0)
             {
@@ -384,7 +394,14 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             int i = 0;
 
             if (Receiver.SupportsSignatures)
+            {
                 SignatureLen = Data[i++];
+                if ((SignatureLen & 128) != 0)
+                {
+                    SignatureLen &= 127;
+                    SignatureLen |= Data[i++] << 7;
+                }
+            }
             else
                 SignatureLen = 0;
 
@@ -540,7 +557,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                 }
 
                 if (k > 0)
-                    Encrypted.WriteByte((byte)k);
+				{
+                    if (k < 128)
+                        Encrypted.WriteByte((byte)k);
+                    else
+                    {
+                        Encrypted.WriteByte((byte)(k | 128));
+                        Encrypted.WriteByte((byte)(k >> 7));
+                    }
+                }
 
                 if (l > 0)
                 {
@@ -591,7 +616,14 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             uint Counter;
 
             if (Receiver.SupportsSignatures)
+            {
                 SignatureLen = Data.ReadByte();
+                if ((SignatureLen & 128) != 0)
+                {
+                    SignatureLen &= 127;
+                    SignatureLen |= Data.ReadByte() << 7;
+                }
+            }
             else
                 SignatureLen = 0;
 

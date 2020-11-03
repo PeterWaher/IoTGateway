@@ -398,11 +398,39 @@
             and viewing position. The Normal vector is determined from the order 
             of the nodes defining the polygon.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],System.Numerics.Vector4[],SkiaSharp.SKColor,System.Boolean)">
+            <summary>
+            Draws a closed polygon.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Normals">Normals</param>
+            <param name="Color">Color</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Color"/> is used on both sides.
+            If false, <paramref name="Color"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
             <summary>
             Draws a closed polygon.
             </summary>
             <param name="Nodes">Nodes.</param>
+            <param name="Shader">Shader.</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Shader"/> is used on both sides.
+            If false, <paramref name="Shader"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],System.Numerics.Vector4[],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
+            <summary>
+            Draws a closed polygon.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Normals">Normals</param>
             <param name="Shader">Shader.</param>
             <param name="TwoSided">If the polygon is two-sided.
             If true, <paramref name="Shader"/> is used on both sides.
@@ -424,6 +452,20 @@
             and viewing position. The Normal vector is determined from the order 
             of the nodes defining the polygon.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],System.Numerics.Vector4[][],SkiaSharp.SKColor,System.Boolean)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Normals">Normals</param>
+            <param name="Color">Color</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Color"/> is used on both sides.
+            If false, <paramref name="Color"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
             <summary>
             Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
@@ -437,11 +479,34 @@
             and viewing position. The Normal vector is determined from the order 
             of the nodes defining the polygon.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,System.Boolean)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Normals">Normals</param>
+            <param name="Shader">Shader.</param>
+            <param name="TwoSided">If the polygon is two-sided.
+            If true, <paramref name="Shader"/> is used on both sides.
+            If false, <paramref name="Shader"/> is only used on the front side.
+            Which side is the front side, is determined from the Normal vector
+            and viewing position. The Normal vector is determined from the order 
+            of the nodes defining the polygon.</param>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,Waher.Script.Graphs3D.I3DShader)">
             <summary>
             Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
             </summary>
             <param name="Nodes">Nodes.</param>
+            <param name="FrontShader">Front side Shader.</param>
+            <param name="BackShader">Back side Shader.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygons(System.Numerics.Vector4[][],System.Numerics.Vector4[][],Waher.Script.Graphs3D.I3DShader,Waher.Script.Graphs3D.I3DShader)">
+            <summary>
+            Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+            </summary>
+            <param name="Nodes">Nodes.</param>
+            <param name="Normals">Normals</param>
             <param name="FrontShader">Front side Shader.</param>
             <param name="BackShader">Back side Shader.</param>
         </member>

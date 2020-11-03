@@ -79,7 +79,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_04_Perspective()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 			this.DrawWireframeCube(Canvas);
 			this.Save(Canvas, "04.png");
@@ -107,7 +107,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_05_Polygon()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 			this.DrawCube(Canvas);
 			this.Save(Canvas, "05.png");
@@ -135,7 +135,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_06_ZBuffer()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 			this.DrawPlanes(Canvas);
 			this.Save(Canvas, "06.png");
@@ -171,7 +171,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_07_Text()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 			this.DrawPlanes(Canvas);
 			Canvas.Text("Hello World!", new Vector4(-400, 50, 1150, 1), "Tahoma", 150, SKColors.BlueViolet);
@@ -213,7 +213,7 @@ namespace Waher.Script.Test
 		{
 			return new PhongShader(
 				new PhongMaterial(1, 2, 0, 10),
-				new PhongIntensity(64, 64, 64, 255),
+				new PhongIntensity(64, 64, 64, Color.Alpha),
 				new PhongLightSource(
 					new PhongIntensity(Color.Red, Color.Green, Color.Blue, Color.Alpha),
 					new PhongIntensity(255, 255, 255, 255),
@@ -256,7 +256,7 @@ namespace Waher.Script.Test
 		public void Canvas3D_Test_11_Rotate_X()
 		{
 			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
 			this.DrawThreePlanes(Canvas, Shader);
@@ -292,7 +292,7 @@ namespace Waher.Script.Test
 		public void Canvas3D_Test_12_Rotate_Y()
 		{
 			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
 			this.DrawThreePlanes(Canvas, Shader);
@@ -328,7 +328,7 @@ namespace Waher.Script.Test
 		public void Canvas3D_Test_13_Rotate_Z()
 		{
 			I3DShader Shader = this.GetPhongShader(SKColors.Red);
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
 
 			this.DrawThreePlanes(Canvas, Shader);
@@ -363,9 +363,12 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Canvas3D_Test_14_Ellipsoid()
 		{
-			Canvas3D Canvas = new Canvas3D(1200, 800, 3, SKColors.White);
+			Canvas3D Canvas = new Canvas3D(1200, 800, 1, SKColors.White);
 			Canvas.Perspective(200, 2000);
-			Canvas.LookAt(-200, 500, 0, 0, 0, 1500, 0, 1, 0);
+			//Canvas.LookAt(-200, 500, 0, 0, 0, 1500, 0, 1, 0);
+			Canvas.RotateX(30, new Vector3(0, 0, 1500));
+			Canvas.RotateY(45, new Vector3(0, 0, 1500));
+			Canvas.RotateZ(60, new Vector3(0, 0, 1500));
 
 			I3DShader Shader = this.GetPhongShader(SKColors.Orange);
 			Canvas.Ellipsoid(0, 0, 1500, 400, 400, 400, 1000, Shader);
@@ -379,5 +382,13 @@ namespace Waher.Script.Test
 		// TODO: Clip
 		// TODO: Test Light / Phong shading with multiple light sources
 		// TODO: Proper interpolation of z
+		// TODO: Sort transparent polygons
+		// TODO: Kolla om det är snabbare att arbeta med Vector3 direkt, än med de 3 koefficienterna separat.
+		// TODO: text-bugg
+		// TODO: Front/Back in shader
+		// TODO: ta bort sz
+		// TODO: Specular lighting
+		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
+
 	}
 }

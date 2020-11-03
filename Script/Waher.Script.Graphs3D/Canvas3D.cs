@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Functions.Analytic;
 using Waher.Script.Graphs;
 
 namespace Waher.Script.Graphs3D
@@ -1372,11 +1370,8 @@ namespace Waher.Script.Graphs3D
 		#region Scan Lines
 
 		private void ScanLine(
-			float sx0, float sy0, float sz0,
-			float wx0, float wy0, float wz0,
-			float sx1, float sz1,
-			float wx1, float wy1, float wz1,
-			Vector3 Normal, I3DShader Shader)
+			float sx0, float sy0, float sz0, float wx0, float wy0, float wz0, Vector3 N0,
+			float sx1, float sz1, float wx1, float wy1, float wz1, Vector3 N1, I3DShader Shader)
 		{
 			float Delta;
 
@@ -1417,12 +1412,12 @@ namespace Waher.Script.Graphs3D
 				if (wz0 < wz1)
 				{
 					this.Plot((int)(sx0 + 0.5f), (int)(sy0 + 0.5f), wz0,
-						ToUInt(Shader.GetColor(wx0, wy0, wz0, Normal, this)));
+						ToUInt(Shader.GetColor(wx0, wy0, wz0, N0, this)));
 				}
 				else
 				{
 					this.Plot((int)(sx1 + 0.5f), (int)(sy1 + 0.5f), wz1,
-						ToUInt(Shader.GetColor(wx1, wy1, wz1, Normal, this)));
+						ToUInt(Shader.GetColor(wx1, wy1, wz1, N1, this)));
 				}
 			}
 			else
@@ -1442,16 +1437,56 @@ namespace Waher.Script.Graphs3D
 				byte R2, G2, B2, A2;
 				byte R3, G3, B3, A3;
 
-				while (isx0 <= isx1)
+				if (N0 != N1)
 				{
+					Vector3 dNdsx = (N1 - N0) * dsx;
+
 					this.xBuf[i] = wx0;
 					this.yBuf[i] = wy0;
 					this.zBuf[i] = wz0;
-					this.normalBuf[i++] = Normal;
+					this.normalBuf[i++] = N0;
 					wx0 += dwxdsx;
 					wy0 += dwydsx;
 					wz0 += dwzdsx;
+					N0 += dNdsx;
 					isx0++;
+
+					while (isx0 < isx1)
+					{
+						this.xBuf[i] = wx0;
+						this.yBuf[i] = wy0;
+						this.zBuf[i] = wz0;
+						this.normalBuf[i++] = Vector3.Normalize(N0);
+						wx0 += dwxdsx;
+						wy0 += dwydsx;
+						wz0 += dwzdsx;
+						N0 += dNdsx;
+						isx0++;
+					}
+
+					this.xBuf[i] = wx1;
+					this.yBuf[i] = wy1;
+					this.zBuf[i] = wz1;
+					this.normalBuf[i++] = N1;
+				}
+				else
+				{
+					while (isx0 < isx1)
+					{
+						this.xBuf[i] = wx0;
+						this.yBuf[i] = wy0;
+						this.zBuf[i] = wz0;
+						this.normalBuf[i++] = N0;
+						wx0 += dwxdsx;
+						wy0 += dwydsx;
+						wz0 += dwzdsx;
+						isx0++;
+					}
+
+					this.xBuf[i] = wx1;
+					this.yBuf[i] = wy1;
+					this.zBuf[i] = wz1;
+					this.normalBuf[i++] = N1;
 				}
 
 				c = i;
@@ -1686,6 +1721,123 @@ namespace Waher.Script.Graphs3D
 			return ((Mask0 | Mask1) == 0);
 		}
 
+		private bool ClipTopBottom(
+			ref float x0, ref float y0, ref float z0,
+			ref float rx0, ref float ry0, ref float rz0, ref Vector3 rN0,
+			ref float x1, ref float y1, ref float z1,
+			ref float rx1, ref float ry1, ref float rz1, ref Vector3 rN1)
+		{
+			byte Mask0 = 0;
+			byte Mask1 = 0;
+			float Delta;
+
+			if (y0 < 0)
+				Mask0 |= 4;
+			else if (y0 > this.hm1)
+				Mask0 |= 8;
+
+			if (y1 < 0)
+				Mask1 |= 4;
+			else if (y1 > this.hm1)
+				Mask1 |= 8;
+
+			if (Mask0 == 0 && Mask1 == 0)
+				return true;
+
+			if ((Mask0 & Mask1) != 0)
+				return false;
+
+			// Top edge:
+
+			if ((Mask0 & 4) != 0)
+			{
+				Delta = y0 / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 -= (x1 - x0) * Delta;
+				z0 -= (z1 - z0) * Delta;
+				rx0 -= (rx1 - rx0) * Delta;
+				ry0 -= (ry1 - ry0) * Delta;
+				rz0 -= (rz1 - rz0) * Delta;
+				rN0 -= (rN1 - rN0) * Delta;
+				y0 = 0;
+
+				Mask0 &= 251;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 4) != 0)
+			{
+				Delta = y1 / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 -= (x0 - x1) * Delta;
+				z1 -= (z0 - z1) * Delta;
+				rx1 -= (rx0 - rx1) * Delta;
+				ry1 -= (ry0 - ry1) * Delta;
+				rz1 -= (rz0 - rz1) * Delta;
+				rN1 -= (rN0 - rN1) * Delta;
+				y1 = 0;
+
+				Mask1 &= 251;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			// Bottom edge:
+
+			if ((Mask0 & 8) != 0)
+			{
+				Delta = (this.hm1 - y0) / (y1 - y0);    // Divisor is non-zero, or masks would have common bit.
+				x0 += (x1 - x0) * Delta;
+				z0 += (z1 - z0) * Delta;
+				rx0 += (rx1 - rx0) * Delta;
+				ry0 += (ry1 - ry0) * Delta;
+				rz0 += (rz1 - rz0) * Delta;
+				rN0 += (rN1 - rN0) * Delta;
+				y0 = this.hm1;
+
+				Mask0 &= 247;
+				if (x0 < 0)
+					Mask0 |= 1;
+				else if (x0 > this.wm1)
+					Mask0 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			if ((Mask1 & 8) != 0)
+			{
+				Delta = (this.hm1 - y1) / (y0 - y1);    // Divisor is non-zero, or masks would have common bit.
+				x1 += (x0 - x1) * Delta;
+				z1 += (z0 - z1) * Delta;
+				rx1 += (rx0 - rx1) * Delta;
+				ry1 += (ry0 - ry1) * Delta;
+				rz1 += (rz0 - rz1) * Delta;
+				rN1 += (rN0 - rN1) * Delta;
+				y1 = this.hm1;
+
+				Mask1 &= 247;
+				if (x1 < 0)
+					Mask1 |= 1;
+				else if (x1 > this.wm1)
+					Mask1 |= 2;
+
+				if ((Mask0 & Mask1) != 0)
+					return false;
+			}
+
+			return ((Mask0 | Mask1) == 0);
+		}
+
 		/// <summary>
 		/// Draws a closed polygon.
 		/// </summary>
@@ -1699,7 +1851,24 @@ namespace Waher.Script.Graphs3D
 		/// of the nodes defining the polygon.</param>
 		public void Polygon(Vector4[] Nodes, SKColor Color, bool TwoSided)
 		{
-			this.Polygons(new Vector4[][] { Nodes }, new ConstantColor(Color), TwoSided);
+			this.Polygons(new Vector4[][] { Nodes }, null, new ConstantColor(Color), TwoSided);
+		}
+
+		/// <summary>
+		/// Draws a closed polygon.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Normals">Normals</param>
+		/// <param name="Color">Color</param>
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Color"/> is used on both sides.
+		/// If false, <paramref name="Color"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygon(Vector4[] Nodes, Vector4[] Normals, SKColor Color, bool TwoSided)
+		{
+			this.Polygons(new Vector4[][] { Nodes }, new Vector4[][] { Normals }, new ConstantColor(Color), TwoSided);
 		}
 
 		/// <summary>
@@ -1715,7 +1884,24 @@ namespace Waher.Script.Graphs3D
 		/// of the nodes defining the polygon.</param>
 		public void Polygon(Vector4[] Nodes, I3DShader Shader, bool TwoSided)
 		{
-			this.Polygons(new Vector4[][] { Nodes }, Shader, TwoSided);
+			this.Polygons(new Vector4[][] { Nodes }, null, Shader, TwoSided);
+		}
+
+		/// <summary>
+		/// Draws a closed polygon.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Normals">Normals</param>
+		/// <param name="Shader">Shader.</param>
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Shader"/> is used on both sides.
+		/// If false, <paramref name="Shader"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygon(Vector4[] Nodes, Vector4[] Normals, I3DShader Shader, bool TwoSided)
+		{
+			this.Polygons(new Vector4[][] { Nodes }, new Vector4[][] { Normals }, Shader, TwoSided);
 		}
 
 		/// <summary>
@@ -1731,7 +1917,24 @@ namespace Waher.Script.Graphs3D
 		/// of the nodes defining the polygon.</param>
 		public void Polygons(Vector4[][] Nodes, SKColor Color, bool TwoSided)
 		{
-			this.Polygons(Nodes, new ConstantColor(Color), TwoSided);
+			this.Polygons(Nodes, null, Color, TwoSided);
+		}
+
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Normals">Normals</param>
+		/// <param name="Color">Color</param>
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Color"/> is used on both sides.
+		/// If false, <paramref name="Color"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygons(Vector4[][] Nodes, Vector4[][] Normals, SKColor Color, bool TwoSided)
+		{
+			this.Polygons(Nodes, Normals, new ConstantColor(Color), TwoSided);
 		}
 
 		/// <summary>
@@ -1747,7 +1950,24 @@ namespace Waher.Script.Graphs3D
 		/// of the nodes defining the polygon.</param>
 		public void Polygons(Vector4[][] Nodes, I3DShader Shader, bool TwoSided)
 		{
-			this.Polygons(Nodes, Shader, TwoSided ? Shader : null);
+			this.Polygons(Nodes, null, Shader, TwoSided);
+		}
+
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Normals">Normals</param>
+		/// <param name="Shader">Shader.</param>
+		/// <param name="TwoSided">If the polygon is two-sided.
+		/// If true, <paramref name="Shader"/> is used on both sides.
+		/// If false, <paramref name="Shader"/> is only used on the front side.
+		/// Which side is the front side, is determined from the Normal vector
+		/// and viewing position. The Normal vector is determined from the order 
+		/// of the nodes defining the polygon.</param>
+		public void Polygons(Vector4[][] Nodes, Vector4[][] Normals, I3DShader Shader, bool TwoSided)
+		{
+			this.Polygons(Nodes, Normals, Shader, TwoSided ? Shader : null);
 		}
 
 		/// <summary>
@@ -1758,6 +1978,18 @@ namespace Waher.Script.Graphs3D
 		/// <param name="BackShader">Back side Shader.</param>
 		public void Polygons(Vector4[][] Nodes, I3DShader FrontShader, I3DShader BackShader)
 		{
+			this.Polygons(Nodes, null, FrontShader, BackShader);
+		}
+
+		/// <summary>
+		/// Draws a set of closed polygons. Interior polygons can be used to undraw the corresponding sections.
+		/// </summary>
+		/// <param name="Nodes">Nodes.</param>
+		/// <param name="Normals">Normals</param>
+		/// <param name="FrontShader">Front side Shader.</param>
+		/// <param name="BackShader">Back side Shader.</param>
+		public void Polygons(Vector4[][] Nodes, Vector4[][] Normals, I3DShader FrontShader, I3DShader BackShader)
+		{
 			int j, d;
 			int i, c;
 			int k, l;
@@ -1766,14 +1998,17 @@ namespace Waher.Script.Graphs3D
 			int Y;
 			Vector4 WP;
 			Vector3 WP3, SP;
-			Vector4[] v;
-			Vector3[] vw, vs;
+			Vector4[] v, n = null;
+			Vector3[] vw, vs, vn;
 			bool First = true;
+			bool InterpolateNormals = !(Normals is null);
 
 			d = Nodes.Length;
+			vn = null;
 
 			Vector3[][] World = new Vector3[d][];
 			Vector3[][] Screen = new Vector3[d][];
+			Vector3[][] Normals2 = InterpolateNormals ? new Vector3[d][] : null;
 
 			for (j = l = 0; j < d; j++)
 			{
@@ -1786,6 +2021,15 @@ namespace Waher.Script.Graphs3D
 				vw = new Vector3[c];
 				vs = new Vector3[c];
 
+				if (InterpolateNormals)
+				{
+					n = Normals[j];
+					if (n.Length != c)
+						throw new ArgumentException("Number of normals do not match number of vertices.", nameof(Normals));
+
+					vn = new Vector3[c];
+				}
+
 				for (i = k = 0; i < c; i++)
 				{
 					WP = this.ModelTransform(v[i]);
@@ -1793,6 +2037,9 @@ namespace Waher.Script.Graphs3D
 
 					if (k > 0 && WP3 == vw[k - 1])
 						continue;   // Removing duplicate points, to avoid problems when calculating normals.
+
+					if (InterpolateNormals)
+						vn[k] = Vector3.Normalize(ToVector3(this.ModelTransform(n[i])));
 
 					vw[k] = WP3;
 					vs[k++] = SP = this.Project(WP);
@@ -1823,7 +2070,12 @@ namespace Waher.Script.Graphs3D
 				}
 
 				World[l] = vw;
-				Screen[l++] = vs;
+				Screen[l] = vs;
+
+				if (InterpolateNormals)
+					Normals2[l] = vn;
+
+				l++;
 			}
 
 			d = l;
@@ -1848,6 +2100,8 @@ namespace Waher.Script.Graphs3D
 			ScanLineRec Rec;
 			Vector3 LastWorld;
 			Vector3 CurrentWorld;
+			Vector3 LastNormal = Vector3.Zero;
+			Vector3 CurrentNormal = Vector3.Zero;
 			Vector3 LastScreen;
 			Vector3 CurrentScreen;
 			Vector3 N;
@@ -1858,7 +2112,9 @@ namespace Waher.Script.Graphs3D
 			float wx1, wy1, wz1;
 			float invdsy, dsxdsy, dszdsy;
 			float dwxdsy, dwydsy, dwzdsy;
+			Vector3 dNdsy = Vector3.Zero;
 			int isy0, isy1;
+			float step;
 
 			for (j = 0; j < d; j++)
 			{
@@ -1881,6 +2137,13 @@ namespace Waher.Script.Graphs3D
 				if (Recs is null)
 					continue;   // Culled
 
+				if (InterpolateNormals)
+				{
+					vn = Normals2[j];
+					LastNormal = vn[c - 2];
+					CurrentNormal = vn[c - 1];
+				}
+
 				sy0 = LastScreen.Y;
 				sy1 = CurrentScreen.Y;
 
@@ -1898,6 +2161,12 @@ namespace Waher.Script.Graphs3D
 					LastScreen = CurrentScreen;
 					CurrentScreen = vs[i];
 
+					if (InterpolateNormals)
+					{
+						LastNormal = CurrentNormal;
+						CurrentNormal = vn[i];
+					}
+
 					sx0 = LastScreen.X;
 					sy0 = LastScreen.Y;
 					sz0 = LastScreen.Z;
@@ -1914,13 +2183,27 @@ namespace Waher.Script.Graphs3D
 					wy1 = CurrentWorld.Y;
 					wz1 = CurrentWorld.Z;
 
-					if (!this.ClipTopBottom(
-						ref sx0, ref sy0, ref sz0,
-						ref wx0, ref wy0, ref wz0,
-						ref sx1, ref sy1, ref sz1,
-						ref wx1, ref wy1, ref wz1))
+					if (InterpolateNormals)
 					{
-						continue;
+						if (!this.ClipTopBottom(
+							ref sx0, ref sy0, ref sz0,
+							ref wx0, ref wy0, ref wz0, ref LastNormal,
+							ref sx1, ref sy1, ref sz1,
+							ref wx1, ref wy1, ref wz1, ref CurrentNormal))
+						{
+							continue;
+						}
+					}
+					else
+					{
+						if (!this.ClipTopBottom(
+							ref sx0, ref sy0, ref sz0,
+							ref wx0, ref wy0, ref wz0,
+							ref sx1, ref sy1, ref sz1,
+							ref wx1, ref wy1, ref wz1))
+						{
+							continue;
+						}
 					}
 
 					isy0 = (int)(sy0 + 0.5f);
@@ -1930,71 +2213,122 @@ namespace Waher.Script.Graphs3D
 					Dir = Math.Sign(isy1 - isy0);
 
 					if (Dir == 0)
-						continue;
-
-					invdsy = 1 / (sy1 - sy0);
-					dsxdsy = (sx1 - sx0) * invdsy;
-					dszdsy = (sz1 - sz0) * invdsy;
-					dwxdsy = (wx1 - wx0) * invdsy;
-					dwydsy = (wy1 - wy0) * invdsy;
-					dwzdsy = (wz1 - wz0) * invdsy;
-
-					if (Dir > 0)
 					{
-						if (Dir == LastDir)
-						{
-							isy0++;
-							sx0 += dsxdsy;
-							sz0 += dszdsy;
-							wx0 += dwxdsy;
-							wy0 += dwydsy;
-							wz0 += dwzdsy;
-						}
+						this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+							InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 
-						while (isy0 < isy1)
-						{
-							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N);
-
-							isy0++;
-							sx0 += dsxdsy;
-							sz0 += dszdsy;
-							wx0 += dwxdsy;
-							wy0 += dwydsy;
-							wz0 += dwzdsy;
-						}
-
-						this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
+						this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+							InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
 					}
 					else
 					{
-						if (Dir == LastDir)
-						{
-							isy0--;
-							sx0 -= dsxdsy;
-							sz0 -= dszdsy;
-							wx0 -= dwxdsy;
-							wy0 -= dwydsy;
-							wz0 -= dwzdsy;
-						}
+						invdsy = 1 / (sy1 - sy0);
+						dsxdsy = (sx1 - sx0) * invdsy;
+						dszdsy = (sz1 - sz0) * invdsy;
+						dwxdsy = (wx1 - wx0) * invdsy;
+						dwydsy = (wy1 - wy0) * invdsy;
+						dwzdsy = (wz1 - wz0) * invdsy;
 
-						if (isy1 < isy0)
+						if (InterpolateNormals)
+							dNdsy = (CurrentNormal - LastNormal) * invdsy;
+
+						if (Dir > 0)
 						{
-							while (isy1 < isy0)
+							if (Dir != LastDir && LastDir != 0)
 							{
-								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
-
-								isy1++;
-								sx1 += dsxdsy;
-								sz1 += dszdsy;
-								wx1 += dwxdsy;
-								wy1 += dwydsy;
-								wz1 += dwzdsy;
+								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
 							}
 
-							this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0, N);
+							isy0++;
+							step = isy0 - sy0;
+							sx0 += step * dsxdsy;
+							sz0 += step * dszdsy;
+							wx0 += step * dwxdsy;
+							wy0 += step * dwydsy;
+							wz0 += step * dwzdsy;
+
+							if (InterpolateNormals)
+								LastNormal += step * dNdsy;
+
+							while (isy0 < isy1)
+							{
+								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+
+								isy0++;
+								sx0 += dsxdsy;
+								sz0 += dszdsy;
+								wx0 += dwxdsy;
+								wy0 += dwydsy;
+								wz0 += dwzdsy;
+
+								if (InterpolateNormals)
+									LastNormal += dNdsy;
+							}
+
+							this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
 						}
-						else
-							this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1, N);
+						else    // Dir < 0
+						{
+							if (Dir == LastDir || LastDir == 0)
+							{
+								isy0--;
+								step = sy0 - isy0;
+								sx0 -= step * dsxdsy;
+								sz0 -= step * dszdsy;
+								wx0 -= step * dwxdsy;
+								wy0 -= step * dwydsy;
+								wz0 -= step * dwzdsy;
+
+								if (InterpolateNormals)
+									LastNormal -= step * dNdsy;
+							}
+
+							if (isy1 < isy0)
+							{
+								Vector3 CurrentNormal2 = CurrentNormal;
+
+								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
+
+								isy1++;
+								step = isy1 - sy1;
+								sx1 += step * dsxdsy;
+								sz1 += step * dszdsy;
+								wx1 += step * dwxdsy;
+								wy1 += step * dwydsy;
+								wz1 += step * dwzdsy;
+
+								if (InterpolateNormals)
+									CurrentNormal2 += step * dNdsy;
+
+								while (isy1 < isy0)
+								{
+									this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N);
+
+									isy1++;
+									sx1 += dsxdsy;
+									sz1 += dszdsy;
+									wx1 += dwxdsy;
+									wy1 += dwydsy;
+									wz1 += dwzdsy;
+
+									if (InterpolateNormals)
+										CurrentNormal2 += dNdsy;
+								}
+
+								this.AddNode(Recs, MinY, sx0, isy0, sz0, wx0, wy0, wz0,
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N);
+							}
+							else
+							{
+								this.AddNode(Recs, MinY, sx1, isy1, sz1, wx1, wy1, wz1,
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N);
+							}
+						}
 					}
 				}
 			}
@@ -2036,10 +2370,9 @@ namespace Waher.Script.Graphs3D
 							}
 							else
 							{
-								this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0,
-									Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz,
-									Rec2.n, Shader);
-								// TODO: Interpolation of normals from N to Rec2.n
+								this.ScanLine(sx0, Y, sz0, wx0, wy0, wz0, N,
+									Rec2.sx, Rec2.sz, Rec2.wx, Rec2.wy, Rec2.wz, Rec2.n,
+									Shader);
 
 								First = true;
 							}
@@ -2047,29 +2380,28 @@ namespace Waher.Script.Graphs3D
 
 						if (!First)
 						{
-							this.Plot((int)(sx0 + 0.5f), Y, sz0,
+							this.Plot((int)(sx0 + 0.5f), Y, wz0,
 								ToUInt(Shader.GetColor(wx0, wy0, wz0, N, this)));
 						}
 					}
 					else if (Rec.has2)
 					{
-						this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0,
+						this.ScanLine(Rec.sx0, Y, Rec.sz0, Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0,
 							Rec.sx1, Rec.sz1, Rec.wx1, Rec.wy1, Rec.wz1, Rec.n1, Shader);
-						// TODO: Interpolation of normals from Rec.n0 to Rec.n1
 					}
 					else
 					{
-						this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.sz0,
+						this.Plot((int)(Rec.sx0 + 0.5f), Y, Rec.wz0,
 							ToUInt(Shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0, this)));
 					}
 				}
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float sx, float sy, float sz,
+		private void AddNode(ScanLineRec[] Records, int MinY, float sx, int isy, float sz,
 			float wx, float wy, float wz, Vector3 N)
 		{
-			int i = (int)(sy + 0.5f) - MinY;
+			int i = isy - MinY;
 			ScanLineRec Rec = Records[i];
 
 			if (Rec is null)
@@ -2557,9 +2889,10 @@ namespace Waher.Script.Graphs3D
 			int N2 = N / 2;
 			int a, b;
 
-			float[,] x = new float[N, N2 + 1];
-			float[,] y = new float[N, N2 + 1];
-			float[,] z = new float[N, N2 + 1];
+			Vector4[,] Node = new Vector4[N, N2 + 1];
+			Vector4[,] Normal = new Vector4[N, N2 + 1];
+			Vector4 Center = new Vector4(cx, cy, cz, 1);
+			Vector4 Delta;
 
 			for (a = 0; a < N; a++)
 			{
@@ -2570,9 +2903,13 @@ namespace Waher.Script.Graphs3D
 					double θ = b * Math.PI / N2;
 					double sinθ = Math.Sin(θ);
 
-					x[a, b] = (float)(cx + rx * sinθ * Math.Cos(φ));
-					y[a, b] = (float)(cy + ry * Math.Cos(θ));
-					z[a, b] = (float)(cz + rz * sinθ * Math.Sin(φ));
+					Normal[a, b] = Delta = new Vector4(
+						(float)(rx * sinθ * Math.Cos(φ)),
+						(float)(ry * Math.Cos(θ)),
+						(float)(rz * sinθ * Math.Sin(φ)),
+						0);
+
+					Node[a, b] = Delta + Center;
 				}
 			}
 
@@ -2585,10 +2922,16 @@ namespace Waher.Script.Graphs3D
 				{
 					this.Polygon(new Vector4[]
 					{
-						new Vector4(x[pa, pb], y[pa, pb], z[pa, pb], 1),
-						new Vector4(x[a, pb], y[a, pb], z[a, pb], 1),
-						new Vector4(x[a, b], y[a, b], z[a, b], 1),
-						new Vector4(x[pa, b], y[pa, b], z[pa, b], 1)
+						Node[pa, pb],
+						Node[a, pb],
+						Node[a, b],
+						Node[pa, b]
+					}, new Vector4[]
+					{
+						Normal[pa, pb],
+						Normal[a, pb],
+						Normal[a, b],
+						Normal[pa, b]
 					}, Shader, TwoSided);
 				}
 			}

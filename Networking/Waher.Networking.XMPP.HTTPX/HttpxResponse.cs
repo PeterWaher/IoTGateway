@@ -94,57 +94,58 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (this.chunked.HasValue)
 			{
-				if (!string.IsNullOrEmpty(this.postResource))
+				if (this.chunked.Value)
 				{
-					this.tempFile = new TemporaryStream();
-					this.response.Append("<data><sha256");
-					this.response.Append(" e2e='");
-					this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
-					this.response.Append("'>");
-
-					this.chunked = false;
-				}
-				else if (this.chunked.Value)
-				{
-					this.streamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
-
-					if (!(this.socks5Proxy is null))
+					if (!string.IsNullOrEmpty(this.postResource))
 					{
-						this.response.Append("<data><s5 sid='");
-						this.response.Append(this.streamId);
-						this.response.Append("' e2e='");
+						this.tempFile = new TemporaryStream();
+						this.response.Append("<data><sha256");
+						this.response.Append(" e2e='");
 						this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
-						this.response.Append("'/></data>");
-						this.ReturnResponse();
-
-						this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e);
-						this.socks5Output.OnAbort += this.OnAbort;
-
-						await this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
-					}
-					else if (!(this.ibbClient is null))
-					{
-						this.response.Append("<data><ibb sid='");
-						this.response.Append(this.streamId);
-						this.response.Append("'/></data>");
-						this.ReturnResponse();
-
-						this.ibbOutput = this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId, this.e2e);
-						this.ibbOutput.OnAbort += this.OnAbort;
+						this.response.Append("'>");
 					}
 					else
 					{
-						this.chunk = new byte[this.maxChunkSize];
+						this.streamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
-						this.response.Append("<data><chunkedBase64 streamId='");
-						this.response.Append(this.streamId);
-						this.response.Append("'/></data>");
-						this.ReturnResponse();
-					}
+						if (!(this.socks5Proxy is null))
+						{
+							this.response.Append("<data><s5 sid='");
+							this.response.Append(this.streamId);
+							this.response.Append("' e2e='");
+							this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
+							this.response.Append("'/></data>");
+							this.ReturnResponse();
 
-					lock (activeStreams)
-					{
-						activeStreams[this.from + " " + this.streamId] = this;
+							this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e);
+							this.socks5Output.OnAbort += this.OnAbort;
+
+							await this.socks5Proxy.InitiateSession(this.to, this.streamId, this.InitiationCallback, null);
+						}
+						else if (!(this.ibbClient is null))
+						{
+							this.response.Append("<data><ibb sid='");
+							this.response.Append(this.streamId);
+							this.response.Append("'/></data>");
+							this.ReturnResponse();
+
+							this.ibbOutput = this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId, this.e2e);
+							this.ibbOutput.OnAbort += this.OnAbort;
+						}
+						else
+						{
+							this.chunk = new byte[this.maxChunkSize];
+
+							this.response.Append("<data><chunkedBase64 streamId='");
+							this.response.Append(this.streamId);
+							this.response.Append("'/></data>");
+							this.ReturnResponse();
+						}
+
+						lock (activeStreams)
+						{
+							activeStreams[this.from + " " + this.streamId] = this;
+						}
 					}
 				}
 				else
@@ -171,7 +172,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.ReturnResponse();
 
-			if (this.chunked.HasValue && this.chunked.Value)
+			if (this.chunked.HasValue && this.chunked.Value && !string.IsNullOrEmpty(this.streamId))
 			{
 				lock (activeStreams)
 				{
@@ -198,21 +199,24 @@ namespace Waher.Networking.XMPP.HTTPX
 				StringBuilder Resp = this.response;
 				this.response = null;
 
-				if (this.chunked.HasValue && !this.chunked.Value)
+				if (this.chunked.HasValue)
 				{
-					if (!string.IsNullOrEmpty(this.postResource))
+					if (this.chunked.Value)
 					{
-						this.tempFile.Position = 0;
+						if (string.IsNullOrEmpty(this.streamId) && !string.IsNullOrEmpty(this.postResource))
+						{
+							this.tempFile.Position = 0;
 
-						byte[] Digest = Hashes.ComputeSHA256Hash(this.tempFile);
-						TemporaryStream Data = this.tempFile;
+							byte[] Digest = Hashes.ComputeSHA256Hash(this.tempFile);
+							TemporaryStream Data = this.tempFile;
 
-						Resp.Append(Convert.ToBase64String(Digest));
-						Resp.Append("</sha256></data>");
+							Resp.Append(Convert.ToBase64String(Digest));
+							Resp.Append("</sha256></data>");
 
-						Task.Run(() => SendPost(this.to, Data, this.postResource, this.client, this.e2e));
+							Task.Run(() => SendPost(this.to, Data, this.postResource, this.client, this.e2e));
 
-						this.tempFile = null;
+							this.tempFile = null;
+						}
 					}
 					else
 					{
@@ -358,9 +362,11 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.AssertNotCancelled();
 
-			if (this.chunked.Value)
+			if (this.chunked.HasValue && this.chunked.Value)
 			{
-				if (!(this.socks5Output is null))
+				if (!(this.tempFile is null))
+					await this.tempFile.WriteAsync(Buffer, Offset, NrBytes); 
+				else if (!(this.socks5Output is null))
 					await this.socks5Output.Write(Buffer, Offset, NrBytes);
 				else if (!(this.ibbOutput is null))
 					await this.ibbOutput.Write(Buffer, Offset, NrBytes);
@@ -391,8 +397,6 @@ namespace Waher.Networking.XMPP.HTTPX
 					}
 				}
 			}
-			else if (!(this.tempFile is null))
-				await this.tempFile.WriteAsync(Buffer, Offset, NrBytes);
 			else
 			{
 				int i = this.tail?.Length ?? 0;
@@ -505,7 +509,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.cancelled = true;
 
-			if (this.chunked.HasValue && this.chunked.Value)
+			if (this.chunked.HasValue && this.chunked.Value && !string.IsNullOrEmpty(this.streamId))
 			{
 				lock (activeStreams)
 				{

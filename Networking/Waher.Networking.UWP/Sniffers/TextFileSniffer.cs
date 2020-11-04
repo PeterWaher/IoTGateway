@@ -74,7 +74,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected override void BeforeWrite()
 		{
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				try
 				{
@@ -133,7 +133,7 @@ namespace Waher.Networking.Sniffers
 		{
 			base.Dispose();
 
-			if (this.file != null)
+			if (!(this.file is null))
 			{
 				this.file.Flush();
 				this.file.Dispose();

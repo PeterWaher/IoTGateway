@@ -84,7 +84,7 @@ namespace Waher.IoTGateway
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (string.IsNullOrEmpty(Request.SubPath))
-				throw new BadRequestException();
+				throw new BadRequestException("Sub-path missing.");
 
 			ContentQueue Queue;
 			string Id = Request.SubPath.Substring(1);
@@ -118,15 +118,17 @@ namespace Waher.IoTGateway
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
-				throw new BadRequestException();
+				throw new BadRequestException("POST request missing data.");
 
 			// TODO: Check User authenticated
 
 			object Obj = Request.DecodeData();
-			string TabID = Request.Header["X-TabID"];
+			if (!(Obj is string Location))
+				throw new BadRequestException("Expected location.");
 
-			if (!(Obj is string Location) || string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			string TabID = Request.Header["X-TabID"];
+			if (string.IsNullOrEmpty(TabID))
+				throw new BadRequestException("Expected X-TabID header.");
 
 			TabQueue Queue = Register(Request, null, Location, TabID);
 			StringBuilder Json = null;

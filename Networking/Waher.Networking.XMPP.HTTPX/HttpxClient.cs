@@ -143,7 +143,76 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.Request(To, "GET", Resource, Callback, DataCallback, State, Headers);
 		}
 
-		// TODO: Add more HTTP methods.
+		/// <summary>
+		/// Performs a HTTP POST request.
+		/// </summary>
+		/// <param name="To">Full JID of entity to query.</param>
+		/// <param name="Resource">Local HTTP resource to query.</param>
+		/// <param name="Data">Data to post to the resource. Data will be encoded prior to performing the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Callback method to call when data is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Headers">HTTP headers of the request.</param>
+		public void POST(string To, string Resource, object Data,
+			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback,
+			object State, params HttpField[] Headers)
+		{
+			byte[] Bin = InternetContent.Encode(Data, Encoding.UTF8, out string ContentType);
+			this.POST(To, Resource, Bin, ContentType, Callback, DataCallback, State, Headers);
+		}
+
+		/// <summary>
+		/// Performs a HTTP POST request.
+		/// </summary>
+		/// <param name="To">Full JID of entity to query.</param>
+		/// <param name="Resource">Local HTTP resource to query.</param>
+		/// <param name="Data">Binary data to post to the resource.</param>
+		/// <param name="ContentType">Content-Type of data to post.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Callback method to call when data is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Headers">HTTP headers of the request.</param>
+		public void POST(string To, string Resource, byte[] Data, string ContentType,
+			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback,
+			object State, params HttpField[] Headers)
+		{
+			using (MemoryStream DataStream = new MemoryStream(Data))
+			{
+				this.POST(To, Resource, DataStream, ContentType, Callback, DataCallback, State, Headers);
+			}
+		}
+
+		/// <summary>
+		/// Performs a HTTP POST request.
+		/// </summary>
+		/// <param name="To">Full JID of entity to query.</param>
+		/// <param name="Resource">Local HTTP resource to query.</param>
+		/// <param name="DataStream">Binary data stream to post to the resource.</param>
+		/// <param name="ContentType">Content-Type of data to post.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Callback method to call when data is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Headers">HTTP headers of the request.</param>
+		public void POST(string To, string Resource, Stream DataStream, string ContentType,
+			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, 
+			object State, params HttpField[] Headers)
+		{
+			List<HttpField> Headers2 = new List<HttpField>()
+			{
+				new HttpField("Content-Type", ContentType)
+			};
+
+			if (!(Headers is null))
+			{
+				foreach (HttpField Field in Headers)
+				{
+					if (Field.Key != "Content-Type")
+						Headers2.Add(Field);
+				}
+			}
+
+			this.Request(To, "POST", Resource, 1.1, Headers2, DataStream, Callback, DataCallback, State);
+		}
 
 		/// <summary>
 		/// Performs an HTTP request.

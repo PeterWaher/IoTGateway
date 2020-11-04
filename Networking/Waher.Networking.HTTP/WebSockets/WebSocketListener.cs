@@ -109,7 +109,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			if (Request.Header.TryGetHeaderField("Sec-WebSocket-Key", out HttpField Field))
 				Challenge = Field.Value;
 			else
-				throw new BadRequestException();
+				throw new BadRequestException("Sec-WebSocket-Key header field missing.");
 
 			if (Request.Header.TryGetHeaderField("Sec-WebSocket-Protocol", out Field))
 			{
@@ -138,7 +138,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				WebSocketVersion = i;
 			}
 			else
-				throw new BadRequestException();
+				throw new BadRequestException("Sec-WebSocket-Version header field missing.");
 
 			if (Request.Header.TryGetHeaderField("Sec-WebSocket-Extensions", out Field))
 			{

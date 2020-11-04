@@ -163,11 +163,11 @@ namespace Waher.Networking.XMPP.HTTPX
 									break;
 
 								case "chunkedBase64":
-									TemporaryStream file = new TemporaryStream();
+									TemporaryStream File = new TemporaryStream();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
-										new HttpRequest(Header, DataStream, e.From), e.E2eEncryption, e.E2eReference, file, 
-                                        MaxChunkSize, Sipub, Ibb, Socks5, Jingle));
+										new HttpRequest(Header, File, e.From), e.E2eEncryption, e.E2eReference, File, 
+                                        MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));
 									return;
 
 								case "sipub":
@@ -285,40 +285,10 @@ namespace Waher.Networking.XMPP.HTTPX
 					Result = true;
 				}
 			}
-			catch (HttpException ex)
-			{
-				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
-				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, !Result, MaxChunkSize, ex.HeaderFields);
-			}
-			catch (System.NotImplementedException ex)
-			{
-				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
-
-				Log.Critical(ex);
-
-				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 501, "Not Implemented", !Result, MaxChunkSize);
-			}
-			catch (IOException ex)
-			{
-				Log.Critical(ex);
-				
-				int Win32ErrorCode = ex.HResult & 0xFFFF;    
-				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
-				{
-					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 507, "Insufficient Storage", true, MaxChunkSize);
-				}
-				else
-					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
-
-				Result = false;
-			}
 			catch (Exception ex)
 			{
 				Result = (Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData);
-
-				Log.Critical(ex);
-
-				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", !Result, MaxChunkSize);
+				await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex, !Result, MaxChunkSize, PostResource);
 			}
 
 			Request.Dispose();
@@ -336,17 +306,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				await Resource.Execute(this.server, Request, Response);
 			}
-			catch (HttpException ex)
-			{
-				if (Response is null || !Response.HeaderSent)
-					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex.StatusCode, ex.Message, true, MaxChunkSize, ex.HeaderFields);
-			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
-
 				if (Response is null || !Response.HeaderSent)
-					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 500, "Internal Server Error", true, MaxChunkSize);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, ex, true, MaxChunkSize, PostResource);
 			}
 			finally
 			{
@@ -355,8 +318,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		private Task SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, 
-            string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, 
-			params KeyValuePair<string, string>[] HeaderFields)
+            string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, params KeyValuePair<string, string>[] HeaderFields)
 		{
 			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null, null), this.server, Request)
 			{
@@ -374,8 +336,17 @@ namespace Waher.Networking.XMPP.HTTPX
 				Response.SetHeader("Connection", "close");
 
 			return Response.SendResponse();
+		}
 
-			// TODO: Add error message content.
+		private Task SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To,
+			string From, Exception Exception, bool CloseAfterTransmission, int MaxChunkSize, string PostResource)
+		{
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, PostResource, null, null), this.server, Request);
+
+			if (CloseAfterTransmission)
+				Response.SetHeader("Connection", "close");
+
+			return Response.SendResponse(Exception);
 		}
 
 		private Task CancelReceived(object Sender, MessageEventArgs e)

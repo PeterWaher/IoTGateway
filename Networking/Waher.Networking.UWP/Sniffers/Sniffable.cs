@@ -155,7 +155,7 @@ namespace Waher.Networking.Sniffers
 
 		private void Transform(TextSnifferEvent Callback, ref string s)
 		{
-			if (Callback != null)
+			if (!(Callback is null))
 			{
 				try
 				{

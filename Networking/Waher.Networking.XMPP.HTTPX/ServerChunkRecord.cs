@@ -17,6 +17,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal string from;
 		internal string to;
 		internal string e2eReference;
+		internal string postResource;
 		internal int nextChunk = 0;
 		internal int maxChunkSize;
 		internal bool sipub;
@@ -26,7 +27,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request,
 			IEndToEndEncryption E2e, string EndpointReference, TemporaryStream File, int MaxChunkSize, bool Sipub, bool Ibb,
-			bool Socks5, bool Jingle)
+			bool Socks5, bool Jingle, string PostResource)
 			: base()
 		{
 			this.server = Server;
@@ -42,6 +43,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.ibb = Ibb;
 			this.s5 = Socks5;
 			this.jingle = Jingle;
+			this.postResource = PostResource;
 		}
 
 		internal override async Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data)
@@ -97,15 +99,20 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private Task Done()
 		{
+			if (!(this.file is null))
+			{
+				this.file.Position = 0;
+				this.file = null;
+			}
+
 			return this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
-				null, this.ibb, this.s5);
+				this.postResource, this.ibb, this.s5);
 		}
 
 		internal override Task Fail(string Message)
 		{
 			this.file?.Dispose();
 			this.file = null;
-			this.Done();
 
 			return Task.CompletedTask;
 		}

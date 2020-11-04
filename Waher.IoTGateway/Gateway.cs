@@ -3831,10 +3831,16 @@ namespace Waher.IoTGateway
 
 		private static void WebServer_CustomError(object Sender, CustomErrorEventArgs e)
 		{
-			string Html = GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
+			if (e.Request.Header.Accept is null)
+				return;
 
-			if (!string.IsNullOrEmpty(Html))
-				e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
+			if (e.Request.Header.Accept.IsAcceptable("text/html"))
+			{
+				string Html = GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
+
+				if (!string.IsNullOrEmpty(Html))
+					e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
+			}
 		}
 
 		/// <summary>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
@@ -9,7 +8,6 @@ using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
-using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
@@ -31,6 +29,33 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				Response.ContentType = "text/plain";
 				Response.Write("World");
 				return Response.SendResponse();
+			});
+
+			this.webServer.Register("/Echo", null, async (Request, Response) =>
+			{
+				if (!Request.HasData)
+					throw new BadRequestException("No data.");
+
+				Response.StatusCode = 200;
+				Response.ContentType = Request.Header.ContentType.Value;
+
+				long c = Request.DataStream.Length;
+				int BufSize = (int)Math.Min(65536, c);
+				byte[] Buf = new byte[BufSize];
+				int i;
+
+				while (c > 0)
+				{
+					i = (int)Math.Min(c, BufSize);
+
+					if (i != await (Request.DataStream.ReadAsync(Buf, 0, BufSize)))
+						throw new IOException("Unexpected end of file.");
+
+					await Response.Write(Buf, 0, i);
+					c -= i;
+				}
+
+				await Response.SendResponse();
 			});
 
 			this.ConnectClients();
@@ -80,7 +105,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		}
 
 		private void DoGet(int Nr)
-		{ 
+		{
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done2 = new ManualResetEvent(false);
@@ -123,8 +148,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					return Task.CompletedTask;
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 120000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000), "Data not returned.");
 		}
 
 		[TestMethod]
@@ -138,107 +163,78 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			this.DoGet(2);
 		}
 
-		private class PostBack : HttpSynchronousResource, IPostResource, IHttpPostMethod
+		[TestMethod]
+		public void HTTPX_Test_03_POST()
 		{
-			private Cache<string, KeyValuePair<PostBackEventHandler, object>> queries = null;
-			private readonly object synchObj = new object();
-			private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+			this.DoPost(3);
+		}
 
-			public PostBack()
-				: base("/PostBack")
+		private void DoPost(int Nr)
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+			MemoryStream ms = null;
+			string ContentType = null;
+			byte[] Bin = new byte[1024 * 1024];
+			string Message;
+
+			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
 			{
+				Rnd.GetBytes(Bin);
 			}
 
-			public override bool HandlesSubPaths => true;
-			public override bool UserSessions => false;
-			public bool AllowsPOST => true;
+			Message = Convert.ToBase64String(Bin);
 
-			public string GetUrl(PostBackEventHandler Callback, object State)
-			{
-				byte[] Bin = new byte[32];
-				string Key;
-
-				lock (this.synchObj)
+			this.httpxClient1.POST(this.client2.FullJID, "/Echo", Message,
+				(sender, e) =>
 				{
-					rnd.GetBytes(Bin);
-					Key = Base64Url.Encode(Bin);
-
-					if (this.queries is null)
+					if (e.Ok && e.HasData && e.State.Equals(Nr))
 					{
-						this.queries = new Cache<string, KeyValuePair<PostBackEventHandler, object>>(int.MaxValue, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
-						this.queries.Removed += this.Queries_Removed;
+						ms = new MemoryStream();
+
+						if (!(e.Data is null))
+							ms.Write(e.Data, 0, e.Data.Length);
+
+						ContentType = e.HttpResponse.ContentType;
+						Done1.Set();
+					}
+					else
+						Error1.Set();
+
+					return Task.CompletedTask;
+				},
+				(sender, e) =>
+				{
+					ms?.Write(e.Data, 0, e.Data.Length);
+
+					if (e.Last)
+					{
+						object Decoded = InternetContent.Decode(ContentType, ms.ToArray(), null);
+
+						if (Decoded is string s && s == Message && e.State.Equals(Nr))
+							Done2.Set();
+						else
+							Error2.Set();
 					}
 
-					this.queries[Key] = new KeyValuePair<PostBackEventHandler, object>(Callback, State);
-					this.queries[string.Empty] = new KeyValuePair<PostBackEventHandler, object>(null, null);    // Keep cache active to avoid multiple recreation when a series of requests occur in sequence.
-				}
+					return Task.CompletedTask;
+				}, Nr);
 
-				return "http://localhost:8080" + this.ResourceName + "/" + Key;
-			}
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 120000), "Data not returned.");
+		}
 
-			private void Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<PostBackEventHandler, object>> e)
-			{
-				lock (this.synchObj)
-				{
-					if (!(this.queries is null) && this.queries.Count == 0)
-					{
-						this.queries.Dispose();
-						this.queries = null;
-					}
-				}
-			}
+		[TestMethod]
+		public void HTTPX_Test_04_POST_PostBack()
+		{
+			PostBack PostBack = new PostBack();
 
-			public Task POST(HttpRequest Request, HttpResponse Response)
-			{
-				if (!Request.HasData)
-					throw new BadRequestException("Missing data.");
+			this.webServer.Register(PostBack);
+			this.httpxClient1.PostResource = PostBack;
 
-				string ContentType = Request.Header.ContentType?.Value;
-				if (string.IsNullOrEmpty(ContentType) || Array.IndexOf(Content.Binary.BinaryDecoder.BinaryContentTypes, ContentType) < 0)
-					throw new BadRequestException("Expected Binary data.");
-
-				string From = Request.Header.From?.Value;
-				if (string.IsNullOrEmpty(From))
-					throw new BadRequestException("No From header.");
-
-				string To = Request.Header["Origin"];
-				if (string.IsNullOrEmpty(To))
-					throw new BadRequestException("No Origin header.");
-
-				string Referer = Request.Header.Referer?.Value;
-				string EndpointReference;
-				string SymmetricCipherReference;
-				int i;
-
-				if (!string.IsNullOrEmpty(Referer) && (i = Referer.IndexOf(':')) >= 0)
-				{
-					EndpointReference = Referer.Substring(0, i);
-					SymmetricCipherReference = Referer.Substring(i + 1);
-				}
-				else
-				{
-					EndpointReference = string.Empty;
-					SymmetricCipherReference = string.Empty;
-				}
-
-				string Key = Request.SubPath;
-				if (string.IsNullOrEmpty(Key))
-					throw new BadRequestException("No sub-path provided.");
-
-				Key = Key.Substring(1);
-
-				KeyValuePair<PostBackEventHandler, object> Rec;
-
-				lock (this.synchObj)
-				{
-					if (this.queries is null || !this.queries.TryGetValue(Key, out Rec))
-						throw new NotFoundException("Resource sub-key not found.");
-				}
-
-				Request.DataStream.Position = 0;
-
-				return Rec.Key.Invoke(this, new PostBackEventArgs(Request.DataStream, Rec.Value, From, To, EndpointReference, SymmetricCipherReference));
-			}
+			this.DoPost(4);
 		}
 
 	}

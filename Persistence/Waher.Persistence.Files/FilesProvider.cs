@@ -2815,7 +2815,7 @@ namespace Waher.Persistence.Files
 					Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
 					Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
 					Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-					Output.WriteAttributeString("count", File.Count.ToString());
+					Output.WriteAttributeString("count", (await File.CountAsync).ToString());
 					Output.WriteAttributeString("encoding", File.Encoding.WebName);
 					Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
 					Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
@@ -2832,7 +2832,7 @@ namespace Waher.Persistence.Files
 						Output.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
 						Output.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
 						Output.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
-						Output.WriteAttributeString("count", Index.IndexFile.Count.ToString());
+						Output.WriteAttributeString("count", (await Index.IndexFile.CountAsync).ToString());
 						Output.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
 						Output.WriteAttributeString("encrypted", Encode(Index.IndexFile.Encrypted));
 						Output.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());

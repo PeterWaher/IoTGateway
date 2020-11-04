@@ -305,7 +305,10 @@ namespace Waher.Persistence.Files
 				if (!(NewBin is null))
 				{
 					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
-					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					if (Leaf is null)
+						throw Database.FlagForRepair(this.collectionName, "Object seems to exist twice in index.");
+					else
+						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 				}
 			}
 			finally

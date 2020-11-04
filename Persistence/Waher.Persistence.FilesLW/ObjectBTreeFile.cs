@@ -4849,6 +4849,11 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Number of objects in file.
+		/// </summary>
+		public Task<ulong> CountAsync => this.GetObjectCount(0, true);
+
+		/// <summary>
 		/// <see cref="ICollection{Object}.IsReadOnly"/>
 		/// </summary>
 		public bool IsReadOnly

@@ -829,7 +829,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+				throw new BadRequestException("No data in PUT request.");
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -857,7 +857,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+				throw new BadRequestException("No data in PUT request.");
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))

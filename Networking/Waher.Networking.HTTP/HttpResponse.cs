@@ -558,6 +558,11 @@ namespace Waher.Networking.HTTP
 							ContentType = ex2.ContentType;
 							Content = ex2.Content;
 						}
+						else if (ex2.ContentObject is string s)
+						{
+							Content = Encoding.UTF8.GetBytes(s);
+							ContentType = "text/plain; charset=utf-8";
+						}
 						else if (!(ex2.ContentObject is null) && this.TryEncode(ex2.ContentObject, out byte[] Content2, out string ContentType2))
 						{
 							Content = Content2;
@@ -580,50 +585,44 @@ namespace Waher.Networking.HTTP
 							}
 						}
 					}
-					else if (ex is System.NotImplementedException)
+					else
 					{
 						Log.Critical(ex);
 
-						this.StatusCode = 501;
-						this.StatusMessage = "Not Implemented";
-					}
-					else if (ex is IOException)
-					{
-						Log.Critical(ex);
-
-						int Win32ErrorCode = ex.HResult & 0xFFFF;
-						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+						if (ex is System.NotImplementedException)
 						{
-							this.StatusCode = 507;
-							this.StatusMessage = "Insufficient Storage";
+							this.StatusCode = 501;
+							this.StatusMessage = "Not Implemented";
+						}
+						else if (ex is IOException)
+						{
+							int Win32ErrorCode = ex.HResult & 0xFFFF;
+							if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+							{
+								this.StatusCode = 507;
+								this.StatusMessage = "Insufficient Storage";
+							}
+							else
+							{
+								this.StatusCode = 500;
+								this.StatusMessage = "Internal Server Error";
+							}
 						}
 						else
 						{
 							this.StatusCode = 500;
 							this.StatusMessage = "Internal Server Error";
 						}
-					}
-					else
-					{
-						Log.Critical(ex);
 
-						this.StatusCode = 500;
-						this.StatusMessage = "Internal Server Error";
-					}
-
-					if (Content is null && !string.IsNullOrEmpty(ex.Message) &&
-						((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304))
-					{
-						Content = Encoding.UTF8.GetBytes(ex.Message);
-						ContentType = "text/plain; charset=utf-8";
+						if (Content is null && !string.IsNullOrEmpty(ex.Message) &&
+							((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304))
+						{
+							Content = Encoding.UTF8.GetBytes(ex.Message);
+							ContentType = "text/plain; charset=utf-8";
+						}
 					}
 
-					if (this.statusCode >= 400 && !(this.httpServer is null) &&
-						this.httpServer.HasCustomErrors &&
-						!(this.httpRequest.Header.Method == "POST" &&
-						!(this.httpRequest.Header.ContentType is null) &&
-						(this.httpRequest.Header.ContentType.Type.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
-						this.httpRequest.Header.ContentType.Type.StartsWith("application/", StringComparison.OrdinalIgnoreCase))))
+					if (this.statusCode >= 400 && !(this.httpServer is null) && this.httpServer.HasCustomErrors)
 					{
 						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content,
 							this.httpRequest, this);
@@ -633,11 +632,13 @@ namespace Waher.Networking.HTTP
 						ContentType = e.ContentType;
 					}
 
-					this.SetHeader("Content-Type", string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType);
-					//this.SetHeader("Connection", "close");
-
 					if (!(Content is null))
+					{
+						this.ContentType = string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType;
+						this.ContentLength = Content.Length;
+						
 						await this.Write(Content);
+					}
 
 					await this.SendResponse();
 				}

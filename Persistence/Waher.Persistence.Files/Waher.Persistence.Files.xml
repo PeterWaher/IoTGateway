@@ -2101,6 +2101,11 @@
             <see cref="P:System.Collections.Generic.ICollection`1.Count"/>
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.ObjectBTreeFile.CountAsync">
+            <summary>
+            Number of objects in file.
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Files.ObjectBTreeFile.IsReadOnly">
             <summary>
             <see cref="P:System.Collections.Generic.ICollection`1.IsReadOnly"/>

@@ -225,6 +225,8 @@
   <Assembly fileName='Waher.Events.pdb'/>
   <Assembly fileName='Waher.Runtime.Inventory.dll'/>
   <Assembly fileName='Waher.Runtime.Inventory.pdb'/>
+  <Assembly fileName='Waher.Runtime.Temporary.dll'/>
+  <Assembly fileName='Waher.Runtime.Temporary.pdb'/>
   <Assembly fileName='Waher.Script.dll'/>
   <Assembly fileName='Waher.Script.pdb'/>
   <Assembly fileName='Waher.Security.SHA3.dll'/>

@@ -69,8 +69,10 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(0, obj.NrReaders);
 						await obj.BeginRead();
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						await obj.EndRead();
 						Assert.AreEqual(0, obj.NrReaders);
 						Done1.SetResult(true);
@@ -89,6 +91,9 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.AreEqual(0, obj.NrWriters);
 						await obj.BeginWrite();
+						Assert.AreEqual(0, obj.NrReaders);
+						Assert.AreEqual(1, obj.NrWriters);
+						Thread.Sleep(2000);
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.AreEqual(1, obj.NrWriters);
 						await obj.EndWrite();
@@ -124,8 +129,10 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(0, obj.NrWriters);
 						await obj.BeginWrite();
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						await obj.EndWrite();
 						Assert.AreEqual(0, obj.NrWriters);
 						Done1.SetResult(true);
@@ -144,6 +151,9 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(1, obj.NrWriters);
 						Assert.AreEqual(0, obj.NrReaders);
 						await obj.BeginRead();
+						Assert.AreEqual(0, obj.NrWriters);
+						Assert.AreEqual(1, obj.NrReaders);
+						Thread.Sleep(2000);
 						Assert.AreEqual(0, obj.NrWriters);
 						Assert.AreEqual(1, obj.NrReaders);
 						await obj.EndRead();
@@ -179,8 +189,10 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(0, obj.NrWriters);
 						await obj.BeginWrite();
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						await obj.EndWrite();
 						Assert.AreEqual(0, obj.NrWriters);
 						Done1.SetResult(true);
@@ -197,8 +209,10 @@ namespace Waher.Runtime.Threading.Test
 					{
 						Thread.Sleep(1000);
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						await obj.BeginWrite();
 						Assert.AreEqual(1, obj.NrWriters);
+						Assert.AreEqual(0, obj.NrReaders);
 						await obj.EndWrite();
 						Assert.AreEqual(0, obj.NrWriters);
 						Done2.SetResult(true);
@@ -232,14 +246,19 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(0, obj.NrReaders);
 						await obj.BeginRead();
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						await obj.BeginRead();
 						Assert.AreEqual(2, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						Thread.Sleep(2000);
 						Assert.AreEqual(2, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						await obj.EndRead();
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(0, obj.NrWriters);
 						await obj.EndRead();
 						Assert.AreEqual(0, obj.NrReaders);
 						Done1.SetResult(true);
@@ -258,6 +277,9 @@ namespace Waher.Runtime.Threading.Test
 						Assert.AreEqual(2, obj.NrReaders);
 						Assert.AreEqual(0, obj.NrWriters);
 						await obj.BeginWrite();
+						Assert.AreEqual(0, obj.NrReaders);
+						Assert.AreEqual(1, obj.NrWriters);
+						Thread.Sleep(2000);
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.AreEqual(1, obj.NrWriters);
 						await obj.EndWrite();
@@ -313,6 +335,8 @@ namespace Waher.Runtime.Threading.Test
 									Assert.AreEqual(1, obj.NrWriters);
 									NrWrites++;
 									Thread.Sleep(10);
+									Assert.AreEqual(0, obj.NrReaders);
+									Assert.AreEqual(1, obj.NrWriters);
 									await obj.EndWrite();
 									Thread.Sleep(j - 100);
 								}
@@ -323,6 +347,8 @@ namespace Waher.Runtime.Threading.Test
 									Assert.IsTrue(obj.NrReaders > 0);
 									NrReads++;
 									Thread.Sleep(10);
+									Assert.AreEqual(0, obj.NrWriters);
+									Assert.IsTrue(obj.NrReaders > 0);
 									await obj.EndRead();
 									Thread.Sleep(j);
 								}

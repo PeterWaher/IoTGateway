@@ -83,7 +83,7 @@ namespace Waher.Runtime.Threading
 			lock (this.synchObj)
 			{
 				if (this.nrReaders <= 0)
-					return Task.CompletedTask;
+					throw new InvalidOperationException("Not in a read state.");
 
 				this.nrReaders--;
 				if (this.nrReaders > 0 || this.noReadersOrWriters.First is null)
@@ -136,7 +136,14 @@ namespace Waher.Runtime.Threading
 					DateTime Now = DateTime.Now;
 					bool Result = await Wait.Task;
 					if (!Result)
+					{
+						lock (this.synchObj)
+						{
+							this.noWriters.Remove(Wait);
+						}
+
 						return false;
+					}
 
 					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
 					Start = Now;
@@ -150,12 +157,16 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public virtual async Task BeginWrite()
 		{
+			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 
 			while (true)
 			{
 				lock (this.synchObj)
 				{
+					if (!(Prev is null))
+						this.noWriters.Remove(Prev);    // In case previously locked for reading
+
 					if (this.nrWriters == 0 && this.nrReaders == 0)
 					{
 						this.nrWriters++;
@@ -170,6 +181,7 @@ namespace Waher.Runtime.Threading
 				}
 
 				await Wait.Task;
+				Prev = Wait;
 			}
 		}
 
@@ -185,19 +197,19 @@ namespace Waher.Runtime.Threading
 			lock (this.synchObj)
 			{
 				if (this.nrWriters <= 0)
-					return Task.CompletedTask;
+					throw new InvalidOperationException("Not in a write state.");
 
 				this.nrWriters--;
 				if (this.nrWriters > 0)
 					return Task.CompletedTask;
 
-				if (this.noReadersOrWriters.First != null)
+				if (!(this.noReadersOrWriters.First is null))
 				{
 					List = this.noReadersOrWriters;
 					this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 				}
 
-				if (this.noWriters.First != null)
+				if (!(this.noWriters.First is null))
 				{
 					List2 = this.noWriters;
 					this.noWriters = new LinkedList<TaskCompletionSource<bool>>();
@@ -218,7 +230,7 @@ namespace Waher.Runtime.Threading
 
 			return Task.CompletedTask;
 		}
-		
+
 		/// <summary>
 		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for writing.
 		/// Each successful call to <see cref="TryBeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
@@ -226,6 +238,7 @@ namespace Waher.Runtime.Threading
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public virtual async Task<bool> TryBeginWrite(int Timeout)
 		{
+			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.Now;
 
@@ -233,6 +246,9 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (!(Prev is null))
+						this.noWriters.Remove(Prev);    // In case previously locked for reading
+
 					if (this.nrWriters == 0 && this.nrReaders == 0)
 					{
 						this.nrWriters++;
@@ -257,10 +273,19 @@ namespace Waher.Runtime.Threading
 					DateTime Now = DateTime.Now;
 					bool Result = await Wait.Task;
 					if (!Result)
+					{
+						lock (this.synchObj)
+						{
+							this.noWriters.Remove(Wait);
+							this.noReadersOrWriters.Remove(Wait);
+						}
+
 						return false;
+					}
 
 					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
 					Start = Now;
+					Prev = Wait;
 				}
 			}
 		}
@@ -278,13 +303,13 @@ namespace Waher.Runtime.Threading
 				this.nrReaders = 0;
 				this.nrWriters = 0;
 
-				if (this.noReadersOrWriters.First != null)
+				if (!(this.noReadersOrWriters.First is null))
 				{
 					List = this.noReadersOrWriters;
 					this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 				}
 
-				if (this.noWriters.First != null)
+				if (!(this.noWriters.First is null))
 				{
 					List2 = this.noWriters;
 					this.noWriters = new LinkedList<TaskCompletionSource<bool>>();

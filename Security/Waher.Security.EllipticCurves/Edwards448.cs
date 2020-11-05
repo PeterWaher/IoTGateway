@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Text;
+using Waher.Runtime.Temporary;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.EllipticCurves
@@ -157,7 +158,7 @@ namespace Waher.Security.EllipticCurves
 
         private byte[] H_dom4(Stream Data)
         {
-            using (TemporaryFile TempFile = new TemporaryFile())
+            using (TemporaryStream TempFile = new TemporaryStream())
             {
                 TempFile.Write(preamble, 0, 8);
                 TempFile.WriteByte(0);              // x=phflag=0

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Numerics;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Security.EllipticCurves
 {
@@ -88,7 +89,7 @@ namespace Waher.Security.EllipticCurves
             byte[] A = Encode(P, Curve);
             byte[] h;
 
-            using (TemporaryFile TempFile = new TemporaryFile())    // dom2(F, C) = blank string
+            using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
             {
                 TempFile.Write(Prefix, 0, ScalarBytes);             // prefix
                 
@@ -103,7 +104,7 @@ namespace Waher.Security.EllipticCurves
             PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint, true);
             byte[] Rs = Encode(R, Curve);
 
-            using (TemporaryFile TempFile = new TemporaryFile())    // dom2(F, C) = blank string
+            using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
             {
                 TempFile.Write(Rs, 0, ScalarBytes);
                 TempFile.Write(A, 0, ScalarBytes);
@@ -272,7 +273,7 @@ namespace Waher.Security.EllipticCurves
                 if (s >= Curve.Order)
                     return false;
 
-                using (TemporaryFile TempFile = new TemporaryFile())        // dom2(F, C) = blank string
+                using (TemporaryStream TempFile = new TemporaryStream())        // dom2(F, C) = blank string
                 {
                     TempFile.Write(R, 0, ScalarBytes);
                     TempFile.Write(PublicKey, 0, ScalarBytes);

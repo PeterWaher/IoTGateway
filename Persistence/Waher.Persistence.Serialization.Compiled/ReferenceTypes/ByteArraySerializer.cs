@@ -18,6 +18,14 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		public Task Init()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// What type of object is being serialized.
 		/// </summary>
 		public Type ValueType
@@ -43,15 +51,15 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_BYTEARRAY: return Reader.ReadByteArray();
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_BYTEARRAY: return Task.FromResult<object>(Reader.ReadByteArray());
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a byte array.");
 			}
 		}
@@ -63,7 +71,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (Value is null)
 			{
@@ -79,6 +87,8 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 				Writer.Write((byte[])Value);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -86,12 +96,10 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
-			Value = null;
-			return false;
+			return Task.FromResult<object>(null);
 		}
 
 	}

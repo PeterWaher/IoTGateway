@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Persistence.Filters;
@@ -402,12 +401,10 @@ namespace Waher.Persistence
 		/// Tries to get the Object ID of an object, if it exists.
 		/// </summary>
 		/// <param name="Object">Object whose Object ID is of interest.</param>
-		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
-		/// <returns>If an Object ID was found.</returns>
-		public bool TryGetObjectId(object Object, out object ObjectId)
+		/// <returns>Object ID, if found, null otherwise.</returns>
+		public Task<object> TryGetObjectId(object Object)
 		{
-			ObjectId = null;
-			return false;
+			return Task.FromResult<object>(null);
 		}
 
 		/// <summary>
@@ -415,5 +412,6 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
 		public Task DropCollection(string CollectionName) => Task.CompletedTask;
+
 	}
 }

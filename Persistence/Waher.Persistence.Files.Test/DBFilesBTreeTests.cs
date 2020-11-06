@@ -347,7 +347,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 			catch (Exception ex)
 			{
-				SaveLastObject(this.provider, LastObjectAdded);
+				await SaveLastObject(this.provider, LastObjectAdded);
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -427,7 +427,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 			catch (Exception ex)
 			{
-				SaveLastObject(Provider, LastObjectAdded);
+				await SaveLastObject(Provider, LastObjectAdded);
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
@@ -438,15 +438,15 @@ namespace Waher.Persistence.FilesLW.Test
 			return Statistics;
 		}
 
-		private static void SaveLastObject(FilesProvider Provider, object LastObjectAdded)
+		private static async Task SaveLastObject(FilesProvider Provider, object LastObjectAdded)
 		{
 			if (LastObjectAdded != null)
 			{
-				IObjectSerializer Serializer = Provider.GetObjectSerializer(LastObjectAdded.GetType());
+				IObjectSerializer Serializer = await Provider.GetObjectSerializer(LastObjectAdded.GetType());
 				BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
-				Serializer.Serialize(Writer, false, false, LastObjectAdded);
+				await Serializer.Serialize(Writer, false, false, LastObjectAdded);
 				byte[] Bin = Writer.GetSerialization();
-				System.IO.File.WriteAllBytes(ObjFileName, Bin);
+				File.WriteAllBytes(ObjFileName, Bin);
 			}
 		}
 
@@ -541,7 +541,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple[] Objects = new Simple[NrObjects];
 			Simple[] Block = new Simple[ArraySize];
 			Simple Obj2;
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(Simple));
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(Simple));
 
 			if (BulkSize > 1)
 				await this.provider.StartBulk();

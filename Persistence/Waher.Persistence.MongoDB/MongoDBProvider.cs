@@ -1683,24 +1683,20 @@ namespace Waher.Persistence.MongoDB
 		/// Tries to get the Object ID of an object, if it exists.
 		/// </summary>
 		/// <param name="Object">Object whose Object ID is of interest.</param>
-		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
-		/// <returns>If an Object ID was found.</returns>
-		public bool TryGetObjectId(object Object, out object ObjectId)
+		/// <returns>Object ID, if found, null otherwise.</returns>
+		public async Task<object> TryGetObjectId(object Object)
 		{
-			ObjectId = null;
-
 			if (Object is null)
-				return false;
+				return null;
 
 			IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
 			if (Serializer is ObjectSerializer SerializerEx &&
 				SerializerEx.HasObjectId(Object))
 			{
-				ObjectId = SerializerEx.GetObjectId(Object, false).Result;	// No asynchronous process involved if not insering new object to create new Object ID.
-				return true;
+				return await SerializerEx.GetObjectId(Object, false);
 			}
 			else
-				return false;
+				return null;
 		}
 
 		/// <summary>

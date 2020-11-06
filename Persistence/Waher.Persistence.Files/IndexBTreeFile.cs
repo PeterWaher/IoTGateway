@@ -128,7 +128,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> SaveNewObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
+			byte[] Bin = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -166,7 +166,7 @@ namespace Waher.Persistence.Files
 
 				while (e1.MoveNext() && e2.MoveNext())
 				{
-					byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
 					if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 						return false;
 
@@ -194,7 +194,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task<bool> DeleteObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
+			byte[] Bin = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -234,7 +234,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						byte[] Bin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+						byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
 						if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 							continue;
 
@@ -262,11 +262,11 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> UpdateObject(Guid ObjectId, object OldObject, object NewObject, IObjectSerializer Serializer)
 		{
-			byte[] OldBin = this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
+			byte[] OldBin = await this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
 			if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			byte[] NewBin = this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
+			byte[] NewBin = await this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
 			if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
@@ -340,11 +340,11 @@ namespace Waher.Persistence.Files
 
 				while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
 				{
-					byte[] OldBin = this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					byte[] OldBin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
 					if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
-					byte[] NewBin = this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
+					byte[] NewBin = await this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
 					if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
@@ -405,9 +405,20 @@ namespace Waher.Persistence.Files
 		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(LockType, bool)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		public async Task<IEnumerator<object>> GetEnumeratorAsync()
+		{
+			return await IndexBTreeFileEnumerator<object>.Create(this, this.recordHandler);
+		}
+
+		/// <summary>
+		/// Returns an untyped enumerator that iterates through the collection in the order specified by the index.
+		/// 
+		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(LockType, bool)"/> method.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
 		{
-			return new IndexBTreeFileEnumerator<object>(this, this.recordHandler);
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -418,7 +429,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new IndexBTreeFileEnumerator<object>(this, this.recordHandler);
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -441,7 +452,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> GetTypedEnumerator<T>(LockType LockType, bool LockParent)
 		{
-			IndexBTreeFileEnumerator<T> e = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+			IndexBTreeFileEnumerator<T> e = await IndexBTreeFileEnumerator<T>.Create(this, this.recordHandler);
 			if (LockType != LockType.None)
 				await e.Lock(LockType, LockParent);
 
@@ -459,9 +470,9 @@ namespace Waher.Persistence.Files
 			object Object = await this.objectFile.LoadObject(ObjectId);
 
 			Type ObjectType = Object.GetType();
-			IObjectSerializer Serializer = this.objectFile.Provider.GetObjectSerializer(ObjectType);
+			IObjectSerializer Serializer = await this.objectFile.Provider.GetObjectSerializer(ObjectType);
 
-			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
+			byte[] Key = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
 			if (Key is null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -583,7 +594,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
+			byte[] Key = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
@@ -591,7 +602,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				Result = await IndexBTreeFileEnumerator<T>.Create(this, this.recordHandler);
 				if (LockType != LockType.None)
 					await Result.Lock(LockType, LockParent);
 
@@ -655,7 +666,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			byte[] Key = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
@@ -663,7 +674,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				Result = await IndexBTreeFileEnumerator<T>.Create(this, this.recordHandler);
 				if (LockType != LockType.None)
 					await Result.Lock(LockType, LockParent);
 
@@ -730,7 +741,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			byte[] Key = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
@@ -738,7 +749,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				Result = await IndexBTreeFileEnumerator<T>.Create(this, this.recordHandler);
 				if (LockType != LockType.None)
 					await Result.Lock(LockType, LockParent);
 
@@ -803,7 +814,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(LockType LockType, bool LockParent, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
+			byte[] Key = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
@@ -811,7 +822,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				Result = new IndexBTreeFileEnumerator<T>(this, this.recordHandler);
+				Result = await IndexBTreeFileEnumerator<T>.Create(this, this.recordHandler);
 				if (LockType != LockType.None)
 					await Result.Lock(LockType, LockParent);
 

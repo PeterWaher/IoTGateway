@@ -149,14 +149,23 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (this.objectId is null)
 				{
 					StringBuilder sb = new StringBuilder();
+					object Id;
 
-					if (!(this.left is null) && Database.TryGetObjectId(this.left, out object Id))
-						sb.Append(Id.ToString());
+					if (!(this.left is null))
+					{
+						Id = Database.TryGetObjectId(this.left).Result;
+						if (!(Id is null))
+							sb.Append(Id.ToString());
+					}
 
 					sb.Append(':');
 
-					if (!(this.right is null) && Database.TryGetObjectId(this.right, out Id))
-						sb.Append(Id.ToString());
+					if (!(this.right is null))
+					{
+						Id = Database.TryGetObjectId(this.right).Result;
+						if (!(Id is null))
+							sb.Append(Id.ToString());
+					}
 
 					this.objectId = sb.ToString();
 				}

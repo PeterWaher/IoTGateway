@@ -123,7 +123,7 @@ namespace Waher.Persistence.Files.Searching
 				if (!this.cursor.CurrentTypeCompatible)
 					continue;
 				
-				if (!(this.filter is null) && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
+				if (!(this.filter is null) && !await this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
 				{
 					if (this.untilFirstFail)
 						return false;
@@ -159,7 +159,7 @@ namespace Waher.Persistence.Files.Searching
 				if (!this.cursor.CurrentTypeCompatible)
 					continue;
 
-				if (!(this.filter is null) && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
+				if (!(this.filter is null) && !await this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer, this.provider))
 				{
 					if (this.untilFirstFail)
 						return false;

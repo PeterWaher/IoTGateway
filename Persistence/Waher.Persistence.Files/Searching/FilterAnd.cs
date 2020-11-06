@@ -69,11 +69,11 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Serializer">Corresponding object serializer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <returns>If the filter can be applied.</returns>
-		public bool AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
+		public async Task<bool> AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
 		{
 			foreach (IApplicableFilter F in this.applicableFilters)
 			{
-				if (!F.AppliesTo(Object, Serializer, Provider))
+				if (!await F.AppliesTo(Object, Serializer, Provider))
 					return false;
 			}
 

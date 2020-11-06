@@ -18,6 +18,14 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		public Task Init()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// What type of object is being serialized.
 		/// </summary>
 		public abstract Type ValueType
@@ -40,7 +48,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public abstract object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
+		public abstract Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
 
 		/// <summary>
 		/// Serializes an object to a binary destination.
@@ -49,19 +57,17 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public abstract void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
+		public abstract Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 
 		/// <summary>
 		/// Gets the value of a field or property of an object, given its name.
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public virtual bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public virtual Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
-			Value = null;
-			return false;
+			return Task.FromResult<object>(null);
 		}
 	}
 }

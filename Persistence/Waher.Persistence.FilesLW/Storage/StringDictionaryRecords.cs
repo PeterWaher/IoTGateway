@@ -26,7 +26,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="GenericSerializer">Generic serializer.</param>
 		/// <param name="Provider">Files database provider.</param>
-		public StringDictionaryRecords(string CollectionName, Encoding Encoding, 
+		public StringDictionaryRecords(string CollectionName, Encoding Encoding,
 			GenericObjectSerializer GenericSerializer, FilesProvider Provider)
 		{
 			this.collectionName = CollectionName;
@@ -98,14 +98,14 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer.</param>
 		/// <returns>Full payloa size.</returns>
-		public uint GetFullPayloadSize(BinaryDeserializer Reader)
+		public async Task<uint> GetFullPayloadSize(BinaryDeserializer Reader)
 		{
-			this.GetSize(Reader, out _, out uint Result);
-			return Result;
+			KeyValuePair<uint, uint> P = await this.GetSize(Reader);
+			return P.Value;
 		}
 
-		private void GetSize(BinaryDeserializer Reader, out uint Size, out uint FullSize)
-		{ 
+		private async Task<KeyValuePair<uint, uint>> GetSize(BinaryDeserializer Reader)
+		{
 			int Pos = Reader.Position;
 			uint DataType = Reader.ReadBits(6);
 
@@ -114,8 +114,8 @@ namespace Waher.Persistence.Files.Storage
 				case ObjectSerializer.TYPE_OBJECT:
 					ulong TypeCode = Reader.ReadVariableLengthUInt64();
 					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
-					string CollectionName = this.provider.GetFieldName(null, CollectionCode);
-					string TypeName = this.provider.GetFieldName(CollectionName, TypeCode);
+					string CollectionName = await this.provider.GetFieldName(null, CollectionCode);
+					string TypeName = await this.provider.GetFieldName(CollectionName, TypeCode);
 					IObjectSerializer Serializer;
 
 					if (string.IsNullOrEmpty(TypeName))
@@ -126,11 +126,11 @@ namespace Waher.Persistence.Files.Storage
 						if (T is null)
 							Serializer = this.genericSerializer;
 						else
-							Serializer = this.provider.GetObjectSerializer(T);
+							Serializer = await this.provider.GetObjectSerializer(T);
 					}
 
 					Reader.Position = Pos + 1;
-					Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
+					await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
 					break;
 
 				case ObjectSerializer.TYPE_BOOLEAN:
@@ -217,10 +217,8 @@ namespace Waher.Persistence.Files.Storage
 				case ObjectSerializer.TYPE_ARRAY:
 					throw new Exception("Arrays must be embedded in objects.");
 
-				case ObjectSerializer.TYPE_MAX:		// BLOB
-					FullSize = (uint)Reader.ReadVariableLengthUInt64();
-					Size = 4;
-					return;
+				case ObjectSerializer.TYPE_MAX:     // BLOB
+					return new KeyValuePair<uint, uint>(4, (uint)Reader.ReadVariableLengthUInt64());
 
 				default:
 					throw new Exception("Object or value expected.");
@@ -228,8 +226,10 @@ namespace Waher.Persistence.Files.Storage
 
 			Reader.FlushBits();
 
-			FullSize = Size = (uint)(Reader.Position - Pos);
+			uint Size = (uint)(Reader.Position - Pos);
 			Reader.Position = Pos;
+
+			return new KeyValuePair<uint, uint>(Size, Size);
 		}
 
 		/// <summary>
@@ -237,24 +237,34 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer.</param>
 		/// <returns>Payload size.</returns>
-		public int GetPayloadSize(BinaryDeserializer Reader)
+		public async Task<int> GetPayloadSize(BinaryDeserializer Reader)
 		{
-			this.GetSize(Reader, out uint Result, out _);
-			return (int)Result;
+			KeyValuePair<uint, uint> P = await this.GetSize(Reader);
+			return (int)P.Key;
 		}
 
 		/// <summary>
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer.</param>
-		/// <param name="IsBlob">If the payload is a BLOB.</param>
-		/// <returns>Payload size.</returns>
-		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
+		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
+		public async Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
 		{
-			this.GetSize(Reader, out uint Result, out uint FullSize);
-			IsBlob = FullSize > Result;
-			return (int)Result;
+			KeyValuePair<uint, uint> P = await this.GetSize(Reader);
+			return new KeyValuePair<int, bool>((int)P.Key, P.Value > P.Key);
 		}
+
+		/// <summary>
+		/// Checks if the following object is a BLOB.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If the following object is a BLOB.</returns>
+		public async Task<bool> IsBlob(BinaryDeserializer Reader)
+		{
+			KeyValuePair<uint, uint> P = await this.GetSize(Reader);
+			return P.Value > P.Key;
+		}
+
 
 		/// <summary>
 		/// Gets the payload type.

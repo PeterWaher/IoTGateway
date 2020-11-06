@@ -51,9 +51,6 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				for (x = 0; x < Columns; x++)
 				{
-					BinarySerializer xWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
-					BinarySerializer yWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
-
 					object xValue = Values[y, x];
 					object yValue = Values[x, y];
 					int? Comparison = Files.Searching.Comparison.Compare(xValue, yValue);

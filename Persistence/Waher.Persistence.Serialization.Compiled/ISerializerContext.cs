@@ -55,7 +55,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Collection">Name of collection.</param>
 		/// <param name="FieldName">Name of field.</param>
 		/// <returns>Field code.</returns>
-		ulong GetFieldCode(string Collection, string FieldName);
+		Task<ulong> GetFieldCode(string Collection, string FieldName);
 
 		/// <summary>
 		/// Gets the name of a field in a collection, given its code.
@@ -64,21 +64,21 @@ namespace Waher.Persistence.Serialization
 		/// <param name="FieldCode">Field code.</param>
 		/// <returns>Field name.</returns>
 		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
-		string GetFieldName(string Collection, ulong FieldCode);
+		Task<string> GetFieldName(string Collection, ulong FieldCode);
 
 		/// <summary>
 		/// Gets the object serializer corresponding to a specific type.
 		/// </summary>
 		/// <param name="Type">Type of object to serialize.</param>
 		/// <returns>Object Serializer</returns>
-		IObjectSerializer GetObjectSerializer(Type Type);
+		Task<IObjectSerializer> GetObjectSerializer(Type Type);
 		
 		/// <summary>
 		/// Gets the object serializer corresponding to a specific type, if one exists.
 		/// </summary>
 		/// <param name="Type">Type of object to serialize.</param>
 		/// <returns>Object Serializer if exists, or null if not.</returns>
-		IObjectSerializer GetObjectSerializerNoCreate(Type Type);
+		Task<IObjectSerializer> GetObjectSerializerNoCreate(Type Type);
 
 		/// <summary>
 		/// Creates a new GUID.

@@ -47,7 +47,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_01_SimpleObject()
+		public async Task DBFiles_ObjSerialization_01_SimpleObject()
 		{
 			Simple Obj = new Simple()
 			{
@@ -78,56 +78,57 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Simple));
-			
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Simple));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTimeOffset", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTimeOffset", Obj));
 			AssertEx.Same(Obj.DateTimeOffset, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("CIString", Obj));
 			AssertEx.Same(Obj.CIString, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -139,26 +140,26 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Simple Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -259,7 +260,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_02_Nullable1()
+		public async Task DBFiles_ObjSerialization_02_Nullable1()
 		{
 			Classes.Nullable Obj = new Classes.Nullable()
 			{
@@ -276,66 +277,67 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Classes.Nullable));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Classes.Nullable));
+			object Value;
 			
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Value = await S.TryGetFieldValue("Boolean2", Obj);
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Value = await S.TryGetFieldValue("Short", Obj);
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Value = await S.TryGetFieldValue("Long", Obj);
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Value = await S.TryGetFieldValue("UShort", Obj);
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Value = await S.TryGetFieldValue("ULong", Obj);
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Value = await S.TryGetFieldValue("Decimal", Obj);
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Value = await S.TryGetFieldValue("Single", Obj);
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Value = await S.TryGetFieldValue("DateTime", Obj);
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Value = await S.TryGetFieldValue("Guid", Obj);
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Value = await S.TryGetFieldValue("FlagsEnum", Obj);
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Classes.Nullable Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
@@ -361,13 +363,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -398,7 +400,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_03_Nullable2()
+		public async Task DBFiles_ObjSerialization_03_Nullable2()
 		{
 			Classes.Nullable Obj = new Classes.Nullable()
 			{
@@ -414,66 +416,67 @@ namespace Waher.Persistence.FilesLW.Test
 				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
 			};
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Classes.Nullable));
-			
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Classes.Nullable));
+			object Value;
+
+			Value = await S.TryGetFieldValue("Boolean1", Obj);
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Value = await S.TryGetFieldValue("Byte", Obj);
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Value = await S.TryGetFieldValue("Int", Obj);
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Value = await S.TryGetFieldValue("SByte", Obj);
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Value = await S.TryGetFieldValue("UInt", Obj);
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Value = await S.TryGetFieldValue("Char", Obj);
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Value = await S.TryGetFieldValue("Double", Obj);
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Value = await S.TryGetFieldValue("String", Obj);
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Value = await S.TryGetFieldValue("TimeSpan", Obj);
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Value = await S.TryGetFieldValue("NormalEnum", Obj);
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Classes.Nullable Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
@@ -499,20 +502,20 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_04_Default1()
+		public async Task DBFiles_ObjSerialization_04_Default1()
 		{
 			Default Obj = new Default()
 			{
@@ -528,66 +531,67 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Default));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Default));
+			object Value;
 			
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Default Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(null, GenObj["Boolean1"]);
@@ -614,13 +618,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -652,7 +656,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_05_Default2()
+		public async Task DBFiles_ObjSerialization_05_Default2()
 		{
 			Default Obj = new Default()
 			{
@@ -670,66 +674,67 @@ namespace Waher.Persistence.FilesLW.Test
 				String2 = "Hello"
 			};
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Default));
-			
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Default));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Default Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
@@ -756,20 +761,20 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_06_SimpleArrays()
+		public async Task DBFiles_ObjSerialization_06_SimpleArrays()
 		{
 			SimpleArrays Obj = new SimpleArrays()
 			{
@@ -795,24 +800,24 @@ namespace Waher.Persistence.FilesLW.Test
 				CIStrings = new CaseInsensitiveString[] { "a", "b", "c", "Today, there will be a lot of ☀." }
 			};
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(SimpleArrays));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(SimpleArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			SimpleArrays Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			SimpleArrays Obj2 = (SimpleArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
@@ -838,13 +843,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (SimpleArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -875,7 +880,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_07_NullableArrays()
+		public async Task DBFiles_ObjSerialization_07_NullableArrays()
 		{
 			NullableArrays Obj = new NullableArrays()
 			{
@@ -900,24 +905,24 @@ namespace Waher.Persistence.FilesLW.Test
 			};
 
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(NullableArrays));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NullableArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			NullableArrays Obj2 = (NullableArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			NullableArrays Obj2 = (NullableArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
@@ -941,13 +946,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (NullableArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (NullableArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -976,7 +981,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_08_Embedded()
+		public async Task DBFiles_ObjSerialization_08_Embedded()
 		{
 			Container Obj = new Container()
 			{
@@ -1029,10 +1034,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(Container));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Container));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -1041,14 +1046,14 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			Container Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Container Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Embedded.Byte, ((GenericObject)GenObj["Embedded"])["Byte"]);
@@ -1075,13 +1080,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -1113,7 +1118,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_09_ObjectIdString()
+		public async Task DBFiles_ObjSerialization_09_ObjectIdString()
 		{
 			ObjectIdString Obj = new ObjectIdString()
 			{
@@ -1122,10 +1127,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.IsTrue(string.IsNullOrEmpty(Obj.ObjectId));
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObjectIdString));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdString));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			Assert.IsFalse(string.IsNullOrEmpty(Obj.ObjectId));
 
@@ -1134,14 +1139,14 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			ObjectIdString Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			ObjectIdString Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Value, GenObj["Value"]);
@@ -1149,13 +1154,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -1168,7 +1173,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_10_ObjectIdByteArray()
+		public async Task DBFiles_ObjSerialization_10_ObjectIdByteArray()
 		{
 			ObjectIdByteArray Obj = new ObjectIdByteArray()
 			{
@@ -1177,10 +1182,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.IsNull(Obj.ObjectId);
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObjectIdByteArray));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdByteArray));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			Assert.IsNotNull(Obj.ObjectId);
 
@@ -1189,14 +1194,14 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			ObjectIdByteArray Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			ObjectIdByteArray Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Value, GenObj["Value"]);
@@ -1204,13 +1209,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -1223,7 +1228,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_11_LocalTypeName()
+		public async Task DBFiles_ObjSerialization_11_LocalTypeName()
 		{
 			LocalNameSubclass1 Obj1 = new LocalNameSubclass1()
 			{
@@ -1240,14 +1245,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
 
-			IObjectSerializer S1 = provider.GetObjectSerializer(typeof(LocalNameSubclass1));
-			IObjectSerializer S2 = provider.GetObjectSerializer(typeof(LocalNameSubclass2));
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(LocalNameBase));
+			IObjectSerializer S1 = await provider.GetObjectSerializer(typeof(LocalNameSubclass1));
+			IObjectSerializer S2 = await provider.GetObjectSerializer(typeof(LocalNameSubclass2));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(LocalNameBase));
 			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S1.Serialize(Writer1, false, false, Obj1);
-			S2.Serialize(Writer2, false, false, Obj2);
+			await S1.Serialize(Writer1, false, false, Obj1);
+			await S2.Serialize(Writer2, false, false, Obj2);
 
 			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1260,8 +1265,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
 			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
 
-			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj1, Obj12);
 			this.AssertEqual(Obj2, Obj22);
@@ -1272,8 +1277,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj1 = (GenericObject)GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			GenericObject GenObj2 = (GenericObject)GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj1 = (GenericObject)await GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj2 = (GenericObject)await GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(Obj1.Name, GenObj1["Name"]);
 			AssertEx.Same(Obj1.Value, GenObj1["Value"]);
@@ -1285,8 +1290,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Writer1.Restart();
 			Writer2.Restart();
 
-			GS.Serialize(Writer1, false, false, GenObj1);
-			GS.Serialize(Writer2, false, false, GenObj2);
+			await GS.Serialize(Writer1, false, false, GenObj1);
+			await GS.Serialize(Writer2, false, false, GenObj2);
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
@@ -1295,8 +1300,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
-			Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			Obj12 = (LocalNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			Obj22 = (LocalNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj1, Obj12);
 			this.AssertEqual(Obj2, Obj22);
@@ -1319,7 +1324,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_12_FullTypeName()
+		public async Task DBFiles_ObjSerialization_12_FullTypeName()
 		{
 			FullNameSubclass1 Obj1 = new FullNameSubclass1()
 			{
@@ -1336,14 +1341,14 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
 
-			IObjectSerializer S1 = provider.GetObjectSerializer(typeof(FullNameSubclass1));
-			IObjectSerializer S2 = provider.GetObjectSerializer(typeof(FullNameSubclass2));
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(FullNameBase));
+			IObjectSerializer S1 = await provider.GetObjectSerializer(typeof(FullNameSubclass1));
+			IObjectSerializer S2 = await provider.GetObjectSerializer(typeof(FullNameSubclass2));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(FullNameBase));
 			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S1.Serialize(Writer1, false, false, Obj1);
-			S2.Serialize(Writer2, false, false, Obj2);
+			await S1.Serialize(Writer1, false, false, Obj1);
+			await S2.Serialize(Writer2, false, false, Obj2);
 
 			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1356,8 +1361,8 @@ namespace Waher.Persistence.FilesLW.Test
 			IDeserializer Reader1 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data1, uint.MaxValue), Console.Out);
 			IDeserializer Reader2 = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data2, uint.MaxValue), Console.Out);
 
-			FullNameSubclass1 Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			FullNameSubclass2 Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			FullNameSubclass1 Obj12 = (FullNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			FullNameSubclass2 Obj22 = (FullNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj1, Obj12);
 			this.AssertEqual(Obj2, Obj22);
@@ -1368,8 +1373,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj1 = (GenericObject)GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			GenericObject GenObj2 = (GenericObject)GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj1 = (GenericObject)await GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj2 = (GenericObject)await GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(Obj1.Name, GenObj1["Name"]);
 			AssertEx.Same(Obj1.Value, GenObj1["Value"]);
@@ -1381,8 +1386,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Writer1.Restart();
 			Writer2.Restart();
 
-			GS.Serialize(Writer1, false, false, GenObj1);
-			GS.Serialize(Writer2, false, false, GenObj2);
+			await GS.Serialize(Writer1, false, false, GenObj1);
+			await GS.Serialize(Writer2, false, false, GenObj2);
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
@@ -1391,8 +1396,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Reader1.Restart(Data1, 0);
 			Reader2.Restart(Data2, 0);
-			Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
-			Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+			Obj12 = (FullNameSubclass1)await S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			Obj22 = (FullNameSubclass2)await S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj1, Obj12);
 			this.AssertEqual(Obj2, Obj22);
@@ -1415,7 +1420,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_13_CollectionTest()
+		public async Task DBFiles_ObjSerialization_13_CollectionTest()
 		{
 			CollectionTest Obj = new CollectionTest()
 			{
@@ -1424,24 +1429,24 @@ namespace Waher.Persistence.FilesLW.Test
 				S3 = "Testing, testing..."
 			};
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(CollectionTest));
-			ISerializer Writer = new DebugSerializer(new BinarySerializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), Console.Out);
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(CollectionTest));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
-			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			CollectionTest Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Test");
 			AssertEx.Same(Obj.S1, GenObj["S1"]);
@@ -1450,13 +1455,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
@@ -1470,7 +1475,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_14_ArraysOfArrays()
+		public async Task DBFiles_ObjSerialization_14_ArraysOfArrays()
 		{
 			ArraysOfArrays Obj = new ArraysOfArrays()
 			{
@@ -1496,24 +1501,24 @@ namespace Waher.Persistence.FilesLW.Test
 				FlagsEnum = new FlagsEnum[][] { new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 }, new FlagsEnum[] { FlagsEnum.Option2, FlagsEnum.Option3 } }
 			};
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(ArraysOfArrays));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ArraysOfArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			ArraysOfArrays Obj2 = (ArraysOfArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			ArraysOfArrays Obj2 = (ArraysOfArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEx.Same(GenObj.CollectionName, "Default");
 			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
@@ -1539,20 +1544,20 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (ArraysOfArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (ArraysOfArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[TestMethod]
-		public void DBFiles_ObjSerialization_15_ObsoleteMethod()
+		public async Task DBFiles_ObjSerialization_15_ObsoleteMethod()
 		{
 			ObsoleteMethod Obj = new ObsoleteMethod()
 			{
@@ -1583,56 +1588,57 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
-			IObjectSerializer S = provider.GetObjectSerializer(typeof(ObsoleteMethod));
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObsoleteMethod));
+			object Value;
 
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
 			AssertEx.Same(Obj.Boolean2, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
 			AssertEx.Same(Obj.Byte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
 			AssertEx.Same(Obj.Short, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
 			AssertEx.Same(Obj.Int, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
 			AssertEx.Same(Obj.Long, Value);
-			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
 			AssertEx.Same(Obj.SByte, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
 			AssertEx.Same(Obj.UShort, Value);
-			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
 			AssertEx.Same(Obj.UInt, Value);
-			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
 			AssertEx.Same(Obj.ULong, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
 			AssertEx.Same(Obj.Char, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
 			AssertEx.Same(Obj.Decimal, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
 			AssertEx.Same(Obj.Double, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
 			AssertEx.Same(Obj.Single, Value);
-			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
-			Assert.IsTrue(S.TryGetFieldValue("DateTimeOffset", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTimeOffset", Obj));
 			AssertEx.Same(Obj.DateTimeOffset, Value);
-			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
 			AssertEx.Same(Obj.TimeSpan, Value);
-			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
 			AssertEx.Same(Obj.Guid, Value);
-			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
 			AssertEx.Same(Obj.NormalEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
 			AssertEx.Same(Obj.FlagsEnum, Value);
-			Assert.IsTrue(S.TryGetFieldValue("CIString", Obj, out Value));
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("CIString", Obj));
 			AssertEx.Same(Obj.CIString, Value);
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -1641,26 +1647,26 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
 
-			ObsoleteMethod Obj2 = (ObsoleteMethod)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			ObsoleteMethod Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
-			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, GenObj);
 
 			Writer.Restart();
 
-			GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
 
 			Reader.Restart(Data, 0);
-			Obj2 = (ObsoleteMethod)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);

@@ -1653,7 +1653,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="StatusCode">Status code.</param>
 		public void RequestResponded(HttpRequest Request, int StatusCode)
 		{
-			if (!(this.currentRequests is null))
+			if (!(this.currentRequests is null) && !(Request is null))
 			{
 				if (this.currentRequests.TryGetValue(Request, out RequestInfo Info))
 				{

@@ -35,9 +35,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Serializer">Corresponding object serializer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <returns>If the filter can be applied.</returns>
-		public bool AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
+		public Task<bool> AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
 		{
-			return this.customFilter.Passes(Object);
+			return Task.FromResult<bool>(this.customFilter.Passes(Object));
 		}
 
 		/// <summary>

@@ -18,6 +18,14 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		public Task Init()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// What type of object is being serialized.
 		/// </summary>
 		public Type ValueType
@@ -43,7 +51,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
@@ -52,25 +60,25 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			{
 				case ObjectSerializer.TYPE_ENUM:
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return Reader.ReadString();
-				case ObjectSerializer.TYPE_CHAR: return new string(Reader.ReadChar(), 1);
-				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean().ToString();
-				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte().ToString();
-				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16().ToString();
-				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32().ToString();
-				case ObjectSerializer.TYPE_INT64: return Reader.ReadInt64().ToString();
-				case ObjectSerializer.TYPE_SBYTE: return Reader.ReadSByte().ToString();
-				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16().ToString();
-				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32().ToString();
-				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64().ToString();
-				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal().ToString();
-				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble().ToString();
-				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle().ToString();
-				case ObjectSerializer.TYPE_GUID: return Reader.ReadGuid().ToString();
-				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime().ToString();
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().ToString();
-				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadTimeSpan().ToString();
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>(Reader.ReadString());
+				case ObjectSerializer.TYPE_CHAR: return Task.FromResult<object>(new string(Reader.ReadChar(), 1));
+				case ObjectSerializer.TYPE_BOOLEAN: return Task.FromResult<object>(Reader.ReadBoolean().ToString());
+				case ObjectSerializer.TYPE_BYTE: return Task.FromResult<object>(Reader.ReadByte().ToString());
+				case ObjectSerializer.TYPE_INT16: return Task.FromResult<object>(Reader.ReadInt16().ToString());
+				case ObjectSerializer.TYPE_INT32: return Task.FromResult<object>(Reader.ReadInt32().ToString());
+				case ObjectSerializer.TYPE_INT64: return Task.FromResult<object>(Reader.ReadInt64().ToString());
+				case ObjectSerializer.TYPE_SBYTE: return Task.FromResult<object>(Reader.ReadSByte().ToString());
+				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>(Reader.ReadUInt16().ToString());
+				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>(Reader.ReadUInt32().ToString());
+				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>(Reader.ReadUInt64().ToString());
+				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>(Reader.ReadDecimal().ToString());
+				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>(Reader.ReadDouble().ToString());
+				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>(Reader.ReadSingle().ToString());
+				case ObjectSerializer.TYPE_GUID: return Task.FromResult<object>(Reader.ReadGuid().ToString());
+				case ObjectSerializer.TYPE_DATETIME: return Task.FromResult<object>(Reader.ReadDateTime().ToString());
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Task.FromResult<object>(Reader.ReadDateTimeOffset().ToString());
+				case ObjectSerializer.TYPE_TIMESPAN: return Task.FromResult<object>(Reader.ReadTimeSpan().ToString());
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a string value.");
 			}
 		}
@@ -82,7 +90,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (Value is null)
 			{
@@ -98,6 +106,8 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 				Writer.Write((string)Value);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -105,12 +115,10 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
-			Value = null;
-			return false;
+			return Task.FromResult<object>(null);
 		}
 	}
 }

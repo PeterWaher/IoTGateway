@@ -69,9 +69,9 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Full size of the payload.</returns>
-		public uint GetFullPayloadSize(BinaryDeserializer Reader)
+		public Task<uint> GetFullPayloadSize(BinaryDeserializer Reader)
 		{
-			return (uint)Reader.ReadVariableLengthUInt64();
+			return Task.FromResult<uint>((uint)Reader.ReadVariableLengthUInt64());
 		}
 
 		/// <summary>
@@ -79,28 +79,38 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Size of the payload.</returns>
-		public int GetPayloadSize(BinaryDeserializer Reader)
+		public Task<int> GetPayloadSize(BinaryDeserializer Reader)
 		{
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 			if (Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit)
-				return 4;
+				return Task.FromResult<int>(4);
 			else
-				return Len;
+				return Task.FromResult<int>(Len);
 		}
 
 		/// <summary>
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
-		/// <param name="IsBlob">If the payload is a BLOB.</param>
-		/// <returns>Size of the payload.</returns>
-		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
+		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
+		public Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
 		{
 			int Len = (int)Reader.ReadVariableLengthUInt64();
-			if (IsBlob = (Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit))
-				return 4;
+			if (Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit)
+				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(4, true));
 			else
-				return Len;
+				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(Len, false));
+		}
+
+		/// <summary>
+		/// Checks if the following object is a BLOB.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If the following object is a BLOB.</returns>
+		public Task<bool> IsBlob(BinaryDeserializer Reader)
+		{
+			int Len = (int)Reader.ReadVariableLengthUInt64();
+			return Task.FromResult<bool>(Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit);
 		}
 
 		/// <summary>

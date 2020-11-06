@@ -40,7 +40,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			return this.Deserialize(Reader, DataType, Embedded, true);
 		}
@@ -53,7 +53,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="CheckFieldNames">If field names are to be extended.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
+		public async Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
 		{
 			StreamBookmark Bookmark = Reader.GetBookmark();
 			uint? DataTypeBak = DataType;
@@ -172,7 +172,7 @@ namespace Waher.Persistence.Serialization
 				if (Normalized)
 				{
 					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
-					CollectionName = this.context.GetFieldName(null, CollectionCode);
+					CollectionName = await this.Context.GetFieldName(null, CollectionCode);
 				}
 				else
 					CollectionName = Reader.ReadString();
@@ -185,7 +185,7 @@ namespace Waher.Persistence.Serialization
 				if (FieldCode == 0)
 					TypeName = string.Empty;
 				else if (CheckFieldNames)
-					TypeName = this.context.GetFieldName(CollectionName, FieldCode);
+					TypeName = await this.Context.GetFieldName(CollectionName, FieldCode);
 				else
 					TypeName = CollectionName + "." + FieldCode.ToString();
 			}
@@ -198,9 +198,9 @@ namespace Waher.Persistence.Serialization
 
 				if (DesiredType != typeof(GenericObject))
 				{
-					IObjectSerializer Serializer2 = this.context.GetObjectSerializer(DesiredType);
+					IObjectSerializer Serializer2 = await this.Context.GetObjectSerializer(DesiredType);
 					Reader.SetBookmark(Bookmark);
-					return Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
+					return await Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
 				}
 			}
 
@@ -215,7 +215,7 @@ namespace Waher.Persistence.Serialization
 						break;
 
 					if (CheckFieldNames)
-						FieldName = this.context.GetFieldName(CollectionName, FieldCode);
+						FieldName = await this.Context.GetFieldName(CollectionName, FieldCode);
 					else
 						FieldName = CollectionName + "." + FieldCode.ToString();
 				}
@@ -316,11 +316,11 @@ namespace Waher.Persistence.Serialization
 						break;
 
 					case ObjectSerializer.TYPE_ARRAY:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, this.ReadGenericArray(Reader)));
+						Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.ReadGenericArray(Reader)));
 						break;
 
 					case ObjectSerializer.TYPE_OBJECT:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, this.Deserialize(Reader, FieldDataType, true)));
+						Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.Deserialize(Reader, FieldDataType, true)));
 						break;
 
 					default:
@@ -331,49 +331,49 @@ namespace Waher.Persistence.Serialization
 			return new GenericObject(CollectionName, TypeName, ObjectId, Properties);
 		}
 
-		private Array ReadGenericArray(IDeserializer Reader)
+		private async Task<Array> ReadGenericArray(IDeserializer Reader)
 		{
 			ulong NrElements = Reader.ReadVariableLengthUInt64();
 			uint ElementDataType = Reader.ReadBits(6);
 
 			switch (ElementDataType)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return this.ReadArray<bool>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_BYTE: return this.ReadArray<byte>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT16: return this.ReadArray<short>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT32: return this.ReadArray<int>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_INT64: return this.ReadArray<long>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_SBYTE: return this.ReadArray<sbyte>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT16: return this.ReadArray<ushort>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT32: return this.ReadArray<uint>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_UINT64: return this.ReadArray<ulong>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DECIMAL: return this.ReadArray<decimal>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DOUBLE: return this.ReadArray<double>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_SINGLE: return this.ReadArray<float>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DATETIME: return this.ReadArray<DateTime>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return this.ReadArray<DateTimeOffset>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_TIMESPAN: return this.ReadArray<TimeSpan>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_CHAR: return this.ReadArray<char>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_BOOLEAN: return await this.ReadArray<bool>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_BYTE: return await this.ReadArray<byte>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_INT16: return await this.ReadArray<short>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_INT32: return await this.ReadArray<int>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_INT64: return await this.ReadArray<long>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_SBYTE: return await this.ReadArray<sbyte>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_UINT16: return await this.ReadArray<ushort>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_UINT32: return await this.ReadArray<uint>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_UINT64: return await this.ReadArray<ulong>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_DECIMAL: return await this.ReadArray<decimal>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_DOUBLE: return await this.ReadArray<double>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_SINGLE: return await this.ReadArray<float>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_DATETIME: return await this.ReadArray<DateTime>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return await this.ReadArray<DateTimeOffset>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_TIMESPAN: return await this.ReadArray<TimeSpan>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_CHAR: return await this.ReadArray<char>(Reader, NrElements, ElementDataType);
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_ENUM: return this.ReadArray<string>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_CI_STRING: return this.ReadArray<CaseInsensitiveString>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_BYTEARRAY: return this.ReadArray<byte[]>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_GUID: return this.ReadArray<Guid>(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_ARRAY: return this.ReadArrayOfArrays(Reader, NrElements);
-				case ObjectSerializer.TYPE_OBJECT: return this.ReadArrayOfObjects(Reader, NrElements, ElementDataType);
-				case ObjectSerializer.TYPE_NULL: return this.ReadArrayOfNullableElements(Reader, NrElements);
+				case ObjectSerializer.TYPE_ENUM: return await this.ReadArray<string>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_CI_STRING: return await this.ReadArray<CaseInsensitiveString>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_BYTEARRAY: return await this.ReadArray<byte[]>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_GUID: return await this.ReadArray<Guid>(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_ARRAY: return await this.ReadArrayOfArrays(Reader, NrElements);
+				case ObjectSerializer.TYPE_OBJECT: return await this.ReadArrayOfObjects(Reader, NrElements, ElementDataType);
+				case ObjectSerializer.TYPE_NULL: return await this.ReadArrayOfNullableElements(Reader, NrElements);
 				default: throw new Exception("Unrecognized data type: " + ElementDataType.ToString());
 			}
 		}
 
-		private T[] ReadArray<T>(IDeserializer Reader, ulong NrElements, uint ElementDataType)
+		private async Task<T[]> ReadArray<T>(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
 			List<T> Elements = new List<T>();
-			IObjectSerializer S = this.context.GetObjectSerializer(typeof(T));
+			IObjectSerializer S = await this.Context.GetObjectSerializer(typeof(T));
 
 			while (NrElements > 0)
 			{
-				if (S.Deserialize(Reader, ElementDataType, true) is T Item)
+				if (await S.Deserialize(Reader, ElementDataType, true) is T Item)
 				{
 					Elements.Add(Item);
 					NrElements--;
@@ -383,27 +383,27 @@ namespace Waher.Persistence.Serialization
 			return Elements.ToArray();
 		}
 
-		private Array[] ReadArrayOfArrays(IDeserializer Reader, ulong NrElements)
+		private async Task<Array[]> ReadArrayOfArrays(IDeserializer Reader, ulong NrElements)
 		{
 			List<Array> Elements = new List<Array>();
 
 			while (NrElements-- > 0)
-				Elements.Add(this.ReadGenericArray(Reader));
+				Elements.Add(await this.ReadGenericArray(Reader));
 
 			return Elements.ToArray();
 		}
 
-		private GenericObject[] ReadArrayOfObjects(IDeserializer Reader, ulong NrElements, uint ElementDataType)
+		private async Task<GenericObject[]> ReadArrayOfObjects(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
 			List<GenericObject> Elements = new List<GenericObject>();
 
 			while (NrElements-- > 0)
-				Elements.Add((GenericObject)this.Deserialize(Reader, ElementDataType, true));
+				Elements.Add((GenericObject)await this.Deserialize(Reader, ElementDataType, true));
 
 			return Elements.ToArray();
 		}
 
-		private object[] ReadArrayOfNullableElements(IDeserializer Reader, ulong NrElements)
+		private async Task<object[]> ReadArrayOfNullableElements(IDeserializer Reader, ulong NrElements)
 		{
 			List<object> Elements = new List<object>();
 			uint ElementDataType;
@@ -496,11 +496,11 @@ namespace Waher.Persistence.Serialization
 						break;
 
 					case ObjectSerializer.TYPE_ARRAY:
-						Elements.Add(this.ReadGenericArray(Reader));
+						Elements.Add(await this.ReadGenericArray(Reader));
 						break;
 
 					case ObjectSerializer.TYPE_OBJECT:
-						Elements.Add(this.Deserialize(Reader, ElementDataType, true));
+						Elements.Add(await this.Deserialize(Reader, ElementDataType, true));
 						break;
 
 					case ObjectSerializer.TYPE_NULL:
@@ -522,7 +522,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (Value is null)
 			{
@@ -568,23 +568,23 @@ namespace Waher.Persistence.Serialization
 					if (string.IsNullOrEmpty(TypedValue.TypeName))
 						Writer.WriteVariableLengthUInt64(0);
 					else
-						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
+						Writer.WriteVariableLengthUInt64(await this.Context.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
 
 					if (Embedded)
-						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName));
+						Writer.WriteVariableLengthUInt64(await this.Context.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.Context.DefaultCollectionName : TypedValue.CollectionName));
 				}
 				else
 				{
 					Writer.Write(TypedValue.TypeName);
 
 					if (Embedded)
-						Writer.Write(string.IsNullOrEmpty(TypedValue.CollectionName) ? this.context.DefaultCollectionName : TypedValue.CollectionName);
+						Writer.Write(string.IsNullOrEmpty(TypedValue.CollectionName) ? this.Context.DefaultCollectionName : TypedValue.CollectionName);
 				}
 
 				foreach (KeyValuePair<string, object> Property in TypedValue)
 				{
 					if (Normalized)
-						Writer.WriteVariableLengthUInt64(this.context.GetFieldCode(TypedValue.CollectionName, Property.Key));
+						Writer.WriteVariableLengthUInt64(await this.Context.GetFieldCode(TypedValue.CollectionName, Property.Key));
 					else
 						Writer.Write(Property.Key);
 
@@ -594,11 +594,11 @@ namespace Waher.Persistence.Serialization
 					else
 					{
 						if (Obj is GenericObject)
-							this.Serialize(Writer, true, true, Obj);
+							await this.Serialize(Writer, true, true, Obj);
 						else
 						{
-							Serializer = this.context.GetObjectSerializer(Obj.GetType());
-							Serializer.Serialize(Writer, true, true, Obj);
+							Serializer = await this.Context.GetObjectSerializer(Obj.GetType());
+							await Serializer.Serialize(Writer, true, true, Obj);
 						}
 					}
 				}
@@ -611,7 +611,7 @@ namespace Waher.Persistence.Serialization
 						WriterBak.Write(TypedValue.ObjectId);
 					else
 					{
-						Guid NewObjectId = this.context.CreateGuid();
+						Guid NewObjectId = this.Context.CreateGuid();
 						WriterBak.Write(NewObjectId);
 						TypedValue.ObjectId = NewObjectId;
 					}
@@ -624,8 +624,8 @@ namespace Waher.Persistence.Serialization
 			}
 			else
 			{
-				IObjectSerializer Serializer = this.context.GetObjectSerializer(Value?.GetType() ?? typeof(object));
-				Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+				IObjectSerializer Serializer = await this.Context.GetObjectSerializer(Value?.GetType() ?? typeof(object));
+				await Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 			}
 		}
 
@@ -634,22 +634,23 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public override bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public override async Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
 			if (Object is GenericObject GenObj)
-				return GenObj.TryGetFieldValue(FieldName, out Value);
+			{
+				if (GenObj.TryGetFieldValue(FieldName, out object Value))
+					return Value;
+				else
+					return null;
+			}
 			else if (!(Object is null) && this.returnTypedObjects)
 			{
-				IObjectSerializer Serializer2 = this.context.GetObjectSerializer(Object.GetType());
-				return Serializer2.TryGetFieldValue(FieldName, Object, out Value);
+				IObjectSerializer Serializer2 = await this.Context.GetObjectSerializer(Object.GetType());
+				return await Serializer2.TryGetFieldValue(FieldName, Object);
 			}
 			else
-			{
-				Value = null;
-				return false;
-			}
+				return null;
 		}
 
 		/// <summary>
@@ -666,14 +667,16 @@ namespace Waher.Persistence.Serialization
 		/// If the class has an Object ID.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
-		public override bool HasObjectId(object Value)
+		public override async Task<bool> HasObjectId(object Value)
 		{
 			if (Value is GenericObject Obj)
 				return !Obj.ObjectId.Equals(Guid.Empty);
 			else if (!(Value is null) && this.returnTypedObjects)
 			{
-				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Value.GetType()) as ObjectSerializer;
-				return Serializer2?.HasObjectId(Value) ?? false;
+				if (await this.Context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2)
+					return await Serializer2.HasObjectId(Value);
+				else
+					return false;
 			}
 			else
 				return false;
@@ -685,7 +688,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Value">Object reference.</param>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>If the object has an Object ID field or property that could be set.</returns>
-		public override bool TrySetObjectId(object Value, Guid ObjectId)
+		public override async Task<bool> TrySetObjectId(object Value, Guid ObjectId)
 		{
 			if (Value is GenericObject Obj)
 			{
@@ -694,8 +697,10 @@ namespace Waher.Persistence.Serialization
 			}
 			else if (!(Value is null) && this.returnTypedObjects)
 			{
-				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Value.GetType()) as ObjectSerializer;
-				return Serializer2?.TrySetObjectId(Value, ObjectId) ?? false;
+				if (await this.Context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2)
+					return await Serializer2.TrySetObjectId(Value, ObjectId);
+				else
+					return false;
 			}
 			else
 				return false;
@@ -719,7 +724,7 @@ namespace Waher.Persistence.Serialization
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
 
-				Guid ObjectId = await this.context.SaveNewObject(Obj);
+				Guid ObjectId = await this.Context.SaveNewObject(Obj);
 
 				Obj.ObjectId = ObjectId;
 
@@ -727,7 +732,7 @@ namespace Waher.Persistence.Serialization
 			}
 			else if (!(Value is null) && this.returnTypedObjects)
 			{
-				if (!(this.context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2))
+				if (!(await this.Context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2))
 					throw new Exception("Unable to set Object ID");
 
 				return await Serializer2.GetObjectId(Value, InsertIfNotFound);
@@ -751,17 +756,19 @@ namespace Waher.Persistence.Serialization
 		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
 		/// </summary>
 		/// <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
-		public override string CollectionName(object Object)
+		public override async Task<string> CollectionName(object Object)
 		{
 			if (Object is GenericObject Obj)
 				return Obj.CollectionName;
 			else if (!(Object is null) && this.returnTypedObjects)
 			{
-				ObjectSerializer Serializer2 = this.context.GetObjectSerializer(Object.GetType()) as ObjectSerializer;
-				return Serializer2?.CollectionName(Object) ?? base.CollectionName(Object);
+				if (await this.Context.GetObjectSerializer(Object.GetType()) is ObjectSerializer Serializer2)
+					return await Serializer2.CollectionName(Object);
+				else
+					return await base.CollectionName(Object);
 			}
 			else
-				return base.CollectionName(Object);
+				return await base.CollectionName(Object);
 		}
 	}
 }

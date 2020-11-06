@@ -146,19 +146,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FieldName">Name of field.</param>
 		/// <returns>Field code.</returns>
-		public uint GetFieldCode(string FieldName)
-		{
-			Task<uint> T = this.GetFieldCodeAsync(FieldName);
-			FilesProvider.Wait(T, this.timeoutMilliseconds);
-			return T.Result;
-		}
-
-		/// <summary>
-		/// Gets the code for a specific field in a collection.
-		/// </summary>
-		/// <param name="FieldName">Name of field.</param>
-		/// <returns>Field code.</returns>
-		public async Task<uint> GetFieldCodeAsync(string FieldName)
+		public async Task<uint> GetFieldCode(string FieldName)
 		{
 			uint Result;
 
@@ -203,7 +191,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FieldName">Name of field.</param>
 		/// <returns>The field code, if one was found, or null otherwise.</returns>
-		public async Task<uint?> TryGetFieldCodeAsync(string FieldName)
+		public async Task<uint?> TryGetFieldCode(string FieldName)
 		{
 			await this.LockRead();
 			try
@@ -247,20 +235,7 @@ namespace Waher.Persistence.Files
 		/// <param name="FieldCode">Field code.</param>
 		/// <returns>Field name.</returns>
 		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
-		public string GetFieldName(uint FieldCode)
-		{
-			Task<string> T = this.GetFieldNameAsync(FieldCode);
-			FilesProvider.Wait(T, this.timeoutMilliseconds);
-			return T.Result;
-		}
-
-		/// <summary>
-		/// Gets the name of a field in a collection, given its code.
-		/// </summary>
-		/// <param name="FieldCode">Field code.</param>
-		/// <returns>Field name.</returns>
-		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
-		public async Task<string> GetFieldNameAsync(uint FieldCode)
+		public async Task<string> GetFieldName(uint FieldCode)
 		{
 			await this.LockRead();
 			try

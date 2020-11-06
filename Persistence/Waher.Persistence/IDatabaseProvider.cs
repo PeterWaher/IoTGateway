@@ -338,9 +338,8 @@ namespace Waher.Persistence
 		/// Tries to get the Object ID of an object, if it exists.
 		/// </summary>
 		/// <param name="Object">Object whose Object ID is of interest.</param>
-		/// <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
-		/// <returns>If an Object ID was found.</returns>
-		bool TryGetObjectId(object Object, out object ObjectId);
+		/// <returns>Object ID, if found, null otherwise.</returns>
+		Task<object> TryGetObjectId(object Object);
 
 		/// <summary>
 		/// Drops a collection, if it exist.

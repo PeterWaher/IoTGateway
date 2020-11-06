@@ -409,24 +409,7 @@
             <param name="FieldName">Name of field.</param>
             <returns>Field code.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.GetFieldCodeAsync(System.String,System.String)">
-            <summary>
-            Gets the code for a specific field in a collection.
-            </summary>
-            <param name="Collection">Name of collection.</param>
-            <param name="FieldName">Name of field.</param>
-            <returns>Field code.</returns>
-        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetFieldName(System.String,System.UInt64)">
-            <summary>
-            Gets the name of a field in a collection, given its code.
-            </summary>
-            <param name="Collection">Name of collection.</param>
-            <param name="FieldCode">Field code.</param>
-            <returns>Field name.</returns>
-            <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
-        </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.GetFieldNameAsync(System.String,System.UInt64)">
             <summary>
             Gets the name of a field in a collection, given its code.
             </summary>
@@ -450,13 +433,12 @@
             </summary>
             <returns>Array of labels.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.TryGetObjectId(System.Object,System.Object@)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.TryGetObjectId(System.Object)">
             <summary>
             Tries to get the Object ID of an object, if it exists.
             </summary>
             <param name="Object">Object whose Object ID is of interest.</param>
-            <param name="ObjectId">Resulting Object ID will be placed in this argument.</param>
-            <returns>If an Object ID was found.</returns>
+            <returns>Object ID, if found, null otherwise.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.RemoveBlocks(System.Int32)">
             <summary>
@@ -1205,6 +1187,14 @@
             </summary>
             <returns>Task object.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.GetEnumeratorAsync">
+            <summary>
+            Returns an untyped enumerator that iterates through the collection in the order specified by the index.
+            
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.IndexBTreeFile.GetTypedEnumerator``1(Waher.Persistence.Files.LockType,System.Boolean)"/> method.
+            </summary>
+            <returns>An enumerator that can be used to iterate through the collection.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.IndexBTreeFile.GetEnumerator">
             <summary>
             Returns an untyped enumerator that iterates through the collection in the order specified by the index.
@@ -1634,14 +1624,7 @@
             <param name="FieldName">Name of field.</param>
             <returns>Field code.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldCodeAsync(System.String)">
-            <summary>
-            Gets the code for a specific field in a collection.
-            </summary>
-            <param name="FieldName">Name of field.</param>
-            <returns>Field code.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.LabelFile.TryGetFieldCodeAsync(System.String)">
+        <member name="M:Waher.Persistence.Files.LabelFile.TryGetFieldCode(System.String)">
             <summary>
             Tries to get the code for a specific field in a collection.
             </summary>
@@ -1655,14 +1638,6 @@
             <returns>Array of labels.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.LabelFile.GetFieldName(System.UInt32)">
-            <summary>
-            Gets the name of a field in a collection, given its code.
-            </summary>
-            <param name="FieldCode">Field code.</param>
-            <returns>Field name.</returns>
-            <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
-        </member>
-        <member name="M:Waher.Persistence.Files.LabelFile.GetFieldNameAsync(System.UInt32)">
             <summary>
             Gets the name of a field in a collection, given its code.
             </summary>
@@ -1992,14 +1967,6 @@
             <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
             <returns>Report</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetCurrentStateReportAsync(System.Boolean,System.Boolean)">
-            <summary>
-            Provides a report on the current state of the file.
-            </summary>
-            <param name="WriteStat">If statistics is to be included in the report.</param>
-            <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
-            <returns>Report</returns>
-        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ComputeStatistics">
             <summary>
             Goes through the entire file and computes statistics abouts its composition.
@@ -2121,6 +2088,14 @@
             Clears the database of all objects.
             </summary>
             <returns>Task object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetEnumeratorAsync">
+            <summary>
+            Returns an untyped enumerator that iterates through the collection.
+            
+            For a typed enumerator, call the <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.GetTypedEnumeratorAsync``1(Waher.Persistence.Files.LockType)"/> method.
+            </summary>
+            <returns>An enumerator that can be used to iterate through the collection.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetEnumerator">
             <summary>
@@ -4258,13 +4233,19 @@
             <param name="Reader">Binary deserializer object.</param>
             <returns>Payload size.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.IndexRecords.GetPayloadSize(Waher.Persistence.Serialization.BinaryDeserializer,System.Boolean@)">
+        <member name="M:Waher.Persistence.Files.Storage.IndexRecords.GetPayloadSizeEx(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
             Gets the payload size.
             </summary>
             <param name="Reader">Binary deserializer object.</param>
-            <param name="IsBlob">If payload is a BLOB.</param>
-            <returns>Payload size.</returns>
+            <returns>Size of the payload, and if the object is a BLOB.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.IndexRecords.IsBlob(Waher.Persistence.Serialization.BinaryDeserializer)">
+            <summary>
+            Checks if the following object is a BLOB.
+            </summary>
+            <param name="Reader">Binary deserializer object.</param>
+            <returns>If the following object is a BLOB.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Storage.IndexRecords.GetPayloadType(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
@@ -4346,13 +4327,19 @@
             <param name="Reader">Binary deserializer object.</param>
             <returns>Size of the payload.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.IRecordHandler.GetPayloadSize(Waher.Persistence.Serialization.BinaryDeserializer,System.Boolean@)">
+        <member name="M:Waher.Persistence.Files.Storage.IRecordHandler.GetPayloadSizeEx(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
             Gets the payload size.
             </summary>
             <param name="Reader">Binary deserializer object.</param>
-            <param name="IsBlob">If the object is a BLOB.</param>
-            <returns>Size of the payload.</returns>
+            <returns>Size of the payload, and if the object is a BLOB.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.IRecordHandler.IsBlob(Waher.Persistence.Serialization.BinaryDeserializer)">
+            <summary>
+            Checks if the following object is a BLOB.
+            </summary>
+            <param name="Reader">Binary deserializer object.</param>
+            <returns>If the following object is a BLOB.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Storage.IRecordHandler.GetPayloadType(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
@@ -4415,13 +4402,19 @@
             <param name="Reader">Binary deserializer object.</param>
             <returns>Size of the payload.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.PrimaryRecords.GetPayloadSize(Waher.Persistence.Serialization.BinaryDeserializer,System.Boolean@)">
+        <member name="M:Waher.Persistence.Files.Storage.PrimaryRecords.GetPayloadSizeEx(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
             Gets the payload size.
             </summary>
             <param name="Reader">Binary deserializer object.</param>
-            <param name="IsBlob">If the payload is a BLOB.</param>
-            <returns>Size of the payload.</returns>
+            <returns>Size of the payload, and if the object is a BLOB.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.PrimaryRecords.IsBlob(Waher.Persistence.Serialization.BinaryDeserializer)">
+            <summary>
+            Checks if the following object is a BLOB.
+            </summary>
+            <param name="Reader">Binary deserializer object.</param>
+            <returns>If the following object is a BLOB.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Storage.PrimaryRecords.GetPayloadType(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
@@ -4549,13 +4542,19 @@
             <param name="Reader">Binary deserializer.</param>
             <returns>Payload size.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.GetPayloadSize(Waher.Persistence.Serialization.BinaryDeserializer,System.Boolean@)">
+        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.GetPayloadSizeEx(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>
             Gets the payload size.
             </summary>
             <param name="Reader">Binary deserializer.</param>
-            <param name="IsBlob">If the payload is a BLOB.</param>
-            <returns>Payload size.</returns>
+            <returns>Size of the payload, and if the object is a BLOB.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.IsBlob(Waher.Persistence.Serialization.BinaryDeserializer)">
+            <summary>
+            Checks if the following object is a BLOB.
+            </summary>
+            <param name="Reader">Binary deserializer object.</param>
+            <returns>If the following object is a BLOB.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.Storage.StringDictionaryRecords.GetPayloadType(Waher.Persistence.Serialization.BinaryDeserializer)">
             <summary>

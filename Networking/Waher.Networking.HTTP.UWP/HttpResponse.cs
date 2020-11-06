@@ -819,7 +819,7 @@ namespace Waher.Networking.HTTP
 				Data = null;
 				ContentType = null;
 
-				foreach (AcceptRecord Rec in this.httpRequest.Header.Accept.Records)
+				foreach (AcceptRecord Rec in Accept.Records)
 				{
 					switch (Rec.Detail)
 					{

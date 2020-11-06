@@ -871,7 +871,7 @@ namespace Waher.Persistence.Files
 							Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
 						else
 						{
-							this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
+							await this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
 							{
 								if (Link == PrevBlockIndex)
 								{
@@ -925,7 +925,7 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
 			this.recordHandler.SkipKey(Reader);
 			int KeySize = Reader.Position;
-			int Len = (int)this.recordHandler.GetFullPayloadSize(Reader);
+			int Len = (int)await this.recordHandler.GetFullPayloadSize(Reader);
 			int HeaderSize = Reader.Position;
 
 			if (Len != Bin.Length - Reader.Position)
@@ -998,7 +998,7 @@ namespace Waher.Persistence.Files
 				object ObjectId = this.recordHandler.GetKey(Reader);
 				object ObjectId2;
 				int KeySize = Reader.Position - Pos;
-				uint Len = this.recordHandler.GetFullPayloadSize(Reader);
+				uint Len = await this.recordHandler.GetFullPayloadSize(Reader);
 				int Bookmark = Reader.Position - Pos;
 				uint BlobBlockIndex = Reader.ReadUInt32();
 				uint ExpectedPrev = uint.MaxValue;
@@ -1110,7 +1110,7 @@ namespace Waher.Persistence.Files
 			int KeySize1 = Reader.Position - Offset;
 			int KeySize2;
 
-			this.recordHandler.GetFullPayloadSize(Reader);
+			await this.recordHandler.GetFullPayloadSize(Reader);
 			BlobBlockIndex = Reader.ReadUInt32();
 
 			while (BlobBlockIndex != uint.MaxValue)
@@ -1218,7 +1218,7 @@ namespace Waher.Persistence.Files
 						Reader.Restart(Info.Block, Info.InternalPosition + 4);
 						if (this.recordHandler.Compare(ObjectId2, this.recordHandler.GetKey(Reader)) == 0)
 						{
-							Len = this.recordHandler.GetFullPayloadSize(Reader);
+							Len = await this.recordHandler.GetFullPayloadSize(Reader);
 							if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
 							{
 								Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
@@ -1334,12 +1334,12 @@ namespace Waher.Persistence.Files
 		/// Saves a new object to the file.
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
-		public Task<Guid> SaveNewObject(object Object)
+		public async Task<Guid> SaveNewObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return this.SaveNewObject(Object, Serializer);
+			return await this.SaveNewObject(Object, Serializer);
 		}
 
 		/// <summary>
@@ -1374,7 +1374,7 @@ namespace Waher.Persistence.Files
 		internal async Task<Guid> SaveNewObjectLocked(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -1418,7 +1418,7 @@ namespace Waher.Persistence.Files
 			BlockInfo Leaf = Rec.Item2;
 
 			Writer = new BinarySerializer(this.collectionName, this.encoding);
-			Serializer.Serialize(Writer, false, false, Object);
+			await Serializer.Serialize(Writer, false, false, Object);
 			Bin = Writer.GetSerialization();
 
 			await this.SaveNewObjectLocked(Bin, Leaf);
@@ -1458,7 +1458,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
 		{
-			bool HasObjectId = Serializer.HasObjectId(Object);
+			bool HasObjectId = await Serializer.HasObjectId(Object);
 			BlockInfo Leaf;
 			Guid ObjectId;
 
@@ -1478,7 +1478,7 @@ namespace Waher.Persistence.Files
 				}
 				while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) is null);
 
-				if (!Serializer.TrySetObjectId(Object, ObjectId))
+				if (!await Serializer.TrySetObjectId(Object, ObjectId))
 					throw new NotSupportedException("Unable to set Object ID.");
 			}
 
@@ -1603,7 +1603,7 @@ namespace Waher.Persistence.Files
 					else
 						ChildSize = 0;
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					c = Reader.Position - Pos + Len;
 
 					if (Pos == InsertAt)
@@ -1697,7 +1697,7 @@ namespace Waher.Persistence.Files
 							if (!this.recordHandler.SkipKey(ParentReader))
 								break;
 
-							ParentLen = this.recordHandler.GetPayloadSize(ParentReader);
+							ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
 							ParentReader.Position += ParentLen;
 						}
 						while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
@@ -1740,7 +1740,7 @@ namespace Waher.Persistence.Files
 				if (ObjectId is null)
 					break;
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 
 				if (ChildLink != 0)
 					await this.CheckChildParentLinkLocked(ChildLink, BlockIndex);
@@ -1812,7 +1812,7 @@ namespace Waher.Persistence.Files
 
 					Comparison = this.recordHandler.Compare(ObjectId, ObjectId2);
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
@@ -1857,7 +1857,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">ID of object to load.</param>
 		public async Task<T> LoadObject<T>(Guid ObjectId)
 		{
-			return (T)await this.LoadObject(ObjectId, this.provider.GetObjectSerializer(typeof(T)));
+			return (T)await this.LoadObject(ObjectId, await this.provider.GetObjectSerializer(typeof(T)));
 		}
 
 		/// <summary>
@@ -1867,7 +1867,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Type">Type of object to load.</param>
 		public async Task<T> LoadObject<T>(Guid ObjectId, Type Type)
 		{
-			return (T)await this.LoadObject(ObjectId, this.provider.GetObjectSerializer(Type));
+			return (T)await this.LoadObject(ObjectId, await this.provider.GetObjectSerializer(Type));
 		}
 
 		/// <summary>
@@ -1936,7 +1936,7 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, Pos);
 
 			this.recordHandler.SkipKey(Reader);
-			this.recordHandler.GetPayloadSize(Reader, out bool IsBlob);
+			bool IsBlob = await this.recordHandler.IsBlob(Reader);
 
 			if (IsBlob)
 			{
@@ -1953,7 +1953,7 @@ namespace Waher.Persistence.Files
 				{
 					Type T = Types.GetType(TypeName);
 					if (!(T is null))
-						Serializer = this.provider.GetObjectSerializer(T);
+						Serializer = await this.provider.GetObjectSerializer(T);
 					else
 						Serializer = this.genericSerializer;
 				}
@@ -1961,7 +1961,7 @@ namespace Waher.Persistence.Files
 
 			Reader.Position = Pos;
 
-			return Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			return await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
 		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
@@ -2003,7 +2003,7 @@ namespace Waher.Persistence.Files
 
 					Comparison = this.recordHandler.Compare(ObjectId, ObjectId2);
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
@@ -2039,11 +2039,11 @@ namespace Waher.Persistence.Files
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public Task UpdateObject(object Object)
+		public async Task UpdateObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
-			return this.UpdateObject(Object, Serializer);
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
+			await this.UpdateObject(Object, Serializer);
 		}
 
 		/// <summary>
@@ -2085,7 +2085,7 @@ namespace Waher.Persistence.Files
 				Old = await this.ParseObjectLocked(Info, Serializer);
 
 				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-				Serializer.Serialize(Writer, false, false, Object);
+				await Serializer.Serialize(Writer, false, false, Object);
 				byte[] Bin = Writer.GetSerialization();
 
 				await this.ReplaceObjectLocked(Bin, Info, true);
@@ -2130,7 +2130,7 @@ namespace Waher.Persistence.Files
 					Olds.AddLast(Old);
 
 					BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-					Serializer.Serialize(Writer, false, false, e2.Current);
+					await Serializer.Serialize(Writer, false, false, e2.Current);
 					byte[] Bin = Writer.GetSerialization();
 
 					await this.ReplaceObjectLocked(Bin, Info, true);
@@ -2153,7 +2153,9 @@ namespace Waher.Persistence.Files
 			this.recordHandler.SkipKey(Reader);
 
 			uint BlockIndex = Info.BlockIndex;
-			int Len = this.recordHandler.GetPayloadSize(Reader, out bool IsBlob);
+			KeyValuePair<int, bool> P = await this.recordHandler.GetPayloadSizeEx(Reader);
+			int Len = P.Key;
+			bool IsBlob = P.Value;
 
 			if (IsBlob && DeleteBlob)
 				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
@@ -2249,7 +2251,7 @@ namespace Waher.Persistence.Files
 					else
 						ChildSize = 0;
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					c = Reader.Position - Pos + Len;
 
 					if (Pos == Info.InternalPosition)
@@ -2324,7 +2326,7 @@ namespace Waher.Persistence.Files
 							if (!this.recordHandler.SkipKey(ParentReader))
 								break;
 
-							ParentLen = this.recordHandler.GetPayloadSize(ParentReader);
+							ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
 							ParentReader.Position += ParentLen;
 						}
 						while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
@@ -2364,12 +2366,12 @@ namespace Waher.Persistence.Files
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public Task<object> DeleteObject(object Object)
+		public async Task<object> DeleteObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return this.DeleteObject(Object, Serializer);
+			return await this.DeleteObject(Object, Serializer);
 		}
 
 		/// <summary>
@@ -2470,7 +2472,10 @@ namespace Waher.Persistence.Files
 			int i, c;
 
 			this.recordHandler.SkipKey(Reader);
-			Len = this.recordHandler.GetPayloadSize(Reader, out bool IsBlob);
+			KeyValuePair<int, bool> P = await this.recordHandler.GetPayloadSizeEx(Reader);
+			Len = P.Key;
+			bool IsBlob = P.Value;
+
 			if (DeleteAnyBlob)
 			{
 				if (Len == 0)
@@ -2651,7 +2656,7 @@ namespace Waher.Persistence.Files
 						Reader.Restart(Info.Block, 0);
 						Info.Header = new BlockHeader(Reader);
 
-						if (this.ForEachObject(Info.Block, (Link, ObjectId2, Pos, Len2) =>
+						if (await this.ForEachObject(Info.Block, (Link, ObjectId2, Pos, Len2) =>
 						{
 							if (this.recordHandler.Compare(ObjectId, ObjectId2) == 0)
 							{
@@ -2858,7 +2863,7 @@ namespace Waher.Persistence.Files
 			uint LastLink = 0;
 			int i, c;
 
-			if (this.ForEachObject(ParentBlock, (Link, ObjectId2, Pos, Len2) =>
+			if (await this.ForEachObject(ParentBlock, (Link, ObjectId2, Pos, Len2) =>
 			{
 				LastPos = Pos;
 				LastLink = Link;
@@ -3096,7 +3101,7 @@ namespace Waher.Persistence.Files
 				if (ObjectId is null)
 					break;
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 				Reader.Position += Len;
 
 				c = Reader.Position - Pos - 4;
@@ -3111,7 +3116,7 @@ namespace Waher.Persistence.Files
 
 		private delegate bool ForEachDelegate(uint Link, object ObjectId, int Pos, int Len);
 
-		private bool ForEachObject(byte[] Block, ForEachDelegate Method)
+		private async Task<bool> ForEachObject(byte[] Block, ForEachDelegate Method)
 		{
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			object ObjectId;
@@ -3129,7 +3134,7 @@ namespace Waher.Persistence.Files
 				if (ObjectId is null)
 					break;
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 				Reader.Position += Len;
 
 				c = Reader.Position - Pos - 4;
@@ -3169,7 +3174,7 @@ namespace Waher.Persistence.Files
 						if (ObjectId is null)
 							break;
 
-						Len = this.recordHandler.GetPayloadSize(Reader);
+						Len = await this.recordHandler.GetPayloadSize(Reader);
 						Reader.Position += Len;
 						LastPos = Pos;
 					}
@@ -3180,7 +3185,7 @@ namespace Waher.Persistence.Files
 						Reader.Position = LastPos;
 						Link = Reader.ReadBlockLink();
 						this.recordHandler.GetKey(Reader);
-						Len = this.recordHandler.GetPayloadSize(Reader);
+						Len = await this.recordHandler.GetPayloadSize(Reader);
 						c = Reader.Position + Len - LastPos - 4;
 
 						byte[] Separator = new byte[c];
@@ -3230,7 +3235,7 @@ namespace Waher.Persistence.Files
 					Prev2 = Prev;
 					Prev = Pos;
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 				while (Reader.BytesLeft >= 4);
@@ -3318,7 +3323,7 @@ namespace Waher.Persistence.Files
 							ObjectId = this.recordHandler.GetKey(Reader);
 							if (!(ObjectId is null))
 							{
-								Len = this.recordHandler.GetPayloadSize(Reader);
+								Len = await this.recordHandler.GetPayloadSize(Reader);
 								Reader.Position += Len;
 
 								Second = Reader.Position;
@@ -3380,7 +3385,7 @@ namespace Waher.Persistence.Files
 						break;
 					}
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 			}
@@ -3477,7 +3482,7 @@ namespace Waher.Persistence.Files
 				if (IsEmpty)
 					return null;
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 				Reader.Position += Len;
 			}
 			while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3525,7 +3530,7 @@ namespace Waher.Persistence.Files
 						return null;
 					}
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 				while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3586,7 +3591,7 @@ namespace Waher.Persistence.Files
 					break;
 				}
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 				Reader.Position += Len;
 			}
 			while (BlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3645,7 +3650,7 @@ namespace Waher.Persistence.Files
 						break;
 					}
 
-					Len = this.recordHandler.GetPayloadSize(Reader);
+					Len = await this.recordHandler.GetPayloadSize(Reader);
 					Reader.Position += Len;
 				}
 				while (BlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3745,20 +3750,7 @@ namespace Waher.Persistence.Files
 		/// <param name="WriteStat">If statistics is to be included in the report.</param>
 		/// <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
 		/// <returns>Report</returns>
-		public string GetCurrentStateReport(bool WriteStat, bool Properties)
-		{
-			Task<string> T = this.GetCurrentStateReportAsync(WriteStat, Properties);
-			FilesProvider.Wait(T, this.timeoutMilliseconds);
-			return T.Result;
-		}
-
-		/// <summary>
-		/// Provides a report on the current state of the file.
-		/// </summary>
-		/// <param name="WriteStat">If statistics is to be included in the report.</param>
-		/// <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
-		/// <returns>Report</returns>
-		public async Task<string> GetCurrentStateReportAsync(bool WriteStat, bool Properties)
+		public async Task<string> GetCurrentStateReport(bool WriteStat, bool Properties)
 		{
 			await this.LockWrite();
 			try
@@ -3846,7 +3838,7 @@ namespace Waher.Persistence.Files
 			{
 				byte[] Block = await this.LoadBlockLocked(0, false);
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
-				
+
 				BlockHeader.SkipHeader(Reader);
 
 				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, null, null);
@@ -3984,7 +3976,7 @@ namespace Waher.Persistence.Files
 						BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, MinObjectId, ObjectId);
 				}
 
-				Len = this.recordHandler.GetFullPayloadSize(Reader);
+				Len = await this.recordHandler.GetFullPayloadSize(Reader);
 				Statistics.ReportObjectStatistics((uint)(Reader.Position - Pos - 4 + Len));
 
 				if (Len == 0)
@@ -4332,7 +4324,7 @@ namespace Waher.Persistence.Files
 				if (ObjectId is null)
 					break;
 
-				Len = this.recordHandler.GetFullPayloadSize(Reader);
+				Len = await this.recordHandler.GetFullPayloadSize(Reader);
 				if (Reader.Position - Pos - 4 + Len > this.inlineObjectSizeLimit)
 				{
 					BlobLink = Reader.ReadBlockLink();
@@ -4365,7 +4357,7 @@ namespace Waher.Persistence.Files
 
 				if (Properties)
 				{
-					Obj = (GenericObject)this.genericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+					Obj = (GenericObject)await this.genericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 					Len = (uint)(Reader.Position - Pos);
 					XmlOutput.WriteAttributeString("len", Len.ToString());
 
@@ -4603,7 +4595,7 @@ namespace Waher.Persistence.Files
 			{
 				BlockSize = 0;
 
-				this.ForEachObject(Block, (Link, ObjectId2, Pos2, Len2) =>
+				await this.ForEachObject(Block, (Link, ObjectId2, Pos2, Len2) =>
 				{
 					BlockSize++;
 					return true;
@@ -4637,7 +4629,7 @@ namespace Waher.Persistence.Files
 				if (IncludeChildren && BlockLink != 0)
 					NrObjects += await this.GetObjectCountLocked(BlockLink, IncludeChildren);
 
-				Len = (uint)this.recordHandler.GetPayloadSize(Reader);
+				Len = (uint)await this.recordHandler.GetPayloadSize(Reader);
 				Reader.Position += (int)Len;
 			}
 
@@ -4696,7 +4688,7 @@ namespace Waher.Persistence.Files
 				if (BlockLink != 0)
 					Rank += await this.GetObjectSizeOfBlockLocked(BlockLink);
 
-				Len = this.recordHandler.GetPayloadSize(Reader);
+				Len = await this.recordHandler.GetPayloadSize(Reader);
 
 				if (this.recordHandler.Compare(ObjectId2, ObjectId) == 0)
 				{
@@ -4724,7 +4716,7 @@ namespace Waher.Persistence.Files
 							if (BlockLink != 0)
 								Rank += await this.GetObjectSizeOfBlockLocked(BlockLink);
 
-							Len = this.recordHandler.GetPayloadSize(Reader);
+							Len = await this.recordHandler.GetPayloadSize(Reader);
 
 							Rank++;
 							Reader.Position += Len;
@@ -4752,9 +4744,16 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{Object}.Add(Object)"/>
 		/// </summary>
-		public void Add(object item)
+		public async void Add(object item)
 		{
-			this.SaveNewObject(item);
+			try
+			{
+				await this.SaveNewObject(item);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>
@@ -4777,10 +4776,10 @@ namespace Waher.Persistence.Files
 			if (Item is null)
 				return false;
 
-			if (!(this.provider.GetObjectSerializer(Item.GetType()) is ObjectSerializer Serializer))
+			if (!(await this.provider.GetObjectSerializer(Item.GetType()) is ObjectSerializer Serializer))
 				return false;
 
-			if (!Serializer.HasObjectId(Item))
+			if (!await Serializer.HasObjectId(Item))
 				return false;
 
 			Guid ObjectId = await Serializer.GetObjectId(Item, false);
@@ -4806,11 +4805,11 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-				Serializer.Serialize(Writer, false, false, Item);
+				await Serializer.Serialize(Writer, false, false, Item);
 				byte[] Bin = Writer.GetSerialization();
 
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
-				if (!(this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) is GenericObject Obj2))
+				if (!(await this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) is GenericObject Obj2))
 					return false;
 
 				return Obj.Equals(Obj2);
@@ -4929,9 +4928,20 @@ namespace Waher.Persistence.Files
 		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		public async Task<IEnumerator<object>> GetEnumeratorAsync()
+		{
+			return await ObjectBTreeFileEnumerator<object>.Create(this, this.recordHandler, null);
+		}
+
+		/// <summary>
+		/// Returns an untyped enumerator that iterates through the collection.
+		/// 
+		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, this.recordHandler, null);
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -4942,7 +4952,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, this.recordHandler, null);
+			return this.GetEnumeratorAsync().Result;
 		}
 
 		/// <summary>
@@ -4964,7 +4974,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public async Task<ObjectBTreeFileEnumerator<T>> GetTypedEnumeratorAsync<T>(LockType LockType)
 		{
-			ObjectBTreeFileEnumerator<T> e = new ObjectBTreeFileEnumerator<T>(this, this.recordHandler, null);
+			ObjectBTreeFileEnumerator<T> e = await ObjectBTreeFileEnumerator<T>.Create(this, this.recordHandler, null);
 			if (LockType != LockType.None)
 				await e.Lock(LockType);
 
@@ -5243,8 +5253,8 @@ namespace Waher.Persistence.Files
 
 			if (!this.indicesCreated)
 			{
-				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
-				string CollectionName = Serializer.CollectionName(null);
+				ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(T));
+				string CollectionName = await Serializer.CollectionName(null);
 				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
 				if (File == this)
 				{
@@ -5272,7 +5282,7 @@ namespace Waher.Persistence.Files
 
 						if (Index is null)
 						{
-							if (this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
+							if (await this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
 								!(Serializer is null) &&
 								Serializer.HasObjectIdField)
 							{
@@ -5366,7 +5376,7 @@ namespace Waher.Persistence.Files
 					if (!Result.CurrentTypeCompatible)
 						continue;
 
-					Key = Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
+					Key = await Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
 					SortedObjects[new Searching.SortedReference<T>(Key, Records, Result.Current, Result.CurrentSerializer, Result.CurrentObjectId)] = true;
 				}
 
@@ -5658,7 +5668,7 @@ namespace Waher.Persistence.Files
 
 				if (Index is null)
 				{
-					if (this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
+					if (await this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
 						!(Serializer is null) &&
 						Serializer.HasObjectIdField &&
 						Serializer.ObjectIdMemberName == FilterFieldValue.FieldName)

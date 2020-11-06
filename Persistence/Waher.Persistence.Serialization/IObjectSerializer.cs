@@ -27,13 +27,18 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		Task Init();
+
+		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
+		Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
 
 		/// <summary>
 		/// Serializes an object to a binary destination.
@@ -42,16 +47,15 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
+		Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 
 		/// <summary>
 		/// Gets the value of a field or property of an object, given its name.
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		bool TryGetFieldValue(string FieldName, object Object, out object Value);
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		Task<object> TryGetFieldValue(string FieldName, object Object);
 
 	}
 }

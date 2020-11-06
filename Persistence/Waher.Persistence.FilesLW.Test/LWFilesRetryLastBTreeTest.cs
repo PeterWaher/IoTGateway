@@ -83,15 +83,15 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
-		private Simple LoadSimple()
+		private async Task<Simple> LoadSimple()
 		{
 			if (!File.Exists(DBFilesBTreeTests.ObjFileName))
 				Assert.Inconclusive("No binary object file to test against.");
 
 			byte[] Bin = File.ReadAllBytes(DBFilesBTreeTests.ObjFileName);
 			BinaryDeserializer Reader = new BinaryDeserializer(DBFilesBTreeTests.CollectionName, Encoding.UTF8, Bin, uint.MaxValue);
-			IObjectSerializer Serializer = this.provider.GetObjectSerializer(typeof(Simple));
-			return (Simple)Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			IObjectSerializer Serializer = await this.provider.GetObjectSerializer(typeof(Simple));
+			return (Simple)await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
 		private Guid LoadObjectId()
@@ -117,7 +117,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_RetryLastTest_01_Retry_SaveNew()
 		{
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
-			Simple Obj = this.LoadSimple();
+			Simple Obj = await this.LoadSimple();
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 

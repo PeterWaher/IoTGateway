@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization.ReferenceTypes;
 using Waher.Persistence.Serialization.ValueTypes;
@@ -121,12 +122,12 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="Type">Type of object to serialize.</param>
 		/// <returns>Object Serializer if exists, or null if not.</returns>
-		public IObjectSerializer GetObjectSerializerNoCreate(Type Type)
+		public Task<IObjectSerializer> GetObjectSerializerNoCreate(Type Type)
 		{
 			lock (this.synchObj)
 			{
 				if (this.serializers.TryGetValue(Type, out IObjectSerializer Result))
-					return Result;
+					return Task.FromResult<IObjectSerializer>(Result);
 			}
 
 			return null;
@@ -137,7 +138,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="Type">Type of object to serialize.</param>
 		/// <returns>Object Serializer</returns>
-		public IObjectSerializer GetObjectSerializer(Type Type)
+		public async Task<IObjectSerializer> GetObjectSerializer(Type Type)
 		{
 			IObjectSerializer Result;
 			TypeInfo TI = Type.GetTypeInfo();
@@ -186,10 +187,12 @@ namespace Waher.Persistence.Serialization
 			try
 			{
 #if NETSTANDARD1_5
-				Result = new ObjectSerializer(Type, this.context, this.compiled);
+				Result = await ObjectSerializer.Create(Type, this.context, this.compiled);
 #else
-				Result = new ObjectSerializer(Type, this.context);
+				Result = await ObjectSerializer.Create(Type, this.context);
 #endif
+				await Result.Init();
+
 				lock (this.synchObj)
 				{
 					this.serializers[Type] = Result;

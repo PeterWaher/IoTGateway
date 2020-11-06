@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
@@ -40,13 +39,21 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		public Task Init()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			return this.Deserialize(Reader, DataType, Embedded, true);
 		}
@@ -59,7 +66,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="CheckFieldNames">If field names are to be extended.</param>
 		/// <returns>Deserialized object.</returns>
-		public object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
+		public async Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
 		{
 			if (!Reader.ReadBit())
 				return null;
@@ -83,8 +90,8 @@ namespace Waher.Persistence.Serialization
 					int Pos = Reader.Position;
 					ulong TypeCode = Reader.ReadVariableLengthUInt64();
 					ulong CollectionCode = Reader.ReadVariableLengthUInt64();
-					string CollectionName = this.context.GetFieldName(null, CollectionCode);
-					string TypeName = this.context.GetFieldName(CollectionName, TypeCode);
+					string CollectionName = await this.context.GetFieldName(null, CollectionCode);
+					string TypeName = await this.context.GetFieldName(CollectionName, TypeCode);
 					IObjectSerializer Serializer;
 
 					if (string.IsNullOrEmpty(TypeName))
@@ -95,12 +102,12 @@ namespace Waher.Persistence.Serialization
 						if (T is null)
 							Serializer = this.genericSerializer;
 						else
-							Serializer = this.context.GetObjectSerializer(T);
+							Serializer = await this.context.GetObjectSerializer(T);
 					}
 
 					Reader.Position = Pos;
 
-					Value = Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
+					Value = await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
 					break;
 
 				case ObjectSerializer.TYPE_BOOLEAN:
@@ -208,14 +215,14 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			KeyValuePair<string, object> TypedValue = (KeyValuePair<string, object>)Value;
-			IObjectSerializer Serializer = this.context.GetObjectSerializer(TypedValue.Value?.GetType() ?? typeof(object));
+			IObjectSerializer Serializer = await this.context.GetObjectSerializer(TypedValue.Value?.GetType() ?? typeof(object));
 
 			Writer.WriteBit(true);
 			Writer.Write(TypedValue.Key);
-			Serializer.Serialize(Writer, true, true, TypedValue.Value);
+			await Serializer.Serialize(Writer, true, true, TypedValue.Value);
 		}
 
 		/// <summary>
@@ -223,25 +230,21 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
 			KeyValuePair<string, object> TypedValue = (KeyValuePair<string, object>)Object;
 
 			switch (FieldName)
 			{
 				case "Key":
-					Value = TypedValue.Key;
-					return true;
+					return Task.FromResult<object>(TypedValue.Key);
 
 				case "Value":
-					Value = TypedValue.Value;
-					return true;
+					return Task.FromResult<object>(TypedValue.Value);
 
 				default:
-					Value = null;
-					return false;
+					return Task.FromResult<object>(null);
 			}
 		}
 	}

@@ -35,17 +35,17 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_GUID: return (Guid?)Reader.ReadGuid();
+				case ObjectSerializer.TYPE_GUID: return Task.FromResult<object>((Guid?)Reader.ReadGuid());
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return (Guid?)Guid.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>((Guid?)Guid.Parse(Reader.ReadString()));
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a nullable Guid value.");
 			}
 		}
@@ -57,7 +57,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			Guid? Value2 = (Guid?)Value;
 
@@ -66,7 +66,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				if (!Value2.HasValue)
 				{
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-					return;
+					return Task.CompletedTask;
 				}
 				else
 					Writer.WriteBits(ObjectSerializer.TYPE_GUID, 6);
@@ -75,6 +75,8 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				throw new NullReferenceException("Value cannot be null.");
 
 			Writer.Write(Value2.Value);
+
+			return Task.CompletedTask;
 		}
 
 	}

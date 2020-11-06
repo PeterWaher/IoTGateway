@@ -35,30 +35,30 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (decimal?)1 : (decimal?)0;
-				case ObjectSerializer.TYPE_BYTE: return (decimal?)Reader.ReadByte();
-				case ObjectSerializer.TYPE_INT16: return (decimal?)Reader.ReadInt16();
-				case ObjectSerializer.TYPE_INT32: return (decimal?)Reader.ReadInt32();
-				case ObjectSerializer.TYPE_INT64: return (decimal?)Reader.ReadInt64();
-				case ObjectSerializer.TYPE_SBYTE: return (decimal?)Reader.ReadSByte();
-				case ObjectSerializer.TYPE_UINT16: return (decimal?)Reader.ReadUInt16();
-				case ObjectSerializer.TYPE_UINT32: return (decimal?)Reader.ReadUInt32();
-				case ObjectSerializer.TYPE_UINT64: return (decimal?)Reader.ReadUInt64();
-				case ObjectSerializer.TYPE_DECIMAL: return (decimal?)Reader.ReadDecimal();
-				case ObjectSerializer.TYPE_DOUBLE: return (decimal?)Reader.ReadDouble();
-				case ObjectSerializer.TYPE_SINGLE: return (decimal?)Reader.ReadSingle();
+				case ObjectSerializer.TYPE_BOOLEAN: return Task.FromResult<object>(Reader.ReadBoolean() ? (decimal?)1 : (decimal?)0);
+				case ObjectSerializer.TYPE_BYTE: return Task.FromResult<object>((decimal?)Reader.ReadByte());
+				case ObjectSerializer.TYPE_INT16: return Task.FromResult<object>((decimal?)Reader.ReadInt16());
+				case ObjectSerializer.TYPE_INT32: return Task.FromResult<object>((decimal?)Reader.ReadInt32());
+				case ObjectSerializer.TYPE_INT64: return Task.FromResult<object>((decimal?)Reader.ReadInt64());
+				case ObjectSerializer.TYPE_SBYTE: return Task.FromResult<object>((decimal?)Reader.ReadSByte());
+				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>((decimal?)Reader.ReadUInt16());
+				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>((decimal?)Reader.ReadUInt32());
+				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>((decimal?)Reader.ReadUInt64());
+				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>((decimal?)Reader.ReadDecimal());
+				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>((decimal?)Reader.ReadDouble());
+				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>((decimal?)Reader.ReadSingle());
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return (decimal?)decimal.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_MIN: return decimal.MinValue;
-				case ObjectSerializer.TYPE_MAX: return decimal.MaxValue;
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>((decimal?)decimal.Parse(Reader.ReadString()));
+				case ObjectSerializer.TYPE_MIN: return Task.FromResult<object>(decimal.MinValue);
+				case ObjectSerializer.TYPE_MAX: return Task.FromResult<object>(decimal.MaxValue);
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a nullable Decimal value.");
 			}
 		}
@@ -70,7 +70,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			decimal? Value2 = (decimal?)Value;
 
@@ -79,7 +79,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				if (!Value2.HasValue)
 				{
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-					return;
+					return Task.CompletedTask;
 				}
 				else
 					Writer.WriteBits(ObjectSerializer.TYPE_DECIMAL, 6);
@@ -88,6 +88,8 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				throw new NullReferenceException("Value cannot be null.");
 
 			Writer.Write(Value2.Value);
+
+			return Task.CompletedTask;
 		}
 
 	}

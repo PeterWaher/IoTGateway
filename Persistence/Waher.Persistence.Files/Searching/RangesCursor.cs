@@ -267,7 +267,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (IApplicableFilter Filter in this.additionalfilters)
 					{
-						if (!Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							Ok = false;
 							break;
@@ -279,7 +279,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfStartRangeField = Filter.Key;
 							Ok = false;
@@ -292,7 +292,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfEndRangeField = Filter.Key;
 							Ok = false;
@@ -303,7 +303,9 @@ namespace Waher.Persistence.Files.Searching
 
 				for (i = 0; i < this.limitsUpdatedAt; i++)
 				{
-					if (CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue, out object FieldValue))
+					object FieldValue = await CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue);
+
+					if (!(FieldValue is null))
 					{
 						if (this.ascending[i])
 						{
@@ -486,7 +488,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (IApplicableFilter Filter in this.additionalfilters)
 					{
-						if (!Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							Ok = false;
 							break;
@@ -498,7 +500,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfStartRangeField = Filter.Key;
 							Ok = false;
@@ -511,7 +513,7 @@ namespace Waher.Persistence.Files.Searching
 				{
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
-						if (!Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
+						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
 							OutOfEndRangeField = Filter.Key;
 							Ok = false;
@@ -522,7 +524,9 @@ namespace Waher.Persistence.Files.Searching
 
 				for (i = 0; i < this.limitsUpdatedAt; i++)
 				{
-					if (CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue, out object FieldValue))
+					object FieldValue = await CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue);
+
+					if (!(FieldValue is null))
 					{
 						if (this.ascending[i])
 						{

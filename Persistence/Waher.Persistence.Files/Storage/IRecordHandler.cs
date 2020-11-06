@@ -32,22 +32,28 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Full size of the payload.</returns>
-		uint GetFullPayloadSize(BinaryDeserializer Reader);
+		Task<uint> GetFullPayloadSize(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Size of the payload.</returns>
-		int GetPayloadSize(BinaryDeserializer Reader);
+		Task<int> GetPayloadSize(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
-		/// <param name="IsBlob">If the object is a BLOB.</param>
-		/// <returns>Size of the payload.</returns>
-		int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob);
+		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
+		Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader);
+
+		/// <summary>
+		/// Checks if the following object is a BLOB.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If the following object is a BLOB.</returns>
+		Task<bool> IsBlob(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Gets the type of the payload, if any.

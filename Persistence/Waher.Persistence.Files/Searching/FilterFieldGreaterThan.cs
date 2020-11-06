@@ -34,9 +34,11 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Serializer">Corresponding object serializer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <returns>If the filter can be applied.</returns>
-		public bool AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
+		public async Task<bool> AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
 		{
-			if (!Serializer.TryGetFieldValue(this.FieldName, Object, out object Value))
+			object Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
+
+			if (Value is null)
 			{
 				Type T = Object.GetType();
 				if (Serializer.ValueType == T)
@@ -46,11 +48,12 @@ namespace Waher.Persistence.Files.Searching
 					Serializer = this.prevSerializer;
 				else
 				{
-					Serializer = this.prevSerializer = Provider.GetObjectSerializer(T);
+					Serializer = this.prevSerializer = await Provider.GetObjectSerializer(T);
 					this.prevType = T;
 				}
 
-				if (!Serializer.TryGetFieldValue(this.FieldName, Object, out Value))
+				Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
+				if (Value is null)
 					return false;
 			}
 

@@ -7,6 +7,7 @@ using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Inventory;
 using System.Runtime.ExceptionServices;
+using Waher.Events;
 
 namespace Waher.Persistence.Files
 {
@@ -18,29 +19,31 @@ namespace Waher.Persistence.Files
 	{
 		private ObjectBTreeFileEnumerator<object> e;
 		private IObjectSerializer currentSerializer;
-		private readonly FilesProvider provider;
-		private readonly IndexBTreeFile file;
-		private readonly IndexRecords recordHandler;
+		private FilesProvider provider;
+		private IndexBTreeFile file;
+		private IndexRecords recordHandler;
 		private Guid currentObjectId;
 		private T current;
-		private readonly int timeoutMilliseconds;
+		private int timeoutMilliseconds;
 		private LockType lockType = LockType.None;
 		private bool lockParent = false;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
-		internal IndexBTreeFileEnumerator(IndexBTreeFile File, IndexRecords RecordHandler)
+		internal static async Task<IndexBTreeFileEnumerator<T>> Create(IndexBTreeFile File, IndexRecords RecordHandler)
 		{
-			this.file = File;
-			this.recordHandler = RecordHandler;
-			this.provider = this.file.ObjectFile.Provider;
-			this.hasCurrent = false;
-			this.currentObjectId = Guid.Empty;
-			this.current = default;
-			this.currentSerializer = null;
-			this.timeoutMilliseconds = File.IndexFile.TimeoutMilliseconds;
-
-			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, RecordHandler);
+			return new IndexBTreeFileEnumerator<T>()
+			{
+				file = File,
+				recordHandler = RecordHandler,
+				provider = File.ObjectFile.Provider,
+				hasCurrent = false,
+				currentObjectId = Guid.Empty,
+				current = default,
+				currentSerializer = null,
+				timeoutMilliseconds = File.IndexFile.TimeoutMilliseconds,
+				e = await ObjectBTreeFileEnumerator<object>.Create(File.IndexFile, RecordHandler)
+			};
 		}
 
 		internal void SetStartingPoint(BlockInfo StartingPoint)
@@ -94,10 +97,16 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
+		public async void Dispose()
 		{
-			//FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
-			Task _ = this.DisposeAsync();
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>
@@ -251,7 +260,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				if (this.currentSerializer is null)
-					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
+					this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
 
 				if (this.lockType == LockType.None)
 					Obj = await this.file.ObjectFile.TryLoadObject(this.currentObjectId, this.currentSerializer);

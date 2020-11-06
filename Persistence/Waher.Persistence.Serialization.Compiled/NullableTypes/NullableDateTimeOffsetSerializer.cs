@@ -35,20 +35,20 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset?)Reader.ReadDateTime();
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return (DateTimeOffset?)Reader.ReadDateTimeOffset();
+				case ObjectSerializer.TYPE_DATETIME: return Task.FromResult<object>((DateTimeOffset?)Reader.ReadDateTime());
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Task.FromResult<object>((DateTimeOffset?)Reader.ReadDateTimeOffset());
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return (DateTimeOffset?)DateTimeOffset.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_MIN: return DateTimeOffset.MinValue;
-				case ObjectSerializer.TYPE_MAX: return DateTimeOffset.MaxValue;
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>((DateTimeOffset?)DateTimeOffset.Parse(Reader.ReadString()));
+				case ObjectSerializer.TYPE_MIN: return Task.FromResult<object>(DateTimeOffset.MinValue);
+				case ObjectSerializer.TYPE_MAX: return Task.FromResult<object>(DateTimeOffset.MaxValue);
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a nullable DateTimeOffset value.");
 			}
 		}
@@ -60,7 +60,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			DateTimeOffset? Value2 = (DateTimeOffset?)Value;
 
@@ -69,7 +69,7 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				if (!Value2.HasValue)
 				{
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-					return;
+					return Task.CompletedTask;
 				}
 				else
 					Writer.WriteBits(ObjectSerializer.TYPE_DATETIMEOFFSET, 6);
@@ -78,6 +78,8 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				throw new NullReferenceException("Value cannot be null.");
 
 			Writer.Write(Value2.Value);
+
+			return Task.CompletedTask;
 		}
 
 	}

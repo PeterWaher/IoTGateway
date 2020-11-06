@@ -28,13 +28,21 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Initializes the serializer before first-time use.
+		/// </summary>
+		public virtual Task Init()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Deserializes an object from a binary source.
 		/// </summary>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public abstract object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
+		public abstract Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded);
 
 		/// <summary>
 		/// Serializes an object to a binary destination.
@@ -43,16 +51,15 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public abstract void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
+		public abstract Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 
 		/// <summary>
 		/// Gets the value of a field or property of an object, given its name.
 		/// </summary>
 		/// <param name="FieldName">Name of field or property.</param>
 		/// <param name="Object">Object.</param>
-		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-		/// <returns>If the corresponding field or property was found.</returns>
-		public abstract bool TryGetFieldValue(string FieldName, object Object, out object Value);
+		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
+		public abstract Task<object> TryGetFieldValue(string FieldName, object Object);
 
 		/// <summary>
 		/// Reads a boolean value.
@@ -896,20 +903,20 @@ namespace Waher.Persistence.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		public static T[] ReadArray<T>(ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
+		public static async Task<T[]> ReadArray<T>(ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_ARRAY:
 					List<T> Elements = new List<T>();
-					IObjectSerializer S = Context.GetObjectSerializer(typeof(T));
+					IObjectSerializer S = await Context.GetObjectSerializer(typeof(T));
 					ulong NrElements = Reader.ReadVariableLengthUInt64();
 					uint ElementDataType = Reader.ReadBits(6);
 					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
 
 					while (NrElements > 0)
 					{
-						if (S.Deserialize(Reader, ElementDataTypeN, true) is T Item)
+						if (await S.Deserialize(Reader, ElementDataTypeN, true) is T Item)
 							Elements.Add(Item);
 						else
 							Elements.Add(default);
@@ -936,12 +943,12 @@ namespace Waher.Persistence.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		public static Array ReadArray(Type T, ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
+		public static async Task<Array> ReadArray(Type T, ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_ARRAY:
-					IObjectSerializer S = Context.GetObjectSerializer(T);
+					IObjectSerializer S = await Context.GetObjectSerializer(T);
 					ulong NrElements = Reader.ReadVariableLengthUInt64();
 					if (NrElements > int.MaxValue)
 						throw new Exception("Array too long.");
@@ -953,7 +960,7 @@ namespace Waher.Persistence.Serialization
 					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
 
 					for (i = 0; i < c; i++)
-						Result.SetValue(S.Deserialize(Reader, ElementDataTypeN, true), i);
+						Result.SetValue(await S.Deserialize(Reader, ElementDataTypeN, true), i);
 
 					return Result;
 
@@ -972,14 +979,14 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Serializer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static void WriteArray<T>(ISerializerContext Context, ISerializer Writer, T[] Value)
+		public static async Task WriteArray<T>(ISerializerContext Context, ISerializer Writer, T[] Value)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
 				Type LastType = typeof(T);
-				IObjectSerializer S = Context.GetObjectSerializer(LastType);
+				IObjectSerializer S = await Context.GetObjectSerializer(LastType);
 				Type ItemType;
 				bool Nullable;
 
@@ -1005,11 +1012,11 @@ namespace Waher.Persistence.Serialization
 						ItemType = Item.GetType();
 						if (ItemType != LastType)
 						{
-							S = Context.GetObjectSerializer(ItemType);
+							S = await Context.GetObjectSerializer(ItemType);
 							LastType = ItemType;
 						}
 
-						S.Serialize(Writer, Nullable, true, Item);
+						await S.Serialize(Writer, Nullable, true, Item);
 					}
 				}
 			}
@@ -1022,14 +1029,14 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Serializer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static void WriteArray(Type T, ISerializerContext Context, ISerializer Writer, Array Value)
+		public static async Task WriteArray(Type T, ISerializerContext Context, ISerializer Writer, Array Value)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 			else
 			{
 				Type LastType = T;
-				IObjectSerializer S = Context.GetObjectSerializer(LastType);
+				IObjectSerializer S = await Context.GetObjectSerializer(LastType);
 				Type ItemType;
 				bool Nullable;
 
@@ -1055,11 +1062,11 @@ namespace Waher.Persistence.Serialization
 						ItemType = Item.GetType();
 						if (ItemType != LastType)
 						{
-							S = Context.GetObjectSerializer(ItemType);
+							S = await Context.GetObjectSerializer(ItemType);
 							LastType = ItemType;
 						}
 
-						S.Serialize(Writer, Nullable, true, Item);
+						await S.Serialize(Writer, Nullable, true, Item);
 					}
 				}
 			}
@@ -1072,10 +1079,10 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <returns>Deserialized object.</returns>
-		public static object ReadEmbeddedObject(ISerializerContext Context, IDeserializer Reader, uint? DataType)
+		public static async Task<object> ReadEmbeddedObject(ISerializerContext Context, IDeserializer Reader, uint? DataType)
 		{
-			IObjectSerializer Serializer = Context.GetObjectSerializer(typeof(object));
-			return Serializer.Deserialize(Reader, DataType, true);
+			IObjectSerializer Serializer = await Context.GetObjectSerializer(typeof(object));
+			return await Serializer.Deserialize(Reader, DataType, true);
 		}
 
 	}

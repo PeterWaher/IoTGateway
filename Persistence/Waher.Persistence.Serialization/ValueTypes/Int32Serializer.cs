@@ -35,30 +35,30 @@ namespace Waher.Persistence.Serialization.ValueTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (int)1 : (int)0;
-				case ObjectSerializer.TYPE_BYTE: return (int)Reader.ReadByte();
-				case ObjectSerializer.TYPE_INT16: return (int)Reader.ReadInt16();
-				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32();
-				case ObjectSerializer.TYPE_INT64: return (int)Reader.ReadInt64();
-				case ObjectSerializer.TYPE_SBYTE: return (int)Reader.ReadSByte();
-				case ObjectSerializer.TYPE_UINT16: return (int)Reader.ReadUInt16();
-				case ObjectSerializer.TYPE_UINT32: return (int)Reader.ReadUInt32();
-				case ObjectSerializer.TYPE_UINT64: return (int)Reader.ReadUInt64();
-				case ObjectSerializer.TYPE_DECIMAL: return (int)Reader.ReadDecimal();
-				case ObjectSerializer.TYPE_DOUBLE: return (int)Reader.ReadDouble();
-				case ObjectSerializer.TYPE_SINGLE: return (int)Reader.ReadSingle();
+				case ObjectSerializer.TYPE_BOOLEAN: return Task.FromResult<object>(Reader.ReadBoolean() ? (int)1 : (int)0);
+				case ObjectSerializer.TYPE_BYTE: return Task.FromResult<object>((int)Reader.ReadByte());
+				case ObjectSerializer.TYPE_INT16: return Task.FromResult<object>((int)Reader.ReadInt16());
+				case ObjectSerializer.TYPE_INT32: return Task.FromResult<object>(Reader.ReadInt32());
+				case ObjectSerializer.TYPE_INT64: return Task.FromResult<object>((int)Reader.ReadInt64());
+				case ObjectSerializer.TYPE_SBYTE: return Task.FromResult<object>((int)Reader.ReadSByte());
+				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>((int)Reader.ReadUInt16());
+				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>((int)Reader.ReadUInt32());
+				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>((int)Reader.ReadUInt64());
+				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>((int)Reader.ReadDecimal());
+				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>((int)Reader.ReadDouble());
+				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>((int)Reader.ReadSingle());
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return int.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_MIN: return int.MinValue;
-				case ObjectSerializer.TYPE_MAX: return int.MaxValue;
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>(int.Parse(Reader.ReadString()));
+				case ObjectSerializer.TYPE_MIN: return Task.FromResult<object>(int.MinValue);
+				case ObjectSerializer.TYPE_MAX: return Task.FromResult<object>(int.MaxValue);
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected an Int32 value.");
 			}
 		}
@@ -70,12 +70,14 @@ namespace Waher.Persistence.Serialization.ValueTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (WriteTypeCode)
 				Writer.WriteBits(ObjectSerializer.TYPE_INT32, 6);
 
 			Writer.Write((int)Value);
+
+			return Task.CompletedTask;
 		}
 
 	}

@@ -35,20 +35,20 @@ namespace Waher.Persistence.Serialization.ValueTypes
 		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <returns>Deserialized object.</returns>
-		public override object Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
+		public override Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime();
-				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset().DateTime;
+				case ObjectSerializer.TYPE_DATETIME: return Task.FromResult<object>(Reader.ReadDateTime());
+				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Task.FromResult<object>(Reader.ReadDateTimeOffset().DateTime);
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return DateTime.Parse(Reader.ReadString());
-				case ObjectSerializer.TYPE_MIN: return DateTime.MinValue;
-				case ObjectSerializer.TYPE_MAX: return DateTime.MaxValue;
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>(DateTime.Parse(Reader.ReadString()));
+				case ObjectSerializer.TYPE_MIN: return Task.FromResult<object>(DateTime.MinValue);
+				case ObjectSerializer.TYPE_MAX: return Task.FromResult<object>(DateTime.MaxValue);
+				case ObjectSerializer.TYPE_NULL: return Task.FromResult<object>(null);
 				default: throw new Exception("Expected a DateTime value.");
 			}
 		}
@@ -60,12 +60,14 @@ namespace Waher.Persistence.Serialization.ValueTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override void Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (WriteTypeCode)
 				Writer.WriteBits(ObjectSerializer.TYPE_DATETIME, 6);
 
 			Writer.Write((DateTime)Value);
+
+			return Task.CompletedTask;
 		}
 
 	}

@@ -143,7 +143,7 @@ namespace Waher.Persistence.Files
 				throw new ArgumentNullException("key is null.", "key");
 
 			Type Type = value?.GetType() ?? typeof(object);
-			IObjectSerializer Serializer = this.provider.GetObjectSerializer(Type);
+			IObjectSerializer Serializer = await this.provider.GetObjectSerializer(Type);
 
 			await this.dictionaryFile.LockWrite();
 			try
@@ -476,7 +476,7 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				Result = new ObjectBTreeFileEnumerator<KeyValuePair<string, object>>(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
+				Result = await ObjectBTreeFileEnumerator<KeyValuePair<string, object>>.Create(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
 				if (LockType != LockType.None)
 					await Result.Lock(LockType);
 			}

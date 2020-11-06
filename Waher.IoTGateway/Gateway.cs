@@ -3853,9 +3853,21 @@ namespace Waher.IoTGateway
 		/// <returns>HTML document, if it could be found and generated, or null otherwise.</returns>
 		public static string GetCustomErrorHtml(HttpRequest Request, string LocalFileName, string ContentType, byte[] Content)
 		{
-			bool IsText = ContentType.StartsWith("text/plain");
-			bool IsMarkdown = ContentType.StartsWith("text/markdown");
-			bool IsEmpty = string.IsNullOrEmpty(ContentType);
+			bool IsText;
+			bool IsMarkdown;
+			bool IsEmpty;
+
+			if (string.IsNullOrEmpty(ContentType))
+			{
+				IsText = IsMarkdown = false;
+				IsEmpty = true;
+			}
+			else
+			{
+				IsText = ContentType.StartsWith("text/plain");
+				IsMarkdown = ContentType.StartsWith("text/markdown");
+				IsEmpty = false;
+			}
 
 			if (IsEmpty || IsText || IsMarkdown)
 			{

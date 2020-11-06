@@ -447,7 +447,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				finally
 				{
-					await this.synchObj.EndWrite();
+					if (!(this.synchObj is null))
+						await this.synchObj.EndWrite();
 				}
 			}
 
@@ -472,7 +473,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				finally
 				{
-					await this.synchObj.EndWrite();
+					if (!(this.synchObj is null))
+						await this.synchObj.EndWrite();
 				}
 			}
 
@@ -596,6 +598,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					this.disposed = true;
 					this.synchObj?.Dispose();
+					this.synchObj = null;
 
 					if (this.disposeData)
 					{

@@ -3831,7 +3831,7 @@ namespace Waher.IoTGateway
 
 		private static void WebServer_CustomError(object Sender, CustomErrorEventArgs e)
 		{
-			if (e.Request.Header.Accept is null)
+			if (e.Request?.Header?.Accept is null)
 				return;
 
 			if (e.Request.Header.Accept.IsAcceptable("text/html"))

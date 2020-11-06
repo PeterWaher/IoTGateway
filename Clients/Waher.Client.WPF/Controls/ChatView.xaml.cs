@@ -273,12 +273,15 @@ namespace Waher.Client.WPF.Controls
 		{
 			w.WriteStartElement(chatRoot, chatNamespace);
 
-			foreach (ChatItem Item in this.ChatListView.Items)
+			foreach (ListViewItem Item in this.ChatListView.Items)
 			{
-				w.WriteStartElement(Item.Type.ToString());
-				w.WriteAttributeString("timestamp", XML.Encode(Item.Timestamp));
-				w.WriteValue(Item.Message);
-				w.WriteEndElement();
+				if (Item.Content is ChatItem ChatItem)
+				{
+					w.WriteStartElement(ChatItem.Type.ToString());
+					w.WriteAttributeString("timestamp", XML.Encode(ChatItem.Timestamp));
+					w.WriteValue(ChatItem.Message);
+					w.WriteEndElement();
+				}
 			}
 
 			w.WriteEndElement();

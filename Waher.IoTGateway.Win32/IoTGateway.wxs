@@ -580,6 +580,7 @@
               <File Id='Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Inventory.Loader.dll' Name='Waher.Runtime.Inventory.Loader.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.dll' Vital='yes'/>
+              <File Id='Waher.Runtime.Queue.dll' Name='Waher.Runtime.Queue.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.dll' Vital='yes'/>
               <File Id='Waher.Runtime.ServiceRegistration.dll' Name='Waher.Runtime.ServiceRegistration.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.ServiceRegistration.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Settings.dll' Vital='yes'/>
               <File Id='Waher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.dll' Vital='yes'/>
@@ -673,6 +674,7 @@
               <RemoveFile Id='RemoveWaher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Inventory.Loader.dll' Name='Waher.Runtime.Inventory.Loader.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Runtime.Queue.dll' Name='Waher.Runtime.Queue.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.ServiceRegistration.dll' Name='Waher.Runtime.ServiceRegistration.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' On='uninstall'/>

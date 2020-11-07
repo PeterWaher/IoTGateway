@@ -51,6 +51,7 @@
     <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />

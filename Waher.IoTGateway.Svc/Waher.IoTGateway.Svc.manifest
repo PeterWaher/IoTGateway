@@ -293,6 +293,7 @@
   <Assembly fileName='Waher.Runtime.Inventory.dll'/>
   <Assembly fileName='Waher.Runtime.Inventory.Loader.dll'/>
   <Assembly fileName='Waher.Runtime.Language.dll'/>
+  <Assembly fileName='Waher.Runtime.Queue.dll'/>
   <Assembly fileName='Waher.Runtime.ServiceRegistration.dll'/>
   <Assembly fileName='Waher.Runtime.Settings.dll'/>
   <Assembly fileName='Waher.Runtime.Text.dll'/>

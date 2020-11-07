@@ -211,9 +211,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 						break;
 					}
 
-					if (Attr is DefaultValueAttribute)
+					if (Attr is DefaultValueAttribute DefaultValueAttribute)
 					{
-						DefaultValue = ((DefaultValueAttribute)Attr).Value;
+						DefaultValue = DefaultValueAttribute.Value;
 						NrDefault++;
 
 						this.defaultValues[Member.Name] = DefaultValue;
@@ -363,9 +363,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 						this.objectIdPropertyInfo = PI;
 					}
 
-					if (Attr is ShortNameAttribute)
+					if (Attr is ShortNameAttribute ShortNameAttribute)
 					{
-						ShortName = ((ShortNameAttribute)Attr).Name;
+						ShortName = ShortNameAttribute.Name;
 						this.shortNamesByFieldName[Member.Name] = ShortName;
 					}
 				}
@@ -587,8 +587,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 						if (Attr is ByReferenceAttribute)
 							ByReference = true;
 
-						if (Attr is ShortNameAttribute)
-							ShortName = ((ShortNameAttribute)Attr).Name;
+						if (Attr is ShortNameAttribute ShortNameAttribute)
+							ShortName = ShortNameAttribute.Name;
 					}
 
 					if (Ignore)
@@ -1618,13 +1618,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 						Ignore = true;
 						break;
 					}
-					else if (Attr is DefaultValueAttribute)
+					else if (Attr is DefaultValueAttribute DefaultValueAttribute)
 					{
 						HasDefaultValue = true;
-						DefaultValue = ((DefaultValueAttribute)Attr).Value;
+						DefaultValue = DefaultValueAttribute.Value;
 					}
-					else if (Attr is ShortNameAttribute)
-						ShortName = ((ShortNameAttribute)Attr).Name;
+					else if (Attr is ShortNameAttribute ShortNameAttribute)
+						ShortName = ShortNameAttribute.Name;
 					else if (Attr is ObjectIdAttribute)
 						ObjectIdField = true;
 					else if (Attr is ByReferenceAttribute)

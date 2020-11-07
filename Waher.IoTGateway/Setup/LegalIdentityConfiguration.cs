@@ -333,7 +333,7 @@ namespace Waher.IoTGateway.Setup
 
 		private void GetLegalIdentities()
 		{
-			Gateway.ContractsClient.GetLegalIdentities((sender, e) =>
+			Gateway.ContractsClient?.GetLegalIdentities((sender, e) =>
 			{
 				if (e.Ok)
 				{

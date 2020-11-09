@@ -263,6 +263,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />

@@ -67,6 +67,7 @@
     <Compile Include=".bak\Waher.Content\Multipart\WwwFormDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Posters\PosterBase.cs" />
     <Compile Include=".bak\Waher.Content\Posters\WebPoster.cs" />
+    <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
@@ -88,23 +89,40 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IProcessingSupport.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
+    <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Q.cs" />
     <Compile Include=".bak\Waher.Script\Constants\Z.cs" />
     <Compile Include=".bak\Waher.Script\Exceptions\ScriptAbortedException.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogAlert.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogCritical.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogDebug.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogEmergency.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogError.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogFunction.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogInformational.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogNotice.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Logging\LogWarning.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Fields.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Optional.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Preview.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Properties.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\DefaultPropertyEnumerator.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\IPropertyEnumerator.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\PropertyEnumerators\TypePropertyEnumerator.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Required.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Scalar\Boolean.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Scalar\Double.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Scalar\Integer.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Count.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Left.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Mid.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Right.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Vectors\Sort.cs" />
     <Compile Include=".bak\Waher.Script\IContextVariables.cs" />
+    <Compile Include=".bak\Waher.Script\Model\FunctionZeroVariables.cs" />
     <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
     <Compile Include=".bak\Waher.Script\Model\IKeyWord.cs" />
     <Compile Include=".bak\Waher.Script\Model\NullCheckBinaryOperator.cs" />
@@ -139,6 +157,7 @@
     <Compile Include=".bak\Waher.Script\Operators\Assignments\WithSelf\ShiftSelfLeft.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Assignments\WithSelf\ShiftSelfRight.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Assignments\WithSelf\SubtractFromSelf.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Comparisons\Range.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />
@@ -574,10 +593,12 @@
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\Microsoft.DependencyValidation.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Runtime\Waher.Runtime.Inventory\*.cs" "$(ProjectDir).bak\Waher.Runtime.Inventory" /S /Y
+xcopy "$(SolutionDir)Runtime\Waher.Runtime.Temporary\*.cs" "$(ProjectDir).bak\Waher.Runtime.Temporary" /S /Y
 xcopy "$(SolutionDir)Events\Waher.Events\*.cs" "$(ProjectDir).bak\Waher.Events" /S /Y
 xcopy "$(SolutionDir)Content\Waher.Content\*.cs" "$(ProjectDir).bak\Waher.Content" /S /Y
 xcopy "$(SolutionDir)Content\Waher.Content.Xml\*.cs" "$(ProjectDir).bak\Waher.Content.Xml" /S /Y

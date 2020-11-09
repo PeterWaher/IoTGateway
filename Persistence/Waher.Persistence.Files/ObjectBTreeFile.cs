@@ -4028,7 +4028,7 @@ namespace Waher.Persistence.Files
 
 						try
 						{
-							object Obj = this.genericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, false);
+							object Obj = await this.genericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, false);
 							Len2 = Pos2 - Reader2.Position;
 						}
 						catch (Exception ex)

@@ -2624,7 +2624,7 @@ namespace Waher.Persistence.Files
 
 												try
 												{
-													Obj = File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
+													Obj = await File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
 													Len2 = Pos2 - Reader2.Position;
 												}
 												catch (Exception)

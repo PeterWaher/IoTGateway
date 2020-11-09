@@ -148,7 +148,7 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.LockWrite();
 			try
 			{
-				byte[] Bin = this.SerializeLocked(key, value, Serializer);
+				byte[] Bin = await this.SerializeLocked(key, value, Serializer);
 				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
 				if (Info is null)
 				{
@@ -183,14 +183,14 @@ namespace Waher.Persistence.Files
 		/// <param name="Value">Value</param>
 		/// <param name="Serializer">Serializer.</param>
 		/// <returns>Serialized record.</returns>
-		private byte[] SerializeLocked(string Key, object Value, IObjectSerializer Serializer)
+		private async Task<byte[]> SerializeLocked(string Key, object Value, IObjectSerializer Serializer)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 
 			Writer.WriteBit(true);
 			Writer.Write(Key);
 
-			Serializer.Serialize(Writer, true, true, Value);
+			await Serializer.Serialize(Writer, true, true, Value);
 
 			return Writer.GetSerialization();
 		}

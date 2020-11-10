@@ -575,7 +575,7 @@
             <param name="Callback">Method to call when validation is completed</param>
             <param name="State">State object to pass to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignatureAsync(Waher.Networking.XMPP.Contracts.LegalIdentity,System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignature(Waher.Networking.XMPP.Contracts.LegalIdentity,System.Byte[],System.Byte[])">
             <summary>
             Validates a signature of binary data.
             </summary>
@@ -588,7 +588,7 @@
             null = Client key algorithm is unknown, and veracity of signature could not be established.
             </returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignatureAsync(Waher.Networking.XMPP.Contracts.LegalIdentity,System.IO.Stream,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignature(Waher.Networking.XMPP.Contracts.LegalIdentity,System.IO.Stream,System.Byte[])">
             <summary>
             Validates a signature of binary data.
             </summary>
@@ -1568,8 +1568,9 @@
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionIdentityAsync(System.String,System.String,System.String)">
             <summary>
             Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityReceived"/> event is raised.
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForIdentityReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityResponseReceived"/> event is raised.
             </summary>
             <param name="LegalId">Legal Identity to petition.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
@@ -1579,8 +1580,9 @@
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionIdentityAsync(System.String,System.String,System.String,System.String)">
             <summary>
             Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityReceived"/> event is raised.
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForIdentityReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityResponseReceived"/> event is raised.
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="LegalId">Legal Identity to petition.</param>
@@ -1590,32 +1592,30 @@
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionIdentityResponseAsync(System.String,System.String,System.String,System.Boolean)">
             <summary>
-            Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityReceived"/> event is raised.
+            Sends a response to a petition for information about a legal identity.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForIdentityReceived"/> event is raised.
             When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityResponseReceived"/> event is raised.
             </summary>
-            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="LegalId">Legal Identity petitioned.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
             to identify the petition request.</param>
-            <param name="RequestorBareJid">Bare JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="Response">If the petition is accepted (true) or rejected (false).</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionIdentityResponseAsync(System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
-            Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityReceived"/> event is raised.
+            Sends a response to a petition for information about a legal identity.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForIdentityReceived"/> event is raised.
             When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityResponseReceived"/> event is raised.
             </summary>
             <param name="Address">Address of server (component).</param>
-            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="LegalId">Legal Identity petitioned.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
             to identify the petition request.</param>
-            <param name="RequestorBareJid">Bare JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="Response">If the petition is accepted (true) or rejected (false).</param>
         </member>
-        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedIdentityReceived">
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForIdentityReceived">
             <summary>
             Event raised when someone requests access to one of the legal identities owned by the client.
             </summary>
@@ -1625,11 +1625,78 @@
             Event raised when a response to an identity petition has been received by the client.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionSignatureAsync(System.String,System.Byte[],System.String,System.String)">
+            <summary>
+            Sends a petition to a third party to request a digital signature of some content. The petition is not
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForSignatureReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedSignatureResponseReceived"/> event is raised.
+            </summary>
+            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="Content">Content to be signed.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="Purpose">Purpose string to show to the owner.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionSignatureAsync(System.String,System.String,System.Byte[],System.String,System.String)">
+            <summary>
+            Sends a petition to a third party to request a digital signature of some content. The petition is not
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForSignatureReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedSignatureResponseReceived"/> event is raised.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="Content">Content to be signed.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="Purpose">Purpose string to show to the owner.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionSignatureResponseAsync(System.String,System.Byte[],System.Byte[],System.String,System.String,System.Boolean)">
+            <summary>
+            Sends a response to a petition for a signature by the client.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForSignatureReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedSignatureResponseReceived"/> event is raised.
+            </summary>
+            <param name="LegalId">Legal Identity petitioned.</param>
+            <param name="Content">Content to be signed.</param>
+            <param name="Signature">Digital signature of content, made by the legal identity.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
+            <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionSignatureResponseAsync(System.String,System.String,System.Byte[],System.Byte[],System.String,System.String,System.Boolean)">
+            <summary>
+            Sends a response to a petition for a signature by the client.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForSignatureReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedSignatureResponseReceived"/> event is raised.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalId">Legal Identity petitioned.</param>
+            <param name="Content">Content to be signed.</param>
+            <param name="Signature">Digital signature of content, made by the legal identity.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
+            <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForSignatureReceived">
+            <summary>
+            Event raised when someone requests access to one of the legal identities owned by the client.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedSignatureResponseReceived">
+            <summary>
+            Event raised when a response to a signature petition has been received by the client.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionContractAsync(System.String,System.String,System.String)">
             <summary>
             Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
             guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived"/> event is raised.
+            When a petition for a contract is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForContractReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractResponseReceived"/> event is raised.
             </summary>
             <param name="ContractId">Smart Contract to petition.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
@@ -1640,7 +1707,8 @@
             <summary>
             Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
             guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived"/> event is raised.
+            When a petition for a contract is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForContractReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractResponseReceived"/> event is raised.
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="ContractId">Smart Contract to petition.</param>
@@ -1650,32 +1718,30 @@
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionContractResponseAsync(System.String,System.String,System.String,System.Boolean)">
             <summary>
-            Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived"/> event is raised.
+            Sends a response to a petition to access a smart contract.
+            When a petition for a contract is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForContractReceived"/> event is raised.
             When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractResponseReceived"/> event is raised.
             </summary>
             <param name="ContractId">Smart Contract to petition.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
             to identify the petition request.</param>
-            <param name="RequestorBareJid">Bare JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="Response">If the petition is accepted (true) or rejected (false).</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionContractResponseAsync(System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
-            Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
-            guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-            When petitioned events are received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived"/> event is raised.
+            Sends a response to a petition to access a smart contract.
+            When a petition for a contract is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForContractReceived"/> event is raised.
             When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractResponseReceived"/> event is raised.
             </summary>
             <param name="Address">Address of server (component).</param>
             <param name="ContractId">Smart Contract to petition.</param>
             <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
             to identify the petition request.</param>
-            <param name="RequestorBareJid">Bare JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="Response">If the petition is accepted (true) or rejected (false).</param>
         </member>
-        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedContractReceived">
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForContractReceived">
             <summary>
             Event raised when someone requests access to a smart contract to which the client is part.
             </summary>
@@ -1856,7 +1922,7 @@
             </summary>
             <param name="e">Message event arguments.</param>
             <param name="RequestorIdentity">Legal Identity of entity making the request.</param>
-            <param name="RequestorBareJid">Full JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="RequestedContractId">Petition for this smart contract.</param>
             <param name="PetitionId">Petition ID. Identifies the petition.</param>
             <param name="Purpose">Purpose of petitioning the identity information.</param>
@@ -1866,9 +1932,9 @@
             Legal Identity of requesting entity.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionEventArgs.RequestorBareJid">
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionEventArgs.RequestorFullJid">
             <summary>
-            Bare JID of requestor.
+            Full JID of requestor.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionEventArgs.RequestedContractId">
@@ -2363,7 +2429,7 @@
             </summary>
             <param name="e">Message event arguments.</param>
             <param name="RequestorIdentity">Legal Identity of entity making the request.</param>
-            <param name="RequestorBareJid">Full JID of requestor.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
             <param name="RequestedIdentityId">Petition for this legal identity.</param>
             <param name="PetitionId">Petition ID. Identifies the petition.</param>
             <param name="Purpose">Purpose of petitioning the identity information.</param>
@@ -2373,9 +2439,9 @@
             Legal Identity of requesting entity.
             </summary>
         </member>
-        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityPetitionEventArgs.RequestorBareJid">
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityPetitionEventArgs.RequestorFullJid">
             <summary>
-            Bare JID of requestor.
+            Full JID of requestor.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityPetitionEventArgs.RequestedIdentityId">
@@ -2589,6 +2655,102 @@
         <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.Signature">
             <summary>
             Digital signature
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignaturePetitionEventHandler">
+            <summary>
+            Delegate for digital signature petition events.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs">
+            <summary>
+            Event arguments for digital signature petitions
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,Waher.Networking.XMPP.Contracts.LegalIdentity,System.String,System.String,System.String,System.String,System.Byte[])">
+            <summary>
+            Event arguments for legal identity petitions
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="RequestorIdentity">Legal Identity of entity making the request.</param>
+            <param name="RequestorFullJid">Full JID of requestor.</param>
+            <param name="SignatoryIdentityId">Legal identity of petitioned signatory.</param>
+            <param name="PetitionId">Petition ID. Identifies the petition.</param>
+            <param name="Purpose">Purpose of petitioning the identity information.</param>
+            <param name="Content">Content to sign.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.RequestorIdentity">
+            <summary>
+            Legal Identity of requesting entity.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.RequestorFullJid">
+            <summary>
+            Full JID of requestor.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.SignatoryIdentityId">
+            <summary>
+            Legal identity of petitioned signatory.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.PetitionId">
+            <summary>
+            Petition ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.Purpose">
+            <summary>
+            Purpose
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionEventArgs.ContentToSign">
+            <summary>
+            Content to sign.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventHandler">
+            <summary>
+            Delegate for signature petition response events.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs">
+            <summary>
+            Event arguments for signature petition responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,Waher.Networking.XMPP.Contracts.LegalIdentity,System.String,System.Byte[],System.Boolean)">
+            <summary>
+            Event arguments for signature petition responses
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="RequestedIdentity">Requested identity, if accepted, null if rejected.</param>
+            <param name="PetitionId">Petition ID. Identifies the petition.</param>
+            <param name="Signature">Digital Signature petitioned.</param>
+            <param name="Response">If accepted (true) or rejected (false).</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs.RequestedIdentity">
+            <summary>
+            Requested identity, if accepted, null if rejected.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs.PetitionId">
+            <summary>
+            Petition ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs.Signature">
+            <summary>
+            Digital Signature petitioned, if accepted by recipient.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.SignaturePetitionResponseEventArgs.Response">
+            <summary>
+            If accepted (true) or rejected (false).
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SmartContractEventHandler">

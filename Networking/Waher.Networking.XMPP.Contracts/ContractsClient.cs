@@ -17,6 +17,7 @@ using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Settings;
 using Waher.Security;
@@ -45,6 +46,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
+		private readonly Cache<string, byte[]> contentPerPid = new Cache<string, byte[]>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity localEndpoint;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
@@ -71,6 +73,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
+			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
 
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
@@ -118,6 +122,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.UnregisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.UnregisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionIdentityResponseMsg", NamespaceLegalIdentities, this.PetitionIdentityResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureMsg", NamespaceLegalIdentities, this.PetitionSignatureMessageHandler, false);
+			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
 
 			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
 			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
@@ -699,7 +705,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			bool? b = this.ValidateSignatureAsync(Identity, Data, Identity.ClientSignature);
+			bool? b = this.ValidateSignature(Identity, Data, Identity.ClientSignature);
 			if (b.HasValue)
 			{
 				if (!b.Value)
@@ -738,7 +744,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 							File.Position = 0;
 
-							b = this.ValidateSignatureAsync(Identity, File, Attachment.Signature);
+							b = this.ValidateSignature(Identity, File, Attachment.Signature);
 							if (b.HasValue)
 							{
 								if (!b.Value)
@@ -838,7 +844,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// false = Signature is invalid.
 		/// null = Client key algorithm is unknown, and veracity of signature could not be established.
 		/// </returns>
-		public bool? ValidateSignatureAsync(LegalIdentity Identity, byte[] Data, byte[] Signature)
+		public bool? ValidateSignature(LegalIdentity Identity, byte[] Data, byte[] Signature)
 		{
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
@@ -866,7 +872,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// false = Signature is invalid.
 		/// null = Client key algorithm is unknown, and veracity of signature could not be established.
 		/// </returns>
-		public bool? ValidateSignatureAsync(LegalIdentity Identity, Stream Data, byte[] Signature)
+		public bool? ValidateSignature(LegalIdentity Identity, Stream Data, byte[] Signature)
 		{
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
 				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
@@ -2787,7 +2793,7 @@ namespace Waher.Networking.XMPP.Contracts
 							File.Position = 0;
 
 							if (Identities.TryGetValue(Attachment.LegalId, out LegalIdentity Identity))
-								IsValid = this.ValidateSignatureAsync(Identity, File, Attachment.Signature);
+								IsValid = this.ValidateSignature(Identity, File, Attachment.Signature);
 							else
 							{
 								MemoryStream ms = new MemoryStream();
@@ -3643,8 +3649,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 		/// <summary>
 		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="LegalId">Legal Identity to petition.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
@@ -3657,8 +3664,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 		/// <summary>
 		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="LegalId">Legal Identity to petition.</param>
@@ -3693,34 +3701,32 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// Sends a response to a petition for information about a legal identity.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
 		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
 		/// </summary>
-		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="LegalId">Legal Identity petitioned.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
 		/// to identify the petition request.</param>
-		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public Task PetitionIdentityResponseAsync(string LegalId, string PetitionId, string RequestorBareJid, bool Response)
+		public Task PetitionIdentityResponseAsync(string LegalId, string PetitionId, string RequestorFullJid, bool Response)
 		{
-			return this.PetitionIdentityResponseAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, RequestorBareJid, Response);
+			return this.PetitionIdentityResponseAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, RequestorFullJid, Response);
 		}
 
 		/// <summary>
-		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedIdentityReceived"/> event is raised.
+		/// Sends a response to a petition for information about a legal identity.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
 		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
-		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="LegalId">Legal Identity petitioned.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
 		/// to identify the petition request.</param>
-		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public async Task PetitionIdentityResponseAsync(string Address, string LegalId, string PetitionId, string RequestorBareJid, bool Response)
+		public async Task PetitionIdentityResponseAsync(string Address, string LegalId, string PetitionId, string RequestorFullJid, bool Response)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3731,7 +3737,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' pid='");
 			Xml.Append(XML.Encode(PetitionId));
 			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(RequestorBareJid));
+			Xml.Append(XML.Encode(RequestorFullJid));
 			Xml.Append("' response='");
 			Xml.Append(CommonTypes.Encode(Response));
 			Xml.Append("'/>");
@@ -3741,7 +3747,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionIdentityMessageHandler(object Sender, MessageEventArgs e)
 		{
-			LegalIdentityPetitionEventHandler h = this.PetitionedIdentityReceived;
+			LegalIdentityPetitionEventHandler h = this.PetitionForIdentityReceived;
 
 			if (!(h is null))
 			{
@@ -3792,7 +3798,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Event raised when someone requests access to one of the legal identities owned by the client.
 		/// </summary>
-		public event LegalIdentityPetitionEventHandler PetitionedIdentityReceived = null;
+		public event LegalIdentityPetitionEventHandler PetitionForIdentityReceived = null;
 
 		private async Task PetitionIdentityResponseMessageHandler(object Sender, MessageEventArgs e)
 		{
@@ -3834,12 +3840,272 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Signature petitions
+
+		/// <summary>
+		/// Sends a petition to a third party to request a digital signature of some content. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public Task PetitionSignatureAsync(string LegalId, byte[] Content, string PetitionId, string Purpose)
+		{
+			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose);
+		}
+
+		/// <summary>
+		/// Sends a petition to a third party to request a digital signature of some content. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose)
+		{
+			if (this.contentPerPid.ContainsKey(PetitionId))
+				throw new InvalidOperationException("Petition ID must be unique for outstanding petitions.");
+
+			this.contentPerPid[PetitionId] = Content;
+
+			StringBuilder Xml = new StringBuilder();
+			byte[] Nonce = new byte[32];
+			this.rnd.GetBytes(Nonce);
+
+			string NonceStr = Convert.ToBase64String(Nonce);
+			string ContentStr = Convert.ToBase64String(Content);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID + ":" + ContentStr);
+			byte[] Signature = await this.SignAsync(Data);
+
+			Xml.Append("<petitionSignature xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' purpose='");
+			Xml.Append(XML.Encode(Purpose));
+			Xml.Append("' nonce='");
+			Xml.Append(NonceStr);
+			Xml.Append("' s='");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("'>");
+			Xml.Append(ContentStr);
+			Xml.Append("</petitionSignature>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		/// <summary>
+		/// Sends a response to a petition for a signature by the client.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity petitioned.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="Signature">Digital signature of content, made by the legal identity.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public Task PetitionSignatureResponseAsync(string LegalId, byte[] Content, 
+			byte[] Signature, string PetitionId, string RequestorFullJid, bool Response)
+		{
+			return this.PetitionSignatureResponseAsync(this.GetTrustProvider(LegalId), LegalId,
+				Content, Signature, PetitionId, RequestorFullJid, Response);
+		}
+
+		/// <summary>
+		/// Sends a response to a petition for a signature by the client.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity petitioned.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="Signature">Digital signature of content, made by the legal identity.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
+		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
+		public async Task PetitionSignatureResponseAsync(string Address, string LegalId, 
+			byte[] Content, byte[] Signature, string PetitionId, string RequestorFullJid, bool Response)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<petitionSignatureResponse xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' pid='");
+			Xml.Append(XML.Encode(PetitionId));
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RequestorFullJid));
+			Xml.Append("' response='");
+			Xml.Append(CommonTypes.Encode(Response));
+			Xml.Append("'><content>");
+			Xml.Append(Convert.ToBase64String(Content));
+			Xml.Append("</content><signature>");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("</signature></petitionSignatureResponse>");
+
+			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		private async Task PetitionSignatureMessageHandler(object Sender, MessageEventArgs e)
+		{
+			SignaturePetitionEventHandler h = this.PetitionForSignatureReceived;
+
+			if (!(h is null))
+			{
+				string LegalId = XML.Attribute(e.Content, "id");
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				string Purpose = XML.Attribute(e.Content, "purpose");
+				string From = XML.Attribute(e.Content, "from");
+				string ContentStr = string.Empty;
+				byte[] Content = null;
+				LegalIdentity Identity = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N.NamespaceURI != NamespaceLegalIdentities)
+						continue;
+
+					if (!(N is XmlElement E))
+						continue;
+
+					switch (E.LocalName)
+					{
+						case "content":
+							ContentStr = E.InnerText;
+							Content = Convert.FromBase64String(ContentStr);
+							break;
+
+						case "identity":
+							Identity = LegalIdentity.Parse(E);
+							break;
+					}
+				}
+
+				if (Identity is null || 
+					Content is null ||
+					string.Compare(e.FromBareJID, this.componentAddress, true) != 0)
+				{
+					return;
+				}
+
+				await this.Validate(Identity, false, async (sender2, e2) =>
+				{
+					if (e2.Status != IdentityStatus.Valid)
+					{
+						Client.Error("Invalid legal identity received and discarded.");
+
+						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+						return;
+					}
+
+					try
+					{
+						await h(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}, null);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when someone requests access to one of the legal identities owned by the client.
+		/// </summary>
+		public event SignaturePetitionEventHandler PetitionForSignatureReceived = null;
+
+		private async Task PetitionSignatureResponseMessageHandler(object Sender, MessageEventArgs e)
+		{
+			SignaturePetitionResponseEventHandler h = this.PetitionedSignatureResponseReceived;
+
+			if (!(h is null))
+			{
+				string PetitionId = XML.Attribute(e.Content, "pid");
+				bool Response = XML.Attribute(e.Content, "response", false);
+				string SignatureStr = string.Empty;
+				byte[] Signature = null;
+				LegalIdentity Identity = null;
+
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.NamespaceURI == NamespaceLegalIdentities)
+					{
+						switch (E.LocalName)
+						{
+							case "identity":
+								Identity = LegalIdentity.Parse(E);
+								break;
+
+							case "signature":
+								SignatureStr = E.InnerText;
+								Signature = Convert.FromBase64String(SignatureStr);
+								break;
+						}
+					}
+				}
+
+				if (Response)
+				{
+					if (Identity is null || Signature is null)
+						return;
+
+					if (!this.contentPerPid.TryGetValue(PetitionId, out byte[] Content))
+						return;
+
+					bool? Result = this.ValidateSignature(Identity, Content, Signature);
+					if (!Result.HasValue || !Result.Value)
+						return;
+				}
+
+				if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
+				{
+					try
+					{
+						await h(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+					finally
+					{
+						this.contentPerPid.Remove(PetitionId);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a response to a signature petition has been received by the client.
+		/// </summary>
+		public event SignaturePetitionResponseEventHandler PetitionedSignatureResponseReceived = null;
+
+		#endregion
+
 		#region Contract petitions
 
 		/// <summary>
 		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
 		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// When a petition for a contract is received, the <see cref="PetitionForContractReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="ContractId">Smart Contract to petition.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
@@ -3853,7 +4119,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
 		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// When a petition for a contract is received, the <see cref="PetitionForContractReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">Smart Contract to petition.</param>
@@ -3888,34 +4155,32 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// Sends a response to a petition to access a smart contract.
+		/// When a petition for a contract is received, the <see cref="PetitionForContractReceived"/> event is raised.
 		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="ContractId">Smart Contract to petition.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
 		/// to identify the petition request.</param>
-		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public Task PetitionContractResponseAsync(string ContractId, string PetitionId, string RequestorBareJid, bool Response)
+		public Task PetitionContractResponseAsync(string ContractId, string PetitionId, string RequestorFullJid, bool Response)
 		{
-			return this.PetitionContractResponseAsync(this.GetTrustProvider(ContractId), ContractId, PetitionId, RequestorBareJid, Response);
+			return this.PetitionContractResponseAsync(this.GetTrustProvider(ContractId), ContractId, PetitionId, RequestorFullJid, Response);
 		}
 
 		/// <summary>
-		/// Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not
-		/// guaranteed to return a response. Response is returned if one of the parts accepts the petition.
-		/// When petitioned events are received, the <see cref="PetitionedContractReceived"/> event is raised.
+		/// Sends a response to a petition to access a smart contract.
+		/// When a petition for a contract is received, the <see cref="PetitionForContractReceived"/> event is raised.
 		/// When a response to a petition is received, the <see cref="PetitionedContractResponseReceived"/> event is raised.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">Smart Contract to petition.</param>
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
 		/// to identify the petition request.</param>
-		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public async Task PetitionContractResponseAsync(string Address, string ContractId, string PetitionId, string RequestorBareJid, bool Response)
+		public async Task PetitionContractResponseAsync(string Address, string ContractId, string PetitionId, string RequestorFullJid, bool Response)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3926,7 +4191,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' pid='");
 			Xml.Append(XML.Encode(PetitionId));
 			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(RequestorBareJid));
+			Xml.Append(XML.Encode(RequestorFullJid));
 			Xml.Append("' response='");
 			Xml.Append(CommonTypes.Encode(Response));
 			Xml.Append("'/>");
@@ -3936,7 +4201,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionContractMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractPetitionEventHandler h = this.PetitionedContractReceived;
+			ContractPetitionEventHandler h = this.PetitionForContractReceived;
 
 			if (!(h is null))
 			{
@@ -3988,7 +4253,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Event raised when someone requests access to a smart contract to which the client is part.
 		/// </summary>
-		public event ContractPetitionEventHandler PetitionedContractReceived = null;
+		public event ContractPetitionEventHandler PetitionForContractReceived = null;
 
 		private async Task PetitionContractResponseMessageHandler(object Sender, MessageEventArgs e)
 		{

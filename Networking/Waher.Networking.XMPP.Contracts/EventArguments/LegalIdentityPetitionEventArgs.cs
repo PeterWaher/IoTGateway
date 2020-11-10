@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Contracts
 	public class LegalIdentityPetitionEventArgs : MessageEventArgs
 	{
 		private readonly LegalIdentity requestorIdentity;
-		private readonly string requestorBareJid;
+		private readonly string requestorFullJid;
 		private readonly string requestedIdentityId;
 		private readonly string petitionId;
 		private readonly string purpose;
@@ -26,16 +26,16 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="e">Message event arguments.</param>
 		/// <param name="RequestorIdentity">Legal Identity of entity making the request.</param>
-		/// <param name="RequestorBareJid">Full JID of requestor.</param>
+		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="RequestedIdentityId">Petition for this legal identity.</param>
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
 		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
-		public LegalIdentityPetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorBareJid,
+		public LegalIdentityPetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorFullJid,
 			string RequestedIdentityId, string PetitionId, string Purpose)
 			: base(e)
 		{
 			this.requestorIdentity = RequestorIdentity;
-			this.requestorBareJid = RequestorBareJid;
+			this.requestorFullJid = RequestorFullJid;
 			this.requestedIdentityId = RequestedIdentityId;
 			this.petitionId = PetitionId;
 			this.purpose = Purpose;
@@ -47,9 +47,9 @@ namespace Waher.Networking.XMPP.Contracts
 		public LegalIdentity RequestorIdentity => this.requestorIdentity;
 
 		/// <summary>
-		/// Bare JID of requestor.
+		/// Full JID of requestor.
 		/// </summary>
-		public string RequestorBareJid => this.requestorBareJid;
+		public string RequestorFullJid => this.requestorFullJid;
 
 		/// <summary>
 		/// Requested identity ID

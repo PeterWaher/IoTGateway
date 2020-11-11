@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 namespace Waher.Runtime.Threading
 {
 	/// <summary>
-	/// Abstract base class for objects that allow single concurrent writers but multiple concurrent readers.
+	/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+	/// When disposing the object, it automatically ends any reading and writing locks it maintains.
 	/// </summary>
-	public class MultiReadSingleWriteObject : IDisposable
+	public class MultiReadSingleWriteObject : IMultiReadSingleWriteObject, IDisposable
 	{
 		private LinkedList<TaskCompletionSource<bool>> noWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();

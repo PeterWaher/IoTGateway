@@ -7,7 +7,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library that provides classes for usage in multi-threaded environments providing multiple-read/single-write capabilities.</Description>
+    <Description>Class library that provides classes for usage in multi-threaded asynchronous environments providing multiple-read/single-write capabilities.</Description>
     <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Threading</PackageProjectUrl>
@@ -16,11 +16,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>threading runtime multiple read single write access</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -36,6 +36,11 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
   </ItemGroup>
 
 </Project>

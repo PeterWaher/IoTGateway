@@ -12,8 +12,6 @@ namespace Waher.Runtime.Settings
 	/// </summary>
 	public static class RuntimeSettings
 	{
-		private static readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
-
 		#region String-valued settings
 
 		/// <summary>
@@ -42,15 +40,10 @@ namespace Waher.Runtime.Settings
 		private static async Task<T> GetAsync<T>(string Key)
 			where T : class
 		{
-			await synchObject.BeginRead();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginRead("setting:" + Key))
 			{
 				T Setting = await Database.FindFirstDeleteRest<T>(new FilterFieldEqualTo("Key", Key));
 				return Setting;
-			}
-			finally
-			{
-				await synchObject.EndRead();
 			}
 		}
 
@@ -73,8 +66,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, string Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				StringSetting Setting = await Database.FindFirstDeleteRest<StringSetting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -96,10 +88,6 @@ namespace Waher.Runtime.Settings
 					else
 						return false;
 				}
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 
@@ -149,8 +137,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, long Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				Int64Setting Setting = await Database.FindFirstDeleteRest<Int64Setting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -172,10 +159,6 @@ namespace Waher.Runtime.Settings
 					else
 						return false;
 				}
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 
@@ -225,8 +208,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, bool Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				BooleanSetting Setting = await Database.FindFirstDeleteRest<BooleanSetting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -248,10 +230,6 @@ namespace Waher.Runtime.Settings
 					else
 						return false;
 				}
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 
@@ -301,8 +279,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, DateTime Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				DateTimeSetting Setting = await Database.FindFirstDeleteRest<DateTimeSetting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -324,10 +301,6 @@ namespace Waher.Runtime.Settings
 					else
 						return false;
 				}
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 
@@ -377,8 +350,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, TimeSpan Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				TimeSpanSetting Setting = await Database.FindFirstDeleteRest<TimeSpanSetting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -400,10 +372,6 @@ namespace Waher.Runtime.Settings
 					else
 						return false;
 				}
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 
@@ -453,8 +421,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, double Value)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				DoubleSetting Setting = await Database.FindFirstDeleteRest<DoubleSetting>(new FilterFieldEqualTo("Key", Key));
 				if (Setting is null)
@@ -477,10 +444,6 @@ namespace Waher.Runtime.Settings
 						return false;
 				}
 			}
-			finally
-			{
-				await synchObject.EndWrite();
-			}
 		}
 
 		#endregion
@@ -494,8 +457,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If a setting was found with the given name and deleted.</returns>
 		public static async Task<bool> DeleteAsync(string Key)
 		{
-			await synchObject.BeginWrite();
-			try
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				bool Found = false;
 
@@ -503,10 +465,6 @@ namespace Waher.Runtime.Settings
 					Found = true;
 
 				return Found;
-			}
-			finally
-			{
-				await synchObject.EndWrite();
 			}
 		}
 

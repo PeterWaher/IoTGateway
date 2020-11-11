@@ -4232,6 +4232,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("</reviewer></peerReview>");
 
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+			byte[] Signature = await this.SignAsync(Data);
 			string FileName = ReviewerLegalIdentity.Id + ".xml";
 			string ContentType = "text/xml; charset=utf-8";
 
@@ -4240,9 +4241,7 @@ namespace Waher.Networking.XMPP.Contracts
 				throw new IOException("Unable to upload Peer Review attachment to broker.");
 
 			await e2.PUT(Data, ContentType, 10000);
-
-			byte[] Signature = await this.SignAsync(Data);
-
+			
 			return await this.AddLegalIdAttachmentAsync(Identity.Id, e2.GetUrl, Signature);
 		}
 

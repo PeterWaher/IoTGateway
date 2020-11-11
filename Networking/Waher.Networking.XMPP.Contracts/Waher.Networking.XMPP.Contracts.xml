@@ -1691,6 +1691,64 @@
             Event raised when a response to a signature petition has been received by the client.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionPeerReviewIDAsync(System.String,Waher.Networking.XMPP.Contracts.LegalIdentity,System.String,System.String)">
+            <summary>
+            Sends a petition to a third party to peer review a new legal identity. The petition is not
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForPeerReviewIDReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedPeerReviewIDResponseReceived"/> event is raised.
+            
+            Note: This is a special case of requesting a signature from a third party. In the normal
+            case, both parties have valid legal identities. In this case, the requestor does not need a
+            valid legal identity. However, the legal identity must be in an applied state, and the request
+            properly signed. The identity also needs a JID meta-data tag equal to the bare JID of the
+            client making the petition.
+            </summary>
+            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="Identity">Legal Identity to peer review.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="Purpose">Purpose string to show to the owner.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionPeerReviewIDAsync(System.String,System.String,Waher.Networking.XMPP.Contracts.LegalIdentity,System.String,System.String)">
+            <summary>
+            Sends a petition to a third party to peer review a new legal identity. The petition is not
+            guaranteed to return a response. Response is returned if the recipient accepts the petition.
+            When a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForPeerReviewIDReceived"/> event is raised.
+            When a response to a petition is received, the <see cref="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedPeerReviewIDResponseReceived"/> event is raised.
+            
+            Note: This is a special case of requesting a signature from a third party. In the normal
+            case, both parties have valid legal identities. In this case, the requestor does not need a
+            valid legal identity. However, the legal identity must be in an applied state, and the request
+            properly signed. The identity also needs a JID meta-data tag equal to the bare JID of the
+            client making the petition.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalId">Legal Identity to petition.</param>
+            <param name="Identity">Legal Identity to peer review.</param>
+            <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+            to identify the petition request.</param>
+            <param name="Purpose">Purpose string to show to the owner.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionForPeerReviewIDReceived">
+            <summary>
+            Event raised when someone makes a request to one of the legal identities owned by the client, for a peer review of a newly created legal identity.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionedPeerReviewIDResponseReceived">
+            <summary>
+            Event raised when a response to a ID Peer Review petition has been received by the client.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AddPeerReviewIDAttachment(Waher.Networking.XMPP.Contracts.LegalIdentity,Waher.Networking.XMPP.Contracts.LegalIdentity,System.Byte[])">
+            <summary>
+            Adds an attachment to a legal identity with information about a peer review of the identity.
+            </summary>
+            <param name="Identity"></param>
+            <param name="ReviewerLegalIdentity">Identity of reviewer.</param>
+            <param name="PeerSignature">Signature made by reviewer.</param>
+            <returns>Updated identity.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.PetitionContractAsync(System.String,System.String,System.String)">
             <summary>
             Sends a petition to the parts of a smart contract, to access the information in the contract. The petition is not

@@ -23,6 +23,7 @@ using Waher.Runtime.Settings;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
+using Waher.Networking.XMPP.HttpFileUpload;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -46,7 +47,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
-		private readonly Cache<string, byte[]> contentPerPid = new Cache<string, byte[]>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
+		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity localEndpoint;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
@@ -676,7 +677,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Now.Date.AddDays(1) > Identity.To)      // To avoid Time-zone problems
+			if (Now.Date.AddDays(-1) > Identity.To)      // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State);
 				return;
@@ -2613,7 +2614,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Now.Date.AddDays(1) > Contract.To)      // To avoid Time-zone problems
+			if (Now.Date.AddDays(-1) > Contract.To)      // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(ContractStatus.NotValidAnymore, Callback, State);
 				return;
@@ -3855,7 +3856,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		public Task PetitionSignatureAsync(string LegalId, byte[] Content, string PetitionId, string Purpose)
 		{
-			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose);
+			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose, false);
 		}
 
 		/// <summary>
@@ -3870,12 +3871,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
 		/// to identify the petition request.</param>
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
-		public async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose)
+		public Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose)
+		{
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false);
+		}
+
+		private async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, 
+			string Purpose, bool PeerReview)
 		{
 			if (this.contentPerPid.ContainsKey(PetitionId))
 				throw new InvalidOperationException("Petition ID must be unique for outstanding petitions.");
 
-			this.contentPerPid[PetitionId] = Content;
+			this.contentPerPid[PetitionId] = new KeyValuePair<byte[], bool>(Content, PeerReview);
 
 			StringBuilder Xml = new StringBuilder();
 			byte[] Nonce = new byte[32];
@@ -3963,54 +3970,88 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionSignatureMessageHandler(object Sender, MessageEventArgs e)
 		{
-			SignaturePetitionEventHandler h = this.PetitionForSignatureReceived;
+			string LegalId = XML.Attribute(e.Content, "id");
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			string Purpose = XML.Attribute(e.Content, "purpose");
+			string From = XML.Attribute(e.Content, "from");
+			string ContentStr = string.Empty;
+			byte[] Content = null;
+			LegalIdentity Identity = null;
+			bool PeerReview = false;
 
-			if (!(h is null))
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string LegalId = XML.Attribute(e.Content, "id");
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				string Purpose = XML.Attribute(e.Content, "purpose");
-				string From = XML.Attribute(e.Content, "from");
-				string ContentStr = string.Empty;
-				byte[] Content = null;
-				LegalIdentity Identity = null;
+				if (N.NamespaceURI != NamespaceLegalIdentities)
+					continue;
 
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
 				{
-					if (N.NamespaceURI != NamespaceLegalIdentities)
-						continue;
+					case "content":
+						ContentStr = E.InnerText;
+						Content = Convert.FromBase64String(ContentStr);
+						break;
 
-					if (!(N is XmlElement E))
-						continue;
+					case "identity":
+						Identity = LegalIdentity.Parse(E);
+						break;
+				}
+			}
 
-					switch (E.LocalName)
+			if (Content is null ||
+				string.Compare(e.FromBareJID, this.componentAddress, true) != 0)
+			{
+				return;
+			}
+
+			if (Identity is null)
+			{
+				string s = Encoding.UTF8.GetString(Content);
+				if (s.StartsWith("<identity") && s.EndsWith("</identity>"))
+				{
+					try
 					{
-						case "content":
-							ContentStr = E.InnerText;
-							Content = Convert.FromBase64String(ContentStr);
-							break;
+						XmlDocument Doc = new XmlDocument();
+						Doc.LoadXml(s);
 
-						case "identity":
-							Identity = LegalIdentity.Parse(E);
-							break;
+						if (Doc.DocumentElement.LocalName == "identity" && 
+							Doc.DocumentElement.NamespaceURI == NamespaceLegalIdentities)
+						{
+							LegalIdentity TempId = LegalIdentity.Parse(Doc.DocumentElement);
+
+							if (TempId.State == IdentityState.Created &&
+								TempId["JID"].ToLower() == XmppClient.GetBareJID(From).ToLower())
+							{
+								Identity = TempId;
+								PeerReview = true;
+							}
+						}
+					}
+					catch (Exception)
+					{
+						// Ignore
 					}
 				}
 
-				if (Identity is null || 
-					Content is null ||
-					string.Compare(e.FromBareJID, this.componentAddress, true) != 0)
-				{
+				if (Identity is null)
 					return;
-				}
+			}
 
+			SignaturePetitionEventHandler h = PeerReview ? this.PetitionForPeerReviewIDReceived : this.PetitionForSignatureReceived;
+
+			if (!(h is null))
+			{
 				await this.Validate(Identity, false, async (sender2, e2) =>
 				{
-					if (e2.Status != IdentityStatus.Valid)
+					if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
 					{
 						Client.Error("Invalid legal identity received and discarded.");
 
 						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 							new KeyValuePair<string, object>("Status", e2.Status));
+
 						return;
 					}
 
@@ -4033,43 +4074,43 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionSignatureResponseMessageHandler(object Sender, MessageEventArgs e)
 		{
-			SignaturePetitionResponseEventHandler h = this.PetitionedSignatureResponseReceived;
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			bool Response = XML.Attribute(e.Content, "response", false);
+			string SignatureStr = string.Empty;
+			byte[] Signature = null;
+			LegalIdentity Identity = null;
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E && E.NamespaceURI == NamespaceLegalIdentities)
+				{
+					switch (E.LocalName)
+					{
+						case "identity":
+							Identity = LegalIdentity.Parse(E);
+							break;
+
+						case "signature":
+							SignatureStr = E.InnerText;
+							Signature = Convert.FromBase64String(SignatureStr);
+							break;
+					}
+				}
+			}
+
+			if (!this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> P))
+				return;
+
+			SignaturePetitionResponseEventHandler h = P.Value ? this.PetitionedPeerReviewIDResponseReceived : this.PetitionedSignatureResponseReceived;
 
 			if (!(h is null))
 			{
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				bool Response = XML.Attribute(e.Content, "response", false);
-				string SignatureStr = string.Empty;
-				byte[] Signature = null;
-				LegalIdentity Identity = null;
-
-				foreach (XmlNode N in e.Content.ChildNodes)
-				{
-					if (N is XmlElement E && E.NamespaceURI == NamespaceLegalIdentities)
-					{
-						switch (E.LocalName)
-						{
-							case "identity":
-								Identity = LegalIdentity.Parse(E);
-								break;
-
-							case "signature":
-								SignatureStr = E.InnerText;
-								Signature = Convert.FromBase64String(SignatureStr);
-								break;
-						}
-					}
-				}
-
 				if (Response)
 				{
 					if (Identity is null || Signature is null)
 						return;
 
-					if (!this.contentPerPid.TryGetValue(PetitionId, out byte[] Content))
-						return;
-
-					bool? Result = this.ValidateSignature(Identity, Content, Signature);
+					bool? Result = this.ValidateSignature(Identity, P.Key, Signature);
 					if (!Result.HasValue || !Result.Value)
 						return;
 				}
@@ -4096,6 +4137,114 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Event raised when a response to a signature petition has been received by the client.
 		/// </summary>
 		public event SignaturePetitionResponseEventHandler PetitionedSignatureResponseReceived = null;
+
+		#endregion
+
+		#region Peer Review of IDs
+
+		/// <summary>
+		/// Sends a petition to a third party to peer review a new legal identity. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForPeerReviewIDReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedPeerReviewIDResponseReceived"/> event is raised.
+		/// 
+		/// Note: This is a special case of requesting a signature from a third party. In the normal
+		/// case, both parties have valid legal identities. In this case, the requestor does not need a
+		/// valid legal identity. However, the legal identity must be in an applied state, and the request
+		/// properly signed. The identity also needs a JID meta-data tag equal to the bare JID of the
+		/// client making the petition.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Identity">Legal Identity to peer review.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public Task PetitionPeerReviewIDAsync(string LegalId, LegalIdentity Identity, string PetitionId, string Purpose)
+		{
+			return this.PetitionPeerReviewIDAsync(this.GetTrustProvider(LegalId), LegalId, Identity, PetitionId, Purpose);
+		}
+
+		/// <summary>
+		/// Sends a petition to a third party to peer review a new legal identity. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForPeerReviewIDReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedPeerReviewIDResponseReceived"/> event is raised.
+		/// 
+		/// Note: This is a special case of requesting a signature from a third party. In the normal
+		/// case, both parties have valid legal identities. In this case, the requestor does not need a
+		/// valid legal identity. However, the legal identity must be in an applied state, and the request
+		/// properly signed. The identity also needs a JID meta-data tag equal to the bare JID of the
+		/// client making the petition.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Identity">Legal Identity to peer review.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		public Task PetitionPeerReviewIDAsync(string Address, string LegalId, LegalIdentity Identity, string PetitionId, string Purpose)
+		{
+			StringBuilder Xml = new StringBuilder();
+			Identity.Serialize(Xml, true, true, true, true, true, false, false);
+			byte[] Content = Encoding.UTF8.GetBytes(Xml.ToString());
+
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, true);
+		}
+
+		/// <summary>
+		/// Event raised when someone makes a request to one of the legal identities owned by the client, for a peer review of a newly created legal identity.
+		/// </summary>
+		public event SignaturePetitionEventHandler PetitionForPeerReviewIDReceived = null;
+
+		/// <summary>
+		/// Event raised when a response to a ID Peer Review petition has been received by the client.
+		/// </summary>
+		public event SignaturePetitionResponseEventHandler PetitionedPeerReviewIDResponseReceived = null;
+
+		/// <summary>
+		/// Adds an attachment to a legal identity with information about a peer review of the identity.
+		/// </summary>
+		/// <param name="Identity"></param>
+		/// <param name="ReviewerLegalIdentity">Identity of reviewer.</param>
+		/// <param name="PeerSignature">Signature made by reviewer.</param>
+		/// <returns>Updated identity.</returns>
+		public async Task<LegalIdentity> AddPeerReviewIDAttachment(LegalIdentity Identity,
+			LegalIdentity ReviewerLegalIdentity, byte[] PeerSignature)
+		{
+			if (!this.client.TryGetExtension(typeof(HttpFileUploadClient), out IXmppExtension Extension) ||
+				!(Extension is HttpFileUploadClient HttpFileUploadClient))
+			{
+				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
+			}
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<peerReview s='");
+			Xml.Append(Convert.ToBase64String(PeerSignature));
+			Xml.Append("' tp='");
+			Xml.Append(XML.Encode(DateTime.UtcNow));
+			Xml.Append("' xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("'><reviewed>");
+			Identity.Serialize(Xml, true, true, true, true, true, false, false);
+			Xml.Append("</reviewed><reviewer>");
+			ReviewerLegalIdentity.Serialize(Xml, true, true, true, true, true, false, false);
+			Xml.Append("</reviewer></peerReview>");
+
+			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
+			string FileName = ReviewerLegalIdentity.Id + ".xml";
+			string ContentType = "text/xml; charset=utf-8";
+
+			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName, ContentType, Data.Length);
+			if (!e2.Ok)
+				throw new IOException("Unable to upload Peer Review attachment to broker.");
+
+			await e2.PUT(Data, ContentType, 10000);
+
+			byte[] Signature = await this.SignAsync(Data);
+
+			return await this.AddLegalIdAttachmentAsync(Identity.Id, e2.GetUrl, Signature);
+		}
 
 		#endregion
 

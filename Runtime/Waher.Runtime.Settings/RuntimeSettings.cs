@@ -484,5 +484,33 @@ namespace Waher.Runtime.Settings
 		}
 
 		#endregion
+
+		#region Delete Setting
+
+		/// <summary>
+		/// Deletes a runtime setting
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <returns>If a setting was found with the given name and deleted.</returns>
+		public static async Task<bool> DeleteAsync(string Key)
+		{
+			await synchObject.BeginWrite();
+			try
+			{
+				bool Found = false;
+
+				foreach (Setting Setting in await Database.FindDelete<Setting>(new FilterFieldEqualTo("Key", Key)))
+					Found = true;
+
+				return Found;
+			}
+			finally
+			{
+				await synchObject.EndWrite();
+			}
+		}
+
+		#endregion
+
 	}
 }

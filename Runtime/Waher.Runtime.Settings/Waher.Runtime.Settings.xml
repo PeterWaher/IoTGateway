@@ -201,6 +201,13 @@
             <param name="Value">New value.</param>
             <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
         </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteAsync(System.String)">
+            <summary>
+            Deletes a runtime setting
+            </summary>
+            <param name="Key">Key name.</param>
+            <returns>If a setting was found with the given name and deleted.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.BooleanSetting">
             <summary>
             Boolean setting object.

@@ -67,6 +67,7 @@ namespace Waher.Persistence
 		{
 			IDatabaseProvider Result = provider;
 			provider = new NullDatabaseProvider();
+			locked = false;
 			return Result;
 		}
 
@@ -75,7 +76,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool HasProvider
 		{
-			get => !(provider is null);
+			get => !(provider is null) && (!(provider is NullDatabaseProvider) || locked);
 		}
 
 		/// <summary>
@@ -993,7 +994,7 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
-		public static IPersistentDictionary GetDictionary(string Collection)
+		public static Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
 			return Provider.GetDictionary(Collection);
 		}

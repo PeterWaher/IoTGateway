@@ -23,7 +23,7 @@ namespace Waher.Security.SPF.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static async Task AssemblyInitialize(TestContext Context)
 		{
 			Types.Initialize(
 				typeof(Database).Assembly,
@@ -31,7 +31,7 @@ namespace Waher.Security.SPF.Test
 				typeof(ObjectSerializer).Assembly,
 				typeof(DnsResolver).Assembly);
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 		}
 

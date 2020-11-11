@@ -19,7 +19,7 @@
       <dependency id="Waher.Events" version="1.0.12"/>
       <dependency id="Waher.Networking.UWP" version="1.0.18"/>
       <dependency id="Waher.Networking.CoAP.UWP" version="1.0.10"/>
-      <dependency id="Waher.Persistence" version="1.1.0"/>
+      <dependency id="Waher.Persistence" version="1.2.0"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.3"/>
       <dependency id="Waher.Security" version="1.0.7"/>

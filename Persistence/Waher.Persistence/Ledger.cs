@@ -64,6 +64,7 @@ namespace Waher.Persistence
 		{
 			ILedgerProvider Result = provider;
 			provider = new NullLedgerProvider();
+			locked = false;
 			return Result;
 		}
 
@@ -72,7 +73,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool HasProvider
 		{
-			get => !(provider is null);
+			get => !(provider is null) && (!(provider is NullLedgerProvider) || locked);
 		}
 
 		/// <summary>

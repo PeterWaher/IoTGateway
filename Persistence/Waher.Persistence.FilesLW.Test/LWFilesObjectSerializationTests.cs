@@ -28,9 +28,9 @@ namespace Waher.Persistence.FilesLW.Test
 			DBFilesBTreeTests.DeleteFiles();
 
 #if LW
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+			provider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 #else
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+			provider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
 #endif
 			await provider.GetFile("Default");
 			await provider.GetFile("Test");

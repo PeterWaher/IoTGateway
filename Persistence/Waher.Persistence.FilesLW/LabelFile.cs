@@ -69,6 +69,8 @@ namespace Waher.Persistence.Files
 			uint LastCode = 0;
 			uint Code = 1;
 
+			await GetKeys(Result);
+
 			if (LabelsExists)
 			{
 				long Len = await Result.GetLength();
@@ -101,7 +103,7 @@ namespace Waher.Persistence.Files
 				{
 					SortedDictionary<uint, string> NewCodes = null;
 
-					using (StringDictionary Names = new StringDictionary(NamesFileName, string.Empty, CollectionName, Provider, false))
+					using (StringDictionary Names = await StringDictionary.Create(NamesFileName, string.Empty, CollectionName, Provider, false))
 					{
 						foreach (KeyValuePair<string, object> Rec in await Names.ToArrayAsync())
 						{

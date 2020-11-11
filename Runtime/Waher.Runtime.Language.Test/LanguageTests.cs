@@ -18,7 +18,7 @@ namespace Waher.Runtime.Language.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(FilesProvider).Assembly, 
@@ -28,7 +28,7 @@ namespace Waher.Runtime.Language.Test
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 		}
 

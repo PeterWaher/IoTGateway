@@ -32,7 +32,7 @@ namespace Waher.Script.Test
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly);
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);
 
 			await Database.Clear("Orders");

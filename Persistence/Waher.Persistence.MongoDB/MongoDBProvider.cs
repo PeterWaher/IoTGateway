@@ -1613,9 +1613,9 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
-		public IPersistentDictionary GetDictionary(string Collection)
+		public Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
-			return new StringDictionary(Collection, this);
+			return Task.FromResult<IPersistentDictionary>(new StringDictionary(Collection, this));	// TODO
 		}
 
 		/// <summary>

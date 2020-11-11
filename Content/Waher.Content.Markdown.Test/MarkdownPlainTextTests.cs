@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Persistence;
@@ -20,7 +19,7 @@ namespace Waher.Content.Markdown.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Waher.Runtime.Inventory.Types.Initialize(
 				typeof(MarkdownPlainTextTests).Assembly,
@@ -33,7 +32,7 @@ namespace Waher.Content.Markdown.Test
 				typeof(ObjectSerializer).Assembly,
 				typeof(ImageCodec).Assembly);
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 		}
 

@@ -63,11 +63,43 @@ namespace Waher.Persistence.Files
 		private uint blobBlockLimit;
 		private bool emptyRoot = false;
 		private readonly Aes aes;
-		private readonly byte[] aesKey;
-		private readonly byte[] ivSeed;
-		private readonly int ivSeedLen;
+		private byte[] aesKey;
+		private byte[] ivSeed;
+		private int ivSeedLen;
 		private readonly bool encrypted;
 		private bool indicesCreated = false;
+
+		private ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
+			IRecordHandler RecordHandler)
+		{
+			this.provider = Provider;
+			this.id = Provider.GetNewFileId();
+			this.fileName = Path.GetFullPath(FileName);
+			this.collectionName = CollectionName;
+			this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);
+			this.blockSize = BlockSize;
+			this.blobBlockSize = BlobBlockSize;
+			this.inlineObjectSizeLimit = (BlockSize - BlockHeaderSize) / 2 - 4;
+			this.encoding = Encoding;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.genericSerializer = new GenericObjectSerializer(Provider);
+			this.encrypted = Encrypted;
+
+			if (RecordHandler is null)
+				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
+			else
+				this.recordHandler = RecordHandler;
+
+			if (this.encrypted)
+			{
+				this.aes = Aes.Create();
+				this.aes.BlockSize = 128;
+				this.aes.KeySize = 256;
+				this.aes.Mode = CipherMode.CBC;
+				this.aes.Padding = PaddingMode.None;
+			}
+		}
 
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
@@ -87,11 +119,10 @@ namespace Waher.Persistence.Files
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+		internal static Task<ObjectBTreeFile> Create(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
 			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
-			: this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
-				  TimeoutMilliseconds, Encrypted, null)
 		{
+			return Create(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding, TimeoutMilliseconds, Encrypted, null);
 		}
 
 		/// <summary>
@@ -113,7 +144,7 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
-		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
+		internal static async Task<ObjectBTreeFile> Create(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
 			IRecordHandler RecordHandler)
 		{
@@ -122,70 +153,53 @@ namespace Waher.Persistence.Files
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
-			this.provider = Provider;
-			this.id = this.provider.GetNewFileId();
-			this.fileName = Path.GetFullPath(FileName);
-			this.collectionName = CollectionName;
-			this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);
-			this.blockSize = BlockSize;
-			this.blobBlockSize = BlobBlockSize;
-			this.inlineObjectSizeLimit = (this.blockSize - BlockHeaderSize) / 2 - 4;
-			this.encoding = Encoding;
-			this.timeoutMilliseconds = TimeoutMilliseconds;
-			this.genericSerializer = new GenericObjectSerializer(this.provider);
-			this.encrypted = Encrypted;
+			ObjectBTreeFile Result = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider,
+				Encoding, TimeoutMilliseconds, Encrypted, RecordHandler);
 
-			if (RecordHandler is null)
-				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
-			else
-				this.recordHandler = RecordHandler;
+			bool FileExists = File.Exists(Result.fileName);
 
-			bool FileExists = File.Exists(this.fileName);
-
-			if (this.encrypted)
+			if (Result.encrypted)
 			{
-				this.aes = Aes.Create();
-				aes.BlockSize = 128;
-				aes.KeySize = 256;
-				aes.Mode = CipherMode.CBC;
-				aes.Padding = PaddingMode.None;
-
-				this.provider.GetKeys(this.fileName, FileExists, out this.aesKey, out this.ivSeed);
-				this.ivSeedLen = this.ivSeed.Length;
+				KeyValuePair<byte[], byte[]> P = await Result.provider.GetKeys(Result.fileName, FileExists);
+				Result.aesKey = P.Key;
+				Result.ivSeed = P.Value;
+				Result.ivSeedLen = Result.ivSeed.Length;
 			}
 
-			string Folder = Path.GetDirectoryName(this.fileName);
+			string Folder = Path.GetDirectoryName(Result.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
 			if (FileExists)
-				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+				Result.file = File.Open(Result.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
 			{
-				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-				Task _ = this.CreateFirstBlock();
+				Result.file = File.Open(Result.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				await Result.CreateFirstBlock();
 			}
 
-			this.blockLimit = (uint)(this.file.Length / this.blockSize);
+			Result.blockLimit = (uint)(Result.file.Length / Result.blockSize);
 
-			if (string.IsNullOrEmpty(this.blobFileName))
+			if (string.IsNullOrEmpty(Result.blobFileName))
 			{
-				this.blobFile = null;
-				this.blobBlockLimit = 0;
+				Result.blobFile = null;
+				Result.blobBlockLimit = 0;
 			}
 			else
 			{
-				Folder = Path.GetDirectoryName(this.blobFileName);
+				Folder = Path.GetDirectoryName(Result.blobFileName);
 				if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 					Directory.CreateDirectory(Folder);
 
-				if (File.Exists(this.blobFileName))
-					this.blobFile = File.Open(this.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+				if (File.Exists(Result.blobFileName))
+					Result.blobFile = File.Open(Result.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 				else
-					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+					Result.blobFile = File.Open(Result.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 
-				this.blobBlockLimit = (uint)(this.blobFile.Length / this.blobBlockSize);
+				Result.blobBlockLimit = (uint)(Result.blobFile.Length / Result.blobBlockSize);
 			}
+
+			return Result;
 		}
 
 		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)

@@ -70,8 +70,7 @@
             Delegate for custom key callback methods.
             </summary>
             <param name="FileName">Name of file.</param>
-            <param name="Key">Key to use</param>
-            <param name="IV">Initiation vector to use</param>
+            <returns>A pair of (Key, IV).</returns>
         </member>
         <member name="T:Waher.Persistence.Files.RegenerationOptions">
             <summary>
@@ -121,24 +120,6 @@
             <param name="Encoding">Encoding to use for text properties.</param>
             <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
             <param name="CustomKeyMethod">Custom method to get keys for encrypted files. (Implies encrypted files)</param>
-        </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.#ctor(System.String,System.String,System.Int32,System.Int32,System.Int32,System.Text.Encoding,System.Int32)">
-            <summary>
-            Persists objects into binary files.
-            </summary>
-            <param name="Folder">Folder to store data files.</param>
-            <param name="DefaultCollectionName">Default collection name.</param>
-            <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-            size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-            a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-            The block sizes also limit the size of objects stored directly in the file. Objects larger than
-            <see cref="P:Waher.Persistence.Files.ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-            <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-            database provider. The cache does not contain BLOB blocks.</param>
-            <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-            of a doubly linked list of blocks of this size.</param>
-            <param name="Encoding">Encoding to use for text properties.</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.CreateAsync(System.String,System.String,System.Int32,System.Int32,System.Int32,System.Text.Encoding,System.Int32,Waher.Persistence.Files.CustomKeyHandler)">
             <summary>
@@ -934,7 +915,7 @@
             This class manages an index file to a <see cref="T:Waher.Persistence.Files.ObjectBTreeFile"/>.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.IndexBTreeFile.#ctor(System.String,Waher.Persistence.Files.ObjectBTreeFile,Waher.Persistence.Files.FilesProvider,System.String[])">
+        <member name="M:Waher.Persistence.Files.IndexBTreeFile.Create(System.String,Waher.Persistence.Files.ObjectBTreeFile,Waher.Persistence.Files.FilesProvider,System.String[])">
             <summary>
             This class manages an index file to a <see cref="T:Waher.Persistence.Files.ObjectBTreeFile"/>.
             </summary>
@@ -1522,7 +1503,7 @@
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Create(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean)">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
@@ -1542,7 +1523,7 @@
             <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
             <param name="Encrypted">If the files should be encrypted or not.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.#ctor(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean,Waher.Persistence.Files.Storage.IRecordHandler)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Create(System.String,System.String,System.String,System.Int32,System.Int32,Waher.Persistence.Files.FilesProvider,System.Text.Encoding,System.Int32,System.Boolean,Waher.Persistence.Files.Storage.IRecordHandler)">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
             </summary>
@@ -3703,14 +3684,6 @@
             Maximum time to wait for access to underlying database (ms)
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Int32)">
-            <summary>
-            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
-            </summary>
-            <param name="FileName">Name of file</param>
-            <param name="CollectionName">Collection Name</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-        </member>
         <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
@@ -3720,6 +3693,30 @@
             <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
             <param name="Encrypted">If file is encrypted.</param>
             <param name="Provider">Provider of encryption keys.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String,System.Int32)">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+            <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+            <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
+            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+            <param name="Encrypted">If file is encrypted.</param>
+            <param name="Provider">Provider of encryption keys.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.GetKeys(Waher.Persistence.Files.SerialFile)">
+            <summary>
+            Gets keys for the serial file, or decendant.
+            </summary>
+            <param name="SerialFile">SerialFile reference, or decendant.</param>
         </member>
         <member name="P:Waher.Persistence.Files.SerialFile.FileName">
             <summary>
@@ -4463,7 +4460,15 @@
             This class manages a string dictionary in a persisted file.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.StringDictionary.#ctor(System.String,System.String,System.String,Waher.Persistence.Files.FilesProvider,System.Boolean)">
+        <member name="M:Waher.Persistence.Files.StringDictionary.#ctor(System.String,Waher.Persistence.Files.FilesProvider,System.Boolean)">
+            <summary>
+            This class manages a string dictionary in a persisted file.
+            </summary>
+            <param name="CollectionName">Collection Name.</param>
+            <param name="Provider">Files provider.</param>
+            <param name="RetainInMemory">Retain the dictionary in memory.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.Create(System.String,System.String,System.String,Waher.Persistence.Files.FilesProvider,System.Boolean)">
             <summary>
             This class manages a string dictionary in a persisted file.
             </summary>

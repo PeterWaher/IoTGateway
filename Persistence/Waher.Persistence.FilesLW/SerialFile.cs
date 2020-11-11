@@ -15,21 +15,21 @@ namespace Waher.Persistence.Files
 	{
 		private const int MinBlockSize = 64;
 
-		private readonly FileStream file;
+		private FileStream file;
 		private readonly FilesProvider provider;
-		private readonly Aes aes;
+		private Aes aes;
 		private readonly string fileName;
 		private readonly string collectionName;
-		private readonly byte[] aesKey;
-		private readonly byte[] ivSeed;
-		private readonly int ivSeedLen;
+		private byte[] aesKey;
+		private byte[] ivSeed;
+		private int ivSeedLen;
 		private readonly bool encrypted;
 		private bool disposed = false;
 
 		/// <summary>
 		/// Maximum time to wait for access to underlying database (ms)
 		/// </summary>
-		protected readonly int timeoutMilliseconds;
+		protected int timeoutMilliseconds;
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
@@ -37,9 +37,26 @@ namespace Waher.Persistence.Files
 		/// <param name="FileName">Name of file</param>
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-		public SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds)
-			: this(FileName, CollectionName, TimeoutMilliseconds, false, null)
+		/// <param name="Encrypted">If file is encrypted.</param>
+		/// <param name="Provider">Provider of encryption keys.</param>
+		protected SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
 		{
+			this.provider = Provider;
+			this.fileName = FileName;
+			this.collectionName = CollectionName;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.encrypted = Encrypted;
+		}
+
+		/// <summary>
+		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+		/// </summary>
+		/// <param name="FileName">Name of file</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		public static Task<SerialFile> Create(string FileName, string CollectionName, int TimeoutMilliseconds)
+		{
+			return Create(FileName, CollectionName, TimeoutMilliseconds, false, null);
 		}
 
 		/// <summary>
@@ -50,38 +67,47 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		public SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+		public static async Task<SerialFile> Create(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
 		{
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
-			this.provider = Provider;
-			this.fileName = FileName;
-			this.collectionName = CollectionName;
-			this.timeoutMilliseconds = TimeoutMilliseconds;
-			this.encrypted = Encrypted;
+			SerialFile Result = new SerialFile(FileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider);
 
-			bool FileExists = File.Exists(this.fileName);
+			await GetKeys(Result);
 
-			string Folder = Path.GetDirectoryName(this.fileName);
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets keys for the serial file, or decendant.
+		/// </summary>
+		/// <param name="SerialFile">SerialFile reference, or decendant.</param>
+		protected static async Task GetKeys(SerialFile SerialFile)
+		{
+			bool FileExists = File.Exists(SerialFile.fileName);
+
+			string Folder = Path.GetDirectoryName(SerialFile.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
 			if (FileExists)
-				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+				SerialFile.file = File.Open(SerialFile.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
-				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				SerialFile.file = File.Open(SerialFile.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 
-			if (this.encrypted)
+			if (SerialFile.encrypted)
 			{
-				this.aes = Aes.Create();
-				aes.BlockSize = 128;
-				aes.KeySize = 256;
-				aes.Mode = CipherMode.CBC;
-				aes.Padding = PaddingMode.None;
+				SerialFile.aes = Aes.Create();
+				SerialFile.aes.BlockSize = 128;
+				SerialFile.aes.KeySize = 256;
+				SerialFile.aes.Mode = CipherMode.CBC;
+				SerialFile.aes.Padding = PaddingMode.None;
 
-				this.provider.GetKeys(this.fileName, FileExists, out this.aesKey, out this.ivSeed);
-				this.ivSeedLen = this.ivSeed.Length;
+				KeyValuePair<byte[], byte[]> P = await SerialFile.provider.GetKeys(SerialFile.fileName, FileExists);
+				SerialFile.aesKey = P.Key;
+				SerialFile.ivSeed = P.Value;
+				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
 			}
 		}
 

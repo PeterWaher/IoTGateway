@@ -11,7 +11,7 @@ namespace Waher.Persistence.Files.Test
 	public class PersistenceTests
 	{
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static async Task ClassInitialize(TestContext Context)
 		{
 			try
 			{
@@ -20,9 +20,9 @@ namespace Waher.Persistence.Files.Test
 			catch
 			{
 #if LW
-				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000));
+				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000));
 #else
-				Database.Register(new FilesProvider("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000, true));
+				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000, true));
 #endif
 			}
 		}

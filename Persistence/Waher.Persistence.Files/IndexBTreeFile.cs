@@ -16,12 +16,12 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class IndexBTreeFile : IDisposable, IEnumerable<object>
 	{
-		private readonly GenericObjectSerializer genericSerializer;
+		private GenericObjectSerializer genericSerializer;
 		private ObjectBTreeFile objectFile;
 		private ObjectBTreeFile indexFile;
 		private IndexRecords recordHandler;
-		private readonly Encoding encoding;
-		private readonly string collectionName;
+		private Encoding encoding;
+		private string collectionName;
 
 		/// <summary>
 		/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.
@@ -31,20 +31,25 @@ namespace Waher.Persistence.Files
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
-		internal IndexBTreeFile(string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider,
+		internal static async Task<IndexBTreeFile> Create(string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider,
 			params string[] FieldNames)
 		{
-			this.objectFile = ObjectFile;
-			this.collectionName = this.objectFile.CollectionName;
-			this.encoding = this.objectFile.Encoding;
+			IndexBTreeFile Result = new IndexBTreeFile()
+			{
+				objectFile = ObjectFile,
+				collectionName = ObjectFile.CollectionName,
+				encoding = ObjectFile.Encoding
+			};
 
-			this.recordHandler = new IndexRecords(this.collectionName, this.encoding, this.objectFile.InlineObjectSizeLimit, FieldNames);
-			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
+			Result.recordHandler = new IndexRecords(Result.collectionName, Result.encoding, Result.objectFile.InlineObjectSizeLimit, FieldNames);
+			Result.genericSerializer = new GenericObjectSerializer(Result.objectFile.Provider);
 
-			this.indexFile = new ObjectBTreeFile(FileName, this.collectionName, string.Empty, this.objectFile.BlockSize,
-				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds,
-				this.objectFile.Encrypted, this.recordHandler);
-			this.recordHandler.Index = this;
+			Result.indexFile = await ObjectBTreeFile.Create(FileName, Result.collectionName, string.Empty, Result.objectFile.BlockSize,
+				Result.objectFile.BlobBlockSize, Provider, Result.encoding, Result.objectFile.TimeoutMilliseconds,
+				Result.objectFile.Encrypted, Result.recordHandler);
+			Result.recordHandler.Index = Result;
+
+			return Result;
 		}
 
 		/// <summary>

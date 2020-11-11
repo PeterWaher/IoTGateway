@@ -18,9 +18,8 @@ namespace Waher.Persistence.Files
 	/// Delegate for custom key callback methods.
 	/// </summary>
 	/// <param name="FileName">Name of file.</param>
-	/// <param name="Key">Key to use</param>
-	/// <param name="IV">Initiation vector to use</param>
-	public delegate void CustomKeyHandler(string FileName, out byte[] Key, out byte[] IV);
+	/// <returns>A pair of (Key, IV).</returns>
+	public delegate Task<KeyValuePair<byte[], byte[]>> CustomKeyHandler(string FileName);
 
 	/// <summary>
 	/// Index regeneration options.
@@ -86,31 +85,6 @@ namespace Waher.Persistence.Files
 
 		#region Constructors
 
-#if NETSTANDARD1_5
-		/// <summary>
-		/// Persists objects into binary files.
-		/// </summary>
-		/// <param name="Folder">Folder to store data files.</param>
-		/// <param name="DefaultCollectionName">Default collection name.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, true, null, true)
-		{
-		}
-#endif
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -131,87 +105,12 @@ namespace Waher.Persistence.Files
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), true, CustomKeyMethod, true)
+				  !(CustomKeyMethod is null), true, CustomKeyMethod)
 		{
 		}
-
-		/// <summary>
-		/// Persists objects into binary files.
-		/// </summary>
-		/// <param name="Folder">Folder to store data files.</param>
-		/// <param name="DefaultCollectionName">Default collection name.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				false, false, null, true)
-		{
-		}
-
-#if NETSTANDARD1_5
-		/// <summary>
-		/// Persists objects into binary files.
-		/// </summary>
-		/// <param name="Folder">Folder to store data files.</param>
-		/// <param name="DefaultCollectionName">Default collection name.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		/// <param name="Compiled">If object serializers should be compiled or not.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, Compiled, null, true)
-		{
-		}
-
-		/// <summary>
-		/// Persists objects into binary files.
-		/// </summary>
-		/// <param name="Folder">Folder to store data files.</param>
-		/// <param name="DefaultCollectionName">Default collection name.</param>
-		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
-		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-		/// of a doubly linked list of blocks of this size.</param>
-		/// <param name="Encoding">Encoding to use for text properties.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="CustomKeyMethod">Custom method to get keys for encrypted files. (Implies encrypted files)</param>
-		/// <param name="Compiled">If object serializers should be compiled or not.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Compiled)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod, true)
-		{
-		}
-#endif
 
 		private FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod, bool CanWait)
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod)
 		{
 			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
 
@@ -238,14 +137,6 @@ namespace Waher.Persistence.Files
 				this.folder += Path.DirectorySeparatorChar;
 
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1));
-
-			this.master = new StringDictionary(this.folder + "Files.master", string.Empty, string.Empty, this, false);
-
-			if (CanWait)
-			{
-				Wait(this.GetFile(this.defaultCollectionName), this.timeoutMilliseconds);
-				Wait(this.LoadConfiguration(), this.timeoutMilliseconds);
-			}
 		}
 
 #if NETSTANDARD1_5
@@ -375,7 +266,9 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod)
 		{
 			FilesProvider Result = new FilesProvider(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
-				Encoding, TimeoutMilliseconds, Encrypted, Compiled, CustomKeyMethod, false);
+				Encoding, TimeoutMilliseconds, Encrypted, Compiled, CustomKeyMethod);
+
+			Result.master = await StringDictionary.Create(Result.folder + "Files.master", string.Empty, string.Empty, Result, false);
 
 			await Result.GetFile(Result.defaultCollectionName);
 			await Result.LoadConfiguration();
@@ -771,18 +664,20 @@ namespace Waher.Persistence.Files
 
 		#region Keys
 
-		internal void GetKeys(string FileName, bool FileExists, out byte[] Key, out byte[] IV)
+		internal async Task<KeyValuePair<byte[], byte[]>> GetKeys(string FileName, bool FileExists)
 		{
+			byte[] Key, IV;
+
 #if NETSTANDARD1_5
 			if (!(this.customKeyMethod is null))
 			{
 #endif
-				this.customKeyMethod(FileName, out Key, out IV);
+				KeyValuePair<byte[], byte[]> P = await this.customKeyMethod(FileName);
 
 				using (SHA256 Sha256 = SHA256.Create())
 				{
-					Key = Sha256.ComputeHash(Key);
-					IV = Sha256.ComputeHash(IV);
+					Key = Sha256.ComputeHash(P.Key);
+					IV = Sha256.ComputeHash(P.Value);
 				}
 #if NETSTANDARD1_5
 			}
@@ -925,6 +820,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 #endif
+			return new KeyValuePair<byte[], byte[]>(Key, IV);
 		}
 
 		#endregion
@@ -1147,7 +1043,7 @@ namespace Waher.Persistence.Files
 
 			LabelFile Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this);
 
-			File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
+			File = await ObjectBTreeFile.Create(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
 				this, this.encoding, this.timeoutMilliseconds, this.encrypted);
 
 			lock (this.files)
@@ -1250,10 +1146,7 @@ namespace Waher.Persistence.Files
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
 				Regenerate = true;
 
-			lock (this.synchObj)
-			{
-				IndexFile = new IndexBTreeFile(s, File, this, FieldNames);
-			}
+			IndexFile = await IndexBTreeFile.Create(s, File, this, FieldNames);
 
 			await File.AddIndex(IndexFile, Regenerate);
 
@@ -2248,7 +2141,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
-		public IPersistentDictionary GetDictionary(string Collection)
+		public async Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
 			string FileName = Path.Combine(this.folder, "Dictionaries");
 			if (!Directory.Exists(FileName))
@@ -2256,7 +2149,7 @@ namespace Waher.Persistence.Files
 
 			FileName = Path.Combine(FileName, Collection);
 
-			return new StringDictionary(FileName + ".dict", FileName + ".dblob", Collection, this, false);
+			return await StringDictionary.Create(FileName + ".dict", FileName + ".dblob", Collection, this, false);
 		}
 
 		#endregion
@@ -2551,7 +2444,7 @@ namespace Waher.Persistence.Files
 						string TempBtreeFileName = TempFileName + ".btree";
 						string TempBlobFileName = TempFileName + ".blob";
 
-						using (ObjectBTreeFile TempFile = new ObjectBTreeFile(TempBtreeFileName, File.CollectionName, TempBlobFileName,
+						using (ObjectBTreeFile TempFile = await ObjectBTreeFile.Create(TempBtreeFileName, File.CollectionName, TempBlobFileName,
 							File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
 						{
 							int c = 0;

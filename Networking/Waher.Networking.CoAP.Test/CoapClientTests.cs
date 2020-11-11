@@ -28,7 +28,7 @@ namespace Waher.Networking.CoAP.Test
 		private CoapEndpoint client;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static async Task AssemblyInitialize(TestContext Context)
 		{
 			Types.Initialize(
 				typeof(IContentDecoder).Assembly,
@@ -42,7 +42,7 @@ namespace Waher.Networking.CoAP.Test
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);
 		}
 

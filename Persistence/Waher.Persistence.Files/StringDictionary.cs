@@ -27,12 +27,10 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a string dictionary in a persisted file.
 		/// </summary>
-		/// <param name="FileName">File name of index file.</param>
-		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
 		/// <param name="CollectionName">Collection Name.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
-		public StringDictionary(string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
+		private StringDictionary(string CollectionName, FilesProvider Provider, bool RetainInMemory)
 		{
 			this.provider = Provider;
 			this.collectionName = CollectionName;
@@ -41,17 +39,31 @@ namespace Waher.Persistence.Files
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.keyValueSerializer = new KeyValueSerializer(this.provider, this.genericSerializer);
 
-			this.recordHandler = new StringDictionaryRecords(this.collectionName, this.encoding,
-				this.genericSerializer, this.provider);
-
-			this.dictionaryFile = new ObjectBTreeFile(FileName, this.collectionName, BlobFileName,
-				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
-				this.provider.Encrypted, this.recordHandler);
+			this.recordHandler = new StringDictionaryRecords(this.collectionName, this.encoding, this.genericSerializer, this.provider);
 
 			if (RetainInMemory)
 				this.inMemory = new Dictionary<string, object>();
 			else
 				this.inMemory = null;
+		}
+
+		/// <summary>
+		/// This class manages a string dictionary in a persisted file.
+		/// </summary>
+		/// <param name="FileName">File name of index file.</param>
+		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="CollectionName">Collection Name.</param>
+		/// <param name="Provider">Files provider.</param>
+		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
+		public static async Task<StringDictionary> Create(string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
+		{
+			StringDictionary Result = new StringDictionary(CollectionName, Provider, RetainInMemory);
+
+			Result.dictionaryFile = await ObjectBTreeFile.Create(FileName, Result.collectionName, BlobFileName,
+				Result.provider.BlockSize, Result.provider.BlobBlockSize, Result.provider, Result.encoding, Result.timeoutMilliseconds,
+				Result.provider.Encrypted, Result.recordHandler);
+
+			return Result;
 		}
 
 		/// <summary>

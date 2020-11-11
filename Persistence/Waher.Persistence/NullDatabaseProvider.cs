@@ -345,7 +345,7 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
-		public IPersistentDictionary GetDictionary(string Collection) => throw new InvalidOperationException("Server is shutting down.");
+		public Task<IPersistentDictionary> GetDictionary(string Collection) => throw new InvalidOperationException("Server is shutting down.");
 
 		/// <summary>
 		/// Gets an array of available collections.

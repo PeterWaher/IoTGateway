@@ -18,7 +18,7 @@ namespace Waher.Networking.DNS.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(Database).Assembly,
@@ -26,7 +26,7 @@ namespace Waher.Networking.DNS.Test
 				typeof(ObjectSerializer).Assembly,
 				typeof(DnsResolver).Assembly);
 
-			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 		}
 

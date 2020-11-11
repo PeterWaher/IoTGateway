@@ -297,7 +297,7 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Collection">Collection Name</param>
 		/// <returns>Persistent dictionary</returns>
-		IPersistentDictionary GetDictionary(string Collection);
+		Task<IPersistentDictionary> GetDictionary(string Collection);
 
 		/// <summary>
 		/// Gets an array of available collections.

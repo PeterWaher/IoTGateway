@@ -20,12 +20,12 @@ namespace Waher.Persistence.FilesLW.Test
 		private static FilesProvider provider;
 
 		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
+		public static async Task ClassInitialize(TestContext Context)
 		{
 #if LW
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
+			provider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 #else
-			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			provider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 #endif
 		}
 

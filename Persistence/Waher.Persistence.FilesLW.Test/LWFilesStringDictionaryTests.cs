@@ -32,7 +32,7 @@ namespace Waher.Persistence.FilesLW.Test
 		protected DateTime start;
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			if (File.Exists(DBFilesBTreeTests.MasterFileName + ".bak"))
 				File.Delete(DBFilesBTreeTests.MasterFileName + ".bak");
@@ -62,11 +62,11 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 #if LW
-			this.provider = new FilesProvider(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000);
 #else
-			this.provider = new FilesProvider(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
 #endif
-			this.file = new StringDictionary(FileName, BlobFileName, CollectionName, this.provider, false);
+			this.file = await StringDictionary.Create(FileName, BlobFileName, CollectionName, this.provider, false);
 			this.start = DateTime.Now;
 		}
 

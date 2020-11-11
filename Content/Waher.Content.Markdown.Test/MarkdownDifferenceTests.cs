@@ -34,6 +34,7 @@ namespace Waher.Content.Markdown.Test
 		}
 
 		[TestMethod]
+		[Ignore("Being implemented")]
 		public void Test_03_Bullets()
 		{
 			this.Test("Test_03_Bullets.md");

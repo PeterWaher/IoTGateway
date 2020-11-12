@@ -920,10 +920,14 @@ namespace Waher.IoTGateway.Setup
 									}
 
 									fs.Position = 0;
-									if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
-										ImportGatewayConfig(fs);
-									else
-										await Import.ExportFile(FileName, fs);
+
+									if (!OnlySelectedCollections)
+									{
+										if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+											ImportGatewayConfig(fs);
+										else
+											await Import.ExportFile(FileName, fs);
+									}
 
 									FirstFile = false;
 								}
@@ -1541,18 +1545,21 @@ namespace Waher.IoTGateway.Setup
 									}
 
 									File.Position = 0;
-									try
+									if (!OnlySelectedCollections)
 									{
-										if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
-											ImportGatewayConfig(File);
-										else
-											await Import.ExportFile(FileName, File);
+										try
+										{
+											if (FirstFile && FileName.EndsWith("Gateway.config", StringComparison.CurrentCultureIgnoreCase))
+												ImportGatewayConfig(File);
+											else
+												await Import.ExportFile(FileName, File);
 
-										ShowReport(TabID, Import, ref LastReport, Overwrite);
-									}
-									catch (Exception ex)
-									{
-										ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
+											ShowReport(TabID, Import, ref LastReport, Overwrite);
+										}
+										catch (Exception ex)
+										{
+											ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
+										}
 									}
 
 									FirstFile = false;

@@ -246,7 +246,6 @@ namespace Waher.Networking.XMPP.Contracts
                             Result.clientSignature = Convert.FromBase64String(E.InnerText);
 							break;
 
-
 						case "attachment":
 							Attachments.Add(new Attachment()
 							{

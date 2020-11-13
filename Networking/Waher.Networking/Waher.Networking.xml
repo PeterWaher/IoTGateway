@@ -774,6 +774,12 @@
             Sniffer that stores events in memory.
             </summary>
         </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.#ctor(System.Int32)">
+            <summary>
+            Sniffer that stores events in memory.
+            </summary>
+            <param name="MaxCount">Maximum number of records in memory.</param>
+        </member>
         <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Error(System.DateTime,System.String)">
             <summary>
             Called to inform the viewer of an error state.
@@ -851,12 +857,6 @@
             Replays sniffer events.
             </summary>
             <param name="Sniffers">Receiver of sniffer events.</param>
-        </member>
-        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToList">
-            <summary>
-            Returns recorded events as a typed list.
-            </summary>
-            <returns>Recorded events.</returns>
         </member>
         <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToArray">
             <summary>
@@ -1083,6 +1083,12 @@
             Replays the event to a given sniffer.
             </summary>
             <param name="Sniffer">Sniffer.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Model.SnifferEvent.ToString">
+            <summary>
+            Converts the sniffer event to a string.
+            </summary>
+            <returns>String-representation of sniffer event.</returns>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferException">
             <summary>

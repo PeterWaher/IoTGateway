@@ -31,5 +31,11 @@ namespace Waher.Networking.Sniffers.Model
 		/// </summary>
 		/// <param name="Sniffer">Sniffer.</param>
 		public abstract void Replay(ISniffer Sniffer);
+
+		/// <summary>
+		/// Converts the sniffer event to a string.
+		/// </summary>
+		/// <returns>String-representation of sniffer event.</returns>
+		public abstract new string ToString();
 	}
 }

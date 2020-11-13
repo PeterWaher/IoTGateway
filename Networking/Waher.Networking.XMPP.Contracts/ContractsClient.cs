@@ -721,7 +721,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (!(Identity.Attachments is null))
+			if (Identity.State == IdentityState.Approved && ValidateState && !(Identity.Attachments is null))
 			{
 				foreach (Attachment Attachment in Identity.Attachments)
 				{
@@ -761,8 +761,9 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 					}
-					catch (Exception)
+					catch (Exception ex)
 					{
+						this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
 						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State);
 						return;
 					}
@@ -958,36 +959,45 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			LegalIdentityEventHandler h = this.IdentityUpdated;
 
-			if (!(h is null))
+			if (h is null)
+				this.client.Information("Incoming identity message discarded: No event handler registered.");
+			else
 			{
 				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
 
 				if (!this.IsFromTrustProvider(Identity.Id, e.From))
-					return;
-
-				if (string.Compare(e.FromBareJID, Identity.Provider, true) == 0)
 				{
-					await this.Validate(Identity, false, async (sender2, e2) =>
-					{
-						if (e2.Status != IdentityStatus.Valid)
-						{
-							Client.Error("Invalid legal identity received and discarded.");
-
-							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-								new KeyValuePair<string, object>("Status", e2.Status));
-							return;
-						}
-
-						try
-						{
-							await h(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}, null);
+					this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
+					return;
 				}
+
+				if (string.Compare(e.FromBareJID, Identity.Provider, true) != 0)
+				{
+					this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
+					return;
+				}
+
+				await this.Validate(Identity, false, async (sender2, e2) =>
+				{
+					if (e2.Status != IdentityStatus.Valid)
+					{
+						this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
+
+						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+
+						return;
+					}
+
+					try
+					{
+						await h(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
+					}
+					catch (Exception ex)
+					{
+						this.client.Exception(ex);
+					}
+				}, null);
 			}
 		}
 
@@ -3776,7 +3786,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						if (e2.Status != IdentityStatus.Valid)
 						{
-							Client.Error("Invalid legal identity received and discarded.");
+							this.client.Error("Invalid legal identity received and discarded.");
 
 							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 								new KeyValuePair<string, object>("Status", e2.Status));
@@ -3876,7 +3886,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false);
 		}
 
-		private async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, 
+		private async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId,
 			string Purpose, bool PeerReview)
 		{
 			if (this.contentPerPid.ContainsKey(PetitionId))
@@ -3924,7 +3934,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// to identify the petition request.</param>
 		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public Task PetitionSignatureResponseAsync(string LegalId, byte[] Content, 
+		public Task PetitionSignatureResponseAsync(string LegalId, byte[] Content,
 			byte[] Signature, string PetitionId, string RequestorFullJid, bool Response)
 		{
 			return this.PetitionSignatureResponseAsync(this.GetTrustProvider(LegalId), LegalId,
@@ -3944,7 +3954,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// to identify the petition request.</param>
 		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="Response">If the petition is accepted (true) or rejected (false).</param>
-		public async Task PetitionSignatureResponseAsync(string Address, string LegalId, 
+		public async Task PetitionSignatureResponseAsync(string Address, string LegalId,
 			byte[] Content, byte[] Signature, string PetitionId, string RequestorFullJid, bool Response)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -4016,7 +4026,7 @@ namespace Waher.Networking.XMPP.Contracts
 						XmlDocument Doc = new XmlDocument();
 						Doc.LoadXml(s);
 
-						if (Doc.DocumentElement.LocalName == "identity" && 
+						if (Doc.DocumentElement.LocalName == "identity" &&
 							Doc.DocumentElement.NamespaceURI == NamespaceLegalIdentities)
 						{
 							LegalIdentity TempId = LegalIdentity.Parse(Doc.DocumentElement);
@@ -4047,7 +4057,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
 					{
-						Client.Error("Invalid legal identity received and discarded.");
+						this.client.Error("Invalid legal identity received and discarded.");
 
 						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 							new KeyValuePair<string, object>("Status", e2.Status));
@@ -4185,7 +4195,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task PetitionPeerReviewIDAsync(string Address, string LegalId, LegalIdentity Identity, string PetitionId, string Purpose)
 		{
 			StringBuilder Xml = new StringBuilder();
-			Identity.Serialize(Xml, true, true, true, true, true, false, false);
+			Identity.Serialize(Xml, true, true, true, true, true, true, true);
 			byte[] Content = Encoding.UTF8.GetBytes(Xml.ToString());
 
 			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, true);
@@ -4226,9 +4236,9 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' xmlns='");
 			Xml.Append(NamespaceLegalIdentities);
 			Xml.Append("'><reviewed>");
-			Identity.Serialize(Xml, true, true, true, true, true, false, false);
+			Identity.Serialize(Xml, true, true, true, true, true, true, true);
 			Xml.Append("</reviewed><reviewer>");
-			ReviewerLegalIdentity.Serialize(Xml, true, true, true, true, true, false, false);
+			ReviewerLegalIdentity.Serialize(Xml, true, true, true, true, true, true, true);
 			Xml.Append("</reviewer></peerReview>");
 
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
@@ -4241,7 +4251,7 @@ namespace Waher.Networking.XMPP.Contracts
 				throw new IOException("Unable to upload Peer Review attachment to broker.");
 
 			await e2.PUT(Data, ContentType, 10000);
-			
+
 			return await this.AddLegalIdAttachmentAsync(Identity.Id, e2.GetUrl, Signature);
 		}
 
@@ -4379,7 +4389,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (e2.Status != IdentityStatus.Valid)
 					{
-						Client.Error("Invalid identity received and discarded.");
+						this.client.Error("Invalid identity received and discarded.");
 
 						Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
 							new KeyValuePair<string, object>("Status", e2.Status));

@@ -215,9 +215,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				}, async (sender, e) =>
 				{
-					await State.File.WriteAsync(e.Data, 0, e.Data.Length);
+					await State.File?.WriteAsync(e.Data, 0, e.Data.Length);
 					if (e.Last)
-						State.Done.TrySetResult(true);
+						State.Done?.TrySetResult(true);
 
 				}, State, Headers2.ToArray());
 

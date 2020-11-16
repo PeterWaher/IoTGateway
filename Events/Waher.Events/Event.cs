@@ -181,7 +181,7 @@ namespace Waher.Events
 		/// <returns>If the event sink should be avoided.</returns>
 		public bool ShoudAvoid(IEventSink EventSink)
 		{
-			return (this.toAvoid != null && this.toAvoid.Contains(EventSink));
+			return (this.toAvoid?.Contains(EventSink) ?? false);
 		}
 
 		/// <summary>

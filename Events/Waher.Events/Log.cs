@@ -155,7 +155,7 @@ namespace Waher.Events
 						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty, 
 							EventLevel.Major, string.Empty, ex.Source, CleanStackTrace(ex.StackTrace));
 
-						if (Event.ToAvoid != null)
+						if (!(Event.ToAvoid is null))
 						{
 							foreach (IEventSink EventSink2 in Event.ToAvoid)
 								Event2.Avoid(EventSink2);
@@ -814,7 +814,7 @@ namespace Waher.Events
 		/// <returns>Unnested exception.</returns>
 		public static Exception UnnestException(Exception Exception)
 		{
-			while (Exception != null && Exception.InnerException != null)
+			while (!(Exception?.InnerException is null))
 			{
 				Type T = Exception.GetType();
 				if (Array.IndexOf(nestedExceptionTypes, T) < 0)

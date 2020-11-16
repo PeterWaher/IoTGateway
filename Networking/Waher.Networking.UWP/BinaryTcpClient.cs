@@ -742,7 +742,6 @@ namespace Waher.Networking
 			if (Count < 0)
 				throw new ArgumentException("Count cannot be negative.", nameof(Count));
 
-
 			if (Count == 0)
 			{
 				Task.TrySetResult(true);

@@ -173,6 +173,7 @@ namespace Waher.Persistence.Files
 		{
 			byte[] Result = new byte[NrBytes];
 			bool W = false;
+			int NrRead;
 
 			await this.LockRead();
 			try
@@ -182,9 +183,7 @@ namespace Waher.Persistence.Files
 
 				this.file.Position = Position;
 
-				int NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
-				if (NrRead < NrBytes)
-					throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
+				NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
 			}
 			finally
 			{
@@ -193,6 +192,9 @@ namespace Waher.Persistence.Files
 
 				await this.EndRead();
 			}
+
+			if (NrRead < NrBytes)
+				throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
 
 			if (this.encrypted)
 			{

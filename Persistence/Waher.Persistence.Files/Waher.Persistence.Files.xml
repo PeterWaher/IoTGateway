@@ -65,6 +65,74 @@
             File name.
             </summary>
         </member>
+        <member name="T:Waher.Persistence.Files.FileOfBlocks">
+            <summary>
+            File of sequential blocks.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            File of sequential blocks.
+            </summary>
+            <param name="CollectionName">Collection Name</param>
+            <param name="FileName">File name. If the file or folder does not exist
+            prior to the creation of the object, they are created accordingly.</param>
+            <param name="BlockSize">Block Size</param>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileOfBlocks.FilePreExisting">
+            <summary>
+            If the file existed before the construction of the object (true),
+            or if the constructor created the file.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileOfBlocks.CollectionName">
+            <summary>
+            Collection name.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileOfBlocks.Length">
+            <summary>
+            File length.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.FileOfBlocks.BlockLimit">
+            <summary>
+            Number of blocks in file.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.LoadBlock(System.UInt32)">
+            <summary>
+            Loads a block from the file.
+            </summary>
+            <param name="BlockIndex">Zero-based block index.</param>
+            <returns>Loaded block.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.LoadBlock(System.UInt32,System.Byte[])">
+            <summary>
+            Loads a block from the file.
+            </summary>
+            <param name="BlockIndex">Zero-based block index.</param>
+            <param name="Block"></param>
+            <returns>Loaded block.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.SaveBlock(System.UInt32,System.Byte[])">
+            <summary>
+            Saves a block to the file.
+            </summary>
+            <param name="BlockIndex">Zero-based block index.</param>
+            <param name="Block">Block to save.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.Truncate(System.UInt32)">
+            <summary>
+            Truncates the file to a given number of blocks.
+            </summary>
+            <param name="BlockLimit">Number of blocks in file.</param>
+        </member>
         <member name="T:Waher.Persistence.Files.CustomKeyHandler">
             <summary>
             Delegate for custom key callback methods.
@@ -1714,18 +1782,18 @@
             Clears the internal memory cache.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.LoadBlock(System.Int64)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.LoadBlock(System.UInt32)">
             <summary>
             Loads a block from the file.
             </summary>
-            <param name="PhysicalPosition">Physical position of block in file.</param>
+            <param name="BlockIndex">Index of block to load.</param>
             <returns>Loaded block.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveBlock(System.Int64,System.Byte[])">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveBlock(System.UInt32,System.Byte[])">
             <summary>
             Saves a block to the file.
             </summary>
-            <param name="PhysicalPosition">Physical position of block in file.</param>
+            <param name="BlockIndex">Block index of block in file.</param>
             <param name="Block">Block to save.</param>
             <returns>Block to save.</returns>
         </member>

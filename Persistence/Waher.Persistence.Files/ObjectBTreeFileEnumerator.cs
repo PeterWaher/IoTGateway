@@ -848,15 +848,12 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> LoadBlock(uint BlockIndex)
 		{
-			long PhysicalPosition = BlockIndex;
-			PhysicalPosition *= this.file.BlockSize;
-
 			if (this.lockType != LockType.None)
-				return await this.file.LoadBlockLocked(PhysicalPosition, true);
+				return await this.file.LoadBlockLocked(BlockIndex, true);
 			else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
 			else
-				return await this.file.LoadBlock(PhysicalPosition);
+				return await this.file.LoadBlock(BlockIndex);
 		}
 
 		/// <summary>

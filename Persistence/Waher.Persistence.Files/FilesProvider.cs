@@ -112,7 +112,8 @@ namespace Waher.Persistence.Files
 		private FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod)
 		{
-			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
+			FileOfBlocks.CheckBlockSize(BlockSize);
+			FileOfBlocks.CheckBlockSize(BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
@@ -2456,10 +2457,7 @@ namespace Waher.Persistence.Files
 							{
 								for (uint BlockIndex = 0; BlockIndex < FileStat.NrBlocks; BlockIndex++)
 								{
-									long PhysicalPosition = BlockIndex;
-									PhysicalPosition *= File.BlockSize;
-
-									byte[] Block = await File.LoadBlockLocked(PhysicalPosition, false);
+									byte[] Block = await File.LoadBlockLocked(BlockIndex, false);
 									BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
 									BinaryDeserializer Reader2;
 									BlockHeader Header = new BlockHeader(Reader);

@@ -35,18 +35,17 @@ namespace Waher.Persistence.Files
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private readonly GenericObjectSerializer genericSerializer;
 		private readonly FilesProvider provider;
-		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(1, 1);
-		private FileStream file;
-		private FileStream blobFile;
+		private readonly FileOfBlocks file;
+		private readonly FileOfBlocks blobFile;
 		private readonly Encoding encoding;
-		private SortedDictionary<long, byte[]> blocksToSave = null;
+		private SortedDictionary<uint, byte[]> blocksToSave = null;
 		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
 		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
 		private readonly object synchObject = new object();
 		private readonly IRecordHandler recordHandler;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
-		private long bytesAdded = 0;
+		private uint blocksAdded = 0;
 		private ulong nrBlockLoads = 0;
 		private ulong nrCacheLoads = 0;
 		private ulong nrBlockSaves = 0;
@@ -101,6 +100,19 @@ namespace Waher.Persistence.Files
 				this.aes.Mode = CipherMode.CBC;
 				this.aes.Padding = PaddingMode.None;
 			}
+
+			this.file = new FileOfBlocks(this.collectionName, FileName, this.blockSize);
+
+			if (string.IsNullOrEmpty(this.blobFileName))
+			{
+				this.blobFile = null;
+				this.blobBlockLimit = 0;
+			}
+			else
+			{
+				this.blobFile = new FileOfBlocks(this.collectionName, this.blobFileName, this.blobBlockSize);
+				this.blobBlockLimit = this.blobFile.BlockLimit;
+			}
 		}
 
 		/// <summary>
@@ -150,7 +162,8 @@ namespace Waher.Persistence.Files
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
 			IRecordHandler RecordHandler)
 		{
-			CheckBlockSizes(BlockSize, BlobBlockSize);
+			FileOfBlocks.CheckBlockSize(BlockSize);
+			FileOfBlocks.CheckBlockSize(BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
@@ -158,79 +171,20 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile Result = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider,
 				Encoding, TimeoutMilliseconds, Encrypted, RecordHandler);
 
-			bool FileExists = File.Exists(Result.fileName);
-
 			if (Result.encrypted)
 			{
-				KeyValuePair<byte[], byte[]> P = await Result.provider.GetKeys(Result.fileName, FileExists);
+				KeyValuePair<byte[], byte[]> P = await Result.provider.GetKeys(Result.fileName, Result.file.FilePreExisting);
 				Result.aesKey = P.Key;
 				Result.ivSeed = P.Value;
 				Result.ivSeedLen = Result.ivSeed.Length;
 			}
 
-			string Folder = Path.GetDirectoryName(Result.fileName);
-			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-				Directory.CreateDirectory(Folder);
-
-			if (FileExists)
-				Result.file = File.Open(Result.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-			else
-			{
-				Result.file = File.Open(Result.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			if (!Result.file.FilePreExisting)
 				await Result.CreateFirstBlock();
-			}
 
-			Result.blockLimit = (uint)(Result.file.Length / Result.blockSize);
-
-			if (string.IsNullOrEmpty(Result.blobFileName))
-			{
-				Result.blobFile = null;
-				Result.blobBlockLimit = 0;
-			}
-			else
-			{
-				Folder = Path.GetDirectoryName(Result.blobFileName);
-				if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-					Directory.CreateDirectory(Folder);
-
-				if (File.Exists(Result.blobFileName))
-					Result.blobFile = File.Open(Result.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-				else
-					Result.blobFile = File.Open(Result.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-
-				Result.blobBlockLimit = (uint)(Result.blobFile.Length / Result.blobBlockSize);
-			}
+			Result.blockLimit = Result.file.BlockLimit;
 
 			return Result;
-		}
-
-		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
-		{
-			if (BlockSize < 1024)
-				throw new ArgumentOutOfRangeException("Block size too small.", nameof(BlockSize));
-
-			if (BlockSize > 65536)
-				throw new ArgumentOutOfRangeException("Block size too large.", nameof(BlockSize));
-
-			if (BlobBlockSize < 1024)
-				throw new ArgumentOutOfRangeException("BLOB Block size too small.", nameof(BlobBlockSize));
-
-			if (BlobBlockSize > 65536)
-				throw new ArgumentOutOfRangeException("BLOB Block size too large.", nameof(BlobBlockSize));
-
-			int i = BlockSize;
-			while (i != 0 && (i & 1) == 0)
-				i >>= 1;
-
-			if (i != 1)
-				throw new ArgumentException("The block size must be a power of 2.", nameof(BlockSize));
-
-			i = BlobBlockSize;
-			while (i != 0 && (i & 1) == 0)
-				i >>= 1;
-
-			if (i != 1)
-				throw new ArgumentException("The BLOB block size must be a power of 2.", nameof(BlobBlockSize));
 		}
 
 		/// <summary>
@@ -239,7 +193,6 @@ namespace Waher.Persistence.Files
 		public override void Dispose()
 		{
 			this.file?.Dispose();
-			this.file = null;
 
 			if (!(this.indices is null))
 			{
@@ -251,9 +204,6 @@ namespace Waher.Persistence.Files
 			}
 
 			this.blobFile?.Dispose();
-			this.blobFile = null;
-
-			this.fileReadAccess.Dispose();
 
 			this.provider.RemoveBlocks(this.id);
 
@@ -536,7 +486,7 @@ namespace Waher.Persistence.Files
 
 						while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
 						{
-							Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
+							Block = await this.LoadBlockLocked(BlockIndex, true);
 							Reader.Restart(Block, 0);
 							Header = new BlockHeader(Reader);
 
@@ -602,7 +552,7 @@ namespace Waher.Persistence.Files
 			{
 				bool Changed = false;
 
-				foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
+				foreach (KeyValuePair<uint, byte[]> Rec in this.blocksToSave)
 				{
 					await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
 					Changed = true;
@@ -611,8 +561,8 @@ namespace Waher.Persistence.Files
 				if (Changed)
 				{
 					this.blocksToSave.Clear();
-					this.bytesAdded = 0;
-					this.blockLimit = (uint)(this.file.Length / this.blockSize);
+					this.blocksAdded = 0;
+					this.blockLimit = this.file.BlockLimit;
 				}
 			}
 		}
@@ -624,18 +574,18 @@ namespace Waher.Persistence.Files
 		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
 			byte[] Block = null;
-			long PhysicalPosition = long.MaxValue;
+			uint BlockIndex = uint.MaxValue;
 
 			if (!(this.emptyBlocks is null))
 			{
-				foreach (uint BlockIndex in this.emptyBlocks.Keys)
+				foreach (uint BlockIndex2 in this.emptyBlocks.Keys)
 				{
-					this.emptyBlocks.Remove(BlockIndex);
+					this.emptyBlocks.Remove(BlockIndex2);
 					if (this.emptyBlocks.Count == 0)
 						this.emptyBlocks = null;
 
-					PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-					Block = await this.LoadBlockLocked(PhysicalPosition, true);
+					Block = await this.LoadBlockLocked(BlockIndex2, true);
+					BlockIndex = BlockIndex2;
 
 					Array.Clear(Block, 0, this.blockSize);
 
@@ -646,15 +596,15 @@ namespace Waher.Persistence.Files
 			if (Block is null)
 			{
 				Block = new byte[this.blockSize];
-				PhysicalPosition = this.file.Length + this.bytesAdded;
+				BlockIndex = this.blockLimit;
 
-				this.bytesAdded += this.blockSize;
+				this.blocksAdded++;
 				this.blockLimit++;
 			}
 
-			this.QueueSaveBlockLocked(PhysicalPosition, Block);
+			this.QueueSaveBlockLocked(BlockIndex, Block);
 
-			return new Tuple<uint, byte[]>((uint)(PhysicalPosition / this.blockSize), Block);
+			return new Tuple<uint, byte[]>(BlockIndex, Block);
 		}
 
 		private async Task CreateFirstBlock()
@@ -681,14 +631,14 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Loads a block from the file.
 		/// </summary>
-		/// <param name="PhysicalPosition">Physical position of block in file.</param>
+		/// <param name="BlockIndex">Index of block to load.</param>
 		/// <returns>Loaded block.</returns>
-		public async Task<byte[]> LoadBlock(long PhysicalPosition)
+		public async Task<byte[]> LoadBlock(uint BlockIndex)
 		{
 			await this.LockRead();
 			try
 			{
-				return await this.LoadBlockLocked(PhysicalPosition, true);
+				return await this.LoadBlockLocked(BlockIndex, true);
 			}
 			finally
 			{
@@ -696,55 +646,33 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
+		internal async Task<byte[]> LoadBlockLocked(uint BlockIndex, bool AddToCache)
 		{
-			if ((PhysicalPosition % this.blockSize) != 0)
-				throw Database.FlagForRepair(this.collectionName, "Block positions must be multiples of the block size.");
-
-			if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out byte[] Block))
+			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] Block))
 			{
 				this.nrCacheLoads++;
 				return Block;
 			}
 
-			if (!(this.blocksToSave is null) && this.blocksToSave.TryGetValue(PhysicalPosition, out Block))
+			if (!(this.blocksToSave is null) && this.blocksToSave.TryGetValue(BlockIndex, out Block))
 			{
 				this.nrCacheLoads++;
 				return Block;
 			}
 
-			int NrRead;
-
-			await this.fileReadAccess.WaitAsync();
-			try
-			{
-				if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-					throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
-
-				Block = new byte[this.blockSize];
-
-				NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
-			}
-			finally
-			{
-				this.fileReadAccess.Release();
-			}
-
-			if (this.blockSize != NrRead)
-				throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+			Block = await this.file.LoadBlock(BlockIndex);
 			this.nrBlockLoads++;
 
 			if (this.encrypted)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize)))
 				{
 					Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
 				}
 			}
 
 			if (AddToCache)
-				this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
+				this.provider.AddBlockToCache(this.id, BlockIndex, Block);
 
 			return Block;
 		}
@@ -752,15 +680,15 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Saves a block to the file.
 		/// </summary>
-		/// <param name="PhysicalPosition">Physical position of block in file.</param>
+		/// <param name="BlockIndex">Block index of block in file.</param>
 		/// <param name="Block">Block to save.</param>
 		/// <returns>Block to save.</returns>
-		public async Task SaveBlock(long PhysicalPosition, byte[] Block)
+		public async Task SaveBlock(uint BlockIndex, byte[] Block)
 		{
 			await this.LockWrite();
 			try
 			{
-				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+				this.QueueSaveBlockLocked(BlockIndex, Block);
 			}
 			finally
 			{
@@ -768,15 +696,10 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		internal void QueueSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
-			if ((PhysicalPosition % this.blockSize) != 0)
-				throw Database.FlagForRepair(this.collectionName, "Block positions must be multiples of the block size.");
-
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
-
-			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
 
 			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] PrevBlock) && PrevBlock != Block)
 			{
@@ -788,12 +711,12 @@ namespace Waher.Persistence.Files
 			}
 
 			if (this.blocksToSave is null)
-				this.blocksToSave = new SortedDictionary<long, byte[]>();
+				this.blocksToSave = new SortedDictionary<uint, byte[]>();
 
-			this.blocksToSave[PhysicalPosition] = Block;
+			this.blocksToSave[BlockIndex] = Block;
 			this.blockUpdateCounter++;
 
-			this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
+			this.provider.AddBlockToCache(this.id, BlockIndex, Block);
 		}
 
 		/// <summary>
@@ -804,13 +727,13 @@ namespace Waher.Persistence.Files
 			get { return this.blockUpdateCounter; }
 		}
 
-		internal async Task DoSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		internal async Task DoSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
 			byte[] EncryptedBlock;
 
 			if (this.encrypted)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+				using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize)))
 				{
 					EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
 				}
@@ -818,10 +741,7 @@ namespace Waher.Persistence.Files
 			else
 				EncryptedBlock = (byte[])Block.Clone();
 
-			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
-
-			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
+			await this.file.SaveBlock(BlockIndex, EncryptedBlock);
 
 			this.nrBlockSaves++;
 		}
@@ -865,34 +785,34 @@ namespace Waher.Persistence.Files
 			{
 				BinaryDeserializer Reader;
 				BlockHeader Header;
-				long DestinationLocation;
-				long SourceLocation;
+				uint DestinationIndex;
+				uint SourceIndex;
 				byte[] Block;
 				uint PrevBlockIndex;
 				uint ParentBlockIndex;
 
 				foreach (uint BlockIndex in this.emptyBlocks.Keys)
 				{
-					DestinationLocation = ((long)BlockIndex) * this.blockSize;
-					SourceLocation = this.file.Length + this.bytesAdded - this.blockSize;
+					DestinationIndex = BlockIndex;
+					SourceIndex = (uint)(this.file.BlockLimit + this.blocksAdded - 1);
 
-					if (DestinationLocation < SourceLocation)
+					if (DestinationIndex < SourceIndex)
 					{
-						PrevBlockIndex = (uint)(SourceLocation / this.blockSize);
+						PrevBlockIndex = SourceIndex;
 
-						Block = await this.LoadBlockLocked(SourceLocation, false);
+						Block = await this.LoadBlockLocked(SourceIndex, false);
 
 						if (!(this.blocksToSave is null))
-							this.blocksToSave.Remove(SourceLocation);
+							this.blocksToSave.Remove(SourceIndex);
 
-						this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
+						this.provider.RemoveBlock(this.id, SourceIndex);
 
-						this.QueueSaveBlockLocked(DestinationLocation, Block);
+						this.QueueSaveBlockLocked(DestinationIndex, Block);
 						await this.UpdateParentLinksLocked(BlockIndex, Block);
 
 						ParentBlockIndex = BitConverter.ToUInt32(Block, 10);
-						SourceLocation = ((long)ParentBlockIndex) * this.blockSize;
-						Block = await this.LoadBlockLocked(SourceLocation, true);
+						SourceIndex = ParentBlockIndex;
+						Block = await this.LoadBlockLocked(SourceIndex, true);
 						Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 						Header = new BlockHeader(Reader);
 
@@ -912,28 +832,28 @@ namespace Waher.Persistence.Files
 							});
 						}
 
-						this.QueueSaveBlockLocked(SourceLocation, Block);
+						this.QueueSaveBlockLocked(SourceIndex, Block);
 					}
 					else
 					{
 						if (!(this.blocksToSave is null))
-							this.blocksToSave.Remove(DestinationLocation);
+							this.blocksToSave.Remove(DestinationIndex);
 
-						this.provider.RemoveBlock(this.id, (uint)(DestinationLocation / this.blockSize));
+						this.provider.RemoveBlock(this.id, DestinationIndex);
 
-						if (SourceLocation != DestinationLocation)
+						if (SourceIndex != DestinationIndex)
 						{
 							if (!(this.blocksToSave is null))
-								this.blocksToSave.Remove(SourceLocation);
+								this.blocksToSave.Remove(SourceIndex);
 
-							this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
+							this.provider.RemoveBlock(this.id, SourceIndex);
 						}
 					}
 
-					if (this.bytesAdded > 0)
-						this.bytesAdded -= this.blockSize;
+					if (this.blocksAdded > 0)
+						this.blocksAdded--;
 					else
-						this.file.SetLength(this.file.Length - this.blockSize);
+						await this.file.Truncate(this.file.BlockLimit - 1);
 
 					this.blockLimit--;
 				}
@@ -960,7 +880,7 @@ namespace Waher.Persistence.Files
 			if (Len != Bin.Length - Reader.Position)
 				throw Database.FlagForRepair(this.collectionName, "Invalid serialization of object");
 
-			this.blobBlockLimit = (uint)(this.blobFile.Length / this.blobBlockSize);
+			this.blobBlockLimit = this.blobFile.BlockLimit;
 
 			byte[] Result = new byte[HeaderSize + 4];
 			byte[] EncryptedBlock;
@@ -971,10 +891,9 @@ namespace Waher.Persistence.Files
 			uint Prev = uint.MaxValue;
 			int Limit = this.blobBlockSize - KeySize - 8;
 			int Pos = HeaderSize;
+			uint BlobBlockIndex = this.blobFile.BlockLimit;
 
 			Array.Copy(Bin, 0, Block, 0, KeySize);
-
-			this.blobFile.Position = this.blobFile.Length;
 
 			Len += HeaderSize;
 			while (Pos < Len)
@@ -1001,7 +920,7 @@ namespace Waher.Persistence.Files
 
 				if (this.encrypted)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(this.blobFile.Position)))
+					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 					{
 						EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
 					}
@@ -1009,7 +928,7 @@ namespace Waher.Persistence.Files
 				else
 					EncryptedBlock = (byte[])Block.Clone();
 
-				await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
+				await this.blobFile.SaveBlock(BlobBlockIndex++, EncryptedBlock);
 				this.nrBlobBlockSaves++;
 			}
 
@@ -1021,7 +940,6 @@ namespace Waher.Persistence.Files
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
-			await this.fileReadAccess.WaitAsync();
 			try
 			{
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
@@ -1036,7 +954,6 @@ namespace Waher.Persistence.Files
 				byte[] Result = new byte[Bookmark + Len];
 				byte[] BlobBlock = new byte[this.blobBlockSize];
 				byte[] DecryptedBlock;
-				long PhysicalPosition;
 				int i = Bookmark;
 				int NrRead;
 				bool ChainError = false;
@@ -1049,20 +966,12 @@ namespace Waher.Persistence.Files
 					if (BlobBlockIndex == uint.MaxValue)
 						throw Database.FlagForRepair(this.collectionName, "BLOB " + ObjectId.ToString() + " ended prematurely.");
 
-					PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
-
-					if (this.blobFile.Position != PhysicalPosition)
-						this.blobFile.Position = PhysicalPosition;
-
-					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-					if (NrRead != this.blobBlockSize)
-						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
 					this.nrBlobBlockLoads++;
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 						{
 							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
@@ -1112,10 +1021,6 @@ namespace Waher.Persistence.Files
 			{
 				throw Database.FlagForRepair(this.collectionName, ex.Message);
 			}
-			finally
-			{
-				this.fileReadAccess.Release();
-			}
 		}
 
 		internal async Task DeleteBlobLocked(byte[] Bin, int Offset)
@@ -1137,9 +1042,6 @@ namespace Waher.Persistence.Files
 			BlockInfo Info;
 			uint BlobBlockIndex;
 			uint Index, Prev, Next, To, Len;
-			long PhysicalPosition;
-			long PhysicalPosition2;
-			int NrRead;
 			int i, c;
 			int KeySize1 = Reader.Position - Offset;
 			int KeySize2;
@@ -1149,20 +1051,12 @@ namespace Waher.Persistence.Files
 
 			while (BlobBlockIndex != uint.MaxValue)
 			{
-				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
-
-				if (this.blobFile.Position != PhysicalPosition)
-					this.blobFile.Position = PhysicalPosition;
-
-				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-				if (NrRead != this.blobBlockSize)
-					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+				await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
 				this.nrBlockLoads++;
 
 				if (this.encrypted)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 					{
 						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
@@ -1184,8 +1078,7 @@ namespace Waher.Persistence.Files
 			BlocksToRemove = new uint[c];
 			BlocksToRemoveSorted.Keys.CopyTo(BlocksToRemove, 0);
 
-			PhysicalPosition = this.blobFile.Length;
-			BlobBlockIndex = (uint)(PhysicalPosition / this.blobBlockSize);
+			BlobBlockIndex = this.blobFile.BlockLimit;
 
 			for (i = c - 1; i >= 0; i--)
 			{
@@ -1193,19 +1086,12 @@ namespace Waher.Persistence.Files
 					break;
 
 				BlobBlockIndex--;
-				PhysicalPosition -= this.blobBlockSize;
-
-				this.blobFile.Position = PhysicalPosition;
-
-				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-				if (NrRead != this.blobBlockSize)
-					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+				await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
 				this.nrBlockLoads++;
 
 				if (this.encrypted)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 					{
 						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
@@ -1232,7 +1118,6 @@ namespace Waher.Persistence.Files
 			foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
 			{
 				BlobBlockIndex = BlocksToRemove[i++];   // To
-				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
 				Index = ReplacementBlock.Item1;           // From
 				KeySize2 = ReplacementBlock.Item2;
@@ -1256,7 +1141,7 @@ namespace Waher.Persistence.Files
 							if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
 							{
 								Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
-								this.QueueSaveBlockLocked(((long)Info.BlockIndex) * this.blockSize, Info.Block);
+								this.QueueSaveBlockLocked(Info.BlockIndex, Info.Block);
 							}
 						}
 					}
@@ -1265,18 +1150,12 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
 				else
 				{
-					PhysicalPosition2 = ((long)Prev) * this.blobBlockSize;
-					this.blobFile.Position = PhysicalPosition2;
-
-					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-					if (NrRead != this.blobBlockSize)
-						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+					await this.blobFile.LoadBlock(Prev, BlobBlock);
 					this.nrBlockLoads++;
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
 						{
 							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
@@ -1288,7 +1167,7 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
+						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
 						{
 							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
 						}
@@ -1296,8 +1175,7 @@ namespace Waher.Persistence.Files
 					else
 						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
-					this.blobFile.Position = PhysicalPosition2;
-					await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
+					await this.blobFile.SaveBlock(Prev, EncryptedBlock);
 					this.nrBlockSaves++;
 				}
 
@@ -1305,18 +1183,12 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
 				else if (Next != uint.MaxValue)
 				{
-					PhysicalPosition2 = ((long)Next) * this.blobBlockSize;
-					this.blobFile.Position = PhysicalPosition2;
-
-					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-					if (NrRead != this.blobBlockSize)
-						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+					await this.blobFile.LoadBlock(Next, BlobBlock);
 					this.nrBlockLoads++;
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
 						{
 							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
@@ -1328,7 +1200,7 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
+						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
 						{
 							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
 						}
@@ -1336,14 +1208,13 @@ namespace Waher.Persistence.Files
 					else
 						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
-					this.blobFile.Position = PhysicalPosition2;
-					await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
+					await this.blobFile.SaveBlock(Next, EncryptedBlock);
 					this.nrBlockSaves++;
 				}
 
 				if (this.encrypted)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 					{
 						EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock, 0, DecryptedBlock.Length);
 					}
@@ -1351,13 +1222,12 @@ namespace Waher.Persistence.Files
 				else
 					EncryptedBlock = (byte[])DecryptedBlock.Clone();
 
-				this.blobFile.Position = PhysicalPosition;
-				await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
+				await this.blobFile.SaveBlock(BlobBlockIndex, EncryptedBlock);
 				this.nrBlockSaves++;
 			}
 
-			this.blobFile.SetLength(this.blobFile.Length - BlocksToRemove.Length * this.blobBlockSize);
-			this.blobBlockLimit = (uint)(this.blobFile.Length / this.blobBlockSize);
+			await this.blobFile.Truncate((uint)(this.blobFile.BlockLimit - BlocksToRemove.Length));
+			this.blobBlockLimit = this.blobFile.BlockLimit;
 		}
 
 		#endregion
@@ -1552,7 +1422,7 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 				}
 
-				this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+				this.QueueSaveBlockLocked(BlockIndex, Block);
 
 				if (IncSize)
 				{
@@ -1560,10 +1430,7 @@ namespace Waher.Persistence.Files
 					{
 						BlockIndex = Header.ParentBlockIndex;
 
-						long PhysicalPosition = BlockIndex;
-						PhysicalPosition *= this.blockSize;
-
-						Block = await this.LoadBlockLocked(PhysicalPosition, true);
+						Block = await this.LoadBlockLocked(BlockIndex, true);
 						BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 						Header = new BlockHeader(Reader);
 
@@ -1573,7 +1440,7 @@ namespace Waher.Persistence.Files
 						Header.SizeSubtree++;
 
 						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
-						this.QueueSaveBlockLocked(PhysicalPosition, Block);
+						this.QueueSaveBlockLocked(BlockIndex, Block);
 					}
 				}
 			}
@@ -1686,8 +1553,8 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
 				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
-				this.QueueSaveBlockLocked(((long)LeftLink) * this.blockSize, Splitter.LeftBlock);
-				this.QueueSaveBlockLocked(((long)RightLink) * this.blockSize, Splitter.RightBlock);
+				this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
+				this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
 
 				if (BlockIndex == 0)
 				{
@@ -1708,10 +1575,7 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					long PhysicalPosition = ParentLink;
-					PhysicalPosition *= this.blockSize;
-
-					byte[] ParentBlock = await this.LoadBlockLocked(PhysicalPosition, true);
+					byte[] ParentBlock = await this.LoadBlockLocked(ParentLink, true);
 					BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
 
 					BlockHeader ParentHeader = new BlockHeader(ParentReader);
@@ -1790,22 +1654,20 @@ namespace Waher.Persistence.Files
 
 		private async Task<uint> GetObjectSizeOfBlockLocked(uint BlockIndex)
 		{
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 
 			return BitConverter.ToUInt32(Block, 2);
 		}
 
 		private async Task CheckChildParentLinkLocked(uint ChildLink, uint NewParentLink)
 		{
-			long PhysicalPosition = ((long)ChildLink) * this.blockSize;
-			byte[] ChildBlock = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] ChildBlock = await this.LoadBlockLocked(ChildLink, true);
 
 			uint ChildParentLink = BitConverter.ToUInt32(ChildBlock, 10);
 			if (ChildParentLink != NewParentLink)
 			{
 				Array.Copy(BitConverter.GetBytes(NewParentLink), 0, ChildBlock, 10, 4);
-				this.QueueSaveBlockLocked(PhysicalPosition, ChildBlock);
+				this.QueueSaveBlockLocked(ChildLink, ChildBlock);
 			}
 		}
 
@@ -1816,10 +1678,7 @@ namespace Waher.Persistence.Files
 
 			while (true)
 			{
-				long PhysicalPosition = BlockIndex;
-				PhysicalPosition *= this.blockSize;
-
-				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 
 				BlockHeader Header = new BlockHeader(Reader);
@@ -1856,7 +1715,7 @@ namespace Waher.Persistence.Files
 				else if (IsEmpty || Comparison > 0)
 				{
 					if (Header.LastBlockIndex == 0)
-						return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), IsEmpty ? Pos : Reader.Position, LastObject);
+						return new BlockInfo(Header, Block, BlockIndex, IsEmpty ? Pos : Reader.Position, LastObject);
 					else
 						BlockIndex = Header.LastBlockIndex;
 				}
@@ -1864,7 +1723,7 @@ namespace Waher.Persistence.Files
 				{
 					LastObject = false;
 					if (BlockLink == 0)
-						return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos, false);
+						return new BlockInfo(Header, Block, BlockIndex, Pos, false);
 					else
 						BlockIndex = BlockLink;
 				}
@@ -2007,10 +1866,7 @@ namespace Waher.Persistence.Files
 
 			while (true)
 			{
-				long PhysicalPosition = BlockIndex;
-				PhysicalPosition *= this.blockSize;
-
-				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 
 				BlockHeader Header = new BlockHeader(Reader);
@@ -2043,7 +1899,7 @@ namespace Waher.Persistence.Files
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
 
 				if (Comparison == 0)                                       // Object ID found.
-					return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos, false);
+					return new BlockInfo(Header, Block, BlockIndex, Pos, false);
 				else if (IsEmpty || Comparison > 0)
 				{
 					if (Header.LastBlockIndex == 0)
@@ -2230,7 +2086,7 @@ namespace Waher.Persistence.Files
 
 				Array.Copy(Bin, 0, Block, Info.InternalPosition + 4, NewSize);
 
-				this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+				this.QueueSaveBlockLocked(BlockIndex, Block);
 			}
 			else
 			{
@@ -2315,8 +2171,8 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
 				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
-				this.QueueSaveBlockLocked(((long)LeftLink) * this.blockSize, Splitter.LeftBlock);
-				this.QueueSaveBlockLocked(((long)RightLink) * this.blockSize, Splitter.RightBlock);
+				this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
+				this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
 
 				if (BlockIndex == 0)
 				{
@@ -2337,10 +2193,7 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					long PhysicalPosition = ParentLink;
-					PhysicalPosition *= this.blockSize;
-
-					byte[] ParentBlock = await this.LoadBlockLocked(PhysicalPosition, true);
+					byte[] ParentBlock = await this.LoadBlockLocked(ParentLink, true);
 					BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
 
 					BlockHeader ParentHeader = new BlockHeader(ParentReader);
@@ -2542,7 +2395,7 @@ namespace Waher.Persistence.Files
 					{
 						if (Header.LastBlockIndex != 0)
 						{
-							Block = await this.LoadBlockLocked(((long)Header.LastBlockIndex) * this.blockSize, true);
+							Block = await this.LoadBlockLocked(Header.LastBlockIndex, true);
 							this.QueueSaveBlockLocked(0, Block);
 
 							this.RegisterEmptyBlockLocked(Header.LastBlockIndex);
@@ -2558,7 +2411,7 @@ namespace Waher.Persistence.Files
 						Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
-						this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+						this.QueueSaveBlockLocked(BlockIndex, Block);
 						await this.DecreaseSizeLocked(Header.ParentBlockIndex);
 
 						if (BlockIndex != 0)
@@ -2569,7 +2422,7 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 
 					if (BlockIndex != 0)
 						await this.DecreaseSizeLocked(Header.ParentBlockIndex);
@@ -2638,8 +2491,8 @@ namespace Waher.Persistence.Files
 					Header.BytesUsed -= (ushort)c;
 					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
-					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
-					this.QueueSaveBlockLocked(((long)LeftBlockLink) * this.blockSize, MergeResult.ResultBlock);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
+					this.QueueSaveBlockLocked(LeftBlockLink, MergeResult.ResultBlock);
 
 					await this.UpdateParentLinksLocked(LeftBlockLink, MergeResult.ResultBlock);
 
@@ -2685,8 +2538,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-					Info.Block = await this.LoadBlockLocked(PhysicalPosition, true);    // Refresh object count.
+					Info.Block = await this.LoadBlockLocked(BlockIndex, true);    // Refresh object count.
 
 					if (Reshuffled)
 					{
@@ -2725,8 +2577,7 @@ namespace Waher.Persistence.Files
 
 			// Update block object counts:
 
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			ulong Size = 0;
@@ -2756,7 +2607,7 @@ namespace Waher.Persistence.Files
 				Header.SizeSubtree = (uint)Size;
 
 			Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
-			this.QueueSaveBlockLocked(PhysicalPosition, Block);
+			this.QueueSaveBlockLocked(BlockIndex, Block);
 
 			if (BlockIndex != 0)
 				await this.DecreaseSizeLocked(Header.ParentBlockIndex, (uint)(PrevSize - Size));
@@ -2808,7 +2659,7 @@ namespace Waher.Persistence.Files
 					else
 					{
 						BlockIndex = Links.First.Value;
-						Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
+						Block = await this.LoadBlockLocked(BlockIndex, true);
 						Links.RemoveFirst();
 						this.RegisterEmptyBlockLocked(BlockIndex);
 					}
@@ -2856,7 +2707,7 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 				if (Header.LastBlockIndex == 0)
-					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 				else
 				{
 					Tuple<uint, byte[]> NewChild = await this.CreateNewBlockLocked();
@@ -2865,7 +2716,7 @@ namespace Waher.Persistence.Files
 
 					Array.Copy(BitConverter.GetBytes(NewChildBlockIndex), 0, Block, BlockHeaderSize, 4);
 
-					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 
 					byte[] Object2 = await this.RotateLeftLocked(NewChildBlockIndex, BlockIndex);
 					if (Object2 is null && BlockIndex != 0)
@@ -2880,7 +2731,7 @@ namespace Waher.Persistence.Files
 
 					Array.Copy(BitConverter.GetBytes(BlockIndex), 0, NewChildBlock, 10, 4);
 
-					this.QueueSaveBlockLocked(((long)NewChildBlockIndex) * this.blockSize, NewChildBlock);
+					this.QueueSaveBlockLocked(NewChildBlockIndex, NewChildBlock);
 
 					if (!(Object2 is null))
 						await this.IncreaseSizeLocked(BlockIndex);
@@ -2892,7 +2743,7 @@ namespace Waher.Persistence.Files
 
 		private async Task MergeEmptyBlockWithSiblingLocked(uint ChildBlockIndex, uint ParentBlockIndex)
 		{
-			byte[] ParentBlock = await this.LoadBlockLocked(((long)ParentBlockIndex) * this.blockSize, true);
+			byte[] ParentBlock = await this.LoadBlockLocked(ParentBlockIndex, true);
 			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
 			BlockHeader ParentHeader = new BlockHeader(ParentReader);
 			int LastPos = 0;
@@ -2923,8 +2774,8 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
 					Array.Copy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 2);
 
-					this.QueueSaveBlockLocked(((long)LastLink) * this.blockSize, MergeResult.ResultBlock);
-					this.QueueSaveBlockLocked(((long)ParentBlockIndex) * this.blockSize, ParentBlock);
+					this.QueueSaveBlockLocked(LastLink, MergeResult.ResultBlock);
+					this.QueueSaveBlockLocked(ParentBlockIndex, ParentBlock);
 
 					await this.UpdateParentLinksLocked(LastLink, MergeResult.ResultBlock);
 
@@ -2999,8 +2850,8 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
 				}
 
-				this.QueueSaveBlockLocked(((long)ParentBlockIndex) * this.blockSize, ParentBlock);
-				this.QueueSaveBlockLocked(((long)ChildBlockIndex) * this.blockSize, MergeResult.ResultBlock);
+				this.QueueSaveBlockLocked(ParentBlockIndex, ParentBlock);
+				this.QueueSaveBlockLocked(ChildBlockIndex, MergeResult.ResultBlock);
 
 				await this.UpdateParentLinksLocked(ChildBlockIndex, MergeResult.ResultBlock);
 
@@ -3019,8 +2870,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<MergeResult> MergeBlocksLocked(uint LeftIndex, byte[] Separator, uint RightIndex)
 		{
-			byte[] LeftBlock = await this.LoadBlockLocked(((long)LeftIndex) * this.blockSize, true);
-			byte[] RightBlock = await this.LoadBlockLocked(((long)RightIndex) * this.blockSize, true);
+			byte[] LeftBlock = await this.LoadBlockLocked(LeftIndex, true);
+			byte[] RightBlock = await this.LoadBlockLocked(RightIndex, true);
 
 			return await this.MergeBlocksLocked(LeftBlock, Separator, RightBlock);
 		}
@@ -3186,8 +3037,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			byte[] Result = null;
@@ -3240,8 +3090,8 @@ namespace Waher.Persistence.Files
 							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 							Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
 
-							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
-							this.QueueSaveBlockLocked(((long)Link) * this.blockSize, MergeResult.ResultBlock);
+							this.QueueSaveBlockLocked(BlockIndex, Block);
+							this.QueueSaveBlockLocked(Link, MergeResult.ResultBlock);
 
 							await this.UpdateParentLinksLocked(Link, MergeResult.ResultBlock);
 
@@ -3299,7 +3149,7 @@ namespace Waher.Persistence.Files
 								Header.BytesUsed = (ushort)c;
 								Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
-								this.QueueSaveBlockLocked(PhysicalPosition, Block);
+								this.QueueSaveBlockLocked(BlockIndex, Block);
 
 								Result = Result2;
 							}
@@ -3318,7 +3168,7 @@ namespace Waher.Persistence.Files
 					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
-					this.QueueSaveBlockLocked(PhysicalPosition, Block);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 
 					await this.DecreaseSizeLocked(Header.ParentBlockIndex);
 				}
@@ -3329,8 +3179,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractSmallestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			byte[] Result = null;
@@ -3390,8 +3239,8 @@ namespace Waher.Persistence.Files
 									Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, c);
 									Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
-									this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
-									this.QueueSaveBlockLocked(((long)Link) * this.blockSize, MergeResult.ResultBlock);
+									this.QueueSaveBlockLocked(BlockIndex, Block);
+									this.QueueSaveBlockLocked(Link, MergeResult.ResultBlock);
 
 									await this.UpdateParentLinksLocked(Link, MergeResult.ResultBlock);
 
@@ -3459,7 +3308,7 @@ namespace Waher.Persistence.Files
 							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 						}
 
-						this.QueueSaveBlockLocked(PhysicalPosition, Block);
+						this.QueueSaveBlockLocked(BlockIndex, Block);
 					}
 				}
 			}
@@ -3476,7 +3325,7 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
-				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+				this.QueueSaveBlockLocked(BlockIndex, Block);
 
 				await this.DecreaseSizeLocked(Header.ParentBlockIndex);
 			}
@@ -3486,8 +3335,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateLeftLocked(uint ChildIndex, uint BlockIndex)
 		{
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			int Pos, PrevPos, Len;
@@ -3543,7 +3391,7 @@ namespace Waher.Persistence.Files
 
 			if (Reshuffled)
 			{
-				Block = await this.LoadBlockLocked(PhysicalPosition, true); // Refresh
+				Block = await this.LoadBlockLocked(BlockIndex, true); // Refresh
 				Reader.Restart(Block, 0);
 				Header = new BlockHeader(Reader);
 
@@ -3598,8 +3446,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateRightLocked(uint ChildIndex, uint BlockIndex)
 		{
-			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			int Pos, PrevPos, Len;
@@ -3663,7 +3510,7 @@ namespace Waher.Persistence.Files
 
 			if (Reshuffled)
 			{
-				Block = await this.LoadBlockLocked(PhysicalPosition, true); // Refresh
+				Block = await this.LoadBlockLocked(BlockIndex, true); // Refresh
 				Reader.Restart(Block, 0);
 				Header = new BlockHeader(Reader);
 
@@ -3729,8 +3576,7 @@ namespace Waher.Persistence.Files
 
 			while (true)
 			{
-				long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 				uint Size = BitConverter.ToUInt32(Block, 2);
 
 				if (Size == uint.MaxValue)
@@ -3746,7 +3592,7 @@ namespace Waher.Persistence.Files
 
 				Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
 
-				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+				this.QueueSaveBlockLocked(BlockIndex, Block);
 
 				if (BlockIndex == 0)
 					return;
@@ -3759,15 +3605,14 @@ namespace Waher.Persistence.Files
 		{
 			while (true)
 			{
-				long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 				uint Size = BitConverter.ToUInt32(Block, 2);
 
 				if (Size < uint.MaxValue)
 				{
 					Size++;
 					Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
-					this.QueueSaveBlockLocked(PhysicalPosition, Block);
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 
 					if (BlockIndex == 0)
 						return;
@@ -3857,18 +3702,13 @@ namespace Waher.Persistence.Files
 
 		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)
 		{
-			long FileSize = this.file.Length + this.bytesAdded;
-			int NrBlocks = (int)(FileSize / this.blockSize);
-			this.blockLimit = (uint)NrBlocks;
-
-			long BlobFileSize = this.blobFile is null ? 0 : this.blobFile.Length;
-			int NrBlobBlocks = (int)(BlobFileSize / this.blobBlockSize);
-			this.blobBlockLimit = (uint)NrBlobBlocks;
+			this.blockLimit = this.file.BlockLimit + this.blocksAdded;
+			this.blobBlockLimit = this.blobFile is null ? 0 : this.blobFile.BlockLimit;
 
 			FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves,
 				this.nrBlobBlockLoads, this.nrBlobBlockSaves, this.nrFullFileScans, this.nrSearches);
-			BitArray BlocksReferenced = new BitArray(NrBlocks);
-			BitArray BlobBlocksReferenced = new BitArray(NrBlobBlocks);
+			BitArray BlocksReferenced = new BitArray((int)this.blockLimit);
+			BitArray BlobBlocksReferenced = new BitArray((int)this.blobBlockLimit);
 			int i;
 
 			try
@@ -3882,7 +3722,7 @@ namespace Waher.Persistence.Files
 
 				List<int> Blocks = new List<int>();
 
-				for (i = 0; i < NrBlocks; i++)
+				for (i = 0; i < this.blockLimit; i++)
 				{
 					if (!BlocksReferenced[i])
 					{
@@ -3894,7 +3734,7 @@ namespace Waher.Persistence.Files
 				Statistics.UnreferencedBlocks = Blocks.ToArray();
 				Blocks.Clear();
 
-				for (i = 0; i < NrBlobBlocks; i++)
+				for (i = 0; i < this.blobBlockLimit; i++)
 				{
 					if (!BlobBlocksReferenced[i])
 						Statistics.LogError("BLOB Block " + i.ToString() + " is not referenced.");
@@ -3936,10 +3776,7 @@ namespace Waher.Persistence.Files
 					BlocksReferenced[(int)BlockIndex] = true;
 			}
 
-			long PhysicalPosition = BlockIndex;
-			PhysicalPosition *= this.blockSize;
-
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, false);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BinaryDeserializer Reader2;
 			BlockHeader Header = new BlockHeader(Reader);
@@ -4253,12 +4090,10 @@ namespace Waher.Persistence.Files
 		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
 		{
 			BinaryDeserializer Reader = null;
-			long NrBlocks = (this.file.Length + this.bytesAdded) / this.blockSize;
+			long NrBlocks = this.file.BlockLimit + this.blocksAdded;
 			byte[] BlobBlock = new byte[this.blobBlockSize];
 			byte[] DecryptedBlock;
-			long PhysicalPosition;
 			uint Link;
-			int NrRead;
 
 			this.blockLimit = (uint)NrBlocks;
 
@@ -4285,18 +4120,14 @@ namespace Waher.Persistence.Files
 				XmlOutput.WriteStartElement("BlobFile");
 				XmlOutput.WriteAttributeString("fileName", this.blobFileName);
 
-				this.blobFile.Position = 0;
-				while ((PhysicalPosition = this.blobFile.Position) < this.blobFile.Length)
+				for (uint BlobBlockIndex = 0; BlobBlockIndex < this.blobFile.BlockLimit; BlobBlockIndex++)
 				{
-					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-					if (NrRead != this.blobBlockSize)
-						throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
-
+					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
 					this.nrBlobBlockLoads++;
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 						{
 							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
@@ -4310,7 +4141,7 @@ namespace Waher.Persistence.Files
 						Reader.Restart(DecryptedBlock, 0);
 
 					XmlOutput.WriteStartElement("Block");
-					XmlOutput.WriteAttributeString("index", (PhysicalPosition / this.blobBlockSize).ToString());
+					XmlOutput.WriteAttributeString("index", BlobBlockIndex.ToString());
 					this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
 
 					Link = Reader.ReadUInt32();
@@ -4332,10 +4163,7 @@ namespace Waher.Persistence.Files
 
 		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput, bool Properties)
 		{
-			long PhysicalPosition = BlockIndex;
-			PhysicalPosition *= this.blockSize;
-
-			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, false);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BinaryDeserializer Reader2;
 			BinaryDeserializer BlobReader;
@@ -4625,7 +4453,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
-			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			uint BlockSize;
 
 			if (!IncludeChildren)
@@ -4678,7 +4506,7 @@ namespace Waher.Persistence.Files
 
 		private async Task<uint> GetObjectCount32Locked(uint BlockIndex)
 		{
-			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			return BitConverter.ToUInt32(Block, 2);
 		}
 
@@ -4735,7 +4563,7 @@ namespace Waher.Persistence.Files
 					while (BlockIndex != 0)
 					{
 						uint ParentIndex = Header.ParentBlockIndex;
-						byte[] Block = await this.LoadBlockLocked(((long)ParentIndex) * this.blockSize, true);
+						byte[] Block = await this.LoadBlockLocked(ParentIndex, true);
 						Reader.Restart(Block, 0);
 						Header = new BlockHeader(Reader);
 
@@ -4930,20 +4758,15 @@ namespace Waher.Persistence.Files
 
 		internal async Task ClearAsyncLocked()
 		{
-			this.file.Dispose();
-			this.file = null;
-
-			File.Delete(this.fileName);
-			this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			await this.file.Truncate(0);
 
 			if (!(this.blobFile is null))
+				await this.blobFile.Truncate(0);
+
+			if (!(this.indices is null))
 			{
-				this.blobFile.Dispose();
-				this.blobFile = null;
-
-				File.Delete(this.blobFileName);
-
-				this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				foreach (IndexBTreeFile IndexFile in this.indices)
+					await IndexFile.ClearAsync();
 			}
 
 			this.provider.RemoveBlocks(this.id);
@@ -4952,7 +4775,7 @@ namespace Waher.Persistence.Files
 			this.blocksToSave?.Clear();
 			this.objectsToSave?.Clear();
 			this.objectsToLoad?.Clear();
-			this.bytesAdded = 0;
+			this.blocksAdded = 0;
 			this.blockLimit = 0;
 			this.blobBlockLimit = 0;
 

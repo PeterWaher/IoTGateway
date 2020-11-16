@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Utility.ExStat
 {
@@ -16,11 +17,14 @@ namespace Waher.Utility.ExStat
 		/// 
 		/// Command line switches:
 		/// 
-		/// -p PATH               Path to start the search. If not provided, the
+		/// -p PATH               Path to start the search. If not provided, 
+		///                       and no comparison paths are provided, the
 		///                       current path will be used, with *.* as search
 		///                       pattern. Can be used multiple times to search
 		///                       through multiple paths, or use multiple search
 		///                       patterns.
+		/// -c PATH               Compares XML files output by ExStat. Only
+		///                       exceptions common in all files will be output.
 		/// -x FILENAME           Export findings to an XML file.
 		/// -s                    Include subfolders in search.
 		/// -?                    Help.
@@ -30,6 +34,7 @@ namespace Waher.Utility.ExStat
 			FileStream FileOutput = null;
 			XmlWriter Output = null;
 			List<string> Paths = new List<string>();
+			List<string> ComparisonPaths = new List<string>();
 			string XmlFileName = null;
 			bool Subfolders = false;
 			bool Help = false;
@@ -50,6 +55,13 @@ namespace Waher.Utility.ExStat
 								throw new Exception("Missing path.");
 
 							Paths.Add(args[i++]);
+							break;
+
+						case "-c":
+							if (i >= c)
+								throw new Exception("Missing path.");
+
+							ComparisonPaths.Add(args[i++]);
 							break;
 
 						case "-x":
@@ -82,11 +94,14 @@ namespace Waher.Utility.ExStat
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("Command line switches:");
 					Console.Out.WriteLine();
-					Console.Out.WriteLine("-p PATH               Path to start the search. If not provided, the");
+					Console.Out.WriteLine("-p PATH               Path to start the search. If not provided,");
+					Console.Out.WriteLine("                      and no comparison paths are provided, the");
 					Console.Out.WriteLine("                      current path will be used, with *.* as search");
 					Console.Out.WriteLine("                      pattern. Can be used multiple times to search");
 					Console.Out.WriteLine("                      through multiple paths, or use multiple search");
 					Console.Out.WriteLine("                      patterns.");
+					Console.Out.WriteLine("-c PATH               Compares XML files output by ExStat. Only");
+					Console.Out.WriteLine("                      exceptions common in all files will be output.");
 					Console.Out.WriteLine("-x FILENAME           Export findings to an XML file.");
 					Console.Out.WriteLine("-enc ENCODING         Text encoding if Byte-order-marks not available.");
 					Console.Out.WriteLine("                      Default=UTF-8");
@@ -97,7 +112,7 @@ namespace Waher.Utility.ExStat
 
 				string SearchPattern;
 
-				if (Paths.Count == 0)
+				if (Paths.Count == 0 && ComparisonPaths.Count == 0)
 					Paths.Add(Directory.GetCurrentDirectory());
 
 				if (string.IsNullOrEmpty(XmlFileName))
@@ -114,7 +129,7 @@ namespace Waher.Utility.ExStat
 					NewLineHandling = NewLineHandling.Entitize,
 					NewLineOnAttributes = false,
 					OmitXmlDeclaration = false,
-					WriteEndDocumentOnClose = true, 
+					WriteEndDocumentOnClose = true,
 					CheckCharacters = false
 				};
 
@@ -125,6 +140,7 @@ namespace Waher.Utility.ExStat
 				Output.WriteStartElement("Statistics", "http://waher.se/schema/ExStat.xsd");
 
 				Dictionary<string, bool> FileProcessed = new Dictionary<string, bool>();
+				Statistics Statistics = new Statistics();
 
 				foreach (string Path0 in Paths)
 				{
@@ -142,7 +158,6 @@ namespace Waher.Utility.ExStat
 					}
 
 					string[] FileNames = Directory.GetFiles(Path, SearchPattern, Subfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-					Statistics Statistics = new Statistics();
 					byte[] Buffer = new byte[BufSize];
 					int NrRead = 0;
 					int Last = 0;
@@ -227,15 +242,273 @@ namespace Waher.Utility.ExStat
 							Console.Out.WriteLine(ex.Message);
 						}
 					}
-
-
-					Export(Output, "PerType", "type", Statistics.PerType, "PerMessage", "PerSource");
-					Export(Output, "PerMessage", "message", Statistics.PerMessage, "PerType", "PerSource");
-					Export(Output, "PerSource", string.Empty, Statistics.PerSource, "PerType", "PerMessage");
-					Export(Output, "PerHour", "hour", "yyyy-MM-ddTHH", Statistics.PerHour);
-					Export(Output, "PerDay", "day", "yyyy-MM-dd", Statistics.PerDay);
-					Export(Output, "PerMonth", "month", "yyyy-MM", Statistics.PerMonth);
 				}
+
+				Statistics.RemoveUntouched();
+
+				bool First = Paths.Count == 0;
+
+				foreach (string Path0 in ComparisonPaths)
+				{
+					string Path = Path0;
+
+					if (Directory.Exists(Path))
+						SearchPattern = "*.xml";
+					else
+					{
+						SearchPattern = System.IO.Path.GetFileName(Path);
+						Path = System.IO.Path.GetDirectoryName(Path);
+
+						if (!Directory.Exists(Path))
+							throw new Exception("Path does not exist.");
+					}
+
+					string[] FileNames = Directory.GetFiles(Path, SearchPattern, Subfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+					foreach (string FileName in FileNames)
+					{
+						if (FileProcessed.ContainsKey(FileName))
+							continue;
+
+						FileProcessed[FileName] = true;
+
+						Console.Out.WriteLine(FileName + "...");
+
+						try
+						{
+							XmlDocument Doc = new XmlDocument();
+							Doc.Load(FileName);
+
+							foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+							{
+								if (!(N is XmlElement E))
+									continue;
+
+								switch (E.LocalName)
+								{
+									case "PerType":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											string Type = XML.Attribute(E2, "type");
+											int Count = XML.Attribute(E2, "count", 0);
+
+											foreach (XmlNode N3 in E2.ChildNodes)
+											{
+												if (!(N3 is XmlElement E3))
+													continue;
+
+												switch (E3.LocalName)
+												{
+													case "PerMessage":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string Message = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerType.Join(Type, Count2, First,Message, null);
+															Statistics.PerMessage.Join(Message, Count2, First,Type, null);
+														}
+														break;
+
+													case "PerSource":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string StackTrace = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerType.Join(Type, Count2, First,null, StackTrace);
+															Statistics.PerSource.Join(StackTrace, Count2, First,Type, null);
+														}
+														break;
+
+													default: 
+														throw new Exception("Unknown element: " + E3.LocalName);
+												}
+											}
+										}
+										break;
+
+									case "PerMessage":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											string Message = XML.Attribute(E2, "message");
+											int Count = XML.Attribute(E2, "count", 0);
+
+											foreach (XmlNode N3 in E2.ChildNodes)
+											{
+												if (!(N3 is XmlElement E3))
+													continue;
+
+												switch (E3.LocalName)
+												{
+													case "PerType":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string Type = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerType.Join(Type, Count2, First,Message, null);
+															Statistics.PerMessage.Join(Message, Count2, First,Type, null);
+														}
+														break;
+
+													case "PerSource":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string StackTrace = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerMessage.Join(Message, Count2, First,null, StackTrace);
+															Statistics.PerSource.Join(StackTrace, Count2, First,null, Message);
+														}
+														break;
+
+													default:
+														throw new Exception("Unknown element: " + E3.LocalName);
+												}
+											}
+										}
+										break;
+
+									case "PerSource":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											string StackTrace = null;
+											int Count = XML.Attribute(E2, "count", 0);
+
+											foreach (XmlNode N3 in E2.ChildNodes)
+											{
+												if (!(N3 is XmlElement E3))
+													continue;
+
+												switch (E3.LocalName)
+												{
+													case "Value":
+														StackTrace = E3.InnerText;
+														break;
+
+													case "PerType":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string Type = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerType.Join(Type, Count2, First,null, StackTrace);
+															Statistics.PerSource.Join(StackTrace, Count2, First,Type, null);
+														}
+														break;
+
+													case "PerMessage":
+														foreach (XmlNode N4 in E3.ChildNodes)
+														{
+															if (!(N4 is XmlElement E4) || E4.LocalName != "Stat")
+																continue;
+
+															string Message = E4["Value"]?.InnerText;
+															int Count2 = XML.Attribute(E4, "count", 0);
+
+															Statistics.PerMessage.Join(Message, Count2, First,null, StackTrace);
+															Statistics.PerSource.Join(StackTrace, Count2, First,null, Message);
+														}
+														break;
+
+													default:
+														throw new Exception("Unknown element: " + E3.LocalName);
+												}
+											}
+										}
+										break;
+
+									case "PerHour":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											string TP = XML.Attribute(E2, "hour");
+											if (XML.TryParse(TP + ":00:00", out DateTime Hour))
+											{
+												int Count = XML.Attribute(E2, "count", 0);
+
+												Statistics.PerHour.Join(Hour, Count, First);
+											}
+										}
+										break;
+
+									case "PerDay":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											DateTime Day = XML.Attribute(E2, "day", DateTime.MinValue);
+											int Count = XML.Attribute(E2, "count", 0);
+
+											Statistics.PerDay.Join(Day, Count, First);
+										}
+										break;
+
+									case "PerMonth":
+										foreach (XmlNode N2 in E.ChildNodes)
+										{
+											if (!(N2 is XmlElement E2) || E2.LocalName != "Stat")
+												continue;
+
+											string TP = XML.Attribute(E2, "month");
+											if (XML.TryParse(TP + "-01", out DateTime Month))
+											{
+												int Count = XML.Attribute(E2, "count", 0);
+
+												Statistics.PerMonth.Join(Month, Count, First);
+											}
+										}
+										break;
+
+									default: 
+										throw new Exception("Unknown element: " + E.LocalName);
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.Out.WriteLine(ex.Message);
+						}
+
+						Statistics.RemoveUntouched();
+						First = false;
+					}
+				}
+
+				Export(Output, "PerType", "type", Statistics.PerType, "PerMessage", "PerSource");
+				Export(Output, "PerMessage", "message", Statistics.PerMessage, "PerType", "PerSource");
+				Export(Output, "PerSource", string.Empty, Statistics.PerSource, "PerType", "PerMessage");
+				Export(Output, "PerHour", "hour", "yyyy-MM-ddTHH", Statistics.PerHour);
+				Export(Output, "PerDay", "day", "yyyy-MM-dd", Statistics.PerDay);
+				Export(Output, "PerMonth", "month", "yyyy-MM", Statistics.PerMonth);
 
 				Output.WriteEndElement();
 				Output.WriteEndDocument();

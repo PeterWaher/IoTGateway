@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Waher.Utility.ExStat": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-c \"C:\\Temp\\1\\*.xml\" -x Join.xml"
     }
   }
 }

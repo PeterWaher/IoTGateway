@@ -12,5 +12,16 @@ namespace Waher.Utility.ExStat
         public Histogram<DateTime> PerHour = new Histogram<DateTime>();
         public Histogram<DateTime> PerDay = new Histogram<DateTime>();
         public Histogram<DateTime> PerMonth = new Histogram<DateTime>();
+
+        public void RemoveUntouched()
+        {
+            this.PerType.RemoveUntouched();
+            this.PerMessage.RemoveUntouched();
+            this.PerSource.RemoveUntouched();
+            this.PerHour.RemoveUntouched();
+            this.PerDay.RemoveUntouched();
+            this.PerMonth.RemoveUntouched();
+        }
+
     }
 }

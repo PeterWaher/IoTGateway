@@ -15,7 +15,7 @@ namespace Waher.Persistence.Files
 	{
 		private const int MinBlockSize = 64;
 
-		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(0, 1);
+		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(1, 1);
 		private readonly FilesProvider provider;
 		private readonly FileStream file;
 		private readonly string fileName;

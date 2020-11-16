@@ -35,7 +35,7 @@ namespace Waher.Persistence.Files
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private readonly GenericObjectSerializer genericSerializer;
 		private readonly FilesProvider provider;
-		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(0, 1);
+		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(1, 1);
 		private FileStream file;
 		private FileStream blobFile;
 		private readonly Encoding encoding;

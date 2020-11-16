@@ -244,7 +244,7 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.LockWrite();
 			try
 			{
-				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null);
+				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null, 0);
 			}
 			catch (KeyNotFoundException)
 			{

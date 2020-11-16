@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Threading;
 
@@ -15,15 +15,17 @@ namespace Waher.Persistence.Files
 	{
 		private const int MinBlockSize = 64;
 
-		private FileStream file;
+		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(0, 1);
 		private readonly FilesProvider provider;
-		private Aes aes;
+		private readonly FileStream file;
 		private readonly string fileName;
 		private readonly string collectionName;
+		private readonly bool encrypted;
+		private readonly bool fileExists;
+		private Aes aes;
 		private byte[] aesKey;
 		private byte[] ivSeed;
 		private int ivSeedLen;
-		private readonly bool encrypted;
 		private bool disposed = false;
 
 		/// <summary>
@@ -46,6 +48,17 @@ namespace Waher.Persistence.Files
 			this.collectionName = CollectionName;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.encrypted = Encrypted;
+			this.fileExists = File.Exists(this.fileName);
+
+			string Folder = Path.GetDirectoryName(this.fileName);
+			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+				Directory.CreateDirectory(Folder);
+
+			if (this.fileExists)
+				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+			else
+				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+
 		}
 
 		/// <summary>
@@ -85,17 +98,6 @@ namespace Waher.Persistence.Files
 		/// <param name="SerialFile">SerialFile reference, or decendant.</param>
 		protected static async Task GetKeys(SerialFile SerialFile)
 		{
-			bool FileExists = File.Exists(SerialFile.fileName);
-
-			string Folder = Path.GetDirectoryName(SerialFile.fileName);
-			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-				Directory.CreateDirectory(Folder);
-
-			if (FileExists)
-				SerialFile.file = File.Open(SerialFile.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-			else
-				SerialFile.file = File.Open(SerialFile.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-
 			if (SerialFile.encrypted)
 			{
 				SerialFile.aes = Aes.Create();
@@ -104,7 +106,7 @@ namespace Waher.Persistence.Files
 				SerialFile.aes.Mode = CipherMode.CBC;
 				SerialFile.aes.Padding = PaddingMode.None;
 
-				KeyValuePair<byte[], byte[]> P = await SerialFile.provider.GetKeys(SerialFile.fileName, FileExists);
+				KeyValuePair<byte[], byte[]> P = await SerialFile.provider.GetKeys(SerialFile.fileName, SerialFile.fileExists);
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;
 				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
@@ -135,7 +137,7 @@ namespace Waher.Persistence.Files
 			await this.LockRead();
 			try
 			{
-				return this.file.Length;
+				return this.file.Length;    // Can only change in write state
 			}
 			finally
 			{
@@ -170,10 +172,14 @@ namespace Waher.Persistence.Files
 		private async Task<byte[]> ReadBlock(long Position, int NrBytes)
 		{
 			byte[] Result = new byte[NrBytes];
+			bool W = false;
 
 			await this.LockRead();
 			try
 			{
+				await this.fileReadAccess.WaitAsync();
+				W = true;
+
 				this.file.Position = Position;
 
 				int NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
@@ -182,6 +188,9 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
+				if (W)
+					this.fileReadAccess.Release();
+
 				await this.EndRead();
 			}
 
@@ -362,6 +371,7 @@ namespace Waher.Persistence.Files
 			if (!this.disposed)
 			{
 				this.file.Dispose();
+				this.fileReadAccess.Dispose();
 				this.aes?.Dispose();
 				this.disposed = true;
 			}

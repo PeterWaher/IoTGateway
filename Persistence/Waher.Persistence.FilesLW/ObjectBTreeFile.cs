@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Exceptions;
@@ -34,6 +35,7 @@ namespace Waher.Persistence.Files
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private readonly GenericObjectSerializer genericSerializer;
 		private readonly FilesProvider provider;
+		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(0, 1);
 		private FileStream file;
 		private FileStream blobFile;
 		private readonly Encoding encoding;
@@ -250,6 +252,8 @@ namespace Waher.Persistence.Files
 
 			this.blobFile?.Dispose();
 			this.blobFile = null;
+
+			this.fileReadAccess.Dispose();
 
 			this.provider.RemoveBlocks(this.id);
 
@@ -549,7 +553,7 @@ namespace Waher.Persistence.Files
 						await this.RemoveEmptyBlocksLocked();
 
 					if (SaveBlocks)
-						await this.SaveUnsaved();
+						await this.SaveUnsavedLocked();
 				}
 				finally
 				{
@@ -592,7 +596,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task SaveUnsaved()
+		private async Task SaveUnsavedLocked()
 		{
 			if (!(this.blocksToSave is null))
 			{
@@ -709,12 +713,23 @@ namespace Waher.Persistence.Files
 				return Block;
 			}
 
-			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
+			int NrRead;
 
-			Block = new byte[this.blockSize];
+			await this.fileReadAccess.WaitAsync();
+			try
+			{
+				if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
+					throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
-			int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+				Block = new byte[this.blockSize];
+
+				NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+			}
+			finally
+			{
+				this.fileReadAccess.Release();
+			}
+
 			if (this.blockSize != NrRead)
 				throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 
@@ -1006,6 +1021,7 @@ namespace Waher.Persistence.Files
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
+			await this.fileReadAccess.WaitAsync();
 			try
 			{
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Pos);
@@ -1095,6 +1111,10 @@ namespace Waher.Persistence.Files
 			catch (OutOfMemoryException ex)
 			{
 				throw Database.FlagForRepair(this.collectionName, ex.Message);
+			}
+			finally
+			{
+				this.fileReadAccess.Release();
 			}
 		}
 
@@ -2429,7 +2449,7 @@ namespace Waher.Persistence.Files
 			await this.LockWrite();
 			try
 			{
-				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
+				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 			}
 			finally
 			{
@@ -2457,7 +2477,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				foreach (Guid ObjectId in ObjectIds)
-					DeletedObjects.AddLast(await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null));
+					DeletedObjects.AddLast(await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0));
 			}
 			finally
 			{
@@ -2471,7 +2491,7 @@ namespace Waher.Persistence.Files
 		}
 
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
-			IObjectSerializer Serializer, object OldObject)
+			IObjectSerializer Serializer, object OldObject, int MergeCount)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
@@ -2576,6 +2596,9 @@ namespace Waher.Persistence.Files
 
 				if (MergeNodes)
 				{
+					if (MergeCount > 100)
+						throw Database.FlagForRepair(this.collectionName, "Suspected circular reference found in database.");
+
 					byte[] Separator = new byte[ObjLen];
 					Array.Copy(Block, Info.InternalPosition + 4, Separator, 0, ObjLen);
 
@@ -2592,7 +2615,7 @@ namespace Waher.Persistence.Files
 
 							await this.UpdateParentLinksLocked(0, MergeResult.ResultBlock);
 
-							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);  // This time, the object will be lower in the tree.
+							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject, MergeCount + 1);  // This time, the object will be lower in the tree.
 						}
 						else
 						{
@@ -2626,7 +2649,7 @@ namespace Waher.Persistence.Files
 					if (!(MergeResult.Separator is null))
 						await this.ReinsertMergeOverflow(MergeResult, BlockIndex);
 
-					return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);  // This time, the object will be lower in the tree.
+					return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject, MergeCount + 1);  // This time, the object will be lower in the tree.
 				}
 				else
 				{
@@ -2655,7 +2678,7 @@ namespace Waher.Persistence.Files
 										NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, true);
 
 										if (NewSeparator is null)
-											return await this.DeleteObjectLocked(ObjectId, true, false, Serializer, OldObject);
+											return await this.DeleteObjectLocked(ObjectId, true, false, Serializer, OldObject, MergeCount);
 									}
 								}
 							}
@@ -2684,7 +2707,7 @@ namespace Waher.Persistence.Files
 							object ObjectId2 = this.GetObjectId(NewSeparator);
 							Info = await this.FindLeafNodeLocked(ObjectId2);
 							await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, NewSeparator, Info.InternalPosition, 0, 0, true, Info.LastObject);
-							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);
+							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject, MergeCount);
 						}
 					}
 

@@ -1934,7 +1934,7 @@ namespace Waher.Persistence.Files
 				{
 					Guid ObjectId = await Serializer.GetObjectId(Object, false);
 					if (ObjectId != Guid.Empty)
-						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
+						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 				}
 
 				return Result;
@@ -1987,7 +1987,7 @@ namespace Waher.Persistence.Files
 
 					Guid ObjectId = await Serializer.GetObjectId(Object, false);
 					if (ObjectId != Guid.Empty)
-						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
+						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 				}
 
 				return Result;

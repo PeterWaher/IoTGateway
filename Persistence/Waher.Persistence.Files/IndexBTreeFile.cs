@@ -206,7 +206,7 @@ namespace Waher.Persistence.Files
 			await this.indexFile.LockWrite();
 			try
 			{
-				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
+				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
 			}
 			catch (KeyNotFoundException)
 			{
@@ -243,7 +243,7 @@ namespace Waher.Persistence.Files
 						if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
 							continue;
 
-						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
+						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
 					}
 					catch (KeyNotFoundException)
 					{
@@ -299,7 +299,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
+						await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
 					}
 					catch (KeyNotFoundException)
 					{
@@ -374,7 +374,7 @@ namespace Waher.Persistence.Files
 					{
 						try
 						{
-							await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
+							await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
 						}
 						catch (KeyNotFoundException)
 						{

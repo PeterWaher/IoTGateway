@@ -37,12 +37,12 @@ namespace Waher.Script.Operators.Comparisons
 		}
 
 		/// <summary>
-		/// If the value specified by <see cref="Left"/> is included in the range.
+		/// If the value specified by <see cref="LeftOperand"/> is included in the range.
 		/// </summary>
 		public bool LeftInclusive => this.leftInclusive;
 
 		/// <summary>
-		/// If the value specified by <see cref="Right"/> is included in the range.
+		/// If the value specified by <see cref="RightOperand"/> is included in the range.
 		/// </summary>
 		public bool RightInclusive => this.rightInclusive;
 

@@ -547,6 +547,8 @@ namespace Waher.Persistence.Files
 
 		private async Task SaveUnsavedLocked()
 		{
+			this.AssertWriting();
+
 			if (!(this.blocksToSave is null))
 			{
 				bool Changed = false;
@@ -572,6 +574,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
+			this.AssertWriting();
+
 			byte[] Block = null;
 			uint BlockIndex = uint.MaxValue;
 
@@ -647,6 +651,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<byte[]> LoadBlockLocked(uint BlockIndex, bool AddToCache)
 		{
+			this.AssertReadingOrWriting();
+
 			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] Block))
 			{
 				this.nrCacheLoads++;
@@ -697,6 +703,8 @@ namespace Waher.Persistence.Files
 
 		internal void QueueSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
+			this.AssertWriting();
+
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
 
@@ -728,6 +736,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task DoSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
+			this.AssertWriting();
+
 			byte[] EncryptedBlock;
 
 			if (this.encrypted)
@@ -764,6 +774,8 @@ namespace Waher.Persistence.Files
 
 		private void RegisterEmptyBlockLocked(uint Block)
 		{
+			this.AssertWriting();
+
 			if (this.emptyBlocks is null)
 				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
 
@@ -780,6 +792,8 @@ namespace Waher.Persistence.Files
 
 		private async Task RemoveEmptyBlocksLocked()
 		{
+			this.AssertWriting();
+
 			if (!(this.emptyBlocks is null))
 			{
 				BinaryDeserializer Reader;
@@ -867,6 +881,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
+			this.AssertWriting();
+
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -936,6 +952,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
 		{
+			this.AssertReadingOrWriting();
+
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -1024,6 +1042,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
+			this.AssertWriting();
+
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -1276,6 +1296,8 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to persist.</param>
 		internal async Task<Guid> SaveNewObjectLocked(object Object)
 		{
+			this.AssertWriting();
+
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
@@ -1312,6 +1334,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
 		{
+			this.AssertWriting();
+
 			BinarySerializer Writer;
 			Guid ObjectId;
 			byte[] Bin;
@@ -1331,6 +1355,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task SaveNewObjectLocked(byte[] Bin, BlockInfo Info)
 		{
+			this.AssertWriting();
+
 			if (Bin.Length > this.inlineObjectSizeLimit)
 			{
 				byte[] BlobReference = await this.SaveBlobLocked(Bin);
@@ -1361,6 +1387,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
 		{
+			this.AssertWriting();
+
 			bool HasObjectId = await Serializer.HasObjectId(Object);
 			BlockInfo Leaf;
 			Guid ObjectId;
@@ -1391,6 +1419,8 @@ namespace Waher.Persistence.Files
 		internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
 			uint ChildRightLink, uint ChildRightLinkSize, bool IncSize, bool LastObject)
 		{
+			this.AssertWriting();
+
 			int Used = Header.BytesUsed;
 			int PayloadSize = (int)(Used + 4 + Bin.Length);
 
@@ -1606,7 +1636,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					await InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
+					await this.InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
 						Splitter.RightSizeSubtree, IncSize, LastObject);
 				}
 
@@ -1623,6 +1653,8 @@ namespace Waher.Persistence.Files
 
 		private async Task UpdateParentLinksLocked(uint BlockIndex, byte[] Block)
 		{
+			this.AssertWriting();
+
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			object ObjectId;
 			int Len;
@@ -1660,6 +1692,8 @@ namespace Waher.Persistence.Files
 
 		private async Task CheckChildParentLinkLocked(uint ChildLink, uint NewParentLink)
 		{
+			this.AssertWriting();
+
 			byte[] ChildBlock = await this.LoadBlockLocked(ChildLink, true);
 
 			uint ChildParentLink = BitConverter.ToUInt32(ChildBlock, 10);
@@ -1672,6 +1706,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BlockInfo> FindLeafNodeLocked(object ObjectId)
 		{
+			this.AssertReadingOrWriting();
+
 			uint BlockIndex = 0;
 			bool LastObject = true;
 
@@ -1824,6 +1860,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
 		{
+			this.AssertReadingOrWriting();
+
 			int Pos = Info.InternalPosition + 4;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, Pos);
 
@@ -1858,6 +1896,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
 		{
+			this.AssertReadingOrWriting();
+
 			uint BlockIndex = 0;
 
 			if (ObjectId is null || (ObjectId is Guid && ObjectId.Equals(Guid.Empty)))
@@ -2036,6 +2076,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
+			this.AssertWriting();
+
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Info.InternalPosition + 4);
@@ -2224,7 +2266,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					await InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
+					await this.InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
 						Splitter.RightSizeSubtree, false, Info.LastObject);
 				}
 
@@ -2345,6 +2387,8 @@ namespace Waher.Persistence.Files
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
 			IObjectSerializer Serializer, object OldObject, int MergeCount)
 		{
+			this.AssertWriting();
+
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
@@ -2668,6 +2712,8 @@ namespace Waher.Persistence.Files
 
 		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
 		{
+			this.AssertWriting();
+
 			byte[] Object;
 
 			if (BlockIndex == 0)
@@ -2742,6 +2788,8 @@ namespace Waher.Persistence.Files
 
 		private async Task MergeEmptyBlockWithSiblingLocked(uint ChildBlockIndex, uint ParentBlockIndex)
 		{
+			this.AssertWriting();
+
 			byte[] ParentBlock = await this.LoadBlockLocked(ParentBlockIndex, true);
 			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
 			BlockHeader ParentHeader = new BlockHeader(ParentReader);
@@ -2869,6 +2917,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<MergeResult> MergeBlocksLocked(uint LeftIndex, byte[] Separator, uint RightIndex)
 		{
+			this.AssertWriting();
+
 			byte[] LeftBlock = await this.LoadBlockLocked(LeftIndex, true);
 			byte[] RightBlock = await this.LoadBlockLocked(RightIndex, true);
 
@@ -2877,6 +2927,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, byte[] Separator, byte[] Right)
 		{
+			this.AssertWriting();
+
 			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
 			uint LeftLastLink = BitConverter.ToUInt32(Left, 6);
 			uint RightLastLink = BitConverter.ToUInt32(Right, 6);
@@ -3036,6 +3088,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
+			this.AssertWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3178,6 +3232,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractSmallestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
+			this.AssertWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3334,6 +3390,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateLeftLocked(uint ChildIndex, uint BlockIndex)
 		{
+			this.AssertWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3445,6 +3503,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateRightLocked(uint ChildIndex, uint BlockIndex)
 		{
+			this.AssertWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3570,6 +3630,8 @@ namespace Waher.Persistence.Files
 
 		private async Task DecreaseSizeLocked(uint BlockIndex, uint Delta)
 		{
+			this.AssertWriting();
+
 			if (Delta == 0)
 				return;
 
@@ -3602,6 +3664,8 @@ namespace Waher.Persistence.Files
 
 		private async Task IncreaseSizeLocked(uint BlockIndex)
 		{
+			this.AssertWriting();
+
 			while (true)
 			{
 				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
@@ -3646,6 +3710,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat, bool Properties)
 		{
+			this.AssertReadingOrWriting();
+
 			StringBuilder Output = new StringBuilder();
 			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
 			FileStatistics Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
@@ -3701,6 +3767,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)
 		{
+			this.AssertReadingOrWriting();
+
 			this.blockLimit = this.file.BlockLimit + this.blocksAdded;
 			this.blobBlockLimit = this.blobFile is null ? 0 : this.blobFile.BlockLimit;
 
@@ -4088,6 +4156,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
 		{
+			this.AssertReadingOrWriting();
+
 			BinaryDeserializer Reader = null;
 			long NrBlocks = this.file.BlockLimit + this.blocksAdded;
 			byte[] BlobBlock = new byte[this.blobBlockSize];
@@ -4162,6 +4232,8 @@ namespace Waher.Persistence.Files
 
 		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput, bool Properties)
 		{
+			this.AssertReadingOrWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BinaryDeserializer Reader2;
@@ -4248,6 +4320,8 @@ namespace Waher.Persistence.Files
 
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, GenericObject Object)
 		{
+			this.AssertReadingOrWriting();
+
 			LinkedList<KeyValuePair<string, Array>> Arrays = null;
 			LinkedList<KeyValuePair<string, GenericObject>> Objects = null;
 			object Value;
@@ -4314,6 +4388,8 @@ namespace Waher.Persistence.Files
 
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, object Item)
 		{
+			this.AssertReadingOrWriting();
+
 			uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(Item);
 
 			switch (TypeCode)
@@ -4452,6 +4528,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
+			this.AssertReadingOrWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			uint BlockSize;
 
@@ -4505,6 +4583,8 @@ namespace Waher.Persistence.Files
 
 		private async Task<uint> GetObjectCount32Locked(uint BlockIndex)
 		{
+			this.AssertReadingOrWriting();
+
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			return BitConverter.ToUInt32(Block, 2);
 		}
@@ -4520,7 +4600,7 @@ namespace Waher.Persistence.Files
 			await this.LockRead();
 			try
 			{
-				return await GetRankLocked(ObjectId);
+				return await this.GetRankLocked(ObjectId);
 			}
 			finally
 			{
@@ -4530,6 +4610,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<ulong> GetRankLocked(object ObjectId)
 		{
+			this.AssertReadingOrWriting();
+
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
@@ -4757,6 +4839,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task ClearAsyncLocked()
 		{
+			this.AssertWriting();
+
 			await this.file.Truncate(0);
 
 			if (!(this.blobFile is null))

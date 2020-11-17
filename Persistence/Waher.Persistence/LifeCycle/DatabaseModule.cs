@@ -34,6 +34,9 @@ namespace Waher.Persistence.LifeCycle
 
 			if (Ledger.HasProvider)
 				await Ledger.Provider.Start();
+
+			databaseProvider = null;
+			ledgerProvider = null;
 		}
 
 		/// <summary>

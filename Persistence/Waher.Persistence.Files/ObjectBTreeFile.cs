@@ -1,4 +1,5 @@
 ﻿//#define DEBUG_LOCKS
+#define ASSERT_LOCKS
 
 using System;
 using System.Collections;
@@ -547,8 +548,9 @@ namespace Waher.Persistence.Files
 
 		private async Task SaveUnsavedLocked()
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (!(this.blocksToSave is null))
 			{
 				bool Changed = false;
@@ -574,8 +576,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = null;
 			uint BlockIndex = uint.MaxValue;
 
@@ -651,8 +654,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<byte[]> LoadBlockLocked(uint BlockIndex, bool AddToCache)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] Block))
 			{
 				this.nrCacheLoads++;
@@ -703,8 +707,9 @@ namespace Waher.Persistence.Files
 
 		internal void QueueSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
 
@@ -736,8 +741,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task DoSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] EncryptedBlock;
 
 			if (this.encrypted)
@@ -774,8 +780,9 @@ namespace Waher.Persistence.Files
 
 		private void RegisterEmptyBlockLocked(uint Block)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (this.emptyBlocks is null)
 				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
 
@@ -792,8 +799,9 @@ namespace Waher.Persistence.Files
 
 		private async Task RemoveEmptyBlocksLocked()
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (!(this.emptyBlocks is null))
 			{
 				BinaryDeserializer Reader;
@@ -881,8 +889,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -952,8 +961,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -1042,8 +1052,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
@@ -1296,8 +1307,9 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to persist.</param>
 		internal async Task<Guid> SaveNewObjectLocked(object Object)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
@@ -1334,8 +1346,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			BinarySerializer Writer;
 			Guid ObjectId;
 			byte[] Bin;
@@ -1355,8 +1368,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task SaveNewObjectLocked(byte[] Bin, BlockInfo Info)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (Bin.Length > this.inlineObjectSizeLimit)
 			{
 				byte[] BlobReference = await this.SaveBlobLocked(Bin);
@@ -1387,8 +1401,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			bool HasObjectId = await Serializer.HasObjectId(Object);
 			BlockInfo Leaf;
 			Guid ObjectId;
@@ -1419,8 +1434,9 @@ namespace Waher.Persistence.Files
 		internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
 			uint ChildRightLink, uint ChildRightLinkSize, bool IncSize, bool LastObject)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			int Used = Header.BytesUsed;
 			int PayloadSize = (int)(Used + 4 + Bin.Length);
 
@@ -1653,8 +1669,9 @@ namespace Waher.Persistence.Files
 
 		private async Task UpdateParentLinksLocked(uint BlockIndex, byte[] Block)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			object ObjectId;
 			int Len;
@@ -1692,8 +1709,9 @@ namespace Waher.Persistence.Files
 
 		private async Task CheckChildParentLinkLocked(uint ChildLink, uint NewParentLink)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] ChildBlock = await this.LoadBlockLocked(ChildLink, true);
 
 			uint ChildParentLink = BitConverter.ToUInt32(ChildBlock, 10);
@@ -1706,8 +1724,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BlockInfo> FindLeafNodeLocked(object ObjectId)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			uint BlockIndex = 0;
 			bool LastObject = true;
 
@@ -1860,8 +1879,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			int Pos = Info.InternalPosition + 4;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, Pos);
 
@@ -1896,8 +1916,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			uint BlockIndex = 0;
 
 			if (ObjectId is null || (ObjectId is Guid && ObjectId.Equals(Guid.Empty)))
@@ -2076,8 +2097,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Info.InternalPosition + 4);
@@ -2387,8 +2409,9 @@ namespace Waher.Persistence.Files
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
 			IObjectSerializer Serializer, object OldObject, int MergeCount)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
@@ -2712,8 +2735,9 @@ namespace Waher.Persistence.Files
 
 		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Object;
 
 			if (BlockIndex == 0)
@@ -2788,8 +2812,9 @@ namespace Waher.Persistence.Files
 
 		private async Task MergeEmptyBlockWithSiblingLocked(uint ChildBlockIndex, uint ParentBlockIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] ParentBlock = await this.LoadBlockLocked(ParentBlockIndex, true);
 			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
 			BlockHeader ParentHeader = new BlockHeader(ParentReader);
@@ -2917,8 +2942,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<MergeResult> MergeBlocksLocked(uint LeftIndex, byte[] Separator, uint RightIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] LeftBlock = await this.LoadBlockLocked(LeftIndex, true);
 			byte[] RightBlock = await this.LoadBlockLocked(RightIndex, true);
 
@@ -2927,8 +2953,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, byte[] Separator, byte[] Right)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
 			uint LeftLastLink = BitConverter.ToUInt32(Left, 6);
 			uint RightLastLink = BitConverter.ToUInt32(Right, 6);
@@ -3088,8 +3115,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3232,8 +3260,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> TryExtractSmallestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3390,8 +3419,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateLeftLocked(uint ChildIndex, uint BlockIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3503,8 +3533,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> RotateRightLocked(uint ChildIndex, uint BlockIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
@@ -3630,8 +3661,9 @@ namespace Waher.Persistence.Files
 
 		private async Task DecreaseSizeLocked(uint BlockIndex, uint Delta)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			if (Delta == 0)
 				return;
 
@@ -3664,8 +3696,9 @@ namespace Waher.Persistence.Files
 
 		private async Task IncreaseSizeLocked(uint BlockIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			while (true)
 			{
 				byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
@@ -3710,8 +3743,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat, bool Properties)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			StringBuilder Output = new StringBuilder();
 			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
 			FileStatistics Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
@@ -3767,8 +3801,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			this.blockLimit = this.file.BlockLimit + this.blocksAdded;
 			this.blobBlockLimit = this.blobFile is null ? 0 : this.blobFile.BlockLimit;
 
@@ -4156,8 +4191,9 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			BinaryDeserializer Reader = null;
 			long NrBlocks = this.file.BlockLimit + this.blocksAdded;
 			byte[] BlobBlock = new byte[this.blobBlockSize];
@@ -4232,8 +4268,9 @@ namespace Waher.Persistence.Files
 
 		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput, bool Properties)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			BinaryDeserializer Reader2;
@@ -4320,8 +4357,9 @@ namespace Waher.Persistence.Files
 
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, GenericObject Object)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			LinkedList<KeyValuePair<string, Array>> Arrays = null;
 			LinkedList<KeyValuePair<string, GenericObject>> Objects = null;
 			object Value;
@@ -4388,8 +4426,9 @@ namespace Waher.Persistence.Files
 
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, object Item)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(Item);
 
 			switch (TypeCode)
@@ -4528,8 +4567,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			uint BlockSize;
 
@@ -4583,8 +4623,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<uint> GetObjectCount32Locked(uint BlockIndex)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			return BitConverter.ToUInt32(Block, 2);
 		}
@@ -4610,8 +4651,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task<ulong> GetRankLocked(object ObjectId)
 		{
+#if ASSERT_LOCKS
 			this.AssertReadingOrWriting();
-
+#endif
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
@@ -4839,8 +4881,9 @@ namespace Waher.Persistence.Files
 
 		internal async Task ClearAsyncLocked()
 		{
+#if ASSERT_LOCKS
 			this.AssertWriting();
-
+#endif
 			await this.file.Truncate(0);
 
 			if (!(this.blobFile is null))

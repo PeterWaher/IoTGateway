@@ -10,7 +10,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Exceptions;

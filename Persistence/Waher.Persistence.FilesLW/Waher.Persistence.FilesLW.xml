@@ -1566,6 +1566,11 @@
             <returns>Field name.</returns>
             <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
         </member>
+        <member name="M:Waher.Persistence.Files.LabelFile.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Files.ObjectBTreeFile">
             <summary>
             This class manages a binary file where objects are persisted in a B-tree.
@@ -3747,44 +3752,41 @@
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
             </summary>
         </member>
-        <member name="F:Waher.Persistence.Files.SerialFile.timeoutMilliseconds">
+        <member name="F:Waher.Persistence.Files.SerialFile.collectionName">
             <summary>
-            Maximum time to wait for access to underlying database (ms)
+            Collection Name
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+        <member name="M:Waher.Persistence.Files.SerialFile.#ctor(System.String,System.String,System.Boolean)">
             <summary>
             Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
             </summary>
             <param name="FileName">Name of file</param>
             <param name="CollectionName">Collection Name</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+            <param name="Encrypted">If file is encrypted.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String)">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+            <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String,System.Boolean,Waher.Persistence.Files.FilesProvider)">
+            <summary>
+            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+            </summary>
+            <param name="FileName">Name of file</param>
+            <param name="CollectionName">Collection Name</param>
             <param name="Encrypted">If file is encrypted.</param>
             <param name="Provider">Provider of encryption keys.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String,System.Int32)">
-            <summary>
-            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
-            </summary>
-            <param name="FileName">Name of file</param>
-            <param name="CollectionName">Collection Name</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.Create(System.String,System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider)">
-            <summary>
-            Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
-            </summary>
-            <param name="FileName">Name of file</param>
-            <param name="CollectionName">Collection Name</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-            <param name="Encrypted">If file is encrypted.</param>
-            <param name="Provider">Provider of encryption keys.</param>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.GetKeys(Waher.Persistence.Files.SerialFile)">
+        <member name="M:Waher.Persistence.Files.SerialFile.GetKeys(Waher.Persistence.Files.SerialFile,Waher.Persistence.Files.FilesProvider)">
             <summary>
             Gets keys for the serial file, or decendant.
             </summary>
             <param name="SerialFile">SerialFile reference, or decendant.</param>
+            <param name="Provider">Provider of encryption keys.</param>
         </member>
         <member name="P:Waher.Persistence.Files.SerialFile.FileName">
             <summary>
@@ -3796,26 +3798,11 @@
             Collection name.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.Files.SerialFile.Provider">
-            <summary>
-            Files provider.
-            </summary>
-        </member>
         <member name="M:Waher.Persistence.Files.SerialFile.GetLength">
             <summary>
             Gets the length of the file, in bytes.
             </summary>
             <returns>Length of file.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.LockRead">
-            <summary>
-            Locks the file for reading.
-            </summary>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.LockWrite">
-            <summary>
-            Locks the file for writing.
-            </summary>
         </member>
         <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64,System.Int32)">
             <summary>

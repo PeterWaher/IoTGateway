@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Threading;
@@ -15,10 +14,13 @@ namespace Waher.Persistence.Files
 	{
 		private readonly Dictionary<string, uint> codesByLabel = new Dictionary<string, uint>();
 		private readonly Dictionary<uint, string> labelsByCode = new Dictionary<uint, string>();
+		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private readonly int timeoutMilliseconds;
 
-		private LabelFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
-			: base(FileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider)
+		private LabelFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted)
+			: base(FileName, CollectionName, Encrypted)
 		{
+			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		/// <summary>
@@ -65,11 +67,11 @@ namespace Waher.Persistence.Files
 			string FileName = Provider.GetFileName(CollectionName);
 			string LabelsFileName = FileName + ".labels";
 			bool LabelsExists = File.Exists(LabelsFileName);
-			LabelFile Result = new LabelFile(LabelsFileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider);
+			LabelFile Result = new LabelFile(LabelsFileName, CollectionName, TimeoutMilliseconds, Encrypted);
 			uint LastCode = 0;
 			uint Code = 1;
 
-			await GetKeys(Result);
+			await GetKeys(Result, Provider);
 
 			if (LabelsExists)
 			{
@@ -141,6 +143,28 @@ namespace Waher.Persistence.Files
 			}
 
 			return Result;
+		}
+
+		private async Task LockRead()
+		{
+			if (!await this.synchObj.TryBeginRead(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get read access to label file for " + this.collectionName + ".");
+		}
+
+		private Task EndRead()
+		{
+			return this.synchObj.EndRead();
+		}
+
+		private async Task LockWrite()
+		{
+			if (!await this.synchObj.TryBeginWrite(this.timeoutMilliseconds))
+				throw new TimeoutException("Unable to get write access to label file for " + this.collectionName + ".");
+		}
+
+		private Task EndWrite()
+		{
+			return this.synchObj.EndWrite();
 		}
 
 		/// <summary>
@@ -253,5 +277,13 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+			this.synchObj.Dispose();
+		}
 	}
 }

@@ -4,22 +4,19 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 	/// </summary>
-	public class SerialFile : MultiReadSingleWriteObject, IDisposable
+	public class SerialFile : IDisposable
 	{
 		private const int MinBlockSize = 64;
 
-		private readonly SemaphoreSlim fileReadAccess = new SemaphoreSlim(1, 1);
-		private readonly FilesProvider provider;
+		private readonly SemaphoreSlim fileAccess = new SemaphoreSlim(1, 1);
 		private readonly FileStream file;
 		private readonly string fileName;
-		private readonly string collectionName;
 		private readonly bool encrypted;
 		private readonly bool fileExists;
 		private Aes aes;
@@ -29,24 +26,20 @@ namespace Waher.Persistence.Files
 		private bool disposed = false;
 
 		/// <summary>
-		/// Maximum time to wait for access to underlying database (ms)
+		/// Collection Name
 		/// </summary>
-		protected int timeoutMilliseconds;
+		protected readonly string collectionName;
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="CollectionName">Collection Name</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
-		/// <param name="Provider">Provider of encryption keys.</param>
-		protected SerialFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+		protected SerialFile(string FileName, string CollectionName, bool Encrypted)
 		{
-			this.provider = Provider;
 			this.fileName = FileName;
 			this.collectionName = CollectionName;
-			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.encrypted = Encrypted;
 			this.fileExists = File.Exists(this.fileName);
 
@@ -66,10 +59,9 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="CollectionName">Collection Name</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
-		public static Task<SerialFile> Create(string FileName, string CollectionName, int TimeoutMilliseconds)
+		public static Task<SerialFile> Create(string FileName, string CollectionName)
 		{
-			return Create(FileName, CollectionName, TimeoutMilliseconds, false, null);
+			return Create(FileName, CollectionName, false, null);
 		}
 
 		/// <summary>
@@ -77,17 +69,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="CollectionName">Collection Name</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		public static async Task<SerialFile> Create(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+		public static async Task<SerialFile> Create(string FileName, string CollectionName, bool Encrypted, FilesProvider Provider)
 		{
-			if (TimeoutMilliseconds <= 0)
-				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
+			SerialFile Result = new SerialFile(FileName, CollectionName, Encrypted);
 
-			SerialFile Result = new SerialFile(FileName, CollectionName, TimeoutMilliseconds, Encrypted, Provider);
-
-			await GetKeys(Result);
+			await GetKeys(Result, Provider);
 
 			return Result;
 		}
@@ -96,7 +84,8 @@ namespace Waher.Persistence.Files
 		/// Gets keys for the serial file, or decendant.
 		/// </summary>
 		/// <param name="SerialFile">SerialFile reference, or decendant.</param>
-		protected static async Task GetKeys(SerialFile SerialFile)
+		/// <param name="Provider">Provider of encryption keys.</param>
+		protected static async Task GetKeys(SerialFile SerialFile, FilesProvider Provider)
 		{
 			if (SerialFile.encrypted)
 			{
@@ -106,7 +95,7 @@ namespace Waher.Persistence.Files
 				SerialFile.aes.Mode = CipherMode.CBC;
 				SerialFile.aes.Padding = PaddingMode.None;
 
-				KeyValuePair<byte[], byte[]> P = await SerialFile.provider.GetKeys(SerialFile.fileName, SerialFile.fileExists);
+				KeyValuePair<byte[], byte[]> P = await Provider.GetKeys(SerialFile.fileName, SerialFile.fileExists);
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;
 				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
@@ -124,43 +113,20 @@ namespace Waher.Persistence.Files
 		public string CollectionName => this.collectionName;
 
 		/// <summary>
-		/// Files provider.
-		/// </summary>
-		public FilesProvider Provider => this.provider;
-
-		/// <summary>
 		/// Gets the length of the file, in bytes.
 		/// </summary>
 		/// <returns>Length of file.</returns>
 		public async Task<long> GetLength()
 		{
-			await this.LockRead();
+			await this.fileAccess.WaitAsync();
 			try
 			{
 				return this.file.Length;    // Can only change in write state
 			}
 			finally
 			{
-				await this.EndRead();
+				this.fileAccess.Release();
 			}
-		}
-
-		/// <summary>
-		/// Locks the file for reading.
-		/// </summary>
-		protected async Task LockRead()
-		{
-			if (!await this.TryBeginRead(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get read access to database.");
-		}
-
-		/// <summary>
-		/// Locks the file for writing.
-		/// </summary>
-		protected async Task LockWrite()
-		{
-			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get write access to database.");
 		}
 
 		/// <summary>
@@ -169,29 +135,26 @@ namespace Waher.Persistence.Files
 		/// <param name="Position">Position in file.</param>
 		/// <param name="NrBytes">Block size, in bytes. (Can be smaller than persisted block.)</param>
 		/// <returns>Block</returns>
-		private async Task<byte[]> ReadBlock(long Position, int NrBytes)
+		public async Task<byte[]> ReadBlock(long Position, int NrBytes)
 		{
-			byte[] Result = new byte[NrBytes];
-			bool W = false;
-			int NrRead;
-
-			await this.LockRead();
+			await this.fileAccess.WaitAsync();
 			try
 			{
-				await this.fileReadAccess.WaitAsync();
-				W = true;
-
-				this.file.Position = Position;
-
-				NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
+				return await this.ReadBlockLocked(Position, NrBytes);
 			}
 			finally
 			{
-				if (W)
-					this.fileReadAccess.Release();
-
-				await this.EndRead();
+				this.fileAccess.Release();
 			}
+		}
+
+		private async Task<byte[]> ReadBlockLocked(long Position, int NrBytes)
+		{
+			byte[] Result = new byte[NrBytes];
+			int NrRead;
+
+			this.file.Position = Position;
+			NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
 
 			if (NrRead < NrBytes)
 				throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
@@ -214,40 +177,48 @@ namespace Waher.Persistence.Files
 		/// <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
 		public async Task<KeyValuePair<byte[], long>> ReadBlock(long Position)
 		{
-			byte[] Block = await this.ReadBlock(Position, MinBlockSize);
-			int Pos = 0;
-			int c = 0;
-			int Offset = 0;
-			byte b;
-
-			do
+			await this.fileAccess.WaitAsync();
+			try
 			{
-				b = Block[Pos++];
+				byte[] Block = await this.ReadBlockLocked(Position, MinBlockSize);
+				int Pos = 0;
+				int c = 0;
+				int Offset = 0;
+				byte b;
 
-				c |= (b & 0x7f) << Offset;
-				Offset += 7;
+				do
+				{
+					b = Block[Pos++];
 
-				if (Offset > 31)
-					throw Database.FlagForRepair(this.collectionName, "Invalid block length. Possible corruption of file: " + this.fileName);
+					c |= (b & 0x7f) << Offset;
+					Offset += 7;
+
+					if (Offset > 31)
+						throw Database.FlagForRepair(this.collectionName, "Invalid block length. Possible corruption of file: " + this.fileName);
+				}
+				while ((b & 0x80) != 0);
+
+				if (c <= 0 || c > int.MaxValue)
+					throw Database.FlagForRepair(this.collectionName, "Invalid length. Possible corruption of file: " + this.fileName);
+
+				int BlockSize = c + Pos;
+				int Tail = BlockSize % MinBlockSize;
+
+				if (Tail > 0)
+					BlockSize += MinBlockSize - Tail;
+
+				if (BlockSize > MinBlockSize)
+					Block = await this.ReadBlockLocked(Position, BlockSize);
+
+				byte[] Data = new byte[c];
+				Array.Copy(Block, Pos, Data, 0, c);
+
+				return new KeyValuePair<byte[], long>(Data, Position + BlockSize);
 			}
-			while ((b & 0x80) != 0);
-
-			if (c <= 0 || c > int.MaxValue)
-				throw Database.FlagForRepair(this.collectionName, "Invalid length. Possible corruption of file: " + this.fileName);
-
-			int BlockSize = c + Pos;
-			int Tail = BlockSize % MinBlockSize;
-
-			if (Tail > 0)
-				BlockSize += MinBlockSize - Tail;
-
-			if (BlockSize > MinBlockSize)
-				Block = await this.ReadBlock(Position, BlockSize);
-
-			byte[] Data = new byte[c];
-			Array.Copy(Block, Pos, Data, 0, c);
-
-			return new KeyValuePair<byte[], long>(Data, Position + BlockSize);
+			finally
+			{
+				this.fileAccess.Release();
+			}
 		}
 
 		/// <summary>
@@ -257,14 +228,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Position of data block.</returns>
 		public async Task<long> WriteBlock(byte[] Data)
 		{
-			await this.LockWrite();
+			await this.fileAccess.WaitAsync();
 			try
 			{
 				return await this.WriteBlockLocked(Data);
 			}
 			finally
 			{
-				await this.EndWrite();
+				this.fileAccess.Release();
 			}
 		}
 
@@ -353,7 +324,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Length">Length at which the file will be truncated.</param>
 		protected async Task Truncate(long Length)
 		{
-			await this.BeginWrite();
+			await this.fileAccess.WaitAsync();
 			try
 			{
 				this.file.SetLength(Length);
@@ -361,24 +332,22 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.EndWrite();
+				this.fileAccess.Release();
 			}
 		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public override void Dispose()
+		public virtual void Dispose()
 		{
 			if (!this.disposed)
 			{
 				this.file.Dispose();
-				this.fileReadAccess.Dispose();
+				this.fileAccess.Dispose();
 				this.aes?.Dispose();
 				this.disposed = true;
 			}
-
-			base.Dispose();
 		}
 	}
 }

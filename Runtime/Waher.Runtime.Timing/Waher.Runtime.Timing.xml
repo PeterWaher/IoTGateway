@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Timing</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Timing.ScheduledEvent">
+            <summary>
+            Contains information about a scheduled event.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Timing.ScheduledEvent.#ctor(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallback,System.Object)">
+            <summary>
+            Contains information about a scheduled event.
+            </summary>
+            <param name="When">When an event is to be executed.</param>
+            <param name="EventMethod">Method to call when event is executed.</param>
+            <param name="State">State object passed on to <paramref name="EventMethod"/>.</param>
+        </member>
+        <member name="P:Waher.Runtime.Timing.ScheduledEvent.When">
+            <summary>
+            When an event is to be executed.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Timing.ScheduledEvent.EventMethod">
+            <summary>
+            Method to call when event is executed.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Timing.ScheduledEvent.State">
+            <summary>
+            State object passed on to <see cref="P:Waher.Runtime.Timing.ScheduledEvent.EventMethod"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Timing.ScheduledEvent.Execute">
+            <summary>
+            Executes the event.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Timing.ScheduledEventCallback">
+            <summary>
+            Callback method for scheduled events.
+            </summary>
+            <param name="State">State object to pass to the scheduled event.</param>
+        </member>
+        <member name="T:Waher.Runtime.Timing.Scheduler">
+            <summary>
+            Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
+            If no events are scheduled the timer is terminated, and recreated when new events are scheduled.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.#ctor">
+            <summary>
+            Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
+            If no events are scheduled the timer is terminated, and recreated when new events are scheduled.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.Add(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallback,System.Object)">
+            <summary>
+            Adds an event.
+            </summary>
+            <param name="When">When to execute the event.</param>
+            <param name="Callback">Method called when event is to be executed.</param>
+            <param name="State">State object bassed to <paramref name="Callback"/>.</param>
+            <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.Remove(System.DateTime)">
+            <summary>
+            Removes an event scheduled for a given point in time.
+            
+            NOTE: It is important to use the timestamp returned when calling <see cref="M:Waher.Runtime.Timing.Scheduler.Add(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallback,System.Object)"/>, not the original value, as these
+            might differ by a few ticks to make all timestamps unique.
+            </summary>
+            <param name="When">Timstamp to remove.</param>
+            <returns>If the event was found and removed.</returns>
+        </member>
+    </members>
+</doc>

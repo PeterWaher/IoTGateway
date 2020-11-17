@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Events.Console</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Events.Console.ConsoleEventSink">
+            <summary>
+            Outputs events to the console standard output.
+            </summary>
+        </member>
+        <member name="M:Waher.Events.Console.ConsoleEventSink.#ctor">
+            <summary>
+            Outputs events to the console standard output.
+            </summary>
+        </member>
+        <member name="M:Waher.Events.Console.ConsoleEventSink.#ctor(System.Boolean)">
+            <summary>
+            Outputs events to the console standard output.
+            </summary>
+            <param name="Beep">Beep if events of type <see cref="F:Waher.Events.EventType.Critical"/>, <see cref="F:Waher.Events.EventType.Alert"/>
+            or <see cref="F:Waher.Events.EventType.Emergency"/> are logged.</param>
+        </member>
+        <member name="M:Waher.Events.Console.ConsoleEventSink.Queue(Waher.Events.Event)">
+            <summary>
+            <see cref="M:Waher.Events.IEventSink.Queue(Waher.Events.Event)"/>
+            </summary>
+        </member>
+    </members>
+</doc>

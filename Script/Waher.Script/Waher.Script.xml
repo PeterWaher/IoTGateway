@@ -15914,12 +15914,12 @@
         </member>
         <member name="P:Waher.Script.Operators.Comparisons.Range.LeftInclusive">
             <summary>
-            If the value specified by <see cref="!:Left"/> is included in the range.
+            If the value specified by <see cref="!:LeftOperand"/> is included in the range.
             </summary>
         </member>
         <member name="P:Waher.Script.Operators.Comparisons.Range.RightInclusive">
             <summary>
-            If the value specified by <see cref="!:Right"/> is included in the range.
+            If the value specified by <see cref="!:RightOperand"/> is included in the range.
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Comparisons.Range.Evaluate(Waher.Script.Variables)">

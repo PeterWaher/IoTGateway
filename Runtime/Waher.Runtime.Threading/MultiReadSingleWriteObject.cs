@@ -60,6 +60,59 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
+		/// If the object is locked for reading or writing.
+		/// </summary>
+		public bool IsReadingOrWriting
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.nrReaders > 0 || this.isWriting;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Throws an <see cref="InvalidOperationException"/> if the object
+		/// is not in a reading state.
+		/// </summary>
+		public void AssertReading()
+		{
+			lock (this.synchObj)
+			{
+				if (this.nrReaders <= 0)
+					throw new InvalidOperationException("Not in a reading state.");
+			}
+		}
+
+		/// <summary>
+		/// Throws an <see cref="InvalidOperationException"/> if the object
+		/// is not in a writing state.
+		/// </summary>
+		public void AssertWriting()
+		{
+			lock (this.synchObj)
+			{
+				if (!this.isWriting)
+					throw new InvalidOperationException("Not in a writing state.");
+			}
+		}
+
+		/// <summary>
+		/// Throws an <see cref="InvalidOperationException"/> if the object
+		/// is not in a reading or writing state.
+		/// </summary>
+		public void AssertReadingOrWriting()
+		{
+			lock (this.synchObj)
+			{
+				if (this.nrReaders <= 0 && !this.isWriting)
+					throw new InvalidOperationException("Not in a reading or writing state.");
+			}
+		}
+
+		/// <summary>
 		/// Waits until object ready for reading.
 		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
@@ -98,7 +151,7 @@ namespace Waher.Runtime.Threading
 			lock (this.synchObj)
 			{
 				if (this.nrReaders <= 0)
-					throw new InvalidOperationException("Not in a read state.");
+					throw new InvalidOperationException("Not in a reading state.");
 
 				this.nrReaders--;
 				if (this.nrReaders > 0 || this.noReadersOrWriters.First is null)
@@ -212,7 +265,7 @@ namespace Waher.Runtime.Threading
 			lock (this.synchObj)
 			{
 				if (!this.isWriting)
-					throw new InvalidOperationException("Not in a write state.");
+					throw new InvalidOperationException("Not in a writing state.");
 
 				this.isWriting = false;
 

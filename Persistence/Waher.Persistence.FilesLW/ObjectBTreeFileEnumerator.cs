@@ -269,6 +269,8 @@ namespace Waher.Persistence.Files
 				{
 					if (this.lockType != LockType.None)
 						this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
+					else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+						throw new InvalidOperationException("Contents of file has been changed.");
 					else
 					{
 						await this.file.LockRead();
@@ -795,7 +797,24 @@ namespace Waher.Persistence.Files
 					if (IsBlob)
 					{
 						this.currentReader.SkipUInt32();
-						Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
+
+						if (this.lockType != LockType.None)
+							Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
+						else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+							throw new InvalidOperationException("Contents of file has been changed.");
+						else
+						{
+							await this.file.LockRead();
+							try
+							{
+								Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
+							}
+							finally
+							{
+								await this.file.EndRead();
+							}
+						}
+
 						Start = 0;
 					}
 

@@ -15,7 +15,7 @@ namespace Waher.Runtime.Threading
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly object synchObj = new object();
 		private int nrReaders = 0;
-		private int nrWriters = 0;
+		private bool isWriting = false;
 
 		/// <summary>
 		/// Number of concurrent readers.
@@ -32,15 +32,29 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
-		/// Number of concurrent writers.
+		/// If the object is in a reading state.
 		/// </summary>
-		public int NrWriters
+		public bool IsReading
 		{
 			get
 			{
 				lock (this.synchObj)
 				{
-					return this.nrWriters;
+					return this.nrReaders > 0;
+				}
+			}
+		}
+
+		/// <summary>
+		/// If the object has a writer.
+		/// </summary>
+		public bool IsWriting
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.isWriting;
 				}
 			}
 		}
@@ -57,7 +71,7 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
-					if (this.nrWriters == 0)
+					if (!this.isWriting)
 					{
 						this.nrReaders++;
 						return;
@@ -114,7 +128,7 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
-					if (this.nrWriters == 0)
+					if (!this.isWriting)
 					{
 						this.nrReaders++;
 						return true;
@@ -168,9 +182,9 @@ namespace Waher.Runtime.Threading
 					if (!(Prev is null))
 						this.noWriters.Remove(Prev);    // In case previously locked for reading
 
-					if (this.nrWriters == 0 && this.nrReaders == 0)
+					if (this.nrReaders == 0 && !this.isWriting)
 					{
-						this.nrWriters++;
+						this.isWriting = true;
 						return;
 					}
 					else
@@ -197,12 +211,10 @@ namespace Waher.Runtime.Threading
 
 			lock (this.synchObj)
 			{
-				if (this.nrWriters <= 0)
+				if (!this.isWriting)
 					throw new InvalidOperationException("Not in a write state.");
 
-				this.nrWriters--;
-				if (this.nrWriters > 0)
-					return Task.CompletedTask;
+				this.isWriting = false;
 
 				if (!(this.noReadersOrWriters.First is null))
 				{
@@ -250,9 +262,9 @@ namespace Waher.Runtime.Threading
 					if (!(Prev is null))
 						this.noWriters.Remove(Prev);    // In case previously locked for reading
 
-					if (this.nrWriters == 0 && this.nrReaders == 0)
+					if (this.nrReaders == 0 && !this.isWriting)
 					{
-						this.nrWriters++;
+						this.isWriting = true;
 						return true;
 					}
 					else if (Timeout <= 0)
@@ -302,7 +314,7 @@ namespace Waher.Runtime.Threading
 			lock (this.synchObj)
 			{
 				this.nrReaders = 0;
-				this.nrWriters = 0;
+				this.isWriting = false;
 
 				if (!(this.noReadersOrWriters.First is null))
 				{
@@ -339,5 +351,6 @@ namespace Waher.Runtime.Threading
 		{
 			this.Unlock();
 		}
+
 	}
 }

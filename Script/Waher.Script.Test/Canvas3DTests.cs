@@ -387,7 +387,68 @@ namespace Waher.Script.Test
 		// TODO: text-bug
 		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
-		/* Test script:
+/* Test script:
+
+GraphWidth:=800;
+GraphHeight:=600;
+
+[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
+X1:=-5..4|0.2;
+X2:=-4..5|0.2;
+Z1:=-5..4|0.2;
+Z2:=-4..5|0.2;
+MinX:=Min(X1);
+MaxX:=Max(X2);
+MinY:=Min(Y);
+MaxY:=Max(Y);
+MinZ:=Min(Z1);
+MaxZ:=Max(Z2);
+NX:=count(X1);
+NZ:=count(Z1);
+
+SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Red",PhongIntensity("White"),[1000, 1000, 0]));
+SB:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Blue",64),PhongIntensity("White"),[1000, 1000, 0]));
+C:=Canvas3D(GraphWidth,GraphHeight,3,"LightGray");
+C.Perspective(GraphHeight/2, 2000);
+C.Translate(0,-GraphHeight/2-MinY,3*GraphWidth-MinZ);
+C.RotateX(-15);
+C.RotateY(-Angle);
+C.Scale(2*GraphWidth/(MaxX-MinX),2*GraphHeight/(MaxY-MinY),2*GraphWidth/(MaxZ-MinZ));
+
+for x:=0 to NX-1 do
+(
+	for z:=0 to NZ-1 do
+		C.Box(X1[x],0,Z1[z],X2[x],Y[x,z],Z2[z],SR);
+);
+C.Polygon([Vector4(MinX,MinY,0,1),Vector4(MaxX,MinY,0,1),Vector4(MaxX,MaxY,0,1),Vector4(MinX,MaxY,0,1)],SB,true);
+C.Polygon([Vector4(MinX,0,MinZ,1),Vector4(MaxX,0,MinZ,1),Vector4(MaxX,0,MaxZ,1),Vector4(MinX,0,MaxZ,1)],SB,true);
+C.Polygon([Vector4(0,MinY,MinZ,1),Vector4(0,MinY,MaxZ,1),Vector4(0,MaxY,MaxZ,1),Vector4(0,MaxY,MinZ,1)],SB,true);
+C
+
+
+foreach Angle in 30..390 do
+(
+	C:=Canvas3D(GraphWidth,GraphHeight,1,"LightGray");
+	C.Perspective(200, 2000);
+	C.Translate(0,-GraphHeight/2-MinY,3*GraphWidth-MinZ);
+	C.RotateX(-15);
+	C.RotateY(-Angle);
+	C.Scale(2*GraphWidth/(MaxX-MinX),2*GraphHeight/(MaxY-MinY),2*GraphWidth/(MaxZ-MinZ));
+
+	for x:=0 to NX-1 do
+	(
+		for z:=0 to NZ-1 do
+			C.Box(X1[x],0,Z1[z],X2[x],Y[x,z],Z2[z],SR);
+	);
+	C.Polygon([Vector4(MinX,MinY,0,1),Vector4(MaxX,MinY,0,1),Vector4(MaxX,MaxY,0,1),Vector4(MinX,MaxY,0,1)],SB,true);
+	C.Polygon([Vector4(MinX,0,MinZ,1),Vector4(MaxX,0,MinZ,1),Vector4(MaxX,0,MaxZ,1),Vector4(MinX,0,MaxZ,1)],SB,true);
+	C.Polygon([Vector4(0,MinY,MinZ,1),Vector4(0,MinY,MaxZ,1),Vector4(0,MaxY,MaxZ,1),Vector4(0,MaxY,MinZ,1)],SB,true);
+	preview(C)
+)
+
+
+[LabelsX,LabelsY,Counts]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,100,-5,5,100);
+
 
 SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
 SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));

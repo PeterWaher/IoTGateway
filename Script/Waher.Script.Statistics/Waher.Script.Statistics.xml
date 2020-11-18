@@ -210,6 +210,44 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Statistics.Functions.Histogram2D">
+            <summary>
+            Computes a two-dimensional histogram from a set of data.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Histogram2D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Computes a two-dimensional histogram from a set of data.
+            </summary>
+            <param name="Data">Data</param>
+            <param name="MinX">Smallest value along the X-axis.</param>
+            <param name="MaxX">Largest value along the X-axis.</param>
+            <param name="NX">Number of buckets along the X-axis.</param>
+            <param name="MinY">Smallest value along the Y-axis.</param>
+            <param name="MaxY">Largest value along the Y-axis.</param>
+            <param name="NY">Number of buckets along the Y-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Histogram2D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Statistics.Functions.Histogram2D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Statistics.Functions.Histogram2D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Statistics.Functions.RandomNumbers.Beta">
             <summary>
             Generates a random number using the beta distribution.

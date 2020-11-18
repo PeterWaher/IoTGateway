@@ -1358,21 +1358,22 @@ The following functions are available in the `Waher.Script.Statistics` library.
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Beta(Alpha,Beta[,N]])`      | Generates a random number using the Beta distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Beta(2,5,10000),0,1,10);VerticalBars(Labels,Counts)` |
-| `Cauchy(Median,Scale[,N]])`  | Generates a random number using the Cauchy distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Cauchy(5,1.5,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `Chi2(Degrees[,N]])`         | Generates a random number using the Chi squared distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Chi2(6,10000),0,20,10);VerticalBars(Labels,Counts)` |
-| `erf(z)`                     | Error function. | `erf(t2)-erf(t1)` |
-| `Exponential([Mean[,N]])`    | Generates a random number using the Exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Exponential(3,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `Gamma(z)`                   | Computes `Γ(z)` | `Gamma(2.5)` |
-| `Gamma(Shape,Scale[,N]])`    | Generates a random number using the Gamma distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Gamma(3,3,10000),0,20,10);VerticalBars(Labels,Counts)` |
-| `Histogram(V,Min,Max,N)`     | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `Laplace(Mean,Scale[,N]])`   | Generates a random number using the Laplace distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Laplace(5,1.5,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `LGamma(a,z)`                | Computes the lower incomplete gamma function `γ(a,z)` | `LGamma(2.5,8)` |
-| `Normal([Mean,StdDev][,N]])` | Generates a random number using the Normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Normal(0,5,10000),-20,20,10);VerticalBars(Labels,Counts)` |
-| `StudentT(Degrees[,N]])`     | Generates a random number using the Student-T distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(StudentT(6,10000),-5,5,10);VerticalBars(Labels,Counts)` |
-| `UGamma(a,z)`                | Computes the upper incomplete gamma function `Γ(a,z)` | `UGamma(2.5,8)` |
-| `Uniform([Min,Max][,N]])`    | Generates a random number using the Uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
-| `Weibull(Shape,Scale[,N]])`  | Generates a random number using the Weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Beta(Alpha,Beta[,N]])`                    | Generates a random number using the Beta distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Beta(2,5,10000),0,1,10);VerticalBars(Labels,Counts)` |
+| `Cauchy(Median,Scale[,N]])`                | Generates a random number using the Cauchy distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Cauchy(5,1.5,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Chi2(Degrees[,N]])`                       | Generates a random number using the Chi squared distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Chi2(6,10000),0,20,10);VerticalBars(Labels,Counts)` |
+| `erf(z)`                                   | Error function. | `erf(t2)-erf(t1)` |
+| `Exponential([Mean[,N]])`                  | Generates a random number using the Exponential distribution. If no `Mean` is given, the mean is assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Exponential(3,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Gamma(z)`                                 | Computes `Γ(z)` | `Gamma(2.5)` |
+| `Gamma(Shape,Scale[,N]])`                  | Generates a random number using the Gamma distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Gamma(3,3,10000),0,20,10);VerticalBars(Labels,Counts)` |
+| `Histogram(V,Min,Max,N)`                   | Calculates the histogram of a set of data `V` with `N` buckets between `Min` and `Max`. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Histogram2D(M,MinX,MaxX,NX,MinY,MaxY,NY)` | Calculates the two-dimensional histogram of a set of data points `M` with `NX` buckets between `MinX` and `MaxX` for the first coordinate, and `NY` buckets between `MinY` and `MaxY` for the second coordinate. | `[LabelsX,LabelsY,Counts]:=Histogram2D([Normal(0,1,10000),Normal(0,1,10000)],-5,5,10,-5,5,10);VerticalBars3D(LabelsX,LabelsY,Counts)` |
+| `Laplace(Mean,Scale[,N]])`                 | Generates a random number using the Laplace distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Laplace(5,1.5,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `LGamma(a,z)`                              | Computes the lower incomplete gamma function `γ(a,z)` | `LGamma(2.5,8)` |
+| `Normal([Mean,StdDev][,N]])`               | Generates a random number using the Normal distribution. If no `Mean` and standard deviation `StdDev` is given, the mean is assumed to be 0 and standarddeviation assumed to be 1. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Normal(0,5,10000),-20,20,10);VerticalBars(Labels,Counts)` |
+| `StudentT(Degrees[,N]])`                   | Generates a random number using the Student-T distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(StudentT(6,10000),-5,5,10);VerticalBars(Labels,Counts)` |
+| `UGamma(a,z)`                              | Computes the upper incomplete gamma function `Γ(a,z)` | `UGamma(2.5,8)` |
+| `Uniform([Min,Max][,N]])`                  | Generates a random number using the Uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
+| `Weibull(Shape,Scale[,N]])`                | Generates a random number using the Weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
 #### Content-related functions (Waher.Script.Content)
 

@@ -414,20 +414,6 @@ foreach Angle in 0..360|0.5 do
 	C.RotateY(2*Angle,[0,0,1500]);
 	C.RotateZ(3*Angle,[0,0,1500]);
 	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
-	C.Box(-300,-300,1200,300,300,1800,SR);
-	Preview(C)
-)
-
-SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
-SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
-foreach Angle in 0..360|0.5 do
-(
-	C:=Canvas3D(480,320,1,"LightGray");
-	C.Perspective(200, 2000);
-	C.RotateX(Angle,[0,0,1500]);
-	C.RotateY(2*Angle,[0,0,1500]);
-	C.RotateZ(3*Angle,[0,0,1500]);
-	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
 	C.Polygon([Vector4(-500,0,1000,1),Vector4(500,0,1000,1),Vector4(500,0,2000,1),Vector4(-500,0,2000,1)],SR,true);
 	C.Polygon([Vector4(0,-500,1000,1),Vector4(0,500,1000,1),Vector4(0,500,2000,1),Vector4(0,-500,2000,1)],SR,true);
 	C.Polygon([Vector4(-500,-500,1500,1),Vector4(500,-500,1500,1),Vector4(500,500,1500,1),Vector4(-500,500,1500,1)],SR,true);

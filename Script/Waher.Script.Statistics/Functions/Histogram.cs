@@ -124,13 +124,106 @@ namespace Waher.Script.Statistics.Functions
 			Scale = (Max - Min) / N;
 
 			for (i = 0; i < N; i++)
-				Labels[i] = Expression.ToString(Min + i * Scale) + "-" + Expression.ToString(Min + (i + 1) * Scale);
+			{
+				Labels[i] = TrimLabel(Expression.ToString(Min + i * Scale)) + "-" +
+					TrimLabel(Expression.ToString(Min + (i + 1) * Scale));
+			}
 
 			return new ObjectVector(new IElement[]
 			{
 				new ObjectVector(Labels),
 				new DoubleVector(Result)
 			});
+		}
+
+		/// <summary>
+		/// Trims a numeric label, removing apparent roundoff errors.
+		/// </summary>
+		/// <param name="Label">Numeric label.</param>
+		/// <returns>Trimmed label.</returns>
+		public static string TrimLabel(string Label)
+		{
+			int i = Label.IndexOf('.');
+			if (i < 0)
+				return Label;
+
+			if (Label.EndsWith("00001"))
+			{
+				i = Label.Length - 5;
+				while (Label[i] == '0')
+					i--;
+
+				if (Label[i] == '.')
+					i--;
+
+				Label = Label.Substring(0, i + 1);
+			}
+			else if (Label.EndsWith("99999"))
+			{
+				bool DecimalSection = true;
+			
+				i = Label.Length - 5;
+				while (Label[i] == '9')
+					i--;
+
+				if (Label[i] == '.')
+				{
+					i--;
+					DecimalSection = false;
+				}
+
+				char[] ch = Label.Substring(0, i + 1).ToCharArray();
+				char ch2;
+				bool CheckOne = true;
+
+				while (i >= 0)
+				{
+					ch2 = ch[i];
+					if (ch2 == '9')
+					{
+						ch[i] = '0';
+						i--;
+					}
+					else if (ch2 == '.')
+					{
+						i--;
+						DecimalSection = false;
+					}
+					else if (ch2 >= '0' && ch2 <= '8')
+					{
+						ch[i]++;
+						CheckOne = false;
+						break;
+					}
+					else
+						break;
+				}
+
+				if (CheckOne)
+				{
+					int c = ch.Length;
+					i++;
+					Array.Resize<char>(ref ch, c + 1);
+					Array.Copy(ch, i, ch, i + 1, c - i);
+					ch[i] = '1';
+				}
+				else if (DecimalSection)
+				{
+					i = ch.Length - 1;
+					while (i >= 0 && ch[i] == '0')
+						i--;
+
+					if (ch[i] == '.')
+						i--;
+
+					if (i < ch.Length - 1)
+						Array.Resize<char>(ref ch, i + 1);
+				}
+
+				Label = new string(ch);
+			}
+
+			return Label;
 		}
 
 	}

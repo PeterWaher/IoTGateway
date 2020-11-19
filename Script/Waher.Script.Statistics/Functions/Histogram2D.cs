@@ -266,10 +266,16 @@ namespace Waher.Script.Statistics.Functions
 			ScaleY = (MaxY - MinY) / NY;
 
 			for (ix = 0; ix < NX; ix++)
-				LabelsX[ix] = Expression.ToString(MinX + ix * ScaleX) + "-" + Expression.ToString(MinX + (ix + 1) * ScaleX);
+			{
+				LabelsX[ix] = Histogram.TrimLabel(Expression.ToString(MinX + ix * ScaleX)) + "-" +
+					Histogram.TrimLabel(Expression.ToString(MinX + (ix + 1) * ScaleX));
+			}
 
 			for (iy = 0; iy < NY; iy++)
-				LabelsY[iy] = Expression.ToString(MinY + iy * ScaleY) + "-" + Expression.ToString(MinY + (iy + 1) * ScaleY);
+			{
+				LabelsY[iy] = Histogram.TrimLabel(Expression.ToString(MinY + iy * ScaleY)) + 
+					"-" + Histogram.TrimLabel(Expression.ToString(MinY + (iy + 1) * ScaleY));
+			}
 
 			return new ObjectVector(new IElement[]
 			{

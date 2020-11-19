@@ -210,6 +210,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Statistics.Functions.Histogram.TrimLabel(System.String)">
+            <summary>
+            Trims a numeric label, removing apparent roundoff errors.
+            </summary>
+            <param name="Label">Numeric label.</param>
+            <returns>Trimmed label.</returns>
+        </member>
         <member name="T:Waher.Script.Statistics.Functions.Histogram2D">
             <summary>
             Computes a two-dimensional histogram from a set of data.

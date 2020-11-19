@@ -2071,12 +2071,23 @@ namespace Waher.Script.Graphs3D
 				MaxY = this.hm1;
 
 			int NrRecs = MaxY - MinY + 1;
-			ScanLineRec[][] Recs2 = new ScanLineRec[2][]
+			ScanLineRecs[] Recs2;
+
+			if (FrontShader == BackShader)
 			{
-				FrontShader is null ? null : new ScanLineRec[NrRecs],
-				BackShader is null ? null : new ScanLineRec[NrRecs],
-			};
-			ScanLineRec[] Recs;
+				ScanLineRecs Temp = new ScanLineRecs(NrRecs);
+				Recs2 = new ScanLineRecs[2] { Temp, Temp };
+			}
+			else
+			{
+				Recs2 = new ScanLineRecs[2]
+				{
+					FrontShader is null ? null : new ScanLineRecs(NrRecs),
+					BackShader is null ? null : new ScanLineRecs(NrRecs),
+				};
+			}
+
+			ScanLineRecs Recs;
 			ScanLineRec Rec;
 			Vector3 LastWorld;
 			Vector3 CurrentWorld;
@@ -2131,8 +2142,20 @@ namespace Waher.Script.Graphs3D
 				isy0 = (int)(sy0 + 0.5f);
 				isy1 = (int)(sy1 + 0.5f);
 
+				sx1 = wx1 = wy1 = wz1 = default;
+
 				int LastDir;
 				int Dir = Math.Sign(isy1 - isy0);
+				int SumAbsDir = 0;
+				float MinSx, WxMinSx, WyMinSx, WzMinSx;
+				float MaxSx, WxMaxSx, WyMaxSx, WzMaxSx;
+				Vector3 NMinSx, NMaxSx;
+
+				MinSx = MaxSx = CurrentScreen.X;
+				WxMinSx = WxMaxSx = CurrentWorld.X;
+				WyMinSx = WyMaxSx = CurrentWorld.Y;
+				WzMinSx = WzMaxSx = CurrentWorld.Z;
+				NMinSx = NMaxSx = CurrentNormal;
 
 				for (i = 0; i < c; i++)
 				{
@@ -2186,16 +2209,29 @@ namespace Waher.Script.Graphs3D
 
 					LastDir = Dir;
 					Dir = Math.Sign(isy1 - isy0);
+					SumAbsDir += Math.Abs(Dir);
 
-					if (Dir == 0)
+					if (SumAbsDir == 0)
 					{
-						this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-							InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
-
-						this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-							InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
+						if (sx1 > MaxSx)
+						{
+							MaxSx = sx1;
+							WxMaxSx = CurrentWorld.X;
+							WyMaxSx = CurrentWorld.Y;
+							WzMaxSx = CurrentWorld.Z;
+							NMaxSx = CurrentNormal;
+						}
+						else if (sx1 < MinSx)
+						{
+							MinSx = sx1;
+							WxMinSx = CurrentWorld.X;
+							WyMinSx = CurrentWorld.Y;
+							WzMinSx = CurrentWorld.Z;
+							NMinSx = CurrentNormal;
+						}
 					}
-					else
+
+					if (Dir != 0)
 					{
 						invdsy = 1 / (sy1 - sy0);
 						dsxdsy = (sx1 - sx0) * invdsy;
@@ -2206,12 +2242,12 @@ namespace Waher.Script.Graphs3D
 						if (InterpolateNormals)
 							dNdsy = (CurrentNormal - LastNormal) * invdsy;
 
-						if (Dir > 0)
+						if (Dir == 1)
 						{
-							if (Dir != LastDir && LastDir != 0)
+							if (LastDir != 1)
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
 							}
 
 							isy0++;
@@ -2227,7 +2263,7 @@ namespace Waher.Script.Graphs3D
 							while (isy0 < isy1)
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
 
 								isy0++;
 								sx0 += dsxdsy;
@@ -2240,10 +2276,16 @@ namespace Waher.Script.Graphs3D
 							}
 
 							this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
+								InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front, Dir);
 						}
-						else    // Dir < 0
+						else    // Dir == -1
 						{
+							if (LastDir == 0)
+							{
+								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
+							}
+
 							if (Dir == LastDir || LastDir == 0)
 							{
 								isy0--;
@@ -2262,7 +2304,7 @@ namespace Waher.Script.Graphs3D
 								Vector3 CurrentNormal2 = CurrentNormal;
 
 								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front);
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front, Dir);
 
 								isy1++;
 								step = isy1 - sy1;
@@ -2277,7 +2319,7 @@ namespace Waher.Script.Graphs3D
 								while (isy1 < isy0)
 								{
 									this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front);
+										InterpolateNormals ? Vector3.Normalize(CurrentNormal2) : N, Front, Dir);
 
 									isy1++;
 									sx1 += dsxdsy;
@@ -2290,15 +2332,24 @@ namespace Waher.Script.Graphs3D
 								}
 
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
-									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front);
+									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
 							}
 							else
 							{
 								this.AddNode(Recs, MinY, sx1, isy1, wx1, wy1, wz1,
-									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front);
+									InterpolateNormals ? Vector3.Normalize(CurrentNormal) : N, Front, Dir);
 							}
 						}
 					}
+				}
+
+				if (SumAbsDir == 0)
+				{
+					this.AddNode(Recs, MinY, MinSx, isy1, WxMinSx, WyMinSx, WzMinSx,
+						InterpolateNormals ? Vector3.Normalize(NMinSx) : N, Front, 0);
+
+					this.AddNode(Recs, MaxY, MaxSx, isy1, WxMaxSx, WyMaxSx, WzMaxSx,
+						InterpolateNormals ? Vector3.Normalize(NMaxSx) : N, Front, 0);
 				}
 			}
 
@@ -2312,7 +2363,7 @@ namespace Waher.Script.Graphs3D
 
 				for (i = 0; i < NrRecs; i++)
 				{
-					Rec = Recs[i];
+					Rec = Recs.Records[i];
 					if (Rec is null)
 						continue;
 
@@ -2363,21 +2414,59 @@ namespace Waher.Script.Graphs3D
 							ToUInt(Shader.GetColor(Rec.wx0, Rec.wy0, Rec.wz0, Rec.n0, this)));
 					}
 				}
+
+				if (FrontShader == BackShader)
+					break;
 			}
 		}
 
-		private void AddNode(ScanLineRec[] Records, int MinY, float sx, int isy,
-			float wx, float wy, float wz, Vector3 N, bool Front)
+		private void AddNode(ScanLineRecs Records, int MinY, float sx, int isy,
+			float wx, float wy, float wz, Vector3 N, bool Front, int Dir)
 		{
 			int i = isy - MinY;
-			ScanLineRec Rec = Records[i];
+			ScanLineRec Rec = Records.Records[i];
 
 			if (!Front)
 				N = -N;
 
+			if (i == Records.Last && Dir == Records.LastDir)
+			{
+				switch (Records.Coordinate)
+				{
+					case 0:
+						Rec.sx0 = sx;
+						Rec.wx0 = wx;
+						Rec.wy0 = wy;
+						Rec.wz0 = wz;
+						Rec.n0 = N;
+						return;
+
+					case 1:
+						Rec.sx1 = sx;
+						Rec.wx1 = wx;
+						Rec.wy1 = wy;
+						Rec.wz1 = wz;
+						Rec.n1 = N;
+						return;
+
+					case 2:
+						Records.LastSegment.sx = sx;
+						Records.LastSegment.wx = wx;
+						Records.LastSegment.wy = wy;
+						Records.LastSegment.wz = wz;
+						Records.LastSegment.n = N;
+						return;
+				}
+			}
+			else
+			{
+				Records.Last = i;
+				Records.LastDir = Dir;
+			}
+
 			if (Rec is null)
 			{
-				Records[i] = new ScanLineRec()
+				Records.Records[i] = new ScanLineRec()
 				{
 					sx0 = sx,
 					wx0 = wx,
@@ -2386,6 +2475,7 @@ namespace Waher.Script.Graphs3D
 					has2 = false,
 					n0 = N
 				};
+				Records.Coordinate = 0;
 			}
 			else if (!Rec.has2)
 			{
@@ -2401,6 +2491,7 @@ namespace Waher.Script.Graphs3D
 					Rec.wy0 = wy;
 					Rec.wz0 = wz;
 					Rec.n0 = N;
+					Records.Coordinate = 0;
 				}
 				else
 				{
@@ -2409,12 +2500,15 @@ namespace Waher.Script.Graphs3D
 					Rec.wy1 = wy;
 					Rec.wz1 = wz;
 					Rec.n1 = N;
+					Records.Coordinate = 1;
 				}
 
 				Rec.has2 = true;
 			}
 			else
 			{
+				Records.Coordinate = 2;
+
 				if (Rec.segments is null)
 				{
 					Rec.segments = new LinkedList<ScanLineSegment>();
@@ -2447,7 +2541,7 @@ namespace Waher.Script.Graphs3D
 					Loop = Loop.Next;
 				}
 
-				ScanLineSegment Segment = new ScanLineSegment()
+				Records.LastSegment = new ScanLineSegment()
 				{
 					sx = sx,
 					wx = wx,
@@ -2457,11 +2551,25 @@ namespace Waher.Script.Graphs3D
 				};
 
 				if (Loop is null)
-					Rec.segments.AddLast(Segment);
+					Rec.segments.AddLast(Records.LastSegment);
 				else if (Prev is null)
-					Rec.segments.AddFirst(Segment);
+					Rec.segments.AddFirst(Records.LastSegment);
 				else
-					Rec.segments.AddAfter(Prev, Segment);
+					Rec.segments.AddAfter(Prev, Records.LastSegment);
+			}
+		}
+
+		private class ScanLineRecs
+		{
+			public ScanLineRec[] Records;
+			public int Last = -1;
+			public int LastDir = int.MaxValue;
+			public int Coordinate = -1;
+			public ScanLineSegment LastSegment = null;
+
+			public ScanLineRecs(int NrRecords)
+			{
+				this.Records = new ScanLineRec[NrRecords];
 			}
 		}
 

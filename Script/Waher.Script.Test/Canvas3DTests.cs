@@ -378,33 +378,36 @@ namespace Waher.Script.Test
 
 			this.Save(Canvas, "14.png");
 		}
+	}
+}
 
-		// TODO: Clip Z
-		// TODO: Test Light / Phong shading with multiple light sources
-		// TODO: Specular lighting
-		// TODO: Sort transparent polygons
-		// TODO: Check if quicker to work with Vector3 directly, than with 3 separate coordinate values.
-		// TODO: text-bug
-		// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
+// TODO: Clip Z
+// TODO: Test Light / Phong shading with multiple light sources
+// TODO: Specular lighting
+// TODO: Sort transparent polygons
+// TODO: Check if quicker to work with Vector3 directly, than with 3 separate coordinate values.
+// TODO: text-bug
+// TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
 /* Test script:
 
-GraphWidth:=800;
-GraphHeight:=600;
+Start:=Now;
+GraphWidth:=1200;
+GraphHeight:=800;
 
 [LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
-X1:=-5..4|0.2;
-X2:=-4..5|0.2;
-Z1:=-5..4|0.2;
-Z2:=-4..5|0.2;
+X1:=-5-0..4.8|0.2;
+X2:=-4.8..5.0|0.2;
+Z1:=-5.0..4.8|0.2;
+Z2:=-4.8..5.0|0.2;
 MinX:=Min(X1);
 MaxX:=Max(X2);
 MinY:=Min(Y);
 MaxY:=Max(Y);
 MinZ:=Min(Z1);
 MaxZ:=Max(Z2);
-NX:=count(X1);
-NZ:=count(Z1);
+NX:=count(X1)-1;
+NZ:=count(Z1)-1;
 
 SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Red",PhongIntensity("White"),[1000, 1000, 0]));
 SB:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Blue",64),PhongIntensity("White"),[1000, 1000, 0]));
@@ -412,17 +415,48 @@ C:=Canvas3D(GraphWidth,GraphHeight,3,"LightGray");
 C.Perspective(GraphHeight/2, 2000);
 C.Translate(0,-GraphHeight/2-MinY,3*GraphWidth-MinZ);
 C.RotateX(-15);
-C.RotateY(-Angle);
+C.RotateY(-30);
 C.Scale(2*GraphWidth/(MaxX-MinX),2*GraphHeight/(MaxY-MinY),2*GraphWidth/(MaxZ-MinZ));
 
-for x:=0 to NX-1 do
+for x:=0 to NX do
 (
-	for z:=0 to NZ-1 do
+	for z:=0 to NZ do
 		C.Box(X1[x],0,Z1[z],X2[x],Y[x,z],Z2[z],SR);
 );
+
+M:=C.ModelTransformation;
+FontSize:=abs(X2[0]-X1[0]);
+FontMargin:=FontSize*0.1;
+FontSize:=FontSize*0.8;
+LabelPos:=Vector4(5*FontMargin,FontMargin,0,1);
+AxisColor:=Color("Black");
+for x:=0 to NX do
+(
+	C.Translate(X1[x],0,MinZ);
+	C.RotateY(90);
+	C.RotateX(90);
+	C.Text(LabelsX[x],LabelPos,"Arial",FontSize,AxisColor);
+	C.ModelTransformation:=M;
+);
+
+FontSize:=abs(Z2[0]-Z1[0]);
+FontMargin:=FontSize*0.1;
+FontSize:=FontSize*0.8;
+LabelPos:=Vector4(0,FontMargin,0,1);
+for z:=0 to NZ do
+(
+	s:=LabelsZ[z];
+	C.Translate(MinX-C.TextWidth(s,"Arial",FontSize)-5*FontMargin,0,Z1[z]);
+	C.RotateX(90);
+	C.Text(s,LabelPos,"Arial",FontSize,AxisColor);
+	C.ModelTransformation:=M;
+);
+
 C.Polygon([Vector4(MinX,MinY,0,1),Vector4(MaxX,MinY,0,1),Vector4(MaxX,MaxY,0,1),Vector4(MinX,MaxY,0,1)],SB,true);
 C.Polygon([Vector4(MinX,0,MinZ,1),Vector4(MaxX,0,MinZ,1),Vector4(MaxX,0,MaxZ,1),Vector4(MinX,0,MaxZ,1)],SB,true);
 C.Polygon([Vector4(0,MinY,MinZ,1),Vector4(0,MinY,MaxZ,1),Vector4(0,MaxY,MaxZ,1),Vector4(0,MaxY,MinZ,1)],SB,true);
+
+print(Now.Subtract(Start).TotalSeconds);
 C
 
 
@@ -521,6 +555,4 @@ foreach Angle in 0..720|0.5 do
 
 	Preview(C)
 )
-		 */
-	}
-}
+*/

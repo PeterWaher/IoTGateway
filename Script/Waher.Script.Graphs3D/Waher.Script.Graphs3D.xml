@@ -556,6 +556,90 @@
             <param name="TextSize">Text size.</param>
             <param name="Color">Text color.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextDimensions(System.String,System.String,System.Single)">
+            <summary>
+            Measures the size of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Size of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextDimensions(System.String,System.String,SkiaSharp.SKFontStyleWeight,System.Single)">
+            <summary>
+            Measures the size of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Size of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextDimensions(System.String,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,System.Single)">
+            <summary>
+            Measures the size of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Size of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextDimensions(System.String,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,SkiaSharp.SKFontStyleSlant,System.Single)">
+            <summary>
+            Measures the size of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="Slant">Font slant.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Size of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextWidth(System.String,System.String,System.Single)">
+            <summary>
+            Measures the width of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Width of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextWidth(System.String,System.String,SkiaSharp.SKFontStyleWeight,System.Single)">
+            <summary>
+            Measures the width of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Width of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextWidth(System.String,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,System.Single)">
+            <summary>
+            Measures the width of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Width of text.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TextWidth(System.String,System.String,SkiaSharp.SKFontStyleWeight,SkiaSharp.SKFontStyleWidth,SkiaSharp.SKFontStyleSlant,System.Single)">
+            <summary>
+            Measures the width of text to be output.
+            </summary>
+            <param name="Text">Text to draw.</param>
+            <param name="FontFamily">Font family.</param>
+            <param name="Weight">Font weight.</param>
+            <param name="Width">Font width.</param>
+            <param name="Slant">Font slant.</param>
+            <param name="TextSize">Text size.</param>
+            <returns>Width of text.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Box(System.Numerics.Vector4,System.Numerics.Vector4,Waher.Script.Graphs3D.I3DShader)">
             <summary>
             Draws a box, with sides parallell to the x, y and z axis.

@@ -1597,9 +1597,9 @@ namespace Waher.Script.Graphs3D
 		}
 
 		private bool ClipTopBottom(
-			ref float x0, ref float y0, 
+			ref float x0, ref float y0,
 			ref float rx0, ref float ry0, ref float rz0,
-			ref float x1, ref float y1, 
+			ref float x1, ref float y1,
 			ref float rx1, ref float ry1, ref float rz1)
 		{
 			byte Mask0 = 0;
@@ -1706,9 +1706,9 @@ namespace Waher.Script.Graphs3D
 		}
 
 		private bool ClipTopBottom(
-			ref float x0, ref float y0, 
+			ref float x0, ref float y0,
 			ref float rx0, ref float ry0, ref float rz0, ref Vector3 rN0,
-			ref float x1, ref float y1, 
+			ref float x1, ref float y1,
 			ref float rx1, ref float ry1, ref float rz1, ref Vector3 rN1)
 		{
 			byte Mask0 = 0;
@@ -2556,7 +2556,6 @@ namespace Waher.Script.Graphs3D
 		{
 			SKPaint Paint = null;
 			SKPath Path = null;
-			SKPath Simple = null;
 			SKPath.Iterator e = null;
 			SKPoint[] Points = new SKPoint[4];
 			SKPathVerb Verb;
@@ -2570,8 +2569,6 @@ namespace Waher.Script.Graphs3D
 				};
 
 				Path = Paint.GetTextPath(Text, 0, 0);
-				//Simple = Path.Simplify();
-
 				e = Path.CreateIterator(false);
 
 				List<Vector4> P = new List<Vector4>();
@@ -2743,6 +2740,9 @@ namespace Waher.Script.Graphs3D
 								P.Add(new Vector4(Start.X + X, Start.Y - Y, Start.Z, 1));
 							}
 							break;
+
+						default:
+							break;
 					}
 				}
 
@@ -2753,9 +2753,214 @@ namespace Waher.Script.Graphs3D
 			{
 				Paint?.Dispose();
 				Path?.Dispose();
-				Simple?.Dispose();
 				e?.Dispose();
 			}
+		}
+
+		#endregion
+
+		#region Text Dimensions
+
+		/// <summary>
+		/// Measures the size of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Size of text.</returns>
+		public SKSize TextDimensions(string Text, string FontFamily, float TextSize)
+		{
+			return this.TextDimensions(Text, FontFamily, SKFontStyleWeight.Normal, SKFontStyleWidth.Normal,
+				SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the size of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Size of text.</returns>
+		public SKSize TextDimensions(string Text, string FontFamily, SKFontStyleWeight Weight, float TextSize)
+		{
+			return this.TextDimensions(Text, FontFamily, Weight, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the size of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Size of text.</returns>
+		public SKSize TextDimensions(string Text, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, float TextSize)
+		{
+			return this.TextDimensions(Text, FontFamily, Weight, Width, SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the size of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="Slant">Font slant.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Size of text.</returns>
+		public SKSize TextDimensions(string Text, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, SKFontStyleSlant Slant, float TextSize)
+		{
+			SKPaint Paint = null;
+			SKPath Path = null;
+			SKPath.Iterator e = null;
+			SKPoint[] Points = new SKPoint[4];
+			SKPathVerb Verb;
+
+			try
+			{
+				Paint = new SKPaint()
+				{
+					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant),
+					TextSize = TextSize
+				};
+
+				Path = Paint.GetTextPath(Text, 0, 0);
+				e = Path.CreateIterator(false);
+
+				List<Vector4> P = new List<Vector4>();
+				List<Vector4[]> v = new List<Vector4[]>();
+				float MaxX = 0;
+				float MaxY = 0;
+				float X, Y;
+
+				while ((Verb = e.Next(Points)) != SKPathVerb.Done)
+				{
+					switch (Verb)
+					{
+						case SKPathVerb.Close:
+							break;
+
+						case SKPathVerb.Move:
+							X = Points[0].X;
+							if (X > MaxX)
+								MaxX = X;
+
+							Y = Points[0].Y;
+							if (Y > MaxY)
+								MaxY = Y;
+
+							break;
+
+						case SKPathVerb.Line:
+							X = Points[1].X;
+							if (X > MaxX)
+								MaxX = X;
+
+							Y = Points[1].Y;
+							if (Y > MaxY)
+								MaxY = Y;
+
+							break;
+
+						case SKPathVerb.Quad:
+						case SKPathVerb.Conic:
+							X = Points[2].X;
+							if (X > MaxX)
+								MaxX = X;
+
+							Y = Points[2].Y;
+							if (Y > MaxY)
+								MaxY = Y;
+
+							break;
+
+						case SKPathVerb.Cubic:
+							X = Points[3].X;
+							if (X > MaxX)
+								MaxX = X;
+
+							Y = Points[3].Y;
+							if (Y > MaxY)
+								MaxY = Y;
+
+							break;
+					}
+				}
+
+				return new SKSize(MaxX, MaxY);
+			}
+			finally
+			{
+				Paint?.Dispose();
+				Path?.Dispose();
+				e?.Dispose();
+			}
+		}
+
+		#endregion
+
+		#region Text Width
+
+		/// <summary>
+		/// Measures the width of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Width of text.</returns>
+		public float TextWidth(string Text, string FontFamily, float TextSize)
+		{
+			return this.TextWidth(Text, FontFamily, SKFontStyleWeight.Normal, SKFontStyleWidth.Normal,
+				SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the width of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Width of text.</returns>
+		public float TextWidth(string Text, string FontFamily, SKFontStyleWeight Weight, float TextSize)
+		{
+			return this.TextWidth(Text, FontFamily, Weight, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the width of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Width of text.</returns>
+		public float TextWidth(string Text, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, float TextSize)
+		{
+			return this.TextWidth(Text, FontFamily, Weight, Width, SKFontStyleSlant.Upright, TextSize);
+		}
+
+		/// <summary>
+		/// Measures the width of text to be output.
+		/// </summary>
+		/// <param name="Text">Text to draw.</param>
+		/// <param name="FontFamily">Font family.</param>
+		/// <param name="Weight">Font weight.</param>
+		/// <param name="Width">Font width.</param>
+		/// <param name="Slant">Font slant.</param>
+		/// <param name="TextSize">Text size.</param>
+		/// <returns>Width of text.</returns>
+		public float TextWidth(string Text, string FontFamily, SKFontStyleWeight Weight,
+			SKFontStyleWidth Width, SKFontStyleSlant Slant, float TextSize)
+		{
+			return this.TextDimensions(Text, FontFamily, Weight, Width, Slant, TextSize).Width;
 		}
 
 		#endregion

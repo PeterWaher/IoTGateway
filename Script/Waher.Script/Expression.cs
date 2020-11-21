@@ -2125,7 +2125,7 @@ namespace Waher.Script
 			while (true)
 			{
 				this.SkipWhiteSpace();
-				switch (this.PeekNextChar())
+				switch (char.ToUpper(this.PeekNextChar()))
 				{
 					case '⋅':
 					case '*':
@@ -2201,7 +2201,7 @@ namespace Waher.Script
 
 					case '.':
 						this.pos++;
-						switch (this.PeekNextChar())
+						switch (char.ToUpper(this.PeekNextChar()))
 						{
 							case '⋅':
 							case '*':
@@ -2311,7 +2311,7 @@ namespace Waher.Script
 			int Start = this.pos;
 			char ch;
 
-			switch (this.PeekNextChar())
+			switch (char.ToUpper(this.PeekNextChar()))
 			{
 				case '-':
 					this.pos++;

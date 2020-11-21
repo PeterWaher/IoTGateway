@@ -1082,6 +1082,7 @@ will return a vector corresponding to the point under the mouse.
 | `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
 | `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
 | `Polygon2D(X,Y[,Color])`                | Plots a filled polygon.                               | [Example][Polygon2DExample]               |
+| `SameScale(Graph)`                      | Informs the graph to use the same scale for all axes. | `SameScale(plot2dcurve(x,y))` |
 | `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
 | `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
@@ -1218,6 +1219,18 @@ G.LabelX:="x";
 G.LabelY:="y=sin(5x)exp(-(x^2/10))";
 G
 }
+
+#### 3D Graph functions (Waher.Script.Graphs3D)
+
+The following functions are available in the `Waher.Script.Graphs3D` library.
+
+| Function                                  | Description                                           | Example                                   |
+|-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `Columns(Values)`                         | Creates a matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | `X:=Columns(0..10)` |
+| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);linemesh3d(x,y,z,'Blue')` |
+| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);polygonmesh3d(x,y,z,'Blue')` |
+| `Rows(Values)`                            | Creates a matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector. | `Z:=Rows(0..10)` |
+| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);surface3d(x,y,z,'Blue')` |
 
 #### Palette generation functions (Waher.Script.Fractals)
 

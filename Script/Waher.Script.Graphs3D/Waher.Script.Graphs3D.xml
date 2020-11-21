@@ -385,6 +385,24 @@
             <param name="Nodes">Nodes</param>
             <param name="Color">Color</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.CalcNormal(System.Numerics.Vector3,System.Numerics.Vector3,System.Numerics.Vector3)">
+            <summary>
+            Calculates a normal to the plane that goes through P0, P1 and P2.
+            </summary>
+            <param name="P0">Point 1</param>
+            <param name="P1">Point 2</param>
+            <param name="P2">Point 3</param>
+            <returns>Normal</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.CalcNormal(System.Numerics.Vector4,System.Numerics.Vector4,System.Numerics.Vector4)">
+            <summary>
+            Calculates a normal to the plane that goes through P0, P1 and P2.
+            </summary>
+            <param name="P0">Point 1</param>
+            <param name="P1">Point 2</param>
+            <param name="P2">Point 3</param>
+            <returns>Normal</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.Polygon(System.Numerics.Vector4[],SkiaSharp.SKColor,System.Boolean)">
             <summary>
             Draws a closed polygon.
@@ -729,6 +747,150 @@
             If shader is 100% opaque.
             </summary>
         </member>
+        <member name="T:Waher.Script.Graphs3D.DrawingVolume">
+            <summary>
+            Contains information about the current drawing area.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Single,System.Single,System.Single)">
+            <summary>
+            Contains information about the current drawing area.
+            </summary>
+            <param name="MinX">Smallest value of X.</param>
+            <param name="MaxX">Largest value of X.</param>
+            <param name="MinY">Smallest value of Y.</param>
+            <param name="MaxY">Largest value of Y.</param>
+            <param name="MinZ">Smallest value of Z.</param>
+            <param name="MaxZ">Largest value of Z.</param>
+            <param name="OffsetX">X-offset of drawing area, relative to the canvas origin.</param>
+            <param name="OffsetY">Y-offset of drawing area, relative to the canvas origin.</param>
+            <param name="OffsetZ">Z-offset of drawing area, relative to the canvas origin.</param>
+            <param name="Width">Width (x) of drawing area.</param>
+            <param name="Height">Height (y) of drawing area.</param>
+            <param name="Depth">Depth (z) of drawing area.</param>
+            <param name="OrigoX">X-coordinate of the origo.</param>
+            <param name="OrigoY">Y-coordinate of the origo.</param>
+            <param name="OrigoZ">Z-coordinate of the origo.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MinX">
+            <summary>
+            Smallest value of X.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MaxX">
+            <summary>
+            Largest value of X.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MinY">
+            <summary>
+            Smallest value of Y.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MaxY">
+            <summary>
+            Largest value of Y.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MinZ">
+            <summary>
+            Smallest value of Z.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.MaxZ">
+            <summary>
+            Largest value of Z.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OffsetX">
+            <summary>
+            X-offset of drawing area, relative to the canvas origin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OffsetY">
+            <summary>
+            Y-offset of drawing area, relative to the canvas origin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OffsetZ">
+            <summary>
+            Z-offset of drawing area, relative to the canvas origin.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.Width">
+            <summary>
+            Width of drawing area.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.Height">
+            <summary>
+            Height of drawing area.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.Depth">
+            <summary>
+            Depth of drawing area.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OrigoX">
+            <summary>
+            X-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OrigoY">
+            <summary>
+            Y-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.OrigoZ">
+            <summary>
+            Z-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Scales three matrices of equal size to point vectors in space.
+            </summary>
+            <param name="MatrixX">X-matrix.</param>
+            <param name="MatrixY">Y-matrix.</param>
+            <param name="MatrixZ">Z-matrix.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleX(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Scales a matrix with x-coordinates to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleY(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Scales a matrix with y-coordinates to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleZ(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Scales a matrix with z-coordinates to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.DescaleX(System.Double)">
+            <summary>
+            Descales a scaled value along the X-axis.
+            </summary>
+            <param name="Value">Scaled value.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.DescaleY(System.Double)">
+            <summary>
+            Descales a scaled value along the Y-axis.
+            </summary>
+            <param name="Value">Scaled value.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.DescaleZ(System.Double)">
+            <summary>
+            Descales a scaled value along the Z-axis.
+            </summary>
+            <param name="Value">Scaled value.</param>
+        </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Canvas3D">
             <summary>
             Generates a <see cref="T:Waher.Script.Graphs3D.Canvas3D"/> object.
@@ -757,6 +919,276 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs3D.Functions.Canvas3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Matrices.Columns">
+            <summary>
+            Creates a matrix whose columns have elements of the same value, each defined by 
+            the corresponding element in the input vector.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a matrix whose columns have elements of the same value, each defined by 
+            the corresponding element in the input vector.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Matrices.Columns.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.EvaluateVector(Waher.Script.Objects.VectorSpaces.DoubleVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.EvaluateVector(Waher.Script.Objects.VectorSpaces.ComplexVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.EvaluateVector(Waher.Script.Objects.VectorSpaces.BooleanVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Columns.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Matrices.Rows">
+            <summary>
+            Creates a matrix whose rows have elements of the same value, each defined by 
+            the corresponding element in the input vector.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a matrix whose rows have elements of the same value, each defined by 
+            the corresponding element in the input vector.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Matrices.Rows.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.EvaluateVector(Waher.Script.Objects.VectorSpaces.DoubleVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.EvaluateVector(Waher.Script.Objects.VectorSpaces.ComplexVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.EvaluateVector(Waher.Script.Objects.VectorSpaces.BooleanVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Rows.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D">
+            <summary>
+            Plots a three-dimensional line mesh.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional line mesh.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional line mesh.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Color">Color.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.LineMesh3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D">
+            <summary>
+            Plots a three-dimensional surface mesh.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface mesh.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface mesh.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Shader">Color or shader.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface mesh.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Shader">Color or shader.</param>
+            <param name="TwoSided">If the surface is two-sided.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.Surface3D">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Color">Color or shader.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Color">Color or shader.</param>
+            <param name="TwoSided">If the surface is two-sided.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.Surface3D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.Surface3D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -1045,6 +1477,274 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.DrawCallback3D">
+            <summary>
+            Delegate for 3D drawing callback methods.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Graph3D">
+            <summary>
+            Handles three-dimensional graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.#ctor">
+            <summary>
+            Base class for two-dimensional graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.#ctor(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,System.Numerics.Vector4[0:,0:],Waher.Script.Graphs3D.DrawCallback3D,System.Boolean,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
+            <summary>
+            Base class for two-dimensional graphs.
+            </summary>
+            <param name="X">X-axis</param>
+            <param name="Y">Y-axis</param>
+            <param name="Z">Z-axis</param>
+            <param name="Normals">Optional Normals</param>
+            <param name="PlotCallback">Callback method that performs the plotting.</param>
+            <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
+            <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
+            <param name="ShowZeroZ">If the z-axis (z=0) should always be shown.</param>
+            <param name="Node">Node creating the graph.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.X">
+            <summary>
+            X-axis series.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Y">
+            <summary>
+            Y-axis series.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Z">
+            <summary>
+            Z-axis series.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Normals">
+            <summary>
+            Optional normals.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Parameters">
+            <summary>
+            Parameters.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MinX">
+            <summary>
+            Smallest X-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MaxX">
+            <summary>
+            Largest X-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MinY">
+            <summary>
+            Smallest Y-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MaxY">
+            <summary>
+            Largest Y-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MinZ">
+            <summary>
+            Smallest Z-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.MaxZ">
+            <summary>
+            Largest Z-value.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Title">
+            <summary>
+            Title for graph.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.LabelX">
+            <summary>
+            Label for x-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.LabelY">
+            <summary>
+            Label for y-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.LabelZ">
+            <summary>
+            Label for z-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.ShowXAxis">
+            <summary>
+            If the X-axis is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.ShowYAxis">
+            <summary>
+            If the Y-axis is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.ShowZAxis">
+            <summary>
+            If the Z-axis is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.ShowGrid">
+            <summary>
+            If the grid is to be displayed.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State object(s) that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.GetLabels(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Elements.IElement@,System.Collections.Generic.IEnumerable{Waher.Script.Abstraction.Elements.IMatrix},System.Int32,Waher.Script.Graphs.LabelType@)">
+            <summary>
+            Gets label values for a series vector.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Series">Series to draw.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <param name="LabelType">Type of labels produced.</param>
+            <returns>Vector of labels.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Scales three matrices of equal size to point vectors in space.
+            </summary>
+            <param name="MatrixX">X-matrix.</param>
+            <param name="MatrixY">Y-matrix.</param>
+            <param name="MatrixZ">Z-matrix.</param>
+            <param name="MinX">Smallest X-value.</param>
+            <param name="MaxX">Largest X-value.</param>
+            <param name="MinY">Smallest Y-value.</param>
+            <param name="MaxY">Largest Y-value.</param>
+            <param name="MinZ">Smallest Z-value.</param>
+            <param name="MaxZ">Largest Z-value.</param>
+            <param name="OffsetX">X-offset to volume.</param>
+            <param name="OffsetY">Y-offset to volume.</param>
+            <param name="OffsetZ">Z-offset to volume.</param>
+            <param name="Width">Width of volume.</param>
+            <param name="Height">Height of volume.</param>
+            <param name="Depth">Depth of volume.</param>
+            <returns>Mesh of point vectors.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double)">
+            <summary>
+            Scales a matrix to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to volume.</param>
+            <param name="Size">Size of volume.</param>
+            <returns>Matrix distributed in the available volume.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.Double[0:,0:],System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Scales a matrix to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to volume.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Matrix distributed in the available volume.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.DateTime[0:,0:],System.DateTime,System.DateTime,System.Double,System.Double)">
+            <summary>
+            Scales a matrix to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Offset">Offset to volume.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Matrix distributed in the available volume.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Objects.PhysicalQuantity[0:,0:],System.Double,System.Double,Waher.Script.Units.Unit,System.Double,System.Double)">
+            <summary>
+            Scales a matrix to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="Unit">Unit.</param>
+            <param name="Offset">Offset to volume.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Matrix distributed in the available volume.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.Object[0:,0:],System.Double,System.Double)">
+            <summary>
+            Scales a matrix to fit a given volume.
+            </summary>
+            <param name="Matrix">Matrix.</param>
+            <param name="Offset">Offset to volume.</param>
+            <param name="Size">Size of area.</param>
+            <returns>Matrix distributed in the available volume.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.ToShader(System.Object)">
+            <summary>
+            Gets a shader object from an argument.
+            </summary>
+            <param name="Argument">Argument value.</param>
+            <returns>Shader object</returns>
         </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>

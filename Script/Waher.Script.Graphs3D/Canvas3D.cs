@@ -1591,9 +1591,28 @@ namespace Waher.Script.Graphs3D
 			return new Vector4(P.X, P.Y, P.Z, 0);
 		}
 
-		private static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
+		/// <summary>
+		/// Calculates a normal to the plane that goes through P0, P1 and P2.
+		/// </summary>
+		/// <param name="P0">Point 1</param>
+		/// <param name="P1">Point 2</param>
+		/// <param name="P2">Point 3</param>
+		/// <returns>Normal</returns>
+		public static Vector3 CalcNormal(Vector3 P0, Vector3 P1, Vector3 P2)
 		{
 			return Vector3.Normalize(Vector3.Cross(P1 - P0, P2 - P0));
+		}
+
+		/// <summary>
+		/// Calculates a normal to the plane that goes through P0, P1 and P2.
+		/// </summary>
+		/// <param name="P0">Point 1</param>
+		/// <param name="P1">Point 2</param>
+		/// <param name="P2">Point 3</param>
+		/// <returns>Normal</returns>
+		public static Vector4 CalcNormal(Vector4 P0, Vector4 P1, Vector4 P2)
+		{
+			return ToVector(Vector3.Normalize(Vector3.Cross(ToVector3(P1 - P0), ToVector3(P2 - P0))));
 		}
 
 		private bool ClipTopBottom(
@@ -2343,7 +2362,7 @@ namespace Waher.Script.Graphs3D
 					}
 				}
 
-				if (SumAbsDir == 0)
+				if (SumAbsDir == 0 && isy1 >= 0 && isy1 <= this.hm1)
 				{
 					this.AddNode(Recs, MinY, MinSx, isy1, WxMinSx, WyMinSx, WzMinSx,
 						InterpolateNormals ? Vector3.Normalize(NMinSx) : N, Front, 0);

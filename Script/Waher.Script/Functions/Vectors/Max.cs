@@ -87,7 +87,6 @@ namespace Waher.Script.Functions.Vectors
 			return CalcMax(Argument, this);
 		}
 
-
 		/// <summary>
 		/// Returns the largest value.
 		/// </summary>
@@ -105,6 +104,37 @@ namespace Waher.Script.Functions.Vectors
 					continue;
 
 				if (Result is null || S.Compare(Result, E) < 0)
+                {
+                    Result = E;
+                    S = Result.AssociatedSet as IOrderedSet;
+                    if (S is null)
+                        throw new ScriptRuntimeException("Cannot compare operands.", Node);
+                }
+            }
+
+            if (Result is null)
+                return ObjectValue.Null;
+            else
+                return Result;
+        }
+
+        /// <summary>
+        /// Returns the largest value.
+        /// </summary>
+        /// <param name="Matrix">Matrix of values. Must not be empty.</param>
+        /// <param name="Node">Node performing the evaluation.</param>
+        /// <returns>Largest value.</returns>
+        public static IElement CalcMax(IMatrix Matrix, ScriptNode Node)
+        {
+            IElement Result = null;
+            IOrderedSet S = null;
+
+            foreach (IElement E in Matrix.ChildElements)
+            {
+                if (E.AssociatedObjectValue is null)
+                    continue;
+
+                if (Result is null || S.Compare(Result, E) < 0)
                 {
                     Result = E;
                     S = Result.AssociatedSet as IOrderedSet;

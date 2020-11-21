@@ -7051,6 +7051,14 @@
             <param name="Node">Node performing the evaluation.</param>
             <returns>Largest value.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Vectors.Max.CalcMax(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Returns the largest value.
+            </summary>
+            <param name="Matrix">Matrix of values. Must not be empty.</param>
+            <param name="Node">Node performing the evaluation.</param>
+            <returns>Largest value.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Vectors.Median">
             <summary>
             Median(v)
@@ -7176,6 +7184,14 @@
             Returns the smallest value.
             </summary>
             <param name="Values">Set of values. Must not be empty.</param>
+            <param name="Node">Node performing the evaluation.</param>
+            <returns>Smallest value.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Vectors.Min.CalcMin(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Returns the smallest value.
+            </summary>
+            <param name="Matrix">Matrix of values. Must not be empty.</param>
             <param name="Node">Node performing the evaluation.</param>
             <returns>Smallest value.</returns>
         </member>

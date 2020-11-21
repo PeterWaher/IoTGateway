@@ -1082,6 +1082,38 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.SameScale">
+            <summary>
+            Makes a graph use the same scale for all axes.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a graph use the same scale for all axes.
+            </summary>
+            <param name="Graph">Graph.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.SameScale.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.SameScale.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.LabelType">
             <summary>
              Type of labels
@@ -1145,6 +1177,11 @@
         <member name="M:Waher.Script.Graphs.Graph.#ctor">
             <summary>
             Base class for graphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Graph.SameScale">
+            <summary>
+            If the same scale should be used for all axes.
             </summary>
         </member>
         <member name="P:Waher.Script.Graphs.Graph.AssociatedObjectValue">
@@ -1285,6 +1322,11 @@
             <param name="Offset">Offset to area.</param>
             <param name="Size">Size of area.</param>
             <returns>Vector distributed in the available area.</returns>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.referenceTimestamp">
+            <summary>
+            Reference time stamp when converting <see cref="T:System.DateTime"/> to <see cref="T:System.Double"/>.
+            </summary>
         </member>
         <member name="M:Waher.Script.Graphs.Graph.Scale(System.Object[],System.Double,System.Double)">
             <summary>

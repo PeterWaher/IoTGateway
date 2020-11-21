@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using SkiaSharp;
 using System.Globalization;
-using System.Text;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -75,12 +73,23 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public abstract class Graph : SemiGroupElement
 	{
+		private bool sameScale = false;
+
 		/// <summary>
 		/// Base class for graphs.
 		/// </summary>
 		public Graph()
 			: base()
 		{
+		}
+
+		/// <summary>
+		/// If the same scale should be used for all axes.
+		/// </summary>
+		public bool SameScale
+		{
+			get => this.sameScale;
+			set => this.sameScale = value;
 		}
 
 		/// <summary>
@@ -431,7 +440,10 @@ namespace Waher.Script.Graphs
 			return Scale(v, (Min - referenceTimestamp).TotalDays, (Max - referenceTimestamp).TotalDays, Offset, Size);
 		}
 
-		private static readonly DateTime referenceTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
+		/// <summary>
+		/// Reference time stamp when converting <see cref="DateTime"/> to <see cref="Double"/>.
+		/// </summary>
+		protected static readonly DateTime referenceTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
 
 		/// <summary>
 		/// Scales a vector to fit a given area.
@@ -817,7 +829,7 @@ namespace Waher.Script.Graphs
 			int Diff1 = Math.Abs(ApproxNrLabels - Nr1);
 
 			int Nr2 = (int)Math.Round(Span.TotalSeconds / timeStepSizes[i + 1].TotalSeconds);
-			int Diff2 = Math.Abs(ApproxNrLabels - Nr1);
+			int Diff2 = Math.Abs(ApproxNrLabels - Nr2);
 
 			if (Diff1 < Diff2)
 				StepSize = timeStepSizes[i];
@@ -850,7 +862,7 @@ namespace Waher.Script.Graphs
 				}
 				else
 				{
-					Nr1 = Nr2;
+					//Nr1 = Nr2;
 					Diff1 = Diff2;
 
 					Nr2 = (int)Math.Floor((Max - TP).TotalDays / 7);
@@ -868,7 +880,7 @@ namespace Waher.Script.Graphs
 					}
 					else
 					{
-						Nr1 = Nr2;
+						//Nr1 = Nr2;
 						Diff1 = Diff2;
 
 						Nr2 = (int)Math.Floor((Max - TP).TotalDays / 30);
@@ -892,7 +904,7 @@ namespace Waher.Script.Graphs
 						}
 						else
 						{
-							Nr1 = Nr2;
+							//Nr1 = Nr2;
 							Diff1 = Diff2;
 
 							Nr2 = (int)Math.Floor((Max - TP).TotalDays / 180);
@@ -913,7 +925,7 @@ namespace Waher.Script.Graphs
 							}
 							else
 							{
-								Nr1 = Nr2;
+								//Nr1 = Nr2;
 								Diff1 = Diff2;
 
 								Nr2 = (int)Math.Floor((Max - TP).TotalDays / 700);

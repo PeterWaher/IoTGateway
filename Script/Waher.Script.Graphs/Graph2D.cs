@@ -45,8 +45,8 @@ namespace Waher.Script.Graphs
 		private bool showXAxis = true;
 		private bool showYAxis = true;
 		private bool showGrid = true;
-		private readonly bool showZeroX = false;
-		private readonly bool showZeroY = false;
+		//private readonly bool showZeroX = false;
+		//private readonly bool showZeroY = false;
 
 		/// <summary>
 		/// Base class for two-dimensional graphs.
@@ -96,11 +96,11 @@ namespace Waher.Script.Graphs
 				}
 			}
 
-			this.showZeroX = ShowZeroX;
-			this.showZeroY = ShowZeroY;
+			//this.showZeroX = ShowZeroX;
+			//this.showZeroY = ShowZeroY;
 
-			this.minX = Min.CalcMin(X, null);
-			this.maxX = Max.CalcMax(X, null);
+			this.minX = Min.CalcMin(X, Node);
+			this.maxX = Max.CalcMax(X, Node);
 
 			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
@@ -110,8 +110,8 @@ namespace Waher.Script.Graphs
 				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
 			}
 
-			this.minY = Min.CalcMin(Y, null);
-			this.maxY = Max.CalcMax(Y, null);
+			this.minY = Min.CalcMin(Y, Node);
+			this.maxY = Max.CalcMax(Y, Node);
 
 			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
 			{
@@ -568,6 +568,31 @@ namespace Waher.Script.Graphs
 					Color = Settings.GridColor,
 					StrokeWidth = Settings.GridWidth
 				};
+
+				if (this.SameScale &&
+					this.minX is DoubleNumber MinX &&
+					this.maxX is DoubleNumber MaxX &&
+					this.minY is DoubleNumber MinY &&
+					this.maxY is DoubleNumber MaxY)
+				{
+					double DX = MaxX.Value - MinX.Value;
+					double DY = MaxY.Value - MinY.Value;
+					double SX = w / (DX == 0 ? 1 : DX);
+					double SY = h / (DY == 0 ? 1 : DY);
+
+					if (SX < SY)
+					{
+						int h2 = (int)(h * SX / SY + 0.5);
+						y3 -= (h - h2) / 2;
+						h = h2;
+					}
+					else if (SY < SX)
+					{
+						int w2 = (int)(w * SY / SX + 0.5);
+						x3 += (w - w2) / 2;
+						w = w2;
+					}
+				}
 
 				double OrigoX;
 				double OrigoY;

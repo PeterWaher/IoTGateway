@@ -92,7 +92,15 @@ namespace Waher.IoTGateway
 			lock (requestsByContentID)
 			{
 				if (requestsByContentID.TryGetValue(Id, out Queue))
+				{
+					if (Queue.Content is null)
+					{
+						Queue.Response = Response;
+						return;
+					}
+
 					requestsByContentID.Remove(Id);
+				}
 				else
 				{
 					requestsByContentID[Id] = new ContentQueue(Id)

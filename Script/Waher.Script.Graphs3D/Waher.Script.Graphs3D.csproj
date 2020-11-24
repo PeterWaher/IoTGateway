@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Contains script extensions for 3D-graphs.</Description>
+    <Description>Contains a 3D-canvas with platform independent software 3D-rendering and drawing primitives, as well as script extensions for 3D-graphs. Includes support for Z-buffer, Phong Shading, Transparency, oversamling &amp; antialiasing.</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

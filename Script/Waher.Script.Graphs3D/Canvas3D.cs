@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -21,6 +22,7 @@ namespace Waher.Script.Graphs3D
 		private readonly Vector3[] normalBuf;
 		private readonly SKColor[] colorBuf;
 		private readonly SKColor backgroundColor;
+		private readonly SortedDictionary<float, LinkedList<PolyRec>> transparentPolygons = new SortedDictionary<float, LinkedList<PolyRec>>(new BackToFront());
 		private Vector3 viewerPosition;
 		private Matrix4x4 projectionTransformation;
 		private Matrix4x4 modelTransformation;
@@ -157,6 +159,8 @@ namespace Waher.Script.Graphs3D
 		/// <returns></returns>
 		public SKImage GetBitmap()
 		{
+			this.PaintTransparentPolygons();
+
 			if (this.overSampling == 1)
 				return this.GetBitmap(this.pixels);
 			else
@@ -1989,8 +1993,8 @@ namespace Waher.Script.Graphs3D
 		/// <param name="BackShader">Back side Shader.</param>
 		public void Polygons(Vector4[][] Nodes, Vector4[][] Normals, I3DShader FrontShader, I3DShader BackShader)
 		{
-			int j, d;
-			int i, c;
+			int j, NrPolygons;
+			int i, NrNodes;
 			int k, l;
 			int MinY = 0;
 			int MaxY = 0;
@@ -2002,34 +2006,34 @@ namespace Waher.Script.Graphs3D
 			bool First = true;
 			bool InterpolateNormals = !(Normals is null);
 
-			d = Nodes.Length;
+			NrPolygons = Nodes.Length;
 			vn = null;
 
-			Vector3[][] World = new Vector3[d][];
-			Vector3[][] Screen = new Vector3[d][];
-			Vector3[][] Normals2 = InterpolateNormals ? new Vector3[d][] : null;
+			Vector3[][] World = new Vector3[NrPolygons][];
+			Vector3[][] Screen = new Vector3[NrPolygons][];
+			Vector3[][] Normals2 = InterpolateNormals ? new Vector3[NrPolygons][] : null;
 
-			for (j = l = 0; j < d; j++)
+			for (j = l = 0; j < NrPolygons; j++)
 			{
 				v = Nodes[j];
-				c = v.Length;
+				NrNodes = v.Length;
 
-				if (c < 3)
+				if (NrNodes < 3)
 					continue;
 
-				vw = new Vector3[c];
-				vs = new Vector3[c];
+				vw = new Vector3[NrNodes];
+				vs = new Vector3[NrNodes];
 
 				if (InterpolateNormals)
 				{
 					n = Normals[j];
-					if (n.Length != c)
+					if (n.Length != NrNodes)
 						throw new ArgumentException("Number of normals do not match number of vertices.", nameof(Normals));
 
-					vn = new Vector3[c];
+					vn = new Vector3[NrNodes];
 				}
 
-				for (i = k = 0; i < c; i++)
+				for (i = k = 0; i < NrNodes; i++)
 				{
 					WP = this.ModelTransform(v[i]);
 					WP3 = ToVector3(WP);
@@ -2062,7 +2066,7 @@ namespace Waher.Script.Graphs3D
 				if (k < 3)
 					continue;
 
-				if (k != c)
+				if (k != NrNodes)
 				{
 					Array.Resize<Vector3>(ref vw, k);
 					Array.Resize<Vector3>(ref vs, k);
@@ -2077,7 +2081,7 @@ namespace Waher.Script.Graphs3D
 				l++;
 			}
 
-			d = l;
+			NrPolygons = l;
 
 			if (MaxY < 0)
 				return;
@@ -2089,8 +2093,98 @@ namespace Waher.Script.Graphs3D
 			else if (MaxY >= this.h)
 				MaxY = this.hm1;
 
+			if ((FrontShader?.Opaque ?? true) && (BackShader?.Opaque ?? true))
+			{
+				this.DrawPolygons(World, Screen, Normals2, MinY, MaxY, NrPolygons,
+					FrontShader, BackShader, InterpolateNormals);
+			}
+			else
+			{
+				float AvgZ = 0;
+
+				for (j = k = 0; j < NrPolygons; j++)
+				{
+					vw = World[j];
+					NrNodes = vw.Length;
+
+					for (i = 0; i < NrNodes; i++)
+					{
+						AvgZ += vw[i].Z;
+						k++;
+					}
+				}
+
+				if (k > 0)
+				{
+					AvgZ /= k;
+
+					if (!this.transparentPolygons.TryGetValue(AvgZ, out LinkedList<PolyRec> PerZ))
+					{
+						PerZ = new LinkedList<PolyRec>();
+						this.transparentPolygons[AvgZ] = PerZ;
+					}
+
+					PerZ.AddLast(new PolyRec()
+					{
+						World = World,
+						Screen = Screen,
+						Normals2 = Normals2,
+						MinY = MinY,
+						MaxY = MaxY,
+						NrPolygons = NrPolygons,
+						FrontShader = FrontShader,
+						BackShader = BackShader,
+						InterpolateNormals = InterpolateNormals,
+					});
+				}
+			}
+		}
+
+		private void PaintTransparentPolygons()
+		{
+			foreach (LinkedList<PolyRec> List in this.transparentPolygons.Values)
+			{
+				foreach (PolyRec Rec in List)
+				{
+					this.DrawPolygons(Rec.World, Rec.Screen, Rec.Normals2, Rec.MinY, Rec.MaxY,
+						Rec.NrPolygons, Rec.FrontShader, Rec.BackShader, Rec.InterpolateNormals);
+				}
+			}
+
+			this.transparentPolygons.Clear();
+		}
+
+		private class PolyRec
+		{
+			public Vector3[][] World;
+			public Vector3[][] Screen;
+			public Vector3[][] Normals2;
+			public int MinY;
+			public int MaxY;
+			public int NrPolygons;
+			public I3DShader FrontShader;
+			public I3DShader BackShader;
+			public bool InterpolateNormals;
+		}
+
+		private class BackToFront : IComparer<float>
+		{
+			public int Compare(float x, float y)
+			{
+				return Math.Sign(y - x);
+			}
+		}
+
+		private void DrawPolygons(Vector3[][] World, Vector3[][] Screen, Vector3[][] Normals2,
+			int MinY, int MaxY, int NrPolygons, I3DShader FrontShader, I3DShader BackShader, bool InterpolateNormals)
+		{
 			int NrRecs = MaxY - MinY + 1;
 			ScanLineRecs[] Recs2;
+			int j;
+			int i, NrNodes;
+			int Y;
+			Vector3[] vw, vs, vn = null;
+			bool First;
 
 			if (FrontShader == BackShader)
 			{
@@ -2127,16 +2221,16 @@ namespace Waher.Script.Graphs3D
 			float step;
 			bool Front;
 
-			for (j = 0; j < d; j++)
+			for (j = 0; j < NrPolygons; j++)
 			{
 				vw = World[j];
 				vs = Screen[j];
-				c = vw.Length;
+				NrNodes = vw.Length;
 
 				//LastWorld = vw[c - 2];
-				CurrentWorld = vw[c - 1];
-				LastScreen = vs[c - 2];
-				CurrentScreen = vs[c - 1];
+				CurrentWorld = vw[NrNodes - 1];
+				LastScreen = vs[NrNodes - 2];
+				CurrentScreen = vs[NrNodes - 1];
 
 				N = CalcNormal(vw[0], vw[1], CurrentWorld);
 
@@ -2151,8 +2245,8 @@ namespace Waher.Script.Graphs3D
 				if (InterpolateNormals)
 				{
 					vn = Normals2[j];
-					LastNormal = vn[c - 2];
-					CurrentNormal = vn[c - 1];
+					LastNormal = vn[NrNodes - 2];
+					CurrentNormal = vn[NrNodes - 1];
 				}
 
 				sy0 = LastScreen.Y;
@@ -2163,7 +2257,7 @@ namespace Waher.Script.Graphs3D
 
 				sx1 = wx1 = wy1 = wz1 = default;
 
-				int LastDir;
+				int LastDir, LastNonZeroDir = 0;
 				int Dir = Math.Sign(isy1 - isy0);
 				int SumAbsDir = 0;
 				float MinSx, WxMinSx, WyMinSx, WzMinSx;
@@ -2176,7 +2270,7 @@ namespace Waher.Script.Graphs3D
 				WzMinSx = WzMaxSx = CurrentWorld.Z;
 				NMinSx = NMaxSx = CurrentNormal;
 
-				for (i = 0; i < c; i++)
+				for (i = 0; i < NrNodes; i++)
 				{
 					LastWorld = CurrentWorld;
 					CurrentWorld = vw[i];
@@ -2227,6 +2321,9 @@ namespace Waher.Script.Graphs3D
 					isy1 = (int)(sy1 + 0.5f);
 
 					LastDir = Dir;
+					if (Dir != 0)
+						LastNonZeroDir = Dir;
+
 					Dir = Math.Sign(isy1 - isy0);
 					SumAbsDir += Math.Abs(Dir);
 
@@ -2263,7 +2360,7 @@ namespace Waher.Script.Graphs3D
 
 						if (Dir == 1)
 						{
-							if (LastDir != 1)
+							if (LastDir == -1 || (LastDir == 0 && LastNonZeroDir == -1))
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
@@ -2299,7 +2396,7 @@ namespace Waher.Script.Graphs3D
 						}
 						else    // Dir == -1
 						{
-							if (LastDir == 0)
+							if (LastDir == 0 && LastNonZeroDir == 1)
 							{
 								this.AddNode(Recs, MinY, sx0, isy0, wx0, wy0, wz0,
 									InterpolateNormals ? Vector3.Normalize(LastNormal) : N, Front, Dir);
@@ -2362,12 +2459,12 @@ namespace Waher.Script.Graphs3D
 					}
 				}
 
-				if (SumAbsDir == 0 && isy1 >= 0 && isy1 <= this.hm1)
+				if (SumAbsDir == 0 && isy1 >= MinY && isy1 <= this.hm1)
 				{
 					this.AddNode(Recs, MinY, MinSx, isy1, WxMinSx, WyMinSx, WzMinSx,
 						InterpolateNormals ? Vector3.Normalize(NMinSx) : N, Front, 0);
 
-					this.AddNode(Recs, MaxY, MaxSx, isy1, WxMaxSx, WyMaxSx, WzMaxSx,
+					this.AddNode(Recs, MinY, MaxSx, isy1, WxMaxSx, WyMaxSx, WzMaxSx,
 						InterpolateNormals ? Vector3.Normalize(NMaxSx) : N, Front, 0);
 				}
 			}
@@ -2605,6 +2702,40 @@ namespace Waher.Script.Graphs3D
 			public bool has2;
 			public LinkedList<ScanLineSegment> segments;
 			public Vector3 n0, n1;
+
+			public override string ToString()
+			{
+				StringBuilder sb = new StringBuilder();
+
+				if (this.segments is null)
+				{
+					sb.Append(this.sx0.ToString());
+
+					if (this.has2)
+					{
+						sb.Append(" | ");
+						sb.Append(this.sx1.ToString());
+					}
+				}
+				else
+				{
+					bool First = true;
+
+					foreach (ScanLineSegment Segment in this.segments)
+					{
+						if (First)
+							First = false;
+						else
+							sb.Append(" | ");
+
+						sb.Append(Segment.sx.ToString());
+					}
+
+					return sb.ToString();
+				}
+
+				return sb.ToString();
+			}
 		}
 
 		private class ScanLineSegment
@@ -2961,7 +3092,9 @@ namespace Waher.Script.Graphs3D
 
 				List<Vector4> P = new List<Vector4>();
 				List<Vector4[]> v = new List<Vector4[]>();
+				float MinX = 0;
 				float MaxX = 0;
+				float MinY = 0;
 				float MaxY = 0;
 				float X, Y;
 
@@ -2976,10 +3109,14 @@ namespace Waher.Script.Graphs3D
 							X = Points[0].X;
 							if (X > MaxX)
 								MaxX = X;
+							else if (X < MinX)
+								MinX = X;
 
 							Y = Points[0].Y;
 							if (Y > MaxY)
 								MaxY = Y;
+							else if (Y < MinY)
+								MinY = Y;
 
 							break;
 
@@ -2987,10 +3124,14 @@ namespace Waher.Script.Graphs3D
 							X = Points[1].X;
 							if (X > MaxX)
 								MaxX = X;
+							else if (X < MinX)
+								MinX = X;
 
 							Y = Points[1].Y;
 							if (Y > MaxY)
 								MaxY = Y;
+							else if (Y < MinY)
+								MinY = Y;
 
 							break;
 
@@ -2999,10 +3140,14 @@ namespace Waher.Script.Graphs3D
 							X = Points[2].X;
 							if (X > MaxX)
 								MaxX = X;
+							else if (X < MinX)
+								MinX = X;
 
 							Y = Points[2].Y;
 							if (Y > MaxY)
 								MaxY = Y;
+							else if (Y < MinY)
+								MinY = Y;
 
 							break;
 
@@ -3010,16 +3155,20 @@ namespace Waher.Script.Graphs3D
 							X = Points[3].X;
 							if (X > MaxX)
 								MaxX = X;
+							else if (X < MinX)
+								MinX = X;
 
 							Y = Points[3].Y;
 							if (Y > MaxY)
 								MaxY = Y;
+							else if (Y < MinY)
+								MinY = Y;
 
 							break;
 					}
 				}
 
-				return new SKSize(MaxX, MaxY);
+				return new SKSize(MaxX - MinX, MaxY - MinY);
 			}
 			finally
 			{

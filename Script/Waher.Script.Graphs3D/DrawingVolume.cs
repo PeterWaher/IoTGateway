@@ -170,6 +170,15 @@ namespace Waher.Script.Graphs3D
 		}
 
 		/// <summary>
+		/// Scales a vector of x-coordinates to fit a given volume.
+		/// </summary>
+		/// <param name="Vector">Vector.</param>
+		public double[] ScaleX(IVector Vector)
+		{
+			return Graph2D.Scale(Vector, this.minX, this.maxX, this.offsetX, this.width);
+		}
+
+		/// <summary>
 		/// Scales a matrix with y-coordinates to fit a given volume.
 		/// </summary>
 		/// <param name="Matrix">Matrix.</param>
@@ -179,12 +188,30 @@ namespace Waher.Script.Graphs3D
 		}
 
 		/// <summary>
+		/// Scales a vector of y-coordinates to fit a given volume.
+		/// </summary>
+		/// <param name="Vector">Vector.</param>
+		public double[] ScaleY(IVector Vector)
+		{
+			return Graph2D.Scale(Vector, this.minY, this.maxY, this.offsetY, this.height);
+		}
+
+		/// <summary>
 		/// Scales a matrix with z-coordinates to fit a given volume.
 		/// </summary>
 		/// <param name="Matrix">Matrix.</param>
 		public double[,] ScaleZ(IMatrix Matrix)
 		{
-			return Graph3D.Scale(Matrix, this.minZ, this.maxZ, this.offsetZ, this.depth);
+			return Graph3D.Scale(Matrix, this.maxZ, this.minZ, this.offsetZ, this.depth);
+		}
+
+		/// <summary>
+		/// Scales a vector of z-coordinates to fit a given volume.
+		/// </summary>
+		/// <param name="Vector">Vector.</param>
+		public double[] ScaleZ(IVector Vector)
+		{
+			return Graph2D.Scale(Vector, this.maxZ, this.minZ, this.offsetZ, this.depth);
 		}
 
 		/// <summary>
@@ -211,7 +238,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Value">Scaled value.</param>
 		public IElement DescaleZ(double Value)
 		{
-			return Graph.Descale(Value, this.minZ, this.maxZ, this.offsetZ, this.depth);
+			return Graph.Descale(Value, this.maxZ, this.minZ, this.offsetZ, this.depth);
 		}
 
 	}

@@ -861,17 +861,35 @@
             </summary>
             <param name="Matrix">Matrix.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleX(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales a vector of x-coordinates to fit a given volume.
+            </summary>
+            <param name="Vector">Vector.</param>
+        </member>
         <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleY(Waher.Script.Abstraction.Elements.IMatrix)">
             <summary>
             Scales a matrix with y-coordinates to fit a given volume.
             </summary>
             <param name="Matrix">Matrix.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleY(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales a vector of y-coordinates to fit a given volume.
+            </summary>
+            <param name="Vector">Vector.</param>
+        </member>
         <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleZ(Waher.Script.Abstraction.Elements.IMatrix)">
             <summary>
             Scales a matrix with z-coordinates to fit a given volume.
             </summary>
             <param name="Matrix">Matrix.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.ScaleZ(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Scales a vector of z-coordinates to fit a given volume.
+            </summary>
+            <param name="Vector">Vector.</param>
         </member>
         <member name="M:Waher.Script.Graphs3D.DrawingVolume.DescaleX(System.Double)">
             <summary>
@@ -1609,6 +1627,21 @@
         <member name="P:Waher.Script.Graphs3D.Graph3D.ShowGrid">
             <summary>
             If the grid is to be displayed.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Angle">
+            <summary>
+            Rotation angle, in degrees, around the Y-axis.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Inclination">
+            <summary>
+            Inclination, in degrees (rotation angle, around the X-axis).
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.Oversampling">
+            <summary>
+            Oversampling (for anti-aliasing-purposes).
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">

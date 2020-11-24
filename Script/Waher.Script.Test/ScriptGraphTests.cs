@@ -73,25 +73,49 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Graph3D_Test_01_LineMesh()
 		{
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);linemesh3d(x,y,z)", "3D_01_1.png");
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);linemesh3d(x,y,z,'Blue')", "3D_01_2.png");
-			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=(R1+R0*cos(theta)).*sin(phi);z:=R0*sin(theta);samescale(linemesh3d(x,y,z))", "3D_01_3.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(linemesh3d(x,y,z))", "3D_01_1.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(linemesh3d(x,y,z,'Blue'))", "3D_01_2.png");
+			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=R0*sin(theta);z:=(R1+R0*cos(theta)).*sin(phi);samescale(linemesh3d(x,y,z))", "3D_01_3.png");
 		}
 
 		[TestMethod]
 		public void Graph3D_Test_02_PolygonMesh()
 		{
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);polygonmesh3d(x,y,z)", "3D_02_1.png");
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);polygonmesh3d(x,y,z,'Blue')", "3D_02_2.png");
-			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=(R1+R0*cos(theta)).*sin(phi);z:=R0*sin(theta);samescale(polygonmesh3d(x,y,z))", "3D_02_3.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(polygonmesh3d(x,y,z))", "3D_02_1.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(polygonmesh3d(x,y,z,'Blue'))", "3D_02_2.png");
+			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=R0*sin(theta);z:=(R1+R0*cos(theta)).*sin(phi);samescale(polygonmesh3d(x,y,z))", "3D_02_3.png");
 		}
 
 		[TestMethod]
 		public void Graph3D_Test_03_Surface()
 		{
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);surface3d(x,y,z)", "3D_03_1.png");
-			this.Test("x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);surface3d(x,y,z,'Blue')", "3D_03_2.png");
-			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=(R1+R0*cos(theta)).*sin(phi);z:=R0*sin(theta);samescale(surface3d(x,y,z))", "3D_03_3.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(surface3d(x,y,z))", "3D_03_1.png");
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);samescale(surface3d(x,y,z,'Blue'))", "3D_03_2.png");
+			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R0:=5;R1:=20;x:=(R1+R0*cos(theta)).*cos(phi);y:=R0*sin(theta);z:=(R1+R0*cos(theta)).*sin(phi);samescale(surface3d(x,y,z))", "3D_03_3.png");
+		}
+
+		[TestMethod]
+		public void Graph3D_Test_04_Labels()
+		{
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);G:=samescale(surface3d(x,y,z));G.Title:='Title';G.LabelX:='X-axis';G.LabelY:='Y-axis';G.LabelZ:='Z-axis';G", "3D_04.png");
+		}
+
+		[TestMethod]
+		public void Graph3D_Test_05_Angle()
+		{
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);G:=samescale(surface3d(x,y,z));G.Title:='Title';G.LabelX:='X-axis';G.LabelY:='Y-axis';G.LabelZ:='Z-axis';G.Angle:=60;G", "3D_05.png");
+		}
+
+		[TestMethod]
+		public void Graph3D_Test_06_Inclination()
+		{
+			this.Test("x:=Columns(-10..10|0.1);z:=Rows(-10..10|0.1);r:=sqrt(x.^2+z.^2);y:=10*cos(r*2).*exp(-r/3);G:=samescale(surface3d(x,y,z));G.Title:='Title';G.LabelX:='X-axis';G.LabelY:='Y-axis';G.LabelZ:='Z-axis';G.Inclination:=60;G", "3D_06.png");
+		}
+
+		[TestMethod]
+		public void Graph3D_Test_07_Add()
+		{
+			this.Test("Thorus(R0,R1,Color,dx,dy,dz):=(theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);x:=(R1+R0*cos(theta)).*cos(phi)+dx;y:=R0*sin(theta)+dy;z:=(R1+R0*cos(theta)).*sin(phi)+dz;samescale(surface3d(x,y,z,Color)));Thorus(5,20,'Red',0,0,0)+Thorus(3,15,'Blue',0,10,0)+Thorus(2,10,'Green',0,17,0)+Thorus(1,7,'Yellow',0,20,0)", "3D_07.png");
 		}
 	}
 }

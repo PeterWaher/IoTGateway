@@ -384,9 +384,7 @@ namespace Waher.Script.Test
 // TODO: Clip Z
 // TODO: Test Light / Phong shading with multiple light sources
 // TODO: Specular lighting
-// TODO: Sort transparent polygons
 // TODO: Check if quicker to work with Vector3 directly, than with 3 separate coordinate values.
-// TODO: text-bug
 // TODO: C.LookAt(-200, 500, 0, 0, 0, 1500, 0, -1, 0);
 
 /* Test script:
@@ -459,100 +457,4 @@ C.Polygon([Vector4(0,MinY,MinZ,1),Vector4(0,MinY,MaxZ,1),Vector4(0,MaxY,MaxZ,1),
 print(Now.Subtract(Start).TotalSeconds);
 C
 
-
-foreach Angle in 30..390 do
-(
-	C:=Canvas3D(GraphWidth,GraphHeight,1,"LightGray");
-	C.Perspective(200, 2000);
-	C.Translate(0,-GraphHeight/2-MinY,3*GraphWidth-MinZ);
-	C.RotateX(-15);
-	C.RotateY(-Angle);
-	C.Scale(2*GraphWidth/(MaxX-MinX),2*GraphHeight/(MaxY-MinY),2*GraphWidth/(MaxZ-MinZ));
-
-	for x:=0 to NX-1 do
-	(
-		for z:=0 to NZ-1 do
-			C.Box(X1[x],0,Z1[z],X2[x],Y[x,z],Z2[z],SR);
-	);
-	C.Polygon([Vector4(MinX,MinY,0,1),Vector4(MaxX,MinY,0,1),Vector4(MaxX,MaxY,0,1),Vector4(MinX,MaxY,0,1)],SB,true);
-	C.Polygon([Vector4(MinX,0,MinZ,1),Vector4(MaxX,0,MinZ,1),Vector4(MaxX,0,MaxZ,1),Vector4(MinX,0,MaxZ,1)],SB,true);
-	C.Polygon([Vector4(0,MinY,MinZ,1),Vector4(0,MinY,MaxZ,1),Vector4(0,MaxY,MaxZ,1),Vector4(0,MaxY,MinZ,1)],SB,true);
-	preview(C)
-)
-
-
-[LabelsX,LabelsY,Counts]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,100,-5,5,100);
-
-
-SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
-SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
-foreach Angle in 0..360|0.5 do
-(
-	C:=Canvas3D(480,320,1,"LightGray");
-	C.Perspective(200, 2000);
-	C.RotateX(Angle,[0,0,1500]);
-	C.RotateY(2*Angle,[0,0,1500]);
-	C.RotateZ(3*Angle,[0,0,1500]);
-	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
-	C.Box(-300,-300,1200,300,300,1800,SR);
-	Preview(C)
-)
-
-
-SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 64),PhongLightSource(Alpha("Red",64),PhongIntensity("White"),[1000, 1000, 0]));
-SO:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
-foreach Angle in 0..360|0.5 do
-(
-	C:=Canvas3D(480,320,1,"LightGray");
-	C.Perspective(200, 2000);
-	C.RotateX(Angle,[0,0,1500]);
-	C.RotateY(2*Angle,[0,0,1500]);
-	C.RotateZ(3*Angle,[0,0,1500]);
-	C.Ellipsoid(0, 0, 1500, 400, 400, 400, 5000, SO);
-	C.Polygon([Vector4(-500,0,1000,1),Vector4(500,0,1000,1),Vector4(500,0,2000,1),Vector4(-500,0,2000,1)],SR,true);
-	C.Polygon([Vector4(0,-500,1000,1),Vector4(0,500,1000,1),Vector4(0,500,2000,1),Vector4(0,-500,2000,1)],SR,true);
-	C.Polygon([Vector4(-500,-500,1500,1),Vector4(500,-500,1500,1),Vector4(500,500,1500,1),Vector4(-500,500,1500,1)],SR,true);
-	Preview(C)
-)
-
-
-
-SR:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Red",PhongIntensity("White"),[1000, 1000, 0]));
-SG:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Green",PhongIntensity("White"),[1000, 1000, 0]));
-SB:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Blue",PhongIntensity("White"),[1000, 1000, 0]));
-SY:=PhongShader(PhongMaterial(1, 2, 0, 10),PhongIntensity(64, 64, 64, 255),PhongLightSource("Yellow",PhongIntensity("White"),[1000, 1000, 0]));
-C:=Canvas3D(480,320,1,"LightGray");
-
-foreach Angle in 0..720|0.5 do
-(
-	C.Clear();
-	C.Perspective(200, 2000);
-
-	M:=C.Translate(-200,200,0);
-	C.Scale(0.5,[0,0,1300]);
-	C.RotateX(Angle,[0,0,1300]);
-	C.Box(-300,-300,1000,300,300,1600,SR);
-
-	C.ModelTransformation:=M;
-	C.Translate(200,200,0);
-	C.Scale(0.5,[0,0,1300]);
-	C.RotateY(Angle,[0,0,1300]);
-	C.Box(-300,-300,1000,300,300,1600,SG);
-
-	C.ModelTransformation:=M;
-	C.Translate(-200,-200,0);
-	C.Scale(0.5,[0,0,1300]);
-	C.RotateZ(Angle,[0,0,1300]);
-	C.Box(-300,-300,1000,300,300,1600,SB);
-
-	C.ModelTransformation:=M;
-	C.Translate(200,-200,0);
-	C.Scale(0.5,[0,0,1300]);
-	C.RotateX(Angle,[0,0,1300]);
-	C.RotateY(2*Angle,[0,0,1300]);
-	C.RotateZ(3*Angle,[0,0,1300]);
-	C.Box(-300,-300,1000,300,300,1600,SY);
-
-	Preview(C)
-)
 */

@@ -1223,21 +1223,52 @@ G
 
 #### 3D Graph functions (Waher.Script.Graphs3D)
 
-The following functions are available in the `Waher.Script.Graphs3D` library.
+The following graph functions are available in the `Waher.Script.Graphs3D` library.
+
+| Function                                  | Description                                           | Example                                   |
+|-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`.    | [Example][LineMesh3DExample] |
+| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
+| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`.      | [Example][Surface3DExample] |
+
+[LineMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Blinemesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[PolygonMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bpolygonmesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[Surface3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bsurface3d%28x%2Cy%2Cz%2C%27Blue%27%29
+
+To use the 3D graph functions, or the 3D graphic drawing primitives, you may also need to
+use the following helper functions.
 
 | Function                                  | Description                                           | Example                                   |
 |-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
 | `Columns(Values)`                         | Creates a square matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | [Example][ColumnsExample] |
-| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][LineMesh3DExample] |
-| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
-| `Rows(Values)`                            | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector. | [Example][RowsExample] |
-| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][Surface3DExample] |
+| `Rows(Values)`                            | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector.    | [Example][RowsExample] |
+| `Vector3(X,Y,Z)`                          | Creates a `Vector3` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector3Example] |
+| `Vector4(X,Y,Z,W)`                        | Creates a `Vector4` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector4Example] |
 
 [ColumnsExample]: Prompt.md?Expression=X%3A%3DColumns%280..10%29
-[LineMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Blinemesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
-[PolygonMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bpolygonmesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
 [RowsExample]: Prompt.md?Expression=Z%3A%3DRows%280..10%29
-[Surface3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bsurface3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[Vector3Example]: Prompt.md?Expression=Vector3%2810%2C20%2C30%29
+[Vector4Example]: Prompt.md?Expression=Vector4%2810%2C20%2C30%2C1%29
+
+Or the following shader-related functions:
+
+| Function                                      | Description                                           | Example                                   |
+|-----------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `ConstantColor(Color)`                        | Creates a constant color shader from the color definition. | [Example][ConstantColorExample1] |
+| `ConstantColor(Red,Green,Blue[,Alpha])`       | Creates a constant color shader from the `Red`, `Green` and `Blue` color components, and the optional `Alpha`. | [Example][ConstantColorExample2] |
+| `PhongIntensity(Color)`                       | Creates a Phong Intensity definition from a color definition for use with a Phong Shader. | [Example][PhongIntensityExample1] |
+| `PhongIntensity(Red,Green,Blue[,Alpha])`      | Creates a Phong Intensity definition from its color components and optional alpha component, for use with a Phong Shader. | [Example][PhongIntensityExample2] |
+| `PhongLightSource(DI,SI,Position)`            | Creates a Light Source for use with a Phong Shader, providing a Diffuse Intensity `DI`, a Specular Intensity `SI` and a `Position` of the light source. | [Example][PhongLightSourceExample] |
+| `PhongMaterial(AR,DR,SR,S)`                   | Provides material coefficients for a Phong Shader: An Ambient Reflection Constant in `AR`, a Diffuse Reflection Constant in `DR`, a Specular Reflection Constant in `SR` and a Shininess constant in `S`. | [Example][PhongMaterialExample] |
+| `PhongShader(M,AI,Sources)`                   | Creates Phong Shader, by providing a Material definition in `M`, an Ambien Intensity in `AI` and a Light Source (or a vector of light sources) in `Sources`. | [Example][PhongShaderExample] |
+
+[ConstantColorExample1]: Prompt.md?Expression=ConstantColor%28%22Red%22%29%0A
+[ConstantColorExample2]: Prompt.md?Expression=ConstantColor%28255%2C0%2C0%2C64%29%0A
+[PhongIntensityExample1]: Prompt.md?Expression=PhongIntensity%28%22Red%22%29%0A
+[PhongIntensityExample2]: Prompt.md?Expression=PhongIntensity%28255%2C0%2C0%2C64%29%0A
+[PhongLightSourceExample]: Prompt.md?Expression=PhongLightSource%28%22Red%22%2CPhongIntensity%28%22White%22%29%2C%5B1000%2C%201000%2C%200%5D%29
+[PhongMaterialExample]: Prompt.md?Expression=PhongMaterial%281%2C%202%2C%200%2C%2010%29
+[PhongShaderExample]: Prompt.md?Expression=PhongShader%28PhongMaterial%281%2C%202%2C%200%2C%2010%29%2CPhongIntensity%2864%2C%2064%2C%2064%2C%20255%29%2CPhongLightSource%28%22Red%22%2CPhongIntensity%28%22White%22%29%2C%5B1000%2C%201000%2C%200%5D%29%29
 
 While the two-dimensional graph functions take two vectors as input, one for each of the
 two coordinates (x and y), the three-dimensional graph functions take matrices as input, one 
@@ -1334,6 +1365,30 @@ Thorus(5,20,'Red',0,0,0)+
 	Thorus(2,10,'Green',0,17,0)+
 	Thorus(1,7,'Yellow',0,20,0)
 ```
+
+When drawing 3D surfaces, you can choose to draw a wireframe, use polygon facets or use proper Phong Shading to emulate a curved surface.
+In the latter example, surface normals are interpolated across all facets, creating a smooth appearance when it interact with light sources.
+
+Example:
+
+	theta:=Columns((0..360|5)°);
+	phi:=Rows((0..360|5)°);
+	R:=10;
+	x:=R*cos(theta).*cos(phi);
+	y:=R*sin(theta);
+	z:=R*cos(theta).*sin(phi);
+	samescale(linemesh3d(x+10,y+10,z)+polygonmesh3d(x+30,y+10,z)+surface3d(x+20,y+30,z))
+
+```async
+theta:=Columns((0..360|5)°);
+phi:=Rows((0..360|5)°);
+R:=10;
+x:=R*cos(theta).*cos(phi);
+y:=R*sin(theta);
+z:=R*cos(theta).*sin(phi);
+samescale(linemesh3d(x+10,y+10,z)+polygonmesh3d(x+30,y+10,z)+surface3d(x+20,y+30,z))
+```
+
 
 #### Palette generation functions (Waher.Script.Fractals)
 

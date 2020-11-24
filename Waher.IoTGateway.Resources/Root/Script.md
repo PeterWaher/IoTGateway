@@ -1082,7 +1082,7 @@ will return a vector corresponding to the point under the mouse.
 | `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
 | `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
 | `Polygon2D(X,Y[,Color])`                | Plots a filled polygon.                               | [Example][Polygon2DExample]               |
-| `SameScale(Graph)`                      | Informs the graph to use the same scale for all axes. | `SameScale(plot2dcurve(x,y))` |
+| `SameScale(Graph)`                      | Informs the graph to use the same scale for all axes. | [Example][SameScaleExample]               |
 | `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
 | `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
@@ -1101,6 +1101,7 @@ will return a vector corresponding to the point under the mouse.
 [Polygon2DExample]: Prompt.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
 [Scatter2DExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
 [VerticalBarsExample]: Prompt.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
+[SameScaleExample]: Prompt.md?Expression=SameScale%28plot2dcurve%28x%2Cy%29%29
 
 The following table lists variables that control graph output:
 
@@ -1226,11 +1227,113 @@ The following functions are available in the `Waher.Script.Graphs3D` library.
 
 | Function                                  | Description                                           | Example                                   |
 |-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
-| `Columns(Values)`                         | Creates a matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | `X:=Columns(0..10)` |
-| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);linemesh3d(x,y,z,'Blue')` |
-| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);polygonmesh3d(x,y,z,'Blue')` |
-| `Rows(Values)`                            | Creates a matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector. | `Z:=Rows(0..10)` |
-| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`. | Example: `x:=Columns(-10..10|0.5);z:=Rows(-10..10|0.5);r:=sqrt(x.^2+z.^2);y:=sin(r*2).*exp(-r/3);surface3d(x,y,z,'Blue')` |
+| `Columns(Values)`                         | Creates a square matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | [Example][ColumnsExample] |
+| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][LineMesh3DExample] |
+| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
+| `Rows(Values)`                            | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector. | [Example][RowsExample] |
+| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][Surface3DExample] |
+
+[ColumnsExample]: Prompt.md?Expression=X%3A%3DColumns%280..10%29
+[LineMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Blinemesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[PolygonMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bpolygonmesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[RowsExample]: Prompt.md?Expression=Z%3A%3DRows%280..10%29
+[Surface3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bsurface3d%28x%2Cy%2Cz%2C%27Blue%27%29
+
+While the two-dimensional graph functions take two vectors as input, one for each of the
+two coordinates (x and y), the three-dimensional graph functions take matrices as input, one 
+for each of the three coordinates (x, y and z). To convert vectors to matrices suitable
+for three-dimensional graphs, you can use the `Columns` and `Rows` functions respectively.
+Since matrices are square, it is important to use the element-wise operators when using
+arithmetic operators with the elements of the matrices. Otherwise, the corresponding matrix
+operations will be used.
+
+Example:
+
+	x:=Columns(-10..10|0.1);
+	z:=Rows(-10..10|0.1);
+	r:=sqrt(x.^2+z.^2);
+	y:=10*cos(r*2).*exp(-r/3);
+	samescale(surface3d(x,y,z))
+
+```async
+GraphWidth:=640;
+GraphHeight:=480;
+x:=Columns(-10..10|0.1);
+z:=Rows(-10..10|0.1);
+r:=sqrt(x.^2+z.^2);
+y:=10*cos(r*2).*exp(-r/3);
+samescale(surface3d(x,y,z))
+```
+
+You can use the `Title`, `LabelX`, `LabelY`, `LabelZ`, `Angle`, `Inclination` and `Oversampling`
+properties of the 3D-graph make the graph more informative:
+
+Example:
+
+	x:=Columns(-10..10|0.1);
+	z:=Rows(-10..10|0.1);
+	r:=sqrt(x.^2+z.^2);
+	y:=10*cos(r*2).*exp(-r/3);
+	G:=samescale(surface3d(x,y,z));
+	G.Title:='Title';
+	G.LabelX:='X-axis';
+	G.LabelY:='Y-axis';
+	G.LabelZ:='Z-axis';
+	G.Angle:=45;
+	G.Inclination:=60;
+	G
+
+```async
+x:=Columns(-10..10|0.1);
+z:=Rows(-10..10|0.1);
+r:=sqrt(x.^2+z.^2);
+y:=10*cos(r*2).*exp(-r/3);
+G:=samescale(surface3d(x,y,z));
+G.Title:='Title';
+G.LabelX:='X-axis';
+G.LabelY:='Y-axis';
+G.LabelZ:='Z-axis';
+G.Angle:=45;
+G.Inclination:=60;
+G
+```
+
+You can also use the addition operator, as with two-dimensional graphs, to show multiple graphs
+simultanerously.
+
+Example:
+
+	Thorus(R0,R1,Color,dx,dy,dz):=
+	(
+		theta:=Columns((0..360|5)°);
+		phi:=Rows((0..360|5)°);
+		x:=(R1+R0*cos(theta)).*cos(phi)+dx;
+		y:=R0*sin(theta)+dy;
+		z:=(R1+R0*cos(theta)).*sin(phi)+dz;
+		samescale(surface3d(x,y,z,Color))
+	);
+
+	Thorus(5,20,'Red',0,0,0)+
+		Thorus(3,15,'Blue',0,10,0)+
+		Thorus(2,10,'Green',0,17,0)+
+		Thorus(1,7,'Yellow',0,20,0)
+
+```async
+Thorus(R0,R1,Color,dx,dy,dz):=
+(
+	theta:=Columns((0..360|5)°);
+	phi:=Rows((0..360|5)°);
+	x:=(R1+R0*cos(theta)).*cos(phi)+dx;
+	y:=R0*sin(theta)+dy;
+	z:=(R1+R0*cos(theta)).*sin(phi)+dz;
+	samescale(surface3d(x,y,z,Color))
+);
+
+Thorus(5,20,'Red',0,0,0)+
+	Thorus(3,15,'Blue',0,10,0)+
+	Thorus(2,10,'Green',0,17,0)+
+	Thorus(1,7,'Yellow',0,20,0)
+```
 
 #### Palette generation functions (Waher.Script.Fractals)
 

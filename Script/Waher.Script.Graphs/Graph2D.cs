@@ -333,7 +333,8 @@ namespace Waher.Script.Graphs
 				axisTypeY = this.axisTypeY,
 				title = this.title,
 				labelX = this.labelX,
-				labelY = this.labelY
+				labelY = this.labelY,
+				SameScale = this.SameScale
 			};
 
 			foreach (IVector v in this.x)

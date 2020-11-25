@@ -1230,10 +1230,12 @@ The following graph functions are available in the `Waher.Script.Graphs3D` libra
 | `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`.    | [Example][LineMesh3DExample] |
 | `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
 | `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`.      | [Example][Surface3DExample] |
+| `VerticalBars3D(X,Y,Z[,Shader])           | Draws a three dimensional vertical bar chart from information available in three equally sized matrices `X`, `Y`, `Z`. `X` and `Z` are assumed to be labels. `Y` contains the corresponding bar value. | [Example][VerticalBars3DExample] |
 
 [LineMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Blinemesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
 [PolygonMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bpolygonmesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
 [Surface3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bsurface3d%28x%2Cy%2Cz%2C%27Blue%27%29
+[VerticalBars3DExample]: Prompt.md?Expression=%5BLabelsX%2CLabelsZ%2CY%5D%3A%3DHistogram2D%28%5BNormal%280%2C1%2C100000%29%2CNormal%280%2C1%2C100000%29%5D%2C-5%2C5%2C50%2C-5%2C5%2C50%29%3BVerticalBars3D%28Columns%28LabelsX%29%2CY%2CRows%28LabelsZ%29%29
 
 To use the 3D graph functions, or the 3D graphic drawing primitives, you may also need to
 use the following helper functions.
@@ -1377,7 +1379,7 @@ Example:
 	x:=R*cos(theta).*cos(phi);
 	y:=R*sin(theta);
 	z:=R*cos(theta).*sin(phi);
-	samescale(linemesh3d(x+10,y+10,z)+polygonmesh3d(x+30,y+10,z)+surface3d(x+20,y+30,z))
+	samescale(linemesh3d(x+10,y+10,z+10)+polygonmesh3d(x+30,y+10,z+10)+surface3d(x+20,y+30,z+10))
 
 ```async
 theta:=Columns((0..360|5)°);
@@ -1386,9 +1388,21 @@ R:=10;
 x:=R*cos(theta).*cos(phi);
 y:=R*sin(theta);
 z:=R*cos(theta).*sin(phi);
-samescale(linemesh3d(x+10,y+10,z)+polygonmesh3d(x+30,y+10,z)+surface3d(x+20,y+30,z))
+samescale(linemesh3d(x+10,y+10,z+10)+polygonmesh3d(x+30,y+10,z+10)+surface3d(x+20,y+30,z+10))
 ```
 
+There are also specific 3D charts available that you can use. They may still require you to
+prepare the input accordingly.
+
+Example:
+
+[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
+VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ))
+
+```async
+[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
+VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ))
+```
 
 #### Palette generation functions (Waher.Script.Fractals)
 

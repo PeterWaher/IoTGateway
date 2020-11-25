@@ -25,6 +25,7 @@ namespace Waher.Script.Test
 			Types.Initialize(typeof(Expression).Assembly,
 				typeof(Graphs.Graph).Assembly,
 				typeof(Graphs3D.Graph3D).Assembly,
+				typeof(Statistics.StatMath).Assembly,
 				typeof(XmlParser).Assembly,
 				typeof(System.Text.RegularExpressions.Regex).Assembly,
 				typeof(Persistence.SQL.Select).Assembly,

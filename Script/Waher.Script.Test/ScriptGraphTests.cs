@@ -117,5 +117,20 @@ namespace Waher.Script.Test
 		{
 			this.Test("Thorus(R0,R1,Color,dx,dy,dz):=(theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);x:=(R1+R0*cos(theta)).*cos(phi)+dx;y:=R0*sin(theta)+dy;z:=(R1+R0*cos(theta)).*sin(phi)+dz;samescale(surface3d(x,y,z,Color)));Thorus(5,20,'Red',0,0,0)+Thorus(3,15,'Blue',0,10,0)+Thorus(2,10,'Green',0,17,0)+Thorus(1,7,'Yellow',0,20,0)", "3D_07.png");
 		}
+
+		[TestMethod]
+		public void Graph3D_Test_08_Planes()
+		{
+			this.Test("theta:=Columns((0..360|5)°);phi:=Rows((0..360|5)°);R:=10;x:=R*cos(theta).*cos(phi);y:=R*sin(theta);z:=R*cos(theta).*sin(phi);samescale(linemesh3d(x+10,y+10,z+10)+polygonmesh3d(x+30,y+10,z+10)+surface3d(x+20,y+30,z+10))", "3D_08.png");
+		}
+
+		[TestMethod]
+		public void Graph3D_Test_09_VerticalBars()
+		{
+			this.Test("[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ))", "3D_09_1.png");
+			this.Test("[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ),'Blue')", "3D_09_2.png");
+		}
+
+
 	}
 }

@@ -22,9 +22,9 @@ namespace Waher.Script.Graphs3D
 		private readonly int width;
 		private readonly int height;
 		private readonly int depth;
-		private readonly float origoX;
-		private readonly float origoY;
-		private readonly float origoZ;
+		private readonly float? origoX;
+		private readonly float? origoY;
+		private readonly float? origoZ;
 
 		/// <summary>
 		/// Contains information about the current drawing area.
@@ -46,7 +46,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="OrigoZ">Z-coordinate of the origo.</param>
 		public DrawingVolume(IElement MinX, IElement MaxX, IElement MinY, IElement MaxY,
 			IElement MinZ, IElement MaxZ, int OffsetX, int OffsetY, int OffsetZ,
-			int Width, int Height, int Depth, float OrigoX, float OrigoY, float OrigoZ)
+			int Width, int Height, int Depth, float? OrigoX, float? OrigoY, float? OrigoZ)
 		{
 			this.minX = MinX;
 			this.maxX = MaxX;
@@ -134,17 +134,17 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// X-coordinate for the origo.
 		/// </summary>
-		public float OrigoX => this.origoX;
+		public float? OrigoX => this.origoX;
 
 		/// <summary>
 		/// Y-coordinate for the origo.
 		/// </summary>
-		public float OrigoY => this.origoY;
+		public float? OrigoY => this.origoY;
 
 		/// <summary>
 		/// Z-coordinate for the origo.
 		/// </summary>
-		public float OrigoZ => this.origoZ;
+		public float? OrigoZ => this.origoZ;
 
 		/// <summary>
 		/// Scales three matrices of equal size to point vectors in space.

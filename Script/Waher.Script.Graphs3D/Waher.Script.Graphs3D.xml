@@ -385,6 +385,34 @@
             <param name="Nodes">Nodes</param>
             <param name="Color">Color</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToVector3(System.Numerics.Vector4)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector4"/> to a <see cref="T:System.Numerics.Vector3"/>.
+            </summary>
+            <param name="P">Point, or vector.</param>
+            <returns>Point or vector.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToVector3(System.Object)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector4"/> to a <see cref="T:System.Numerics.Vector3"/>.
+            </summary>
+            <param name="P">Point, or vector.</param>
+            <returns>Point or vector.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToPoint(System.Numerics.Vector3)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector3"/> to a <see cref="T:System.Numerics.Vector4"/> point.
+            </summary>
+            <param name="P">Point, or vector.</param>
+            <returns>Point.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToVector(System.Numerics.Vector3)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector3"/> to a <see cref="T:System.Numerics.Vector4"/> vector.
+            </summary>
+            <param name="P">Point, or vector.</param>
+            <returns>Vector.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.CalcNormal(System.Numerics.Vector3,System.Numerics.Vector3,System.Numerics.Vector3)">
             <summary>
             Calculates a normal to the plane that goes through P0, P1 and P2.
@@ -752,7 +780,7 @@
             Contains information about the current drawing area.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.DrawingVolume.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Single,System.Single,System.Single)">
+        <member name="M:Waher.Script.Graphs3D.DrawingVolume.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Nullable{System.Single},System.Nullable{System.Single},System.Nullable{System.Single})">
             <summary>
             Contains information about the current drawing area.
             </summary>
@@ -1207,6 +1235,52 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D">
+            <summary>
+            Plots a three-dimensional vertical bars chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional vertical bars chart.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+            <param name="X">X-axis.</param>
+            <param name="Y">Y-axis.</param>
+            <param name="Z">Z-axis.</param>
+            <param name="Color">Color or shader.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>

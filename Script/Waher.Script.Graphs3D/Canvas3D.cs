@@ -1547,7 +1547,12 @@ namespace Waher.Script.Graphs3D
 
 		#region Polygon
 
-		internal static Vector3 ToVector3(Vector4 P)
+		/// <summary>
+		/// Converts a <see cref="Vector4"/> to a <see cref="Vector3"/>.
+		/// </summary>
+		/// <param name="P">Point, or vector.</param>
+		/// <returns>Point or vector.</returns>
+		public static Vector3 ToVector3(Vector4 P)
 		{
 			if (P.W == 1 || P.W == 0)
 				return new Vector3(P.X, P.Y, P.Z);
@@ -1556,7 +1561,12 @@ namespace Waher.Script.Graphs3D
 			return new Vector3(P.X * d, P.Y * d, P.Z * d);
 		}
 
-		internal static Vector3 ToVector3(object Object)
+		/// <summary>
+		/// Converts a <see cref="Vector4"/> to a <see cref="Vector3"/>.
+		/// </summary>
+		/// <param name="P">Point, or vector.</param>
+		/// <returns>Point or vector.</returns>
+		public static Vector3 ToVector3(object Object)
 		{
 			if (Object is Vector3 Vector3)
 				return Vector3;
@@ -1585,12 +1595,22 @@ namespace Waher.Script.Graphs3D
 			}
 		}
 
-		internal static Vector4 ToPoint(Vector3 P)
+		/// <summary>
+		/// Converts a <see cref="Vector3"/> to a <see cref="Vector4"/> point.
+		/// </summary>
+		/// <param name="P">Point, or vector.</param>
+		/// <returns>Point.</returns>
+		public static Vector4 ToPoint(Vector3 P)
 		{
 			return new Vector4(P.X, P.Y, P.Z, 1);
 		}
 
-		internal static Vector4 ToVector(Vector3 P)
+		/// <summary>
+		/// Converts a <see cref="Vector3"/> to a <see cref="Vector4"/> vector.
+		/// </summary>
+		/// <param name="P">Point, or vector.</param>
+		/// <returns>Vector.</returns>
+		public static Vector4 ToVector(Vector3 P)
 		{
 			return new Vector4(P.X, P.Y, P.Z, 0);
 		}

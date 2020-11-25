@@ -571,9 +571,9 @@ namespace Waher.Script.Graphs3D
 			int Width = 1000;
 			int Height = 1000;
 			int Depth = 1000;
-			float OrigoX;
-			float OrigoY;
-			float OrigoZ;
+			float? OrigoX;
+			float? OrigoY;
+			float? OrigoZ;
 
 			if (this.SameScale &&
 				this.minX is DoubleNumber MinX &&
@@ -626,21 +626,25 @@ namespace Waher.Script.Graphs3D
 			if (this.minX.AssociatedSet is IAbelianGroup AgX)
 				OrigoX = (float)Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, OffsetX, Width)[0];
 			else
-				OrigoX = 0;
+				OrigoX = null;
 
 			if (this.minY.AssociatedSet is IAbelianGroup AgY)
 				OrigoY = (float)Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, OffsetY, Height)[0];
 			else
-				OrigoY = 0;
+				OrigoY = null;
 
 			if (this.minZ.AssociatedSet is IAbelianGroup AgZ)
-				OrigoZ = (float)Scale(new ObjectVector(AgZ.AdditiveIdentity), this.minZ, this.maxZ, OffsetZ, Depth)[0];
+				OrigoZ = (float)Scale(new ObjectVector(AgZ.AdditiveIdentity), this.maxZ, this.minZ, OffsetZ, Depth)[0];
 			else
-				OrigoZ = 0;
+				OrigoZ = null;
+
+			float PlaneX = OrigoX ?? OffsetX;
+			float PlaneY = OrigoY ?? OffsetY;
+			float PlaneZ = OrigoZ ?? OffsetZ + Depth;
 
 			DrawingVolume DrawingVolume = new DrawingVolume(this.minX, this.maxX,
 				this.minY, this.maxY, this.minZ, this.maxZ, OffsetX, OffsetY, OffsetZ,
-				Width, Height, Depth, (float)OrigoX, (float)OrigoY, (float)OrigoZ);
+				Width, Height, Depth, OrigoX, OrigoY, OrigoZ);
 
 			Canvas3D Canvas = new Canvas3D(Settings.Width, Settings.Height, this.overSampling, Settings.BackgroundColor);
 
@@ -681,7 +685,8 @@ namespace Waher.Script.Graphs3D
 			Matrix4x4 M = Canvas.ModelTransformation;
 			double[] LabelXX = DrawingVolume.ScaleX(XLabels);
 			float LabelMargin = (float)Settings.LabelFontSize * 0.1f;
-			float TextSize = (float)Settings.LabelFontSize * 5;
+			float TextSize0 = (float)Settings.LabelFontSize * 5;
+			float TextSize = this.CalcTextSize(LabelXX, TextSize0);
 			SKSize Size;
 			string s;
 			float f;
@@ -698,33 +703,33 @@ namespace Waher.Script.Graphs3D
 				{
 					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
 					{
-						Canvas.Line(
-							new Vector4(f, OrigoY, OffsetZ, 1),
-							new Vector4(f, OrigoY, OffsetZ + Depth, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(f, PlaneY, OffsetZ, 1),
+							new Vector4(f, PlaneY, OffsetZ + Depth, 1),
+							Settings.AxisColor, 3);
 
-						Canvas.Line(
-							new Vector4(f, OffsetY, OrigoZ, 1),
-							new Vector4(f, OffsetY + Height, OrigoZ, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(f, OffsetY, PlaneZ, 1),
+							new Vector4(f, OffsetY + Height, PlaneZ, 1),
+							Settings.AxisColor, 3);
 					}
 					else
 					{
-						Canvas.Line(
-							new Vector4(f, OrigoY, OffsetZ, 1),
-							new Vector4(f, OrigoY, OffsetZ + Depth, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(f, PlaneY, OffsetZ, 1),
+							new Vector4(f, PlaneY, OffsetZ + Depth, 1),
+							Settings.GridColor, 3);
 
-						Canvas.Line(
-							new Vector4(f, OffsetY, OrigoZ, 1),
-							new Vector4(f, OffsetY + Height, OrigoZ, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(f, OffsetY, PlaneZ, 1),
+							new Vector4(f, OffsetY + Height, PlaneZ, 1),
+							Settings.GridColor, 3);
 					}
 				}
 
 				if (this.showXAxis)
 				{
-					Canvas.Translate(f, OrigoY, OffsetZ);
+					Canvas.Translate(f, PlaneY, OffsetZ);
 					Canvas.RotateY(-90);
 					Canvas.RotateX(90);
 					Canvas.Text(s,
@@ -736,19 +741,20 @@ namespace Waher.Script.Graphs3D
 
 			if (!string.IsNullOrEmpty(this.labelX))
 			{
-				Size = Canvas.TextDimensions(this.labelX, Settings.FontName, TextSize * 1.25f);
+				Size = Canvas.TextDimensions(this.labelX, Settings.FontName, TextSize0 * 1.25f);
 
-				Canvas.Translate(OffsetX + Width / 2, OrigoY, OffsetZ);
+				Canvas.Translate(OffsetX + Width / 2, PlaneY, OffsetZ);
 				Canvas.RotateX(90);
 				Canvas.Text(this.labelX,
 					new Vector4(-Size.Width / 2, -2 * Size.Height, 0, 1),
-					Settings.FontName, TextSize * 1.25f, Settings.AxisColor);
+					Settings.FontName, TextSize0 * 1.25f, Settings.AxisColor);
 				Canvas.ModelTransformation = M;
 			}
 
 			double[] LabelZZ = DrawingVolume.ScaleZ(ZLabels);
 
 			i = 0;
+			TextSize = this.CalcTextSize(LabelZZ, TextSize0);
 
 			foreach (IElement Label in ZLabels.ChildElements)
 			{
@@ -761,33 +767,33 @@ namespace Waher.Script.Graphs3D
 				{
 					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
 					{
-						Canvas.Line(
-							new Vector4(OffsetX, OrigoY, f, 1),
-							new Vector4(OffsetX + Width, OrigoY, f, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(OffsetX, PlaneY, f, 1),
+							new Vector4(OffsetX + Width, PlaneY, f, 1),
+							Settings.AxisColor, 3);
 
-						Canvas.Line(
-							new Vector4(OrigoX, OffsetY, f, 1),
-							new Vector4(OrigoX, OffsetY + Height, f, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(PlaneX, OffsetY, f, 1),
+							new Vector4(PlaneX, OffsetY + Height, f, 1),
+							Settings.AxisColor, 3);
 					}
 					else
 					{
-						Canvas.Line(
-							new Vector4(OffsetX, OrigoY, f, 1),
-							new Vector4(OffsetX + Width, OrigoY, f, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(OffsetX, PlaneY, f, 1),
+							new Vector4(OffsetX + Width, PlaneY, f, 1),
+							Settings.GridColor, 3);
 
-						Canvas.Line(
-							new Vector4(OrigoX, OffsetY, f, 1),
-							new Vector4(OrigoX, OffsetY + Height, f, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(PlaneX, OffsetY, f, 1),
+							new Vector4(PlaneX, OffsetY + Height, f, 1),
+							Settings.GridColor, 3);
 					}
 				}
 
 				if (this.showZAxis)
 				{
-					Canvas.Translate(OffsetX + Width, OrigoY, f);
+					Canvas.Translate(OffsetX + Width, PlaneY, f);
 					Canvas.RotateX(90);
 					Canvas.Text(s,
 						new Vector4(5 * LabelMargin, LabelMargin - Size.Height / 2, 0, 1),
@@ -798,20 +804,21 @@ namespace Waher.Script.Graphs3D
 
 			if (!string.IsNullOrEmpty(this.labelZ))
 			{
-				Size = Canvas.TextDimensions(this.labelZ, Settings.FontName, TextSize * 1.25f);
+				Size = Canvas.TextDimensions(this.labelZ, Settings.FontName, TextSize0 * 1.25f);
 
-				Canvas.Translate(OffsetX + Width, OrigoY, OffsetZ + Depth / 2);
+				Canvas.Translate(OffsetX + Width, PlaneY, OffsetZ + Depth / 2);
 				Canvas.RotateY(-90);
 				Canvas.RotateX(90);
 				Canvas.Text(this.labelZ,
 					new Vector4(-Size.Width / 2, -2 * Size.Height, 0, 1),
-					Settings.FontName, TextSize * 1.25f, Settings.AxisColor);
+					Settings.FontName, TextSize0 * 1.25f, Settings.AxisColor);
 				Canvas.ModelTransformation = M;
 			}
 
 			double[] LabelYY = DrawingVolume.ScaleY(YLabels);
 
 			i = 0;
+			TextSize = this.CalcTextSize(LabelYY, TextSize0);
 
 			foreach (IElement Label in YLabels.ChildElements)
 			{
@@ -824,33 +831,33 @@ namespace Waher.Script.Graphs3D
 				{
 					if (Label is DoubleNumber DLbl && DLbl.Value == 0)
 					{
-						Canvas.Line(
-							new Vector4(OrigoX, f, OffsetZ, 1),
-							new Vector4(OrigoX, f, OffsetZ + Depth, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(PlaneX, f, OffsetZ, 1),
+							new Vector4(PlaneX, f, OffsetZ + Depth, 1),
+							Settings.AxisColor, 3);
 
-						Canvas.Line(
-							new Vector4(OffsetX, f, OrigoZ, 1),
-							new Vector4(OffsetX + Width, f, OrigoZ, 1),
-							Settings.AxisColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(OffsetX, f, PlaneZ, 1),
+							new Vector4(OffsetX + Width, f, PlaneZ, 1),
+							Settings.AxisColor, 3);
 					}
 					else
 					{
-						Canvas.Line(
-							new Vector4(OrigoX, f, OffsetZ, 1),
-							new Vector4(OrigoX, f, OffsetZ + Depth, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(PlaneX, f, OffsetZ, 1),
+							new Vector4(PlaneX, f, OffsetZ + Depth, 1),
+							Settings.GridColor, 3);
 
-						Canvas.Line(
-							new Vector4(OffsetX, f, OrigoZ, 1),
-							new Vector4(OffsetX + Width, f, OrigoZ, 1),
-							Settings.GridColor);
+						this.DrawPlaneLine(Canvas,
+							new Vector4(OffsetX, f, PlaneZ, 1),
+							new Vector4(OffsetX + Width, f, PlaneZ, 1),
+							Settings.GridColor, 3);
 					}
 				}
 
 				if (this.showYAxis)
 				{
-					Canvas.Translate(OffsetX, f, OrigoZ);
+					Canvas.Translate(OffsetX, f, PlaneZ);
 					Canvas.Text(s,
 						new Vector4(-5 * LabelMargin - Size.Width, LabelMargin - Size.Height / 2, 0, 1),
 						Settings.FontName, TextSize, Settings.AxisColor);
@@ -860,24 +867,24 @@ namespace Waher.Script.Graphs3D
 
 			if (!string.IsNullOrEmpty(this.labelY))
 			{
-				Size = Canvas.TextDimensions(this.labelY, Settings.FontName, TextSize * 1.25f);
+				Size = Canvas.TextDimensions(this.labelY, Settings.FontName, TextSize0 * 1.25f);
 
-				Canvas.Translate(OffsetX, OrigoY, OffsetZ + Depth / 2);
+				Canvas.Translate(OffsetX, OffsetY + Height / 2, PlaneZ);
 				Canvas.RotateZ(90);
 				Canvas.Text(this.labelY,
 					new Vector4(-Size.Width / 2, 2 * Size.Height, 0, 1),
-					Settings.FontName, TextSize * 1.25f, Settings.AxisColor);
+					Settings.FontName, TextSize0 * 1.25f, Settings.AxisColor);
 				Canvas.ModelTransformation = M;
 			}
 
 			if (!string.IsNullOrEmpty(this.title))
 			{
-				Size = Canvas.TextDimensions(this.title, Settings.FontName, TextSize * 1.5f);
+				Size = Canvas.TextDimensions(this.title, Settings.FontName, TextSize0 * 1.5f);
 
-				Canvas.Translate(OrigoX, OffsetY + Height, OrigoZ);
+				Canvas.Translate(OffsetX + Width / 2, OffsetY + Height, OffsetZ + Depth / 2);
 				Canvas.Text(this.title,
 					new Vector4(-Size.Width / 2, Size.Height / 2, 0, 1),
-					Settings.FontName, TextSize * 1.5f, Settings.AxisColor);
+					Settings.FontName, TextSize0 * 1.5f, Settings.AxisColor);
 				Canvas.ModelTransformation = M;
 			}
 
@@ -885,27 +892,58 @@ namespace Waher.Script.Graphs3D
 				Settings.AxisColor.Green, Settings.AxisColor.Blue, 32));
 
 			this.DrawPlane(Canvas,
-				new Vector4(OffsetX, OffsetY, OrigoZ, 1),
-				new Vector4(OffsetX + Width, OffsetY, OrigoZ, 1),
-				new Vector4(OffsetX + Width, OffsetY + Height, OrigoZ, 1),
-				new Vector4(OffsetX, OffsetY + Height, OrigoZ, 1),
-				AxisPlaneShader, true, 2);
+				new Vector4(OffsetX, OffsetY, PlaneZ, 1),
+				new Vector4(OffsetX + Width, OffsetY, PlaneZ, 1),
+				new Vector4(OffsetX + Width, OffsetY + Height, PlaneZ, 1),
+				new Vector4(OffsetX, OffsetY + Height, PlaneZ, 1),
+				AxisPlaneShader, true, 3);
 
 			this.DrawPlane(Canvas,
-				new Vector4(OffsetX, OrigoY, OffsetZ, 1),
-				new Vector4(OffsetX + Width, OrigoY, OffsetZ, 1),
-				new Vector4(OffsetX + Width, OrigoY, OffsetZ + Depth, 1),
-				new Vector4(OffsetX, OrigoY, OffsetZ + Depth, 1),
-				AxisPlaneShader, true, 2);
+				new Vector4(OffsetX, PlaneY, OffsetZ, 1),
+				new Vector4(OffsetX + Width, PlaneY, OffsetZ, 1),
+				new Vector4(OffsetX + Width, PlaneY, OffsetZ + Depth, 1),
+				new Vector4(OffsetX, PlaneY, OffsetZ + Depth, 1),
+				AxisPlaneShader, true, 3);
 
 			this.DrawPlane(Canvas,
-				new Vector4(OrigoX, OffsetY, OffsetZ, 1),
-				new Vector4(OrigoX, OffsetY, OffsetZ + Depth, 1),
-				new Vector4(OrigoX, OffsetY + Height, OffsetZ + Depth, 1),
-				new Vector4(OrigoX, OffsetY + Height, OffsetZ, 1),
-				AxisPlaneShader, true, 2);
+				new Vector4(PlaneX, OffsetY, OffsetZ, 1),
+				new Vector4(PlaneX, OffsetY, OffsetZ + Depth, 1),
+				new Vector4(PlaneX, OffsetY + Height, OffsetZ + Depth, 1),
+				new Vector4(PlaneX, OffsetY + Height, OffsetZ, 1),
+				AxisPlaneShader, true, 3);
 
 			return Canvas.CreateBitmap(Settings, out States);
+		}
+
+		private float CalcTextSize(double[] LabelPositions, float TextSize)
+		{
+			int i, c = LabelPositions.Length;
+			float Diff;
+
+			for (i = 1; i < c; i++)
+			{
+				Diff = (float)(Math.Abs(LabelPositions[i] - LabelPositions[i - 1]));
+				if (Diff < TextSize)
+					TextSize = Diff;
+			}
+
+			return TextSize;
+		}
+
+		private void DrawPlaneLine(Canvas3D Canvas, Vector4 P0, Vector4 P1,
+			SKColor Color, int Halvings)
+		{
+			if (Halvings == 0)
+				Canvas.Line(P0, P1, Color);
+			else
+			{
+				Halvings--;
+
+				Vector4 Pm = (P0 + P1) / 2;
+
+				this.DrawPlaneLine(Canvas, P0, Pm, Color, Halvings);
+				this.DrawPlaneLine(Canvas, Pm, P1, Color, Halvings);
+			}
 		}
 
 		private void DrawPlane(Canvas3D Canvas, Vector4 P0, Vector4 P1, Vector4 P2, Vector4 P3,

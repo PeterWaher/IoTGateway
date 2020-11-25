@@ -305,6 +305,7 @@
   <Assembly fileName='Waher.Script.Cryptography.dll'/>
   <Assembly fileName='Waher.Script.Fractals.dll'/>
   <Assembly fileName='Waher.Script.Graphs.dll'/>
+  <Assembly fileName='Waher.Script.Graphs3D.dll'/>
   <Assembly fileName='Waher.Script.Persistence.dll'/>
   <Assembly fileName='Waher.Script.Statistics.dll'/>
   <Assembly fileName='Waher.Script.Xml.dll'/>

@@ -529,7 +529,8 @@ There are various different comparison operators. All have the same [order of pr
 objects such as sets, vectors, arrays, matrices, etc.
 
 **Note 2**: If regular expressions contain named groups, variables with the corresponding names will be set to the contents of the corresponding
-groups if the regular expression matches the string.
+groups if the regular expression matches the string. If the contents is numerical, the corresponding variable will also be numerical. If you
+want to reference the string literal, use the variable starting with the same name having a suffix of `_STR`.
 
 #### Range operators
 

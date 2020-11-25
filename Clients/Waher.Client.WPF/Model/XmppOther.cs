@@ -142,5 +142,32 @@ namespace Waher.Client.WPF.Model
 			return Request;
 		}
 
+		public override bool CanRecycle
+		{
+			get
+			{
+				if (!this.XmppAccountNode.IsOnline)
+					return false;
+
+				RosterItem Item = this.XmppAccountNode.Client[this.BareJID];
+				if (Item is null || !Item.HasLastPresence || !Item.LastPresence.IsOnline)
+					return false;
+
+				return true;
+			}
+		}
+
+		public override void Recycle(MainWindow Window)
+		{
+			if (!this.XmppAccountNode.IsOnline)
+				return;
+
+			RosterItem Item = this.XmppAccountNode.Client[this.BareJID];
+			if (Item is null || !Item.HasLastPresence || !Item.LastPresence.IsOnline)
+				return;
+
+			this.XmppAccountNode.CheckType(this, Item.LastPresenceFullJid);
+		}
+
 	}
 }

@@ -774,7 +774,7 @@ namespace Waher.Client.WPF.Model
 					Node.OnUpdated();
 
 					if (e.Availability != Availability.Offline && Node.GetType() == typeof(XmppContact))
-						this.client.SendServiceDiscoveryRequest(e.From, this.ServiceDiscoveryResponse, Node);
+						this.CheckType(Node, e.From);
 				}
 				else if (string.Compare(e.FromBareJID, this.client.BareJID, true) == 0)
 					this.client.Information("Presence from same bare JID. Ignored.");
@@ -785,6 +785,11 @@ namespace Waher.Client.WPF.Model
 				if (Item != null)
 					await this.CheckRosterItemSubscriptions(Item);
 			}
+		}
+
+		internal void CheckType(TreeNode Node, string FullJid)
+		{
+			this.client.SendServiceDiscoveryRequest(FullJid, this.ServiceDiscoveryResponse, Node);
 		}
 
 		private Task ServiceDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e)

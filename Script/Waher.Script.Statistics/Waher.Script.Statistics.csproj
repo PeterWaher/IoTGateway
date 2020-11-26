@@ -6,7 +6,9 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Contains script extensions for statistical computations.</Description>
+    <Description>Contains script extensions for statistical computations.
+
+Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptStatistics</Description>
     <Copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Statistics</PackageProjectUrl>

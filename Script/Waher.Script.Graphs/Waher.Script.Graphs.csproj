@@ -3,7 +3,10 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Description>Contains script extensions for graphs.</Description>
+    <Description>Contains script extensions for graphs.
+
+Script Syntax:
+https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

@@ -7,7 +7,10 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Contains script extensions for parsing XML.</Description>
+    <Description>Contains script extensions for parsing XML.
+
+Script Syntax: https://waher.se/Script.md#xml
+https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
     <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Xml</PackageProjectUrl>

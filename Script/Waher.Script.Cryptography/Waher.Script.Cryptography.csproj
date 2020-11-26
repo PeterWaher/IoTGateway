@@ -7,7 +7,10 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library that adds cryptography functions to the script engine.</Description>
+    <Description>Class library that adds cryptography functions to the script engine.
+
+Script Syntax:
+https://waher.se/Script.md#cryptographyRelatedFunctionsWaherScriptCryptography</Description>
     <Copyright>Copyright © Waher Data AB 2020. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Cryptography</PackageProjectUrl>

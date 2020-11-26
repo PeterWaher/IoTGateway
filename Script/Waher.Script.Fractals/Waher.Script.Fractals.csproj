@@ -4,7 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Class library that adds fractal image functions to the script engine, suitable for generating backgound images.</Description>
+    <Description>Class library that adds fractal image functions to the script engine, suitable for generating backgound images.
+
+Script Syntax:
+https://waher.se/Script.md#paletteGenerationFunctionsWaherScriptFractals</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>

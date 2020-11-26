@@ -1535,12 +1535,15 @@ namespace Waher.IoTGateway
 					case "libegl.dll":
 					case "libglesv2.dll":
 					case "libskiasharp.dll":
+					case "libzstd.dll":
 					case "mscordaccore.dll":
 					case "mscordbi.dll":
 					case "mscorlib.dll":
 					case "mscorrc.debug.dll":
 					case "mscorrc.dll":
 					case "netstandard.dll":
+					case "snappy32.dll":
+					case "snappy64.dll":
 					case "sos.dll":
 					case "sos.netcore.dll":
 					case "ucrtbase.dll":

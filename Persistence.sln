@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Events", "Events", "{9D9A921B-43BE-4F67-830C-22094925234C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events", "Events\Waher.Events\Waher.Events.csproj", "{F247794C-4F29-49CA-A0DD-B6170A1ED5AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{0D510A76-814B-4D6E-8D13-9C59507F7A7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory", "Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj", "{DC77C67B-99FD-4D30-B160-D61F67F61227}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence", "Persistence\Waher.Persistence\Waher.Persistence.csproj", "{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Serialization", "Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj", "{A67F86B3-A5C7-4F97-824E-BD7C20594A24}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FilesLW", "Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj", "{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A20F36D5-2F24-4BC4-9742-283E495D4608}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Waher.IoTGateway.Resources\Root\Script.md = Waher.IoTGateway.Resources\Root\Script.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Serialization.Compiled", "Persistence\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj", "{1499144A-E29C-4A7C-8D28-2D0E2984B241}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Files", "Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj", "{7C788B07-0641-42B3-A52C-DACFB4832849}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC77C67B-99FD-4D30-B160-D61F67F61227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC77C67B-99FD-4D30-B160-D61F67F61227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC77C67B-99FD-4D30-B160-D61F67F61227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC77C67B-99FD-4D30-B160-D61F67F61227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67F86B3-A5C7-4F97-824E-BD7C20594A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67F86B3-A5C7-4F97-824E-BD7C20594A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67F86B3-A5C7-4F97-824E-BD7C20594A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67F86B3-A5C7-4F97-824E-BD7C20594A24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1499144A-E29C-4A7C-8D28-2D0E2984B241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1499144A-E29C-4A7C-8D28-2D0E2984B241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1499144A-E29C-4A7C-8D28-2D0E2984B241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1499144A-E29C-4A7C-8D28-2D0E2984B241}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C788B07-0641-42B3-A52C-DACFB4832849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C788B07-0641-42B3-A52C-DACFB4832849}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C788B07-0641-42B3-A52C-DACFB4832849}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C788B07-0641-42B3-A52C-DACFB4832849}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB} = {9D9A921B-43BE-4F67-830C-22094925234C}
+		{DC77C67B-99FD-4D30-B160-D61F67F61227} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}
+	EndGlobalSection
+EndGlobal

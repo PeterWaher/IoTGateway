@@ -1982,7 +1982,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, 
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
 				new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0),
 				LockType.Read, "SByte", "CIString"))
 			{
@@ -2072,6 +2072,149 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
+		[TestMethod]
+		public async Task DBFiles_Index_Test_66_Search_ObjectId_GreaterThan()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("ObjectId", Id), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.Greater(Obj.ObjectId, Id);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					AssertEx.LessOrEqual(Obj2.ObjectId, Id);
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_67_Search_ObjectId_GreaterOrEqualTo()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("ObjectId", Id), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.GreaterOrEqual(Obj.ObjectId, Id);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					AssertEx.Less(Obj2.ObjectId, Id);
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_68_Search_ObjectId_LesserThan()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserThan("ObjectId", Id), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.Less(Obj.ObjectId, Id);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					AssertEx.GreaterOrEqual(Obj2.ObjectId, Id);
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_69_Search_ObjectId_LesserOrEqualTo()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("ObjectId", Id), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.LessOrEqual(Obj.ObjectId, Id);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					AssertEx.Greater(Obj2.ObjectId, Id);
+			}
+		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_70_Search_ObjectId_AND()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
+				new FilterAnd(
+				new FilterFieldGreaterOrEqualTo("ObjectId", Id),
+				new FilterCustom<Simple>(Obj => Sum(Obj.ObjectId) >= 0x80)), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.GreaterOrEqual(Obj.ObjectId, Id);
+					AssertEx.GreaterOrEqual(Sum(Obj.ObjectId), 0x80);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Obj2.ObjectId.CompareTo(Id) < 0 || Sum(Obj2.ObjectId) < 0x80);
+			}
+		}
+
+		private static byte Sum(Guid ID)
+		{
+			byte Result = 0;
+
+			foreach (byte b in ID.ToByteArray())
+				Result += b;
+
+			return Result;
+		}
 
 	}
 }

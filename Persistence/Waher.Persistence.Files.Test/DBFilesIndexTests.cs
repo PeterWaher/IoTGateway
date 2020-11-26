@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -2046,6 +2045,33 @@ namespace Waher.Persistence.FilesLW.Test
 					Obj.Byte + Obj.SByte <= 0);
 			}
 		}
+
+		[TestMethod]
+		public async Task DBFiles_Index_Test_65_Search_ObjectId_EqualTo()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid[] Guids = new Guid[Objects.Count];
+			Objects.Keys.CopyTo(Guids, 0);
+			int i = ObjectsToEnumerate / 2;
+			Guid Id = Guids[i];
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldEqualTo("ObjectId", Id), LockType.Read))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.Same(Obj.ObjectId, Id);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					AssertEx.NotSame(Obj2.ObjectId, Id);
+			}
+		}
+
 
 	}
 }

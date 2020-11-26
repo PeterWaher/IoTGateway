@@ -27,6 +27,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Serializa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Files", "Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj", "{7C788B07-0641-42B3-A52C-DACFB4832849}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.MongoDB", "Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj", "{F5330115-A938-4F70-8289-298ABB62767D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Files.Test", "Persistence\Waher.Persistence.Files.Test\Waher.Persistence.Files.Test.csproj", "{5BB8F18B-2E30-4ABD-BAA6-867EFE584BB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FilesLW.Test", "Persistence\Waher.Persistence.FilesLW.Test\Waher.Persistence.FilesLW.Test.csproj", "{2FC6F344-EECD-4CBE-B45C-AB0E9F651AEA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.MongoDB.Test", "Persistence\Waher.Persistence.MongoDB.Test\Waher.Persistence.MongoDB.Test.csproj", "{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +69,22 @@ Global
 		{7C788B07-0641-42B3-A52C-DACFB4832849}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C788B07-0641-42B3-A52C-DACFB4832849}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C788B07-0641-42B3-A52C-DACFB4832849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5330115-A938-4F70-8289-298ABB62767D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5330115-A938-4F70-8289-298ABB62767D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5330115-A938-4F70-8289-298ABB62767D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5330115-A938-4F70-8289-298ABB62767D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BB8F18B-2E30-4ABD-BAA6-867EFE584BB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB8F18B-2E30-4ABD-BAA6-867EFE584BB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB8F18B-2E30-4ABD-BAA6-867EFE584BB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB8F18B-2E30-4ABD-BAA6-867EFE584BB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC6F344-EECD-4CBE-B45C-AB0E9F651AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC6F344-EECD-4CBE-B45C-AB0E9F651AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC6F344-EECD-4CBE-B45C-AB0E9F651AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC6F344-EECD-4CBE-B45C-AB0E9F651AEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

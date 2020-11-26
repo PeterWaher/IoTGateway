@@ -3337,6 +3337,11 @@
             </summary>
             <returns>Normalized filter.</returns>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterCustom`1.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterField">
             <summary>
             Abstract base class for all field filters.

@@ -2216,5 +2216,31 @@ namespace Waher.Persistence.FilesLW.Test
 			return Result;
 		}
 
+		[TestMethod]
+		public async Task DBFiles_Index_Test_71_ObjectId_Order()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid Last = Guid.Empty;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
+				new FilterCustom<Simple>(Obj => Sum(Obj.ObjectId) >= 0x80), LockType.Read, "ObjectId"))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.IsNotNull(Obj);
+					AssertEx.Greater(Obj.ObjectId, Last);
+					AssertEx.GreaterOrEqual(Sum(Obj.ObjectId), 0x80);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+					Last = Obj.ObjectId;
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Sum(Obj2.ObjectId) < 0x80);
+			}
+		}
+
 	}
 }

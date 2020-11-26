@@ -45,6 +45,8 @@ namespace Waher.Persistence.Files
 		private BlockInfo startingPoint;
 		private IRecordHandler recordHandler;
 		private object currentObjectId;
+		private string objectIdMemberName;
+		private int fieldCount;
 		private T current;
 		private ulong? currentRank;
 		private byte[] currentBlock;
@@ -75,13 +77,22 @@ namespace Waher.Persistence.Files
 				recordHandler = RecordHandler,
 				startingPoint = null,
 				defaultSerializer = DefaultSerializer,
-				timeoutMilliseconds = File.TimeoutMilliseconds
+				timeoutMilliseconds = File.TimeoutMilliseconds,
+				objectIdMemberName = null,
+				fieldCount = 0
 			};
 
 			Result.Reset();
 
 			if (Result.defaultSerializer is null && typeof(T) != typeof(object))
 				Result.defaultSerializer = await File.Provider.GetObjectSerializer(typeof(T));
+
+			if (Result.defaultSerializer is ObjectSerializer Serializer &&
+				Serializer.HasObjectIdField)
+			{
+				Result.objectIdMemberName = Serializer.ObjectIdMemberName;
+				Result.fieldCount = 1;
+			}
 
 			return Result;
 		}
@@ -1154,7 +1165,61 @@ namespace Waher.Persistence.Files
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return false;
+			if (SortOrder is null)
+				return true;
+
+			int SortLen = SortOrder.Length;
+			if (SortLen == 0)
+				return true;
+
+			if (this.fieldCount < SortLen)
+				return false;
+
+			string s;
+			int FieldIndex = 0;
+			int SortIndex;
+			int NrConstantsFound = 0;
+			bool Ascending;
+
+			for (SortIndex = 0; SortIndex < SortLen; SortIndex++)
+			{
+				s = SortOrder[SortIndex];
+				if (s.StartsWith("-"))
+				{
+					Ascending = false;
+					s = s.Substring(1);
+				}
+				else
+				{
+					Ascending = true;
+
+					if (s.StartsWith("+"))
+						s = s.Substring(1);
+				}
+
+				while (FieldIndex < this.fieldCount)
+				{
+					if (s == this.objectIdMemberName)
+						break;
+					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, this.objectIdMemberName) < 0)
+						return false;
+					else
+					{
+						NrConstantsFound++;
+						FieldIndex++;
+					}
+				}
+
+				if (FieldIndex >= this.fieldCount)
+					return false;
+
+				if (!Ascending)
+					return false;
+
+				FieldIndex++;
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -1166,7 +1231,61 @@ namespace Waher.Persistence.Files
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			return false;
+			if (SortOrder is null)
+				return false;
+
+			int SortLen = SortOrder.Length;
+			if (SortLen == 0)
+				return true;
+
+			if (this.fieldCount < SortLen)
+				return false;
+
+			string s;
+			int FieldIndex = 0;
+			int SortIndex;
+			int NrConstantsFound = 0;
+			bool Ascending;
+
+			for (SortIndex = 0; SortIndex < SortLen; SortIndex++)
+			{
+				s = SortOrder[SortIndex];
+				if (s.StartsWith("-"))
+				{
+					Ascending = false;
+					s = s.Substring(1);
+				}
+				else
+				{
+					Ascending = true;
+
+					if (s.StartsWith("+"))
+						s = s.Substring(1);
+				}
+
+				while (FieldIndex < this.fieldCount)
+				{
+					if (s == this.objectIdMemberName)
+						break;
+					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, this.objectIdMemberName) < 0)
+						return false;
+					else
+					{
+						NrConstantsFound++;
+						FieldIndex++;
+					}
+				}
+
+				if (FieldIndex >= this.fieldCount)
+					return false;
+
+				if (Ascending)
+					return false;
+
+				FieldIndex++;
+			}
+
+			return true;
 		}
 
 		/// <summary>

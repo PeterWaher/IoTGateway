@@ -35,6 +35,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FilesLW.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.MongoDB.Test", "Persistence\Waher.Persistence.MongoDB.Test\Waher.Persistence.MongoDB.Test.csproj", "{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Script", "Script", "{38AE860A-1581-4605-B415-3822A9CDC705}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{911A14A7-3B77-4479-A852-B68DC817107D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Persistence", "Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj", "{60A64053-190A-476A-B113-77D0BA95BD9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Test", "Script\Waher.Script.Test\Waher.Script.Test.csproj", "{382C12E9-EAA0-40CC-8896-563AAB42E0DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +93,18 @@ Global
 		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFDAE580-1CC6-4257-A53A-CBC1F15B770A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{911A14A7-3B77-4479-A852-B68DC817107D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{911A14A7-3B77-4479-A852-B68DC817107D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{911A14A7-3B77-4479-A852-B68DC817107D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{911A14A7-3B77-4479-A852-B68DC817107D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60A64053-190A-476A-B113-77D0BA95BD9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60A64053-190A-476A-B113-77D0BA95BD9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60A64053-190A-476A-B113-77D0BA95BD9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60A64053-190A-476A-B113-77D0BA95BD9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{382C12E9-EAA0-40CC-8896-563AAB42E0DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{382C12E9-EAA0-40CC-8896-563AAB42E0DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{382C12E9-EAA0-40CC-8896-563AAB42E0DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{382C12E9-EAA0-40CC-8896-563AAB42E0DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +112,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F247794C-4F29-49CA-A0DD-B6170A1ED5AB} = {9D9A921B-43BE-4F67-830C-22094925234C}
 		{DC77C67B-99FD-4D30-B160-D61F67F61227} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
+		{911A14A7-3B77-4479-A852-B68DC817107D} = {38AE860A-1581-4605-B415-3822A9CDC705}
+		{60A64053-190A-476A-B113-77D0BA95BD9A} = {38AE860A-1581-4605-B415-3822A9CDC705}
+		{382C12E9-EAA0-40CC-8896-563AAB42E0DB} = {38AE860A-1581-4605-B415-3822A9CDC705}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

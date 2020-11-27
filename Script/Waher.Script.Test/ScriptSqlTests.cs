@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -8,6 +7,7 @@ using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Xml;
@@ -112,7 +112,7 @@ namespace Waher.Script.Test
 			for (RowIndex = 0; RowIndex < NrRows; RowIndex++)
 			{
 				object[] ExpectedRow = ExpectedOutput[RowIndex];
-				ObjectVector Row = M.GetRow(RowIndex) as ObjectVector;
+				IVector Row = M.GetRow(RowIndex);
 
 				Assert.IsNotNull(Row, "Object row vector expected.");
 				Assert.AreEqual(NrColumns = ExpectedRow.Length, Row.Dimension, "Number of columns in response incorrect.");
@@ -121,6 +121,8 @@ namespace Waher.Script.Test
 					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
 			}
 		}
+
+		#region SELECT
 
 		[TestMethod]
 		public void SELECT_Test_01_Orders()
@@ -775,6 +777,50 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
+		public async Task SELECT_Test_59_GroupBy()
+		{
+			await Database.Clear("Collection1");
+
+			this.Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A) from Collection1 group by B",
+				new object[][]
+				{
+					new object[] { 0d, 714264285d },
+					new object[] { 1d, 714278571d },
+					new object[] { 2d, 714292857d },
+					new object[] { 3d, 714307143d },
+					new object[] { 4d, 714321429d },
+					new object[] { 5d, 714235715d },
+					new object[] { 6d, 714250000d }
+				});
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_60_GroupBy_OrderBy()
+		{
+			await Database.Clear("Collection1");
+
+			this.Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A) from Collection1 group by B order by B",
+				new object[][]
+				{
+					new object[] { 0d, 714264285d },
+					new object[] { 1d, 714278571d },
+					new object[] { 2d, 714292857d },
+					new object[] { 3d, 714307143d },
+					new object[] { 4d, 714321429d },
+					new object[] { 5d, 714235715d },
+					new object[] { 6d, 714250000d }
+				});
+		}
+
+		#endregion
+
+		#region INSERT
+
+		[TestMethod]
 		public void INSERT_Test_01_INSERT_VALUES()
 		{
 			this.Test(
@@ -885,10 +931,11 @@ namespace Waher.Script.Test
 				});
 		}
 
+		#endregion
+
 		/* TODO:
 		 *	SELECT
 		 *		UNION	
-		 *		GROUP BY
 		 *		HAVING
 		 *		ORDER BY
 		 *		TOP

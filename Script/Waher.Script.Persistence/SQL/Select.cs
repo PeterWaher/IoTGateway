@@ -128,21 +128,7 @@ namespace Waher.Script.Persistence.SQL
 				foreach (ScriptNode Node in this.groupBy)
 				{
 					if (Node is VariableReference Ref)
-					{
-						bool Found = false;
-
-						foreach (KeyValuePair<VariableReference, bool> P in OrderBy)
-						{
-							if (P.Key.VariableName == Ref.VariableName)
-							{
-								Found = true;
-								break;
-							}
-						}
-
-						if (!Found)
-							OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, true));
-					}
+						this.AddIfNotFound(Ref, true, OrderBy);
 					else
 					{
 						CalculatedOrder = true;
@@ -156,7 +142,7 @@ namespace Waher.Script.Persistence.SQL
 				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
 				{
 					if (Node.Key is VariableReference Ref)
-						OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, Node.Value));
+						this.AddIfNotFound(Ref, Node.Value, OrderBy);
 					else
 					{
 						CalculatedOrder = true;
@@ -310,6 +296,19 @@ namespace Waher.Script.Persistence.SQL
 			Result.ColumnNames = Names;
 
 			return Result;
+		}
+
+		private void AddIfNotFound(VariableReference Ref, bool Ascending, List<KeyValuePair<VariableReference, bool>> OrderBy)
+		{
+			string Name = Ref.VariableName;
+
+			foreach (KeyValuePair<VariableReference, bool> P in OrderBy)
+			{
+				if (P.Key.VariableName == Name)
+					return;
+			}
+
+			OrderBy.Add(new KeyValuePair<VariableReference, bool>(Ref, Ascending));
 		}
 
 		/// <summary>

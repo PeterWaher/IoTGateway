@@ -877,7 +877,7 @@ The following table lists available scalar functions:
 | `Round(z)`   | Round `z` up or down to closest integer.  | Asserts `z` is an Integer.                              | `Round(pi)`       |
 | `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | Asserts `z` is -1, 0 or 1.                              | `Sign(pi)`        |
 | `Str(x)`     | Alias for `String(x)`.                    | Asserts `z` is a string.                                | `Str(100)`        |
-| `String(x)`  | Converts `x` to a string.                 | Asserts `z` is a string.                                | String(100)`      |
+| `String(x)`  | Converts `x` to a string.                 | Asserts `z` is a string.                                | `String(100)`     |
 
 ### Complex Functions
 

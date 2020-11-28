@@ -4,6 +4,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.DNS.Communication;
+using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -160,6 +162,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_16_Resolve_Mail_Exchange_5()
 		{
 			await this.TestExchange("littlesister.se");
@@ -213,6 +216,27 @@ namespace Waher.Networking.DNS.Test
 			string[] Text = await DnsResolver.LookupText("cybercity.online");
 			foreach (string Row in Text)
 				Console.Out.WriteLine(Row);
+		}
+
+		[TestMethod]
+		public async Task Test_23_Query()
+		{
+			DnsResponse Response;
+
+			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.A, QCLASS.IN);
+			Console.Out.WriteLine(Response.ToString());
+
+			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.MX, QCLASS.IN);
+			Console.Out.WriteLine(Response.ToString());
+
+			Response = await DnsResolver.Query("lab.tagroot.io", QTYPE.TXT, QCLASS.IN);
+			Console.Out.WriteLine(Response.ToString());
+
+			Response = await DnsResolver.Query("_xmpp-client._tcp.lab.tagroot.io", QTYPE.SRV, QCLASS.IN);
+			Console.Out.WriteLine(Response.ToString());
+
+			Response = await DnsResolver.Query("_xmpp-server._tcp.lab.tagroot.io", QTYPE.SRV, QCLASS.IN);
+			Console.Out.WriteLine(Response.ToString());
 		}
 	}
 }

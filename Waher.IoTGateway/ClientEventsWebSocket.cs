@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
@@ -51,7 +52,18 @@ namespace Waher.IoTGateway
 								TabID = TabID
 							};
 
-							Task _ = ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
+							Task.Run(async () =>
+							{
+								try
+								{
+									await ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+							});
+
 							ClientEvents.PushEvent(new string[] { TabID }, "CheckServerInstance", serverId, false);
 						}
 						break;

@@ -31,7 +31,7 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex FromUpdateObject = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]<UpdateObject>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GatewayStartup = new Regex(@"Waher[.]IoTGateway[.]Gateway[.+]<Start>\w*[.]\w*",
+		internal static readonly Regex GatewayStartup = new Regex(@"Waher[.]IoTGateway[.]Gateway([.]Start|[.+]<Start>\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachment = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);

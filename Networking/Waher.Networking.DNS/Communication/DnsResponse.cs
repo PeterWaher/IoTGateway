@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence.Attributes;
@@ -115,5 +116,45 @@ namespace Waher.Networking.DNS.Communication
 			get => this.raw;
 			set => this.raw = value;
 		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Name: ");
+			sb.AppendLine(this.name);
+			sb.Append("Type: ");
+			sb.AppendLine(this.type.ToString());
+			sb.Append("Class: ");
+			sb.AppendLine(this._class.ToString());
+			sb.Append("Expires: ");
+			sb.AppendLine(this.expires.ToString());
+
+			Append(sb, "Answer", this.answer);
+			Append(sb, "Authority", this.authority);
+			Append(sb, "Additional", this.additional);
+
+			return sb.ToString();
+		}
+
+		private static void Append(StringBuilder sb, string Label, ResourceRecord[] Records)
+		{
+			if ((Records?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine(Label);
+				sb.AppendLine(new string('=', Label.Length + 3));
+
+				foreach (ResourceRecord Rec in Records)
+				{
+					sb.AppendLine();
+					sb.AppendLine(Rec.ToString());
+				}
+			}
+		}
+
 	}
 }

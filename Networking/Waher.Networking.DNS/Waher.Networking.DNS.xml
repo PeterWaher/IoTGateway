@@ -333,6 +333,11 @@
             Raw DNS message
             </summary>
         </member>
+        <member name="M:Waher.Networking.DNS.Communication.DnsResponse.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
             Implements a DNS UDP-based client.

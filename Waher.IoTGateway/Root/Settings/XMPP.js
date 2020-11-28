@@ -124,9 +124,11 @@ function RandomizePassword()
                 Input.type = "text";
 
                 Input = document.getElementById("Password2");
-
-                Input.value = xhttp.responseText;
-                Input.type = "text";
+                if (Input)
+                {
+                    Input.value = xhttp.responseText;
+                    Input.type = "text";
+                }
             }
             else
                 ShowError(xhttp);
@@ -169,7 +171,7 @@ function ShowStatus(data)
     if (data.id)
     {
         var P = document.getElementById(data.id);
-        if (P != null)
+        if (P)
         {
             P.innerText = data.message;
             return;

@@ -834,7 +834,7 @@ namespace Waher.Networking.XMPP
 		internal async Task ConnectionError(Exception ex)
 		{
 			this.State = XmppState.Error;
-		
+
 			ExceptionEventHandler h = this.OnConnectionError;
 			if (!(h is null))
 			{
@@ -1142,7 +1142,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		private void CleanUp(bool RaiseEvent)
-		{ 
+		{
 			this.State = XmppState.Offline;
 
 			this.authenticationMechanisms?.Clear();
@@ -4889,7 +4889,6 @@ namespace Waher.Networking.XMPP
 				return "<nick xmlns='http://jabber.org/protocol/nick'>" + XML.Encode(NickName) + "</nick>";
 		}
 
-
 		/// <summary>
 		/// Requests subscription of presence information from a contact.
 		/// </summary>
@@ -5072,6 +5071,109 @@ namespace Waher.Networking.XMPP
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
+		}
+
+		/// <summary>
+		/// Sends a directed presence stanza to a recipient.
+		/// </summary>
+		/// <param name="To">JID of recipient.</param>
+		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
+		public void SendDirectedPresence(string To, string CustomXml)
+		{
+			this.SendDirectedPresence(To, CustomXml, null, null);
+		}
+
+		/// <summary>
+		/// Sends a directed presence stanza to a recipient.
+		/// </summary>
+		/// <param name="To">JID of recipient.</param>
+		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
+		/// <param name="Callback">Method to call when a response is returned.</param>
+		/// <param name="State">State object, to pass on to callback method.</param>
+		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State)
+		{
+			this.SendDirectedPresence(To, CustomXml, Callback, State,
+				this.defaultRetryTimeout, this.defaultNrRetries,
+				this.defaultDropOff, this.defaultMaxRetryTimeout);
+		}
+
+		/// <summary>
+		/// Sends a directed presence stanza to a recipient.
+		/// </summary>
+		/// <param name="To">JID of recipient.</param>
+		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
+		/// <param name="Callback">Method to call when a response is returned.</param>
+		/// <param name="State">State object, to pass on to callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+		{
+			PendingRequest PendingRequest;
+			DateTime TP;
+			uint SeqNr;
+
+			lock (this.synchObject)
+			{
+				do
+				{
+					SeqNr = this.seqnr++;
+				}
+				while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
+				if (!(Callback is null))
+				{
+					PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, To);
+					TP = PendingRequest.Timeout;
+
+					while (this.pendingRequestsByTimeout.ContainsKey(TP))
+						TP = TP.AddTicks(this.gen.Next(1, 10));
+
+					PendingRequest.Timeout = TP;
+
+					this.pendingRequestsBySeqNr[SeqNr] = PendingRequest;
+					this.pendingRequestsByTimeout[TP] = PendingRequest;
+				}
+			}
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<presence id='");
+			Xml.Append(SeqNr.ToString());
+			Xml.Append("' to='");
+			Xml.Append(XML.Encode(To));
+			Xml.Append("'");
+			if (string.IsNullOrEmpty(CustomXml))
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append(">");
+				Xml.Append(CustomXml);
+				Xml.Append("</presence>");
+			}
+
+			this.BeginWrite(Xml.ToString(), null);
+		}
+
+		/// <summary>
+		/// Sends a directed presence stanza to a recipient.
+		/// </summary>
+		/// <param name="To">JID of recipient.</param>
+		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
+		public Task SendDirectedPresenceAsync(string To, string CustomXml)
+		{
+			TaskCompletionSource<PresenceEventArgs> Query = new TaskCompletionSource<PresenceEventArgs>();
+
+			this.SendDirectedPresence(To, CustomXml, (sender, e) =>
+			{
+				Query.SetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Query.Task;
 		}
 
 		private Task RosterPushHandler(object Sender, IqEventArgs e)
@@ -5445,8 +5547,8 @@ namespace Waher.Networking.XMPP
 							Xml.Append(MsgId);
 							Xml.Append("'/>");
 
-							this.SendIqSet(e.From, Xml.ToString(), 
-								async (sender, e2) => await this.CallDeliveryCallback(DeliveryCallback, State, e2.Ok), 
+							this.SendIqSet(e.From, Xml.ToString(),
+								async (sender, e2) => await this.CallDeliveryCallback(DeliveryCallback, State, e2.Ok),
 								null, 5000, int.MaxValue, true, 3600000);
 							return;
 						}
@@ -5912,6 +6014,42 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Performs an asynchronous service discovery request
 		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceDiscoveryEventArgs> ServiceDiscoveryAsync(string To)
+		{
+			return this.ServiceDiscoveryAsync(null, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service discovery request
+		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceDiscoveryEventArgs> ServiceDiscoveryAsync(string To, string Node)
+		{
+			return this.ServiceDiscoveryAsync(null, To, Node);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceDiscoveryEventArgs> ServiceDiscoveryAsync(IEndToEndEncryption E2eEncryption, string To)
+		{
+			return ServiceDiscoveryAsync(E2eEncryption, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service discovery request
+		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
 		/// <param name="To">Destination address.</param>
@@ -6136,6 +6274,42 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Performs an asynchronous service items discovery request
 		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(string To)
+		{
+			return ServiceItemsDiscoveryAsync(null, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(IEndToEndEncryption E2eEncryption, string To)
+		{
+			return this.ServiceItemsDiscoveryAsync(E2eEncryption, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service items discovery request
+		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(string To, string Node)
+		{
+			return ServiceItemsDiscoveryAsync(null, To, Node);
+		}
+
+		/// <summary>
+		/// Performs an asynchronous service items discovery request
+		/// </summary>
 		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
 		/// cannot be established, the request is sent normally.</param>
 		/// <param name="To">Destination address.</param>
@@ -6298,6 +6472,17 @@ namespace Waher.Networking.XMPP
 				throw new TimeoutException();
 
 			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous software version request
+		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <returns>Version information.</returns>
+		public Task<SoftwareVersionEventArgs> SoftwareVersionAsync(string To)
+		{
+			return this.SoftwareVersionAsync(null, To);
 		}
 
 		/// <summary>
@@ -6518,6 +6703,16 @@ namespace Waher.Networking.XMPP
 				throw new TimeoutException();
 
 			return Result.Result;
+		}
+
+		/// <summary>
+		/// Performs an asynchronous search form request
+		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public Task<SearchFormEventArgs> SearchFormAsync(string To)
+		{
+			return this.SearchFormAsync(null, To);
 		}
 
 		/// <summary>

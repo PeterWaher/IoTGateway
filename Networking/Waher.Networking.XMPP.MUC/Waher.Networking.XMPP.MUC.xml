@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.MUC</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.MUC.MultiUserChatClient">
+            <summary>
+            Client managing communication with a Multi-User-Chat service.
+            https://xmpp.org/extensions/xep-0045.html
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.Namespace">
+            <summary>
+            http://jabber.org/protocol/muc
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
+            <summary>
+            Client managing communication with a Multi-User-Chat service.
+            https://xmpp.org/extensions/xep-0045.html
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+            <param name="ComponentAddress">Address to the Publish/Subscribe component.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MultiUserChatClient.ComponentAddress">
+            <summary>
+            Publish/Subscribe component address.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MultiUserChatClient.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoom(System.String,System.String,System.String)">
+            <summary>
+            Enter a chatroom.
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+        </member>
+    </members>
+</doc>

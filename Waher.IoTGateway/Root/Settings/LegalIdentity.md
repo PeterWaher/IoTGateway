@@ -345,7 +345,14 @@ more information about their approval procedure.
 	value="((AlternativeField.Value))"/>
 <button type="button" class="negButtonSm" onclick="RemoveAltField('((Index))')">Remove</button>
 </p>
-[[;Index++))}}
+[[;Index++)) else if DomainConfiguration.Instance.UseDomainName and !empty(DomainConfiguration.Instance.Domain) then (]]
+<p>
+<label for="AltFieldName0">Alternative Field:</label>  
+<input id="AltFieldName0" name="NameAltField0" type="text" style="width:20em" title="Alternative field name." value="DOMAIN"/>
+<input id="AltFieldValue0" name="AltFieldValue0" type="text" style="width:20em" title="Alternative field value." value="((DomainConfiguration.Instance.Domain))"/>
+<button type="button" class="negButtonSm" onclick="RemoveAltField('0')">Remove</button>
+</p>
+[[)}}
 
 <p>
 <label for="AltFieldName">Alternative Field:</label>  

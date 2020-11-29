@@ -136,11 +136,11 @@ function GetLegalIdentityReq()
     return Req;
 }
 
-function ApplicationOK()
+function ApplicationOK(Empty)
 {
     document.getElementById("ApplyError").style.display = "none";
     document.getElementById("NextMessage").style.display = "block";
-    document.getElementById("NextButton").style.display = "block";
+    document.getElementById("NextButton").style.display = "inline-block";
 }
 
 function ApplicationError(Message)

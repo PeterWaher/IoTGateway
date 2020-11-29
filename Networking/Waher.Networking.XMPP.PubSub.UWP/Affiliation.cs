@@ -9,9 +9,9 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	public class Affiliation
     {
-		private string node;
-		private string jid;
-		private AffiliationStatus status;
+		private readonly string node;
+		private readonly string jid;
+		private readonly AffiliationStatus status;
 
 		/// <summary>
 		/// Contains information about a user affiliation.

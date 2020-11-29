@@ -9,10 +9,10 @@ namespace Waher.Networking.XMPP.PubSub
 	/// </summary>
 	public class Subscription
     {
-		private string node;
-		private string jid;
-		private string subscriptionId;
-		private NodeSubscriptionStatus status;
+		private readonly string node;
+		private readonly string jid;
+		private readonly string subscriptionId;
+		private readonly NodeSubscriptionStatus status;
 
 		/// <summary>
 		/// Contains information about a subscription.

@@ -314,7 +314,7 @@ namespace Waher.Networking.XMPP.MUC
 					{
 						if (N is XmlElement E && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 						{
-							Form = new DataForm(this.client, e.FirstElement,
+							Form = new DataForm(this.client, E,
 								(sender2, Form2) =>
 								{
 									StringBuilder Xml2 = new StringBuilder();

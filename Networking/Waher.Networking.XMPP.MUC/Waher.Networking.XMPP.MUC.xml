@@ -4,15 +4,245 @@
         <name>Waher.Networking.XMPP.MUC</name>
     </assembly>
     <members>
+        <member name="T:Waher.Networking.XMPP.MUC.Affiliation">
+            <summary>
+            Affiliation enumeration
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Affiliation.Owner">
+            <summary>
+            Owner of room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Affiliation.Admin">
+            <summary>
+            Administrator of room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Affiliation.Member">
+            <summary>
+            Member of room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Affiliation.Outcast">
+            <summary>
+            Outcast
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Affiliation.None">
+            <summary>
+            No affiliation
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.Role">
+            <summary>
+            Role enumeration
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Role.Moderator">
+            <summary>
+            Room moderator
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Role.Participant">
+            <summary>
+            Room participant
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Role.Visitor">
+            <summary>
+            Room visitor
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.Role.None">
+            <summary>
+            No role
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync">
+            <summary>
+            Delegate for User Presence events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.UserPresenceEventArgs">
+            <summary>
+            Event arguments for user presence events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.#ctor(Waher.Networking.XMPP.PresenceEventArgs,System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,Waher.Networking.XMPP.MUC.Role,System.String,Waher.Networking.XMPP.MUC.MucStatus[])">
+            <summary>
+            Event arguments for user presence events.
+            </summary>
+            <param name="e">Presence event arguments</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="UserNick">Nick-Name of user sending presence.</param>
+            <param name="Affiliation">User affiliation.</param>
+            <param name="Role">User role.</param>
+            <param name="FullJid">Full JID, if privileges allow.</param>
+            <param name="Status">Status codes.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.RoomId">
+            <summary>
+            Room ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Domain">
+            <summary>
+            Domain hosting the room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.NickName">
+            <summary>
+            Nick-Name of user sending presence.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.FullJid">
+            <summary>
+            Full JID, if privileges allow (null otherwise).
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Affiliation">
+            <summary>
+            User Affiliation in room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Role">
+            <summary>
+            User role in room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.MucStatus">
+            <summary>
+            Any status codes informing about changes to status.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.MucStatus">
+            <summary>
+            MUC Status, as defined in https://xmpp.org/registrar/mucstatus.html
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.FullJidVisisble">
+            <summary>
+            Inform user that any occupant is allowed to see the user's full JID
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.AffiliationChanged">
+            <summary>
+            Inform user that his or her affiliation changed while not in the room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.ShowsUnavailableMembers">
+            <summary>
+            Inform occupants that room now shows unavailable members
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.DoesNotShowUnavailableMembers">
+            <summary>
+            Inform occupants that room now does not show unavailable members
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.NonPrivacyRelatedConfigurationChange">
+            <summary>
+            Inform occupants that a non-privacy-related room configuration change has occurred
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.OwnPresence">
+            <summary>
+            Inform user that presence refers to one of its own room occupants
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.LoggingEnabled">
+            <summary>
+            Inform occupants that room logging is now enabled
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.LoggingDisabled">
+            <summary>
+            Inform occupants that room logging is now disabled
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RoomNonAnonymous">
+            <summary>
+            Inform occupants that the room is now non-anonymous
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RoomSemiAnonymous">
+            <summary>
+            Inform occupants that the room is now semi-anonymous
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RoomAnonymous">
+            <summary>
+            Inform occupants that the room is now fully-anonymous
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.Created">
+            <summary>
+            Inform user that a new room has been created
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.NickModified">
+            <summary>
+            Inform user that the service has assigned or modified the occupant's roomnick
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.Banned">
+            <summary>
+            Inform user that he or she has been banned from the room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.NewRoomNickName">
+            <summary>
+            Inform all occupants of new room nickname
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.Kicked">
+            <summary>
+            Inform user that he or she has been kicked from the room
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RemovedDueToAffiliationChange">
+            <summary>
+            Inform user that he or she is being removed from the room because of an affiliation change
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RemovedDueToNonMembership">
+            <summary>
+            Inform user that he or she is being removed from the room because the room has been changed to members-only and the user is not a member
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RemovedDueToSystemShutdown">
+            <summary>
+            Inform user that he or she is being removed from the room because of a system shutdown
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.MultiUserChatClient">
             <summary>
             Client managing communication with a Multi-User-Chat service.
             https://xmpp.org/extensions/xep-0045.html
             </summary>
         </member>
-        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.Namespace">
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.NamespaceMuc">
             <summary>
             http://jabber.org/protocol/muc
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.NamespaceMucUser">
+            <summary>
+            http://jabber.org/protocol/muc#user
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.NamespaceMucAdmin">
+            <summary>
+            http://jabber.org/protocol/muc#admin
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.NamespaceMucOwner">
+            <summary>
+            http://jabber.org/protocol/muc#owner
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
@@ -38,13 +268,83 @@
             Implemented extensions.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoom(System.String,System.String,System.String)">
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.UserPresence">
+            <summary>
+            Event raised when user presence is received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoom(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Enter a chatroom.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoomAsync(System.String,System.String,System.String)">
             <summary>
             Enter a chatroom.
             </summary>
             <param name="RoomName">Room name.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="NickName">Nickname to use in the chat room.</param>
+            <returns>Room entry response.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.CreateInstantRoom(System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Creates an instant room (with default settings).
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.CreateInstantRoomAsync(System.String,System.String)">
+            <summary>
+            Creates an instant room (with default settings).
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfiguration(System.String,System.String,Waher.Networking.XMPP.DataForms.DataFormEventHandler,System.Object)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfiguration(System.String,System.String,Waher.Networking.XMPP.DataForms.DataFormEventHandler,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfigurationAsync(System.String,System.String)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <returns>Configuration Form, if found, or null if not supported.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfigurationAsync(System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomName">Room name.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+            <param name="State">State object to pass on to callback method.</param>
+            <returns>Configuration Form, if found, or null if not supported.</returns>
         </member>
     </members>
 </doc>

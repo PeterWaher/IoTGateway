@@ -2286,108 +2286,134 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>> Handlers = null;
-				PresenceEventHandlerAsync h;
+				PresenceEventHandlerAsync Callback;
 				RosterItem Item;
 				string Key;
+				object State = null;
+				string Id = e.Id;
+				string FromBareJid = e.FromBareJID;
 
-				lock (this.synchObject)
+				if (uint.TryParse(Id, out uint SeqNr))
 				{
-					foreach (XmlElement E in e.Presence.ChildNodes)
+					lock (this.synchObject)
 					{
-						Key = E.LocalName + " " + E.NamespaceURI;
-						if (this.presenceHandlers.TryGetValue(Key, out h))
+						if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
 						{
-							if (Handlers is null)
-								Handlers = new LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>>();
+							Callback = Rec.PresenceCallback;
+							State = Rec.State;
 
-							Handlers.AddLast(new KeyValuePair<PresenceEventHandlerAsync, XmlElement>(h, E));
+							this.pendingRequestsBySeqNr.Remove(SeqNr);
+							this.pendingRequestsByTimeout.Remove(Rec.Timeout);
+						}
+						else
+							Callback = null;
+					}
+				}
+				else
+					Callback = null;
+
+				if (Callback is null)
+				{
+					lock (this.synchObject)
+					{
+						foreach (XmlElement E in e.Presence.ChildNodes)
+						{
+							Key = E.LocalName + " " + E.NamespaceURI;
+							if (this.presenceHandlers.TryGetValue(Key, out Callback))
+							{
+								if (Handlers is null)
+									Handlers = new LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>>();
+
+								Handlers.AddLast(new KeyValuePair<PresenceEventHandlerAsync, XmlElement>(Callback, E));
+							}
+						}
+					}
+
+					switch (e.Type)
+					{
+						case PresenceType.Available:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							e.UpdateLastPresence = true;
+
+							lock (this.roster)
+							{
+								if (this.roster.TryGetValue(e.FromBareJID, out Item))
+									Item.PresenceReceived(this, e);
+							}
+							break;
+
+						case PresenceType.Unavailable:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+
+							lock (this.roster)
+							{
+								if (this.roster.TryGetValue(e.FromBareJID, out Item))
+									Item.PresenceReceived(this, e);
+							}
+							break;
+
+						case PresenceType.Error:
+						case PresenceType.Probe:
+						default:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							break;
+
+						case PresenceType.Subscribe:
+							lock (this.subscriptionRequests)
+							{
+								this.subscriptionRequests[e.FromBareJID] = e;
+							}
+
+							this.Information("OnPresenceSubscribe()");
+							Callback = this.OnPresenceSubscribe;
+							break;
+
+						case PresenceType.Subscribed:
+							this.Information("OnPresenceSubscribed()");
+							Callback = this.OnPresenceSubscribed;
+							break;
+
+						case PresenceType.Unsubscribe:
+							this.Information("OnPresenceUnsubscribe()");
+							Callback = this.OnPresenceUnsubscribe;
+							break;
+
+						case PresenceType.Unsubscribed:
+							this.Information("OnPresenceUnsubscribed()");
+							Callback = this.OnPresenceUnsubscribed;
+							break;
+					}
+
+					if (!(Handlers is null))
+					{
+						foreach (KeyValuePair<PresenceEventHandlerAsync, XmlElement> P in Handlers)
+						{
+							e.Content = P.Value;
+							this.Information(P.Key.GetMethodInfo().Name);
+
+							try
+							{
+								await P.Key(this, e);
+							}
+							catch (Exception ex)
+							{
+								this.Exception(ex);
+							}
 						}
 					}
 				}
 
-				switch (e.Type)
-				{
-					case PresenceType.Available:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-						e.UpdateLastPresence = true;
-
-						lock (this.roster)
-						{
-							if (this.roster.TryGetValue(e.FromBareJID, out Item))
-								Item.PresenceReceived(this, e);
-						}
-						break;
-
-					case PresenceType.Unavailable:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-
-						lock (this.roster)
-						{
-							if (this.roster.TryGetValue(e.FromBareJID, out Item))
-								Item.PresenceReceived(this, e);
-						}
-						break;
-
-					case PresenceType.Error:
-					case PresenceType.Probe:
-					default:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-						break;
-
-					case PresenceType.Subscribe:
-						lock (this.subscriptionRequests)
-						{
-							this.subscriptionRequests[e.FromBareJID] = e;
-						}
-
-						this.Information("OnPresenceSubscribe()");
-						h = this.OnPresenceSubscribe;
-						break;
-
-					case PresenceType.Subscribed:
-						this.Information("OnPresenceSubscribed()");
-						h = this.OnPresenceSubscribed;
-						break;
-
-					case PresenceType.Unsubscribe:
-						this.Information("OnPresenceUnsubscribe()");
-						h = this.OnPresenceUnsubscribe;
-						break;
-
-					case PresenceType.Unsubscribed:
-						this.Information("OnPresenceUnsubscribed()");
-						h = this.OnPresenceUnsubscribed;
-						break;
-				}
-
-				if (!(Handlers is null))
-				{
-					foreach (KeyValuePair<PresenceEventHandlerAsync, XmlElement> P in Handlers)
-					{
-						e.Content = P.Value;
-						this.Information(P.Key.GetMethodInfo().Name);
-
-						try
-						{
-							await P.Key(this, e);
-						}
-						catch (Exception ex)
-						{
-							this.Exception(ex);
-						}
-					}
-				}
-
-				if (!(h is null))
+				if (!(Callback is null))
 				{
 					e.Content = null;
+					e.State = State;
 
 					try
 					{
-						await h(this, e);
+						await Callback(this, e);
 					}
 					catch (Exception ex)
 					{

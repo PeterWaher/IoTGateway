@@ -115,10 +115,11 @@ namespace Waher.Networking.XMPP
 		private readonly string entityCapabilityHashFunction = null;
 		private readonly int errorCode;
 		private readonly sbyte priority;
-		private readonly bool ok;
 		private readonly bool hasEntityCapabilities = false;
+		private bool ok;
 		private bool updateLastPresence = false;
 		private bool testing = false;
+		private object state = null;
 
 		internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
 			: this(Client, null, Presence)
@@ -156,6 +157,7 @@ namespace Waher.Networking.XMPP
 			this.priority = e.priority;
 			this.ok = e.ok;
 			this.received = e.received;
+			this.state = e.state;
 		}
 
 		private PresenceEventArgs(XmppClient Client, XmppComponent Component, XmlElement Presence)
@@ -387,6 +389,15 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// State object, if event a callback from a directed presence request.
+		/// </summary>
+		public object State
+		{
+			get { return this.state; }
+			set { this.state = value; }
+		}
+
+		/// <summary>
 		/// If contact is online.
 		/// </summary>
 		public bool IsOnline
@@ -408,7 +419,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).
 		/// </summary>
-		public bool Ok { get { return this.ok; } }
+		public bool Ok
+		{
+			get { return this.ok; }
+			set { this.ok = value; }
+		}
 
 		/// <summary>
 		/// Error Code
@@ -538,7 +553,7 @@ namespace Waher.Networking.XMPP
 		/// NickName, if available, as defined in XEP-0172. Can be sent in presence subscription requests, as an informal way to
 		/// let the recipient know who the sender is. If not found, null is returned.
 		/// </summary>
-		public string NickName
+		public virtual string NickName
 		{
 			get
 			{

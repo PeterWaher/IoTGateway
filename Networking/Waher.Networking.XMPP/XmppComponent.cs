@@ -319,11 +319,8 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Offline;
 
-			if (!(this.pendingPresenceRequests is null))
-			{
-				this.pendingPresenceRequests.Dispose();
-				this.pendingPresenceRequests = null;
-			}
+			this.pendingPresenceRequests?.Dispose();
+			this.pendingPresenceRequests = null;
 
 			if (!(this.outputQueue is null))
 			{

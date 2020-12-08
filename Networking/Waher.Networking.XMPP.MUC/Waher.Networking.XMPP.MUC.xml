@@ -345,7 +345,7 @@
             <summary>
             Enter a chat room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="NickName">Nickname to use in the chat room.</param>
             <returns>Room entry response.</returns>
@@ -364,7 +364,7 @@
             <summary>
             Leave a chat room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="NickName">Nickname to use in the chat room.</param>
             <returns>Room entry response.</returns>
@@ -373,7 +373,7 @@
             <summary>
             Creates an instant room (with default settings).
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
@@ -382,7 +382,7 @@
             <summary>
             Creates an instant room (with default settings).
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <returns>Response to request.</returns>
         </member>
@@ -390,7 +390,7 @@
             <summary>
             Gets the configuration form for a room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
@@ -399,7 +399,7 @@
             <summary>
             Gets the configuration form for a room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
@@ -409,7 +409,7 @@
             <summary>
             Gets the configuration form for a room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <returns>Configuration Form, if found, or null if not supported.</returns>
         </member>
@@ -417,7 +417,7 @@
             <summary>
             Gets the configuration form for a room.
             </summary>
-            <param name="RoomName">Room name.</param>
+            <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
             <param name="State">State object to pass on to callback method.</param>
@@ -532,6 +532,187 @@
             <summary>
             Event raised when a group chat message from a MUC room occupant was received.
             </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.RoomSubject">
+            <summary>
+            Event raised when a room subject message was received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ChangeRoomSubject(System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Subject">Room subject.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ChangeRoomSubject(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Subject">Room subject.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendPrivateMessage(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Message">Message body.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendPrivateMessage(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendPrivateMessage(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendPrivateMessage(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+            <param name="ParentThreadId">Parent Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomPrivateMessage(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Xml">Message body.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomPrivateMessage(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomPrivateMessage(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomPrivateMessage(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple private message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="NickName">Nick-name of recipient.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+            <param name="ParentThreadId">Parent Thread ID</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.PrivateMessageReceived">
+            <summary>
+            Event raised when a group chat message from a MUC room occupant was received.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ChangeNickName(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Changes to a new nick-name.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ChangeNickNameAsync(System.String,System.String,System.String)">
+            <summary>
+            Changes to a new nick-name.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+            <returns>Room entry response.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetPresence(System.String,System.String,System.String,Waher.Networking.XMPP.Availability,Waher.Networking.XMPP.PresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Sets the presence of the occupant in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname of the occupant.</param>
+            <param name="Availability">Occupant availability.</param>
+            <param name="Callback">Method to call when stanza has been sent.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetPresenceAsync(System.String,System.String,System.String,Waher.Networking.XMPP.Availability)">
+            <summary>
+            Sets the presence of the occupant in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname of the occupant.</param>
+            <param name="Availability">Occupant availability.</param>
+            <returns>Task object that finishes when stanza has been sent.</returns>
         </member>
     </members>
 </doc>

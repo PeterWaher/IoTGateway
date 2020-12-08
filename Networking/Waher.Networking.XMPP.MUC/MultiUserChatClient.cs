@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.MUC
@@ -48,6 +49,8 @@ namespace Waher.Networking.XMPP.MUC
 			this.componentAddress = ComponentAddress;
 
 			this.client.RegisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
+
+			this.client.OnGroupChatMessage += Client_OnGroupChatMessage;
 		}
 
 		/// <summary>
@@ -56,6 +59,8 @@ namespace Waher.Networking.XMPP.MUC
 		public override void Dispose()
 		{
 			this.client.UnregisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
+
+			this.client.OnGroupChatMessage -= Client_OnGroupChatMessage;
 
 			base.Dispose();
 		}
@@ -88,7 +93,7 @@ namespace Waher.Networking.XMPP.MUC
 
 		private static bool TryParseUserPresence(PresenceEventArgs e, out UserPresenceEventArgs Result)
 		{
-			if (!TryParseOccupantJid(e.From, out string RoomId, out string Domain, out string NickName))
+			if (!TryParseOccupantJid(e.From, true, out string RoomId, out string Domain, out string NickName))
 			{
 				Result = null;
 				return false;
@@ -160,18 +165,25 @@ namespace Waher.Networking.XMPP.MUC
 			}
 		}
 
-		private static bool TryParseOccupantJid(string OccupantJid, out string RoomId,
-			out string Domain, out string NickName)
+		private static bool TryParseOccupantJid(string OccupantJid, bool RequireNick,
+			out string RoomId, out string Domain, out string NickName)
 		{
 			int i = OccupantJid.IndexOf('/');
 			if (i < 0)
 			{
-				RoomId = Domain = NickName = null;
-				return false;
+				if (RequireNick)
+				{
+					RoomId = Domain = NickName = null;
+					return false;
+				}
+				else
+					NickName = string.Empty;
 			}
-
-			NickName = OccupantJid.Substring(i + 1);
-			OccupantJid = OccupantJid.Substring(0, i);
+			else
+			{
+				NickName = OccupantJid.Substring(i + 1);
+				OccupantJid = OccupantJid.Substring(0, i);
+			}
 
 			i = OccupantJid.IndexOf('@');
 			if (i < 0)
@@ -401,6 +413,169 @@ namespace Waher.Networking.XMPP.MUC
 			return Result.Task;
 		}
 
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Message">Message body.</param>
+		public void SendGroupChatMessage(string RoomID, string Domain, string Message)
+		{
+			this.SendGroupChatMessage(RoomID, Domain, Message, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Message">Message body.</param>
+		/// <param name="Language">Language</param>
+		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language)
+		{
+			this.SendGroupChatMessage(RoomID, Domain, Message, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Message">Message body.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language, string ThreadId)
+		{
+			this.SendGroupChatMessage(RoomID, Domain, Message, Language, ThreadId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Message">Message body.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language, string ThreadId, string ParentThreadId)
+		{
+			this.client.SendMessage(MessageType.GroupChat, RoomID + "@" + Domain,
+				string.Empty, Message, string.Empty, Language, ThreadId, ParentThreadId);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Xml">Message body.</param>
+		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml)
+		{
+			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, string.Empty, 
+				string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Xml">Message body.</param>
+		/// <param name="Language">Language</param>
+		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml, string Language)
+		{
+			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Xml">Message body.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml, string Language, string ThreadId)
+		{
+			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, Language, ThreadId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple group chat message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="Xml">Message body.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SendCustomGroupChatMessage(string RoomID, string Domain, 
+			string Xml, string Language, string ThreadId, string ParentThreadId)
+		{
+			this.client.SendMessage(MessageType.GroupChat, RoomID + "@" + Domain,
+				 Xml, string.Empty, string.Empty, Language, ThreadId, ParentThreadId);
+		}
+
+		private Task Client_OnGroupChatMessage(object Sender, MessageEventArgs e)
+		{
+			if (!TryParseOccupantJid(e.From, false, out string RoomId, out string Domain, out string NickName))
+				return Task.CompletedTask;
+
+			try
+			{
+				if (string.IsNullOrEmpty(NickName))
+				{
+					RoomMessageEventArgs e2 = new RoomMessageEventArgs(e, RoomId, Domain);
+					this.RoomMessage?.Invoke(this, e2);
+				}
+				else
+				{
+					RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
+					this.RoomOccupantMessage?.Invoke(this, e2);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Event raised when a group chat message from a MUC room was received.
+		/// </summary>
+		public event RoomMessageEventHandler RoomMessage;
+
+		/// <summary>
+		/// Event raised when a group chat message from a MUC room occupant was received.
+		/// </summary>
+		public event RoomOccupantMessageEventHandler RoomOccupantMessage;
 
 	}
 }

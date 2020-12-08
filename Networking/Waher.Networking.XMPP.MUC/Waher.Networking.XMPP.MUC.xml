@@ -59,6 +59,63 @@
             No role
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomMessageEventHandler">
+            <summary>
+            Delegate for MUC Room event handlers.
+            </summary>
+            <param name="Sender"></param>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomMessageEventArgs">
+            <summary>
+            Message from a MUC room.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomMessageEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,System.String,System.String)">
+            <summary>
+            Message from a MUC room.
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomMessageEventArgs.RoomId">
+            <summary>
+            Room ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomMessageEventArgs.Domain">
+            <summary>
+            Domain hosting the room.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomOccupantMessageEventHandler">
+            <summary>
+            Delegate for MUC Room occupant event handlers.
+            </summary>
+            <param name="Sender"></param>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomOccupantMessageEventArgs">
+            <summary>
+            Message from a MUC room occupant.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomOccupantMessageEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,System.String,System.String,System.String)">
+            <summary>
+            Message from a MUC room occupant.
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomOccupantMessageEventArgs.NickName">
+            <summary>
+            Nick-name of occupant.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync">
             <summary>
             Delegate for User Presence events.
@@ -345,6 +402,116 @@
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
             <param name="State">State object to pass on to callback method.</param>
             <returns>Configuration Form, if found, or null if not supported.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendGroupChatMessage(System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Message">Message body.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendGroupChatMessage(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendGroupChatMessage(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendGroupChatMessage(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Message">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+            <param name="ParentThreadId">Parent Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomGroupChatMessage(System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Xml">Message body.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomGroupChatMessage(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomGroupChatMessage(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SendCustomGroupChatMessage(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a simple group chat message to a chat room.
+            
+            Note: The client must be an occupant of the chat room before messages
+            can be properly propagated to other occupants of the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="Xml">Message body.</param>
+            <param name="Language">Language</param>
+            <param name="ThreadId">Thread ID</param>
+            <param name="ParentThreadId">Parent Thread ID</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.RoomMessage">
+            <summary>
+            Event raised when a group chat message from a MUC room was received.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.RoomOccupantMessage">
+            <summary>
+            Event raised when a group chat message from a MUC room occupant was received.
+            </summary>
         </member>
     </members>
 </doc>

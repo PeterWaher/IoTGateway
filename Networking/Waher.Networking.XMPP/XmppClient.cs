@@ -1100,6 +1100,49 @@ namespace Waher.Networking.XMPP
 		public event StateChangedEventHandler OnStateChanged = null;
 
 		/// <summary>
+		/// Waits for one of the states in <paramref name="States"/> to occur.
+		/// </summary>
+		/// <param name="Timeout">Time to wait, in milliseconds.</param>
+		/// <param name="States">States to wait for.</param>
+		/// <returns>Index into <paramref name="States"/> corresponding to the
+		/// first state match occurring. If -1 is returned, none of the states
+		/// provided occurred within the given time.</returns>
+		public async Task<int> WaitStateAsync(int Timeout, params XmppState[] States)
+		{
+			if (States is null || States.Length == 0)
+				return -1;
+
+			TaskCompletionSource<int> T = new TaskCompletionSource<int>();
+			int Result;
+
+			Task StateEventHandler(object Sender, XmppState NewState)
+			{
+				int i = Array.IndexOf<XmppState>(States, NewState);
+				if (i >= 0)
+					T.TrySetResult(i);
+
+				return Task.CompletedTask;
+			}
+
+			this.OnStateChanged += StateEventHandler;
+			try
+			{
+				Result = Array.IndexOf<XmppState>(States, this.state);
+				if (Result < 0)
+				{
+					Task _ = Task.Delay(Timeout).ContinueWith((T2) => T.TrySetResult(-1));
+					Result = await T.Task;
+				}
+			}
+			finally
+			{ 
+				this.OnStateChanged -= StateEventHandler;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
 		public void Dispose()
@@ -4883,6 +4926,22 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
+		/// <returns>Task object that finishes when stanza has been sent.</returns>
+		public Task SetPresenceAsync(Availability Availability, params KeyValuePair<string, string>[] Status)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.SetPresence(Availability, (sender, e) => Result.TrySetResult(true), Status);
+
+			return Result.Task;
+		}
+
 		private void PresenceSent(object Sender, EventArgs e)
 		{
 			if (!this.setPresence)
@@ -5103,23 +5162,25 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
-		public void SendDirectedPresence(string To, string CustomXml)
+		public void SendDirectedPresence(string Type, string To, string CustomXml)
 		{
-			this.SendDirectedPresence(To, CustomXml, null, null);
+			this.SendDirectedPresence(Type, To, CustomXml, null, null);
 		}
 
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
 		/// <param name="Callback">Method to call when a response is returned.</param>
 		/// <param name="State">State object, to pass on to callback method.</param>
-		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State)
+		public void SendDirectedPresence(string Type, string To, string CustomXml, PresenceEventHandlerAsync Callback, object State)
 		{
-			this.SendDirectedPresence(To, CustomXml, Callback, State,
+			this.SendDirectedPresence(Type, To, CustomXml, Callback, State,
 				this.defaultRetryTimeout, this.defaultNrRetries,
 				this.defaultDropOff, this.defaultMaxRetryTimeout);
 		}
@@ -5127,6 +5188,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
 		/// <param name="Callback">Method to call when a response is returned.</param>
@@ -5136,7 +5198,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
-		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State,
+		public void SendDirectedPresence(string Type, string To, string CustomXml, PresenceEventHandlerAsync Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest;
@@ -5170,6 +5232,13 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
+
+			if (!string.IsNullOrEmpty(Type))
+			{
+				Xml.Append("' type='");
+				Xml.Append(XML.Encode(Type));
+			}
+
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(To));
 			Xml.Append("'");
@@ -5188,13 +5257,14 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
-		public Task SendDirectedPresenceAsync(string To, string CustomXml)
+		public Task SendDirectedPresenceAsync(string Type, string To, string CustomXml)
 		{
 			TaskCompletionSource<PresenceEventArgs> Query = new TaskCompletionSource<PresenceEventArgs>();
 
-			this.SendDirectedPresence(To, CustomXml, (sender, e) =>
+			this.SendDirectedPresence(Type, To, CustomXml, (sender, e) =>
 			{
 				Query.SetResult(e);
 				return Task.CompletedTask;

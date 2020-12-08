@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="e">Message event arguments.</param>
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="NickName">Nick-name of occupant.</param>
 		public RoomOccupantMessageEventArgs(MessageEventArgs e, string RoomId, 
 			string Domain, string NickName)
 			: base(e, RoomId, Domain)

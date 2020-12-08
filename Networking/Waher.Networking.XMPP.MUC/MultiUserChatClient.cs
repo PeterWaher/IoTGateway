@@ -199,7 +199,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Enter a chatroom.
+		/// Enter a chat room.
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
@@ -209,7 +209,7 @@ namespace Waher.Networking.XMPP.MUC
 		public void EnterRoom(string RoomId, string Domain, string NickName,
 			UserPresenceEventHandlerAsync Callback, object State)
 		{
-			this.client.SendDirectedPresence(RoomId + "@" + Domain + "/" + NickName,
+			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
 				"<x xmlns='" + NamespaceMuc + "'/>", (sender, e) =>
 				{
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Enter a chatroom.
+		/// Enter a chat room.
 		/// </summary>
 		/// <param name="RoomName">Room name.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
@@ -238,6 +238,54 @@ namespace Waher.Networking.XMPP.MUC
 			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
 
 			this.EnterRoom(RoomName, Domain, NickName, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Leave a chat room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void LeaveRoom(string RoomId, string Domain, string NickName,
+			UserPresenceEventHandlerAsync Callback, object State)
+		{
+			this.client.SendDirectedPresence("unavailable", RoomId + "@" + Domain + "/" + NickName,
+				string.Empty, (sender, e) =>
+				{
+					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
+					{
+						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
+							Affiliation.None, Role.None, string.Empty)
+						{
+							Ok = false
+						};
+					}
+
+					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
+				}, State);
+		}
+
+		/// <summary>
+		/// Leave a chat room.
+		/// </summary>
+		/// <param name="RoomName">Room name.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <returns>Room entry response.</returns>
+		public Task<UserPresenceEventArgs> LeaveRoomAsync(string RoomName, string Domain,
+			string NickName)
+		{
+			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
+
+			this.LeaveRoom(RoomName, Domain, NickName, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;

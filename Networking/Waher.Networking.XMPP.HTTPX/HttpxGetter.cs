@@ -211,7 +211,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							State.Done.TrySetResult(true);
 					}
 					else
-						State.Done.TrySetException(new IOException(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get resource." : e.ErrorText));
+						State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
 
 				}, async (sender, e) =>
 				{

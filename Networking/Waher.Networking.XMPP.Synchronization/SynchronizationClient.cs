@@ -941,7 +941,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				if (e.Ok)
 					Result.SetResult(e.ClockSourceJID);
 				else
-					Result.SetException(new Exception(e.ErrorText));
+					Result.SetException(e.StanzaError ?? new Exception("Unable to query clock source."));
 
 			}, null);
 

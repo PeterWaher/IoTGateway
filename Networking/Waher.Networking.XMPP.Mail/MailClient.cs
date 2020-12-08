@@ -279,7 +279,7 @@ namespace Waher.Networking.XMPP.Mail
 				if (e.Ok)
 					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));
 				else
-					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get message object." : e.ErrorText));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get message object."));
 
 				return Task.CompletedTask;
 
@@ -313,7 +313,7 @@ namespace Waher.Networking.XMPP.Mail
 				if (e.Ok)
 					Result.TrySetResult(true);
 				else
-					Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to delete message object." : e.ErrorText));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to delete message object."));
 
 				return Task.CompletedTask;
 

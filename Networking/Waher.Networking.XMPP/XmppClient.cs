@@ -155,6 +155,7 @@ namespace Waher.Networking.XMPP
 		/// jabber:client
 		/// </summary>
 		public const string NamespaceClient = "jabber:client";
+
 		/// <summary>
 		/// urn:ietf:params:xml:ns:xmpp-streams
 		/// </summary>

@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP.Software
 				if (e.Ok)
 					Result.TrySetResult(e.Package);
 				else
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get package information." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new Exception("Unable to get package information."));
 
 				return Task.CompletedTask;
 
@@ -216,7 +216,7 @@ namespace Waher.Networking.XMPP.Software
 				if (e.Ok)
 					Result.TrySetResult(e.Packages);
 				else
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get packages." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new Exception("Unable to get packages."));
 
 				return Task.CompletedTask;
 
@@ -260,10 +260,7 @@ namespace Waher.Networking.XMPP.Software
 				if (e.Ok)
 					Result.TrySetResult(true);
 				else
-				{
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to subscribe to software updates for " +
-						FileName + "." : e.ErrorText));
-				}
+					Result.SetException(e.StanzaError ?? new Exception("Unable to subscribe to software updates for " + FileName + "."));
 
 				return Task.CompletedTask;
 
@@ -308,8 +305,7 @@ namespace Waher.Networking.XMPP.Software
 					Result.TrySetResult(true);
 				else
 				{
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to unsubscribe from software updates for " +
-						FileName + "." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new Exception("Unable to unsubscribe from software updates for " + FileName + "."));
 				}
 
 				return Task.CompletedTask;
@@ -381,7 +377,7 @@ namespace Waher.Networking.XMPP.Software
 				if (e.Ok)
 					Result.TrySetResult(e.FileNames);
 				else
-					Result.SetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get list of current subscriptions." : e.ErrorText));
+					Result.SetException(e.StanzaError ?? new Exception("Unable to get list of current subscriptions."));
 
 				return Task.CompletedTask;
 

@@ -222,7 +222,7 @@ namespace Waher.Networking.XMPP.PEP
 			if (e.Ok)
 				Result.TrySetResult(e.ItemId);
 			else
-				Result.TrySetException(new Exception(string.IsNullOrEmpty(e.ErrorText) ? "Unable to publish event." : e.ErrorText));
+				Result.TrySetException(e.StanzaError ?? new Exception("Unable to publish event."));
 
 			return Task.CompletedTask;
 		}

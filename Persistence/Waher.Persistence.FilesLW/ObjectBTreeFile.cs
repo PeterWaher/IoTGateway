@@ -4874,9 +4874,6 @@ namespace Waher.Persistence.Files
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.ClearAsync();
 		}
 
 		internal async Task ClearAsyncLocked()

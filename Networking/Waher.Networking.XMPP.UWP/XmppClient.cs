@@ -155,6 +155,7 @@ namespace Waher.Networking.XMPP
 		/// jabber:client
 		/// </summary>
 		public const string NamespaceClient = "jabber:client";
+
 		/// <summary>
 		/// urn:ietf:params:xml:ns:xmpp-streams
 		/// </summary>
@@ -1097,6 +1098,49 @@ namespace Waher.Networking.XMPP
 		/// Event raised whenever the internal state of the connection changes.
 		/// </summary>
 		public event StateChangedEventHandler OnStateChanged = null;
+
+		/// <summary>
+		/// Waits for one of the states in <paramref name="States"/> to occur.
+		/// </summary>
+		/// <param name="Timeout">Time to wait, in milliseconds.</param>
+		/// <param name="States">States to wait for.</param>
+		/// <returns>Index into <paramref name="States"/> corresponding to the
+		/// first state match occurring. If -1 is returned, none of the states
+		/// provided occurred within the given time.</returns>
+		public async Task<int> WaitStateAsync(int Timeout, params XmppState[] States)
+		{
+			if (States is null || States.Length == 0)
+				return -1;
+
+			TaskCompletionSource<int> T = new TaskCompletionSource<int>();
+			int Result;
+
+			Task StateEventHandler(object Sender, XmppState NewState)
+			{
+				int i = Array.IndexOf<XmppState>(States, NewState);
+				if (i >= 0)
+					T.TrySetResult(i);
+
+				return Task.CompletedTask;
+			}
+
+			this.OnStateChanged += StateEventHandler;
+			try
+			{
+				Result = Array.IndexOf<XmppState>(States, this.state);
+				if (Result < 0)
+				{
+					Task _ = Task.Delay(Timeout).ContinueWith((T2) => T.TrySetResult(-1));
+					Result = await T.Task;
+				}
+			}
+			finally
+			{ 
+				this.OnStateChanged -= StateEventHandler;
+			}
+
+			return Result;
+		}
 
 		/// <summary>
 		/// Closes the connection and disposes of all resources.
@@ -2286,108 +2330,134 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>> Handlers = null;
-				PresenceEventHandlerAsync h;
+				PresenceEventHandlerAsync Callback;
 				RosterItem Item;
 				string Key;
+				object State = null;
+				string Id = e.Id;
+				string FromBareJid = e.FromBareJID;
 
-				lock (this.synchObject)
+				if (uint.TryParse(Id, out uint SeqNr))
 				{
-					foreach (XmlElement E in e.Presence.ChildNodes)
+					lock (this.synchObject)
 					{
-						Key = E.LocalName + " " + E.NamespaceURI;
-						if (this.presenceHandlers.TryGetValue(Key, out h))
+						if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
 						{
-							if (Handlers is null)
-								Handlers = new LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>>();
+							Callback = Rec.PresenceCallback;
+							State = Rec.State;
 
-							Handlers.AddLast(new KeyValuePair<PresenceEventHandlerAsync, XmlElement>(h, E));
+							this.pendingRequestsBySeqNr.Remove(SeqNr);
+							this.pendingRequestsByTimeout.Remove(Rec.Timeout);
+						}
+						else
+							Callback = null;
+					}
+				}
+				else
+					Callback = null;
+
+				if (Callback is null)
+				{
+					lock (this.synchObject)
+					{
+						foreach (XmlElement E in e.Presence.ChildNodes)
+						{
+							Key = E.LocalName + " " + E.NamespaceURI;
+							if (this.presenceHandlers.TryGetValue(Key, out Callback))
+							{
+								if (Handlers is null)
+									Handlers = new LinkedList<KeyValuePair<PresenceEventHandlerAsync, XmlElement>>();
+
+								Handlers.AddLast(new KeyValuePair<PresenceEventHandlerAsync, XmlElement>(Callback, E));
+							}
+						}
+					}
+
+					switch (e.Type)
+					{
+						case PresenceType.Available:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							e.UpdateLastPresence = true;
+
+							lock (this.roster)
+							{
+								if (this.roster.TryGetValue(e.FromBareJID, out Item))
+									Item.PresenceReceived(this, e);
+							}
+							break;
+
+						case PresenceType.Unavailable:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+
+							lock (this.roster)
+							{
+								if (this.roster.TryGetValue(e.FromBareJID, out Item))
+									Item.PresenceReceived(this, e);
+							}
+							break;
+
+						case PresenceType.Error:
+						case PresenceType.Probe:
+						default:
+							this.Information("OnPresence()");
+							Callback = this.OnPresence;
+							break;
+
+						case PresenceType.Subscribe:
+							lock (this.subscriptionRequests)
+							{
+								this.subscriptionRequests[e.FromBareJID] = e;
+							}
+
+							this.Information("OnPresenceSubscribe()");
+							Callback = this.OnPresenceSubscribe;
+							break;
+
+						case PresenceType.Subscribed:
+							this.Information("OnPresenceSubscribed()");
+							Callback = this.OnPresenceSubscribed;
+							break;
+
+						case PresenceType.Unsubscribe:
+							this.Information("OnPresenceUnsubscribe()");
+							Callback = this.OnPresenceUnsubscribe;
+							break;
+
+						case PresenceType.Unsubscribed:
+							this.Information("OnPresenceUnsubscribed()");
+							Callback = this.OnPresenceUnsubscribed;
+							break;
+					}
+
+					if (!(Handlers is null))
+					{
+						foreach (KeyValuePair<PresenceEventHandlerAsync, XmlElement> P in Handlers)
+						{
+							e.Content = P.Value;
+							this.Information(P.Key.GetMethodInfo().Name);
+
+							try
+							{
+								await P.Key(this, e);
+							}
+							catch (Exception ex)
+							{
+								this.Exception(ex);
+							}
 						}
 					}
 				}
 
-				switch (e.Type)
-				{
-					case PresenceType.Available:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-						e.UpdateLastPresence = true;
-
-						lock (this.roster)
-						{
-							if (this.roster.TryGetValue(e.FromBareJID, out Item))
-								Item.PresenceReceived(this, e);
-						}
-						break;
-
-					case PresenceType.Unavailable:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-
-						lock (this.roster)
-						{
-							if (this.roster.TryGetValue(e.FromBareJID, out Item))
-								Item.PresenceReceived(this, e);
-						}
-						break;
-
-					case PresenceType.Error:
-					case PresenceType.Probe:
-					default:
-						this.Information("OnPresence()");
-						h = this.OnPresence;
-						break;
-
-					case PresenceType.Subscribe:
-						lock (this.subscriptionRequests)
-						{
-							this.subscriptionRequests[e.FromBareJID] = e;
-						}
-
-						this.Information("OnPresenceSubscribe()");
-						h = this.OnPresenceSubscribe;
-						break;
-
-					case PresenceType.Subscribed:
-						this.Information("OnPresenceSubscribed()");
-						h = this.OnPresenceSubscribed;
-						break;
-
-					case PresenceType.Unsubscribe:
-						this.Information("OnPresenceUnsubscribe()");
-						h = this.OnPresenceUnsubscribe;
-						break;
-
-					case PresenceType.Unsubscribed:
-						this.Information("OnPresenceUnsubscribed()");
-						h = this.OnPresenceUnsubscribed;
-						break;
-				}
-
-				if (!(Handlers is null))
-				{
-					foreach (KeyValuePair<PresenceEventHandlerAsync, XmlElement> P in Handlers)
-					{
-						e.Content = P.Value;
-						this.Information(P.Key.GetMethodInfo().Name);
-
-						try
-						{
-							await P.Key(this, e);
-						}
-						catch (Exception ex)
-						{
-							this.Exception(ex);
-						}
-					}
-				}
-
-				if (!(h is null))
+				if (!(Callback is null))
 				{
 					e.Content = null;
+					e.State = State;
 
 					try
 					{
-						await h(this, e);
+						await Callback(this, e);
 					}
 					catch (Exception ex)
 					{
@@ -4856,6 +4926,22 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
+		/// <returns>Task object that finishes when stanza has been sent.</returns>
+		public Task SetPresenceAsync(Availability Availability, params KeyValuePair<string, string>[] Status)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.SetPresence(Availability, (sender, e) => Result.TrySetResult(true), Status);
+
+			return Result.Task;
+		}
+
 		private void PresenceSent(object Sender, EventArgs e)
 		{
 			if (!this.setPresence)
@@ -5076,23 +5162,25 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
-		public void SendDirectedPresence(string To, string CustomXml)
+		public void SendDirectedPresence(string Type, string To, string CustomXml)
 		{
-			this.SendDirectedPresence(To, CustomXml, null, null);
+			this.SendDirectedPresence(Type, To, CustomXml, null, null);
 		}
 
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
 		/// <param name="Callback">Method to call when a response is returned.</param>
 		/// <param name="State">State object, to pass on to callback method.</param>
-		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State)
+		public void SendDirectedPresence(string Type, string To, string CustomXml, PresenceEventHandlerAsync Callback, object State)
 		{
-			this.SendDirectedPresence(To, CustomXml, Callback, State,
+			this.SendDirectedPresence(Type, To, CustomXml, Callback, State,
 				this.defaultRetryTimeout, this.defaultNrRetries,
 				this.defaultDropOff, this.defaultMaxRetryTimeout);
 		}
@@ -5100,6 +5188,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
 		/// <param name="Callback">Method to call when a response is returned.</param>
@@ -5109,7 +5198,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
-		public void SendDirectedPresence(string To, string CustomXml, PresenceEventHandlerAsync Callback, object State,
+		public void SendDirectedPresence(string Type, string To, string CustomXml, PresenceEventHandlerAsync Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest;
@@ -5143,6 +5232,13 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
+
+			if (!string.IsNullOrEmpty(Type))
+			{
+				Xml.Append("' type='");
+				Xml.Append(XML.Encode(Type));
+			}
+
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(To));
 			Xml.Append("'");
@@ -5161,13 +5257,14 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sends a directed presence stanza to a recipient.
 		/// </summary>
+		/// <param name="Type">Presence type.</param>
 		/// <param name="To">JID of recipient.</param>
 		/// <param name="CustomXml">Custom XML to include in the presence stanza.</param>
-		public Task SendDirectedPresenceAsync(string To, string CustomXml)
+		public Task SendDirectedPresenceAsync(string Type, string To, string CustomXml)
 		{
 			TaskCompletionSource<PresenceEventArgs> Query = new TaskCompletionSource<PresenceEventArgs>();
 
-			this.SendDirectedPresence(To, CustomXml, (sender, e) =>
+			this.SendDirectedPresence(Type, To, CustomXml, (sender, e) =>
 			{
 				Query.SetResult(e);
 				return Task.CompletedTask;

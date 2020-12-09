@@ -61,7 +61,7 @@
     <ApplicationIcon>Configure.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>489A1520AE68C3C2EEA4966514C807E40DC68BC2</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F0A8735F3F4B8D6D4E85E5D187DC5F7F1532D6FD</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Waher.Client.WPF_TemporaryKey.pfx</ManifestKeyFile>

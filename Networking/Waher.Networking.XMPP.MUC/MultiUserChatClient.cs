@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.MUC
 			this.componentAddress = ComponentAddress;
 
 			this.client.RegisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
-			this.client.RegisterMessageHandler("x", NamespaceMucUser, this.PrivateMessageHandler, false);
+			this.client.RegisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
 
 			this.client.OnGroupChatMessage += Client_OnGroupChatMessage;
 		}
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.MUC
 		public override void Dispose()
 		{
 			this.client.UnregisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
-			this.client.UnregisterMessageHandler("x", NamespaceMucUser, this.PrivateMessageHandler, false);
+			this.client.UnregisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
 
 			this.client.OnGroupChatMessage -= Client_OnGroupChatMessage;
 
@@ -211,8 +211,37 @@ namespace Waher.Networking.XMPP.MUC
 		public void EnterRoom(string RoomId, string Domain, string NickName,
 			UserPresenceEventHandlerAsync Callback, object State)
 		{
+			this.EnterRoom(RoomId, Domain, NickName, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Enter a chat room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <param name="Password">Password</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void EnterRoom(string RoomId, string Domain, string NickName, string Password,
+			UserPresenceEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<x xmlns='");
+			Xml.Append(NamespaceMuc);
+
+			if (string.IsNullOrEmpty(Password))
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'><password>");
+				Xml.Append(XML.Encode(Password));
+				Xml.Append("</password></x>");
+			}
+
 			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
-				"<x xmlns='" + NamespaceMuc + "'/>", (sender, e) =>
+				Xml.ToString(), (sender, e) =>
 				{
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
@@ -234,12 +263,24 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <returns>Room entry response.</returns>
-		public Task<UserPresenceEventArgs> EnterRoomAsync(string RoomId, string Domain,
-			string NickName)
+		public Task<UserPresenceEventArgs> EnterRoomAsync(string RoomId, string Domain, string NickName)
+		{
+			return this.EnterRoomAsync(RoomId, Domain, NickName, string.Empty);
+		}
+
+		/// <summary>
+		/// Enter a chat room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <param name="Password">Password</param>
+		/// <returns>Room entry response.</returns>
+		public Task<UserPresenceEventArgs> EnterRoomAsync(string RoomId, string Domain, string NickName, string Password)
 		{
 			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
 
-			this.EnterRoom(RoomId, Domain, NickName, (sender, e) =>
+			this.EnterRoom(RoomId, Domain, NickName, Password, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
@@ -804,20 +845,95 @@ namespace Waher.Networking.XMPP.MUC
 				 string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
-		private Task PrivateMessageHandler(object Sender, MessageEventArgs e)
+		private Task UserMessageHandler(object Sender, MessageEventArgs e)
 		{
-			if (!TryParseOccupantJid(e.From, true, out string RoomId, out string Domain, out string NickName))
+			if (!TryParseOccupantJid(e.From, false, out string RoomId, out string Domain, out string NickName))
 				return Task.CompletedTask;
 
-			try
+			if (string.IsNullOrEmpty(NickName))
 			{
-				RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
+				string InvitationFrom = null;
+				string DeclinedFrom = null;
+				string Password = null;
+				string Reason = null;
 
-				this.PrivateMessageReceived?.Invoke(this, e2);
+				foreach (XmlNode N in e.Content.ChildNodes)
+				{
+					if (N is XmlElement E && E.NamespaceURI == NamespaceMucUser)
+					{
+						bool CheckReason = false;
+
+						switch (E.LocalName)
+						{
+							case "invite":
+								InvitationFrom = XML.Attribute(E, "from");
+								CheckReason = true;
+								break;
+
+							case "decline":
+								DeclinedFrom = XML.Attribute(E, "from");
+								CheckReason = true;
+								break;
+
+							case "password":
+								Password = E.InnerText;
+								break;
+						}
+
+						if (CheckReason)
+						{
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.NamespaceURI == NamespaceMucUser && E2.LocalName == "reason")
+								{
+									Reason = E2.InnerText;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				if (!string.IsNullOrEmpty(InvitationFrom))
+				{
+					try
+					{
+						RoomInvitationMessageEventArgs e2 = new RoomInvitationMessageEventArgs(this, e, RoomId, Domain,
+							InvitationFrom, Reason, Password);
+
+						this.RoomInvitationReceived?.Invoke(this, e2);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+				else if (!string.IsNullOrEmpty(DeclinedFrom))
+				{
+					try
+					{
+						RoomDeclinedMessageEventArgs e2 = new RoomDeclinedMessageEventArgs(e, RoomId, Domain, DeclinedFrom, Reason);
+
+						this.RoomDeclinedInvitationReceived?.Invoke(this, e2);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
 			}
-			catch (Exception ex)
+			else
 			{
-				Log.Critical(ex);
+				try
+				{
+					RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
+
+					this.PrivateMessageReceived?.Invoke(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 
 			return Task.CompletedTask;
@@ -827,6 +943,16 @@ namespace Waher.Networking.XMPP.MUC
 		/// Event raised when a group chat message from a MUC room occupant was received.
 		/// </summary>
 		public event RoomOccupantMessageEventHandler PrivateMessageReceived;
+
+		/// <summary>
+		/// Event raised when an invitation from a MUC room has been received.
+		/// </summary>
+		public event RoomInvitationMessageEventHandler RoomInvitationReceived;
+
+		/// <summary>
+		/// Event raised when an invitation from a MUC room has been declined.
+		/// </summary>
+		public event RoomDeclinedMessageEventHandler RoomDeclinedInvitationReceived;
 
 		/// <summary>
 		/// Changes to a new nick-name.
@@ -885,7 +1011,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Availability">Occupant availability.</param>
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability, 
+		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
 			PresenceEventHandlerAsync Callback, object State)
 		{
 			string Xml = string.Empty;
@@ -929,7 +1055,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname of the occupant.</param>
 		/// <param name="Availability">Occupant availability.</param>
 		/// <returns>Task object that finishes when stanza has been sent.</returns>
-		public Task SetPresenceAsync(string RoomId, string Domain, string NickName, 
+		public Task SetPresenceAsync(string RoomId, string Domain, string NickName,
 			Availability Availability)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
@@ -940,6 +1066,91 @@ namespace Waher.Networking.XMPP.MUC
 			}, null);
 
 			return Result.Task;
+		}
+
+		/// <summary>
+		/// Sends an invitation to the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		public void Invite(string RoomID, string Domain, string BareJid)
+		{
+			this.Invite(RoomID, Domain, BareJid, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends an invitation to the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		public void Invite(string RoomID, string Domain, string BareJid, string Reason)
+		{
+			this.Invite(RoomID, Domain, BareJid, Reason, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends an invitation to the room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		/// <param name="Language">Language</param>
+		public void Invite(string RoomID, string Domain, string BareJid, string Reason, string Language)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<x xmlns='");
+			Xml.Append(NamespaceMucUser);
+			Xml.Append("'><invite to='");
+			Xml.Append(XML.Encode(BareJid));
+			Xml.Append("'>");
+
+			if (!string.IsNullOrEmpty(Reason))
+			{
+				Xml.Append("<reason>");
+				Xml.Append(XML.Encode(Reason));
+				Xml.Append("</reason>");
+			}
+
+			Xml.Append("</invite></x>");
+
+			this.client.SendMessage(MessageType.Normal, RoomID + "@" + Domain,
+				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Declines an invitation from a room.
+		/// </summary>
+		/// <param name="RoomID">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="InviteFrom">Original invitation was sent from.</param>
+		/// <param name="Reason">Reason for declining the invitation.</param>
+		/// <param name="Language">Language</param>
+		public void DeclineInvitation(string RoomID, string Domain, string InviteFrom, string Reason, string Language)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<x xmlns='");
+			Xml.Append(NamespaceMucUser);
+			Xml.Append("'><decline to='");
+			Xml.Append(XML.Encode(XmppClient.GetBareJID(InviteFrom)));
+			Xml.Append("'>");
+
+			if (!string.IsNullOrEmpty(Reason))
+			{
+				Xml.Append("<reason>");
+				Xml.Append(XML.Encode(Reason));
+				Xml.Append("</reason>");
+			}
+
+			Xml.Append("</decline></x>");
+
+			this.client.SendMessage(MessageType.Normal, RoomID + "@" + Domain,
+				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
 
 	}

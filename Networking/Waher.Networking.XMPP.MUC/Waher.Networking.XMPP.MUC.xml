@@ -59,6 +59,116 @@
             No role
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventHandler">
+            <summary>
+            Delegate for MUC Room declined event handlers.
+            </summary>
+            <param name="Sender"></param>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventArgs">
+            <summary>
+            Message from a MUC room containing a declined invitation.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,System.String,System.String,System.String,System.String)">
+            <summary>
+            Message from a MUC room containing a declined invitation.
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="DeclinedFrom">JID of entity sending the declined.</param>
+            <param name="Reason">Reason for declined.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventArgs.DeclinedFrom">
+            <summary>
+            JID of entity sending the declined invitation.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventArgs.Reason">
+            <summary>
+            Reason for declining the invitation.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventHandler">
+            <summary>
+            Delegate for MUC Room invitation event handlers.
+            </summary>
+            <param name="Sender"></param>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs">
+            <summary>
+            Message from a MUC room containing an invitation.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.#ctor(Waher.Networking.XMPP.MUC.MultiUserChatClient,Waher.Networking.XMPP.MessageEventArgs,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Message from a MUC room containing an invitation.
+            </summary>
+            <param name="MucClient">Multi-User Chat Client.</param>
+            <param name="e">Message event arguments.</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="InviteFrom">JID of entity sending the invitation.</param>
+            <param name="Reason">Reason for invitation.</param>
+            <param name="Password">Password, if used.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.MucClient">
+            <summary>
+            Multi-User Chat Client.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.InviteFrom">
+            <summary>
+            JID of entity sending the invitation.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Reason">
+            <summary>
+            Reason for invitation.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Password">
+            <summary>
+            Password, if used.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Accept(System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Accepts the invitation, and enters the room.
+            </summary>
+            <param name="NickName">Nick-name to use in the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Accept(System.String)">
+            <summary>
+            Accepts the invitation, and enters the room.
+            </summary>
+            <param name="NickName">Nick-name to use in the room.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Decline">
+            <summary>
+            Declines the invitation, and enters the room.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Decline(System.String)">
+            <summary>
+            Declines the invitation, and enters the room.
+            </summary>
+            <param name="Reason">Reason for declining invitation.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventArgs.Decline(System.String,System.String)">
+            <summary>
+            Declines the invitation, and enters the room.
+            </summary>
+            <param name="Reason">Reason for declining invitation.</param>
+            <param name="Language">Language of text.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.RoomMessageEventHandler">
             <summary>
             Delegate for MUC Room event handlers.
@@ -341,6 +451,17 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoom(System.String,System.String,System.String,System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Enter a chat room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+            <param name="Password">Password</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoomAsync(System.String,System.String,System.String)">
             <summary>
             Enter a chat room.
@@ -348,6 +469,16 @@
             <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="NickName">Nickname to use in the chat room.</param>
+            <returns>Room entry response.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.EnterRoomAsync(System.String,System.String,System.String,System.String)">
+            <summary>
+            Enter a chat room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname to use in the chat room.</param>
+            <param name="Password">Password</param>
             <returns>Room entry response.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.LeaveRoom(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
@@ -674,6 +805,16 @@
             Event raised when a group chat message from a MUC room occupant was received.
             </summary>
         </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.RoomInvitationReceived">
+            <summary>
+            Event raised when an invitation from a MUC room has been received.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.RoomDeclinedInvitationReceived">
+            <summary>
+            Event raised when an invitation from a MUC room has been declined.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ChangeNickName(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync,System.Object)">
             <summary>
             Changes to a new nick-name.
@@ -713,6 +854,43 @@
             <param name="NickName">Nickname of the occupant.</param>
             <param name="Availability">Occupant availability.</param>
             <returns>Task object that finishes when stanza has been sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Invite(System.String,System.String,System.String)">
+            <summary>
+            Sends an invitation to the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="BareJid">Bare JID of entity to invite.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Invite(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends an invitation to the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="BareJid">Bare JID of entity to invite.</param>
+            <param name="Reason">Reason for sending the invitation.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Invite(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends an invitation to the room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="BareJid">Bare JID of entity to invite.</param>
+            <param name="Reason">Reason for sending the invitation.</param>
+            <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.DeclineInvitation(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Declines an invitation from a room.
+            </summary>
+            <param name="RoomID">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="InviteFrom">Original invitation was sent from.</param>
+            <param name="Reason">Reason for declining the invitation.</param>
+            <param name="Language">Language</param>
         </member>
     </members>
 </doc>

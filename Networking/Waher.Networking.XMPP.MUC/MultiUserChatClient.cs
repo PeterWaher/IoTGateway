@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.MUC
 {
@@ -1305,5 +1306,37 @@ namespace Waher.Networking.XMPP.MUC
 			return Result.Task;
 		}
 
+		/// <summary>
+		/// Gets information about a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetRoomInformation(string RoomId, string Domain, RoomInformationEventHandler Callback, object State)
+		{
+			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, (sender, e) =>
+			{
+				return Callback?.Invoke(this, new RoomInformationEventArgs(e)) ?? Task.CompletedTask;
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets information about a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		public Task<RoomInformationEventArgs> GetRoomInformationAsync(string RoomId, string Domain)
+		{
+			TaskCompletionSource<RoomInformationEventArgs> Result = new TaskCompletionSource<RoomInformationEventArgs>();
+			
+			this.GetRoomInformation(RoomId, Domain, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
 	}
 }

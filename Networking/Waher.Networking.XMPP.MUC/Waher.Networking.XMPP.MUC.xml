@@ -92,6 +92,109 @@
             Reason for declining the invitation.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomInformationEventHandler">
+            <summary>
+            Delegate for room information response event handlers.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomInformationEventArgs">
+            <summary>
+            Room information response event arguments.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.#ctor(Waher.Networking.XMPP.ServiceDiscovery.ServiceDiscoveryEventArgs)">
+            <summary>
+            Room information response event arguments.
+            </summary>
+            <param name="e">Service discovery response.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.UserRegistration">
+            <summary>
+            Support for the muc#register FORM_TYPE
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.RoomConfiguration">
+            <summary>
+            Support for the muc#roomconfig FORM_TYPE
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.RoomInformation">
+            <summary>
+            Support for the muc#roominfo FORM_TYPE
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.StableId">
+            <summary>
+            This MUC will reflect the original message 'id' in 'groupchat' messages.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Hidden">
+            <summary>
+            Hidden room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.MembersOnly">
+            <summary>
+            Members-only room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Moderated">
+            <summary>
+            Moderated room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.NonAnonymous">
+            <summary>
+            Non-anonymous room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Open">
+            <summary>
+            Open room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.PasswordProtected">
+            <summary>
+            Password-protected room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Persistent">
+            <summary>
+            Persistent room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Public">
+            <summary>
+            Public room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Rooms">
+            <summary>
+            List of MUC rooms (each as a separate item)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.SemiAnonymous">
+            <summary>
+            Semi-anonymous room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Temporary">
+            <summary>
+            Temporary room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Unmoderated">
+            <summary>
+            Unmoderated room in Multi-User Chat (MUC)
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomInformationEventArgs.Unsecured">
+            <summary>
+            Unsecured room in Multi-User Chat (MUC)
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.RoomInvitationMessageEventHandler">
             <summary>
             Delegate for MUC Room invitation event handlers.
@@ -964,6 +1067,22 @@
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
             <param name="State">State object to pass on to callback method.</param>
             <returns>Room Registration response.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomInformation(System.String,System.String,Waher.Networking.XMPP.MUC.RoomInformationEventHandler,System.Object)">
+            <summary>
+            Gets information about a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomInformationAsync(System.String,System.String)">
+            <summary>
+            Gets information about a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
         </member>
     </members>
 </doc>

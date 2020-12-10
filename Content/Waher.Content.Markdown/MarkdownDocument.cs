@@ -340,8 +340,15 @@ namespace Waher.Content.Markdown
 								Variables.Add(" MarkdownSettings ", Settings);
 							}
 
-							Exp = new Expression(Script);
-							Exp.Evaluate(Variables);
+							try
+							{
+								Exp = new Expression(Script);
+								Exp.Evaluate(Variables);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex, FileName2);
+							}
 						}
 					}
 				}

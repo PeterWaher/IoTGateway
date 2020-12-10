@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.UPnP;
@@ -470,14 +471,17 @@ namespace Waher.Networking.PeerToPeer
 					PeerToPeerNetworkStateChangeEventHandler h = this.OnStateChange;
 					if (!(h is null))
 					{
-						try
+						Task.Run(async () =>
 						{
-							h(this, value);
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
+							try
+							{
+								await h(this, value);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						});
 					}
 				}
 			}

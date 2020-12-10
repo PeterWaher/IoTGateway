@@ -510,12 +510,12 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
-		public void SendGroupChatMessage(string RoomID, string Domain, string Message)
+		public void SendGroupChatMessage(string RoomId, string Domain, string Message)
 		{
-			this.SendGroupChatMessage(RoomID, Domain, Message, string.Empty, string.Empty, string.Empty);
+			this.SendGroupChatMessage(RoomId, Domain, Message, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -524,13 +524,13 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language)
+		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language)
 		{
-			this.SendGroupChatMessage(RoomID, Domain, Message, Language, string.Empty, string.Empty);
+			this.SendGroupChatMessage(RoomId, Domain, Message, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -539,14 +539,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language, string ThreadId)
+		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId)
 		{
-			this.SendGroupChatMessage(RoomID, Domain, Message, Language, ThreadId, string.Empty);
+			this.SendGroupChatMessage(RoomId, Domain, Message, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -555,15 +555,15 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendGroupChatMessage(string RoomID, string Domain, string Message, string Language, string ThreadId, string ParentThreadId)
+		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomID + "@" + Domain,
+			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				string.Empty, Message, string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
@@ -573,12 +573,12 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
-		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml)
+		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml)
 		{
-			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, string.Empty,
+			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, string.Empty,
 				string.Empty, string.Empty);
 		}
 
@@ -588,13 +588,13 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml, string Language)
+		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language)
 		{
-			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, Language, string.Empty, string.Empty);
+			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -603,14 +603,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendCustomGroupChatMessage(string RoomID, string Domain, string Xml, string Language, string ThreadId)
+		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language, string ThreadId)
 		{
-			this.SendCustomGroupChatMessage(RoomID, Domain, Xml, Language, ThreadId, string.Empty);
+			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -619,16 +619,16 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendCustomGroupChatMessage(string RoomID, string Domain,
+		public void SendCustomGroupChatMessage(string RoomId, string Domain,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomID + "@" + Domain,
+			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				 Xml, string.Empty, string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
@@ -683,12 +683,12 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Subject">Room subject.</param>
-		public void ChangeRoomSubject(string RoomID, string Domain, string Subject)
+		public void ChangeRoomSubject(string RoomId, string Domain, string Subject)
 		{
-			this.ChangeRoomSubject(RoomID, Domain, Subject, string.Empty);
+			this.ChangeRoomSubject(RoomId, Domain, Subject, string.Empty);
 		}
 
 		/// <summary>
@@ -697,13 +697,13 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Subject">Room subject.</param>
 		/// <param name="Language">Language</param>
-		public void ChangeRoomSubject(string RoomID, string Domain, string Subject, string Language)
+		public void ChangeRoomSubject(string RoomId, string Domain, string Subject, string Language)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomID + "@" + Domain,
+			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				string.Empty, string.Empty, Subject, Language, string.Empty, string.Empty);
 		}
 
@@ -713,13 +713,13 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
-		public void SendPrivateMessage(string RoomID, string Domain, string NickName, string Message)
+		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message)
 		{
-			this.SendPrivateMessage(RoomID, Domain, NickName, Message, string.Empty, string.Empty, string.Empty);
+			this.SendPrivateMessage(RoomId, Domain, NickName, Message, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -728,14 +728,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendPrivateMessage(string RoomID, string Domain, string NickName, string Message, string Language)
+		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language)
 		{
-			this.SendPrivateMessage(RoomID, Domain, NickName, Message, Language, string.Empty, string.Empty);
+			this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -744,15 +744,15 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendPrivateMessage(string RoomID, string Domain, string NickName, string Message, string Language, string ThreadId)
+		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId)
 		{
-			this.SendPrivateMessage(RoomID, Domain, NickName, Message, Language, ThreadId, string.Empty);
+			this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -761,16 +761,16 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendPrivateMessage(string RoomID, string Domain, string NickName, string Message, string Language, string ThreadId, string ParentThreadId)
+		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.Chat, RoomID + "@" + Domain + "/" + NickName,
+			this.client.SendMessage(MessageType.Chat, RoomId + "@" + Domain + "/" + NickName,
 				"<x xmlns='" + NamespaceMucUser + "'/>", Message, string.Empty,
 				Language, ThreadId, ParentThreadId);
 		}
@@ -781,13 +781,13 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
-		public void SendCustomPrivateMessage(string RoomID, string Domain, string NickName, string Xml)
+		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml)
 		{
-			this.SendCustomPrivateMessage(RoomID, Domain, NickName, Xml, string.Empty,
+			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, string.Empty,
 				string.Empty, string.Empty);
 		}
 
@@ -797,14 +797,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendCustomPrivateMessage(string RoomID, string Domain, string NickName, string Xml, string Language)
+		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language)
 		{
-			this.SendCustomPrivateMessage(RoomID, Domain, NickName, Xml, Language, string.Empty, string.Empty);
+			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -813,15 +813,15 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendCustomPrivateMessage(string RoomID, string Domain, string NickName, string Xml, string Language, string ThreadId)
+		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language, string ThreadId)
 		{
-			this.SendCustomPrivateMessage(RoomID, Domain, NickName, Xml, Language, ThreadId, string.Empty);
+			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -830,17 +830,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// Note: The client must be an occupant of the chat room before messages
 		/// can be properly propagated to other occupants of the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendCustomPrivateMessage(string RoomID, string Domain, string NickName,
+		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.Chat, RoomID + "@" + Domain + "/" + NickName,
+			this.client.SendMessage(MessageType.Chat, RoomId + "@" + Domain + "/" + NickName,
 				 Xml + "<x xmlns='" + NamespaceMucUser + "'/>", string.Empty,
 				 string.Empty, Language, ThreadId, ParentThreadId);
 		}
@@ -1071,35 +1071,35 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Sends an invitation to the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
-		public void Invite(string RoomID, string Domain, string BareJid)
+		public void Invite(string RoomId, string Domain, string BareJid)
 		{
-			this.Invite(RoomID, Domain, BareJid, string.Empty, string.Empty);
+			this.Invite(RoomId, Domain, BareJid, string.Empty, string.Empty);
 		}
 
 		/// <summary>
 		/// Sends an invitation to the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
-		public void Invite(string RoomID, string Domain, string BareJid, string Reason)
+		public void Invite(string RoomId, string Domain, string BareJid, string Reason)
 		{
-			this.Invite(RoomID, Domain, BareJid, Reason, string.Empty);
+			this.Invite(RoomId, Domain, BareJid, Reason, string.Empty);
 		}
 
 		/// <summary>
 		/// Sends an invitation to the room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
 		/// <param name="Language">Language</param>
-		public void Invite(string RoomID, string Domain, string BareJid, string Reason, string Language)
+		public void Invite(string RoomId, string Domain, string BareJid, string Reason, string Language)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1118,19 +1118,19 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</invite></x>");
 
-			this.client.SendMessage(MessageType.Normal, RoomID + "@" + Domain,
+			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
 		/// Declines an invitation from a room.
 		/// </summary>
-		/// <param name="RoomID">Room ID</param>
+		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="InviteFrom">Original invitation was sent from.</param>
 		/// <param name="Reason">Reason for declining the invitation.</param>
 		/// <param name="Language">Language</param>
-		public void DeclineInvitation(string RoomID, string Domain, string InviteFrom, string Reason, string Language)
+		public void DeclineInvitation(string RoomId, string Domain, string InviteFrom, string Reason, string Language)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1149,8 +1149,160 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</decline></x>");
 
-			this.client.SendMessage(MessageType.Normal, RoomID + "@" + Domain,
+			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Starts the registration process with a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RegisterWithRoom(string RoomId, string Domain, RoomRegistrationEventHandler Callback,
+			object State)
+		{
+			this.RegisterWithRoom(RoomId, Domain, Callback, null, State);
+		}
+
+		/// <summary>
+		/// Starts the registration process with a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RegisterWithRoom(string RoomId, string Domain, RoomRegistrationEventHandler Callback,
+			IqResultEventHandlerAsync SubmissionCallback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(XmppClient.NamespaceRegister);
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
+			{
+				DataForm Form = null;
+				bool AlreadyRegistered = false;
+				string UserName = null;
+
+				if (!(e.FirstElement is null))
+				{
+					foreach (XmlNode N in e.FirstElement.ChildNodes)
+					{
+						if (N is XmlElement E)
+						{
+							switch (E.LocalName)
+							{
+								case "registered":
+									AlreadyRegistered = true;
+									break;
+
+								case "username":
+									UserName = E.InnerText;
+									break;
+
+								case "x":
+									if (E.NamespaceURI != XmppClient.NamespaceData)
+										break;
+
+									Form = new DataForm(this.client, E,
+										(sender2, Form2) =>
+										{
+											StringBuilder Xml2 = new StringBuilder();
+
+											Xml2.Append("<query xmlns='");
+											Xml2.Append(XmppClient.NamespaceRegister);
+											Xml2.Append("'>");
+
+											Form2.SerializeSubmit(Xml2);
+
+											Xml2.Append("</query>");
+
+											this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
+											{
+												return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
+											}, null);
+
+											return Task.CompletedTask;
+										},
+										(sender2, Form2) =>
+										{
+											StringBuilder Xml2 = new StringBuilder();
+
+											Xml2.Append("<query xmlns='");
+											Xml2.Append(XmppClient.NamespaceRegister);
+											Xml2.Append("'>");
+
+											Form2.SerializeCancel(Xml2);
+
+											Xml2.Append("</query>");
+
+											this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
+											{
+												e3.Ok = false;
+												return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
+											}, null);
+
+											return Task.CompletedTask;
+										},
+										e.From, e.To)
+									{
+										State = e.State
+									};
+
+									break;
+							}
+						}
+					}
+				}
+
+				RoomRegistrationEventArgs e2 = new RoomRegistrationEventArgs(e, Form, AlreadyRegistered, UserName);
+
+				try
+				{
+					Callback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+				return Task.CompletedTask;
+			}, State);
+		}
+
+		/// <summary>
+		/// Starts the registration process with a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <returns>Room Registration response.</returns>
+		public Task<RoomRegistrationEventArgs> RegisterWithRoomAsync(string RoomId, string Domain)
+		{
+			return this.RegisterWithRoomAsync(RoomId, Domain, null, null);
+		}
+
+		/// <summary>
+		/// Starts the registration process with a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>Room Registration response.</returns>
+		public Task<RoomRegistrationEventArgs> RegisterWithRoomAsync(string RoomId, string Domain,
+			IqResultEventHandlerAsync SubmissionCallback, object State)
+		{
+			TaskCompletionSource<RoomRegistrationEventArgs> Result = new TaskCompletionSource<RoomRegistrationEventArgs>();
+
+			this.RegisterWithRoom(RoomId, Domain, (sender, e) => Result.TrySetResult(e), 
+				SubmissionCallback, State);
+
+			return Result.Task;
 		}
 
 	}

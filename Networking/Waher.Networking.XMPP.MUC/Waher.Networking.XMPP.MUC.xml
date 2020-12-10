@@ -227,6 +227,42 @@
             Nick-name of occupant.
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomRegistrationEventHandler">
+            <summary>
+            Delegate for room registration callback events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs">
+            <summary>
+            Event arguments for a room registration event handlers.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.DataForms.DataForm,System.Boolean,System.String)">
+            <summary>
+            Event arguments for a room registration event handlers.
+            </summary>
+            <param name="e">IQ Result event arguments.</param>
+            <param name="Form">Registration form. Can be null if already registered.</param>
+            <param name="AlreadyRegistered">If the Bare JID was already registered.</param>
+            <param name="UserName">Nick-Name of the Bare JID.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs.Form">
+            <summary>
+            Registration form. Can be null if already registered.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs.UserName">
+            <summary>
+            User Name of Bare Jid, if already registered.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs.AlreadyRegistered">
+            <summary>
+            If already registered. The nick-name is available in <see cref="P:Waher.Networking.XMPP.MUC.RoomRegistrationEventArgs.UserName"/>.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.UserPresenceEventHandlerAsync">
             <summary>
             Delegate for User Presence events.
@@ -561,7 +597,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Message">Message body.</param>
         </member>
@@ -572,7 +608,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Message">Message body.</param>
             <param name="Language">Language</param>
@@ -584,7 +620,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Message">Message body.</param>
             <param name="Language">Language</param>
@@ -597,7 +633,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Message">Message body.</param>
             <param name="Language">Language</param>
@@ -611,7 +647,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Xml">Message body.</param>
         </member>
@@ -622,7 +658,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Xml">Message body.</param>
             <param name="Language">Language</param>
@@ -634,7 +670,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Xml">Message body.</param>
             <param name="Language">Language</param>
@@ -647,7 +683,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Xml">Message body.</param>
             <param name="Language">Language</param>
@@ -676,7 +712,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Subject">Room subject.</param>
         </member>
@@ -687,7 +723,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="Subject">Room subject.</param>
             <param name="Language">Language</param>
@@ -699,7 +735,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Message">Message body.</param>
@@ -711,7 +747,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Message">Message body.</param>
@@ -724,7 +760,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Message">Message body.</param>
@@ -738,7 +774,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Message">Message body.</param>
@@ -753,7 +789,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Xml">Message body.</param>
@@ -765,7 +801,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Xml">Message body.</param>
@@ -778,7 +814,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Xml">Message body.</param>
@@ -792,7 +828,7 @@
             Note: The client must be an occupant of the chat room before messages
             can be properly propagated to other occupants of the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="NickName">Nick-name of recipient.</param>
             <param name="Xml">Message body.</param>
@@ -859,7 +895,7 @@
             <summary>
             Sends an invitation to the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="BareJid">Bare JID of entity to invite.</param>
         </member>
@@ -867,7 +903,7 @@
             <summary>
             Sends an invitation to the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="BareJid">Bare JID of entity to invite.</param>
             <param name="Reason">Reason for sending the invitation.</param>
@@ -876,7 +912,7 @@
             <summary>
             Sends an invitation to the room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="BareJid">Bare JID of entity to invite.</param>
             <param name="Reason">Reason for sending the invitation.</param>
@@ -886,11 +922,48 @@
             <summary>
             Declines an invitation from a room.
             </summary>
-            <param name="RoomID">Room ID</param>
+            <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="InviteFrom">Original invitation was sent from.</param>
             <param name="Reason">Reason for declining the invitation.</param>
             <param name="Language">Language</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RegisterWithRoom(System.String,System.String,Waher.Networking.XMPP.MUC.RoomRegistrationEventHandler,System.Object)">
+            <summary>
+            Starts the registration process with a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RegisterWithRoom(System.String,System.String,Waher.Networking.XMPP.MUC.RoomRegistrationEventHandler,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Starts the registration process with a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RegisterWithRoomAsync(System.String,System.String)">
+            <summary>
+            Starts the registration process with a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <returns>Room Registration response.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RegisterWithRoomAsync(System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Starts the registration process with a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+            <param name="State">State object to pass on to callback method.</param>
+            <returns>Room Registration response.</returns>
         </member>
     </members>
 </doc>

@@ -1300,7 +1300,7 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			TaskCompletionSource<RoomRegistrationEventArgs> Result = new TaskCompletionSource<RoomRegistrationEventArgs>();
 
-			this.RegisterWithRoom(RoomId, Domain, (sender, e) => Result.TrySetResult(e), 
+			this.RegisterWithRoom(RoomId, Domain, (sender, e) => Result.TrySetResult(e),
 				SubmissionCallback, State);
 
 			return Result.Task;
@@ -1329,7 +1329,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<RoomInformationEventArgs> GetRoomInformationAsync(string RoomId, string Domain)
 		{
 			TaskCompletionSource<RoomInformationEventArgs> Result = new TaskCompletionSource<RoomInformationEventArgs>();
-			
+
 			this.GetRoomInformation(RoomId, Domain, (sender, e) =>
 			{
 				Result.TrySetResult(e);
@@ -1337,6 +1337,80 @@ namespace Waher.Networking.XMPP.MUC
 			}, null);
 
 			return Result.Task;
+		}
+
+		/// <summary>
+		/// Gets information about items (occupants) in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetRoomItems(string RoomId, string Domain, ServiceItemsDiscoveryEventHandler Callback, object State)
+		{
+			this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets information about items (occupants) in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		public Task<ServiceItemsDiscoveryEventArgs> GetRoomItemsAsync(string RoomId, string Domain)
+		{
+			return this.client.ServiceItemsDiscoveryAsync(RoomId + "@" + Domain);
+		}
+
+		/// <summary>
+		/// Performs a service discocery request on an occupant of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name of occupant.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void OccupantServiceDiscovery(string RoomId, string Domain, string NickName,
+			ServiceDiscoveryEventHandler Callback, object State)
+		{
+			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a service discocery request on an occupant of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name of occupant.</param>
+		/// <returns>Response to service discovery request.</returns>
+		public Task<ServiceDiscoveryEventArgs> OccupantServiceDiscoveryAsync(string RoomId, string Domain, string NickName)
+		{
+			return this.client.ServiceDiscoveryAsync(RoomId + "@" + Domain + "/" + NickName);
+		}
+
+		/// <summary>
+		/// Performs a service items discocery request on an occupant of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name of occupant.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void OccupantServiceItemsDiscovery(string RoomId, string Domain, string NickName,
+			ServiceItemsDiscoveryEventHandler Callback, object State)
+		{
+			this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a service items discocery request on an occupant of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name of occupant.</param>
+		/// <returns>Response to service items discovery request.</returns>
+		public Task<ServiceItemsDiscoveryEventArgs> OccupantServiceItemsDiscoveryAsync(string RoomId, string Domain, string NickName)
+		{
+			return this.client.ServiceItemsDiscoveryAsync(RoomId + "@" + Domain + "/" + NickName);
 		}
 	}
 }

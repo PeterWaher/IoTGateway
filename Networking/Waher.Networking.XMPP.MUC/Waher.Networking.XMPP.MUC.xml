@@ -1084,5 +1084,59 @@
             <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomItems(System.String,System.String,Waher.Networking.XMPP.ServiceDiscovery.ServiceItemsDiscoveryEventHandler,System.Object)">
+            <summary>
+            Gets information about items (occupants) in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomItemsAsync(System.String,System.String)">
+            <summary>
+            Gets information about items (occupants) in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantServiceDiscovery(System.String,System.String,System.String,Waher.Networking.XMPP.ServiceDiscovery.ServiceDiscoveryEventHandler,System.Object)">
+            <summary>
+            Performs a service discocery request on an occupant of a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name of occupant.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantServiceDiscoveryAsync(System.String,System.String,System.String)">
+            <summary>
+            Performs a service discocery request on an occupant of a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name of occupant.</param>
+            <returns>Response to service discovery request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantServiceItemsDiscovery(System.String,System.String,System.String,Waher.Networking.XMPP.ServiceDiscovery.ServiceItemsDiscoveryEventHandler,System.Object)">
+            <summary>
+            Performs a service items discocery request on an occupant of a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name of occupant.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantServiceItemsDiscoveryAsync(System.String,System.String,System.String)">
+            <summary>
+            Performs a service items discocery request on an occupant of a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name of occupant.</param>
+            <returns>Response to service items discovery request.</returns>
+        </member>
     </members>
 </doc>

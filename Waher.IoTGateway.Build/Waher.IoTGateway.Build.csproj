@@ -29,6 +29,8 @@
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
+    <MSBuild Projects="..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>

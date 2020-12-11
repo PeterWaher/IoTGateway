@@ -1412,5 +1412,196 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.client.ServiceItemsDiscoveryAsync(RoomId + "@" + Domain + "/" + NickName);
 		}
+
+		/// <summary>
+		/// Sets the role of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Role">New role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetOccupantRole(string RoomId, string Domain, string OccupantNickName,
+			Role Role, string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.SetOccupantState(RoomId, Domain, OccupantNickName, null, Role, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets the affiliation of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">New affiliation.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetOccupantAffiliation(string RoomId, string Domain, string OccupantNickName,
+			Affiliation Affiliation, string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.SetOccupantState(RoomId, Domain, OccupantNickName, Affiliation, null, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets the affiliation of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Kick(string RoomId, string Domain, string OccupantNickName, 
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.SetOccupantState(RoomId, Domain, OccupantNickName, null, Role.None, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets the state of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">Optional new affiliation.</param>
+		/// <param name="Role">Optional new role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetOccupantState(string RoomId, string Domain, string OccupantNickName,
+			Affiliation? Affiliation, Role? Role, string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceMucAdmin);
+			Xml.Append("'><item nick='");
+			Xml.Append(XML.Encode(OccupantNickName));
+			Xml.Append("'");
+
+			if (Affiliation.HasValue)
+			{
+				Xml.Append(" affiliation='");
+				Xml.Append(Affiliation.Value.ToString().ToLower());
+				Xml.Append("'");
+			}
+
+			if (Role.HasValue)
+			{
+				Xml.Append(" role='");
+				Xml.Append(Role.Value.ToString().ToLower());
+				Xml.Append("'");
+			}
+
+			Xml.Append(">");
+
+			if(!string.IsNullOrEmpty(Reason))
+			{
+				Xml.Append("<reason>");
+				Xml.Append(XML.Encode(Reason));
+				Xml.Append("</reason>");
+			}
+
+			Xml.Append("</item></query>");
+
+			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+		}
+
+
+		/// <summary>
+		/// Sets the role of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Role">New role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> SetOccupantRoleAsync(string RoomId, string Domain, string OccupantNickName,
+			Role Role, string Reason)
+		{
+			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, null, Role, Reason);
+		}
+
+		/// <summary>
+		/// Sets the affiliation of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">New affiliation.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> SetOccupantAffiliationAsync(string RoomId, string Domain, string OccupantNickName,
+			Affiliation Affiliation, string Reason)
+		{
+			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, Affiliation, null, Reason);
+		}
+
+		/// <summary>
+		/// Sets the affiliation of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> KickAsync(string RoomId, string Domain, string OccupantNickName,
+			string Reason)
+		{
+			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, null, Role.None, Reason);
+		}
+
+		/// <summary>
+		/// Sets the state of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">Optional new affiliation.</param>
+		/// <param name="Role">Optional new role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> SetOccupantStateAsync(string RoomId, string Domain, string OccupantNickName,
+			Affiliation? Affiliation, Role? Role, string Reason)
+		{
+			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
+
+			this.SetOccupantState(RoomId, Domain, OccupantNickName, Affiliation, Role, Reason, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
 	}
 }

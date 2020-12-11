@@ -1024,6 +1024,20 @@
               <File Id='Waher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.Utility.ExStat.pdb' Name='Waher.Utility.ExStat.pdb' On='uninstall'/>
             </Component>
+            <Component Id='UtilityExtract' Guid='179608D4-E6B0-4B56-A6D3-6923D2262CD2'>
+              <File Id='Waher.Utility.Extract.exe' Name='Waher.Utility.Extract.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Extract.dll' Name='Waher.Utility.Extract.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.dll' Vital='yes'/>
+              <File Id='Waher.Utility.Extract.deps.json' Name='Waher.Utility.Extract.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.Extract.runtimeconfig.json' Name='Waher.Utility.Extract.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Extract.exe' Name='Waher.Utility.Extract.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Extract.dll' Name='Waher.Utility.Extract.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Extract.deps.json' Name='Waher.Utility.Extract.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Extract.runtimeconfig.json' Name='Waher.Utility.Extract.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityExtractDebugFiles' Guid='3CC734DD-9572-4017-8439-EF04BA07B318'>
+              <File Id='Waher.Utility.Extract.pdb' Name='Waher.Utility.Extract.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Extract.pdb' Name='Waher.Utility.Extract.pdb' On='uninstall'/>
+            </Component>
             <Directory Id='Graphics' Name='Graphics'>
               <Component Id='Emoji1Zip' Guid='8CA3074F-7809-4D73-82EF-B15316E5151F'>
                 <RemoveFolder Id='RemoveGraphicsFolder' On='uninstall' />
@@ -1784,6 +1798,7 @@
         <ComponentRef Id='UtilitySign' />
         <ComponentRef Id='UtilityTransform' />
         <ComponentRef Id='UtilityExStat' />
+        <ComponentRef Id='UtilityExtract' />
       </Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
@@ -1799,6 +1814,7 @@
         <ComponentRef Id='UtilitySignDebugFiles' />
         <ComponentRef Id='UtilityTransformDebugFiles' />
         <ComponentRef Id='UtilityExStatDebugFiles' />
+        <ComponentRef Id='UtilityExtractDebugFiles' />
       </Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />

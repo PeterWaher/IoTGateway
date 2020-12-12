@@ -22,6 +22,7 @@ namespace Waher.Networking.XMPP.MUC
 		private readonly string domain;
 		private readonly string userNick;
 		private readonly string fullJid;
+		private readonly string reason;
 
 		/// <summary>
 		/// Event arguments for user presence events.
@@ -36,7 +37,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Status">Status codes.</param>
 		public UserPresenceEventArgs(PresenceEventArgs e, string RoomId, string Domain, 
 			string UserNick, Affiliation Affiliation, Role Role, string FullJid,
-			params MucStatus[] Status)
+			string Reason, params MucStatus[] Status)
 			: base(e)
 		{
 			this.roomId = RoomId;
@@ -45,6 +46,7 @@ namespace Waher.Networking.XMPP.MUC
 			this.affiliation = Affiliation;
 			this.role = Role;
 			this.fullJid = FullJid;
+			this.reason = Reason;
 			this.status = Status;
 		}
 
@@ -67,6 +69,11 @@ namespace Waher.Networking.XMPP.MUC
 		/// Full JID, if privileges allow (null otherwise).
 		/// </summary>
 		public string FullJid => this.fullJid;
+
+		/// <summary>
+		/// Any reason provided for the change.
+		/// </summary>
+		public string Reason => this.reason;
 
 		/// <summary>
 		/// User Affiliation in room.

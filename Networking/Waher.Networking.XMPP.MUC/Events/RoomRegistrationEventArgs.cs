@@ -29,8 +29,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="AlreadyRegistered">If the Bare JID was already registered.</param>
 		/// <param name="UserName">Nick-Name of the Bare JID.</param>
 		public RoomRegistrationEventArgs(IqResultEventArgs e, DataForm Form, 
-			bool AlreadyRegistered, string UserName) :
-			base(e)
+			bool AlreadyRegistered, string UserName) 
+			: base(e)
 		{
 			this.form = Form;
 			this.alreadyRegistered = AlreadyRegistered;

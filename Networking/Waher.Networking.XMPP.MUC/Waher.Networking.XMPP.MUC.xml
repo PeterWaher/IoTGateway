@@ -59,6 +59,30 @@
             No role
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.MUC.OccupantListEventHandler">
+            <summary>
+            Delegate for occupant list callback events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.OccupantListEventArgs">
+            <summary>
+            Event arguments for a occupant list event handlers.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.OccupantListEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.MUC.MucOccupant[])">
+            <summary>
+            Event arguments for a occupant list event handlers.
+            </summary>
+            <param name="e">IQ Result event arguments.</param>
+            <param name="Occupants">Occupants</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.OccupantListEventArgs.Occupants">
+            <summary>
+            List of occupants.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.RoomDeclinedMessageEventHandler">
             <summary>
             Delegate for MUC Room declined event handlers.
@@ -378,7 +402,7 @@
             Event arguments for user presence events.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.#ctor(Waher.Networking.XMPP.PresenceEventArgs,System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,Waher.Networking.XMPP.MUC.Role,System.String,Waher.Networking.XMPP.MUC.MucStatus[])">
+        <member name="M:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.#ctor(Waher.Networking.XMPP.PresenceEventArgs,System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,Waher.Networking.XMPP.MUC.Role,System.String,System.String,Waher.Networking.XMPP.MUC.MucStatus[])">
             <summary>
             Event arguments for user presence events.
             </summary>
@@ -411,6 +435,11 @@
             Full JID, if privileges allow (null otherwise).
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Reason">
+            <summary>
+            Any reason provided for the change.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Affiliation">
             <summary>
             User Affiliation in room.
@@ -424,6 +453,114 @@
         <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.MucStatus">
             <summary>
             Any status codes informing about changes to status.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.MucOccupant">
+            <summary>
+            Multi-User Chat room occupant.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MucOccupant.#ctor(Waher.Networking.XMPP.MUC.MultiUserChatClient,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,Waher.Networking.XMPP.MUC.Role)">
+            <summary>
+            Multi-User Chat room occupant.
+            </summary>
+            <param name="Client">MUC Client</param>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the MUC room.</param>
+            <param name="NickName">Nick-name</param>
+            <param name="Jid">JID</param>
+            <param name="Affiliation">Affiliation</param>
+            <param name="Role">Role</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.Client">
+            <summary>
+            MUC Client
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.RoomId">
+            <summary>
+            Room ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.Domain">
+            <summary>
+            Domain hosting the MUC room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.Affiliation">
+            <summary>
+            Affiliation assigned to occupant.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.Role">
+            <summary>
+            Role assigned to occupant.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.NickName">
+            <summary>
+            Nick-name in room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupant.Jid">
+            <summary>
+            JID of occupant
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.MUC.MucOccupantConfiguration">
+            <summary>
+            Contains information about a configuration to be made to an occupant in a room.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.#ctor(System.String,Waher.Networking.XMPP.MUC.Affiliation)">
+            <summary>
+            Contains information about a configuration to be made to an occupant in a room.
+            </summary>
+            <param name="NickName">Nick-name of occupant in room.</param>
+            <param name="Affiliation">Affiliation change, if specified.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.#ctor(System.String,Waher.Networking.XMPP.MUC.Role)">
+            <summary>
+            Contains information about a configuration to be made to an occupant in a room.
+            </summary>
+            <param name="NickName">Nick-name of occupant in room.</param>
+            <param name="Role">Role change, if specified.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.#ctor(System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role})">
+            <summary>
+            Contains information about a configuration to be made to an occupant in a room.
+            </summary>
+            <param name="NickName">Nick-name of occupant in room.</param>
+            <param name="Affiliation">Affiliation change, if specified.</param>
+            <param name="Role">Role change, if specified.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.#ctor(System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},System.String)">
+            <summary>
+            Contains information about a configuration to be made to an occupant in a room.
+            </summary>
+            <param name="NickName">Nick-name of occupant in room.</param>
+            <param name="Affiliation">Affiliation change, if specified.</param>
+            <param name="Role">Role change, if specified.</param>
+            <param name="Reason">Optioanl Reason</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.NickName">
+            <summary>
+            Nick-name of occupant in room.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.Affiliation">
+            <summary>
+            Affiliation change, if specified.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.Role">
+            <summary>
+            Role change, if specified.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.Reason">
+            <summary>
+            Optional reason.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.MUC.MucStatus">
@@ -550,6 +687,11 @@
         <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.NamespaceMucOwner">
             <summary>
             http://jabber.org/protocol/muc#owner
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MultiUserChatClient.FormTypeRequest">
+            <summary>
+            http://jabber.org/protocol/muc#request
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
@@ -1138,9 +1280,9 @@
             <param name="NickName">Nick-name of occupant.</param>
             <returns>Response to service items discovery request.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantRole(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Role,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupant(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Role,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
-            Sets the role of an occupant.
+            Configures the role of an occupant.
             
             Note: You will need moderator, admin or owner privileges, depending
             on the type of change requested.
@@ -1153,9 +1295,9 @@
             <param name="Callback">Method to call when response is returned from room.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantAffiliation(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupant(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
-            Sets the affiliation of an occupant.
+            Configures the affiliation of an occupant.
             
             Note: You will need moderator, admin or owner privileges, depending
             on the type of change requested.
@@ -1167,10 +1309,94 @@
             <param name="Reason">Reason for change.</param>
             <param name="Callback">Method to call when response is returned from room.</param>
             <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupant(System.String,System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Sets the state (affiliation and/or role) of an occupant.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Affiliation">Optional new affiliation.</param>
+            <param name="Role">Optional new role.</param>
+            <param name="Reason">Reason for change.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupant(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[],Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Configures the states (affiliations and/or roles) of occupants.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Changes">Configurations to perform.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantAsync(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Role,System.String)">
+            <summary>
+            Configures the role of an occupant.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Role">New role.</param>
+            <param name="Reason">Reason for change.</param>
+            <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantAsync(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,System.String)">
+            <summary>
+            Configures the affiliation of an occupant.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Affiliation">New affiliation.</param>
+            <param name="Reason">Reason for change.</param>
+            <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantAsync(System.String,System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},System.String)">
+            <summary>
+            Configures the state (affiliation and/or role) of an occupant.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Affiliation">Optional new affiliation.</param>
+            <param name="Role">Optional new role.</param>
+            <param name="Reason">Reason for change.</param>
+            <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantAsync(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[])">
+            <summary>
+            Configures the state (affiliation and/or role) of an occupant.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Changes">Configurations to perform.</param>
+            <returns>Response to request.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Kick(System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
-            Sets the affiliation of an occupant.
+            Kicks an occupant out of a room.
             
             Note: You will need moderator, admin or owner privileges, depending
             on the type of change requested.
@@ -1181,54 +1407,10 @@
             <param name="Reason">Reason for change.</param>
             <param name="Callback">Method to call when response is returned from room.</param>
             <param name="State">State object to pass on to callback method.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantState(System.String,System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
-            <summary>
-            Sets the state of an occupant.
-            
-            Note: You will need moderator, admin or owner privileges, depending
-            on the type of change requested.
-            </summary>
-            <param name="RoomId">Room ID.</param>
-            <param name="Domain">Domain of service hosting the room.</param>
-            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-            <param name="Affiliation">Optional new affiliation.</param>
-            <param name="Role">Optional new role.</param>
-            <param name="Reason">Reason for change.</param>
-            <param name="Callback">Method to call when response is returned from room.</param>
-            <param name="State">State object to pass on to callback method.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantRoleAsync(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Role,System.String)">
-            <summary>
-            Sets the role of an occupant.
-            
-            Note: You will need moderator, admin or owner privileges, depending
-            on the type of change requested.
-            </summary>
-            <param name="RoomId">Room ID.</param>
-            <param name="Domain">Domain of service hosting the room.</param>
-            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-            <param name="Role">New role.</param>
-            <param name="Reason">Reason for change.</param>
-            <returns>Response to request.</returns>
-        </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantAffiliationAsync(System.String,System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,System.String)">
-            <summary>
-            Sets the affiliation of an occupant.
-            
-            Note: You will need moderator, admin or owner privileges, depending
-            on the type of change requested.
-            </summary>
-            <param name="RoomId">Room ID.</param>
-            <param name="Domain">Domain of service hosting the room.</param>
-            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-            <param name="Affiliation">New affiliation.</param>
-            <param name="Reason">Reason for change.</param>
-            <returns>Response to request.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.KickAsync(System.String,System.String,System.String,System.String)">
             <summary>
-            Sets the affiliation of an occupant.
+            Kicks an occupant out of a room.
             
             Note: You will need moderator, admin or owner privileges, depending
             on the type of change requested.
@@ -1239,9 +1421,9 @@
             <param name="Reason">Reason for change.</param>
             <returns>Response to request.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetOccupantStateAsync(System.String,System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},System.String)">
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GrantVoice(System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
-            Sets the state of an occupant.
+            Grants voice to a visitor of a room.
             
             Note: You will need moderator, admin or owner privileges, depending
             on the type of change requested.
@@ -1249,10 +1431,135 @@
             <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-            <param name="Affiliation">Optional new affiliation.</param>
-            <param name="Role">Optional new role.</param>
+            <param name="Reason">Reason for change.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GrantVoiceAsync(System.String,System.String,System.String,System.String)">
+            <summary>
+            Grants voice to a visitor of a room.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
             <param name="Reason">Reason for change.</param>
             <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RevokeVoice(System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Revokes voice to a visitor of a room.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Reason">Reason for change.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RevokeVoiceAsync(System.String,System.String,System.String,System.String)">
+            <summary>
+            Revokes voice to a visitor of a room.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+            <param name="Reason">Reason for change.</param>
+            <returns>Response to request.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupants(System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation,Waher.Networking.XMPP.MUC.OccupantListEventHandler,System.Object)">
+            <summary>
+            Gets a list of occupants having a specific affiliation.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Affiliation">Optional affiliation.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupants(System.String,System.String,Waher.Networking.XMPP.MUC.Role,Waher.Networking.XMPP.MUC.OccupantListEventHandler,System.Object)">
+            <summary>
+            Gets a list of occupants having a specific role.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Role">Role.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupants(System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role},Waher.Networking.XMPP.MUC.OccupantListEventHandler,System.Object)">
+            <summary>
+            Gets a list of occupants having a specific affiliation or role.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Affiliation">Optional affiliation.</param>
+            <param name="Role">Optional role.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupantsAsync(System.String,System.String,Waher.Networking.XMPP.MUC.Affiliation)">
+            <summary>
+            Gets a list of occupants having a specific affiliation.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Affiliation">Optional affiliation.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupantsAsync(System.String,System.String,Waher.Networking.XMPP.MUC.Role)">
+            <summary>
+            Gets a list of occupants having a specific role.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Role">Role.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetOccupantsAsync(System.String,System.String,System.Nullable{Waher.Networking.XMPP.MUC.Affiliation},System.Nullable{Waher.Networking.XMPP.MUC.Role})">
+            <summary>
+            Gets a list of occupants having a specific affiliation or role.
+            
+            Note: You will need moderator, admin or owner privileges, depending
+            on the type of change requested.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Affiliation">Optional affiliation.</param>
+            <param name="Role">Optional role.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RequestVoice(System.String,System.String)">
+            <summary>
+            Request voice privileges in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantRequest">
+            <summary>
+            Event raised when a request has been received from an occupant in a room.
+            </summary>
         </member>
     </members>
 </doc>

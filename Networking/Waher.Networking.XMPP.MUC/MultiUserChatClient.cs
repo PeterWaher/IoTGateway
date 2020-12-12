@@ -36,6 +36,11 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		public const string NamespaceMucOwner = "http://jabber.org/protocol/muc#owner";
 
+		/// <summary>
+		/// http://jabber.org/protocol/muc#request
+		/// </summary>
+		public const string FormTypeRequest = "http://jabber.org/protocol/muc#request";
+
 		private readonly string componentAddress;
 
 		/// <summary>
@@ -51,6 +56,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			this.client.RegisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
 			this.client.RegisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
+			this.client.RegisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 
 			this.client.OnGroupChatMessage += Client_OnGroupChatMessage;
 		}
@@ -62,6 +68,7 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			this.client.UnregisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
 			this.client.UnregisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
+			this.client.UnregisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 
 			this.client.OnGroupChatMessage -= Client_OnGroupChatMessage;
 
@@ -105,7 +112,8 @@ namespace Waher.Networking.XMPP.MUC
 			List<MucStatus> Status = null;
 			Affiliation Affiliation = Affiliation.None;
 			Role Role = Role.None;
-			string FullJid = null;
+			string FullJid = string.Empty;
+			string Reason = string.Empty;
 
 			foreach (XmlNode N in e.Presence.ChildNodes)
 			{
@@ -125,6 +133,23 @@ namespace Waher.Networking.XMPP.MUC
 
 							if (E2.HasAttribute("jid"))
 								FullJid = E2.Attributes["jid"].Value;
+
+							foreach (XmlNode N3 in E2.ChildNodes)
+							{
+								if (!(N3 is XmlElement E3) || E3.NamespaceURI != NamespaceMucUser)
+									continue;
+
+								switch (E3.LocalName)
+								{
+									case "actor":
+										NickName = XML.Attribute(E3, "nick", NickName);
+										break;
+
+									case "reason":
+										Reason = E3.InnerText;
+										break;
+								}
+							}
 							break;
 
 						case "status":
@@ -138,7 +163,7 @@ namespace Waher.Networking.XMPP.MUC
 			}
 
 			Result = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-				Affiliation, Role, FullJid, Status?.ToArray() ?? new MucStatus[0]);
+				Affiliation, Role, FullJid, Reason, Status?.ToArray() ?? new MucStatus[0]);
 
 			return true;
 		}
@@ -247,7 +272,7 @@ namespace Waher.Networking.XMPP.MUC
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
 						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty)
+							Affiliation.None, Role.None, string.Empty, string.Empty)
 						{
 							Ok = false
 						};
@@ -307,7 +332,7 @@ namespace Waher.Networking.XMPP.MUC
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
 						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty)
+							Affiliation.None, Role.None, string.Empty, string.Empty)
 						{
 							Ok = false
 						};
@@ -972,7 +997,7 @@ namespace Waher.Networking.XMPP.MUC
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
 						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty)
+							Affiliation.None, Role.None, string.Empty, string.Empty)
 						{
 							Ok = false
 						};
@@ -1414,7 +1439,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Sets the role of an occupant.
+		/// Configures the role of an occupant.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -1426,14 +1451,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetOccupantRole(string RoomId, string Domain, string OccupantNickName,
+		public void ConfigureOccupant(string RoomId, string Domain, string OccupantNickName,
 			Role Role, string Reason, IqResultEventHandlerAsync Callback, object State)
 		{
-			this.SetOccupantState(RoomId, Domain, OccupantNickName, null, Role, Reason, Callback, State);
+			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, null, Role, Reason, Callback, State);
 		}
 
 		/// <summary>
-		/// Sets the affiliation of an occupant.
+		/// Configures the affiliation of an occupant.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -1445,32 +1470,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetOccupantAffiliation(string RoomId, string Domain, string OccupantNickName,
+		public void ConfigureOccupant(string RoomId, string Domain, string OccupantNickName,
 			Affiliation Affiliation, string Reason, IqResultEventHandlerAsync Callback, object State)
 		{
-			this.SetOccupantState(RoomId, Domain, OccupantNickName, Affiliation, null, Reason, Callback, State);
+			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Affiliation, null, Reason, Callback, State);
 		}
 
 		/// <summary>
-		/// Sets the affiliation of an occupant.
-		/// 
-		/// Note: You will need moderator, admin or owner privileges, depending
-		/// on the type of change requested.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-		/// <param name="Reason">Reason for change.</param>
-		/// <param name="Callback">Method to call when response is returned from room.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void Kick(string RoomId, string Domain, string OccupantNickName, 
-			string Reason, IqResultEventHandlerAsync Callback, object State)
-		{
-			this.SetOccupantState(RoomId, Domain, OccupantNickName, null, Role.None, Reason, Callback, State);
-		}
-
-		/// <summary>
-		/// Sets the state of an occupant.
+		/// Sets the state (affiliation and/or role) of an occupant.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -1483,16 +1490,312 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetOccupantState(string RoomId, string Domain, string OccupantNickName,
+		public void ConfigureOccupant(string RoomId, string Domain, string OccupantNickName,
 			Affiliation? Affiliation, Role? Role, string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, new MucOccupantConfiguration[] 
+			{ 
+				new MucOccupantConfiguration(OccupantNickName, Affiliation, Role, Reason)
+			}, Callback, State);
+		}
+
+		/// <summary>
+		/// Configures the states (affiliations and/or roles) of occupants.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Changes">Configurations to perform.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ConfigureOccupant(string RoomId, string Domain, MucOccupantConfiguration[] Changes, 
+			IqResultEventHandlerAsync Callback, object State)
+		{ 
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceMucAdmin);
+			Xml.Append("'>");
+
+			foreach (MucOccupantConfiguration Config in Changes)
+			{
+				Xml.Append("<item nick='");
+				Xml.Append(XML.Encode(Config.NickName));
+				Xml.Append("'");
+
+				if (Config.Affiliation.HasValue)
+				{
+					Xml.Append(" affiliation='");
+					Xml.Append(Config.Affiliation.Value.ToString().ToLower());
+					Xml.Append("'");
+				}
+
+				if (Config.Role.HasValue)
+				{
+					Xml.Append(" role='");
+					Xml.Append(Config.Role.Value.ToString().ToLower());
+					Xml.Append("'");
+				}
+
+				Xml.Append(">");
+
+				if (!string.IsNullOrEmpty(Config.Reason))
+				{
+					Xml.Append("<reason>");
+					Xml.Append(XML.Encode(Config.Reason));
+					Xml.Append("</reason>");
+				}
+
+				Xml.Append("</item>");
+			}
+			
+			Xml.Append("</query>");
+
+			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Configures the role of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Role">New role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantNickName,
+			Role Role, string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, null, Role, Reason);
+		}
+
+		/// <summary>
+		/// Configures the affiliation of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">New affiliation.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantNickName,
+			Affiliation Affiliation, string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, Affiliation, null, Reason);
+		}
+
+		/// <summary>
+		/// Configures the state (affiliation and/or role) of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Affiliation">Optional new affiliation.</param>
+		/// <param name="Role">Optional new role.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantNickName,
+			Affiliation? Affiliation, Role? Role, string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, new MucOccupantConfiguration[]
+			{
+				new MucOccupantConfiguration(OccupantNickName, Affiliation, Role, Reason)
+			});
+		}
+
+		/// <summary>
+		/// Configures the state (affiliation and/or role) of an occupant.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Changes">Configurations to perform.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, MucOccupantConfiguration[] Changes)
+		{
+			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
+
+			this.ConfigureOccupant(RoomId, Domain, Changes, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Kicks an occupant out of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Kick(string RoomId, string Domain, string OccupantNickName,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, null, Role.None, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Kicks an occupant out of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> KickAsync(string RoomId, string Domain, string OccupantNickName,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, null, Role.None, Reason);
+		}
+
+		/// <summary>
+		/// Grants voice to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GrantVoice(string RoomId, string Domain, string OccupantNickName,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, null, Role.Participant, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Grants voice to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> GrantVoiceAsync(string RoomId, string Domain, string OccupantNickName,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, null, Role.Participant, Reason);
+		}
+
+		/// <summary>
+		/// Revokes voice to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RevokeVoice(string RoomId, string Domain, string OccupantNickName,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, null, Role.Visitor, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Revokes voice to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> RevokeVoiceAsync(string RoomId, string Domain, string OccupantNickName,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, null, Role.Visitor, Reason);
+		}
+
+		/// <summary>
+		/// Gets a list of occupants having a specific affiliation.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Affiliation">Optional affiliation.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetOccupants(string RoomId, string Domain, Affiliation Affiliation,
+			OccupantListEventHandler Callback, object State)
+		{
+			this.GetOccupants(RoomId, Domain, Affiliation, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a list of occupants having a specific role.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Role">Role.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetOccupants(string RoomId, string Domain, Role Role, 
+			OccupantListEventHandler Callback, object State)
+		{
+			this.GetOccupants(RoomId, Domain, null, Role, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a list of occupants having a specific affiliation or role.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Affiliation">Optional affiliation.</param>
+		/// <param name="Role">Optional role.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetOccupants(string RoomId, string Domain, Affiliation? Affiliation,
+			Role? Role, OccupantListEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceMucAdmin);
-			Xml.Append("'><item nick='");
-			Xml.Append(XML.Encode(OccupantNickName));
-			Xml.Append("'");
+			Xml.Append("'><item");
 
 			if (Affiliation.HasValue)
 			{
@@ -1508,93 +1811,76 @@ namespace Waher.Networking.XMPP.MUC
 				Xml.Append("'");
 			}
 
-			Xml.Append(">");
+			Xml.Append("/></query>");
 
-			if(!string.IsNullOrEmpty(Reason))
+			this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
 			{
-				Xml.Append("<reason>");
-				Xml.Append(XML.Encode(Reason));
-				Xml.Append("</reason>");
-			}
+				List<MucOccupant> Occupants = new List<MucOccupant>();
 
-			Xml.Append("</item></query>");
+				if (e.Ok && !(e.FirstElement is null) && e.FirstElement.LocalName == "query" &&
+					e.FirstElement.NamespaceURI == NamespaceMucAdmin)
+				{
+					foreach (XmlNode N in e.FirstElement.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "item" && E.NamespaceURI == NamespaceMucAdmin)
+						{
+							Affiliation Affiliation2 = ToAffiliation(XML.Attribute(E, "affiliation"));
+							Role Role2 = ToRole(XML.Attribute(E, "role"));
+							string Jid = XML.Attribute(E, "jid");
+							string NickName = XML.Attribute(E, "nick");
 
-			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+							Occupants.Add(new MucOccupant(this, RoomId, Domain, NickName, Jid, Affiliation2, Role2));
+						}
+					}
+				}
+
+				return Callback?.Invoke(this, new OccupantListEventArgs(e, Occupants.ToArray())) ?? Task.CompletedTask;
+			}, State);
 		}
 
-
 		/// <summary>
-		/// Sets the role of an occupant.
+		/// Gets a list of occupants having a specific affiliation.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-		/// <param name="Role">New role.</param>
-		/// <param name="Reason">Reason for change.</param>
-		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> SetOccupantRoleAsync(string RoomId, string Domain, string OccupantNickName,
-			Role Role, string Reason)
+		/// <param name="Affiliation">Optional affiliation.</param>
+		public Task<OccupantListEventArgs> GetOccupantsAsync(string RoomId, string Domain, Affiliation Affiliation)
 		{
-			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, null, Role, Reason);
+			return this.GetOccupantsAsync(RoomId, Domain, Affiliation, null);
 		}
 
 		/// <summary>
-		/// Sets the affiliation of an occupant.
+		/// Gets a list of occupants having a specific role.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-		/// <param name="Affiliation">New affiliation.</param>
-		/// <param name="Reason">Reason for change.</param>
-		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> SetOccupantAffiliationAsync(string RoomId, string Domain, string OccupantNickName,
-			Affiliation Affiliation, string Reason)
+		/// <param name="Role">Role.</param>
+		public Task<OccupantListEventArgs> GetOccupantsAsync(string RoomId, string Domain, Role Role)
 		{
-			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, Affiliation, null, Reason);
+			return this.GetOccupantsAsync(RoomId, Domain, null, Role);
 		}
 
 		/// <summary>
-		/// Sets the affiliation of an occupant.
+		/// Gets a list of occupants having a specific affiliation or role.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-		/// <param name="Reason">Reason for change.</param>
-		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> KickAsync(string RoomId, string Domain, string OccupantNickName,
-			string Reason)
+		/// <param name="Affiliation">Optional affiliation.</param>
+		/// <param name="Role">Optional role.</param>
+		public Task<OccupantListEventArgs> GetOccupantsAsync(string RoomId, string Domain, Affiliation? Affiliation, Role? Role)
 		{
-			return this.SetOccupantStateAsync(RoomId, Domain, OccupantNickName, null, Role.None, Reason);
-		}
+			TaskCompletionSource<OccupantListEventArgs> Result = new TaskCompletionSource<OccupantListEventArgs>();
 
-		/// <summary>
-		/// Sets the state of an occupant.
-		/// 
-		/// Note: You will need moderator, admin or owner privileges, depending
-		/// on the type of change requested.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
-		/// <param name="Affiliation">Optional new affiliation.</param>
-		/// <param name="Role">Optional new role.</param>
-		/// <param name="Reason">Reason for change.</param>
-		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> SetOccupantStateAsync(string RoomId, string Domain, string OccupantNickName,
-			Affiliation? Affiliation, Role? Role, string Reason)
-		{
-			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
-
-			this.SetOccupantState(RoomId, Domain, OccupantNickName, Affiliation, Role, Reason, (sender, e) =>
+			this.GetOccupants(RoomId, Domain, Affiliation, Role, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
@@ -1602,6 +1888,36 @@ namespace Waher.Networking.XMPP.MUC
 
 			return Result.Task;
 		}
+
+		/// <summary>
+		/// Request voice privileges in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		public void RequestVoice(string RoomId, string Domain)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<x xmlns='");
+			Xml.Append(XmppClient.NamespaceData);
+			Xml.Append("' type='submit'><field var='FORM_TYPE'>");
+			Xml.Append("<value>http://jabber.org/protocol/muc#request</value>");
+			Xml.Append("</field><field var='muc#role' type='list-single'>");
+			Xml.Append("<value>participant</value></field></x>");
+
+			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private Task UserRequestHandler(object Sender, MessageFormEventArgs e)
+		{
+			return this.OccupantRequest?.Invoke(this, e) ?? Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Event raised when a request has been received from an occupant in a room.
+		/// </summary>
+		public event MessageFormEventHandlerAsync OccupantRequest;
 
 	}
 }

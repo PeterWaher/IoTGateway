@@ -846,6 +846,11 @@ namespace Waher.Client.WPF
 			}, null);
 		}
 
+		public void ShowDataForm(DataForm Form)
+		{
+			UpdateGui(this.ShowForm, Form);
+		}
+
 		private void ShowForm(object P)
 		{
 			Mouse.OverrideCursor = null;

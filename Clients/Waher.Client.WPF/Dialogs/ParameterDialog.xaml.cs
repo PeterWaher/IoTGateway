@@ -133,14 +133,14 @@ namespace Waher.Client.WPF.Dialogs
 
 		private Control Layout(Panel Container, LayoutElement Element, DataForm Form)
 		{
-			if (Element is FieldReference)
-				return this.Layout(Container, (FieldReference)Element, Form);
-			else if (Element is Networking.XMPP.DataForms.Layout.TextElement)
-				this.Layout(Container, (Networking.XMPP.DataForms.Layout.TextElement)Element, Form);
-			else if (Element is Networking.XMPP.DataForms.Layout.Section)
-				return this.Layout(Container, (Networking.XMPP.DataForms.Layout.Section)Element, Form);
-			else if (Element is ReportedReference)
-				this.Layout(Container, (ReportedReference)Element, Form);
+			if (Element is FieldReference FieldReference)
+				return this.Layout(Container, FieldReference, Form);
+			else if (Element is Networking.XMPP.DataForms.Layout.TextElement TextElement)
+				this.Layout(Container, TextElement, Form);
+			else if (Element is Networking.XMPP.DataForms.Layout.Section Section)
+				return this.Layout(Container, Section, Form);
+			else if (Element is ReportedReference ReportedReference)
+				this.Layout(Container, ReportedReference, Form);
 
 			return null;
 		}

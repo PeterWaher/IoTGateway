@@ -462,6 +462,13 @@
             Any status codes informing about changes to status.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.HasStatus(Waher.Networking.XMPP.MUC.MucStatus)">
+            <summary>
+            If a given status was reported.
+            </summary>
+            <param name="Status">Status</param>
+            <returns>If status was reported.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.MucOccupant">
             <summary>
             Multi-User Chat room occupant.

@@ -1,0 +1,22 @@
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.EnterRoomForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add room" Height="248" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=RoomID}">
+        <Label Content="Room ID:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,33,12,0" Name="RoomID" VerticalAlignment="Top" 
+                 ToolTip="Enter the ID of the room you want to add." TextChanged="FormChanged" />
+        <Label Content="Nick-Name:" Height="28" HorizontalAlignment="Left" Margin="12,62,0,0" Name="label2" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,83,12,0" Name="NickName" VerticalAlignment="Top" 
+                 ToolTip="Enter the Nick-Name you want to use in the room." TextChanged="FormChanged" />
+        <Label Content="Password (if used):" Height="28" HorizontalAlignment="Left" Margin="12,112,0,0" Name="label3" VerticalAlignment="Top" />
+        <PasswordBox Height="23" HorizontalAlignment="Stretch" Margin="12,133,12,0" Name="Password" VerticalAlignment="Top" 
+                 ToolTip="Enter a password, if required by the room." />
+        <DockPanel Margin="0,175,0,0" Width="160">
+            <Button Content="Add" Height="23" HorizontalAlignment="Left" Name="AddButton" VerticalAlignment="Top" Width="75" IsDefault="True"
+                    ToolTip="Add the Room to your list of rooms on this service." Click="AddButton_Click" IsEnabled="False" />
+            <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75"
+                    ToolTip="Closes the dialog without adding a new room." IsCancel="True" Click="CancelButton_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

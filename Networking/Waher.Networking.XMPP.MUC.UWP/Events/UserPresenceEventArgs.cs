@@ -98,5 +98,15 @@ namespace Waher.Networking.XMPP.MUC
 		/// Any status codes informing about changes to status.
 		/// </summary>
 		public MucStatus[] MucStatus => this.status;
+
+		/// <summary>
+		/// If a given status was reported.
+		/// </summary>
+		/// <param name="Status">Status</param>
+		/// <returns>If status was reported.</returns>
+		public bool HasStatus(MucStatus Status)
+		{
+			return Array.IndexOf<MucStatus>(this.status, Status) >= 0;
+		}
 	}
 }

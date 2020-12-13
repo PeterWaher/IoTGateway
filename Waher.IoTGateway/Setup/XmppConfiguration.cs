@@ -68,6 +68,7 @@ namespace Waher.IoTGateway.Setup
 		private string thingRegistry = string.Empty;
 		private string provisioning = string.Empty;
 		private string events = string.Empty;
+		private string muc = string.Empty;
 		private string pubSub = string.Empty;
 		private string legal = string.Empty;
 		private string software = string.Empty;
@@ -210,6 +211,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get { return this.events; }
 			set { this.events = value; }
+		}
+
+		/// <summary>
+		/// JID of Multi-User Chat service.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string MultiUserChat
+		{
+			get { return this.muc; }
+			set { this.muc = value; }
 		}
 
 		/// <summary>
@@ -728,6 +739,7 @@ namespace Waher.IoTGateway.Setup
 						this.thingRegistry = string.Empty;
 						this.provisioning = string.Empty;
 						this.events = string.Empty;
+						this.muc = string.Empty;
 						this.pubSub = string.Empty;
                         this.legal = string.Empty;
                         this.software = string.Empty;
@@ -745,6 +757,9 @@ namespace Waher.IoTGateway.Setup
 
 								if (e.HasFeature(Networking.XMPP.Provisioning.ProvisioningClient.NamespaceProvisioningDevice))
 									this.provisioning = Item.JID;
+
+								if (e.HasFeature(Networking.XMPP.MUC.MultiUserChatClient.NamespaceMuc))
+									this.muc = Item.JID;
 
 								if (e.HasFeature(Networking.XMPP.PubSub.PubSubClient.NamespacePubSub) && this.ContainsIdentity("service", "pubsub", e))
 									this.pubSub = Item.JID;
@@ -774,6 +789,7 @@ namespace Waher.IoTGateway.Setup
 							{ "provisioning", this.provisioning },
 							{ "eventLog", this.events },
 							{ "pubSub", this.pubSub },
+							{ "muc", this.muc },
 							{ "legal", this.legal },
 							{ "software", this.software }
 						};

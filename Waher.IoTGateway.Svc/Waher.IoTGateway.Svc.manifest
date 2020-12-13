@@ -277,6 +277,7 @@
   <Assembly fileName='Waher.Networking.XMPP.Control.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.HTTPX.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.Mail.dll'/>
+  <Assembly fileName='Waher.Networking.XMPP.MUC.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.P2P.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.PEP.dll'/>
   <Assembly fileName='Waher.Networking.XMPP.Provisioning.dll'/>

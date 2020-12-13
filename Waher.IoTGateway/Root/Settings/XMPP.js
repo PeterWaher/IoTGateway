@@ -255,6 +255,7 @@ function ConnectionOK1(data)
         data.thingRegistry &&
         data.provisioning &&
         data.pubSub &&
+        data.muc &&
         data.legal &&
         data.software;
 
@@ -278,6 +279,8 @@ function ConnectionOK1(data)
     document.getElementById("ProvisioningJID").innerText = data.provisioning;
     document.getElementById("PubSub").innerText = data.pubSub ? "✓" : "✗";
     document.getElementById("PubSubJID").innerText = data.pubSub;
+    document.getElementById("Muc").innerText = data.muc ? "✓" : "✗";
+    document.getElementById("MucJID").innerText = data.muc;
     document.getElementById("Legal").innerText = data.legal ? "✓" : "✗";
     document.getElementById("LegalJID").innerText = data.legal;
     document.getElementById("Software").innerText = data.software ? "✓" : "✗";

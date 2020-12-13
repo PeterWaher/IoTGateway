@@ -182,6 +182,7 @@ limit applications using the server to interoperate accordingly.
 | Thing Registry | <span id="ThingRegistry">{{empty(Config.ThingRegistry) ? "✗" : "✓"}}</span> | <span id="ThingRegistryJID">{{Config.ThingRegistry}}</span> |
 | Provisioning | <span id="Provisioning">{{empty(Config.Provisioning) ? "✗" : "✓"}}</span> | <span id="ProvisioningJID">{{Config.Provisioning}}</span> |
 | Publish/Subscribe | <span id="PubSub">{{empty(Config.PubSub) ? "✗" : "✓"}}</span> | <span id="PubSubJID">{{Config.PubSub}}</span> |
+| Multi-User Chat | <span id="Muc">{{empty(Config.MultiUserChat) ? "✗" : "✓"}}</span> | <span id="MucJID">{{Config.MultiUserChat}}</span> |
 | Legal Identities | <span id="Legal">{{empty(Config.LegalIdentities) ? "✗" : "✓"}}</span> | <span id="LegalJID">{{Config.LegalIdentities}}</span> |
 | Software Updates | <span id="Software">{{empty(Config.SoftwareUpdates) ? "✗" : "✓"}}</span> | <span id="SoftwareJID">{{Config.SoftwareUpdates}}</span> |
 

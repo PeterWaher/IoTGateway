@@ -41,6 +41,7 @@ using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
+using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -135,6 +136,7 @@ namespace Waher.IoTGateway
 		private static ConcentratorServer concentratorServer = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
+		private static MultiUserChatClient mucClient = null;
 		private static ContractsClient contractsClient = null;
 		private static SoftwareUpdateClient softwareUpdateClient = null;
 		private static MailClient mailClient = null;
@@ -1300,6 +1302,11 @@ namespace Waher.IoTGateway
 			else
 				contractsClient = null;
 
+			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.MultiUserChat))
+				mucClient = new MultiUserChatClient(xmppClient, XmppConfiguration.Instance.MultiUserChat);
+			else
+				mucClient = null;
+
 			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.SoftwareUpdates))
 			{
 				string PackagesFolder = Path.Combine(Gateway.appDataFolder, "Packages");
@@ -1693,6 +1700,9 @@ namespace Waher.IoTGateway
 
 				pepClient?.Dispose();
 				pepClient = null;
+
+				mucClient?.Dispose();
+				mucClient = null;
 
 				mailClient?.Dispose();
 				mailClient = null;
@@ -2532,6 +2542,14 @@ namespace Waher.IoTGateway
 		public static PepClient PepClient
 		{
 			get { return pepClient; }
+		}
+
+		/// <summary>
+		/// XMPP Multi-User Chat Protocol (MUC) Client.
+		/// </summary>
+		public static MultiUserChatClient MucClient
+		{
+			get { return mucClient; }
 		}
 
 		/// <summary>
@@ -3444,7 +3462,7 @@ namespace Waher.IoTGateway
 
 			// TODO: Check contract server signature is valid.
 
-			foreach (Role R in Contract.Roles)
+			foreach (Waher.Networking.XMPP.Contracts.Role R in Contract.Roles)
 			{
 				if (R.Name == Role)
 				{

@@ -19,6 +19,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -30,6 +31,7 @@ using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Client.WPF.Model.Legal;
+using Waher.Client.WPF.Model.Muc;
 using Waher.Client.WPF.Model.Provisioning;
 using Waher.Client.WPF.Model.PubSub;
 using Waher.Client.WPF.Model.Things;
@@ -64,6 +66,7 @@ namespace Waher.Client.WPF.Model
 		private ControlClient controlClient;
 		private ConcentratorClient concentratorClient;
 		private SynchronizationClient synchronizationClient;
+		private MultiUserChatClient mucClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
@@ -221,6 +224,14 @@ namespace Waher.Client.WPF.Model
 			this.pepClient.RegisterHandler(typeof(SensorData), PepClient_SensorData);
 		}
 
+		private void AddMucClient(string MucComponentAddress)
+		{
+			this.mucClient?.Dispose();
+			this.mucClient = null;
+
+			this.mucClient = new MultiUserChatClient(this.client, MucComponentAddress);
+		}
+
 		private async Task ConcentratorClient_OnEvent(object Sender, SourceEventMessageEventArgs EventMessage)
 		{
 			if (this.TryGetChild(EventMessage.FromBareJID, out TreeNode Child) &&
@@ -358,6 +369,9 @@ namespace Waher.Client.WPF.Model
 
 			this.pepClient?.Dispose();
 			this.pepClient = null;
+
+			this.mucClient?.Dispose();
+			this.mucClient = null;
 
 			this.sensorClient?.Dispose();
 			this.sensorClient = null;
@@ -1050,6 +1064,11 @@ namespace Waher.Client.WPF.Model
 			get { return this.pepClient; }
 		}
 
+		public MultiUserChatClient MucClient
+		{
+			get { return this.mucClient; }
+		}
+
 		public SensorClient SensorClient
 		{
 			get { return this.sensorClient; }
@@ -1121,6 +1140,11 @@ namespace Waher.Client.WPF.Model
 							{
 								this.AddPepClient(Item.JID);
 								Component = new PubSubService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.pepClient.PubSubClient);
+							}
+							else if (e2.HasFeature(MultiUserChatClient.NamespaceMuc))
+							{
+								this.AddMucClient(Item.JID);
+								Component = new MucService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.mucClient);
 							}
 							else if (e2.HasFeature(ContractsClient.NamespaceLegalIdentities))
 								Component = await LegalService.Create(this, Item.JID, Item.Name, Item.Node, e2.Features);

@@ -287,6 +287,7 @@
     <Compile Include="Model\EventLog.cs" />
     <Compile Include="Model\IMenuAggregator.cs" />
     <Compile Include="Model\Legal\LegalService.cs" />
+    <Compile Include="Model\Muc\MucService.cs" />
     <Compile Include="Model\PubSub\PubSubItem.cs" />
     <Compile Include="Model\PubSub\PubSubNode.cs" />
     <Compile Include="Model\PubSub\PubSubService.cs" />

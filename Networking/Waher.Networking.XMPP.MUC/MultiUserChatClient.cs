@@ -98,15 +98,32 @@ namespace Waher.Networking.XMPP.MUC
 		private Task UserPresenceHandler(object Sender, PresenceEventArgs e)
 		{
 			if (TryParseUserPresence(e, out UserPresenceEventArgs e2))
-				return this.UserPresence?.Invoke(this, e2) ?? Task.CompletedTask;
+			{
+				if (e2.RoomDestroyed)
+					return this.RoomDestroyed?.Invoke(this, e2) ?? Task.CompletedTask;
+				else if (string.IsNullOrEmpty(e2.NickName))
+					return this.RoomPresence?.Invoke(this, e2) ?? Task.CompletedTask;
+				else
+					return this.OccupantPresence?.Invoke(this, e2) ?? Task.CompletedTask;
+			}
 			else
 				return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Event raised when user presence is received.
+		/// Event raised when user presence is received from a room occupant.
 		/// </summary>
-		public event UserPresenceEventHandlerAsync UserPresence;
+		public event UserPresenceEventHandlerAsync OccupantPresence;
+
+		/// <summary>
+		/// Event raised when user presence is received from a room.
+		/// </summary>
+		public event UserPresenceEventHandlerAsync RoomPresence;
+
+		/// <summary>
+		/// Event raised when a room where the client is an occupant is destroyed.
+		/// </summary>
+		public event UserPresenceEventHandlerAsync RoomDestroyed;
 
 		private static bool TryParseUserPresence(PresenceEventArgs e, out UserPresenceEventArgs Result)
 		{
@@ -121,6 +138,7 @@ namespace Waher.Networking.XMPP.MUC
 			Role Role = Role.None;
 			string FullJid = string.Empty;
 			string Reason = string.Empty;
+			bool RoomDestroyed = false;
 
 			foreach (XmlNode N in e.Presence.ChildNodes)
 			{
@@ -165,12 +183,30 @@ namespace Waher.Networking.XMPP.MUC
 
 							Status.Add((MucStatus)XML.Attribute(E2, "code", 0));
 							break;
+
+						case "destroy":
+							RoomDestroyed = true;
+
+							foreach (XmlNode N3 in E2.ChildNodes)
+							{
+								if (!(N3 is XmlElement E3) || E3.NamespaceURI != NamespaceMucUser)
+									continue;
+
+								switch (E3.LocalName)
+								{
+									case "reason":
+										Reason = E3.InnerText;
+										break;
+								}
+							}
+							break;
 					}
 				}
 			}
 
 			Result = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-				Affiliation, Role, FullJid, Reason, Status?.ToArray() ?? new MucStatus[0]);
+				Affiliation, Role, FullJid, Reason, RoomDestroyed,
+				Status?.ToArray() ?? new MucStatus[0]);
 
 			return true;
 		}
@@ -233,6 +269,8 @@ namespace Waher.Networking.XMPP.MUC
 			return true;
 		}
 
+		#region Enter Room
+
 		/// <summary>
 		/// Enter a chat room.
 		/// </summary>
@@ -279,7 +317,7 @@ namespace Waher.Networking.XMPP.MUC
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
 						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty, string.Empty)
+							Affiliation.None, Role.None, string.Empty, string.Empty, false)
 						{
 							Ok = false
 						};
@@ -322,6 +360,10 @@ namespace Waher.Networking.XMPP.MUC
 			return Result.Task;
 		}
 
+		#endregion
+
+		#region Leave Room
+
 		/// <summary>
 		/// Leave a chat room.
 		/// </summary>
@@ -339,7 +381,7 @@ namespace Waher.Networking.XMPP.MUC
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
 					{
 						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty, string.Empty)
+							Affiliation.None, Role.None, string.Empty, string.Empty, false)
 						{
 							Ok = false
 						};
@@ -369,6 +411,10 @@ namespace Waher.Networking.XMPP.MUC
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Create Instant Room
 
 		/// <summary>
 		/// Creates an instant room (with default settings).
@@ -409,6 +455,10 @@ namespace Waher.Networking.XMPP.MUC
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Room Configuration
 
 		/// <summary>
 		/// Gets the configuration form for a room.
@@ -536,6 +586,10 @@ namespace Waher.Networking.XMPP.MUC
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Group Chat Messages
 
 		/// <summary>
 		/// Sends a simple group chat message to a chat room.
@@ -705,6 +759,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		public event RoomOccupantMessageEventHandler RoomOccupantMessage;
 
+		#endregion
+
+		#region Room Subjects
+
 		/// <summary>
 		/// Event raised when a room subject message was received.
 		/// </summary>
@@ -739,6 +797,10 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				string.Empty, string.Empty, Subject, Language, string.Empty, string.Empty);
 		}
+
+		#endregion
+
+		#region Private Messages
 
 		/// <summary>
 		/// Sends a simple private message to a chat room.
@@ -878,6 +940,10 @@ namespace Waher.Networking.XMPP.MUC
 				 string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
+		#endregion
+
+		#region Room Invitations
+
 		private Task UserMessageHandler(object Sender, MessageEventArgs e)
 		{
 			if (!TryParseOccupantJid(e.From, false, out string RoomId, out string Domain, out string NickName))
@@ -988,120 +1054,6 @@ namespace Waher.Networking.XMPP.MUC
 		public event RoomDeclinedMessageEventHandler RoomDeclinedInvitationReceived;
 
 		/// <summary>
-		/// Changes to a new nick-name.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="NickName">Nickname to use in the chat room.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void ChangeNickName(string RoomId, string Domain, string NickName,
-			UserPresenceEventHandlerAsync Callback, object State)
-		{
-			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
-				string.Empty, (sender, e) =>
-				{
-					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
-					{
-						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
-							Affiliation.None, Role.None, string.Empty, string.Empty)
-						{
-							Ok = false
-						};
-					}
-
-					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
-				}, State);
-		}
-
-		/// <summary>
-		/// Changes to a new nick-name.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="NickName">Nickname to use in the chat room.</param>
-		/// <returns>Room entry response.</returns>
-		public Task<UserPresenceEventArgs> ChangeNickNameAsync(string RoomId, string Domain,
-			string NickName)
-		{
-			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
-
-			this.ChangeNickName(RoomId, Domain, NickName, (sender, e) =>
-			{
-				Result.TrySetResult(e);
-				return Task.CompletedTask;
-			}, null);
-
-			return Result.Task;
-		}
-
-		/// <summary>
-		/// Sets the presence of the occupant in a room.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="NickName">Nickname of the occupant.</param>
-		/// <param name="Availability">Occupant availability.</param>
-		/// <param name="Callback">Method to call when stanza has been sent.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
-			PresenceEventHandlerAsync Callback, object State)
-		{
-			string Xml = string.Empty;
-			string Type = string.Empty;
-
-			switch (Availability)
-			{
-				case Availability.Online:
-				default:
-					break;
-
-				case Availability.Away:
-					Xml = "<show>away</show>";
-					break;
-
-				case Availability.Chat:
-					Xml = "<show>chat</show>";
-					break;
-
-				case Availability.DoNotDisturb:
-					Xml = "<show>dnd</show>";
-					break;
-
-				case Availability.ExtendedAway:
-					Xml = "<show>xa</show>";
-					break;
-
-				case Availability.Offline:
-					Type = "unavailable";
-					break;
-			}
-
-			this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml, Callback, State);
-		}
-
-		/// <summary>
-		/// Sets the presence of the occupant in a room.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="NickName">Nickname of the occupant.</param>
-		/// <param name="Availability">Occupant availability.</param>
-		/// <returns>Task object that finishes when stanza has been sent.</returns>
-		public Task SetPresenceAsync(string RoomId, string Domain, string NickName,
-			Availability Availability)
-		{
-			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.SetPresence(RoomId, Domain, NickName, Availability, (sender, e) =>
-			{
-				Result.TrySetResult(true);
-				return Task.CompletedTask;
-			}, null);
-
-			return Result.Task;
-		}
-
-		/// <summary>
 		/// Sends an invitation to the room.
 		/// </summary>
 		/// <param name="RoomId">Room ID</param>
@@ -1185,6 +1137,132 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
+
+		#endregion
+
+		#region Changing Nick-Name
+
+		/// <summary>
+		/// Changes to a new nick-name.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ChangeNickName(string RoomId, string Domain, string NickName,
+			UserPresenceEventHandlerAsync Callback, object State)
+		{
+			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
+				string.Empty, (sender, e) =>
+				{
+					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
+					{
+						e2 = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
+							Affiliation.None, Role.None, string.Empty, string.Empty, false)
+						{
+							Ok = false
+						};
+					}
+
+					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
+				}, State);
+		}
+
+		/// <summary>
+		/// Changes to a new nick-name.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <returns>Room entry response.</returns>
+		public Task<UserPresenceEventArgs> ChangeNickNameAsync(string RoomId, string Domain,
+			string NickName)
+		{
+			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
+
+			this.ChangeNickName(RoomId, Domain, NickName, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Setting Room Presence
+
+		/// <summary>
+		/// Sets the presence of the occupant in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname of the occupant.</param>
+		/// <param name="Availability">Occupant availability.</param>
+		/// <param name="Callback">Method to call when stanza has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
+			PresenceEventHandlerAsync Callback, object State)
+		{
+			string Xml = string.Empty;
+			string Type = string.Empty;
+
+			switch (Availability)
+			{
+				case Availability.Online:
+				default:
+					break;
+
+				case Availability.Away:
+					Xml = "<show>away</show>";
+					break;
+
+				case Availability.Chat:
+					Xml = "<show>chat</show>";
+					break;
+
+				case Availability.DoNotDisturb:
+					Xml = "<show>dnd</show>";
+					break;
+
+				case Availability.ExtendedAway:
+					Xml = "<show>xa</show>";
+					break;
+
+				case Availability.Offline:
+					Type = "unavailable";
+					break;
+			}
+
+			this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets the presence of the occupant in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname of the occupant.</param>
+		/// <param name="Availability">Occupant availability.</param>
+		/// <returns>Task object that finishes when stanza has been sent.</returns>
+		public Task SetPresenceAsync(string RoomId, string Domain, string NickName,
+			Availability Availability)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+			this.SetPresence(RoomId, Domain, NickName, Availability, (sender, e) =>
+			{
+				Result.TrySetResult(true);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Room Registration
 
 		/// <summary>
 		/// Starts the registration process with a room.
@@ -1348,6 +1426,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		public event MessageFormEventHandlerAsync RegistrationRequest;
 
+		#endregion
+
+		#region Room Information
+
 		/// <summary>
 		/// Gets information about a room.
 		/// </summary>
@@ -1456,6 +1538,10 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.client.ServiceItemsDiscoveryAsync(RoomId + "@" + Domain + "/" + NickName);
 		}
+
+		#endregion
+
+		#region Configuring Occupants
 
 		/// <summary>
 		/// Configures the role of an occupant.
@@ -1687,6 +1773,10 @@ namespace Waher.Networking.XMPP.MUC
 			return Result.Task;
 		}
 
+		#endregion
+
+		#region Kicking occupants
+
 		/// <summary>
 		/// Kicks an occupant out of a room.
 		/// 
@@ -1753,6 +1843,10 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantNickName, Role.None, Reason);
 		}
+
+		#endregion
+
+		#region Voice privileges
 
 		/// <summary>
 		/// Grants voice to a visitor of a room.
@@ -2092,6 +2186,10 @@ namespace Waher.Networking.XMPP.MUC
 			return this.GetOccupantsAsync(RoomId, Domain, null, Role.Participant);
 		}
 
+		#endregion
+
+		#region Banning occupants
+
 		/// <summary>
 		/// Bans an occupant out of a room.
 		/// 
@@ -2183,8 +2281,12 @@ namespace Waher.Networking.XMPP.MUC
 			return this.GetOccupantsAsync(RoomId, Domain, Affiliation.Outcast, null);
 		}
 
+		#endregion
+
+		#region Membership affiliation
+
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2201,7 +2303,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2219,7 +2321,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2240,7 +2342,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2255,7 +2357,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2272,7 +2374,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Grants membership to a visitor of a room.
+		/// Grants membership to an occupant of a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2291,7 +2393,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Revokes the membersjip of an occupant in a room.
+		/// Revokes the membership from an occupant in a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2308,7 +2410,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Revokes the membersjip of an occupant in a room.
+		/// Revokes the membership from an occupant in a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2326,7 +2428,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Revokes the membersjip of an occupant in a room.
+		/// Revokes the membership from an occupant in a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2341,7 +2443,7 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
-		/// Revokes the membersjip of an occupant in a room.
+		/// Revokes the membership from an occupant in a room.
 		/// 
 		/// Note: You will need moderator, admin or owner privileges, depending
 		/// on the type of change requested.
@@ -2380,6 +2482,10 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.GetOccupantsAsync(RoomId, Domain, Affiliation.Member, null);
 		}
+
+		#endregion
+
+		#region Moderator Role
 
 		/// <summary>
 		/// Grants moderator status to a visitor of a room.
@@ -2539,5 +2645,447 @@ namespace Waher.Networking.XMPP.MUC
 			return this.GetOccupantsAsync(RoomId, Domain, null, Role.Moderator);
 		}
 
+		#endregion
+
+		#region Ownership affiliation
+
+		/// <summary>
+		/// Grants ownership to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			this.GrantOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Grants ownership to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain,
+				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Owner, Reason),
+				Callback, State);
+		}
+
+		/// <summary>
+		/// Grants ownership to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> GrantOwnershipAsync(string RoomId, string Domain, string OccupantBareJid)
+		{
+			return this.GrantOwnershipAsync(RoomId, Domain, OccupantBareJid, string.Empty);
+		}
+
+		/// <summary>
+		/// Grants ownership to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> GrantOwnershipAsync(string RoomId, string Domain, string OccupantBareJid,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain,
+				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Owner, Reason));
+		}
+
+		/// <summary>
+		/// Revokes the ownership from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			this.RevokeOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Revokes the ownership from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Admin, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Revokes the ownership from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> RevokeOwnershipAsync(string RoomId, string Domain, string OccupantBareJid)
+		{
+			return this.RevokeOwnershipAsync(RoomId, Domain, OccupantBareJid, string.Empty);
+		}
+
+		/// <summary>
+		/// Revokes the ownership from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or owner privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> RevokeOwnershipAsync(string RoomId, string Domain, string OccupantBareJid,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantBareJid, Affiliation.Admin, Reason);
+		}
+
+		/// <summary>
+		/// Gets a list of owners of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetOwnerList(string RoomId, string Domain,
+			OccupantListEventHandler Callback, object State)
+		{
+			this.GetOccupants(RoomId, Domain, Affiliation.Owner, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a list of owners of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <returns>Response with occupants with voice, if ok.</returns>
+		public Task<OccupantListEventArgs> GetOwnerListAsync(string RoomId, string Domain)
+		{
+			return this.GetOccupantsAsync(RoomId, Domain, Affiliation.Owner, null);
+		}
+
+		#endregion
+
+		#region Administrator affiliation
+
+		/// <summary>
+		/// Grants administrator to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			this.GrantAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Grants administrator to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain,
+				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Admin, Reason),
+				Callback, State);
+		}
+
+		/// <summary>
+		/// Grants administrator to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> GrantAdministratorAsync(string RoomId, string Domain, string OccupantBareJid)
+		{
+			return this.GrantAdministratorAsync(RoomId, Domain, OccupantBareJid, string.Empty);
+		}
+
+		/// <summary>
+		/// Grants administrator to a visitor of a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> GrantAdministratorAsync(string RoomId, string Domain, string OccupantBareJid,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain,
+				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Admin, Reason));
+		}
+
+		/// <summary>
+		/// Revokes the administrator from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			this.RevokeAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Revokes the administrator from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Member, Reason, Callback, State);
+		}
+
+		/// <summary>
+		/// Revokes the administrator from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> RevokeAdministratorAsync(string RoomId, string Domain, string OccupantBareJid)
+		{
+			return this.RevokeAdministratorAsync(RoomId, Domain, OccupantBareJid, string.Empty);
+		}
+
+		/// <summary>
+		/// Revokes the administrator from an occupant in a room.
+		/// 
+		/// Note: You will need moderator, admin or admin privileges, depending
+		/// on the type of change requested.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
+		/// <param name="Reason">Reason for change.</param>
+		/// <returns>Response to request.</returns>
+		public Task<IqResultEventArgs> RevokeAdministratorAsync(string RoomId, string Domain, string OccupantBareJid,
+			string Reason)
+		{
+			return this.ConfigureOccupantAsync(RoomId, Domain, OccupantBareJid, Affiliation.Member, Reason);
+		}
+
+		/// <summary>
+		/// Gets a list of admins of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetAdminList(string RoomId, string Domain,
+			OccupantListEventHandler Callback, object State)
+		{
+			this.GetOccupants(RoomId, Domain, Affiliation.Admin, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a list of admins of a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <returns>Response with occupants with voice, if ok.</returns>
+		public Task<OccupantListEventArgs> GetAdminListAsync(string RoomId, string Domain)
+		{
+			return this.GetOccupantsAsync(RoomId, Domain, Affiliation.Admin, null);
+		}
+
+		#endregion
+
+		#region Destroy room
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DestroyRoom(string RoomId, string Domain, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.DestroyRoom(RoomId, Domain, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Reason">Optional reason for destroying the room.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DestroyRoom(string RoomId, string Domain, string Reason,
+			IqResultEventHandlerAsync Callback, object State)
+		{
+			this.DestroyRoom(RoomId, Domain, Reason, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Reason">Optional reason for destroying the room.</param>
+		/// <param name="AlternateRoomJid">Optional alternative Room JID</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DestroyRoom(string RoomId, string Domain, string Reason,
+			string AlternateRoomJid, IqResultEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceMucOwner);
+			Xml.Append("'><destroy");
+
+			if (!string.IsNullOrEmpty(AlternateRoomJid))
+			{
+				Xml.Append(" jid='");
+				Xml.Append(XML.Encode(AlternateRoomJid));
+				Xml.Append('\'');
+			}
+
+			if (string.IsNullOrEmpty(Reason))
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append("><reason>");
+				Xml.Append(XML.Encode(Reason));
+				Xml.Append("</reason></destroy>");
+			}
+
+			Xml.Append("</query>");
+
+			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		public Task<IqResultEventArgs> DestroyRoomAsync(string RoomId, string Domain)
+		{
+			return this.DestroyRoomAsync(RoomId, Domain, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Reason">Optional reason for destroying the room.</param>
+		public Task<IqResultEventArgs> DestroyRoomAsync(string RoomId, string Domain, string Reason)
+		{
+			return this.DestroyRoomAsync(RoomId, Domain, Reason, string.Empty);
+		}
+
+		/// <summary>
+		/// Destroyes a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Reason">Optional reason for destroying the room.</param>
+		/// <param name="AlternateRoomJid">Optional alternative Room JID</param>
+		public Task<IqResultEventArgs> DestroyRoomAsync(string RoomId, string Domain, string Reason,
+			string AlternateRoomJid)
+		{
+			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
+
+			this.DestroyRoom(RoomId, Domain, Reason, AlternateRoomJid, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
 	}
 }

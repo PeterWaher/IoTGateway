@@ -21,6 +21,18 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		private readonly Dictionary<string, bool> features;
 		private readonly Identity[] identities;
 
+		/// <summary>
+		/// Event arguments for service discovery responses.
+		/// </summary>
+		/// <param name="e">Event arguments.</param>
+		protected ServiceDiscoveryEventArgs(ServiceDiscoveryEventArgs e)
+			: base(e)
+		{
+			this.identities = e.identities;
+			this.features = e.features;
+			this.extendedInformation = e.extendedInformation;
+		}
+
 		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Identity[] Identities, 
 			Dictionary<string, bool> Features, Dictionary<string, DataForm> ExtendedInformation)
 			: base(e)

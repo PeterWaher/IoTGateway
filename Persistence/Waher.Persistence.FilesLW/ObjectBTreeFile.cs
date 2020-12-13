@@ -3730,25 +3730,19 @@ namespace Waher.Persistence.Files
 		/// <returns>Report</returns>
 		public async Task<string> GetCurrentStateReport(bool WriteStat, bool Properties)
 		{
+			StringBuilder Output = new StringBuilder();
+			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
+			FileStatistics Statistics;
+
 			await this.LockWrite();
 			try
 			{
-				return await this.GetCurrentStateReportAsyncLocked(WriteStat, Properties);
+				Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-		}
-
-		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat, bool Properties)
-		{
-#if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
-#endif
-			StringBuilder Output = new StringBuilder();
-			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
-			FileStatistics Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
 
 			if (Statistics.IsCorrupt)
 				Output.AppendLine("Database is corrupt.");
@@ -3764,7 +3758,7 @@ namespace Waher.Persistence.Files
 			if (Statistics.IsCorrupt || !Statistics.IsBalanced)
 			{
 				Output.AppendLine();
-				await this.ExportGraphXMLLocked(Output, Properties);
+				await this.ExportGraphXML(Output, Properties);
 				Output.AppendLine();
 			}
 
@@ -4113,37 +4107,6 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXML(StringBuilder Output, bool Properties)
 		{
-			await this.LockWrite();
-			try
-			{
-				await this.ExportGraphXMLLocked(Output, Properties);
-			}
-			finally
-			{
-				await this.EndWrite();
-			}
-		}
-
-		/// <summary>
-		/// Exports the structure of the file to XML.
-		/// </summary>
-		/// <param name="Properties">If object properties should be exported as well.</param>
-		/// <returns>Graph XML.</returns>
-		public async Task<string> ExportGraphXMLLocked(bool Properties)
-		{
-			StringBuilder Output = new StringBuilder();
-			await this.ExportGraphXMLLocked(Output, Properties);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Exports the structure of the file to XML.
-		/// </summary>
-		/// <param name="Output">XML Output</param>
-		/// <param name="Properties">If object properties should be exported as well.</param>
-		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXMLLocked(StringBuilder Output, bool Properties)
-		{
 			XmlWriterSettings Settings = new XmlWriterSettings()
 			{
 				CloseOutput = false,
@@ -4159,7 +4122,7 @@ namespace Waher.Persistence.Files
 
 			using (XmlWriter w = XmlWriter.Create(Output, Settings))
 			{
-				await this.ExportGraphXMLLocked(w, Properties);
+				await this.ExportGraphXML(w, Properties);
 				w.Flush();
 			}
 		}
@@ -4175,90 +4138,78 @@ namespace Waher.Persistence.Files
 			await this.LockWrite();
 			try
 			{
-				await this.ExportGraphXMLLocked(XmlOutput, Properties);
+				BinaryDeserializer Reader = null;
+				long NrBlocks = this.file.BlockLimit + this.blocksAdded;
+				byte[] BlobBlock = new byte[this.blobBlockSize];
+				byte[] DecryptedBlock;
+				uint Link;
+
+				this.blockLimit = (uint)NrBlocks;
+
+				XmlOutput.WriteStartElement("Collection", "http://waher.se/Schema/Persistence/Files.xsd");
+				XmlOutput.WriteAttributeString("name", this.collectionName);
+
+				XmlOutput.WriteStartElement("BTreeFile");
+				XmlOutput.WriteAttributeString("fileName", this.fileName);
+
+				await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
+			
+				XmlOutput.WriteEndElement();
+
+				if (!(this.blobFile is null))
+				{
+					XmlOutput.WriteStartElement("BlobFile");
+					XmlOutput.WriteAttributeString("fileName", this.blobFileName);
+
+					for (uint BlobBlockIndex = 0; BlobBlockIndex < this.blobFile.BlockLimit; BlobBlockIndex++)
+					{
+						await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
+						this.nrBlobBlockLoads++;
+
+						if (this.encrypted)
+						{
+							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
+							{
+								DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+							}
+						}
+						else
+							DecryptedBlock = (byte[])BlobBlock.Clone();
+
+						if (Reader is null)
+							Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock, this.blockLimit);
+						else
+							Reader.Restart(DecryptedBlock, 0);
+
+						XmlOutput.WriteStartElement("Block");
+						XmlOutput.WriteAttributeString("index", BlobBlockIndex.ToString());
+						this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
+
+						Link = Reader.ReadUInt32();
+						if (Link != uint.MaxValue)
+							XmlOutput.WriteAttributeString("prev", Link.ToString());
+
+						Link = Reader.ReadUInt32();
+						if (Link != uint.MaxValue)
+							XmlOutput.WriteAttributeString("next", Link.ToString());
+
+						XmlOutput.WriteEndElement();
+					}
+
+					XmlOutput.WriteEndElement();
+				}
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-		}
-
-		/// <summary>
-		/// Exports the structure of the file to XML.
-		/// </summary>
-		/// <param name="XmlOutput">XML Output</param>
-		/// <param name="Properties">If object properties should be exported as well.</param>
-		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
-		{
-#if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
-#endif
-			BinaryDeserializer Reader = null;
-			long NrBlocks = this.file.BlockLimit + this.blocksAdded;
-			byte[] BlobBlock = new byte[this.blobBlockSize];
-			byte[] DecryptedBlock;
-			uint Link;
-
-			this.blockLimit = (uint)NrBlocks;
-
-			XmlOutput.WriteStartElement("Collection", "http://waher.se/Schema/Persistence/Files.xsd");
-			XmlOutput.WriteAttributeString("name", this.collectionName);
-
-			XmlOutput.WriteStartElement("BTreeFile");
-			XmlOutput.WriteAttributeString("fileName", this.fileName);
-			await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
-			XmlOutput.WriteEndElement();
 
 			foreach (IndexBTreeFile Index in this.indices)
 			{
 				XmlOutput.WriteStartElement("IndexFile");
 				XmlOutput.WriteAttributeString("fileName", Index.IndexFile.fileName);
 
-				await Index.IndexFile.ExportGraphXMLLocked(XmlOutput, false);
-
-				XmlOutput.WriteEndElement();
-			}
-
-			if (!(this.blobFile is null))
-			{
-				XmlOutput.WriteStartElement("BlobFile");
-				XmlOutput.WriteAttributeString("fileName", this.blobFileName);
-
-				for (uint BlobBlockIndex = 0; BlobBlockIndex < this.blobFile.BlockLimit; BlobBlockIndex++)
-				{
-					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
-					this.nrBlobBlockLoads++;
-
-					if (this.encrypted)
-					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
-					}
-					else
-						DecryptedBlock = (byte[])BlobBlock.Clone();
-
-					if (Reader is null)
-						Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock, this.blockLimit);
-					else
-						Reader.Restart(DecryptedBlock, 0);
-
-					XmlOutput.WriteStartElement("Block");
-					XmlOutput.WriteAttributeString("index", BlobBlockIndex.ToString());
-					this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
-
-					Link = Reader.ReadUInt32();
-					if (Link != uint.MaxValue)
-						XmlOutput.WriteAttributeString("prev", Link.ToString());
-
-					Link = Reader.ReadUInt32();
-					if (Link != uint.MaxValue)
-						XmlOutput.WriteAttributeString("next", Link.ToString());
-
-					XmlOutput.WriteEndElement();
-				}
+				await Index.IndexFile.ExportGraphXML(XmlOutput, false);
 
 				XmlOutput.WriteEndElement();
 			}

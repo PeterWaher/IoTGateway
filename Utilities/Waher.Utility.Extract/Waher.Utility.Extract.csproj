@@ -16,6 +16,10 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <RuntimeFrameworkVersion>2.2.8</RuntimeFrameworkVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

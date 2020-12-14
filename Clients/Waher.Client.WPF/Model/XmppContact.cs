@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Windows;
 using System.Windows.Media;
+using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
@@ -221,7 +221,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanEdit
 		{
-			get { return false; }	// TODO: Edit Friendly name, groups
+			get { return false; }   // TODO: Edit Friendly name, groups
 		}
 
 		public override bool CanRecycle
@@ -274,13 +274,30 @@ namespace Waher.Client.WPF.Model
 					XmppAccountNode.Client.SendChatMessage(To, Message);
 				else
 				{
-					string PlainText = Markdown.GeneratePlainText().Trim();
-
 					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>", PlainText,
-						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+						MultiFormatMessage(Markdown), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}
 			}
+		}
+
+		public static string MultiFormatMessage(MarkdownDocument Markdown)
+		{
+			string PlainText = Markdown.GeneratePlainText().Trim();
+			string HTML = HtmlDocument.GetBody(Markdown.GenerateHTML()).Trim();
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<body>");
+			sb.Append(XML.Encode(PlainText));
+			sb.Append("</body>");
+			sb.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
+			sb.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
+			sb.Append(HTML);
+			sb.Append("</body></html>");
+			sb.Append("<content xmlns='urn:xmpp:content' type='text/markdown'>");
+			sb.Append(XML.HtmlValueEncode(Markdown.MarkdownText));
+			sb.Append("</content>");
+
+			return sb.ToString();
 		}
 
 		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)

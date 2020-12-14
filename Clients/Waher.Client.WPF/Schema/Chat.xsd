@@ -12,14 +12,16 @@
 				<xs:element name="Received" type="TextItem"/>
 				<xs:element name="Transmitted" type="TextItem"/>
 			</xs:choice>
+      <xs:attribute name="muc" type="xs:boolean" use="optional" default="false"/>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:complexType name="TextItem">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
-			</xs:extension>
+        <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
+        <xs:attribute name="from" type="xs:string" use="optional"/>
+      </xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
 

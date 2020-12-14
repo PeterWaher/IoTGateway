@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Xml;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +8,6 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
-using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Client.WPF.Model;
 
@@ -30,6 +27,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		private readonly ChatItemType type;
 		private readonly DateTime timestamp;
 		private readonly bool lastIsTable;
+		private readonly string from;
 		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
@@ -41,18 +39,20 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// </summary>
 		/// <param name="Type">Type of chat record.</param>
 		/// <param name="Message">Message</param>
+		/// <param name="From">From where the message came.</param>
 		/// <param name="Markdown">Markdown, if available, or null if plain text.</param>
 		/// <param name="FormattedMessage">Formatted message.</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, MarkdownDocument Markdown, 
+		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown,
 			Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
 			this.type = Type;
 			this.timestamp = this.lastUpdated = Timestamp;
 			this.message = Message;
+			this.from = From;
 
 			if (Markdown is null)
 			{
@@ -75,7 +75,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				this.ParseMarkdown(Markdown);
 
 				foreach (MarkdownElement E in Markdown)
-					this.lastIsTable = (E is Waher.Content.Markdown.Model.BlockElements.Table);
+					this.lastIsTable = (E is Content.Markdown.Model.BlockElements.Table);
 			}
 		}
 
@@ -201,17 +201,37 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <summary>
 		/// Timestamp of item.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Timestamp when item was last updated.
 		/// </summary>
-		public DateTime LastUpdated { get { return this.lastUpdated; } }
+		public DateTime LastUpdated => this.lastUpdated;
 
 		/// <summary>
 		/// Chat item type.
 		/// </summary>
-		public ChatItemType Type { get { return this.type; } }
+		public ChatItemType Type => this.type;
+
+		/// <summary>
+		/// Who sent the message.
+		/// </summary>
+		public string From => this.from;
+
+		/// <summary>
+		/// Resource-name of who sent the message.
+		/// </summary>
+		public string FromResource
+		{
+			get
+			{
+				int i = this.from?.IndexOf('/') ?? -1;
+				if (i < 0)
+					return string.Empty;
+				else
+					return this.from.Substring(i + 1);
+			}
+		}
 
 		/// <summary>
 		/// Time of day of reception, as a string.
@@ -244,12 +264,12 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <summary>
 		/// Message
 		/// </summary>
-		public string Message { get { return this.message; } }
+		public string Message => this.message;
 
 		/// <summary>
 		/// Formatted Message
 		/// </summary>
-		public object FormattedMessage { get { return this.formattedMessage; } }
+		public object FormattedMessage => this.formattedMessage;
 
 	}
 }

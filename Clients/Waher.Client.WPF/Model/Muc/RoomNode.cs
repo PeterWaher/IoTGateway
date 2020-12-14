@@ -5,10 +5,13 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Client.WPF.Dialogs.Muc;
+using Waher.Content.Html;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Runtime.Settings;
 using Waher.Things.DisplayableParameters;
+using Waher.Content.Markdown;
 
 namespace Waher.Client.WPF.Model.Muc
 {
@@ -315,6 +318,16 @@ namespace Waher.Client.WPF.Model.Muc
 			this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
 
 			MainWindow.SuccessBox("Invitation sent.");
+		}
+
+		public override bool CanChat => true;
+
+		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
+		{
+			if (Markdown is null)
+				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message);
+			else
+				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Markdown));
 		}
 
 	}

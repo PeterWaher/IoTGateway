@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Waher.Client.WPF.Dialogs.Muc;
+using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -335,25 +336,66 @@ namespace Waher.Client.WPF.Model.Muc
 			return Task.CompletedTask;
 		}
 
-		private Task MucClient_RoomSubject(object Sender, RoomOccupantMessageEventArgs e)
+		private RoomNode GetRoomNode(string RoomId, string Domain)
 		{
-			// TODO
-			return Task.CompletedTask;
-		}
+			if (this.children is null)
+				return null;
 
-		private Task MucClient_RoomPresence(object Sender, UserPresenceEventArgs e)
-		{
-			// TODO
-			return Task.CompletedTask;
+			foreach (TreeNode Node in this.children.Values)
+			{
+				if (Node is RoomNode RoomNode &&
+					RoomNode.RoomId == RoomId &&
+					RoomNode.Domain == Domain)
+				{
+					return RoomNode;
+				}
+			}
+
+			return null;    // TODO: Check if hidden node, and create node dynamically
 		}
 
 		private Task MucClient_RoomOccupantMessage(object Sender, RoomOccupantMessageEventArgs e)
+		{
+			RoomNode RoomNode = this.GetRoomNode(e.RoomId, e.Domain);
+			if (RoomNode is null)
+				return Task.CompletedTask;
+
+			MainWindow.UpdateGui(() =>
+			{
+				MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
+				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp, RoomNode, RoomNode.Header);
+			});
+
+			return Task.CompletedTask;
+		}
+
+		private Task MucClient_RoomSubject(object Sender, RoomOccupantMessageEventArgs e)
+		{
+			RoomNode RoomNode = this.GetRoomNode(e.RoomId, e.Domain);
+			if (RoomNode is null)
+				return Task.CompletedTask;
+
+			MainWindow.UpdateGui(() =>
+			{
+				MainWindow.currentInstance.MucChatSubject(e.From, RoomNode, e.Subject);
+			});
+
+			return Task.CompletedTask;
+		}
+
+		private Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			// TODO
 			return Task.CompletedTask;
 		}
 
 		private Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
+		{
+			// TODO
+			return Task.CompletedTask;
+		}
+
+		private Task MucClient_RoomPresence(object Sender, UserPresenceEventArgs e)
 		{
 			// TODO
 			return Task.CompletedTask;
@@ -366,12 +408,6 @@ namespace Waher.Client.WPF.Model.Muc
 		}
 
 		private Task MucClient_RegistrationRequest(object Sender, Networking.XMPP.MessageFormEventArgs e)
-		{
-			// TODO
-			return Task.CompletedTask;
-		}
-
-		private Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			// TODO
 			return Task.CompletedTask;

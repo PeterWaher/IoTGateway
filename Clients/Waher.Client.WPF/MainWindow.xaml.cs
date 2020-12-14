@@ -28,7 +28,7 @@ using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
-using System.Runtime.CompilerServices;
+using Waher.Client.WPF.Model.Muc;
 using Waher.Runtime.Settings;
 
 namespace Waher.Client.WPF
@@ -514,7 +514,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = MainWindow.NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
-			View = new ChatView(Node);
+			View = new ChatView(Node, Node is RoomNode);
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -533,12 +533,6 @@ namespace Waher.Client.WPF
 		{
 			ChatView View = (ChatView)P;
 			View.Input.Focus();
-		}
-
-		public Task OnChatMessage(object Sender, MessageEventArgs e)
-		{
-			UpdateGui(this.ChatMessageReceived, e);
-			return Task.CompletedTask;
 		}
 
 		public Task OnStateChange(object _, XmppState _2)
@@ -628,13 +622,17 @@ namespace Waher.Client.WPF
 
 		private static readonly ReverseInt32 reverseInt32 = new ReverseInt32();
 
-		private void ChatMessageReceived(object P)
+		public Task OnChatMessage(object Sender, MessageEventArgs e)
 		{
-			MessageEventArgs e = (MessageEventArgs)P;
+			UpdateGui(this.ChatMessageReceived, e);
+			return Task.CompletedTask;
+		}
 
-			DateTime Timestamp = DateTime.Now;
-			string Message = e.Body;
-			bool IsMarkdown = false;
+		public static void ParseChatMessage(MessageEventArgs e, out string Message, out bool IsMarkdown, out DateTime Timestamp)
+		{
+			Timestamp = DateTime.Now;
+			Message = e.Body;
+			IsMarkdown = false;
 
 			foreach (XmlNode N in e.Message.ChildNodes)
 			{
@@ -668,7 +666,12 @@ namespace Waher.Client.WPF
 					}
 				}
 			}
+		}
 
+		private void ChatMessageReceived(object P)
+		{
+			MessageEventArgs e = (MessageEventArgs)P;
+			ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp);
 		}
 
@@ -687,6 +690,8 @@ namespace Waher.Client.WPF
 						continue;
 
 					XmppAccountNode = XmppContact.XmppAccountNode;
+					if (XmppAccountNode.BareJID != ToBareJid)
+						continue;
 				}
 				else if (ChatView.Node is Model.XmppComponent XmppComponent)
 				{
@@ -694,40 +699,120 @@ namespace Waher.Client.WPF
 						continue;
 
 					XmppAccountNode = XmppComponent.Account;
+					if (XmppAccountNode.BareJID != ToBareJid)
+						continue;
 				}
 				else
 					continue;
 
-				if (XmppAccountNode is null)
-					continue;
-
-				if (XmppAccountNode.BareJID != ToBareJid)
-					continue;
-
-				ChatView.ChatMessageReceived(Message, IsMarkdown, Timestamp, this);
+				ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
 				return;
 			}
 
 			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
 			{
-				if (!(Node is XmppAccountNode XmppAccountNode2))
-					continue;
-
-				if (XmppAccountNode2.BareJID != ToBareJid)
-					continue;
-
-				if (XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
+				if (Node is XmppAccountNode XmppAccountNode2 &&
+					XmppAccountNode2.BareJID == ToBareJid &&
+					XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
 				{
 					TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
 					this.Tabs.Items.Add(TabItem2);
 
-					ChatView ChatView = new ChatView(ContactNode);
+					ChatView ChatView = new ChatView(ContactNode, false);
 					TabItem2.Content = ChatView;
 
-					ChatView.ChatMessageReceived(Message, IsMarkdown, Timestamp, this);
+					ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
 					return;
 				}
 			}
+		}
+
+		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp, 
+			RoomNode Node, string Title)
+		{
+			string FromBareJid = XmppClient.GetBareJID(FromFullJid);
+
+			foreach (TabItem TabItem in this.Tabs.Items)
+			{
+				if (!(TabItem.Content is ChatView ChatView))
+					continue;
+
+				if (ChatView.Node is RoomNode Room)
+				{
+					if (Room.Jid != FromBareJid)
+						continue;
+				}
+				else
+					continue;
+
+				ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+				return;
+			}
+
+			TabItem TabItem2 = MainWindow.NewTab(Title);
+			this.Tabs.Items.Add(TabItem2);
+
+			ChatView ChatView2 = new ChatView(Node, true);
+			TabItem2.Content = ChatView2;
+
+			ChatView2.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+		}
+
+		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
+			OccupantNode Node, string Title)
+		{
+			foreach (TabItem TabItem in this.Tabs.Items)
+			{
+				if (!(TabItem.Content is ChatView ChatView))
+					continue;
+
+				if (ChatView.Node is OccupantNode Occupant)
+				{
+					if (Occupant.Jid != FromFullJid)
+						continue;
+				}
+				else
+					continue;
+
+				ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+				return;
+			}
+
+			TabItem TabItem2 = MainWindow.NewTab(Title);
+			this.Tabs.Items.Add(TabItem2);
+
+			ChatView ChatView2 = new ChatView(Node, true);
+			TabItem2.Content = ChatView2;
+
+			ChatView2.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+		}
+
+		public void MucChatSubject(string FromFullJid, RoomNode Node, string Title)
+		{
+			string FromBareJid = XmppClient.GetBareJID(FromFullJid);
+
+			foreach (TabItem TabItem in this.Tabs.Items)
+			{
+				if (!(TabItem.Content is ChatView ChatView))
+					continue;
+
+				if (ChatView.Node is RoomNode Room)
+				{
+					if (Room.Jid != FromBareJid)
+						continue;
+				}
+				else
+					continue;
+
+				TabItem.Header = Title;
+				return;
+			}
+
+			TabItem TabItem2 = MainWindow.NewTab(Title);
+			this.Tabs.Items.Add(TabItem2);
+
+			ChatView ChatView2 = new ChatView(Node, true);
+			TabItem2.Content = ChatView2;
 		}
 
 		private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)

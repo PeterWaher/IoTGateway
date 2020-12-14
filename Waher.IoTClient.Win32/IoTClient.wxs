@@ -236,6 +236,7 @@
               <File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
               <File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
               <File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
+              <File Id='Waher.Content.Html.dll' Name='Waher.Content.Html.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.dll' Vital='yes'/>
               <File Id='Waher.Content.Images.dll' Name='Waher.Content.Images.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.dll' Vital='yes'/>
               <File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
               <File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
@@ -284,6 +285,7 @@
               <RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Content.Html.dll' Name='Waher.Content.Html.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Images.dll' Name='Waher.Content.Images.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
@@ -331,6 +333,7 @@
               <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
               <File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
               <File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
+              <File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.pdb' Vital='yes'/>
               <File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.pdb' Vital='yes'/>
               <File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
               <File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
@@ -386,6 +389,7 @@
               <RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Content.Html.pdb' Name='Waher.Content.Html.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Images.pdb' Name='Waher.Content.Images.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>

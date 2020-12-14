@@ -29,8 +29,9 @@
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Received" DisplayMemberBinding="{Binding Received}" Width="70"/>
-                    <GridViewColumn Header="Chat history" Width="600">
+                    <GridViewColumn Header="Received" DisplayMemberBinding="{Binding Received}" Width="70" x:Name="ReceivedColumn"/>
+                    <GridViewColumn Header="From" DisplayMemberBinding="{Binding FromStr}" Width="0" x:Name="FromColumn"/>
+                    <GridViewColumn Header="Chat history" Width="600" x:Name="ContentColumn">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl Content="{Binding FormattedMessage}"/>

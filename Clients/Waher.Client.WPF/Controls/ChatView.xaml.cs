@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -9,14 +7,11 @@ using System.Xml.Schema;
 using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
+using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
@@ -34,12 +29,20 @@ namespace Waher.Client.WPF.Controls
 	{
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private readonly TreeNode node;
+		private bool muc;
 
-		public ChatView(TreeNode Node)
+		public ChatView(TreeNode Node, bool Muc)
 		{
 			this.node = Node;
+			this.muc = Muc;
 
 			InitializeComponent();
+
+			if (Muc)
+			{
+				this.FromColumn.Width = this.ReceivedColumn.Width;
+				this.ContentColumn.Width -= this.ReceivedColumn.Width;
+			}
 		}
 
 		internal static void InitEmojis()
@@ -51,9 +54,9 @@ namespace Waher.Client.WPF.Controls
 					Folder = AppDomain.CurrentDomain.BaseDirectory;
 
 				emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24,
-					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", "png", "64x64", "%FILENAME%"),
-					System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Folder), "Graphics", "Emoji1.zip"),
-					System.IO.Path.Combine(MainWindow.AppDataFolder, "Graphics"));
+					Path.Combine(MainWindow.AppDataFolder, "Graphics", "Emoji1", "png", "64x64", "%FILENAME%"),
+					Path.Combine(Path.GetDirectoryName(Folder), "Graphics", "Emoji1.zip"),
+					Path.Combine(MainWindow.AppDataFolder, "Graphics"));
 			}
 		}
 
@@ -75,7 +78,8 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.ChatListView.View is GridView GridView)
 			{
-				GridView.Columns[1].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[2].ActualWidth -
+				GridView.Columns[2].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - 
+					GridView.Columns[1].ActualWidth - GridView.Columns[3].ActualWidth -
 					SystemParameters.VerticalScrollBarWidth - 8, 10);
 			}
 
@@ -110,6 +114,7 @@ namespace Waher.Client.WPF.Controls
 				if (c > 0 &&
 					(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
 					Item.Type == ChatItemType.Transmitted &&
+					string.IsNullOrWhiteSpace(Item.From) &&
 					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
 					(s = Item.Message).IndexOf('|') >= 0)
 				{
@@ -141,7 +146,7 @@ namespace Waher.Client.WPF.Controls
 				Markdown = null;
 			}
 
-			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Msg, Markdown, Colors.Black, Colors.Honeydew);
+			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Msg, string.Empty, Markdown, Colors.Black, Colors.Honeydew);
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
@@ -155,7 +160,7 @@ namespace Waher.Client.WPF.Controls
 			this.node.SendChatMessage(Msg, Markdown);
 		}
 
-		public void ChatMessageReceived(string Message, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
+		public void ChatMessageReceived(string Message, string From, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
 		{
 			MarkdownDocument Markdown;
 			ChatItem Item;
@@ -169,6 +174,7 @@ namespace Waher.Client.WPF.Controls
 					if (c > 0 &&
 						(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
 						Item.Type == ChatItemType.Received &&
+						Item.From == From &&
 						(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
 						Item.LastIsTable)
 					{
@@ -189,7 +195,7 @@ namespace Waher.Client.WPF.Controls
 			else
 				Markdown = null;
 
-			Item = new ChatItem(ChatItemType.Received, Timestamp, Message, Markdown, Colors.Black, Colors.AliceBlue);
+			Item = new ChatItem(ChatItemType.Received, Timestamp, Message, From, Markdown, Colors.Black, Colors.AliceBlue);
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
@@ -272,6 +278,7 @@ namespace Waher.Client.WPF.Controls
 		private void SaveAsXml(XmlWriter w)
 		{
 			w.WriteStartElement(chatRoot, chatNamespace);
+			w.WriteAttributeString("muc", CommonTypes.Encode(this.muc));
 
 			foreach (ListViewItem Item in this.ChatListView.Items)
 			{
@@ -279,6 +286,10 @@ namespace Waher.Client.WPF.Controls
 				{
 					w.WriteStartElement(ChatItem.Type.ToString());
 					w.WriteAttributeString("timestamp", XML.Encode(ChatItem.Timestamp));
+
+					if (!string.IsNullOrEmpty(ChatItem.From))
+						w.WriteAttributeString("from", ChatItem.From);
+
 					w.WriteValue(ChatItem.Message);
 					w.WriteEndElement();
 				}
@@ -331,10 +342,28 @@ namespace Waher.Client.WPF.Controls
 			DateTime Timestamp;
 			Color ForegroundColor;
 			Color BackgroundColor;
+			string From;
 
 			XSL.Validate(FileName, Xml, chatRoot, chatNamespace, schema);
 
 			this.ChatListView.Items.Clear();
+
+			bool PrevMuc = this.muc;
+			this.muc = XML.Attribute(Xml.DocumentElement, "muc", this.muc);
+
+			if (this.muc != PrevMuc)
+			{
+				if (this.muc)
+				{
+					this.FromColumn.Width = this.ReceivedColumn.Width;
+					this.ContentColumn.Width -= this.ReceivedColumn.Width;
+				}
+				else
+				{
+					this.ContentColumn.Width += this.FromColumn.Width;
+					this.FromColumn.Width = 0;
+				}
+			}
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
@@ -346,6 +375,7 @@ namespace Waher.Client.WPF.Controls
 					continue;
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
+				From = XML.Attribute(E, "from");
 
 				switch (Type)
 				{
@@ -372,7 +402,7 @@ namespace Waher.Client.WPF.Controls
 					Markdown = null;
 				}
 
-				ChatItem Item = new ChatItem(Type, Timestamp, E.InnerText, Markdown, ForegroundColor, BackgroundColor);
+				ChatItem Item = new ChatItem(Type, Timestamp, E.InnerText, From, Markdown, ForegroundColor, BackgroundColor);
 				ListViewItem ListViewItem = new ListViewItem()
 				{
 					Content = Item,

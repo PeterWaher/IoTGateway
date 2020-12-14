@@ -8,11 +8,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Win32;
-using Waher.Events;
-using Waher.Networking;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls.Sniffers;
+using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Things.DisplayableParameters;
 
@@ -226,7 +226,8 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						ChatView ChatView = new ChatView(null);
+						bool Muc = XML.Attribute(Xml.DocumentElement, "muc", false);
+						ChatView ChatView = new ChatView(null, Muc);
 						ChatView.Input.IsEnabled = false;
 						ChatView.SendButton.IsEnabled = false;
 

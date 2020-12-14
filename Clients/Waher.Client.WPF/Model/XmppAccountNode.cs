@@ -448,6 +448,9 @@ namespace Waher.Client.WPF.Model
 		internal static readonly BitmapImage hourglass = new BitmapImage(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage database = new BitmapImage(new Uri("../Graphics/Database-icon_16.png", UriKind.Relative));
 		internal static readonly BitmapImage component = new BitmapImage(new Uri("../Graphics/server-components-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage chatBubble = new BitmapImage(new Uri("../Graphics/Chat-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage legal = new BitmapImage(new Uri("../Graphics/justice-balance-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage log = new BitmapImage(new Uri("../Graphics/App-edit-icon_16.png", UriKind.Relative));
 		internal static readonly BitmapImage none = new BitmapImage(new Uri("../Graphics/None.png", UriKind.Relative));
 		internal static readonly BitmapImage from = new BitmapImage(new Uri("../Graphics/From.png", UriKind.Relative));
 		internal static readonly BitmapImage to = new BitmapImage(new Uri("../Graphics/To.png", UriKind.Relative));
@@ -969,6 +972,15 @@ namespace Waher.Client.WPF.Model
 
 		public override void Recycle(MainWindow Window)
 		{
+			if (!(this.children is null))
+			{
+				foreach (TreeNode Node in this.children.Values)
+				{
+					if (Node.CanRecycle)
+						Node.Recycle(Window);
+				}
+			}
+
 			this.client.Reconnect();
 		}
 

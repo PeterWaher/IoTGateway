@@ -668,7 +668,7 @@ namespace Waher.Client.WPF.Model
 					Command = MainWindow.Chat,
 					Icon = new Image()
 					{
-						Source = new BitmapImage(new Uri("../Graphics/Chat-icon_16.png", UriKind.Relative)),
+						Source = XmppAccountNode.chatBubble,
 						Width = 16,
 						Height = 16
 					}

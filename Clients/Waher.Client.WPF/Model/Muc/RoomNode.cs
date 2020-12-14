@@ -66,7 +66,12 @@ namespace Waher.Client.WPF.Model.Muc
 		}
 
 		public override string ToolTip => this.name;
-		public override bool CanRecycle => false;
+		public override bool CanRecycle => true;
+
+		public override void Recycle(MainWindow Window)
+		{
+			this.entered = false;
+		}
 
 		public override string TypeName
 		{
@@ -226,7 +231,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 					e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, Form.NickName.Text, Form.Password.Password);
 					if (!e.Ok)
-						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to configure room." : e.ErrorText);
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to enter room." : e.ErrorText);
 				}
 
 				if (!(Form is null))
@@ -261,8 +266,6 @@ namespace Waher.Client.WPF.Model.Muc
 				{
 					if (e.Ok)
 						this.OnUpdated();
-					else
-						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to configure room." : e.ErrorText);
 
 					return Task.CompletedTask;
 				}, null);

@@ -45,7 +45,7 @@ namespace Waher.Client.WPF.Model.Legal
 			base.Dispose();
 		}
 
-		public override ImageSource ImageResource => XmppAccountNode.database;
+		public override ImageSource ImageResource => XmppAccountNode.legal;
 
 		public override string ToolTip
 		{

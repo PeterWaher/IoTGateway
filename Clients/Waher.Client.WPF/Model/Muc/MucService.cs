@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using Waher.Client.WPF.Dialogs;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Settings;
@@ -32,7 +33,20 @@ namespace Waher.Client.WPF.Model.Muc
 			get { return this.mucClient; }
 		}
 
-		public override ImageSource ImageResource => XmppAccountNode.database;
+		public override ImageSource ImageResource => XmppAccountNode.chatBubble;
+		public override bool CanRecycle => true;
+
+		public override void Recycle(MainWindow Window)
+		{
+			if (!(this.children is null))
+			{
+				foreach (TreeNode Node in this.children.Values)
+				{
+					if (Node.CanRecycle)
+						Node.Recycle(Window);
+				}
+			}
+		}
 
 		public override string ToolTip
 		{
@@ -115,6 +129,7 @@ namespace Waher.Client.WPF.Model.Muc
 				string Domain = this.mucClient.ComponentAddress;
 				string NickName = Dialog.NickName.Text;
 				string Password = Dialog.Password.Password;
+				DataForm Form = null;
 
 				this.mucClient.EnterRoom(RoomId, Domain, NickName, Password, async (sender, e) =>
 				{
@@ -124,6 +139,17 @@ namespace Waher.Client.WPF.Model.Muc
 						{
 							this.mucClient.GetRoomConfiguration(RoomId, Domain, (sender2, ConfigurationForm) =>
 							{
+								Form = ConfigurationForm;
+
+								if (!string.IsNullOrEmpty(Password))
+								{
+									Field PasswordProtectionField = Form["muc#roomconfig_passwordprotectedroom"];
+									PasswordProtectionField?.SetValue("true");
+
+									Field PasswordField = Form["muc#roomconfig_roomsecret"];
+									PasswordField?.SetValue(Password);
+								}
+
 								MainWindow.currentInstance.ShowDataForm(ConfigurationForm);
 								return Task.CompletedTask;
 							}, async (sender2, e2) =>
@@ -133,10 +159,11 @@ namespace Waher.Client.WPF.Model.Muc
 									await RuntimeSettings.SetAsync(RoomId + "@" + Domain + ".Nick", NickName);
 									await RuntimeSettings.SetAsync(RoomId + "@" + Domain + ".Pwd", Password);
 
-									this.AddRoomNode(RoomId, Domain, NickName, Password);
+									Field NameField = Form["muc#roomconfig_roomname"];
+									string Name = NameField?.ValueString ?? RoomId;
+
+									this.AddRoomNode(RoomId, Domain, NickName, Password, Name);
 								}
-								else
-									MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to configure room." : e.ErrorText);
 							}, null);
 						}
 						else
@@ -144,7 +171,7 @@ namespace Waher.Client.WPF.Model.Muc
 							await RuntimeSettings.SetAsync(RoomId + "@" + Domain + ".Nick", NickName);
 							await RuntimeSettings.SetAsync(RoomId + "@" + Domain + ".Pwd", Password);
 
-							this.AddRoomNode(RoomId, Domain, NickName, Password);
+							this.AddRoomNode(RoomId, Domain, NickName, Password, RoomId);
 						}
 					}
 					else
@@ -153,11 +180,11 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		private void AddRoomNode(string RoomId, string Domain, string NickName, string Password)
+		private void AddRoomNode(string RoomId, string Domain, string NickName, string Password, string Name)
 		{
 			if (this.IsLoaded)
 			{
-				RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, string.Empty, true);
+				RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, Name, true);
 
 				if (this.children is null)
 					this.children = new SortedDictionary<string, TreeNode>() { { Node.Key, Node } };
@@ -172,6 +199,10 @@ namespace Waher.Client.WPF.Model.Muc
 				MainWindow.UpdateGui(() =>
 				{
 					this.Account?.View?.NodeAdded(this, Node);
+
+					foreach (TreeNode Node2 in Node.Children)
+						this.Account?.View?.NodeAdded(Node, Node2);
+
 					this.OnUpdated();
 				});
 			}

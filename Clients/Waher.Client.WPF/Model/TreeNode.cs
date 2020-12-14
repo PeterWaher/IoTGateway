@@ -365,6 +365,11 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the node provides a custom delete question.
+		/// </summary>
+		public virtual bool CustomDeleteQuestion => false;
+
+		/// <summary>
 		/// Method called when a node is to be deleted.
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>

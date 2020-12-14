@@ -1,0 +1,27 @@
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.Muc.DestroyRoomForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Destroy room" Height="305" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=Reason}">
+        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Left" Margin="12,12,12,0" VerticalAlignment="Top">
+            <Run>Are you sure you want to destroy</Run>
+            <Run x:Name="RoomName" FontWeight="Bold">Room</Run>
+            <Run>? Persisted messages will be lost.</Run>
+            <Run>(Archived messages will be kept.)</Run>
+            <Run>You can provide a reason for destroying the room. It will be sent to any occupants before destroying the room.</Run>
+            <Run>You can also direct occupants to an alternative room.</Run>
+        </TextBlock>
+        <Label Content="Reason:" Height="28" HorizontalAlignment="Left" Margin="12,115,0,0" Name="label2" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,136,11.6,0" Name="Reason" VerticalAlignment="Top" 
+                 ToolTip="Reason for destroying the room." />
+        <Label Content="Alternative Room JID:" Height="28" HorizontalAlignment="Left" Margin="12,165,0,0" Name="label4" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,186,11.6,0" Name="AlternativeRoomJid" VerticalAlignment="Top" 
+                 ToolTip="Alternative Room JID." TextChanged="AlternativeRoomJid_TextChanged" />
+        <DockPanel Margin="0,230,0,0" Width="160">
+            <Button Content="Yes" Height="23" HorizontalAlignment="Left" Name="YesButton" VerticalAlignment="Top" Width="75" IsDefault="True"
+                    ToolTip="Destroy the Room and removed it from your list of rooms on this service." Click="YesButton_Click" IsEnabled="True" />
+            <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75"
+                    ToolTip="Closes the dialog without destroying the room." IsCancel="True" Click="CancelButton_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

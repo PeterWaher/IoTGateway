@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
-using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Runtime.Settings;
@@ -126,8 +126,9 @@ namespace Waher.Client.WPF.Model.Muc
 		}
 
 		public override bool CanAddChildren => true;
-		public override bool CanDelete => true;
 		public override bool CanEdit => true;
+		public override bool CanDelete => true;
+		public override bool CustomDeleteQuestion => true;
 
 		protected override async void LoadChildren()
 		{
@@ -280,13 +281,40 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
-			// TODO
-			base.Delete(Parent, OnDeleted);
+			DestroyRoomForm Form = new DestroyRoomForm(this.Header)
+			{
+				Owner = MainWindow.currentInstance
+			};
+
+			bool? Result = Form.ShowDialog();
+			if (!Result.HasValue || !Result.Value)
+				return;
+
+			this.MucClient.DestroyRoom(this.roomId, this.domain, Form.Reason.Text, Form.AlternativeRoomJid.Text, (sender, e) =>
+			{
+				if (e.Ok)
+					base.Delete(Parent, OnDeleted);
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to destroy room." : e.ErrorText);
+
+				return Task.CompletedTask;
+			}, null);
 		}
 
 		public override void Add()
 		{
-			// TODO
+			SendRoomInvitationForm Form = new SendRoomInvitationForm()
+			{
+				Owner = MainWindow.currentInstance
+			};
+
+			bool? Result = Form.ShowDialog();
+			if (!Result.HasValue || !Result.Value)
+				return;
+
+			this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
+
+			MainWindow.SuccessBox("Invitation sent.");
 		}
 
 	}

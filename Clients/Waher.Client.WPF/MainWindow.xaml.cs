@@ -366,7 +366,8 @@ namespace Waher.Client.WPF
 			if (Node is null || !Node.CanDelete)
 				return;
 
-			if (System.Windows.MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
+			if (Node.CustomDeleteQuestion ||
+				System.Windows.MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
 				try
@@ -1064,9 +1065,9 @@ namespace Waher.Client.WPF
 			MessageBox(ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
-		public static void SuccessBox(string ErrorMessage)
+		public static void SuccessBox(string Message)
 		{
-			MessageBox(ErrorMessage, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+			MessageBox(Message, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 
 		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)

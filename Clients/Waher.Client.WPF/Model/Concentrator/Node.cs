@@ -703,7 +703,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (!string.IsNullOrEmpty(Command.FailureString))
 					MainWindow.MessageBox(Command.FailureString, "Failure", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 				else
-					MainWindow.MessageBox(e.ErrorText, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+					MainWindow.ErrorBox(e.ErrorText);
 			}
 		}
 

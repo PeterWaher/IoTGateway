@@ -7060,6 +7060,20 @@ namespace Waher.Networking.XMPP
 				return JID;
 		}
 
+		/// <summary>
+		/// Gets the resource part of a full JID. If no resource part is available, the empty string is returned.
+		/// </summary>
+		/// <param name="JID">Full JID</param>
+		/// <returns>Resource part, or empty string if no resource part.</returns>
+		public static string GetResource(string JID)
+		{
+			int i = JID.IndexOf('/');
+			if (i < 0)
+				return string.Empty;
+			else
+				return JID.Substring(i + 1);
+		}
+
 		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;

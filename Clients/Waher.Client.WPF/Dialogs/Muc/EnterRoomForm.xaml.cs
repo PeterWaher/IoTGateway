@@ -9,26 +9,27 @@ namespace Waher.Client.WPF.Dialogs.Muc
 	/// </summary>
 	public partial class EnterRoomForm : Window
 	{
-		public EnterRoomForm()
+		public EnterRoomForm(string Domain)
 		{
 			InitializeComponent();
+
+			this.Domain.Text = Domain;
 		}
 
-		public EnterRoomForm(string RoomId)
+		public EnterRoomForm(string RoomId, string Domain)
 		{
 			InitializeComponent();
 
 			this.Title = "Enter room";
 			this.RoomID.Text = RoomId;
 			this.RoomID.IsReadOnly = true;
+			this.Domain.Text = Domain;
+			this.Domain.IsReadOnly = true;
 			this.AddButton.Content = "Enter";
 			this.AddButton.ToolTip = "Enter the Room.";
 			this.CancelButton.ToolTip = "Closes the dialog without entering the room.";
 
-			if (string.IsNullOrEmpty(RoomId))
-				this.RoomID.Focus();
-			else
-				this.NickName.Focus();
+			this.NickName.Focus();
 		}
 
 		private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -45,6 +46,7 @@ namespace Waher.Client.WPF.Dialogs.Muc
 		{
 			this.AddButton.IsEnabled = 
 				!string.IsNullOrEmpty(this.RoomID.Text.Trim()) &&
+				!string.IsNullOrEmpty(this.Domain.Text.Trim()) &&
 				!string.IsNullOrEmpty(this.NickName.Text.Trim());
 		}
 	}

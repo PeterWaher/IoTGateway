@@ -741,6 +741,9 @@ namespace Waher.Client.WPF
 				{
 					if (Room.Jid != FromBareJid)
 						continue;
+
+					if (Room.Service.MucClient.Client.BareJID != ToBareJid)
+						continue;
 				}
 				else
 					continue;
@@ -1153,6 +1156,14 @@ namespace Waher.Client.WPF
 		public static void SuccessBox(string Message)
 		{
 			MessageBox(Message, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		public static void ShowStatus(string Message)
+		{
+			UpdateGui(() =>
+			{
+				MainWindow.currentInstance.MainView.ShowStatus(Message);
+			});
 		}
 
 		public static void MessageBox(string Text, string Caption, MessageBoxButton Button, MessageBoxImage Icon)

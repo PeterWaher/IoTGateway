@@ -80,9 +80,9 @@ namespace Waher.Client.WPF.Model.PubSub
 			get
 			{
 				if (this.IsExpanded)
-					return XmppAccountNode.folderOpen;
+					return XmppAccountNode.folderYellowOpen;
 				else
-					return XmppAccountNode.folderClosed;
+					return XmppAccountNode.folderYellowClosed;
 			}
 		}
 

@@ -87,9 +87,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (this.nodeInfo.HasChildren)
 				{
 					if (this.IsExpanded)
-						return XmppAccountNode.folderOpen;
+						return XmppAccountNode.folderYellowOpen;
 					else
-						return XmppAccountNode.folderClosed;
+						return XmppAccountNode.folderYellowClosed;
 				}
 				else
 					return XmppAccountNode.box;

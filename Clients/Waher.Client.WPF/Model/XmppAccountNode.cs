@@ -194,6 +194,7 @@ namespace Waher.Client.WPF.Model
 			this.client.OnRosterItemUpdated += this.Client_OnRosterItemUpdated;
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
 			this.client.OnNormalMessage += Client_OnNormalMessage;
+			this.client.OnErrorMessage += Client_OnErrorMessage;
 
 			this.client.SetPresence(Availability.Chat);
 
@@ -207,6 +208,15 @@ namespace Waher.Client.WPF.Model
 			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
 
 			this.client.Connect();
+		}
+
+		private Task Client_OnErrorMessage(object Sender, MessageEventArgs e)
+		{
+			string Msg = e.ErrorText;
+			if (!string.IsNullOrEmpty(Msg))
+				MainWindow.ShowStatus(Msg);
+
+			return Task.CompletedTask;
 		}
 
 		private void AddPepClient(string PubSubComponentAddress)
@@ -442,8 +452,10 @@ namespace Waher.Client.WPF.Model
 		internal static readonly BitmapImage extendedAway = new BitmapImage(new Uri("../Graphics/ExtendedAway.png", UriKind.Relative));
 		internal static readonly BitmapImage offline = new BitmapImage(new Uri("../Graphics/Offline.png", UriKind.Relative));
 		internal static readonly BitmapImage online = new BitmapImage(new Uri("../Graphics/Online.png", UriKind.Relative));
-		internal static readonly BitmapImage folderClosed = new BitmapImage(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage folderOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderBlueClosed = new BitmapImage(new Uri("../Graphics/folder-blue-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderBlueOpen = new BitmapImage(new Uri("../Graphics/folder-blue-open-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderYellowClosed = new BitmapImage(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderYellowOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage box = new BitmapImage(new Uri("../Graphics/App-miscellaneous-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage hourglass = new BitmapImage(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
 		internal static readonly BitmapImage database = new BitmapImage(new Uri("../Graphics/Database-icon_16.png", UriKind.Relative));
@@ -796,7 +808,7 @@ namespace Waher.Client.WPF.Model
 				else if (string.Compare(e.FromBareJID, this.client.BareJID, true) == 0)
 					this.client.Information("Presence from same bare JID. Ignored.");
 				else
-					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);
+					this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
 
 				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
 				if (Item != null)

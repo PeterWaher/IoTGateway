@@ -733,6 +733,10 @@
     <Resource Include="Graphics\App-edit-icon_16.png" />
     <Resource Include="Graphics\App-edit-icon_32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\folder-blue-icon.png" />
+    <Resource Include="Graphics\folder-blue-open-icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.2.80.2\build\net462\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.2.80.2\build\net462\SkiaSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

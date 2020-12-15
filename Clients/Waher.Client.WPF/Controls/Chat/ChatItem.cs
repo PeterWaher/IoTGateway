@@ -219,6 +219,24 @@ namespace Waher.Client.WPF.Controls.Chat
 		public string From => this.from;
 
 		/// <summary>
+		/// Nick-name of sender.
+		/// </summary>
+		public string FromStr
+		{
+			get
+			{
+				if (this.from is null)
+					return string.Empty;
+
+				int i = this.from.IndexOf('/');
+				if (i < 0)
+					return this.from;
+				
+				return this.from.Substring(i + 1);
+			}
+		}
+
+		/// <summary>
 		/// Resource-name of who sent the message.
 		/// </summary>
 		public string FromResource

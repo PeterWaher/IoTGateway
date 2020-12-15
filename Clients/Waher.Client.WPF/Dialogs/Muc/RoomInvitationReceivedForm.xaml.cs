@@ -9,37 +9,22 @@ namespace Waher.Client.WPF.Dialogs.Muc
 	/// </summary>
 	public partial class RoomInvitationReceivedForm : Window
 	{
-		public string InviteFrom = string.Empty;
-		public string Password = string.Empty;
-		public string InvitationReason = string.Empty;
-		public string RoomId = string.Empty;
-		public string Domain = string.Empty;
-		public string RoomName = string.Empty;
-		public string RoomJid = string.Empty;
-		public bool MembersOnly = false;
-		public bool Moderated = false;
-		public bool NonAnonymous = false;
-		public bool Open = false;
-		public bool PasswordProtected = false;
-		public bool Persistent = false;
-		public bool Public = false;
-		public bool SemiAnonymous = false;
-		public bool Temporary = false;
-		public bool Unmoderated = false;
-		public bool Unsecured = false;
-
-		public string MembersOnlyStr => ToStr(MembersOnly);
-		public string ModeratedStr => ToStr(Moderated);
-		public string NonAnonymousStr => ToStr(NonAnonymous);
-		public string OpenStr => ToStr(Open);
-		public string PasswordProtectedStr => ToStr(PasswordProtected);
-		public string PersistentStr => ToStr(Persistent);
-		public string PublicStr => ToStr(Public);
-		public string HiddenStr => ToStr(!Public);
-		public string SemiAnonymousStr => ToStr(SemiAnonymous);
-		public string TemporaryStr => ToStr(Temporary);
-		public string UnmoderatedStr => ToStr(Unmoderated);
-		public string UnsecuredStr => ToStr(Unsecured);
+		public string InviteTo { set => this.lblInviteTo.Text = value; }
+		public string InviteFrom { set => this.lblInviteFrom.Text = value; }
+		public string InvitationReason { set => this.lblInvitationReason.Text = value; }
+		public string RoomName { set => this.lblRoomName.Text = value; }
+		public string RoomJid { set => this.lblRoomJid.Text = value; }
+		public bool MembersOnly { set => this.lblMembersOnly.Text = ToStr(value); }
+		public bool Moderated { set => this.lblModerated.Text = ToStr(value); }
+		public bool NonAnonymous { set => this.lblNonAnonymous.Text = ToStr(value); }
+		public bool Open { set => this.lblOpen.Text = ToStr(value); }
+		public bool PasswordProtected { set => this.lblPasswordProtected.Text = ToStr(value); }
+		public bool Persistent { set => this.lblPersistent.Text = ToStr(value); }
+		public bool Public { set => this.lblPublic.Text = ToStr(value); }
+		public bool SemiAnonymous { set => this.lblSemiAnonymous.Text = ToStr(value); }
+		public bool Temporary { set => this.lblTemporary.Text = ToStr(value); }
+		public bool Unmoderated { set => this.lblUnmoderated.Text = ToStr(value); }
+		public bool Unsecured { set => this.lblUnsecured.Text = ToStr(value); }
 
 		public RoomInvitationReceivedForm()
 		{

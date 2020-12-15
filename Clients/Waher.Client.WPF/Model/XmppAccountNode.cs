@@ -214,7 +214,7 @@ namespace Waher.Client.WPF.Model
 		{
 			string Msg = e.ErrorText;
 			if (!string.IsNullOrEmpty(Msg))
-				MainWindow.ShowStatus(Msg);
+				MainWindow.ErrorBox(Msg);
 
 			return Task.CompletedTask;
 		}

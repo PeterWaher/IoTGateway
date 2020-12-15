@@ -4,14 +4,12 @@
         Title="Room invitation received" Height="375" Width="400" WindowStartupLocation="CenterOwner">
     <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=NickName}">
         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Left" Margin="12,12,12,0" VerticalAlignment="Top">
-            <Run>You have received an invitation from</Run>
-            <Run FontWeight="Bold" Text="{Binding InviteFrom}"/>
+            <Run>You (</Run><Run FontWeight="Bold" x:Name="lblInviteTo"/><Run>) have received an invitation from</Run>
+            <Run FontWeight="Bold" x:Name="lblInviteFrom"/>
             <Run>to join the room</Run>
-            <Run FontWeight="Bold" Text="{Binding RoomName}"/>
-            <Run> (</Run>
-            <Run FontWeight="Bold" Text="{Binding RoomJid}"/>
-            <Run>).</Run>
-            <Run Text="{Binding InvitationReason}"/>
+            <Run FontWeight="Bold" x:Name="lblRoomName"/>
+            <Run>(</Run><Run FontWeight="Bold" x:Name="lblRoomJid"/><Run>).</Run>
+            <Run x:Name="lblInvitationReason"/>
             <Run>Do you accept or decline the invitation? More information about the room can be seen below.</Run>
         </TextBlock>
         <Grid Margin="12,83,12,0" Height="100" VerticalAlignment="Top">
@@ -30,29 +28,29 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left">Open:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Text="{Binding OpenStr}"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" x:Name="lblOpen"/>
             <TextBlock Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left">Members Only:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="0" HorizontalAlignment="Center" Text="{Binding MembersOnlyStr}"/>
-            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left">Moderated:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding ModeratedStr}"/>
-            <TextBlock Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left">Unmoderated:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding UnmoderatedStr}"/>
-            <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left">Password-Protected:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" Text="{Binding PasswordProtectedStr}"/>
-            <TextBlock Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left">Unsecured:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="2" HorizontalAlignment="Center" Text="{Binding UnsecuredStr}"/>
-            <TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left">Persistent:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Center" Text="{Binding PersistentStr}"/>
-            <TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Left">Temporary:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="3" HorizontalAlignment="Center" Text="{Binding TemporaryStr}"/>
+            <TextBlock Grid.Column="3" Grid.Row="0" HorizontalAlignment="Center" x:Name="lblMembersOnly"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left">Unmoderated:</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" x:Name="lblUnmoderated"/>
+            <TextBlock Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left">Moderated:</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="1" HorizontalAlignment="Center" x:Name="lblModerated"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left">Unsecured:</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" x:Name="lblUnsecured"/>
+            <TextBlock Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left">Password-Protected:</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="2" HorizontalAlignment="Center" x:Name="lblPasswordProtected"/>
+            <TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left">Temporary:</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Center" x:Name="lblTemporary"/>
+            <TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Left">Persistent:</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="3" HorizontalAlignment="Center" x:Name="lblPersistent"/>
             <TextBlock Grid.Column="0" Grid.Row="4" HorizontalAlignment="Left">Non-anonymous:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" Text="{Binding NonAnonymousStr}"/>
+            <TextBlock Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" x:Name="lblNonAnonymous"/>
             <TextBlock Grid.Column="2" Grid.Row="4" HorizontalAlignment="Left">Semi-anonymous:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="4" HorizontalAlignment="Center" Text="{Binding SemiAnonymousStr}"/>
+            <TextBlock Grid.Column="3" Grid.Row="4" HorizontalAlignment="Center" x:Name="lblSemiAnonymous"/>
             <TextBlock Grid.Column="0" Grid.Row="5" HorizontalAlignment="Left">Public:</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="5" HorizontalAlignment="Center" Text="{Binding PublicStr}"/>
+            <TextBlock Grid.Column="1" Grid.Row="5" HorizontalAlignment="Center" x:Name="lblPublic"/>
             <TextBlock Grid.Column="2" Grid.Row="5" HorizontalAlignment="Left">Hidden:</TextBlock>
-            <TextBlock Grid.Column="3" Grid.Row="5" HorizontalAlignment="Center" Text="{Binding HiddenStr}"/>
+            <TextBlock Grid.Column="3" Grid.Row="5" HorizontalAlignment="Center" x:Name="lblHidden"/>
         </Grid>
         <Label Content="Nick-Name (if accepting):" Height="28" HorizontalAlignment="Left" Margin="12,193,0,0" Name="label4" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,214,11.6,0" Name="NickName" VerticalAlignment="Top" 

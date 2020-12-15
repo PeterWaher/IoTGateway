@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Client.WPF.Dialogs.Muc;
+using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Runtime.Settings;
@@ -25,6 +26,7 @@ namespace Waher.Client.WPF.Model.Muc
 		private string nickName;
 		private string password;
 		private bool entered;
+		private bool entering = false;
 
 		public RoomNode(TreeNode Parent, string RoomId, string Domain, string NickName, string Password, string Name, bool Entered)
 			: base(Parent)
@@ -149,11 +151,15 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				if (!this.loadingChildren && !this.IsLoaded)
 				{
-					if (!await this.AssertEntered())
-						return;
-
 					Mouse.OverrideCursor = Cursors.Wait;
 					this.loadingChildren = true;
+
+					if (!await this.AssertEntered(true))
+					{
+						this.loadingChildren = false;
+						MainWindow.MouseDefault();
+						return;
+					}
 
 					this.MucClient?.GetOccupants(this.roomId, this.domain, null, null, (sender, e) =>
 					{
@@ -166,16 +172,24 @@ namespace Waher.Client.WPF.Model.Muc
 
 							this.Service.NodesRemoved(this.children.Values, this);
 
+							lock (this.occupantByNick)
+							{
+								foreach (KeyValuePair<string, OccupantNode> P in this.occupantByNick)
+									Children[P.Key] = P.Value;
+							}
+
 							foreach (MucOccupant Occupant in e.Occupants)
 							{
-								OccupantNode Node = new OccupantNode(this, Occupant.RoomId, Occupant.Domain, Occupant.NickName,
-									Occupant.Affiliation, Occupant.Role, Occupant.Jid);
-
-								Children[Occupant.Jid] = Node;
-
 								lock (this.occupantByNick)
 								{
-									this.occupantByNick[Occupant.NickName] = Node;
+									if (!this.occupantByNick.TryGetValue(Occupant.NickName, out OccupantNode Node))
+									{
+										Node = new OccupantNode(this, Occupant.RoomId, Occupant.Domain, Occupant.NickName,
+											Occupant.Affiliation, Occupant.Role, Occupant.Jid);
+
+										this.occupantByNick[Occupant.NickName] = Node;
+										Children[Occupant.Jid] = Node;
+									}
 								}
 							}
 
@@ -195,6 +209,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 			catch (Exception ex)
 			{
+				this.loadingChildren = false;
 				MainWindow.ErrorBox(ex.Message);
 			}
 		}
@@ -217,71 +232,95 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		private async Task<bool> AssertEntered()
+		internal async void EnterIfNotAlready(bool ForwardPresence)
 		{
-			if (!this.entered)
+			try
 			{
-				UserPresenceEventArgs e;
-				EnterRoomForm Form = null;
+				await this.AssertEntered(ForwardPresence);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
 
-				if (string.IsNullOrEmpty(this.nickName))
-					e = null;
-				else
-					e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, this.nickName, this.password);
+		private async Task<bool> AssertEntered(bool ForwardPresence)
+		{
+			if (!this.entered && !this.entering)
+			{
+				this.entering = true;
 
-				while (!(e?.Ok ?? false))
+				try
 				{
-					TaskCompletionSource<bool> InputReceived = new TaskCompletionSource<bool>();
+					UserPresenceEventArgs e;
+					EnterRoomForm Form = null;
 
-					if (Form is null)
+					if (string.IsNullOrEmpty(this.nickName))
+						e = null;
+					else
+						e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, this.nickName, this.password);
+
+					while (!(e?.Ok ?? false))
 					{
-						Form = new EnterRoomForm(this.roomId, this.domain)
+						TaskCompletionSource<bool> InputReceived = new TaskCompletionSource<bool>();
+
+						if (Form is null)
 						{
-							Owner = MainWindow.currentInstance
-						};
+							Form = new EnterRoomForm(this.roomId, this.domain)
+							{
+								Owner = MainWindow.currentInstance
+							};
 
-						Form.NickName.Text = this.nickName;
-						Form.Password.Password = this.password;
+							Form.NickName.Text = this.nickName;
+							Form.Password.Password = this.password;
+						}
+
+						MainWindow.UpdateGui(() =>
+						{
+							bool? Result = Form.ShowDialog();
+							InputReceived.TrySetResult(Result.HasValue && Result.Value);
+						});
+
+						if (!await InputReceived.Task)
+							return false;
+
+						e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, Form.NickName.Text, Form.Password.Password);
+						if (!e.Ok)
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to enter room." : e.ErrorText);
 					}
 
-					MainWindow.UpdateGui(() =>
+					if (!(Form is null))
 					{
-						bool? Result = Form.ShowDialog();
-						InputReceived.TrySetResult(Result.HasValue && Result.Value);
-					});
+						string Prefix = this.MucClient.Client.BareJID + "." + this.roomId + "@" + this.domain;
+						bool Updated = false;
 
-					if (!await InputReceived.Task)
-						return false;
+						if (this.nickName != Form.NickName.Text)
+						{
+							this.nickName = Form.NickName.Text;
+							await RuntimeSettings.SetAsync(Prefix + ".Nick", this.nickName);
+							Updated = true;
+						}
 
-					e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, Form.NickName.Text, Form.Password.Password);
-					if (!e.Ok)
-						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to enter room." : e.ErrorText);
+						if (this.password != Form.Password.Password)
+						{
+							this.password = Form.Password.Password;
+							await RuntimeSettings.SetAsync(Prefix + ".Pwd", this.password);
+							Updated = true;
+						}
+
+						if (Updated)
+							this.OnUpdated();
+					}
+
+					if (ForwardPresence)
+						await this.Service.MucClient_OccupantPresence(this, e);
+
+					this.entered = true;
 				}
-
-				if (!(Form is null))
+				finally
 				{
-					string Prefix = this.MucClient.Client.BareJID + "." + this.roomId + "@" + this.domain;
-					bool Updated = false;
-
-					if (this.nickName != Form.NickName.Text)
-					{
-						this.nickName = Form.NickName.Text;
-						await RuntimeSettings.SetAsync(Prefix + ".Nick", this.nickName);
-						Updated = true;
-					}
-
-					if (this.password != Form.Password.Password)
-					{
-						this.password = Form.Password.Password;
-						await RuntimeSettings.SetAsync(Prefix + ".Pwd", this.password);
-						Updated = true;
-					}
-
-					if (Updated)
-						this.OnUpdated();
+					this.entering = false;
 				}
-
-				this.entered = true;
 			}
 
 			return true;
@@ -291,7 +330,7 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			try
 			{
-				if (!await this.AssertEntered())
+				if (!await this.AssertEntered(true))
 					return;
 
 				DataForm ConfigurationForm = await this.MucClient.GetRoomConfigurationAsync(this.roomId, this.domain, (sender, e) =>
@@ -423,7 +462,7 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				bool Changed = false;
 
-				if (Affiliation.HasValue && Affiliation!=Result.Affiliation)
+				if (Affiliation.HasValue && Affiliation != Result.Affiliation)
 				{
 					Result.Affiliation = Affiliation;
 					Changed = true;

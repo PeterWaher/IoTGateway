@@ -137,6 +137,12 @@ namespace Waher.Client.WPF.Model.Muc
 
 						this.NodesRemoved(this.children.Values, this);
 
+						lock (this.roomByJid)
+						{
+							foreach (KeyValuePair<string, RoomNode> P in this.roomByJid)
+								Children[P.Key] = P.Value;
+						}
+
 						foreach (Item Item in e.Items)
 						{
 							string RoomId;
@@ -155,16 +161,19 @@ namespace Waher.Client.WPF.Model.Muc
 							}
 
 							string Jid = RoomId + "@" + Domain;
+
 							string Prefix = this.mucClient.Client.BareJID + "." + Jid;
 							string NickName = await RuntimeSettings.GetAsync(Prefix + ".Nick", string.Empty);
 							string Password = await RuntimeSettings.GetAsync(Prefix + ".Pwd", string.Empty);
-							RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, Item.Name, false);
-
-							Children[Item.JID] = Node;
-
+							
 							lock (this.roomByJid)
 							{
-								this.roomByJid[Jid] = Node;
+								if (!this.roomByJid.TryGetValue(Jid, out RoomNode Node))
+								{
+									Node = new RoomNode(this, RoomId, Domain, NickName, Password, Item.Name, false);
+									this.roomByJid[Jid] = Node;
+									Children[Item.JID] = Node;
+								}
 							}
 						}
 
@@ -232,7 +241,7 @@ namespace Waher.Client.WPF.Model.Muc
 									Field NameField = Form["muc#roomconfig_roomname"];
 									string Name = NameField?.ValueString ?? RoomId;
 
-									this.AddRoomNode(RoomId, Domain, NickName, Password, Name);
+									this.AddRoomNode(RoomId, Domain, NickName, Password, Name, true);
 								}
 							}, null);
 						}
@@ -241,7 +250,9 @@ namespace Waher.Client.WPF.Model.Muc
 							await RuntimeSettings.SetAsync(Prefix + ".Nick", NickName);
 							await RuntimeSettings.SetAsync(Prefix + ".Pwd", Password);
 
-							this.AddRoomNode(RoomId, Domain, NickName, Password, string.Empty);
+							this.AddRoomNode(RoomId, Domain, NickName, Password, string.Empty, true);
+
+							await this.MucClient_OccupantPresence(this, e);
 						}
 					}
 					else
@@ -250,9 +261,9 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		private RoomNode AddRoomNode(string RoomId, string Domain, string NickName, string Password, string Name)
+		private RoomNode AddRoomNode(string RoomId, string Domain, string NickName, string Password, string Name, bool Entered)
 		{
-			RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, Name, true);
+			RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, Name, Entered);
 
 			lock (this.roomByJid)
 			{
@@ -290,12 +301,10 @@ namespace Waher.Client.WPF.Model.Muc
 			RoomInvitationReceivedForm Form = new RoomInvitationReceivedForm()
 			{
 				Owner = MainWindow.currentInstance,
-				InviteFrom = e.InviteFrom,
-				Password = e.Password,
+				InviteTo = XmppClient.GetBareJID(e.To),
+				InviteFrom = XmppClient.GetBareJID(e.InviteFrom),
 				InvitationReason = e.Reason,
-				RoomId = e.RoomId,
 				RoomName = e.RoomId,
-				Domain = e.Domain,
 				RoomJid = e.RoomId + "@" + e.Domain
 			};
 
@@ -382,7 +391,7 @@ namespace Waher.Client.WPF.Model.Muc
 			string NickName = await RuntimeSettings.GetAsync(Prefix + ".Nick", string.Empty);
 			string Password = await RuntimeSettings.GetAsync(Prefix + ".Pwd", string.Empty);
 
-			Result = this.AddRoomNode(RoomId, Domain, NickName, Password, string.Empty);
+			Result = this.AddRoomNode(RoomId, Domain, NickName, Password, string.Empty, false);
 
 			return Result;
 		}
@@ -426,7 +435,7 @@ namespace Waher.Client.WPF.Model.Muc
 			});
 		}
 
-		private async Task MucClient_OccupantPresence(object Sender, UserPresenceEventArgs e)
+		internal async Task MucClient_OccupantPresence(object Sender, UserPresenceEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, e.Affiliation, e.Role, e.FullJid);
@@ -436,6 +445,8 @@ namespace Waher.Client.WPF.Model.Muc
 				OccupantNode.Availability = e.Availability;
 				OccupantNode.OnUpdated();
 			}
+
+			RoomNode.EnterIfNotAlready(false);
 
 			// TODO: e.MucStatus;
 			// TODO: e.RoomDestroyed;

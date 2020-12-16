@@ -5,7 +5,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Client.WPF.Dialogs.Muc
 {
 	/// <summary>
-	/// Interaction logic for InviteOccupantForm.xaml
+	/// Interaction logic for SendRoomInvitationForm.xaml
 	/// </summary>
 	public partial class SendRoomInvitationForm : Window
 	{

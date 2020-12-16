@@ -73,6 +73,8 @@ namespace Waher.Client.WPF.Controls
 				Registry.SetValue(MainWindow.registryKey, "SensorDataStatusWidth", (int)GridView.Columns[4].Width, RegistryValueKind.DWord);
 				Registry.SetValue(MainWindow.registryKey, "SensorDataTypeWidth", (int)GridView.Columns[5].Width, RegistryValueKind.DWord);
 			}
+
+			this.Node?.ViewClosed();
 		}
 
 		public TreeNode Node

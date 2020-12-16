@@ -5,8 +5,7 @@
     <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=Reason}">
         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Left" Margin="12,12,12,0" VerticalAlignment="Top">
             <Run>Are you sure you want to destroy</Run>
-            <Run x:Name="RoomName" FontWeight="Bold">Room</Run>
-            <Run>? Persisted messages will be lost.</Run>
+            <Run x:Name="RoomName" FontWeight="Bold">Room</Run><Run>? Persisted messages will be lost.</Run>
             <Run>(Archived messages will be kept.)</Run>
             <Run>You can provide a reason for destroying the room. It will be sent to any occupants before destroying the room.</Run>
             <Run>You can also direct occupants to an alternative room.</Run>

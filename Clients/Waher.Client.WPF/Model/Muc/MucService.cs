@@ -432,7 +432,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.UpdateGui(() =>
 			{
-				MainWindow.currentInstance.MucChatSubject(e.From, RoomNode, e.Subject);
+				MainWindow.currentInstance.MucChatSubject(e.From, XmppClient.GetBareJID(e.To), RoomNode, e.Subject);
 			});
 		}
 
@@ -469,7 +469,10 @@ namespace Waher.Client.WPF.Model.Muc
 				OccupantNode.OnUpdated();
 			}
 
-			RoomNode.EnterIfNotAlready(false);
+			if (e.Availability != Availability.Offline)
+				RoomNode.EnterIfNotAlready(false);
+
+
 
 			// TODO: e.MucStatus;
 			// TODO: e.RoomDestroyed;

@@ -787,5 +787,10 @@ namespace Waher.Client.WPF.Model
 			// Do nothing by default.
 		}
 
+		public virtual void ViewClosed()
+		{
+			// Do nothing by default.
+		}
+
 	}
 }

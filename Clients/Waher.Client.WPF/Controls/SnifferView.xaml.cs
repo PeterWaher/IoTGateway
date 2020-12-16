@@ -37,6 +37,8 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.node != null)
 				this.node.RemoveSniffer(this.sniffer);
+
+			this.Node?.ViewClosed();
 		}
 
 		public TreeNode Node

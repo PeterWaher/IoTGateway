@@ -178,6 +178,9 @@
     <Compile Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml.cs">
       <DependentUpon>RoomInvitationReceivedForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Muc\ChangeSubjectForm.xaml.cs">
+      <DependentUpon>ChangeSubjectForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Muc\SendRoomInvitationForm.xaml.cs">
       <DependentUpon>SendRoomInvitationForm.xaml</DependentUpon>
     </Compile>
@@ -242,6 +245,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Muc\ChangeSubjectForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

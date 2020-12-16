@@ -727,8 +727,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp, 
-			RoomNode Node, string Title)
+		public ChatView FindRoomView(string FromFullJid, string ToBareJid)
 		{
 			string FromBareJid = XmppClient.GetBareJID(FromFullJid);
 
@@ -748,6 +747,19 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
+				return ChatView;
+			}
+
+			return null;
+		}
+
+		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
+			RoomNode Node, string Title)
+		{
+			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
+
+			if (!(ChatView is null))
+			{
 				ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
 				return;
 			}
@@ -790,24 +802,15 @@ namespace Waher.Client.WPF
 			ChatView2.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
 		}
 
-		public void MucChatSubject(string FromFullJid, RoomNode Node, string Title)
+		public void MucChatSubject(string FromFullJid, string ToBareJid, RoomNode Node, string Title)
 		{
-			string FromBareJid = XmppClient.GetBareJID(FromFullJid);
+			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
 
-			foreach (TabItem TabItem in this.Tabs.Items)
+			if (!(ChatView is null))
 			{
-				if (!(TabItem.Content is ChatView ChatView))
-					continue;
+				if (ChatView.Parent is TabItem TabItem)
+					TabItem.Header = Title;
 
-				if (ChatView.Node is RoomNode Room)
-				{
-					if (Room.Jid != FromBareJid)
-						continue;
-				}
-				else
-					continue;
-
-				TabItem.Header = Title;
 				return;
 			}
 

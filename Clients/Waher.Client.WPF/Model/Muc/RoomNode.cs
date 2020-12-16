@@ -45,8 +45,21 @@ namespace Waher.Client.WPF.Model.Muc
 			this.SetParameters();
 		}
 
+		public override string Header
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(this.name))
+					return this.name;
+
+				if (this.domain == (this.Parent as MucService)?.JID)
+					return this.roomId;
+				else
+					return this.Jid;
+			}
+		}
+
 		public override string Key => this.Jid;
-		public override string Header => string.IsNullOrEmpty(this.name) ? this.Jid : this.name;
 		public string RoomId => this.roomId;
 		public string Domain => this.domain;
 		public string NickName => this.nickName;
@@ -526,7 +539,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MenuItem Item;
 
-			this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+			this.GroupSeparator(ref CurrentGroup, "MUC", Menu);
 
 			Menu.Items.Add(Item = new MenuItem()
 			{
@@ -543,6 +556,14 @@ namespace Waher.Client.WPF.Model.Muc
 			});
 
 			Item.Click += this.RequestPrivileges_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "Change _Subject...",
+				IsEnabled = true,
+			});
+
+			Item.Click += this.ChangeSubject_Click;
 		}
 
 		private void RegisterWithRoom_Click(object sender, RoutedEventArgs e)
@@ -563,7 +584,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 							this.nickName = e2.UserName;
 							RuntimeSettings.Set(Prefix + ".Nick", this.nickName);
-							
+
 							this.EnterIfNotAlready(true);
 						}
 
@@ -588,6 +609,25 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			this.MucClient.RequestVoice(this.roomId, this.domain);
 			MainWindow.SuccessBox("Voice privileges requested.");
+		}
+
+		private void ChangeSubject_Click(object sender, RoutedEventArgs e)
+		{
+			ChangeSubjectForm Form = new ChangeSubjectForm()
+			{
+				Owner = MainWindow.currentInstance
+			};
+
+			bool? b = Form.ShowDialog();
+
+			if (b.HasValue && b.Value)
+				this.MucClient.ChangeRoomSubject(this.roomId, this.domain, Form.Subject.Text);
+		}
+
+		public override void ViewClosed()
+		{
+			this.MucClient.LeaveRoom(this.roomId, this.domain, this.nickName, null, null);
+			this.entered = false;
 		}
 
 	}

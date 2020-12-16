@@ -67,6 +67,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
+			this.Node?.ViewClosed();
 		}
 
 		public TreeNode Node

@@ -1921,6 +1921,11 @@
             <param name="Count">Number of bytes read.</param>
             <returns>If the process should be continued.</returns>
         </member>
+        <member name="P:Waher.Networking.TextTcpClient.LastReceivedBytes">
+            <summary>
+            Number of bytes of current (or last) text received. Can be used in event handlers to <see cref="E:Waher.Networking.TextTcpClient.OnReceived"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.TextTcpClient.TextDataReceived(System.String)">
             <summary>
             Method called when text data has been received.
@@ -1946,6 +1951,11 @@
             <param name="Text">Text packet.</param>
             <param name="Callback">Method to call when packet has been sent.</param>
             <returns>If data was sent.</returns>
+        </member>
+        <member name="P:Waher.Networking.TextTcpClient.LastTransmittedBytes">
+            <summary>
+            Number of bytes of current (or last) text transmitted. Can be used in event handlers to <see cref="E:Waher.Networking.TextTcpClient.OnSent"/>.
+            </summary>
         </member>
         <member name="M:Waher.Networking.TextTcpClient.TextDataSent(System.String)">
             <summary>

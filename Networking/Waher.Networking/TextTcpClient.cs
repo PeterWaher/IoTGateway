@@ -17,6 +17,8 @@ namespace Waher.Networking
 	{
 		private Encoding encoding;
 		private readonly bool sniffText;
+		private int lastReceivedBytes = 0;
+		private int lastTransmittedBytes = 0;
 
 		/// <summary>
 		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
@@ -111,9 +113,15 @@ namespace Waher.Networking
 		/// <returns>If the process should be continued.</returns>
 		protected override Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
 		{
+			this.lastReceivedBytes = Count;
 			string Text = this.encoding.GetString(Buffer, Offset, Count);
 			return this.TextDataReceived(Text);
 		}
+
+		/// <summary>
+		/// Number of bytes of current (or last) text received. Can be used in event handlers to <see cref="OnReceived"/>.
+		/// </summary>
+		public int LastReceivedBytes => this.lastReceivedBytes;
 
 		/// <summary>
 		/// Method called when text data has been received.
@@ -151,10 +159,16 @@ namespace Waher.Networking
 		public async virtual Task<bool> SendAsync(string Text, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Text);
+			this.lastTransmittedBytes = Data.Length;
 			bool Result = await base.SendAsync(Data, Callback);
 			await this.TextDataSent(Text);
 			return Result;
 		}
+
+		/// <summary>
+		/// Number of bytes of current (or last) text transmitted. Can be used in event handlers to <see cref="OnSent"/>.
+		/// </summary>
+		public int LastTransmittedBytes => this.lastTransmittedBytes;
 
 		/// <summary>
 		/// Method called when text data has been sent.

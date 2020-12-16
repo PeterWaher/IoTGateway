@@ -11,9 +11,9 @@ namespace Waher.Events.Statistics
 	/// </summary>
 	public class Statistic
 	{
-		private long count;
-		private DateTime first;
+		private readonly DateTime first;
 		private DateTime last;
+		private long count;
 
 		/// <summary>
 		/// Contains statistical information about one item.

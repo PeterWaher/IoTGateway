@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Networking.XMPP;
@@ -166,7 +168,7 @@ namespace Waher.Client.WPF.Model.Muc
 							string Prefix = this.mucClient.Client.BareJID + "." + Jid;
 							string NickName = await RuntimeSettings.GetAsync(Prefix + ".Nick", string.Empty);
 							string Password = await RuntimeSettings.GetAsync(Prefix + ".Pwd", string.Empty);
-							
+
 							lock (this.roomByJid)
 							{
 								if (!this.roomByJid.TryGetValue(Jid, out RoomNode Node))
@@ -401,6 +403,7 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			string NickName = XmppClient.GetResource(e.From);
+			ChatItemType Type = ChatItemType.Received;
 
 			if (!string.IsNullOrEmpty(NickName) && RoomNode.NickName == NickName)
 			{
@@ -417,18 +420,24 @@ namespace Waher.Client.WPF.Model.Muc
 
 				if (!HasDelay)
 					return;
+
+				Type = ChatItemType.Transmitted;
 			}
+
+			RoomNode.EnterIfNotAlready(true);
 
 			MainWindow.UpdateGui(() =>
 			{
 				MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
-				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp, RoomNode, RoomNode.Header);
+				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
 			});
 		}
 
 		private async Task MucClient_RoomSubject(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
+			if (!RoomNode.Entered)
+				return;
 
 			MainWindow.UpdateGui(() =>
 			{
@@ -462,30 +471,164 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, e.Affiliation, e.Role, e.FullJid);
+			ChatView View = null;
 
 			if (!OccupantNode.Availability.HasValue || e.Availability != OccupantNode.Availability.Value)
 			{
 				OccupantNode.Availability = e.Availability;
 				OccupantNode.OnUpdated();
+
+				View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+
+				if (!(View is null))
+				{
+					switch (OccupantNode.Availability)
+					{
+						case Availability.Online:
+							View.Event("Online.", e.NickName);
+							break;
+
+						case Availability.Offline:
+							View.Event("Offline.", e.NickName);
+							break;
+
+						case Availability.Away:
+							View.Event("Away.", e.NickName);
+							break;
+
+						case Availability.Chat:
+							View.Event("Ready to chat.", e.NickName);
+							break;
+
+						case Availability.DoNotDisturb:
+							View.Event("Busy.", e.NickName);
+							break;
+
+						case Availability.ExtendedAway:
+							View.Event("Away (extended).", e.NickName);
+							break;
+					}
+				}
 			}
 
-			if (e.Availability != Availability.Offline)
-				RoomNode.EnterIfNotAlready(false);
-
-
-
-			// TODO: e.MucStatus;
-			// TODO: e.RoomDestroyed;
-
-			// TODO: Present occupants in chat view
+			await this.MucClient_RoomPresence(Sender, e, View);
 		}
 
-		private async Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
+		private Task MucClient_RoomPresence(object Sender, UserPresenceEventArgs e)
 		{
-			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
-			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, null, null, null);
+			return this.MucClient_RoomPresence(Sender, e, null);
+		}
 
-			// TODO
+		private async Task MucClient_RoomPresence(object _, UserPresenceEventArgs e, ChatView View)
+		{
+			if ((e.MucStatus?.Length ?? 0) > 0 || e.RoomDestroyed)
+			{
+				RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
+
+				if (View is null)
+					View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+
+				if (!(View is null))
+				{
+					foreach (MucStatus Status in e.MucStatus ?? new MucStatus[0])
+					{
+						switch (Status)
+						{
+							case MucStatus.AffiliationChanged:
+								View.Event("New affiliation: " + e.Affiliation.ToString(), e.NickName);
+								break;
+
+							case MucStatus.LoggingEnabled:
+								View.Event("This room logs messages.", e.NickName);
+								break;
+
+							case MucStatus.LoggingDisabled:
+								View.Event("This room does not log messages.", e.NickName);
+								break;
+
+							case MucStatus.NickModified:
+								View.Event("Nick-name changed.", e.NickName);
+								break;
+
+							case MucStatus.RoomNonAnonymous:
+								View.Event("This room does not anonymous.", e.NickName);
+								break;
+
+							case MucStatus.RoomSemiAnonymous:
+								View.Event("This room is semi-anonymous.", e.NickName);
+								break;
+
+							case MucStatus.RoomAnonymous:
+								View.Event("This room does anonymous.", e.NickName);
+								break;
+
+							case MucStatus.FullJidVisisble:
+								View.Event("All participants in this room have access to the full JID of each other.", e.NickName);
+								break;
+
+							case MucStatus.ShowsUnavailableMembers:
+								View.Event("This room displays unavailable members.", e.NickName);
+								break;
+
+							case MucStatus.DoesNotShowUnavailableMembers:
+								View.Event("This room hieds unavailable members.", e.NickName);
+								break;
+
+							case MucStatus.NonPrivacyRelatedConfigurationChange:
+								View.Event("A configuration that does not affect privacy changed.", e.NickName);
+								break;
+
+							case MucStatus.OwnPresence:
+								break;
+
+							case MucStatus.Created:
+								View.Event("Room created.", e.NickName);
+								break;
+
+							case MucStatus.Banned:
+								View.Event("Banned from the room.", e.NickName);
+								break;
+
+							case MucStatus.NewRoomNickName:
+								View.Event("New room nick-name.", e.NickName);
+								break;
+
+							case MucStatus.Kicked:
+								View.Event("Temporarily kicked from the room.", e.NickName);
+								break;
+
+							case MucStatus.RemovedDueToAffiliationChange:
+								View.Event("Removed from the room due to an affiliation change.", e.NickName);
+								break;
+
+							case MucStatus.RemovedDueToNonMembership:
+								View.Event("Removed from the room, since no longer member.", e.NickName);
+								break;
+
+							case MucStatus.RemovedDueToSystemShutdown:
+								View.Event("Removed from the room due to system shutdown.", e.NickName);
+								break;
+
+							case MucStatus.RemovedDueToFailure:
+								View.Event("Removed from the room due to technical problems.", e.NickName);
+								break;
+						}
+					}
+				}
+
+				if (e.RoomDestroyed)
+				{
+					View?.Event("Room has been destroyed on the host.", e.NickName);
+
+					RoomNode.Parent.RemoveChild(RoomNode);
+					RoomNode.Parent.OnUpdated();
+				}
+			}
+		}
+
+		private async Task MucClient_RoomDestroyed(object Sender, UserPresenceEventArgs e)
+		{
+			await this.MucClient_RoomPresence(Sender, e);
 		}
 
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
@@ -495,16 +638,10 @@ namespace Waher.Client.WPF.Model.Muc
 			// TODO
 		}
 
-		private async Task MucClient_RoomPresence(object Sender, UserPresenceEventArgs e)
+		private async Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
-
-			// TODO
-		}
-
-		private async Task MucClient_RoomDestroyed(object Sender, UserPresenceEventArgs e)
-		{
-			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
+			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, null, null, null);
 
 			// TODO
 		}

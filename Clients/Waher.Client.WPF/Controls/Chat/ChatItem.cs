@@ -16,7 +16,8 @@ namespace Waher.Client.WPF.Controls.Chat
 	public enum ChatItemType
 	{
 		Received,
-		Transmitted
+		Transmitted,
+		Event
 	}
 
 	/// <summary>
@@ -56,7 +57,7 @@ namespace Waher.Client.WPF.Controls.Chat
 
 			if (Markdown is null)
 			{
-				XamlSettings Settings = Markdown.Settings.XamlSettings;
+				XamlSettings Settings = ChatView.GetMarkdownSettings().XamlSettings;
 
 				this.formattedMessage = new TextBlock()
 				{
@@ -258,7 +259,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		{
 			get
 			{
-				if (this.type == ChatItemType.Received)
+				if (this.type == ChatItemType.Received || this.type == ChatItemType.Event)
 					return this.timestamp.ToLongTimeString();
 				else
 					return string.Empty;

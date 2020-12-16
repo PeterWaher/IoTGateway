@@ -717,6 +717,12 @@
             Inform user that he or she is being removed from the room because of a system shutdown
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.MUC.MucStatus.RemovedDueToFailure">
+            <summary>
+            Inform users that a user was removed because of an error reply (for example
+            when an s2s link fails between the MUC and the removed users server).
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.MUC.MultiUserChatClient">
             <summary>
             Client managing communication with a Multi-User-Chat service.

@@ -10,8 +10,9 @@
 		<xs:complexType>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="Received" type="TextItem"/>
-				<xs:element name="Transmitted" type="TextItem"/>
-			</xs:choice>
+        <xs:element name="Transmitted" type="TextItem"/>
+        <xs:element name="Event" type="TextItem"/>
+      </xs:choice>
       <xs:attribute name="muc" type="xs:boolean" use="optional" default="false"/>
 		</xs:complexType>
 	</xs:element>

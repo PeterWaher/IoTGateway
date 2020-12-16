@@ -102,6 +102,12 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Inform user that he or she is being removed from the room because of a system shutdown
 		/// </summary>
-		RemovedDueToSystemShutdown = 332
+		RemovedDueToSystemShutdown = 332,
+
+		/// <summary>
+		/// Inform users that a user was removed because of an error reply (for example
+		/// when an s2s link fails between the MUC and the removed users server).
+		/// </summary>
+		RemovedDueToFailure = 333
 	}
 }

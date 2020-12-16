@@ -79,7 +79,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.ChatListView.View is GridView GridView)
 			{
-				GridView.Columns[2].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth - 
+				GridView.Columns[2].Width = Math.Max(this.ActualWidth - GridView.Columns[0].ActualWidth -
 					GridView.Columns[1].ActualWidth - GridView.Columns[3].ActualWidth -
 					SystemParameters.VerticalScrollBarWidth - 8, 10);
 			}
@@ -101,13 +101,20 @@ namespace Waher.Client.WPF.Controls
 
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
-			MarkdownDocument Markdown;
-			ChatItem Item;
 			string Msg = this.Input.Text;
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
 
-			if (Msg.IndexOf('|') >= 0)
+			this.ChatMessageTransmitted(Msg, out MarkdownDocument Markdown);
+
+			this.node.SendChatMessage(Msg, Markdown);
+		}
+
+		public void ChatMessageTransmitted(string Message, out MarkdownDocument Markdown)
+		{
+			ChatItem Item;
+
+			if (Message.IndexOf('|') >= 0)
 			{
 				string s;
 				int c = this.ChatListView.Items.Count;
@@ -124,7 +131,7 @@ namespace Waher.Client.WPF.Controls
 						if (!s.EndsWith("\n"))
 							s += Environment.NewLine;
 
-						s += Msg;
+						s += Message;
 						Markdown = new MarkdownDocument(s, GetMarkdownSettings());
 						Item.Update(s, Markdown);
 						this.ChatListView.Items.Refresh();
@@ -140,14 +147,14 @@ namespace Waher.Client.WPF.Controls
 
 			try
 			{
-				Markdown = new MarkdownDocument(Msg, GetMarkdownSettings());
+				Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
 			}
 			catch (Exception)
 			{
 				Markdown = null;
 			}
 
-			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Msg, string.Empty, Markdown, Colors.Black, Colors.Honeydew);
+			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Message, string.Empty, Markdown, Colors.Black, Colors.Honeydew);
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
@@ -157,8 +164,6 @@ namespace Waher.Client.WPF.Controls
 			};
 			this.ChatListView.Items.Add(ListViewItem);
 			this.ChatListView.ScrollIntoView(ListViewItem);
-
-			this.node.SendChatMessage(Msg, Markdown);
 		}
 
 		public void ChatMessageReceived(string Message, string From, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
@@ -289,7 +294,7 @@ namespace Waher.Client.WPF.Controls
 					w.WriteAttributeString("timestamp", XML.Encode(ChatItem.Timestamp));
 
 					if (!string.IsNullOrEmpty(ChatItem.From))
-						w.WriteAttributeString("from", ChatItem.From);
+						w.WriteAttributeString("from", ChatItem.FromStr);
 
 					w.WriteValue(ChatItem.Message);
 					w.WriteEndElement();
@@ -390,6 +395,11 @@ namespace Waher.Client.WPF.Controls
 						BackgroundColor = Colors.Honeydew;
 						break;
 
+					case ChatItemType.Event:
+						ForegroundColor = EventFgColor;
+						BackgroundColor = EventBgColor;
+						break;
+
 					default:
 						continue;
 				}
@@ -436,12 +446,12 @@ namespace Waher.Client.WPF.Controls
 				this.Input.Text = Item.Message;
 				e.Handled = true;
 			}
-			else if (e.OriginalSource is System.Windows.Documents.Run Run)
+			else if (e.OriginalSource is Run Run)
 			{
 				this.Input.Text = Run.Text;
 				e.Handled = true;
 			}
-			else if (e.OriginalSource is System.Windows.Controls.TextBlock TextBlock)
+			else if (e.OriginalSource is TextBlock TextBlock)
 			{
 				this.Input.Text = TextBlock.Text;
 				e.Handled = true;
@@ -453,5 +463,25 @@ namespace Waher.Client.WPF.Controls
 			string Uri = ((Hyperlink)sender).NavigateUri.ToString();
 			System.Diagnostics.Process.Start(Uri);
 		}
+
+		public void Event(string Message, string From)
+		{
+			MainWindow.UpdateGui(() =>
+			{
+				ChatItem Item = new ChatItem(ChatItemType.Event, DateTime.Now, Message, From, null, EventFgColor, EventBgColor);
+				ListViewItem ListViewItem = new ListViewItem()
+				{
+					Content = Item,
+					Foreground = new SolidColorBrush(EventFgColor),
+					Background = new SolidColorBrush(EventBgColor),
+					Margin = new Thickness(0)
+				};
+				this.ChatListView.Items.Add(ListViewItem);
+				this.ChatListView.ScrollIntoView(ListViewItem);
+			});
+		}
+
+		public static readonly Color EventFgColor = Color.FromRgb(32, 32, 32);
+		public static readonly Color EventBgColor = Color.FromRgb(240, 240, 240);
 	}
 }

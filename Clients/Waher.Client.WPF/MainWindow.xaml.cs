@@ -24,6 +24,7 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
@@ -754,23 +755,33 @@ namespace Waher.Client.WPF
 		}
 
 		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
-			RoomNode Node, string Title)
+			ChatItemType Type, RoomNode Node, string Title)
 		{
 			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
 
-			if (!(ChatView is null))
+			if (ChatView is null)
 			{
-				ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
-				return;
+				TabItem TabItem2 = MainWindow.NewTab(Title);
+				this.Tabs.Items.Add(TabItem2);
+
+				ChatView ChatView2 = new ChatView(Node, true);
+				TabItem2.Content = ChatView2;
 			}
 
-			TabItem TabItem2 = MainWindow.NewTab(Title);
-			this.Tabs.Items.Add(TabItem2);
+			switch (Type)
+			{
+				case ChatItemType.Transmitted:
+					ChatView.ChatMessageTransmitted(Message, out MarkdownDocument _);
+					break;
 
-			ChatView ChatView2 = new ChatView(Node, true);
-			TabItem2.Content = ChatView2;
+				case ChatItemType.Received:
+					ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+					break;
 
-			ChatView2.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+				case ChatItemType.Event:
+					ChatView.Event(Message, XmppClient.GetResource(FromFullJid));
+					break;
+			}
 		}
 
 		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
@@ -809,7 +820,7 @@ namespace Waher.Client.WPF
 			if (!(ChatView is null))
 			{
 				if (ChatView.Parent is TabItem TabItem)
-					TabItem.Header = Title;
+					NewHeader(Title, TabItem);
 
 				return;
 			}
@@ -1094,6 +1105,18 @@ namespace Waher.Client.WPF
 
 		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
 		{
+			TabItem Result = new TabItem();
+			NewHeader(HeaderText, Result, out HeaderLabel);
+			return Result;
+		}
+
+		internal static void NewHeader(string HeaderText, TabItem Tab)
+		{
+			NewHeader(HeaderText, Tab, out TextBlock _);
+		}
+
+		internal static void NewHeader(string HeaderText, TabItem Tab, out TextBlock HeaderLabel)
+		{
 			StackPanel Header = new StackPanel()
 			{
 				Orientation = Orientation.Horizontal
@@ -1116,17 +1139,12 @@ namespace Waher.Client.WPF
 			Header.Children.Add(HeaderLabel);
 			Header.Children.Add(CloseImage);
 
-			TabItem Result = new TabItem()
-			{
-				Header = Header
-			};
-
 			CloseImage.MouseLeftButtonDown += CloseImage_MouseLeftButtonDown;
 			CloseImage.MouseEnter += CloseImage_MouseEnter;
 			CloseImage.MouseLeave += CloseImage_MouseLeave;
-			CloseImage.Tag = Result;
+			CloseImage.Tag = Tab;
 
-			return Result;
+			Tab.Header = Header;
 		}
 
 		private static void CloseImage_MouseLeave(object sender, MouseEventArgs e)

@@ -37,6 +37,11 @@
                     <xsl:text>color:black;background-color:#F0FFF0</xsl:text>
                   </xsl:attribute>
                 </xsl:when>
+                <xsl:when test="name()='Event'">
+                  <xsl:attribute name="style">
+                    <xsl:text>color:#202020;background-color:#F0F0F0</xsl:text>
+                  </xsl:attribute>
+                </xsl:when>
               </xsl:choose>
               <td>
                 <xsl:if test="name()='Received'">

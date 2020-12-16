@@ -64,6 +64,8 @@ namespace Waher.Client.WPF.Model.Muc
 		public string Domain => this.domain;
 		public string NickName => this.nickName;
 		public string Jid => this.roomId + "@" + this.domain;
+		public bool Entered => this.entered;
+		public bool Entering => this.entering;
 
 		private void SetParameters()
 		{
@@ -411,6 +413,13 @@ namespace Waher.Client.WPF.Model.Muc
 
 				return Task.CompletedTask;
 			}, null);
+		}
+
+		public override void SelectionChanged()
+		{
+			this.EnterIfNotAlready(true);
+
+			base.SelectionChanged();
 		}
 
 		public override void Add()

@@ -1465,6 +1465,40 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		/// <summary>
+		/// Gets information about my registered nick-name.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response has been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetMyNickName(string RoomId, string Domain, ServiceDiscoveryEventHandler Callback, object State)
+		{
+			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, "x-roomuser-item", (sender, e) =>
+			{
+				return Callback?.Invoke(this, e) ?? Task.CompletedTask;
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets information about my registered nick-name.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <returns>Information about my registered nick-name, if any, and if supported by the service.</returns>
+		public Task<ServiceDiscoveryEventArgs> GetMyNickNameAsync(string RoomId, string Domain)
+		{
+			TaskCompletionSource<ServiceDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceDiscoveryEventArgs>();
+
+			this.GetMyNickName(RoomId, Domain, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
 		/// Gets information about items (occupants) in a room.
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>

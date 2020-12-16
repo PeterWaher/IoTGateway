@@ -8,6 +8,7 @@ using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
+using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Settings;
 using Waher.Things.DisplayableParameters;
 using Waher.Content.Markdown;
@@ -254,6 +255,24 @@ namespace Waher.Client.WPF.Model.Muc
 				{
 					UserPresenceEventArgs e;
 					EnterRoomForm Form = null;
+
+					if (string.IsNullOrEmpty(this.nickName))
+					{
+						ServiceDiscoveryEventArgs e2 = await this.MucClient.GetMyNickNameAsync(this.roomId, this.domain);
+
+						if (e2.Ok)
+						{
+							foreach (Identity Id in e2.Identities)
+							{
+								if (Id.Category == "conference" && Id.Type == "text")
+								{
+									this.nickName = Id.Name;
+									this.OnUpdated();
+									break;
+								}
+							}
+						}
+					}
 
 					if (string.IsNullOrEmpty(this.nickName))
 						e = null;

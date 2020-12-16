@@ -1301,6 +1301,23 @@
             <param name="Domain">Domain of service hosting the room.</param>
             <returns>Room information response.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetMyNickName(System.String,System.String,Waher.Networking.XMPP.ServiceDiscovery.ServiceDiscoveryEventHandler,System.Object)">
+            <summary>
+            Gets information about my registered nick-name.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response has been returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetMyNickNameAsync(System.String,System.String)">
+            <summary>
+            Gets information about my registered nick-name.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <returns>Information about my registered nick-name, if any, and if supported by the service.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomItems(System.String,System.String,Waher.Networking.XMPP.ServiceDiscovery.ServiceItemsDiscoveryEventHandler,System.Object)">
             <summary>
             Gets information about items (occupants) in a room.

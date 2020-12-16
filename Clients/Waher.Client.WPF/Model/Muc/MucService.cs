@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
@@ -435,6 +436,28 @@ namespace Waher.Client.WPF.Model.Muc
 			});
 		}
 
+		private Task MucClient_RegistrationRequest(object Sender, MessageFormEventArgs e)
+		{
+			MainWindow.UpdateGui(() =>
+			{
+				ParameterDialog Dialog = new ParameterDialog(e.Form);
+				Dialog.ShowDialog();
+			});
+
+			return Task.CompletedTask;
+		}
+
+		private Task MucClient_OccupantRequest(object Sender, MessageFormEventArgs e)
+		{
+			MainWindow.UpdateGui(() =>
+			{
+				ParameterDialog Dialog = new ParameterDialog(e.Form);
+				Dialog.ShowDialog();
+			});
+
+			return Task.CompletedTask;
+		}
+
 		internal async Task MucClient_OccupantPresence(object Sender, UserPresenceEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
@@ -481,18 +504,6 @@ namespace Waher.Client.WPF.Model.Muc
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 
 			// TODO
-		}
-
-		private Task MucClient_RegistrationRequest(object Sender, MessageFormEventArgs e)
-		{
-			// TODO
-			return Task.CompletedTask;
-		}
-
-		private Task MucClient_OccupantRequest(object Sender, MessageFormEventArgs e)
-		{
-			// TODO
-			return Task.CompletedTask;
 		}
 
 	}

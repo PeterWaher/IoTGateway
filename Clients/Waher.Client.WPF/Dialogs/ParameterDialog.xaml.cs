@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Waher.Content;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
@@ -431,14 +425,20 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				ErrorLabel.Text = Field.Error;
-				ErrorLabel.Visibility = Visibility.Visible;
+
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
 			}
 			else
 			{
 				Background = null;
 				this.CheckOkButtonEnabled();
-				ErrorLabel.Visibility = Visibility.Collapsed;
+
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
 			}
 
 			foreach (UIElement Element in StackPanel.Children)
@@ -470,15 +470,18 @@ namespace Waher.Client.WPF.Dialogs
 
 			ComboBoxItem Item;
 
-			foreach (KeyValuePair<string, string> P in Field.Options)
+			if (!(Field.Options is null))
 			{
-				Item = new ComboBoxItem()
+				foreach (KeyValuePair<string, string> P in Field.Options)
 				{
-					Content = P.Key,
-					Tag = P.Value
-				};
+					Item = new ComboBoxItem()
+					{
+						Content = P.Key,
+						Tag = P.Value
+					};
 
-				ComboBox.Items.Add(Item);
+					ComboBox.Items.Add(Item);
+				}
 			}
 
 			if (Field.ValidationMethod is Networking.XMPP.DataForms.ValidationMethods.OpenValidation)
@@ -493,8 +496,10 @@ namespace Waher.Client.WPF.Dialogs
 				string s = Field.ValueString;
 
 				ComboBox.IsEditable = false;
-				ComboBox.SelectedIndex = Array.FindIndex<KeyValuePair<string, string>>(Field.Options, (P) => P.Value.Equals(s));
 				ComboBox.SelectionChanged += this.ComboBox_SelectionChanged;
+
+				if (!(Field.Options is null))
+					ComboBox.SelectedIndex = Array.FindIndex<KeyValuePair<string, string>>(Field.Options, (P) => P.Value.Equals(s));
 			}
 
 			Container.Children.Add(ComboBox);
@@ -525,13 +530,20 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				ErrorLabel.Text = Field.Error;
-				ErrorLabel.Visibility = Visibility.Visible;
+
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
 			}
 			else
 			{
 				ComboBox.Background = null;
-				ErrorLabel.Visibility = Visibility.Collapsed;
+				
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
+				
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -560,14 +572,21 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				ErrorLabel.Text = Field.Error;
-				ErrorLabel.Visibility = Visibility.Visible;
+
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
 				return;
 			}
 			else
 			{
 				ComboBox.Background = null;
-				ErrorLabel.Visibility = Visibility.Collapsed;
+				
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
+				
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -802,10 +821,13 @@ namespace Waher.Client.WPF.Dialogs
 			Button Button = (Button)sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
-			if (MediaElement.SpeedRatio >= 0)
-				MediaElement.SpeedRatio = -1;
-			else if (MediaElement.SpeedRatio > -32)
-				MediaElement.SpeedRatio *= 2;
+			if (!(MediaElement is null))
+			{
+				if (MediaElement.SpeedRatio >= 0)
+					MediaElement.SpeedRatio = -1;
+				else if (MediaElement.SpeedRatio > -32)
+					MediaElement.SpeedRatio *= 2;
+			}
 		}
 
 		private void Play_Click(object sender, RoutedEventArgs e)
@@ -813,27 +835,30 @@ namespace Waher.Client.WPF.Dialogs
 			Button Button = (Button)sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
-			if (MediaElement.Position >= MediaElement.NaturalDuration.TimeSpan)
+			if (!(MediaElement is null))
 			{
-				MediaElement.Stop();
-				MediaElement.Position = TimeSpan.Zero;
-			}
+				if (MediaElement.Position >= MediaElement.NaturalDuration.TimeSpan)
+				{
+					MediaElement.Stop();
+					MediaElement.Position = TimeSpan.Zero;
+				}
 
-			MediaElement.Play();
+				MediaElement.Play();
+			}
 		}
 
 		private void Pause_Click(object sender, RoutedEventArgs e)
 		{
 			Button Button = (Button)sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
-			MediaElement.Pause();
+			MediaElement?.Pause();
 		}
 
 		private void Stop_Click(object sender, RoutedEventArgs e)
 		{
 			Button Button = (Button)sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
-			MediaElement.Stop();
+			MediaElement?.Stop();
 		}
 
 		private void Forward_Click(object sender, RoutedEventArgs e)
@@ -841,10 +866,13 @@ namespace Waher.Client.WPF.Dialogs
 			Button Button = (Button)sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
-			if (MediaElement.SpeedRatio <= 0)
-				MediaElement.SpeedRatio = 1;
-			else if (MediaElement.SpeedRatio < 32)
-				MediaElement.SpeedRatio *= 2;
+			if (!(MediaElement is null))
+			{
+				if (MediaElement.SpeedRatio <= 0)
+					MediaElement.SpeedRatio = 1;
+				else if (MediaElement.SpeedRatio < 32)
+					MediaElement.SpeedRatio *= 2;
+			}
 		}
 
 		private Control Layout(Panel Container, TextMultiField Field, DataForm _)
@@ -903,13 +931,20 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				ErrorLabel.Text = Field.Error;
-				ErrorLabel.Visibility = Visibility.Visible;
+
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
 			}
 			else
 			{
 				PasswordBox.Background = null;
-				ErrorLabel.Visibility = Visibility.Collapsed;
+				
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
+				
 				this.CheckOkButtonEnabled();
 			}
 		}
@@ -1007,13 +1042,19 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				ErrorLabel.Text = Field.Error;
-				ErrorLabel.Visibility = Visibility.Visible;
+				if (!(ErrorLabel is null))
+				{
+					ErrorLabel.Text = Field.Error;
+					ErrorLabel.Visibility = Visibility.Visible;
+				}
 			}
 			else
 			{
 				TextBox.Background = null;
-				ErrorLabel.Visibility = Visibility.Collapsed;
+				
+				if (!(ErrorLabel is null))
+					ErrorLabel.Visibility = Visibility.Collapsed;
+				
 				this.CheckOkButtonEnabled();
 			}
 		}

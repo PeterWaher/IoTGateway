@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
+using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.Muc;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Settings;
 using Waher.Things.DisplayableParameters;
-using Waher.Content.Markdown;
 
 namespace Waher.Client.WPF.Model.Muc
 {
@@ -199,7 +202,7 @@ namespace Waher.Client.WPF.Model.Muc
 							this.Service.NodesAdded(Children.Values, this);
 						}
 						else
-							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get occupants." : e.ErrorText);
+							MainWindow.ShowStatus(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get occupants." : e.ErrorText);
 
 						return Task.CompletedTask;
 
@@ -256,6 +259,8 @@ namespace Waher.Client.WPF.Model.Muc
 					UserPresenceEventArgs e;
 					EnterRoomForm Form = null;
 
+					Mouse.OverrideCursor = Cursors.Wait;
+
 					if (string.IsNullOrEmpty(this.nickName))
 					{
 						ServiceDiscoveryEventArgs e2 = await this.MucClient.GetMyNickNameAsync(this.roomId, this.domain);
@@ -294,6 +299,7 @@ namespace Waher.Client.WPF.Model.Muc
 							Form.Password.Password = this.password;
 						}
 
+						MainWindow.MouseDefault();
 						MainWindow.UpdateGui(() =>
 						{
 							bool? Result = Form.ShowDialog();
@@ -301,8 +307,12 @@ namespace Waher.Client.WPF.Model.Muc
 						});
 
 						if (!await InputReceived.Task)
+						{
+							this.entered = false;
 							return false;
+						}
 
+						Mouse.OverrideCursor = Cursors.Wait;
 						e = await this.MucClient.EnterRoomAsync(this.roomId, this.domain, Form.NickName.Text, Form.Password.Password);
 						if (!e.Ok)
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to enter room." : e.ErrorText);
@@ -509,5 +519,76 @@ namespace Waher.Client.WPF.Model.Muc
 
 			return Result;
 		}
+
+		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			base.AddContexMenuItems(ref CurrentGroup, Menu);
+
+			MenuItem Item;
+
+			this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "_Register with room...",
+				IsEnabled = true,
+			});
+
+			Item.Click += this.RegisterWithRoom_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "Request _voice...",
+				IsEnabled = true,
+			});
+
+			Item.Click += this.RequestPrivileges_Click;
+		}
+
+		private void RegisterWithRoom_Click(object sender, RoutedEventArgs e)
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+
+			this.MucClient.GetRoomRegistrationForm(this.roomId, this.domain, (sender2, e2) =>
+			{
+				MainWindow.MouseDefault();
+
+				if (e2.Ok)
+				{
+					if (e2.AlreadyRegistered)
+					{
+						if (this.nickName != e2.UserName)
+						{
+							string Prefix = this.MucClient.Client.BareJID + "." + this.roomId + "@" + this.domain;
+
+							this.nickName = e2.UserName;
+							RuntimeSettings.Set(Prefix + ".Nick", this.nickName);
+							
+							this.EnterIfNotAlready(true);
+						}
+
+						MainWindow.MessageBox("You are already registered in the room with nick-name '" + e2.UserName + "'.",
+							"Information", MessageBoxButton.OK, MessageBoxImage.Information);
+					}
+					else
+					{
+						MainWindow.UpdateGui(() =>
+						{
+							ParameterDialog Dialog = new ParameterDialog(e2.Form);
+							Dialog.ShowDialog();
+						});
+					}
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get room registration form." : e2.ErrorText);
+			}, null);
+		}
+
+		private void RequestPrivileges_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.RequestVoice(this.roomId, this.domain);
+			MainWindow.SuccessBox("Voice privileges requested.");
+		}
+
 	}
 }

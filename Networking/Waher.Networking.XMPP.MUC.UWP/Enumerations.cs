@@ -12,27 +12,27 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Owner of room
 		/// </summary>
-		Owner,
+		Owner = 0,
 
 		/// <summary>
 		/// Administrator of room
 		/// </summary>
-		Admin,
+		Admin = 1,
 
 		/// <summary>
 		/// Member of room
 		/// </summary>
-		Member,
+		Member = 2,
 
 		/// <summary>
 		/// Outcast
 		/// </summary>
-		Outcast,
+		Outcast = 3,
 
 		/// <summary>
 		/// No affiliation
 		/// </summary>
-		None
+		None = 4
 	}
 
 	/// <summary>
@@ -43,21 +43,21 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Room moderator
 		/// </summary>
-		Moderator,
+		Moderator = 0,
 
 		/// <summary>
 		/// Room participant
 		/// </summary>
-		Participant,
+		Participant = 1,
 
 		/// <summary>
 		/// Room visitor
 		/// </summary>
-		Visitor,
+		Visitor = 2,
 
 		/// <summary>
 		/// No role
 		/// </summary>
-		None
+		None = 3
 	}
 }

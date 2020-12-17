@@ -71,6 +71,7 @@
     <ProjectReference Include="..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Networking\Waher.Script.Networking.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj" />

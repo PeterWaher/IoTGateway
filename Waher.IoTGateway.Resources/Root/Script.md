@@ -1527,6 +1527,15 @@ The following functions can be used to create fractal images based on Iterated F
 | `TwintrianVariation`	  |							   |					   |
 | `WavesVariation`		  |							   |					   |
 
+#### Networking-related functions (Waher.Script.Networking)
+
+The following functions are available in the `Waher.Script.Networking` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `WhoIs(Ip)`                  | Makes a WHOIS request to provide textual information about an IP-address. | `WHOIS("1.2.3.4")` |
+| `Dns(Name[,QTYPE[,QCLASS]])` | Makes a DNS request to resolve a name, given a QTYPE (default `QTYPE.A`) and QCLASS (default `QCLASS.IN`). | `DNS(Domain,QTYPE.TXT)` |
+
 #### Persistence-related functions (Waher.Script.Persistence)
 
 The following functions are available in the `Waher.Script.Persistence` library.

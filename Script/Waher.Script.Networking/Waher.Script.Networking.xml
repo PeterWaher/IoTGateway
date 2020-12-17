@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Networking</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Networking.Functions.Dns">
+            <summary>
+            Makes a DNS query regarding a name.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.Dns.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a DNS query regarding a name.
+            </summary>
+            <param name="Name">Name to resolve.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.Dns.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a DNS query regarding a name.
+            </summary>
+            <param name="Name">Name to resolve.</param>
+            <param name="Type">TYPE parameter.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.Dns.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a DNS query regarding a name.
+            </summary>
+            <param name="Name">Name to resolve.</param>
+            <param name="Type">TYPE parameter.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Networking.Functions.Dns.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Networking.Functions.Dns.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.Dns.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Networking.Functions.WhoIs">
+            <summary>
+            Makes a WHOIS query regarding an IP address.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.WhoIs.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Makes a WHOIS query regarding an IP address.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Networking.Functions.WhoIs.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.WhoIs.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Networking.Functions.WhoIs.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+    </members>
+</doc>

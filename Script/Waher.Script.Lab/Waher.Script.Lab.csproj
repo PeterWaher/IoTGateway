@@ -222,6 +222,10 @@
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.Networking\Waher.Script.Networking.csproj">
+      <Project>{7101894b-d43a-46b2-948f-19a888eab92a}</Project>
+      <Name>Waher.Script.Networking</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
       <Name>Waher.Script.Persistence</Name>

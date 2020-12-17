@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Extends the script engine with functions for different network protocols.
+
+Script Syntax: https://waher.se/Script.md#networkingRelatedFunctionsWaherScriptNetworking</Description>
+    <Copyright>Copyright © Waher Data AB 2020. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Networking</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>script execution parsing networking</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Networking\Waher.Script.Networking.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Networking\Waher.Script.Networking.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.WHOIS\Waher.Networking.WHOIS.csproj" />
+    <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
+  </ItemGroup>
+
+</Project>

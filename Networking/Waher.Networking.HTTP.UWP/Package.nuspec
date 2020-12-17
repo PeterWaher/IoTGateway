@@ -17,8 +17,8 @@
     <dependencies>
       <dependency id="Waher.Content" version="1.0.29"/>
       <dependency id="Waher.Events" version="1.0.13"/>
-      <dependency id="Waher.Events.Statistics" version="1.0.3"/>
-      <dependency id="Waher.Networking.UWP" version="1.0.19"/>
+      <dependency id="Waher.Events.Statistics" version="1.0.4"/>
+      <dependency id="Waher.Networking.UWP" version="1.0.20"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.4"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Runtime.Temporary" version="1.0.0"/>

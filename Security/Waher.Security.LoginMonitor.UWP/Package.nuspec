@@ -16,9 +16,9 @@
     <tags>Security Login Monitor UWP</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.0.13"/>
-      <dependency id="Waher.Networking.UWP" version="1.0.19"/>
+      <dependency id="Waher.Networking.UWP" version="1.0.20"/>
       <dependency id="Waher.Networking.WHOIS.UWP" version="1.0.0"/>
-      <dependency id="Waher.Persistence" version="1.2.1"/>
+      <dependency id="Waher.Persistence" version="1.2.2"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Security" version="1.0.7"/>
 		</dependencies>

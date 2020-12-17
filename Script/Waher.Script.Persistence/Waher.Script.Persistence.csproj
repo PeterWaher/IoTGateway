@@ -18,10 +18,10 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing persistence SQL</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.20</AssemblyVersion>
-    <FileVersion>1.0.20</FileVersion>
+    <AssemblyVersion>1.0.21</AssemblyVersion>
+    <FileVersion>1.0.21</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.20</Version>
+    <Version>1.0.21</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Persistence\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

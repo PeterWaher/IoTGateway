@@ -2549,7 +2549,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2583,7 +2583,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2625,7 +2625,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2697,7 +2697,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -5211,7 +5211,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5245,7 +5245,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5287,7 +5287,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5359,7 +5359,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -7909,7 +7909,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7943,7 +7943,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7985,7 +7985,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8057,7 +8057,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -10580,7 +10580,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10614,7 +10614,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10656,7 +10656,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10728,7 +10728,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -13287,7 +13287,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13321,7 +13321,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13363,7 +13363,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13435,7 +13435,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -15958,7 +15958,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15992,7 +15992,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16034,7 +16034,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16106,7 +16106,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -18665,7 +18665,7 @@
           "Waher.Content.Xml": "1.0.11"
         }
       },
-      "Waher.Content.Markdown/1.0.43": {
+      "Waher.Content.Markdown/1.0.44": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18699,7 +18699,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Events.Statistics/1.0.3": {
+      "Waher.Events.Statistics/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18741,7 +18741,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.2.1": {
+      "Waher.Persistence/1.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18813,7 +18813,7 @@
           "Waher.Events": "1.0.13",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.2.1",
+          "Waher.Persistence": "1.2.2",
           "Waher.Runtime.Inventory": "1.0.14",
           "Waher.Security": "1.0.7"
         }
@@ -28837,7 +28837,7 @@
       "path": "../Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../Waher.Content.Html/Waher.Content.Html.csproj"
     },
-    "Waher.Content.Markdown/1.0.43": {
+    "Waher.Content.Markdown/1.0.44": {
       "type": "project",
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
@@ -28852,7 +28852,7 @@
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Events.Statistics/1.0.3": {
+    "Waher.Events.Statistics/1.0.4": {
       "type": "project",
       "path": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj",
       "msbuildProject": "../../Events/Waher.Events.Statistics/Waher.Events.Statistics.csproj"
@@ -28872,7 +28872,7 @@
       "path": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj",
       "msbuildProject": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj"
     },
-    "Waher.Persistence/1.2.1": {
+    "Waher.Persistence/1.2.2": {
       "type": "project",
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"

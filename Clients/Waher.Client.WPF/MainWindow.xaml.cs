@@ -703,6 +703,11 @@ namespace Waher.Client.WPF
 					if (XmppAccountNode.BareJID != ToBareJid)
 						continue;
 				}
+				else if (ChatView.Node is OccupantNode OccupantNode)
+				{
+					if (OccupantNode.RoomId + "@" + OccupantNode.Domain + "/" + OccupantNode.NickName != FromBareJid)
+						continue;
+				}
 				else
 					continue;
 
@@ -713,17 +718,31 @@ namespace Waher.Client.WPF
 			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
 			{
 				if (Node is XmppAccountNode XmppAccountNode2 &&
-					XmppAccountNode2.BareJID == ToBareJid &&
-					XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
+					XmppAccountNode2.BareJID == ToBareJid)
 				{
-					TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
-					this.Tabs.Items.Add(TabItem2);
+					if (XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
+					{
+						TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
+						this.Tabs.Items.Add(TabItem2);
 
-					ChatView ChatView = new ChatView(ContactNode, false);
-					TabItem2.Content = ChatView;
+						ChatView ChatView = new ChatView(ContactNode, false);
+						TabItem2.Content = ChatView;
 
-					ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
-					return;
+						ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+						return;
+					}
+					else if (XmppAccountNode2.TryGetChild(XmppClient.GetDomain(FromBareJid), out TreeNode ComponentNode) &&
+						ComponentNode.TryGetChild(XmppClient.GetResource(FromBareJid), out ContactNode))
+					{
+						TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
+						this.Tabs.Items.Add(TabItem2);
+
+						ChatView ChatView = new ChatView(ContactNode, false);
+						TabItem2.Content = ChatView;
+
+						ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+						return;
+					}
 				}
 			}
 		}

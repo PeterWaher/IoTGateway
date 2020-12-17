@@ -175,6 +175,9 @@
     </Compile>
     <Compile Include="Controls\Sniffers\SniffItem.cs" />
     <Compile Include="Controls\Sniffers\TabSniffer.cs" />
+    <Compile Include="Dialogs\Muc\OccupantPrivilegesForm.xaml.cs">
+      <DependentUpon>OccupantPrivilegesForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml.cs">
       <DependentUpon>RoomInvitationReceivedForm.xaml</DependentUpon>
     </Compile>
@@ -243,6 +246,10 @@
     <Page Include="Controls\SnifferView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Muc\OccupantPrivilegesForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml">
       <Generator>MSBuild:Compile</Generator>

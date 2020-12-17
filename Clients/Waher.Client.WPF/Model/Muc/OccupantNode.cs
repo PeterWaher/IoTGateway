@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Xml;
+using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.MUC;
@@ -183,14 +185,55 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override void Edit()
 		{
-			// TODO: Edit affiliation & role
-			base.Edit();
+			OccupantPrivilegesForm Form = new OccupantPrivilegesForm();
+
+			Form.Affiliation.SelectedIndex = (int)this.affiliation;
+			Form.Role.SelectedIndex = (int)this.role;
+
+			if (string.IsNullOrEmpty(this.jid))
+				Form.Affiliation.IsEnabled = false;
+
+			bool? b = Form.ShowDialog();
+			if (b.HasValue && b.Value)
+			{
+				Affiliation NewAffiliation = (Affiliation)Form.Affiliation.SelectedIndex;
+				Role NewRole = (Role)Form.Role.SelectedIndex;
+				string Reason = Form.Reason.Text;
+
+				Task.Run(() => this.Config(NewAffiliation, NewRole, Reason));
+			}
+		}
+
+		private async Task Config(Affiliation Affiliation, Role Role, string Reason)
+		{
+			try
+			{
+				if (this.affiliation != Affiliation)
+				{
+					await this.MucClient.ConfigureOccupantAsync(this.roomId, this.domain, XmppClient.GetBareJID(this.jid), Affiliation, Reason);
+					this.affiliation = Affiliation;
+					this.OnUpdated();
+				}
+
+				if (this.role != Role)
+				{
+					await this.MucClient.ConfigureOccupantAsync(this.roomId, this.domain, this.nickName, Role, Reason);
+					this.role = Role;
+					this.OnUpdated();
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
 		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
 		{
-			// TODO: Send private message
-			base.SendChatMessage(Message, Markdown);
+			if (Markdown is null)
+				this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message);
+			else
+				this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName, XmppContact.MultiFormatMessage(Markdown));
 		}
 
 	}

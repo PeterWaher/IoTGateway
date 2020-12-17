@@ -339,21 +339,64 @@ namespace Waher.Client.WPF.Model.Muc
 
 				MainWindow.UpdateGui(() =>
 				{
-					bool? b = Form.ShowDialog();
-
-					if (b.HasValue)
-					{
-						if (b.Value)
-							e.Accept(Form.NickName.Text);
-						else
-							e.Decline(Form.Reason.Text);
-					}
+					this.ShowInvitationForm(Form, e, e2);
 				});
 
 				return Task.CompletedTask;
 			}, null);
 
 			return Task.CompletedTask;
+		}
+
+		private void ShowInvitationForm(RoomInvitationReceivedForm Form, RoomInvitationMessageEventArgs e, RoomInformationEventArgs e2)
+		{
+			bool? b = Form.ShowDialog();
+
+			if (b.HasValue)
+			{
+				if (b.Value)
+				{
+					e.Accept(Form.NickName.Text, (sender2, e3) =>
+					{
+						if (!e3.Ok)
+						{
+							MainWindow.UpdateGui(() =>
+							{
+								MessageBox.Show(MainWindow.currentInstance, 
+									string.IsNullOrEmpty(e3.ErrorText) ? "Unable to process invitation." : e3.ErrorText,
+									"Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+								RoomInvitationReceivedForm Form2 = new RoomInvitationReceivedForm()
+								{
+									Owner = MainWindow.currentInstance,
+									InviteTo = XmppClient.GetBareJID(e.To),
+									InviteFrom = XmppClient.GetBareJID(e.InviteFrom),
+									InvitationReason = e.Reason,
+									RoomName = Form.RoomName,
+									RoomJid = e.RoomId + "@" + e.Domain,
+									MembersOnly = e2.MembersOnly,
+									Moderated = e2.Moderated,
+									NonAnonymous = e2.NonAnonymous,
+									Open = e2.Open,
+									PasswordProtected = e2.PasswordProtected,
+									Persistent = e2.Persistent,
+									Public = e2.Public,
+									SemiAnonymous = e2.SemiAnonymous,
+									Temporary = e2.Temporary,
+									Unmoderated = e2.Unmoderated,
+									Unsecured = e2.Unsecured
+								};
+
+								this.ShowInvitationForm(Form2, e, e2);
+							});
+						}
+
+						return Task.CompletedTask;
+					}, null);
+				}
+				else
+					e.Decline(Form.Reason.Text);
+			}
 		}
 
 		private Task MucClient_RoomDeclinedInvitationReceived(object Sender, RoomDeclinedMessageEventArgs e)
@@ -631,17 +674,19 @@ namespace Waher.Client.WPF.Model.Muc
 			await this.MucClient_RoomPresence(Sender, e);
 		}
 
-		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
-		{
-			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
-
-			// TODO
-		}
-
 		private async Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, null, null, null);
+
+			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
+
+			MainWindow.currentInstance.ChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp);
+		}
+
+		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
+		{
+			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 
 			// TODO
 		}

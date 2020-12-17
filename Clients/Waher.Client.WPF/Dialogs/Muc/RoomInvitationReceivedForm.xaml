@@ -1,18 +1,16 @@
 ﻿<Window x:Class="Waher.Client.WPF.Dialogs.Muc.RoomInvitationReceivedForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Room invitation received" Height="375" Width="400" WindowStartupLocation="CenterOwner">
+        Title="Room invitation received" Height="405" Width="400" WindowStartupLocation="CenterOwner">
     <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=NickName}">
         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Left" Margin="12,12,12,0" VerticalAlignment="Top">
             <Run>You (</Run><Run FontWeight="Bold" x:Name="lblInviteTo"/><Run>) have received an invitation from</Run>
             <Run FontWeight="Bold" x:Name="lblInviteFrom"/>
             <Run>to join the room</Run>
             <Run FontWeight="Bold" x:Name="lblRoomName"/>
-            <Run>(</Run><Run FontWeight="Bold" x:Name="lblRoomJid"/><Run>).</Run>
-            <Run x:Name="lblInvitationReason"/>
-            <Run>Do you accept or decline the invitation? More information about the room can be seen below.</Run>
+            <Run>(</Run><Run FontWeight="Bold" x:Name="lblRoomJid"/><Run>). "</Run><Run x:Name="lblInvitationReason"/><Run>" Do you accept or decline the invitation? More information about the room can be seen below.</Run>
         </TextBlock>
-        <Grid Margin="12,83,12,0" Height="100" VerticalAlignment="Top">
+        <Grid Margin="12,113,12,0" Height="100" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
@@ -52,13 +50,13 @@
             <TextBlock Grid.Column="2" Grid.Row="5" HorizontalAlignment="Left">Hidden:</TextBlock>
             <TextBlock Grid.Column="3" Grid.Row="5" HorizontalAlignment="Center" x:Name="lblHidden"/>
         </Grid>
-        <Label Content="Nick-Name (if accepting):" Height="28" HorizontalAlignment="Left" Margin="12,193,0,0" Name="label4" VerticalAlignment="Top" />
-        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,214,11.6,0" Name="NickName" VerticalAlignment="Top" 
+        <Label Content="Nick-Name (if accepting):" Height="28" HorizontalAlignment="Left" Margin="12,223,0,0" Name="label4" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,244,11.6,0" Name="NickName" VerticalAlignment="Top" 
                  ToolTip="Nick-name to use in the room." TextChanged="NickName_TextChanged"/>
-        <Label Content="Reason (if declining):" Height="28" HorizontalAlignment="Left" Margin="12,243,0,0" Name="label2" VerticalAlignment="Top" />
-        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,264,11.6,0" Name="Reason" VerticalAlignment="Top" 
+        <Label Content="Reason (if declining):" Height="28" HorizontalAlignment="Left" Margin="12,273,0,0" Name="label2" VerticalAlignment="Top" />
+        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,294,11.6,0" Name="Reason" VerticalAlignment="Top" 
                  ToolTip="Reason for declining. Message will be returned to original sender of invitation." />
-        <DockPanel Margin="0,305,0,0" Width="245">
+        <DockPanel Margin="0,335,0,0" Width="245">
             <Button Content="Accept" Height="23" HorizontalAlignment="Left" Name="AcceptButton" VerticalAlignment="Top" Width="75" IsDefault="True"
                     ToolTip="Accept the invitation." Click="AcceptButton_Click" IsEnabled="False" />
             <Button Content="Decline" Height="23" HorizontalAlignment="Left" Name="DeclineButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75"

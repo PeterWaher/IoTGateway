@@ -9,10 +9,15 @@ namespace Waher.Client.WPF.Dialogs.Muc
 	/// </summary>
 	public partial class RoomInvitationReceivedForm : Window
 	{
+		public string RoomName 
+		{
+			get => this.lblRoomName.Text;
+			set => this.lblRoomName.Text = value; 
+		}
+
 		public string InviteTo { set => this.lblInviteTo.Text = value; }
 		public string InviteFrom { set => this.lblInviteFrom.Text = value; }
 		public string InvitationReason { set => this.lblInvitationReason.Text = value; }
-		public string RoomName { set => this.lblRoomName.Text = value; }
 		public string RoomJid { set => this.lblRoomJid.Text = value; }
 		public bool MembersOnly { set => this.lblMembersOnly.Text = ToStr(value); }
 		public bool Moderated { set => this.lblModerated.Text = ToStr(value); }
@@ -50,7 +55,7 @@ namespace Waher.Client.WPF.Dialogs.Muc
 		{
 			foreach (char ch in s)
 			{
-				if (!char.IsLetter(ch))
+				if (!char.IsLetterOrDigit(ch))
 					return false;
 			}
 

@@ -7074,6 +7074,24 @@ namespace Waher.Networking.XMPP
 				return JID.Substring(i + 1);
 		}
 
+		/// <summary>
+		/// Gets the domain part of a JID.
+		/// </summary>
+		/// <param name="JID">Any JID</param>
+		/// <returns>Domain part.</returns>
+		public static string GetDomain(string JID)
+		{
+			int i = JID.IndexOf('/');
+			if (i >= 0)
+				JID = JID.Substring(0, i);
+
+			i = JID.IndexOf('@');
+			if (i >= 0)
+				JID = JID.Substring(i + 1);
+
+			return JID;
+		}
+
 		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;

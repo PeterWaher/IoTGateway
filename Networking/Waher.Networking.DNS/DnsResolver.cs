@@ -320,25 +320,30 @@ namespace Waher.Networking.DNS
 			DnsResponse Response;
 			DnsMessage Message;
 
-			try
+			if (Database.HasProvider)
 			{
-				Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
-					new FilterFieldEqualTo("Name", Name),
-					new FilterFieldEqualTo("Type", TYPE),
-					new FilterFieldEqualTo("Class", CLASS)));
-
-				if (!(Response is null) && (Response.Expires <= DateTime.Now || Response.Raw is null))
+				try
 				{
-					await Database.Delete(Response);
+					Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
+						new FilterFieldEqualTo("Name", Name),
+						new FilterFieldEqualTo("Type", TYPE),
+						new FilterFieldEqualTo("Class", CLASS)));
+
+					if (!(Response is null) && (Response.Expires <= DateTime.Now || Response.Raw is null))
+					{
+						await Database.Delete(Response);
+						Response = null;
+					}
+				}
+				catch (Exception)
+				{
+					// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
+					await Database.Clear("DnsCache");
 					Response = null;
 				}
 			}
-			catch (Exception)
-			{
-				// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
-				await Database.Clear("DnsCache");
+			else
 				Response = null;
-			}
 
 			if (Response is null)
 			{
@@ -393,7 +398,7 @@ namespace Waher.Networking.DNS
 
 				Response.Expires = DateTime.Now.AddSeconds(Ttl);
 
-				if (Save)
+				if (Save && Database.HasProvider)
 					await Database.Insert(Response);
 			}
 

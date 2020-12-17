@@ -7092,6 +7092,20 @@ namespace Waher.Networking.XMPP
 			return JID;
 		}
 
+		/// <summary>
+		/// Gets the account part of a JID.
+		/// </summary>
+		/// <param name="JID">Any JID</param>
+		/// <returns>Account part.</returns>
+		public static string GetAccount(string JID)
+		{
+			int i = JID.IndexOf('@');
+			if (i >= 0)
+				return JID.Substring(0, i);
+			else
+				return string.Empty;
+		}
+
 		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;

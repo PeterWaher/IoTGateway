@@ -1,19 +1,24 @@
-﻿<Window x:Class="Waher.Client.WPF.Dialogs.SelectItemDialog"
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.IoT.ClaimDeviceForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Select Item" Height="350" Width="600" WindowStartupLocation="CenterOwner">
+        Title="Claim device" Height="350" Width="600" WindowStartupLocation="CenterOwner">
     <DockPanel FocusManager.FocusedElement="{Binding ElementName=ClaimUri}" Margin="8,8,8,8">
+        <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+            <Label Content="IoT Discovery URI:" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" />
+            <TextBox Height="23" HorizontalAlignment="Stretch" Name="ClaimUri" VerticalAlignment="Top" 
+                     ToolTip="Enter the IoT Discovery URI of the device you want to claim." TextChanged="ClaimUri_TextChanged" />
+            <CheckBox Name="Public" Content="Make device publicly searchable." Margin="0,8,0,0"/>
+        </StackPanel>
         <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal">
-                <Button Content="OK" Height="23" HorizontalAlignment="Left" Name="OkButton" VerticalAlignment="Top" Width="75" IsDefault="True"
-                    ToolTip="Select item." Click="OkButton_Click" IsEnabled="False" />
+                <Button Content="Claim" Height="23" HorizontalAlignment="Left" Name="ClaimButton" VerticalAlignment="Top" Width="75" IsDefault="True"
+                    ToolTip="Claim the device identified by the IoT Discovery URI." Click="ClaimButton_Click" IsEnabled="False" />
                 <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75"
-                    ToolTip="Closes the dialog without taking any action." IsCancel="True" Click="CancelButton_Click"/>
+                    ToolTip="Closes the dialog without claiming any devices." IsCancel="True" Click="CancelButton_Click"/>
             </StackPanel>
         </DockPanel>
         <DockPanel DockPanel.Dock="Top" Margin="0,8,0,8">
-            <Label Content="Select item:" Height="28" HorizontalAlignment="Left" Name="Label" VerticalAlignment="Top" DockPanel.Dock="Top" />
-            <ListView Name="ItemsView" ScrollViewer.VerticalScrollBarVisibility="Visible" SelectionChanged="ItemsView_SelectionChanged" MouseDoubleClick="ItemsView_MouseDoubleClick">
+            <ListView Name="TagsListView" ScrollViewer.VerticalScrollBarVisibility="Visible">
                 <ListView.Resources>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -21,17 +26,17 @@
                 </ListView.Resources>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Type">
+                        <GridViewColumn Header="Tag">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Localized}"/>
+                                    <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Value">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Unlocalized}"/>
+                                    <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding StringValue}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

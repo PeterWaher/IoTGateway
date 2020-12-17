@@ -1,4 +1,4 @@
-﻿<Window x:Class="Waher.Client.WPF.Dialogs.LegalIdentityForm"
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.Legal.LegalIdentityForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         FocusManager.FocusedElement="{Binding ElementName=FirstName}"

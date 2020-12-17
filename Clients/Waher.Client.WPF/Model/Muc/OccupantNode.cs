@@ -177,7 +177,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
-			// TODO: Kick
+			this.MucClient?.Kick(this.RoomId, this.domain, this.nickName, null, null);
 			base.Delete(Parent, OnDeleted);
 		}
 

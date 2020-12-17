@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Waher.Networking.XMPP.Provisioning;
 
-namespace Waher.Client.WPF.Dialogs
+namespace Waher.Client.WPF.Dialogs.IoT
 {
 	/// <summary>
 	/// Interaction logic for AddContactForm.xaml

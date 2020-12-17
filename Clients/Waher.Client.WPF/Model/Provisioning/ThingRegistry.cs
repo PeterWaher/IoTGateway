@@ -17,9 +17,8 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Client.WPF.Model.Concentrator;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Client.WPF.Model.Provisioning
 {

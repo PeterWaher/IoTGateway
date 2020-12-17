@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
@@ -12,9 +11,9 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
-using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Networking.Sniffers;

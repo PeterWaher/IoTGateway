@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
-using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.Legal;
 
 namespace Waher.Client.WPF.Model.Legal
 {

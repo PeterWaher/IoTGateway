@@ -193,16 +193,16 @@
     <Compile Include="Dialogs\ChangePasswordForm.xaml.cs">
       <DependentUpon>ChangePasswordForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\LegalIdentityForm.xaml.cs">
+    <Compile Include="Dialogs\Legal\LegalIdentityForm.xaml.cs">
       <DependentUpon>LegalIdentityForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\SelectItemDialog.xaml.cs">
+    <Compile Include="Dialogs\IoT\SelectItemDialog.xaml.cs">
       <DependentUpon>SelectItemDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ClaimDeviceForm.xaml.cs">
+    <Compile Include="Dialogs\IoT\ClaimDeviceForm.xaml.cs">
       <DependentUpon>ClaimDeviceForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\SearchForThingsDialog.xaml.cs">
+    <Compile Include="Dialogs\IoT\SearchForThingsDialog.xaml.cs">
       <DependentUpon>SearchForThingsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ParameterDialog.xaml.cs">
@@ -268,15 +268,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\LegalIdentityForm.xaml">
+    <Page Include="Dialogs\Legal\LegalIdentityForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\SelectItemDialog.xaml">
+    <Page Include="Dialogs\IoT\SelectItemDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\ClaimDeviceForm.xaml">
+    <Page Include="Dialogs\IoT\ClaimDeviceForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -288,7 +288,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\SearchForThingsDialog.xaml">
+    <Page Include="Dialogs\IoT\SearchForThingsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

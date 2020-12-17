@@ -1,4 +1,4 @@
-﻿<Window x:Class="Waher.Client.WPF.Dialogs.SearchForThingsDialog"
+﻿<Window x:Class="Waher.Client.WPF.Dialogs.IoT.SearchForThingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Search for things" Height="600" Width="700" WindowStartupLocation="CenterOwner">

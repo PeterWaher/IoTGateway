@@ -185,11 +185,11 @@ namespace Waher.Client.WPF.Model.Muc
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();
 
+						this.Service.NodesRemoved(this.children.Values, this);
+
 						if (e.Ok)
 						{
 							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
-
-							this.Service.NodesRemoved(this.children.Values, this);
 
 							lock (this.occupantByNick)
 							{
@@ -199,17 +199,8 @@ namespace Waher.Client.WPF.Model.Muc
 
 							foreach (MucOccupant Occupant in e.Occupants)
 							{
-								lock (this.occupantByNick)
-								{
-									if (!this.occupantByNick.TryGetValue(Occupant.NickName, out OccupantNode Node))
-									{
-										Node = new OccupantNode(this, Occupant.RoomId, Occupant.Domain, Occupant.NickName,
-											Occupant.Affiliation, Occupant.Role, Occupant.Jid);
-
-										this.occupantByNick[Occupant.NickName] = Node;
-										Children[Occupant.Jid] = Node;
-									}
-								}
+								Children[Occupant.Jid] = this.CreateOccupantNode(Occupant.RoomId, Occupant.Domain, Occupant.NickName,
+									Occupant.Affiliation, Occupant.Role, Occupant.Jid);
 							}
 
 							this.children = new SortedDictionary<string, TreeNode>(Children);
@@ -230,6 +221,22 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				this.loadingChildren = false;
 				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		internal OccupantNode CreateOccupantNode(string RoomId, string Domain, string NickName, Affiliation Affiliation, Role Role, string Jid)
+		{
+			lock (this.occupantByNick)
+			{
+				if (!this.occupantByNick.TryGetValue(NickName, out OccupantNode Node))
+				{
+					Node = new OccupantNode(this, RoomId, Domain, NickName, Affiliation, Role, Jid);
+
+					lock (this.occupantByNick)
+						this.occupantByNick[NickName] = Node;
+				}
+
+				return Node;
 			}
 		}
 

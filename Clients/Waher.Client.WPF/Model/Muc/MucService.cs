@@ -10,6 +10,7 @@ using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.Muc;
+using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
@@ -686,9 +687,14 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
 		{
-			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
+			await this.GetRoomNode(e.RoomId, e.Domain);
+			ChatView View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
-			// TODO
+			if (IsMarkdown)
+				View?.Event(Message, string.Empty, new MarkdownDocument(Message, ChatView.GetMarkdownSettings()), Timestamp);
+			else
+				View?.Event(Message, string.Empty);
 		}
 
 	}

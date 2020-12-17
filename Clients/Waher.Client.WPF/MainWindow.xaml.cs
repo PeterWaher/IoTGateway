@@ -15,6 +15,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
@@ -661,7 +662,7 @@ namespace Waher.Client.WPF
 								E.HasAttribute("stamp") &&
 								XML.TryParse(E.GetAttribute("stamp"), out DateTime Timestamp2))
 							{
-								Timestamp = Timestamp2;
+								Timestamp = Timestamp2.ToLocalTime();
 							}
 							break;
 					}
@@ -717,8 +718,7 @@ namespace Waher.Client.WPF
 
 			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
 			{
-				if (Node is XmppAccountNode XmppAccountNode2 &&
-					XmppAccountNode2.BareJID == ToBareJid)
+				if (Node is XmppAccountNode XmppAccountNode2 && XmppAccountNode2.BareJID == ToBareJid)
 				{
 					if (XmppAccountNode2.TryGetChild(FromBareJid, out TreeNode ContactNode))
 					{
@@ -731,17 +731,32 @@ namespace Waher.Client.WPF
 						ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
 						return;
 					}
-					else if (XmppAccountNode2.TryGetChild(XmppClient.GetDomain(FromBareJid), out TreeNode ComponentNode) &&
-						ComponentNode.TryGetChild(XmppClient.GetResource(FromBareJid), out ContactNode))
+					else
 					{
-						TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
-						this.Tabs.Items.Add(TabItem2);
+						string BareJid = XmppClient.GetBareJID(FromBareJid);
+						string Account = XmppClient.GetAccount(BareJid);
+						string Domain = XmppClient.GetDomain(BareJid);
+						string Resource = XmppClient.GetResource(FromBareJid);
 
-						ChatView ChatView = new ChatView(ContactNode, false);
-						TabItem2.Content = ChatView;
+						if (XmppAccountNode2.TryGetChild(Domain, out TreeNode ComponentNode) &&
+							ComponentNode.TryGetChild(BareJid, out TreeNode RoomNode0) &&
+							RoomNode0 is RoomNode RoomNode)
+						{
+							if (!RoomNode.TryGetChild(Resource, out ContactNode))
+							{
+								ContactNode = RoomNode.CreateOccupantNode(Account, Domain, Resource,
+									Networking.XMPP.MUC.Affiliation.None, Role.None, string.Empty);
+							}
 
-						ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
-						return;
+							TabItem TabItem2 = MainWindow.NewTab(FromBareJid);
+							this.Tabs.Items.Add(TabItem2);
+
+							ChatView ChatView = new ChatView(ContactNode, false);
+							TabItem2.Content = ChatView;
+
+							ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+							return;
+						} 
 					}
 				}
 			}

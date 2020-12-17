@@ -466,9 +466,14 @@ namespace Waher.Client.WPF.Controls
 
 		public void Event(string Message, string From)
 		{
+			this.Event(Message, From, null, DateTime.Now);
+		}
+
+		public void Event(string Message, string From, MarkdownDocument Markdown, DateTime Timestamp)
+		{
 			MainWindow.UpdateGui(() =>
 			{
-				ChatItem Item = new ChatItem(ChatItemType.Event, DateTime.Now, Message, From, null, EventFgColor, EventBgColor);
+				ChatItem Item = new ChatItem(ChatItemType.Event, Timestamp, Message, From, Markdown, EventFgColor, EventBgColor);
 				ListViewItem ListViewItem = new ListViewItem()
 				{
 					Content = Item,

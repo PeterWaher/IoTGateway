@@ -149,15 +149,18 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="XmlOutput">XML Output</param>
 		/// <param name="fs">File stream</param>
 		/// <param name="Repair">If database should be repaired, if errors are found</param>
-		public static async Task DoAnalyze(string FullPath, string FileName, DateTime Created, XmlWriter XmlOutput, FileStream fs, bool Repair)
+		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true. If null, process could not be completed.</returns>
+		public static async Task<string[]> DoAnalyze(string FullPath, string FileName, DateTime Created, XmlWriter XmlOutput, FileStream fs, bool Repair)
 		{
+			string[] Collections = null;
+
 			try
 			{
 				Log.Informational("Starting analyzing database.", FileName);
 
 				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName, 0, Created);
 
-				await Database.Analyze(XmlOutput, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"), 
+				Collections = await Database.Analyze(XmlOutput, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"), 
 					Gateway.AppDataFolder, false, Repair);
 
 				XmlOutput.Flush();
@@ -210,6 +213,8 @@ namespace Waher.IoTGateway.WebResources
 					analyzing = false;
 				}
 			}
+
+			return Collections;
 		}
 
 	}

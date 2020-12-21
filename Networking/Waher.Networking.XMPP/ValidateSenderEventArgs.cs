@@ -18,6 +18,8 @@ namespace Waher.Networking.XMPP
 	{
 		private readonly XmppClient client;
 		private readonly XmlElement stanza;
+		private readonly IqEventArgs iqStanza;
+		private readonly MessageEventArgs messageStanza;
 		private string from;
 		private string fromBareJid;
 		private bool accepted = false;
@@ -26,20 +28,22 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event arguments for message events.
 		/// </summary>
-		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From)
-			: this(Client, Stanza, From, XmppClient.GetBareJID(From))
+		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From, IqEventArgs IqStanza, MessageEventArgs MessageStanza)
+			: this(Client, Stanza, From, XmppClient.GetBareJID(From), IqStanza, MessageStanza)
 		{
 		}
 
 		/// <summary>
 		/// Event arguments for message events.
 		/// </summary>
-		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From, string FromBareJid)
+		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From, string FromBareJid, IqEventArgs IqStanza, MessageEventArgs MessageStanza)
 		{
 			this.client = Client;
 			this.stanza = Stanza;
 			this.from = From;
 			this.fromBareJid = FromBareJid;
+			this.iqStanza = IqStanza;
+			this.messageStanza = MessageStanza;
 		}
 
 		/// <summary>
@@ -71,6 +75,22 @@ namespace Waher.Networking.XMPP
 		public string FromBareJID
 		{
 			get { return this.fromBareJid; }
+		}
+
+		/// <summary>
+		/// IQ Stanza, or null if message stanza.
+		/// </summary>
+		public IqEventArgs IqStanza
+		{
+			get { return this.iqStanza; }
+		}
+
+		/// <summary>
+		/// Message Stanza, or null if iq stanza.
+		/// </summary>
+		public MessageEventArgs MessageStanza
+		{
+			get { return this.messageStanza; }
 		}
 
 		/// <summary>

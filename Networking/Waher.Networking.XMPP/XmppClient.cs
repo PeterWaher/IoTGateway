@@ -1882,7 +1882,7 @@ namespace Waher.Networking.XMPP
 							{
 								case "get":
 									IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
-									if (this.ValidateSender(E, From, ie.FromBareJid))
+									if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
 										this.ProcessIq(this.iqGetHandlers, ie);
 									else
 										ie.IqError(new ForbiddenException("Access denied.", E));
@@ -1890,7 +1890,7 @@ namespace Waher.Networking.XMPP
 
 								case "set":
 									ie = new IqEventArgs(this, E, Id, To, From);
-									if (this.ValidateSender(E, From, ie.FromBareJid))
+									if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
 										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 									else
 										ie.IqError(new ForbiddenException("Access denied.", E));
@@ -1933,7 +1933,7 @@ namespace Waher.Networking.XMPP
 						case "message":
 							MessageEventArgs me = new MessageEventArgs(this, E);
 
-							if (this.ValidateSender(E, me.From, me.FromBareJID))
+							if (this.ValidateSender(E, me.From, me.FromBareJID, null, me))
 								this.ProcessMessage(me);
 							break;
 
@@ -2126,13 +2126,13 @@ namespace Waher.Networking.XMPP
 			return true;
 		}
 
-		private bool ValidateSender(XmlElement Stanza, string From, string FromBareJid)
+		private bool ValidateSender(XmlElement Stanza, string From, string FromBareJid, IqEventArgs IqStanza, MessageEventArgs MessageStanza)
 		{
 			ValidateSenderEventHandler h = this.OnValidateSender;
 			if (h is null)
 				return true;
 
-			ValidateSenderEventArgs e = new ValidateSenderEventArgs(this, Stanza, From, FromBareJid);
+			ValidateSenderEventArgs e = new ValidateSenderEventArgs(this, Stanza, From, FromBareJid, IqStanza, MessageStanza);
 			try
 			{
 				h(this, e);

@@ -3206,7 +3206,7 @@ namespace Waher.IoTGateway
 					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new object[] { To, Markdown, Text, Html, MessageId, Update });
 				}
 				else
-					SendChatMessage(Markdown, Text, Html, To, MessageId, Update);
+					SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, string.Empty, Update);
 			}
 			else
 				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new object[] { To, Markdown, Text, Html, MessageId, Update });
@@ -3230,8 +3230,20 @@ namespace Waher.IoTGateway
 		/// <param name="MessageId">Message ID to use.</param>
 		public static void SendChatMessage(string Markdown, string To, string MessageId)
 		{
+			SendChatMessage(Markdown, To, MessageId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public static void SendChatMessage(string Markdown, string To, string MessageId, string ThreadId)
+		{
 			(string Text, string Html) = ConvertMarkdown(Markdown);
-			SendChatMessage(Markdown, Text, Html, To, MessageId, false);
+			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, false);
 		}
 
 		/// <summary>
@@ -3242,11 +3254,81 @@ namespace Waher.IoTGateway
 		/// <param name="MessageId">Message ID of message to update.</param>
 		public static void SendChatMessageUpdate(string Markdown, string To, string MessageId)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
-			SendChatMessage(Markdown, Text, Html, To, MessageId, true);
+			SendChatMessageUpdate(Markdown, To, MessageId, string.Empty);
 		}
 
-		private static void SendChatMessage(string Markdown, string Text, string Html, string To, string MessageId, bool Update)
+		/// <summary>
+		/// Sends a chat message update to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID of message to update.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public static void SendChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, true);
+		}
+
+		/// <summary>
+		/// Sends a group chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		public static void SendGroupChatMessage(string Markdown, string To)
+		{
+			SendGroupChatMessage(Markdown, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a group chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID to use.</param>
+		public static void SendGroupChatMessage(string Markdown, string To, string MessageId)
+		{
+			SendGroupChatMessage(Markdown, To, MessageId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a group chat message to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public static void SendGroupChatMessage(string Markdown, string To, string MessageId, string ThreadId)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, false);
+		}
+
+		/// <summary>
+		/// Sends a group chat message update to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID of message to update.</param>
+		public static void SendGroupChatMessageUpdate(string Markdown, string To, string MessageId)
+		{
+			SendGroupChatMessageUpdate(Markdown, To, MessageId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a group chat message update to a recipient.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing text to send.</param>
+		/// <param name="To">Recipient of chat message.</param>
+		/// <param name="MessageId">Message ID of message to update.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public static void SendGroupChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, true);
+		}
+
+		private static void SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
 		{
 			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
 			{
@@ -3272,8 +3354,8 @@ namespace Waher.IoTGateway
 					MessageId = string.Empty;
 				}
 
-				xmppClient.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, To, Xml.ToString(), Text,
-					string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+				xmppClient.SendMessage(QoSLevel.Unacknowledged, Type, MessageId, To, Xml.ToString(), Text,
+					string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 			}
 		}
 

@@ -554,6 +554,7 @@ namespace Waher.Client.WPF.Model.Muc
 			base.AddContexMenuItems(ref CurrentGroup, Menu);
 
 			MenuItem Item;
+			MenuItem Item2;
 
 			this.GroupSeparator(ref CurrentGroup, "MUC", Menu);
 
@@ -580,6 +581,60 @@ namespace Waher.Client.WPF.Model.Muc
 			});
 
 			Item.Click += this.ChangeSubject_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "Occupant Lists",
+				IsEnabled = true,
+			});
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Owners...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetOwnersList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Administrators...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetAdministratorsList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Moderators...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetModeratorsList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Members...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetMembersList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Participants...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetParticipantsList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
+				Header = "Outcasts...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetOutcastsList_Click;
 		}
 
 		private void RegisterWithRoom_Click(object sender, RoutedEventArgs e)
@@ -644,6 +699,60 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			this.MucClient.LeaveRoom(this.roomId, this.domain, this.nickName, null, null);
 			this.entered = false;
+		}
+
+		private void GetAdministratorsList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetAdminList(this.roomId, this.domain, this.OccupantListCallback, "Administrators");
+		}
+
+		private void GetOwnersList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetOwnerList(this.roomId, this.domain, this.OccupantListCallback, "Owners");
+		}
+
+		private void GetModeratorsList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetModeratorList(this.roomId, this.domain, this.OccupantListCallback, "Moderators");
+		}
+
+		private void GetMembersList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetMemberList(this.roomId, this.domain, this.OccupantListCallback, "Members");
+		}
+
+		private void GetParticipantsList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetVoiceList(this.roomId, this.domain, this.OccupantListCallback, "Participants");
+		}
+
+		private void GetOutcastsList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetBannedOccupants(this.roomId, this.domain, this.OccupantListCallback, "Outcasts");
+		}
+
+		private Task OccupantListCallback(object Sender, OccupantListEventArgs e)
+		{
+			if (e.Ok)
+			{
+				OccupantListForm Form = new OccupantListForm((string)e.State, e.Occupants)
+				{
+					Owner = MainWindow.currentInstance
+				};
+
+				MainWindow.UpdateGui(() =>
+				{
+					bool? b = Form.ShowDialog();
+					if (b.HasValue && b.Value)
+					{
+						
+					}
+				});
+			}
+			else
+				MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get occupant list." : e.ErrorText);
+
+			return Task.CompletedTask;
 		}
 
 	}

@@ -7,7 +7,7 @@ using Waher.Networking.XMPP.Concentrator;
 namespace Waher.Client.WPF.Dialogs.IoT
 {
 	/// <summary>
-	/// Interaction logic for AddContactForm.xaml
+	/// Interaction logic for SelectItemDialog.xaml
 	/// </summary>
 	public partial class SelectItemDialog : Window
 	{

@@ -187,6 +187,9 @@
     <Compile Include="Dialogs\Muc\ChangeSubjectForm.xaml.cs">
       <DependentUpon>ChangeSubjectForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Muc\OccupantListForm.xaml.cs">
+      <DependentUpon>OccupantListForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Muc\SendRoomInvitationForm.xaml.cs">
       <DependentUpon>SendRoomInvitationForm.xaml</DependentUpon>
     </Compile>
@@ -263,6 +266,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\Muc\ChangeSubjectForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Muc\OccupantListForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

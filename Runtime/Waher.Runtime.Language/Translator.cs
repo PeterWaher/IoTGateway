@@ -300,6 +300,7 @@ namespace Waher.Runtime.Language
 								Id = null;
 								Untranslated = false;
 								InString = true;
+								Value = null;
 
 								if (Xml.MoveToFirstAttribute())
 								{
@@ -325,7 +326,7 @@ namespace Waher.Runtime.Language
 					case XmlNodeType.EndElement:
 						if (InString)
 						{
-							if (Id.HasValue && Value != null)
+							if (Id.HasValue && !(Value is null))
 							{
 								if (string.IsNullOrEmpty(Value))
 									await Namespace.DeleteStringAsync(Id.Value);

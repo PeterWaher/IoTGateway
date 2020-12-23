@@ -530,14 +530,14 @@
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.#ctor(System.String,Waher.Networking.XMPP.MUC.Affiliation,System.String)">
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
             <param name="Reason">Optioanl Reason</param>
         </member>
@@ -545,7 +545,7 @@
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="NickName">Nick-name of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
         </member>
@@ -553,7 +553,7 @@
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="NickName">Nick-name of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
             <param name="Reason">Optioanl Reason</param>
@@ -577,7 +577,7 @@
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="NickName">Nick-Name of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
             <param name="Role">Role change, if specified.</param>
@@ -586,13 +586,13 @@
             <summary>
             Contains information about a configuration to be made to an occupant in a room.
             </summary>
-            <param name="BareJid">Bare JID of occupant in room.</param>
+            <param name="Jid">JID of occupant in room.</param>
             <param name="NickName">Nick-Name of occupant in room.</param>
             <param name="Affiliation">Affiliation change, if specified.</param>
             <param name="Role">Role change, if specified.</param>
             <param name="Reason">Optioanl Reason</param>
         </member>
-        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.BareJid">
+        <member name="P:Waher.Networking.XMPP.MUC.MucOccupantConfiguration.Jid">
             <summary>
             Bare JID  of occupant in room.
             </summary>

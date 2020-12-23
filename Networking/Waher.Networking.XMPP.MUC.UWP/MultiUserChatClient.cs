@@ -1683,10 +1683,10 @@ namespace Waher.Networking.XMPP.MUC
 			{
 				Xml.Append("<item");
 
-				if (!string.IsNullOrEmpty(Config.BareJid))
+				if (!string.IsNullOrEmpty(Config.Jid))
 				{
 					Xml.Append(" jid='");
-					Xml.Append(XML.Encode(Config.BareJid));
+					Xml.Append(XML.Encode(Config.Jid));
 					Xml.Append('\'');
 				}
 

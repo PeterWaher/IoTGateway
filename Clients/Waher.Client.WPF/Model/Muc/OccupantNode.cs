@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
 using Waher.Client.WPF.Dialogs.Muc;
@@ -234,6 +236,223 @@ namespace Waher.Client.WPF.Model.Muc
 				this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message);
 			else
 				this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName, XmppContact.MultiFormatMessage(Markdown));
+		}
+
+		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
+		{
+			base.AddContexMenuItems(ref CurrentGroup, Menu);
+
+			MenuItem Item;
+			MenuItem Affiliation;
+			MenuItem Role;
+
+			this.GroupSeparator(ref CurrentGroup, "MUC", Menu);
+
+			Menu.Items.Add(Affiliation = new MenuItem()
+			{
+				Header = "_Affiliation",
+				IsEnabled = true,
+			});
+
+			Affiliation.Items.Add(Item = new MenuItem()
+			{
+				Header = "Owner",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.affiliation == Networking.XMPP.MUC.Affiliation.Owner
+			});
+
+			Item.Click += this.SetAffiliationOwner_Click;
+
+			Affiliation.Items.Add(Item = new MenuItem()
+			{
+				Header = "Administrator",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.affiliation == Networking.XMPP.MUC.Affiliation.Admin
+			});
+
+			Item.Click += this.SetAffiliationAdministrator_Click;
+
+			Affiliation.Items.Add(Item = new MenuItem()
+			{
+				Header = "Member",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.affiliation == Networking.XMPP.MUC.Affiliation.Member
+			});
+
+			Item.Click += this.SetAffiliationMember_Click;
+
+			Affiliation.Items.Add(Item = new MenuItem()
+			{
+				Header = "None",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.affiliation == Networking.XMPP.MUC.Affiliation.None
+			});
+
+			Item.Click += this.SetAffiliationNone_Click;
+
+			Affiliation.Items.Add(Item = new MenuItem()
+			{
+				Header = "Outcast",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.affiliation == Networking.XMPP.MUC.Affiliation.Outcast
+			});
+
+			Item.Click += this.SetAffiliationOutcast_Click;
+
+			Menu.Items.Add(Role = new MenuItem()
+			{
+				Header = "_Role",
+				IsEnabled = true,
+			});
+
+			Role.Items.Add(Item = new MenuItem()
+			{
+				Header = "Moderator",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.role == Networking.XMPP.MUC.Role.Moderator
+			});
+
+			Item.Click += this.SetRoleModerator_Click;
+
+			Role.Items.Add(Item = new MenuItem()
+			{
+				Header = "Participant",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.role == Networking.XMPP.MUC.Role.Participant
+			});
+
+			Item.Click += this.SetRoleParticipant_Click;
+
+			Role.Items.Add(Item = new MenuItem()
+			{
+				Header = "Visitor",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.role == Networking.XMPP.MUC.Role.Visitor
+			});
+
+			Item.Click += this.SetRoleVisitor_Click;
+
+			Role.Items.Add(Item = new MenuItem()
+			{
+				Header = "None",
+				IsEnabled = true,
+				IsCheckable = true,
+				IsChecked = this.role == Networking.XMPP.MUC.Role.None
+			});
+
+			Item.Click += this.SetRoleNone_Click;
+
+			Menu.Items.Add(Item = new MenuItem()
+			{
+				Header = "_Ban...",
+				IsEnabled = true,
+			});
+
+			Item.Click += this.Ban_Click;
+		}
+
+		private void Ban_Click(object sender, RoutedEventArgs e)
+		{
+			BanOccupantForm Form = new BanOccupantForm(this.nickName);
+			bool? b = Form.ShowDialog();
+
+			if (b.HasValue && b.Value)
+			{
+				this.MucClient.Ban(this.roomId, this.domain, this.jid, Form.Reason.Text, (sender2, e2) =>
+				{
+					if (e2.Ok)
+						this.Delete(this.Parent, null);
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to ban the occupant." : e2.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+			}
+		}
+
+		private void SetAffiliationOwner_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Owner);
+		}
+
+		private void SetAffiliationAdministrator_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Admin);
+		}
+
+		private void SetAffiliationMember_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Member);
+		}
+
+		private void SetAffiliationNone_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.None);
+		}
+
+		private void SetAffiliationOutcast_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Outcast);
+		}
+
+		private void SetAffiliation(Affiliation Affiliation)
+		{
+			this.MucClient.ConfigureOccupant(this.roomId, this.domain, this.jid, Affiliation, string.Empty, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					this.affiliation = Affiliation;
+					this.OnUpdated();
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to change affiliation." : e.ErrorText);
+
+				return Task.CompletedTask;
+			}, null);
+		}
+
+		private void SetRoleModerator_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetRole(Networking.XMPP.MUC.Role.Moderator);
+		}
+
+		private void SetRoleParticipant_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetRole(Networking.XMPP.MUC.Role.Participant);
+		}
+
+		private void SetRoleVisitor_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetRole(Networking.XMPP.MUC.Role.Visitor);
+		}
+
+		private void SetRoleNone_Click(object sender, RoutedEventArgs e)
+		{
+			this.SetRole(Networking.XMPP.MUC.Role.None);
+		}
+
+		private void SetRole(Role Role)
+		{
+			this.MucClient.ConfigureOccupant(this.roomId, this.domain, this.nickName, Role, string.Empty, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					this.role = Role;
+					this.OnUpdated();
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to change role." : e.ErrorText);
+
+				return Task.CompletedTask;
+			}, null);
 		}
 
 	}

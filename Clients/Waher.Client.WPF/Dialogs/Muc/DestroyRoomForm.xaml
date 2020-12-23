@@ -18,7 +18,7 @@
                  ToolTip="Alternative Room JID." TextChanged="AlternativeRoomJid_TextChanged" />
         <DockPanel Margin="0,230,0,0" Width="160">
             <Button Content="Yes" Height="23" HorizontalAlignment="Left" Name="YesButton" VerticalAlignment="Top" Width="75" IsDefault="True"
-                    ToolTip="Destroy the Room and removed it from your list of rooms on this service." Click="YesButton_Click" IsEnabled="True" />
+                    ToolTip="Destroy the Room and remove it from your list of rooms on this service." Click="YesButton_Click" IsEnabled="True" />
             <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Name="CancelButton" Margin="10,0,0,0" VerticalAlignment="Top" Width="75"
                     ToolTip="Closes the dialog without destroying the room." IsCancel="True" Click="CancelButton_Click"/>
         </DockPanel>

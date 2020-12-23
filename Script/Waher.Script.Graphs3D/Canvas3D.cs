@@ -1564,7 +1564,7 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Converts a <see cref="Vector4"/> to a <see cref="Vector3"/>.
 		/// </summary>
-		/// <param name="P">Point, or vector.</param>
+		/// <param name="Object">Untyped point, or vector.</param>
 		/// <returns>Point or vector.</returns>
 		public static Vector3 ToVector3(object Object)
 		{

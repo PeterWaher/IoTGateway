@@ -45,6 +45,7 @@ namespace Waher.Script.Networking.Functions
 		/// </summary>
 		/// <param name="Name">Name to resolve.</param>
 		/// <param name="Type">TYPE parameter.</param>
+		/// <param name="Class">CLASS parameter.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

@@ -396,7 +396,7 @@
             <summary>
             Converts a <see cref="T:System.Numerics.Vector4"/> to a <see cref="T:System.Numerics.Vector3"/>.
             </summary>
-            <param name="P">Point, or vector.</param>
+            <param name="Object">Untyped point, or vector.</param>
             <returns>Point or vector.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.ToPoint(System.Numerics.Vector3)">

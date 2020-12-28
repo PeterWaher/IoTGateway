@@ -123,6 +123,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Events\DirectInvitationMessageEventArgs.cs" />
     <Compile Include="Events\OccupantListEventArgs.cs" />
     <Compile Include="Events\RoomDeclinedMessageEventArgs.cs" />
     <Compile Include="Events\RoomInformationEventArgs.cs" />

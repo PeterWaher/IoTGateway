@@ -32,6 +32,11 @@ namespace Waher.Networking.XMPP.MUC
 		public const string NamespaceMucAdmin = "http://jabber.org/protocol/muc#admin";
 
 		/// <summary>
+		/// jabber:x:conference
+		/// </summary>
+		public const string NamespaceJabberConference = "jabber:x:conference";
+
+		/// <summary>
 		/// http://jabber.org/protocol/muc#owner
 		/// </summary>
 		public const string NamespaceMucOwner = "http://jabber.org/protocol/muc#owner";
@@ -61,6 +66,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			this.client.RegisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
 			this.client.RegisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
+			this.client.RegisterMessageHandler("x", NamespaceJabberConference, this.DirectInvitationMessageHandler, true);
 			this.client.RegisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 			this.client.RegisterMessageFormHandler(FormTypeRegister, this.RegistrationRequestHandler);
 
@@ -74,6 +80,7 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			this.client.UnregisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);
 			this.client.UnregisterMessageHandler("x", NamespaceMucUser, this.UserMessageHandler, false);
+			this.client.UnregisterMessageHandler("x", NamespaceJabberConference, this.DirectInvitationMessageHandler, true);
 			this.client.UnregisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 			this.client.UnregisterMessageFormHandler(FormTypeRegister, this.RegistrationRequestHandler);
 
@@ -1137,6 +1144,139 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
+
+		#endregion
+
+		#region Direct Invitation (XEP-0249)
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		public void InviteDirect(string RoomId, string Domain, string BareJid)
+		{
+			this.InviteDirect(RoomId, Domain, BareJid, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason)
+		{
+			this.InviteDirect(RoomId, Domain, BareJid, Reason, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		/// <param name="Language">Language</param>
+		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language)
+		{
+			this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Password">Password required to enter room.</param>
+		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password)
+		{
+			this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, Password, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Password">Password required to enter room.</param>
+		/// <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
+		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password, string ThreadId)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<x xmlns='");
+			Xml.Append(NamespaceJabberConference);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RoomId));
+			Xml.Append('@');
+			Xml.Append(XML.Encode(Domain));
+
+			if (!string.IsNullOrEmpty(Password))
+			{
+				Xml.Append("' password='");
+				Xml.Append(XML.Encode(Password));
+			}
+
+			if (!string.IsNullOrEmpty(Reason))
+			{
+				Xml.Append("' reason='");
+				Xml.Append(XML.Encode(Reason));
+			}
+
+			if (!string.IsNullOrEmpty(ThreadId))
+			{
+				Xml.Append("' continue='true' thread='");
+				Xml.Append(XML.Encode(ThreadId));
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendMessage(MessageType.Normal, BareJid, Xml.ToString(), string.Empty, string.Empty, Language,
+				string.Empty, string.Empty);
+		}
+
+		private async Task DirectInvitationMessageHandler(object Sender, MessageEventArgs e)
+		{
+			DirectInvitationMessageEventHandler h = this.DirectInvitationReceived;
+			if (!(h is null))
+			{
+				try
+				{
+					string RoomJid = XML.Attribute(e.Content, "jid");
+					string Password = XML.Attribute(e.Content, "password");
+					string Reason = XML.Attribute(e.Content, "reason");
+					string ThreadId = XML.Attribute(e.Content, "thread");
+					bool Continue = XML.Attribute(e.Content, "continue", false);
+					int i = RoomJid.IndexOf('@');
+
+					if (i < 0)
+						return;
+
+					string RoomId = RoomJid.Substring(0, i);
+					string Domain = RoomJid.Substring(i + 1);
+
+					await h(this, new DirectInvitationMessageEventArgs(this, e, RoomId, Domain, Reason, Password, Continue, ThreadId));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a direct invitation from a peer has been received.
+		/// </summary>
+		public event DirectInvitationMessageEventHandler DirectInvitationReceived;
 
 		#endregion
 

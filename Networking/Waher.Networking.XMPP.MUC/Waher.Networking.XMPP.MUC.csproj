@@ -7,14 +7,14 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library adding support for the Multi-User-Chat (MUC) extension (XEP-0045) to the XMPP Client library defined in Waher.Networking.XMPP.</Description>
+    <Description>Class library adding support for the Multi-User-Chat (MUC) extension (XEP-0045) to the XMPP Client library defined in Waher.Networking.XMPP. Direct invitations (XEP-0249) is also supported.</Description>
     <Copyright>Copyright © Waher Data AB 2020. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.MUC</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp muc Multi-User Chat XEP-0045</PackageTags>
+    <PackageTags>networking communication xmpp muc Multi-User Chat XEP-0045 XEP-0249</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>

@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.MUC
 		private readonly string fullJid;
 		private readonly string reason;
 		private readonly bool roomDestroyed;
+		private string roomJid = null;
 
 		/// <summary>
 		/// Event arguments for user presence events.
@@ -38,7 +39,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Optional reason provided for the change.</param>
 		/// <param name="RoomDestroyed">If room has been destroyed.</param>
 		/// <param name="Status">Status codes.</param>
-		public UserPresenceEventArgs(PresenceEventArgs e, string RoomId, string Domain, 
+		public UserPresenceEventArgs(PresenceEventArgs e, string RoomId, string Domain,
 			string UserNick, Affiliation Affiliation, Role Role, string FullJid,
 			string Reason, bool RoomDestroyed, params MucStatus[] Status)
 			: base(e)
@@ -98,6 +99,20 @@ namespace Waher.Networking.XMPP.MUC
 		/// Any status codes informing about changes to status.
 		/// </summary>
 		public MucStatus[] MucStatus => this.status;
+
+		/// <summary>
+		/// Room JID
+		/// </summary>
+		public string RoomJid
+		{
+			get
+			{
+				if (this.roomJid is null)
+					this.roomJid = this.roomId + "@" + this.domain;
+
+				return this.roomJid;
+			}
+		}
 
 		/// <summary>
 		/// If a given status was reported.

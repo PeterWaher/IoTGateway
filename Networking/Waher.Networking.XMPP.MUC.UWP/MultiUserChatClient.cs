@@ -1656,7 +1656,7 @@ namespace Waher.Networking.XMPP.MUC
 		public void ConfigureOccupant(string RoomId, string Domain, MucOccupantConfiguration Change,
 			IqResultEventHandlerAsync Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, new MucOccupantConfiguration[] { Change }, Callback, State);
+			this.ConfigureOccupants(RoomId, Domain, new MucOccupantConfiguration[] { Change }, Callback, State);
 		}
 
 		/// <summary>
@@ -1670,7 +1670,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Changes">Configurations to perform.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupant(string RoomId, string Domain, MucOccupantConfiguration[] Changes,
+		public void ConfigureOccupants(string RoomId, string Domain, MucOccupantConfiguration[] Changes,
 			IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1740,7 +1740,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantNickName,
 			Role Role, string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantNickName, Role, Reason));
 		}
 
@@ -1759,7 +1759,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantBareJid,
 			Affiliation Affiliation, string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, Affiliation, Reason));
 		}
 
@@ -1780,7 +1780,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, string OccupantBareJid, string OccupantNickName,
 			Affiliation? Affiliation, Role? Role, string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, OccupantNickName, Affiliation, Role, Reason));
 		}
 
@@ -1794,11 +1794,11 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Changes">Configurations to perform.</param>
 		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> ConfigureOccupantAsync(string RoomId, string Domain, params MucOccupantConfiguration[] Changes)
+		public Task<IqResultEventArgs> ConfigureOccupantsAsync(string RoomId, string Domain, params MucOccupantConfiguration[] Changes)
 		{
 			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
 
-			this.ConfigureOccupant(RoomId, Domain, Changes, (sender, e) =>
+			this.ConfigureOccupants(RoomId, Domain, Changes, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
@@ -2422,7 +2422,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> GrantMembershipAsync(string RoomId, string Domain, string OccupantBareJid,
 			string DefaultNickName, string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, DefaultNickName, Affiliation.Member, Reason));
 		}
 
@@ -2749,7 +2749,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> GrantOwnershipAsync(string RoomId, string Domain, string OccupantBareJid,
 			string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Owner, Reason));
 		}
 
@@ -2914,7 +2914,7 @@ namespace Waher.Networking.XMPP.MUC
 		public Task<IqResultEventArgs> GrantAdministratorAsync(string RoomId, string Domain, string OccupantBareJid,
 			string Reason)
 		{
-			return this.ConfigureOccupantAsync(RoomId, Domain,
+			return this.ConfigureOccupantsAsync(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Admin, Reason));
 		}
 

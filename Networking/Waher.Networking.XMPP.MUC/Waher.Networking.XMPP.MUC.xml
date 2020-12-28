@@ -1439,7 +1439,7 @@
             <param name="Callback">Method to call when response is returned from room.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupant(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[],Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupants(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[],Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Configures the states (affiliations and/or roles) of occupants.
             
@@ -1496,7 +1496,7 @@
             <param name="Reason">Reason for change.</param>
             <returns>Response to request.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantAsync(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[])">
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.ConfigureOccupantsAsync(System.String,System.String,Waher.Networking.XMPP.MUC.MucOccupantConfiguration[])">
             <summary>
             Configures the state (affiliation and/or role) of an occupant.
             

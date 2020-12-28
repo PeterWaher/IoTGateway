@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.XMPP.MUC.UWP")]
-[assembly: AssemblyDescription("Class library adding support for the Multi-User-Chat (MUC) extension (XEP-0045) to the XMPP Client library defined in Waher.Networking.XMPP. Direct invitations (XEP-0249) is also supported.")]
+[assembly: AssemblyDescription("Class library adding support for the Multi-User-Chat (MUC) extension (XEP-0045) to the XMPP Client library defined in Waher.Networking.XMPP. Direct invitations (XEP-0249), and Self-Ping (XEP-410) are also supported.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]

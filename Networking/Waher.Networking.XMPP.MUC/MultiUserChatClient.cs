@@ -3261,5 +3261,49 @@ namespace Waher.Networking.XMPP.MUC
 		}
 
 		#endregion
+
+		#region Self-ping
+
+		/// <summary>
+		/// Performs a self-ping to check if the connection to a Multi-User Chat Room is still valid. If not, a
+		/// <see cref="IqResultEventArgs.Ok"/> will be false, and <see cref="IqResultEventArgs.StanzaError"/> will
+		/// contains a <see cref="StanzaErrors.NotAcceptableException"/> stanza-error, and the room should be
+		/// re-entered.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name used in room.</param>
+		/// <param name="Callback">Method to call when response is returned from room.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SelfPing(string RoomId, string Domain, string NickName, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", Callback, State);
+		}
+
+		/// <summary>
+		/// Performs a self-ping to check if the connection to a Multi-User Chat Room is still valid. If not, a
+		/// <see cref="IqResultEventArgs.Ok"/> will be false, and <see cref="IqResultEventArgs.StanzaError"/> will
+		/// contains a <see cref="StanzaErrors.NotAcceptableException"/> stanza-error, and the room should be
+		/// re-entered.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nick-name used in room.</param>
+		/// <returns>Response to ping request.</returns>
+		public Task<IqResultEventArgs> SelfPingAsync(string RoomId, string Domain, string NickName)
+		{
+			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
+
+			this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 	}
 }

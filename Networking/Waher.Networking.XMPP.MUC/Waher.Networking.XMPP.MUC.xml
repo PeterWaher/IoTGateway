@@ -2517,5 +2517,30 @@
             <param name="Reason">Optional reason for destroying the room.</param>
             <param name="AlternateRoomJid">Optional alternative Room JID</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SelfPing(System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Performs a self-ping to check if the connection to a Multi-User Chat Room is still valid. If not, a
+            <see cref="P:Waher.Networking.XMPP.IqResultEventArgs.Ok"/> will be false, and <see cref="P:Waher.Networking.XMPP.IqResultEventArgs.StanzaError"/> will
+            contains a <see cref="T:Waher.Networking.XMPP.StanzaErrors.NotAcceptableException"/> stanza-error, and the room should be
+            re-entered.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name used in room.</param>
+            <param name="Callback">Method to call when response is returned from room.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SelfPingAsync(System.String,System.String,System.String)">
+            <summary>
+            Performs a self-ping to check if the connection to a Multi-User Chat Room is still valid. If not, a
+            <see cref="P:Waher.Networking.XMPP.IqResultEventArgs.Ok"/> will be false, and <see cref="P:Waher.Networking.XMPP.IqResultEventArgs.StanzaError"/> will
+            contains a <see cref="T:Waher.Networking.XMPP.StanzaErrors.NotAcceptableException"/> stanza-error, and the room should be
+            re-entered.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nick-name used in room.</param>
+            <returns>Response to ping request.</returns>
+        </member>
     </members>
 </doc>

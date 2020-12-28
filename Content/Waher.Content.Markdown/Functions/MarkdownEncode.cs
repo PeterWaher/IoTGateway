@@ -19,8 +19,8 @@ namespace Waher.Content.Markdown.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public MarkdownEncode(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
-        {
+			: base(Argument, Start, Length, Expression)
+		{
 		}
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace Waher.Content.Markdown.Functions
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "markdownencode"; }
+			get { return "MarkdownEncode"; }
 		}
 
 		/// <summary>
@@ -40,6 +40,17 @@ namespace Waher.Content.Markdown.Functions
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
 			return new StringValue(EscapeText(Argument));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+		{
+			return new StringValue(EscapeText(Argument.AssociatedObjectValue?.ToString() ?? string.Empty));
 		}
 
 		/// <summary>

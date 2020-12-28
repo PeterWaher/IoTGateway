@@ -429,20 +429,46 @@ namespace Waher.Client.WPF.Model.Muc
 			base.SelectionChanged();
 		}
 
-		public override void Add()
+		public override async void Add()
 		{
-			SendRoomInvitationForm Form = new SendRoomInvitationForm()
+			try
 			{
-				Owner = MainWindow.currentInstance
-			};
+				SendRoomInvitationForm Form = new SendRoomInvitationForm()
+				{
+					Owner = MainWindow.currentInstance
+				};
 
-			bool? Result = Form.ShowDialog();
-			if (!Result.HasValue || !Result.Value)
-				return;
+				bool? Result = Form.ShowDialog();
+				if (!Result.HasValue || !Result.Value)
+					return;
 
-			this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
+				string BareJid = Form.BareJid.Text.Trim();
+				string Reason = Form.Reason.Text.Trim();
+				bool InvitationSent = false;
 
-			MainWindow.ShowStatus("Invitation sent.");
+				Networking.XMPP.RosterItem Item = this.MucClient.Client[BareJid];
+				if (!(Item is null) && Item.HasLastPresence && Item.LastPresence.IsOnline)
+				{
+					ServiceDiscoveryEventArgs e = await this.MucClient.Client.ServiceDiscoveryAsync(Item.LastPresenceFullJid);
+
+					if (e.HasFeature(MultiUserChatClient.NamespaceJabberConference))
+					{
+						this.MucClient.InviteDirect(this.roomId, this.domain, BareJid, Reason, string.Empty, this.password);
+						MainWindow.ShowStatus("Direct Invitation sent.");
+						InvitationSent = true;
+					}
+				}
+
+				if (!InvitationSent)
+				{
+					this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
+					MainWindow.ShowStatus("Invitation sent.");
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
 		public override bool CanChat => true;

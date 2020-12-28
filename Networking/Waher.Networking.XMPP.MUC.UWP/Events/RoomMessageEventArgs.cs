@@ -6,9 +6,8 @@ namespace Waher.Networking.XMPP.MUC
 	/// <summary>
 	/// Delegate for MUC Room event handlers.
 	/// </summary>
-	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	/// <returns></returns>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
 	public delegate Task RoomMessageEventHandler(object Sender, RoomMessageEventArgs e);
 
 	/// <summary>

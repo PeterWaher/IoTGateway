@@ -630,6 +630,14 @@ namespace Waher.Client.WPF.Model.Muc
 
 			Item.Items.Add(Item2 = new MenuItem()
 			{
+				Header = "Visitors...",
+				IsEnabled = true,
+			});
+
+			Item2.Click += this.GetVisitorsList_Click;
+
+			Item.Items.Add(Item2 = new MenuItem()
+			{
 				Header = "Outcasts...",
 				IsEnabled = true,
 			});
@@ -726,6 +734,11 @@ namespace Waher.Client.WPF.Model.Muc
 			this.MucClient.GetVoiceList(this.roomId, this.domain, this.OccupantListCallback, "Participants");
 		}
 
+		private void GetVisitorsList_Click(object sender, RoutedEventArgs e)
+		{
+			this.MucClient.GetOccupants(this.roomId, this.domain, null, Role.Visitor, this.OccupantListCallback, "Visitors");
+		}
+
 		private void GetOutcastsList_Click(object sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetBannedOccupants(this.roomId, this.domain, this.OccupantListCallback, "Outcasts");
@@ -745,7 +758,13 @@ namespace Waher.Client.WPF.Model.Muc
 					bool? b = Form.ShowDialog();
 					if (b.HasValue && b.Value)
 					{
-						
+						this.MucClient.ConfigureOccupants(this.roomId, this.domain, Form.GetChanges(), (sender2, e2) =>
+						{
+							if (!e2.Ok)
+								MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to apply changes." : e.ErrorText);
+
+							return Task.CompletedTask;
+						}, null);
 					}
 				});
 			}

@@ -3328,22 +3328,59 @@ namespace Waher.IoTGateway
 			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, true);
 		}
 
+		/// <summary>
+		/// Gets XML for a multi-formatted chat message.
+		/// </summary>
+		/// <param name="Markdown">Markdown containing message text. Used to generate plain text and HTML copies of the same content.</param>
+		/// <returns>Multi-format XML for chat message.</returns>
+		public static string GetMultiFormatChatMessageXml(string Markdown)
+		{
+			(string Text, string Html) = ConvertMarkdown(Markdown);
+			return GetMultiFormatChatMessageXml(Text, Html, Markdown);
+		}
+
+		/// <summary>
+		/// Gets XML for a multi-formatted chat message.
+		/// </summary>
+		/// <param name="Text">Plain-text version of message.</param>
+		/// <param name="Html">HTML version of message.</param>
+		/// <param name="Markdown">Markdown containing message text.</param>
+		/// <returns>Multi-format XML for chat message.</returns>
+		public static string GetMultiFormatChatMessageXml(string Text, string Html, string Markdown)
+		{
+			StringBuilder Xml = new StringBuilder();
+			AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
+			return Xml.ToString();
+		}
+
+		/// <summary>
+		/// Appends the XML for a multi-formatted chat message to a string being built.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Text">Plain-text version of message.</param>
+		/// <param name="Html">HTML version of message.</param>
+		/// <param name="Markdown">Markdown containing message text.</param>
+		public static void AppendMultiFormatChatMessageXml(StringBuilder Xml, string Text, string Html, string Markdown)
+		{
+			Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+			Xml.Append(XML.Encode(Markdown));
+			Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
+
+			HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+
+			foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
+				N.Export(Xml);
+
+			Xml.Append("</body></html>");
+		}
+
 		private static void SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
 		{
 			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
 			{
 				StringBuilder Xml = new StringBuilder();
-
-				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
-				Xml.Append(XML.Encode(Markdown));
-				Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
-
-				HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
-
-				foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
-					N.Export(Xml);
-
-				Xml.Append("</body></html>");
+				
+				AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
 
 				if (Update && !string.IsNullOrEmpty(MessageId))
 				{

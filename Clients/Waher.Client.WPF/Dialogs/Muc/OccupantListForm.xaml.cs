@@ -36,17 +36,19 @@ namespace Waher.Client.WPF.Dialogs.Muc
 
 			public MucOccupant Occupant => this.occupant;
 			public string NickName => this.occupant.NickName;
+			public string Affiliation => this.affiliation.ToString();
+			public string Role => this.role.ToString();
 
-			public string Affiliation
+			public int AffiliationIndex
 			{
-				get => this.affiliation.ToString();
-				set => this.affiliation = (Affiliation)Enum.Parse(typeof(Affiliation), value);
+				get => (int)this.affiliation;
+				set => this.affiliation = (Affiliation)value;
 			}
 
-			public string Role
+			public int RoleIndex
 			{
-				get => this.role.ToString();
-				set => this.role = (Role)Enum.Parse(typeof(Role), value);
+				get => (int)this.role;
+				set => this.role = (Role)value;
 			}
 
 			public bool Changed => this.affiliation != this.occupant.Affiliation || this.role != this.occupant.Role;

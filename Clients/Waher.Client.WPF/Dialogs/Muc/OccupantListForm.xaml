@@ -30,7 +30,7 @@
                         <GridViewColumn Header="Affiliation" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ComboBox Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Top" Text="{Binding Affiliation}" ToolTip="Room affiliation for occupant.">
+                                    <ComboBox Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Top" SelectedIndex="{Binding AffiliationIndex}" ToolTip="Room affiliation for occupant.">
                                         <ComboBoxItem>Owner</ComboBoxItem>
                                         <ComboBoxItem>Administrator</ComboBoxItem>
                                         <ComboBoxItem>Member</ComboBoxItem>
@@ -43,7 +43,7 @@
                         <GridViewColumn Header="Role" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ComboBox Height="23" HorizontalAlignment="Stretch" Name="Role" VerticalAlignment="Top" ToolTip="Role of occupant in room." Text="{Binding Role}">
+                                    <ComboBox Height="23" HorizontalAlignment="Stretch" Name="Role" VerticalAlignment="Top" ToolTip="Role of occupant in room." SelectedIndex="{Binding RoleIndex}">
                                         <ComboBoxItem>Moderator</ComboBoxItem>
                                         <ComboBoxItem>Participant</ComboBoxItem>
                                         <ComboBoxItem>Visitor</ComboBoxItem>

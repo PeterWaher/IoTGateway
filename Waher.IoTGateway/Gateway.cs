@@ -3362,9 +3362,16 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing message text.</param>
 		public static void AppendMultiFormatChatMessageXml(StringBuilder Xml, string Text, string Html, string Markdown)
 		{
+			Xml.Append("<body>");
+			Xml.Append(XML.Encode(Text));
+			Xml.Append("</body>");
+
 			Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
 			Xml.Append(XML.Encode(Markdown));
-			Xml.Append("</content><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
+			Xml.Append("</content>");
+
+			Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
+			Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
 
 			HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
 
@@ -3391,7 +3398,7 @@ namespace Waher.IoTGateway
 					MessageId = string.Empty;
 				}
 
-				xmppClient.SendMessage(QoSLevel.Unacknowledged, Type, MessageId, To, Xml.ToString(), Text,
+				xmppClient.SendMessage(QoSLevel.Unacknowledged, Type, MessageId, To, Xml.ToString(), string.Empty,
 					string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 			}
 		}

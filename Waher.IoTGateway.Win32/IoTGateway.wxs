@@ -1536,6 +1536,7 @@
                 <File Id='LegalIdentities.md' Name='LegalIdentities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentities.md'/>
                 <File Id='LegalIdentity.js' Name='LegalIdentity.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentity.js'/>
                 <File Id='LegalIdentity.md' Name='LegalIdentity.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentity.md'/>
+                <File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
                 <File Id='Notification.js' Name='Notification.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Notification.js'/>
                 <File Id='Notification.md' Name='Notification.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Notification.md'/>
                 <File Id='PersonalData.js' Name='PersonalData.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\PersonalData.js'/>
@@ -1546,11 +1547,14 @@
                 <File Id='Roster.md' Name='Roster.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.md'/>
                 <File Id='RosterItems.md' Name='RosterItems.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\RosterItems.md'/>
                 <File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
-                <File Id='Next.js' Name='Next.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Next.js'/>
+                <File Id='Sniffer.css' Name='Sniffer.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.css'/>
+                <File Id='Sniffer.js' Name='Sniffer.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.js'/>
+                <File Id='Sniffer.md' Name='Sniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.md'/>
                 <File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
                 <File Id='Theme.md' Name='Theme.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.md'/>
                 <File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
                 <File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
+                <File Id='XMPPSniffer.md' Name='XMPPSniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPPSniffer.md'/>
                 <RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
                 <RemoveFile Id='RemoveBackup.md' Name='Backup.md' On='uninstall'/>
                 <RemoveFile Id='RemoveConfig.cssx' Name='Config.cssx' On='uninstall'/>
@@ -1562,6 +1566,7 @@
                 <RemoveFile Id='RemoveLegalIdentities.md' Name='LegalIdentities.md' On='uninstall'/>
                 <RemoveFile Id='RemoveLegalIdentity.js' Name='LegalIdentity.js' On='uninstall'/>
                 <RemoveFile Id='RemoveLegalIdentity.md' Name='LegalIdentity.md' On='uninstall'/>
+                <RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
                 <RemoveFile Id='RemoveNotification.js' Name='Notification.js' On='uninstall'/>
                 <RemoveFile Id='RemoveNotification.md' Name='Notification.md' On='uninstall'/>
                 <RemoveFile Id='RemovePersonalData.js' Name='PersonalData.js' On='uninstall'/>
@@ -1572,11 +1577,14 @@
                 <RemoveFile Id='RemoveRoster.md' Name='Roster.md' On='uninstall'/>
                 <RemoveFile Id='RemoveRosterItems.md' Name='RosterItems.md' On='uninstall'/>
                 <RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
-                <RemoveFile Id='RemoveNext.js' Name='Next.js' On='uninstall'/>
+                <RemoveFile Id='RemoveSniffer.css' Name='Sniffer.css' On='uninstall'/>
+                <RemoveFile Id='RemoveSniffer.js' Name='Sniffer.js' On='uninstall'/>
+                <RemoveFile Id='RemoveSniffer.md' Name='Sniffer.md' On='uninstall'/>
                 <RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
                 <RemoveFile Id='RemoveTheme.md' Name='Theme.md' On='uninstall'/>
                 <RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
                 <RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
+                <RemoveFile Id='RemoveXMPPSniffer.md' Name='XMPPSniffer.md' On='uninstall'/>
               </Component>
               <Directory Id='Database' Name='Database'>
                 <Component Id='DatabaseFiles' Guid='1F5D29D1-7E5F-425E-BD02-151A6B117F3D'>

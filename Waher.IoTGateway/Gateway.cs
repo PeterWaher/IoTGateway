@@ -212,7 +212,7 @@ namespace Waher.IoTGateway
 		public static async Task<bool> Start(bool ConsoleOutput, bool LoopbackIntefaceAvailable, string InstanceName)
 		{
 			bool FirstStart = firstStart;
-			
+
 			firstStart = false;
 			instance = InstanceName;
 
@@ -635,7 +635,7 @@ namespace Waher.IoTGateway
 							startingServer?.Dispose();
 							startingServer = null;
 
-							ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+							await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
 							if (await Configuration.SetupConfiguration(webServer))
 								ReloadConfigurations = true;
@@ -846,7 +846,7 @@ namespace Waher.IoTGateway
 					webServer.Add(Sniffer);
 				}
 
-				ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
+				await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
 				coapEndpoint = new CoapEndpoint();
 				Types.SetModuleParameter("CoAP", coapEndpoint);
@@ -3386,7 +3386,7 @@ namespace Waher.IoTGateway
 			if (Gateway.XmppClient != null && Gateway.XmppClient.State == XmppState.Connected)
 			{
 				StringBuilder Xml = new StringBuilder();
-				
+
 				AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
 
 				if (Update && !string.IsNullOrEmpty(MessageId))
@@ -4115,6 +4115,100 @@ namespace Waher.IoTGateway
 			}
 
 			return null;
+		}
+
+		#endregion
+
+		#region Sniffers
+
+		/// <summary>
+		/// Creates a web sniffer, and adds it to a sniffable object.
+		/// </summary>
+		/// <param name="SnifferId">Sniffer ID</param>
+		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
+		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static string AddWebSniffer(string SnifferId, HttpRequest Request, ISniffable Sniffable, string UserVariable, params string[] Privileges)
+		{
+			return AddWebSniffer(SnifferId, Request, BinaryPresentationMethod.ByteCount, Sniffable, UserVariable, Privileges);
+		}
+
+		/// <summary>
+		/// Creates a web sniffer, and adds it to a sniffable object.
+		/// </summary>
+		/// <param name="SnifferId">Sniffer ID</param>
+		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static string AddWebSniffer(string SnifferId, HttpRequest Request, BinaryPresentationMethod BinaryPresentationMethod,
+			ISniffable Sniffable, string UserVariable, params string[] Privileges)
+		{
+			return AddWebSniffer(SnifferId, Request, TimeSpan.FromHours(1), BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
+		}
+
+		/// <summary>
+		/// Creates a web sniffer, and adds it to a sniffable object.
+		/// </summary>
+		/// <param name="SnifferId">Sniffer ID</param>
+		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
+		/// <param name="MaxLife">Maximum life of sniffer.</param>
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static string AddWebSniffer(string SnifferId, HttpRequest Request, TimeSpan MaxLife,
+			BinaryPresentationMethod BinaryPresentationMethod, ISniffable Sniffable, string UserVariable, params string[] Privileges)
+		{
+			string Resource = Request.Header.ResourcePart;
+			int i = Resource.IndexOfAny(new char[] { '?', '#' });
+			if (i > 0)
+				Resource = Resource.Substring(0, i);
+
+			return AddWebSniffer(SnifferId, Resource, MaxLife, BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
+		}
+
+		/// <summary>
+		/// Creates a web sniffer, and adds it to a sniffable object.
+		/// </summary>
+		/// <param name="SnifferId">Sniffer ID</param>
+		/// <param name="PageResource">Resource of page displaying the sniffer.</param>
+		/// <param name="MaxLife">Maximum life of sniffer.</param>
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static string AddWebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife,
+			BinaryPresentationMethod BinaryPresentationMethod, ISniffable Sniffable, string UserVariable, params string[] Privileges)
+		{
+			bool Found = false;
+
+			foreach (ISniffer Sniffer in Sniffable)
+			{
+				if (Sniffer is WebSniffer WebSniffer && WebSniffer.SnifferId == SnifferId)
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (!Found)
+			{
+				WebSniffer Sniffer = new WebSniffer(SnifferId, PageResource, MaxLife, BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
+				Sniffable.Add(Sniffer);
+			}
+
+			return "\r\n\r\n![Sniffer](/Settings/Sniffer.md)\r\n\r\n";
 		}
 
 		#endregion

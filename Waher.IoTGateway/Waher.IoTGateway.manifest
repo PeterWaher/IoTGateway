@@ -32,10 +32,14 @@
       <Content fileName="Roster.js"/>
       <Content fileName="Roster.md"/>
       <Content fileName="RosterItems.md"/>
+      <Content fileName="Sniffer.css"/>
+      <Content fileName="Sniffer.js"/>
+      <Content fileName="Sniffer.md"/>
       <Content fileName="Theme.js"/>
       <Content fileName="Theme.md"/>
       <Content fileName="XMPP.js"/>
       <Content fileName="XMPP.md"/>
+      <Content fileName="XMPPSniffer.md"/>
       <Folder name="Database">
         <Content fileName="MongoDB.md"/>
       </Folder>

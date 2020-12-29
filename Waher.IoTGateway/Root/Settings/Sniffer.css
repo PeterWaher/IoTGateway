@@ -1,0 +1,41 @@
+﻿.rx 
+{
+    color: white;
+    background-color: navy;
+    word-break: break-all;
+}
+
+.tx 
+{
+    color: black;
+    background-color: white;
+    word-break: break-all;
+}
+
+.info 
+{
+    color: yellow;
+    background-color: darkgreen;
+    word-break: break-all;
+}
+
+.warning 
+{
+    color: black;
+    background-color: yellow;
+    word-break: break-all;
+}
+
+.err
+{
+    color: yellow;
+    background-color: red;
+    word-break: break-all;
+}
+
+.ex
+{
+    color: yellow;
+    background-color: darkred;
+    word-break: break-all;
+}

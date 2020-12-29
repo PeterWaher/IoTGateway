@@ -226,7 +226,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.HttpServer.ETagSalt = this.Updated.Ticks.ToString();
 
-				ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
+				await ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
 					{
 						new KeyValuePair<string, object>("themeId", Def.Id),
 						new KeyValuePair<string, object>("cssUrl", Def.CSSX),

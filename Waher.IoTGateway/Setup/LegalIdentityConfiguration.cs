@@ -634,12 +634,12 @@ namespace Waher.IoTGateway.Setup
 				this.Step = 1;
 				await Database.Update(this);
 
-				ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
+				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 
 				this.UpdateClients(e.Identity);
 			}
 			else
-				ClientEvents.PushEvent(new string[] { TabID }, "ApplicationError", e.ErrorText);
+				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationError", e.ErrorText);
 		}
 
 		private string CalcPasswordhash(LegalIdentity ID, string Password)

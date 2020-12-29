@@ -416,7 +416,7 @@ namespace Waher.IoTGateway.Setup
 				{
 					if (!await this.Test(TabID, this.domain))
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", this.domain, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", this.domain, false, "User");
 						return;
 					}
 				}
@@ -427,7 +427,7 @@ namespace Waher.IoTGateway.Setup
 					{
 						if (!await this.Test(TabID, AltDomainName))
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", AltDomainName, false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "NameNotValid", AltDomainName, false, "User");
 							return;
 						}
 					}
@@ -439,11 +439,11 @@ namespace Waher.IoTGateway.Setup
 				this.Updated = DateTime.Now;
 				await Database.Update(this);
 
-				ClientEvents.PushEvent(new string[] { TabID }, "NamesOK", string.Empty, false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "NamesOK", string.Empty, false, "User");
 			}
 			catch (Exception ex)
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
 			}
 		}
 
@@ -482,7 +482,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script checking current IP Address: " + ex.Message, false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script checking current IP Address: " + ex.Message, false, "User");
 				return false;
 			}
 
@@ -492,11 +492,11 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script updating the dynamic DNS server: " + ex.Message, false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script updating the dynamic DNS server: " + ex.Message, false, "User");
 				return false;
 			}
 
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking current IP Address.", false, "User");
+			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking current IP Address.", false, "User");
 
 			Variables Variables = new Variables();
 			object Result;
@@ -507,27 +507,27 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address: " + ex.Message, false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address: " + ex.Message, false, "User");
 				return false;
 			}
 
 			if (!(Result is string CurrentIP) || !IPAddress.TryParse(CurrentIP, out IPAddress _))
 			{
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address. Unexpected response.", false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address. Unexpected response.", false, "User");
 				return false;
 			}
 
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Current IP Address: " + CurrentIP, false, "User");
+			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Current IP Address: " + CurrentIP, false, "User");
 
 			string LastIP = await RuntimeSettings.GetAsync("Last.IP." + DomainName, string.Empty);
 
 			if (LastIP == CurrentIP)
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed for " + DomainName + ".", false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed for " + DomainName + ".", false, "User");
 			else
 			{
 				try
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating IP address for " + DomainName + " to " + CurrentIP + ".", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating IP address for " + DomainName + " to " + CurrentIP + ".", false, "User");
 
 					Variables["Account"] = this.dynDnsAccount;
 					Variables["Password"] = this.dynDnsPassword;
@@ -540,7 +540,7 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to register new dynamic IP Address: " + ex.Message, false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to register new dynamic IP Address: " + ex.Message, false, "User");
 					return false;
 				}
 			}
@@ -550,7 +550,7 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task<bool> Test(string TabID, string DomainName)
 		{
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Testing " + DomainName + "...", false, "User");
+			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Testing " + DomainName + "...", false, "User");
 
 			if (!await this.CheckDynamicIp(TabID, DomainName))
 				return false;
@@ -581,7 +581,7 @@ namespace Waher.IoTGateway.Setup
 					HttpResponseMessage Response = await HttpClient.GetAsync("http://" + DomainName + "/Settings/TestDomainName");
 					if (!Response.IsSuccessStatusCode)
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Domain name does not point to this machine.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Domain name does not point to this machine.", false, "User");
 						return false;
 					}
 
@@ -590,23 +590,23 @@ namespace Waher.IoTGateway.Setup
 
 					if (Token != this.token)
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unexpected response returned. Domain name does not point to this machine.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unexpected response returned. Domain name does not point to this machine.", false, "User");
 						return false;
 					}
 				}
 				catch (TimeoutException)
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Time-out. Check that the domain name points to this machine.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Time-out. Check that the domain name points to this machine.", false, "User");
 					return false;
 				}
 				catch (Exception ex)
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to validate domain name: " + ex.Message, false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to validate domain name: " + ex.Message, false, "User");
 					return false;
 				}
 			}
 
-			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Domain name valid.", false, "User");
+			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Domain name valid.", false, "User");
 
 			return true;
 		}
@@ -743,32 +743,32 @@ namespace Waher.IoTGateway.Setup
 
 				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Connecting to directory.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Connecting to directory.", false, "User");
 
 					AcmeDirectory AcmeDirectory = await Client.GetDirectory();
 
 					if (AcmeDirectory.ExternalAccountRequired)
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "An external account is required.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "An external account is required.", false, "User");
 
 					if (AcmeDirectory.TermsOfService != null)
 					{
 						URL = AcmeDirectory.TermsOfService.ToString();
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Terms of service available on: " + URL, false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Terms of service available on: " + URL, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
 
 						this.urlToS = URL;
 
 						if (!this.acceptToS)
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "You need to accept the terms of service.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "You need to accept the terms of service.", false, "User");
 							return false;
 						}
 					}
 
 					if (AcmeDirectory.Website != null)
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Web site available on: " + AcmeDirectory.Website.ToString(), false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Web site available on: " + AcmeDirectory.Website.ToString(), false, "User");
 
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Getting account.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Getting account.", false, "User");
 
 					List<string> Names = new List<string>();
 
@@ -791,43 +791,43 @@ namespace Waher.IoTGateway.Setup
 					{
 						Account = await Client.GetAccount();
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account found.", false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Created: " + Account.CreatedAt.ToString(), false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Initial IP: " + Account.InitialIp, false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account found.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Created: " + Account.CreatedAt.ToString(), false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Initial IP: " + Account.InitialIp, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
 
 						if (string.IsNullOrEmpty(this.contactEMail))
 						{
 							if (Account.Contact != null && Account.Contact.Length != 0)
 							{
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
 								Account = await Account.Update(new string[0]);
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
 							}
 						}
 						else
 						{
 							if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
 							{
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
 								Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
 							}
 						}
 					}
 					catch (AcmeAccountDoesNotExistException)
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account not found.", false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating account.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account not found.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating account.", false, "User");
 
 						Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
 							this.acceptToS);
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account created.", false, "User");
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account created.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
 					}
 
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating new key.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating new key.", false, "User");
 					await Account.NewKey();
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
@@ -835,15 +835,15 @@ namespace Waher.IoTGateway.Setup
 						RSA.ImportParameters(Client.ExportAccountKey(true));
 					}
 
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "New key generated.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "New key generated.", false, "User");
 
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating order.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating order.", false, "User");
 					AcmeOrder Order = await Account.OrderCertificate(DomainNames, null, null);
-					ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order created.", false, "User");
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order created.", false, "User");
 
 					foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Processing authorization for " + Authorization.Value, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Processing authorization for " + Authorization.Value, false, "User");
 
 						AcmeChallenge Challenge;
 						bool Acknowledged = false;
@@ -859,11 +859,11 @@ namespace Waher.IoTGateway.Setup
 								this.challenge = "/" + HttpChallenge.Token;
 								this.token = HttpChallenge.KeyAuthorization;
 
-								ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Acknowleding challenge.", false, "User");
+								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Acknowleding challenge.", false, "User");
 								if (await this.CheckDynamicIp(TabID, Authorization.Value))
 								{
 									Challenge = await HttpChallenge.AcknowledgeChallenge();
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Challenge acknowledged: " + Challenge.Status.ToString(), false, "User");
+									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Challenge acknowledged: " + Challenge.Status.ToString(), false, "User");
 
 									Acknowledged = true;
 								}
@@ -872,7 +872,7 @@ namespace Waher.IoTGateway.Setup
 
 						if (!Acknowledged)
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "No automated method found to respond to any of the authorization challenges.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "No automated method found to respond to any of the authorization challenges.", false, "User");
 							return false;
 						}
 
@@ -880,13 +880,13 @@ namespace Waher.IoTGateway.Setup
 
 						do
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Waiting to poll authorization status.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Waiting to poll authorization status.", false, "User");
 							await Task.Delay(5000);
 
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Polling authorization.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Polling authorization.", false, "User");
 							Authorization2 = await Authorization2.Poll();
 
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Authorization polled: " + Authorization2.Status.ToString(), false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Authorization polled: " + Authorization2.Status.ToString(), false, "User");
 						}
 						while (Authorization2.Status == AcmeAuthorizationStatus.pending);
 
@@ -914,7 +914,7 @@ namespace Waher.IoTGateway.Setup
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))   // TODO: Make configurable
 					{
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Finalizing order.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Finalizing order.", false, "User");
 
 						SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
@@ -925,7 +925,7 @@ namespace Waher.IoTGateway.Setup
 							EMailAddress = this.contactEMail
 						});
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order finalized: " + Order.Status.ToString(), false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order finalized: " + Order.Status.ToString(), false, "User");
 
 						if (Order.Status != AcmeOrderStatus.valid)
 						{
@@ -942,19 +942,19 @@ namespace Waher.IoTGateway.Setup
 						if (Order.Certificate is null)
 							throw new Exception("No certificate URI provided.");
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Downloading certificate.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Downloading certificate.", false, "User");
 
 						X509Certificate2[] Certificates = await Order.DownloadCertificate();
 						X509Certificate2 Certificate = Certificates[0];
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Exporting certificate.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Exporting certificate.", false, "User");
 
 						this.certificate = Certificate.Export(X509ContentType.Cert);
 						this.privateKey = RSA.ExportCspBlob(true);
 						this.pfx = null;
 						this.password = string.Empty;
 
-						ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Adding private key.", false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Adding private key.", false, "User");
 
 						try
 						{
@@ -962,8 +962,8 @@ namespace Waher.IoTGateway.Setup
 						}
 						catch (PlatformNotSupportedException)
 						{
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Platform does not support adding of private key.", false, "User");
-							ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Searching for OpenSSL on machine.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Platform does not support adding of private key.", false, "User");
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Searching for OpenSSL on machine.", false, "User");
 
 							string[] Files;
 							string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
@@ -990,7 +990,7 @@ namespace Waher.IoTGateway.Setup
 							{
 								if (Files.Length == 0)
 								{
-									ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.", false, "User");
+									await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.", false, "User");
 									return false;
 								}
 								else
@@ -999,7 +999,7 @@ namespace Waher.IoTGateway.Setup
 									{
 										if (CertFileName is null)
 										{
-											ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false, "User");
+											await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false, "User");
 
 											StringBuilder PemOutput = new StringBuilder();
 											byte[] Bin = Certificate.Export(X509ContentType.Cert);
@@ -1011,7 +1011,7 @@ namespace Waher.IoTGateway.Setup
 											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
 											File.WriteAllText(CertFileName, PemOutput.ToString(), Encoding.ASCII);
 
-											ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false, "User");
+											await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false, "User");
 
 											DerEncoder KeyOutput = new DerEncoder();
 											SignAlg.ExportPrivateKey(KeyOutput);
@@ -1026,7 +1026,7 @@ namespace Waher.IoTGateway.Setup
 											File.WriteAllText(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
 										}
 
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false, "User");
+										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false, "User");
 
 										Process P = new Process()
 										{
@@ -1048,29 +1048,29 @@ namespace Waher.IoTGateway.Setup
 										if (!P.WaitForExit(60000) || P.ExitCode != 0)
 										{
 											if (!P.StandardOutput.EndOfStream)
-												ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Output: " + P.StandardOutput.ReadToEnd(), false, "User");
+												await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Output: " + P.StandardOutput.ReadToEnd(), false, "User");
 
 											if (!P.StandardError.EndOfStream)
-												ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Error: " + P.StandardError.ReadToEnd(), false, "User");
+												await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Error: " + P.StandardError.ReadToEnd(), false, "User");
 
 											continue;
 										}
 
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false, "User");
+										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false, "User");
 
 										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
 										this.pfx = File.ReadAllBytes(CertFileName2);
 										this.password = Password;
 										this.openSslPath = OpenSslFile;
 
-										ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "PFX successfully generated using OpenSSL.", false, "User");
+										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "PFX successfully generated using OpenSSL.", false, "User");
 										break;
 									}
 
 									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
-										ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to convert to PFX using OpenSSL.", false, "User");
+										await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to convert to PFX using OpenSSL.", false, "User");
 										return false;
 									}
 								}
@@ -1079,19 +1079,19 @@ namespace Waher.IoTGateway.Setup
 							{
 								if (CertFileName != null && File.Exists(CertFileName))
 								{
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary certificate file.", false, "User");
+									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary certificate file.", false, "User");
 									File.Delete(CertFileName);
 								}
 
 								if (KeyFileName != null && File.Exists(KeyFileName))
 								{
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary key file.", false, "User");
+									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary key file.", false, "User");
 									File.Delete(KeyFileName);
 								}
 
 								if (CertFileName2 != null && File.Exists(CertFileName2))
 								{
-									ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary pfx file.", false, "User");
+									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary pfx file.", false, "User");
 									File.Delete(CertFileName2);
 								}
 							}
@@ -1104,7 +1104,7 @@ namespace Waher.IoTGateway.Setup
 						this.Updated = DateTime.Now;
 						await Database.Update(this);
 
-						ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false, "User");
+						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false, "User");
 
 						Gateway.UpdateCertificate(this);
 
@@ -1115,7 +1115,7 @@ namespace Waher.IoTGateway.Setup
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message), false, "User");
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message), false, "User");
 				return false;
 			}
 			finally

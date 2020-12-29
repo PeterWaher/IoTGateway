@@ -212,7 +212,7 @@ namespace Waher.IoTGateway.Setup
 
 				await Database.Update(this);
 
-				ClientEvents.PushEvent(new string[] { TabID }, "ShowNext", JSON.Encode(new Dictionary<string, object>()
+				await ClientEvents.PushEvent(new string[] { TabID }, "ShowNext", JSON.Encode(new Dictionary<string, object>()
 				{
 					{ "consent", Consent }
 				}, false), true, "User");

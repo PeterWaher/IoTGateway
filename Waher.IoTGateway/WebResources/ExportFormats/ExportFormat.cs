@@ -281,7 +281,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 
-			ClientEvents.PushEvent(TabIDs, "UpdateExport", sb.ToString(), true, "User");
+			Task _ = ClientEvents.PushEvent(TabIDs, "UpdateExport", sb.ToString(), true, "User");
 		}
 
 		/// <summary>
@@ -298,7 +298,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 
 			string[] TabIDs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
 
-			ClientEvents.PushEvent(TabIDs, "FileDeleted", sb.ToString(), true, "User");
+			Task _ = ClientEvents.PushEvent(TabIDs, "FileDeleted", sb.ToString(), true, "User");
 		}
 	}
 }

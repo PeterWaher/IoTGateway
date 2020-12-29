@@ -431,7 +431,7 @@ namespace Waher.IoTGateway.Setup
 					Result.Append("Click on the Next button to continue.");
 				}
 
-				ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
+				await ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
 				{
 					{ "ok", true },
 					{ "message", Result.ToString() }
@@ -442,7 +442,7 @@ namespace Waher.IoTGateway.Setup
 				Log.Critical(ex);
 				ShowStatus(TabID, "Failure: " + ex.Message);
 
-				ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
+				await ClientEvents.PushEvent(new string[] { TabID }, "RestoreFinished", JSON.Encode(new Dictionary<string, object>()
 				{
 					{ "ok", false },
 					{ "message", ex.Message }

@@ -394,7 +394,7 @@ namespace Waher.IoTGateway.WebResources
 				Log.Critical(ex);
 
 				string[] Tabs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
-				ClientEvents.PushEvent(Tabs, "BackupFailed", "{\"fileName\":\"" + CommonTypes.JsonStringEncode(Output.FileName) +
+				await ClientEvents.PushEvent(Tabs, "BackupFailed", "{\"fileName\":\"" + CommonTypes.JsonStringEncode(Output.FileName) +
 					"\", \"message\": \"" + CommonTypes.JsonStringEncode(ex.Message) + "\"}", true, "User");
 			}
 			finally

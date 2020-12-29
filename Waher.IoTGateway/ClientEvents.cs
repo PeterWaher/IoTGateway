@@ -1102,14 +1102,15 @@ namespace Waher.IoTGateway
 		/// <param name="TabIDs">Tab IDs.</param>
 		/// <param name="Type">Event Type.</param>
 		/// <param name="Data">Event Data.</param>
-		public static void PushEvent(string[] TabIDs, string Type, object Data)
+		/// <returns>Number of tabs event is actually sent to.</returns>
+		public static Task<int> PushEvent(string[] TabIDs, string Type, object Data)
 		{
 			if (Data is string s)
-				PushEvent(TabIDs, Type, s, false, null, null);
+				return PushEvent(TabIDs, Type, s, false, null, null);
 			else
 			{
 				s = JSON.Encode(Data, false);
-				PushEvent(TabIDs, Type, s, true, null, null);
+				return PushEvent(TabIDs, Type, s, true, null, null);
 			}
 		}
 
@@ -1119,9 +1120,10 @@ namespace Waher.IoTGateway
 		/// <param name="TabIDs">Tab IDs.</param>
 		/// <param name="Type">Event Type.</param>
 		/// <param name="Data">Event Data (as plain text).</param>
-		public static void PushEvent(string[] TabIDs, string Type, string Data)
+		/// <returns>Number of tabs event is actually sent to.</returns>
+		public static Task<int> PushEvent(string[] TabIDs, string Type, string Data)
 		{
-			PushEvent(TabIDs, Type, Data, false, null, null);
+			return PushEvent(TabIDs, Type, Data, false, null, null);
 		}
 
 		/// <summary>
@@ -1131,9 +1133,10 @@ namespace Waher.IoTGateway
 		/// <param name="Type">Event Type.</param>
 		/// <param name="Data">Event Data (as plain text, or as JSON).</param>
 		/// <param name="DataIsJson">If <paramref name="Data"/> is JSON or plain text.</param>
-		public static void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson)
+		/// <returns>Number of tabs event is actually sent to.</returns>
+		public static Task<int> PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson)
 		{
-			PushEvent(TabIDs, Type, Data, DataIsJson, null, null);
+			return PushEvent(TabIDs, Type, Data, DataIsJson, null, null);
 		}
 
 		/// <summary>
@@ -1147,8 +1150,11 @@ namespace Waher.IoTGateway
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Optional privileges. If provided, event is only pushed to clients with a user variable having
 		/// the following set of privileges.</param>
-		public static async void PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson, string UserVariable, params string[] Privileges)
+		/// <returns>Number of tabs event is actually sent to.</returns>
+		public static async Task<int> PushEvent(string[] TabIDs, string Type, string Data, bool DataIsJson, string UserVariable, params string[] Privileges)
 		{
+			int Result = 0;
+
 			try
 			{
 				StringBuilder Json = new StringBuilder();
@@ -1233,6 +1239,7 @@ namespace Waher.IoTGateway
 						}
 
 						timeoutByTabID.Remove(TabID);
+						Result++;
 					}
 				}
 			}
@@ -1240,6 +1247,8 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
+
+			return Result;
 		}
 
 	}

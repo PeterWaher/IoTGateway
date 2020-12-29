@@ -104,7 +104,7 @@ namespace Waher.IoTGateway.Setup
 						new KeyValuePair<string, object>("html", this.RosterItemsHtml(Gateway.XmppClient.Roster, Gateway.XmppClient.SubscriptionRequests))
 					}, false);
 
-					ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
+					Task _2 = ClientEvents.PushEvent(TabIDs, "UpdateRoster", Json, true, "User");
 				}
 			}
 
@@ -130,7 +130,7 @@ namespace Waher.IoTGateway.Setup
 					new KeyValuePair<string, object>("html", this.RosterItemsHtml(new RosterItem[0], new PresenceEventArgs[] { e }))
 				}, false);
 
-				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
+				Task _ = ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
 			}
 
 			return Task.CompletedTask;
@@ -156,7 +156,7 @@ namespace Waher.IoTGateway.Setup
 					new KeyValuePair<string, object>("html", this.RosterItemsHtml(new RosterItem[]{ Item }, new PresenceEventArgs[0]))
 				}, false);
 
-				ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
+				Task _2 = ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
 			}
 
 			return Task.CompletedTask;
@@ -178,7 +178,7 @@ namespace Waher.IoTGateway.Setup
 					new KeyValuePair<string, object>("bareJid", BareJid)
 				}, false);
 
-				ClientEvents.PushEvent(TabIDs, "RemoveRosterItem", Json, true, "User");
+				Task _ = ClientEvents.PushEvent(TabIDs, "RemoveRosterItem", Json, true, "User");
 			}
 		}
 

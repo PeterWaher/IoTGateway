@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Cache;
 using Waher.Security;
 
 namespace Waher.IoTGateway.WebResources
@@ -13,7 +15,7 @@ namespace Waher.IoTGateway.WebResources
 	/// <summary>
 	/// Sending sniffer events to the corresponding web page(s).
 	/// </summary>
-	public class WebSniffer : SnifferBase
+	public class WebSniffer : SnifferBase, IDisposable
 	{
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly DateTime created = DateTime.Now;
@@ -23,8 +25,10 @@ namespace Waher.IoTGateway.WebResources
 		private readonly string userVariable;
 		private readonly string resource;
 		private readonly string snifferId;
+		private readonly bool feedbackCheck;
 		private string[] tabIds = null;
 		private DateTime tabIdTimestamp = DateTime.MinValue;
+		private Cache<string, bool> outgoing;
 
 		/// <summary>
 		/// Sending sniffer events to the corresponding web page(s).
@@ -49,6 +53,21 @@ namespace Waher.IoTGateway.WebResources
 			this.tabIds = null;
 			this.userVariable = UserVariable;
 			this.privileges = Privileges;
+			this.feedbackCheck = Sniffable is HttpServer;
+
+			if (this.feedbackCheck)
+				this.outgoing = new Cache<string, bool>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+			else
+				this.outgoing = null;
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public virtual void Dispose()
+		{
+			this.outgoing?.Dispose();
+			this.outgoing = null;
 		}
 
 		/// <summary>
@@ -76,11 +95,32 @@ namespace Waher.IoTGateway.WebResources
 					this.tabIdTimestamp = Now;
 				}
 
-				int Tabs = await ClientEvents.PushEvent(this.tabIds, Function, JSON.Encode(new KeyValuePair<string, object>[]
+				if (this.feedbackCheck && Message.StartsWith("{") && Message.EndsWith("}"))
 				{
-					new KeyValuePair<string, object>("timestamp", XML.Encode(Timestamp)),
-					new KeyValuePair<string, object>("message", Message)
-				}, true), true, this.userVariable, this.privileges);
+					try
+					{
+						object Parsed = JSON.Parse(Message);
+						if (Parsed is IDictionary<string, object> Obj &&
+							Obj.TryGetValue("data", out object Temp) &&
+							Temp is IDictionary<string, object> Obj2 &&
+							Obj2.TryGetValue("timestamp", out object Timestamp2) &&
+							Obj2.TryGetValue("message", out object Message2) &&
+							(this.outgoing?.ContainsKey(this.ToJson(Timestamp2, Message2)) ?? true))
+						{
+							return;
+						}
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
+				}
+
+				string Data = this.ToJson(XML.Encode(Timestamp), Message);
+
+				this.outgoing?.Add(Data, true);
+
+				int Tabs = await ClientEvents.PushEvent(this.tabIds, Function, Data, true, this.userVariable, this.privileges);
 
 				if (CloseIfNoTabs && Tabs <= 0 && (Now - this.created).TotalSeconds >= 5)
 					await this.Close();
@@ -91,10 +131,20 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
+		private string ToJson(object Timestamp, object Message)
+		{
+			return JSON.Encode(new KeyValuePair<string, object>[]
+			{
+				new KeyValuePair<string, object>("timestamp", Timestamp),
+				new KeyValuePair<string, object>("message", Message)
+			}, false);
+		}
+
 		private async Task Close()
 		{
 			await this.Push(DateTime.Now, "Sniffer closed.", "Information", false);
 			this.sniffable.Remove(this);
+			this.Dispose();
 		}
 
 		private void Process(DateTime Timestamp, byte[] Data, string Function)
@@ -218,5 +268,6 @@ namespace Waher.IoTGateway.WebResources
 		{
 			this.Process(Timestamp, Warning, "Warning");
 		}
+
 	}
 }

@@ -4,8 +4,8 @@ Date: 2020-12-29
 Author: Peter Waher
 Master: /Master.md
 JavaScript: /Events.js
-JavaScript: /Settings/Sniffer.js
-CSS: /Settings/Sniffer.css
+JavaScript: Sniffer.js
+CSS: Sniffer.css
 UserVariable: User
 Login: /Login.md
 Parameter: SnifferId

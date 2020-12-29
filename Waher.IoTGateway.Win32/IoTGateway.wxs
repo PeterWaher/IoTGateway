@@ -1547,14 +1547,10 @@
                 <File Id='Roster.md' Name='Roster.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.md'/>
                 <File Id='RosterItems.md' Name='RosterItems.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\RosterItems.md'/>
                 <File Id='SettingsMaster.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Master.md' />
-                <File Id='Sniffer.css' Name='Sniffer.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.css'/>
-                <File Id='Sniffer.js' Name='Sniffer.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.js'/>
-                <File Id='Sniffer.md' Name='Sniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Sniffer.md'/>
                 <File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
                 <File Id='Theme.md' Name='Theme.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.md'/>
                 <File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
                 <File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
-                <File Id='XMPPSniffer.md' Name='XMPPSniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPPSniffer.md'/>
                 <RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
                 <RemoveFile Id='RemoveBackup.md' Name='Backup.md' On='uninstall'/>
                 <RemoveFile Id='RemoveConfig.cssx' Name='Config.cssx' On='uninstall'/>
@@ -1577,14 +1573,10 @@
                 <RemoveFile Id='RemoveRoster.md' Name='Roster.md' On='uninstall'/>
                 <RemoveFile Id='RemoveRosterItems.md' Name='RosterItems.md' On='uninstall'/>
                 <RemoveFile Id='RemoveSettingsMaster.md' Name='Master.md' On='uninstall'/>
-                <RemoveFile Id='RemoveSniffer.css' Name='Sniffer.css' On='uninstall'/>
-                <RemoveFile Id='RemoveSniffer.js' Name='Sniffer.js' On='uninstall'/>
-                <RemoveFile Id='RemoveSniffer.md' Name='Sniffer.md' On='uninstall'/>
                 <RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
                 <RemoveFile Id='RemoveTheme.md' Name='Theme.md' On='uninstall'/>
                 <RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
                 <RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
-                <RemoveFile Id='RemoveXMPPSniffer.md' Name='XMPPSniffer.md' On='uninstall'/>
               </Component>
               <Directory Id='Database' Name='Database'>
                 <Component Id='DatabaseFiles' Guid='1F5D29D1-7E5F-425E-BD02-151A6B117F3D'>
@@ -1614,6 +1606,22 @@
                   <RemoveFile Id='RemovePiiWebPages.md' Name='WebPages.md' On='uninstall'/>
                 </Component>
               </Directory>
+            </Directory>
+            <Directory Id='Sniffers' Name='Sniffers'>
+              <Component Id='SnifferFiles' Guid='9B93F989-9F8E-4BB9-9488-6C9B9E602E37'>
+                <CreateFolder>
+                  <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                </CreateFolder>
+                <RemoveFolder Id='RemoveSniffers' On='uninstall' />
+                <File Id='Sniffer.css' Name='Sniffer.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Sniffer.css' KeyPath='yes'/>
+                <File Id='Sniffer.js' Name='Sniffer.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Sniffer.js'/>
+                <File Id='Sniffer.md' Name='Sniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Sniffer.md'/>
+                <File Id='XMPPSniffer.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\XMPP.md'/>
+                <RemoveFile Id='RemoveSniffer.css' Name='Sniffer.css' On='uninstall'/>
+                <RemoveFile Id='RemoveSniffer.js' Name='Sniffer.js' On='uninstall'/>
+                <RemoveFile Id='RemoveSniffer.md' Name='Sniffer.md' On='uninstall'/>
+                <RemoveFile Id='RemoveXMPPSniffer.md' Name='XMPP.md' On='uninstall'/>
+              </Component>
             </Directory>
             <Directory Id='Templates' Name='Templates'>
               <Component Id='TemplateFiles' Guid='627A90AF-D6C1-41B1-814A-043B7B626E98'>
@@ -1783,6 +1791,7 @@
         <ComponentRef Id='AudioFiles' />
         <ComponentRef Id='ImageFiles' />
         <ComponentRef Id='SettingsFiles' />
+        <ComponentRef Id='SnifferFiles' />
         <ComponentRef Id='DatabaseFiles'/>
         <ComponentRef Id='PersonalDataFiles'/>
         <ComponentRef Id='TemplateFiles' />

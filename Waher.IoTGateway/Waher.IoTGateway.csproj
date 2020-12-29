@@ -112,16 +112,16 @@
     <Content Include="Root\ProposeContract.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\Sniffer.md">
+    <Content Include="Root\Sniffers\Sniffer.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\Sniffer.js">
+    <Content Include="Root\Sniffers\Sniffer.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\Sniffer.css">
+    <Content Include="Root\Sniffers\Sniffer.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Settings\XMPPSniffer.md">
+    <Content Include="Root\Sniffers\XMPP.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\SignatureRequest.js">

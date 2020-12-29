@@ -6,7 +6,7 @@ Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
-JavaScript: /Settings/Sniffer.js
+JavaScript: /Sniffers/Sniffer.js
 CSS: /Settings/Config.cssx
 UserVariable: User
 Login: /Login.md

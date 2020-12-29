@@ -4208,7 +4208,7 @@ namespace Waher.IoTGateway
 				Sniffable.Add(Sniffer);
 			}
 
-			return "\r\n\r\n![Sniffer](/Settings/Sniffer.md)\r\n\r\n";
+			return "\r\n\r\n![Sniffer](/Sniffers/Sniffer.md)\r\n\r\n";
 		}
 
 		#endregion

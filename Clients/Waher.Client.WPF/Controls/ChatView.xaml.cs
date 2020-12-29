@@ -40,8 +40,9 @@ namespace Waher.Client.WPF.Controls
 
 			if (Muc)
 			{
-				this.FromColumn.Width = this.ReceivedColumn.Width;
-				this.ContentColumn.Width -= this.ReceivedColumn.Width;
+				double w = this.ReceivedColumn.Width * 2;
+				this.FromColumn.Width = w;
+				this.ContentColumn.Width -= w;
 			}
 		}
 
@@ -361,8 +362,9 @@ namespace Waher.Client.WPF.Controls
 			{
 				if (this.muc)
 				{
-					this.FromColumn.Width = this.ReceivedColumn.Width;
-					this.ContentColumn.Width -= this.ReceivedColumn.Width;
+					double w = this.ReceivedColumn.Width * 2;
+					this.FromColumn.Width = w;
+					this.ContentColumn.Width -= w;
 				}
 				else
 				{

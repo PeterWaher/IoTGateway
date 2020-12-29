@@ -6,6 +6,7 @@ Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/
 JavaScript: /Events.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
+JavaScript: /Settings/Sniffer.js
 CSS: /Settings/Config.cssx
 UserVariable: User
 Login: /Login.md
@@ -160,6 +161,7 @@ Password is incorrect, or a new account was not permitted to be created.
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>
+<button type='button' onclick='OpenSniffer("/Settings/XmppSniffer.md")'>Sniffer</button>
 [[;}}
 
 </fieldset>

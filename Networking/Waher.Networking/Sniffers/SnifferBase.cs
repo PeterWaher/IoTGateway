@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Waher.Events;
-using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
 {

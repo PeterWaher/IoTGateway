@@ -2,6 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
@@ -19,6 +21,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Model;
+using Waher.Client.WPF.Model.Muc;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -29,6 +32,7 @@ namespace Waher.Client.WPF.Controls
 	{
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private readonly TreeNode node;
+		private Timer timer;
 		private bool muc;
 
 		public ChatView(TreeNode Node, bool Muc)
@@ -43,7 +47,11 @@ namespace Waher.Client.WPF.Controls
 				double w = this.ReceivedColumn.Width * 2;
 				this.FromColumn.Width = w;
 				this.ContentColumn.Width -= w;
+
+				this.timer = new Timer(this.MucSelfPing, null, 60000, 60000);
 			}
+			else
+				this.timer = null;
 		}
 
 		internal static void InitEmojis()
@@ -68,6 +76,9 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
+			this.timer?.Dispose();
+			this.timer = null;
+
 			this.Node?.ViewClosed();
 		}
 
@@ -490,5 +501,30 @@ namespace Waher.Client.WPF.Controls
 
 		public static readonly Color EventFgColor = Color.FromRgb(32, 32, 32);
 		public static readonly Color EventBgColor = Color.FromRgb(240, 240, 240);
+
+		private void MucSelfPing(object State)
+		{
+			if (this.node is RoomNode RoomNode)
+			{
+				RoomNode.MucClient.SelfPing(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, (sender, e) =>
+				{
+					if (!e.Ok)
+					{
+						if (e.StanzaError is Networking.XMPP.StanzaErrors.NotAcceptableException)   // Need to reconnect with room.
+						{
+							RoomNode.MucClient.EnterRoom(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, RoomNode.Password, (sender2, e2) =>
+							{
+								if (e2.Ok)
+									RoomNode.MucClient.SetPresence(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, Networking.XMPP.Availability.Chat, null, null);
+
+								return Task.CompletedTask;
+							}, null);
+						}
+					}
+
+					return Task.CompletedTask;
+				}, null);
+			}
+		}
 	}
 }

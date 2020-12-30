@@ -63,6 +63,7 @@ namespace Waher.Client.WPF.Model.Muc
 		public string RoomId => this.roomId;
 		public string Domain => this.domain;
 		public string NickName => this.nickName;
+		public string Password => this.password;
 		public string Jid => this.roomId + "@" + this.domain;
 		public bool Entered => this.entered;
 		public bool Entering => this.entering;

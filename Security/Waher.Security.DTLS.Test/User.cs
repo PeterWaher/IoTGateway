@@ -8,9 +8,9 @@ namespace Waher.Security.DTLS.Test
 {
 	public class User : IUser
 	{
-		private string userName;
-		private string passwordHash;
-		private string passwordHashType;
+		private readonly string userName;
+		private readonly string passwordHash;
+		private readonly string passwordHashType;
 
 		public User(string UserName, string PasswordHash, string PasswordHashType)
 		{

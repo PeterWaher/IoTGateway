@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
+using Waher.Security.Users;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -78,21 +79,25 @@ namespace Waher.IoTGateway.WebResources
 			else
 				From = "/Index.md";
 
-			DateTime? Next = await Gateway.LoginAuditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "Web");
-			if (Next.HasValue)
-			{
-				StringBuilder sb = new StringBuilder();
-				DateTime TP = Next.Value;
-				DateTime Today = DateTime.Today;
+			LoginResult Result = await Users.Login(UserName, Password, Request.RemoteEndPoint, "Web");
 
-				if (Next.Value == DateTime.MaxValue)
-				{
+			switch (Result.Type)
+			{
+				case LoginResultType.PermanentlyBlocked:
+					StringBuilder sb = new StringBuilder();
+
 					sb.Append("This endpoint (");
 					sb.Append(Request.RemoteEndPoint);
 					sb.Append(") has been blocked from the system.");
-				}
-				else
-				{
+
+					Request.Session["LoginError"] = sb.ToString();
+					throw new SeeOtherException(Request.Header.Referer.Value);
+
+				case LoginResultType.TemporarilyBlocked:
+					sb = new StringBuilder();
+					DateTime TP = Result.Next.Value;
+					DateTime Today = DateTime.Today;
+
 					sb.Append("Too many failed login attempts in a row registered. Try again after ");
 					sb.Append(TP.ToLongTimeString());
 
@@ -108,30 +113,34 @@ namespace Waher.IoTGateway.WebResources
 					}
 
 					sb.Append('.');
-				}
 
-				Request.Session["LoginError"] = sb.ToString();
+					Request.Session["LoginError"] = sb.ToString();
+					throw new SeeOtherException(Request.Header.Referer.Value);
 
-				throw new SeeOtherException(Request.Header.Referer.Value);
-			}
-
-			LoginResult LoginResult = await Gateway.DoMainXmppLogin(UserName, Password, Request.RemoteEndPoint, "Web");
-			if (LoginResult == LoginResult.Successful)
-				DoLogin(Request, From, false);
-			else
-			{
-				if (LoginResult == LoginResult.InvalidLogin)
+				case LoginResultType.InvalidCredentials:
+				default:
 					Request.Session["LoginError"] = "Invalid login credentials provided.";
-				else
-					Request.Session["LoginError"] = "Unable to connect to XMPP server.";
+					throw new SeeOtherException(Request.Header.Referer.Value);
 
-				throw new SeeOtherException(Request.Header.Referer.Value);
+				case LoginResultType.Success:
+					DoLogin(Request, From, Result.User);
+					break;
 			}
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From, bool AutoLogin)
+		internal static void DoLogin(HttpRequest Request, string From, User User)
 		{
-			Request.Session["User"] = new User();
+			DoLogin(Request, From, false, User);
+		}
+
+		internal static void DoLogin(HttpRequest Request, string From)
+		{
+			DoLogin(Request, From, true, new InternalUser());
+		}
+
+		private static void DoLogin(HttpRequest Request, string From, bool AutoLogin, IUser User)
+		{
+			Request.Session["User"] = User;
 			Request.Session[" AutoLogin "] = AutoLogin;
 			Request.Session.Remove("LoginError");
 
@@ -139,7 +148,7 @@ namespace Waher.IoTGateway.WebResources
 				throw new SeeOtherException(From);
 		}
 
-		private class User : IUser
+		private class InternalUser : IUser
 		{
 			public string PasswordHash
 			{

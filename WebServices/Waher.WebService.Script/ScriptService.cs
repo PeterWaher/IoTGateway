@@ -148,7 +148,7 @@ namespace Waher.WebService.Script
 			if (Node is null)
 				return true;
 			else if (State is IUser User)
-				return User.HasPrivilege(Node.GetType().FullName);
+				return User.HasPrivilege("Script." + Node.GetType().FullName);
 			else
 				return false;
 		}

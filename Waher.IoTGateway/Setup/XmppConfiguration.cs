@@ -19,6 +19,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Security;
+using Waher.Security.Users;
 using Waher.Runtime.Language;
 
 namespace Waher.IoTGateway.Setup
@@ -64,6 +65,7 @@ namespace Waher.IoTGateway.Setup
 		private string account = string.Empty;
 		private string accountHumanReadableName = string.Empty;
 		private string password = string.Empty;
+		private string password0 = string.Empty;
 		private string passwordType = string.Empty;
 		private string thingRegistry = string.Empty;
 		private string provisioning = string.Empty;
@@ -243,20 +245,20 @@ namespace Waher.IoTGateway.Setup
 			set { this.legal = value; }
 		}
 
-        /// <summary>
-        /// JID of software updates component.
-        /// </summary>
-        [DefaultValueStringEmpty]
-        public string SoftwareUpdates
-        {
-            get { return this.software; }
-            set { this.software = value; }
-        }
+		/// <summary>
+		/// JID of software updates component.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string SoftwareUpdates
+		{
+			get { return this.software; }
+			set { this.software = value; }
+		}
 
-        /// <summary>
-        /// Bare JID
-        /// </summary>
-        [DefaultValueStringEmpty]
+		/// <summary>
+		/// Bare JID
+		/// </summary>
+		[DefaultValueStringEmpty]
 		public string BareJid
 		{
 			get { return this.bareJid; }
@@ -412,9 +414,10 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called during startup to configure the system.
 		/// </summary>
-		public override Task ConfigureSystem()
+		public override async Task ConfigureSystem()
 		{
-			return Gateway.ConfigureXmpp(this);
+			await Gateway.ConfigureXmpp(this);
+			await this.CheckAdminAccount();
 		}
 
 		/// <summary>
@@ -523,18 +526,15 @@ namespace Waher.IoTGateway.Setup
 
 			if (this.password != Password)
 			{
-				this.password = Password;
+				this.password = this.password0 = Password;
 				this.passwordType = string.Empty;
 			}
 
-			if (!(this.client is null))
-			{
-				this.client.Dispose();
-				this.client = null;
-			}
+			this.client?.Dispose();
+			this.client = null;
 
 			this.Connect(TabID);
-		
+
 			Response.StatusCode = 200;
 
 			return Task.CompletedTask;
@@ -662,6 +662,8 @@ namespace Waher.IoTGateway.Setup
 
 					case XmppState.Connected:
 						this.bareJid = Client.BareJID;
+						this.password = Client.PasswordHash;
+						this.passwordType = Client.PasswordHashMethod;
 
 						if (this.bareJid != defaultFacility)
 						{
@@ -741,10 +743,10 @@ namespace Waher.IoTGateway.Setup
 						this.events = string.Empty;
 						this.muc = string.Empty;
 						this.pubSub = string.Empty;
-                        this.legal = string.Empty;
-                        this.software = string.Empty;
+						this.legal = string.Empty;
+						this.software = string.Empty;
 
-                        if (e2.Ok)
+						if (e2.Ok)
 						{
 							foreach (Item Item in e2.Items)
 							{
@@ -770,10 +772,10 @@ namespace Waher.IoTGateway.Setup
 								if (e.HasFeature(Networking.XMPP.Contracts.ContractsClient.NamespaceLegalIdentities))
 									this.legal = Item.JID;
 
-                                if (e.HasFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespaceSoftwareUpdates))
-                                    this.software = Item.JID;
-                            }
-                        }
+								if (e.HasFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespaceSoftwareUpdates))
+									this.software = Item.JID;
+							}
+						}
 
 						Dictionary<string, object> ConnectionInfo = new Dictionary<string, object>()
 						{
@@ -977,6 +979,33 @@ namespace Waher.IoTGateway.Setup
 			{
 				Log.Critical(ex);
 				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", ex.Message, false, "User");
+			}
+		}
+
+		private async Task CheckAdminAccount()
+		{
+			if (string.IsNullOrEmpty(this.password0) || !string.IsNullOrEmpty(this.passwordType))
+				return;
+
+			User User = await Users.GetUser(this.account, true);
+
+			User.PasswordHash = Convert.ToBase64String(Users.ComputeHash(this.account, 
+				string.IsNullOrEmpty(this.password0) ? this.password : this.password0));
+
+			if (User.RoleIds.Length == 0)
+				User.RoleIds = new string[] { "Administrator" };
+
+			await Database.Update(User);
+
+			Role Role = await Roles.GetRole("Administrator");
+			if (Role.Privileges.Length == 0)
+			{
+				Role.Privileges = new PrivilegePattern[]
+				{
+					new PrivilegePattern(".*", true)
+				};
+
+				await Database.Update(Role);
 			}
 		}
 

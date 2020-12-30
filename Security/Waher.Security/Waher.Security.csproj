@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <Description>Defines a basic security architecture.</Description>
+    <Description>Basic security architecture for applications or libraries working with users, roles &amp; privileges.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>security users hashes</PackageTags>
-    <PackageReleaseNotes>Basic security architecture for applications or libraries working with users, roles &amp; privileges.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.7</AssemblyVersion>
     <FileVersion>1.0.7</FileVersion>

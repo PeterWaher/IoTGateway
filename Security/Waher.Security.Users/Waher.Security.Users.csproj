@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Defines an architecture of persistent users, roles and privileges that can be used to provide detailed authorization in applications. Privileges are ordered in a tree structure. Roles contains a list of allowed privileges (nodes or entire branches), or explicitly prohibited privileges (nodes or branches). Each user can be assigned one or more roles. Credentials are protected using hash digests. Objects are persisted through the object database abstraction layer, defined in Waher.Persistence.</Description>
+    <Copyright>Copyright © Waher Data AB 2020. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.Users</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>security users roles privileges authorization</PackageTags>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <NeutralLanguage>English</NeutralLanguage>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.Users\Waher.Security.Users.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Security\Waher.Security.Users\Waher.Security.Users.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
+    <ProjectReference Include="..\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
+    <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
+  </ItemGroup>
+
+</Project>

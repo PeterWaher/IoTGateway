@@ -1487,7 +1487,7 @@ namespace Waher.Networking.XMPP.Chat
 		private bool IsAuthorized(ref ScriptNode Node, object State)
 		{
 			if (State is IUser User)
-				return User.HasPrivilege(Node.GetType().FullName);
+				return User.HasPrivilege("Script." + Node.GetType().FullName);
 			else
 				return false;
 		}
@@ -1988,7 +1988,7 @@ namespace Waher.Networking.XMPP.Chat
 				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
 
 			// TODO: Localization
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -2184,7 +2184,7 @@ namespace Waher.Networking.XMPP.Chat
 
 			if (e.Done)
 				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
-		
+
 			return Task.CompletedTask;
 		}
 

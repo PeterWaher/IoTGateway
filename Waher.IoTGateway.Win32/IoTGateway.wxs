@@ -610,6 +610,7 @@
               <File Id='Waher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.dll' Vital='yes'/>
               <File Id='Waher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.dll' Vital='yes'/>
               <File Id='Waher.Security.SPF.dll' Name='Waher.Security.SPF.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.dll' Vital='yes'/>
+              <File Id='Waher.Security.Users.dll' Name='Waher.Security.Users.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.dll' Vital='yes'/>
               <File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
               <File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
               <File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
@@ -706,6 +707,7 @@
               <RemoveFile Id='RemoveWaher.Security.PKCS.dll' Name='Waher.Security.PKCS.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Security.SPF.dll' Name='Waher.Security.SPF.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Security.Users.dll' Name='Waher.Security.Users.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>

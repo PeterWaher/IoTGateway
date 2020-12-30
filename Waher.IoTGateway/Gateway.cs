@@ -58,6 +58,8 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.LoginMonitor;
+using Waher.Security.SHA3;
+using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
@@ -65,27 +67,6 @@ using Waher.Script.Graphs;
 
 namespace Waher.IoTGateway
 {
-	/// <summary>
-	/// Login result.
-	/// </summary>
-	public enum LoginResult
-	{
-		/// <summary>
-		/// Unable to connect to server.
-		/// </summary>
-		UnableToConnect,
-
-		/// <summary>
-		/// Login credentials invalid.
-		/// </summary>
-		InvalidLogin,
-
-		/// <summary>
-		/// Login successful
-		/// </summary>
-		Successful
-	}
-
 	/// <summary>
 	/// Delegate for callback methods used for the creation of database providers.
 	/// </summary>
@@ -1363,6 +1344,23 @@ namespace Waher.IoTGateway
 			}
 			else
 				certificate = null;
+
+			Users.Register(ComputeUserPasswordHash, "DIGEST-SHA3-256", LoginAuditor, true);
+
+			await Privileges.LoadAll();
+			await Roles.LoadAll();
+		}
+
+		/// <summary>
+		/// Computes a hash digest based on a user name and a password, and the current domain.
+		/// </summary>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <returns>Hash Digest</returns>
+		public static byte[] ComputeUserPasswordHash(string UserName, string Password)
+		{
+			SHA3_256 H = new SHA3_256();
+			return H.ComputeVariable(Encoding.UTF8.GetBytes(UserName + ":" + domain + ":" + Password));
 		}
 
 		internal static bool UpdateCertificate(DomainConfiguration Configuration)
@@ -2048,128 +2046,6 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
-		/// Performs a login operation on the main XMPP account, on the main XMPP account domain.
-		/// </summary>
-		/// <param name="UserName">User name</param>
-		/// <param name="Password">Password</param>
-		/// <param name="RemoteEndPoint">Remote End-Point.</param>
-		/// <param name="Protocol">Protocol used to log in.</param>
-		/// <returns>If the login-operation was successful or not.</returns>
-		public static async Task<LoginResult> DoMainXmppLogin(string UserName, string Password, string RemoteEndPoint, string Protocol)
-		{
-			if (xmppClient is null || xmppClient.UserName != UserName)
-			{
-				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
-				return LoginResult.InvalidLogin;
-			}
-
-			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			string PasswordHash;
-			string PasswordHashMethod;
-			bool Connected = false;
-
-			using (XmppClient Client = new XmppClient(xmppClient.Host, xmppClient.Port, UserName, Password, "en", typeof(Gateway).Assembly))
-			{
-				Client.TrustServer = xmppClient.TrustServer;
-				Client.AllowCramMD5 = xmppClient.AllowCramMD5;
-				Client.AllowDigestMD5 = xmppClient.AllowDigestMD5;
-				Client.AllowPlain = xmppClient.AllowPlain;
-				Client.AllowScramSHA1 = xmppClient.AllowScramSHA1;
-				Client.AllowScramSHA256 = xmppClient.AllowScramSHA256;
-				Client.AllowEncryption = xmppClient.AllowEncryption;
-
-				Client.OnStateChanged += (sender, NewState) =>
-				{
-					switch (NewState)
-					{
-						case XmppState.StreamOpened:
-							Connected = true;
-							break;
-
-						case XmppState.Binding:
-							Result.TrySetResult(true);
-							break;
-
-						case XmppState.Error:
-							Result.TrySetResult(false);
-							break;
-					}
-
-					return Task.CompletedTask;
-				};
-
-				scheduler.Add(DateTime.Now.AddSeconds(10), (P) => Result.TrySetResult(false), null);
-
-				Client.Connect();
-
-				if (await Result.Task)
-				{
-					if (XmppConfiguration.Instance.StorePasswordInsteadOfHash)
-					{
-						PasswordHash = Password;
-						PasswordHashMethod = string.Empty;
-					}
-					else
-					{
-						PasswordHash = Client.PasswordHash;
-						PasswordHashMethod = Client.PasswordHashMethod;
-					}
-
-					LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
-				}
-				else
-				{
-					if (Connected)
-					{
-						LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
-						return LoginResult.InvalidLogin;
-					}
-					else
-					{
-						if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
-							UserName == xmppCredentials.Account && Password == xmppCredentials.Password &&
-							string.IsNullOrEmpty(xmppCredentials.PasswordType))
-						{
-							LoginAuditor.Success("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.",
-								UserName, RemoteEndPoint, Protocol);
-
-							return LoginResult.Successful;
-						}
-						else
-						{
-							LoginAuditor.Fail("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, Protocol);
-							return LoginResult.UnableToConnect;
-						}
-					}
-				}
-			}
-
-			if (xmppClient.State != XmppState.Connected &&
-				(xmppClient.PasswordHash != PasswordHash || xmppClient.PasswordHashMethod != PasswordHashMethod))
-			{
-				Log.Notice("XMPP credentials updated.", UserName, RemoteEndPoint, "CredentialsUpdated", EventLevel.Minor);
-
-				xmppClient.Reconnect(UserName, PasswordHash, PasswordHashMethod);
-
-				xmppCredentials.Account = UserName;
-				xmppCredentials.Password = PasswordHash;
-				xmppCredentials.PasswordType = PasswordHashMethod;
-				xmppCredentials.AllowRegistration = false;
-				xmppCredentials.FormSignatureKey = string.Empty;
-				xmppCredentials.FormSignatureSecret = string.Empty;
-
-				XmppConfiguration.Instance.Account = UserName;
-				XmppConfiguration.Instance.Password = PasswordHash;
-				XmppConfiguration.Instance.PasswordType = PasswordHashMethod;
-
-				XmppConfiguration.Instance.Updated = DateTime.Now;
-				await Database.Update(XmppConfiguration.Instance);
-			}
-
-			return LoginResult.Successful;
-		}
-
-		/// <summary>
 		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
 		/// </summary>
 		/// <param name="Request">Web request</param>
@@ -2199,7 +2075,7 @@ namespace Waher.IoTGateway
 				LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
 					string.Empty, Request.RemoteEndPoint, "Web");
 
-				Login.DoLogin(Request, From, true);
+				Login.DoLogin(Request, From);
 				return;
 			}
 
@@ -2236,7 +2112,7 @@ namespace Waher.IoTGateway
 #endif
 			{
 				LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-				Login.DoLogin(Request, From, true);
+				Login.DoLogin(Request, From);
 				return;
 			}
 
@@ -2298,7 +2174,7 @@ namespace Waher.IoTGateway
 						if (P.SessionId == CurrentSession)
 						{
 							LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-							Login.DoLogin(Request, From, true);
+							Login.DoLogin(Request, From);
 							break;
 						}
 					}
@@ -3548,7 +3424,7 @@ namespace Waher.IoTGateway
 				{
 					foreach (SystemConfiguration Configuration in configurations)
 					{
-						if (User.HasPrivilege(Configuration.GetType().FullName))
+						if (User.HasPrivilege("Settings." + Configuration.GetType().FullName))
 							Result.Add(new WebMenuItem(Configuration.Title(Language).Result, Configuration.Resource));
 					}
 				}

@@ -1,0 +1,323 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Security.Users</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Security.Users.LoginResultType">
+            <summary>
+            Result of login attempt
+            </summary>
+        </member>
+        <member name="F:Waher.Security.Users.LoginResultType.PermanentlyBlocked">
+            <summary>
+            Remote endpoint has been permanently blocked from the system.
+            </summary>
+        </member>
+        <member name="F:Waher.Security.Users.LoginResultType.TemporarilyBlocked">
+            <summary>
+            Remote endpoint has been temporarily blocked from the system. New attempts can be made after <see cref="P:Waher.Security.Users.LoginResult.Next"/>.
+            </summary>
+        </member>
+        <member name="F:Waher.Security.Users.LoginResultType.InvalidCredentials">
+            <summary>
+            User name or password incorrect
+            </summary>
+        </member>
+        <member name="F:Waher.Security.Users.LoginResultType.Success">
+            <summary>
+            Login successful. User object can be accessed using <see cref="P:Waher.Security.Users.LoginResult.User"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Security.Users.LoginResult">
+            <summary>
+            Contains information about a login attempt.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.LoginResult.#ctor(System.DateTime)">
+            <summary>
+            Remote endpoint has been blocked.
+            </summary>
+            <param name="Next">Time when a new login can be attempted.</param>
+        </member>
+        <member name="M:Waher.Security.Users.LoginResult.#ctor(Waher.Security.Users.User)">
+            <summary>
+            Login attempt has been made.
+            </summary>
+            <param name="User">User object found and authenticated.</param>
+        </member>
+        <member name="P:Waher.Security.Users.LoginResult.User">
+            <summary>
+            User object corresponding to the successfully logged in user.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.LoginResult.Next">
+            <summary>
+            Time when a new login can be attempted.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.LoginResult.Type">
+            <summary>
+            Type of login result.
+            </summary>
+        </member>
+        <member name="T:Waher.Security.Users.Privilege">
+            <summary>
+            Corresponds to a privilege in the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Privilege.#ctor">
+            <summary>
+            Corresponds to a privilege in the system.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.ObjectId">
+            <summary>
+            Object ID of privilege
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.ParentFullId">
+            <summary>
+            Full Privilege ID of parent privilege. If the empty string, privilege is a root privilege.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.LocalId">
+            <summary>
+            Local Privilege ID, unique among the child privileges of the same parent.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.FullId">
+            <summary>
+            Full Privilege ID. Corresponds to the concatenation of ancestor IDs with the local ID, delimited with period characters.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.Description">
+            <summary>
+            Description of privilege.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Privilege.Parent">
+            <summary>
+            Parent privilege.
+            </summary>
+        </member>
+        <member name="T:Waher.Security.Users.PrivilegePattern">
+            <summary>
+            Contains a reference to a privilege
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.PrivilegePattern.#ctor">
+            <summary>
+            Contains a reference to a privilege
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.PrivilegePattern.#ctor(System.String,System.Boolean)">
+            <summary>
+            Contains a reference to a privilege
+            </summary>
+            <param name="Pattern">Regular expression.</param>
+            <param name="Include">If privileges matching the pattern should be included (true) or excluded (false).</param>
+        </member>
+        <member name="P:Waher.Security.Users.PrivilegePattern.Expression">
+            <summary>
+            Privilege ID regular expression to match against.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.PrivilegePattern.Include">
+            <summary>
+            If privileges matching the pattern are included (true) or excluded (false).
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.PrivilegePattern.IsIncluded(System.String)">
+            <summary>
+            If the privilege is included.
+            </summary>
+            <param name="Privilege">Full Privilege Id</param>
+            <returns>true=yes, false=no, null=not applicable</returns>
+        </member>
+        <member name="T:Waher.Security.Users.Privileges">
+            <summary>
+            Maintains the collection of all privileges in the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Privileges.GetPrivilege(System.String)">
+            <summary>
+            Gets the <see cref="T:Waher.Security.Users.Privilege"/> object corresponding to a full Privilege ID.
+            </summary>
+            <param name="PrivilegeId">Full Privilege ID, consisting of the concatenation of the full parent privelege ID, 
+            a period character and the local id of the privilege.</param>
+            <returns>Privilege object.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.Privileges.LoadAll">
+            <summary>
+            Loads all privileges
+            </summary>
+        </member>
+        <member name="T:Waher.Security.Users.Role">
+            <summary>
+            Corresponds to a role in the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Role.#ctor">
+            <summary>
+            Corresponds to a role in the system.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Role.ObjectId">
+            <summary>
+            Object ID of role
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Role.Id">
+            <summary>
+            Role ID
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Role.Description">
+            <summary>
+            Description of privilege.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Role.Privileges">
+            <summary>
+            Privileges
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Role.HasPrivilege(System.String)">
+            <summary>
+            If the user has a given privilege.
+            </summary>
+            <param name="Privilege">Privilege.</param>
+            <returns>If the user has the corresponding privilege.</returns>
+        </member>
+        <member name="T:Waher.Security.Users.Roles">
+            <summary>
+            Maintains the collection of all roles in the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Roles.GetRole(System.String)">
+            <summary>
+            Gets the <see cref="T:Waher.Security.Users.Role"/> object corresponding to a Role ID.
+            </summary>
+            <param name="RoleId">Role ID.</param>
+            <returns>Role object.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.Roles.LoadAll">
+            <summary>
+            Loads all roles
+            </summary>
+        </member>
+        <member name="T:Waher.Security.Users.User">
+            <summary>
+            Corresponds to a user in the system.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.User.#ctor">
+            <summary>
+            Corresponds to a user in the system.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.User.ObjectId">
+            <summary>
+            Object ID of user
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.User.UserName">
+            <summary>
+            User Name
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.User.RoleIds">
+            <summary>
+            Role IDs
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.User.PasswordHash">
+            <summary>
+            Password Hash
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.User.PasswordHashType">
+            <summary>
+            Type of password hash. The empty stream means a clear-text password.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.User.LoadRoles">
+            <summary>
+            Load role objects.
+            </summary>
+            <returns>Array of roles</returns>
+        </member>
+        <member name="M:Waher.Security.Users.User.HasPrivilege(System.String)">
+            <summary>
+            If the user has a given privilege.
+            </summary>
+            <param name="Privilege">Privilege.</param>
+            <returns>If the user has the corresponding privilege.</returns>
+        </member>
+        <member name="T:Waher.Security.Users.HashComputationMethod">
+            <summary>
+            Delegate for hash digest computation methods.
+            </summary>
+            <param name="UserName">User name</param>
+            <param name="Password">Password</param>
+            <returns>Hash digest.</returns>
+        </member>
+        <member name="T:Waher.Security.Users.Users">
+            <summary>
+            Maintains the collection of all users in the system.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.Users.Source">
+            <summary>
+            User source.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Users.TryGetUser(System.String)">
+            <summary>
+            Tries to get a user with a given user name.
+            </summary>
+            <param name="UserName">User Name.</param>
+            <returns>User, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.Users.GetUser(System.String,System.Boolean)">
+            <summary>
+            Gets the <see cref="T:Waher.Security.Users.User"/> object corresponding to a User Name.
+            </summary>
+            <param name="UserName">User Name.</param>
+            <param name="CreateIfNew">If user should be created, if it does not exist.</param>
+            <returns>User object, or null if not found and not created.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.Users.Register(Waher.Security.Users.HashComputationMethod,System.String,Waher.Security.LoginMonitor.LoginAuditor,System.Boolean)">
+            <summary>
+            Registers a Hash Digest Computation Method.
+            </summary>
+            <param name="HashComputationMethod">Hash Digest Computation Method.</param>
+            <param name="HashMethodTypeName">Hash Digest Computation Method Type Name.</param>
+            <param name="LoginAuditor">Auditor of login attempts.</param>
+            <param name="Lock">If the registration should be locked.</param>
+        </member>
+        <member name="P:Waher.Security.Users.Users.HashMethodTypeName">
+            <summary>
+            Hash Digest Computation Method Type Name.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.Users.ComputeHash(System.String,System.String)">
+            <summary>
+            Computes a hash of a password.
+            </summary>
+            <param name="UserName">User name.</param>
+            <param name="Password">Password.</param>
+        </member>
+        <member name="M:Waher.Security.Users.Users.Login(System.String,System.String,System.String,System.String)">
+            <summary>
+            Attempts to login in the system.
+            </summary>
+            <param name="UserName">User name</param>
+            <param name="Password">Password</param>
+            <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
+            <param name="Protocol">Protocol used for login.</param>
+            <returns>Login result.</returns>
+        </member>
+    </members>
+</doc>

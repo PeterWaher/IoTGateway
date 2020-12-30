@@ -323,6 +323,7 @@
   <Assembly fileName='Waher.Security.PKCS.dll'/>
   <Assembly fileName='Waher.Security.SHA3.dll'/>
   <Assembly fileName='Waher.Security.SPF.dll'/>
+  <Assembly fileName='Waher.Security.Users.dll'/>
   <Assembly fileName='Waher.Theme.CactusRose.dll'/>
   <Assembly fileName='Waher.Theme.GothicPeacock.dll'/>
   <Assembly fileName='Waher.Things.dll'/>

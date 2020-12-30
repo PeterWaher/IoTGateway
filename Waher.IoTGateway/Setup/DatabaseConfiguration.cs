@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
-using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -109,10 +107,12 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called during startup to configure the system.
 		/// </summary>
-		public override Task ConfigureSystem()
+		public override async Task ConfigureSystem()
 		{
-			this.DatabasePlugin?.ConfigureSettings(this.databasePluginSettings);
-			return Task.CompletedTask;
+			IDatabasePlugin Plugin = this.DatabasePlugin;
+
+			if (!(Plugin is null))
+				await Plugin.ConfigureSettings(this.databasePluginSettings);
 		}
 
 		/// <summary>

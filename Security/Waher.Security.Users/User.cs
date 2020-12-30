@@ -20,6 +20,7 @@ namespace Waher.Security.Users
 		private string passwordHash = string.Empty;
 		private string[] roleIds = null;
 		private Role[] roles = null;
+		private UserMetaData[] metaData = null;
 
 		/// <summary>
 		/// Corresponds to a user in the system.
@@ -64,6 +65,16 @@ namespace Waher.Security.Users
 					this.privileges.Clear();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Meta-data information about user.
+		/// </summary>
+		[DefaultValueNull]
+		public UserMetaData[] MetaData
+		{
+			get => this.metaData;
+			set => this.metaData = value;
 		}
 
 		/// <summary>

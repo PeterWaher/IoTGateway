@@ -232,6 +232,11 @@
             Role IDs
             </summary>
         </member>
+        <member name="P:Waher.Security.Users.User.MetaData">
+            <summary>
+            Meta-data information about user.
+            </summary>
+        </member>
         <member name="P:Waher.Security.Users.User.PasswordHash">
             <summary>
             Password Hash
@@ -254,6 +259,26 @@
             </summary>
             <param name="Privilege">Privilege.</param>
             <returns>If the user has the corresponding privilege.</returns>
+        </member>
+        <member name="T:Waher.Security.Users.UserMetaData">
+            <summary>
+            Contains a piece of meta-data information about a user.
+            </summary>
+        </member>
+        <member name="M:Waher.Security.Users.UserMetaData.#ctor">
+            <summary>
+            Contains a piece of meta-data information about a user.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.UserMetaData.Name">
+            <summary>
+            Name of meta-data tag.
+            </summary>
+        </member>
+        <member name="P:Waher.Security.Users.UserMetaData.Value">
+            <summary>
+            Value of meta-data tag.
+            </summary>
         </member>
         <member name="T:Waher.Security.Users.HashComputationMethod">
             <summary>

@@ -80,7 +80,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				Gateway.AssertUserAuthenticated(Request);
+				Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 				if (!Request.HasData ||
 					!(Request.DecodeData() is Dictionary<string, object> RequestObj) ||

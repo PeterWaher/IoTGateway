@@ -8,19 +8,24 @@ using Waher.Security;
 namespace Waher.IoTGateway.WebResources
 {
 	/// <summary>
-	/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway.
+	/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
+	/// holds a given set of privileges.
 	/// </summary>
-	public class LoggedIn : HttpAuthenticationScheme
+	public class RequiredUserPrivileges : HttpAuthenticationScheme
 	{
 		private readonly HttpServer server;
+		private readonly string[] privileges;
 
 		/// <summary>
-		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway.
+		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
+		/// holds a given set of privileges.
 		/// </summary>
 		/// <param name="Server">HTTP Server object.</param>
-		public LoggedIn(HttpServer Server)
+		/// <param name="Privileges">Required user privileges.</param>
+		public RequiredUserPrivileges(HttpServer Server, params string[] Privileges)
 		{
 			this.server = Server;
+			this.privileges = Privileges;
 		}
 
 		/// <summary>
@@ -50,10 +55,20 @@ namespace Waher.IoTGateway.WebResources
 				Request.Session = Variables = this.server.GetSession(HttpSessionID);
 			}
 
-			if (Variables != null && Variables.TryGetVariable("User", out Variable v))
-				return Task.FromResult<IUser>(v.ValueObject as IUser);
-			else
+			if (Variables is null ||
+				!Variables.TryGetVariable("User", out Variable v) ||
+				!(v.ValueObject is IUser User))
+			{
 				return Task.FromResult<IUser>(null);
+			}
+
+			foreach (string Privilege in this.privileges)
+			{
+				if (!User.HasPrivilege(Privilege))
+					return Task.FromResult<IUser>(null);
+			}
+
+			return Task.FromResult<IUser>(User);
 		}
 	}
 }

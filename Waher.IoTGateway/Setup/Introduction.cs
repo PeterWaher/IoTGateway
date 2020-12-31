@@ -96,9 +96,14 @@ namespace Waher.IoTGateway.Setup
 			return base.CleanupAfterConfiguration(WebServer);
 		}
 
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Config.Introduction";
+
 		private async Task Simplified(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			await Gateway.SimplifiedConfiguration();
 

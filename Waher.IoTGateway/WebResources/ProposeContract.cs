@@ -59,7 +59,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				Gateway.AssertUserAuthenticated(Request);
+				Gateway.AssertUserAuthenticated(Request, "Admin.Legal.ProposeContract");
 
 				if (Gateway.ContractsClient is null)
 					throw new NotSupportedException("Proposing new contracts not permitted. Broker does not support smart contracts.");

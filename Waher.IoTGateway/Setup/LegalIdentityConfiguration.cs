@@ -513,9 +513,14 @@ namespace Waher.IoTGateway.Setup
 			return base.SetupConfiguration(WebServer);
 		}
 
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Legal.ID";
+
 		private Task ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -725,7 +730,7 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task ContractAction(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No content.");

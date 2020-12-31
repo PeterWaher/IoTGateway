@@ -132,19 +132,24 @@ namespace Waher.IoTGateway.Setup
 
 		private Task UploadBackup(HttpRequest Request, HttpResponse Response)
 		{
-			Upload(Request, Response, ref this.expectedBlockBackup, this.backupFilePerSession, "backup");
+			this.Upload(Request, Response, ref this.expectedBlockBackup, this.backupFilePerSession, "backup");
 			return Task.CompletedTask;
 		}
 
 		private Task UploadKey(HttpRequest Request, HttpResponse Response)
 		{
-			Upload(Request, Response, ref this.expectedBlockKey, this.keyFilePerSession, "key");
+			this.Upload(Request, Response, ref this.expectedBlockKey, this.keyFilePerSession, "key");
 			return Task.CompletedTask;
 		}
 
-		private static void Upload(HttpRequest Request, HttpResponse Response, ref int ExpectedBlockNr, Dictionary<string, TemporaryFile> Files, string Name)
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Data.Restore";
+
+		private void Upload(HttpRequest Request, HttpResponse Response, ref int ExpectedBlockNr, Dictionary<string, TemporaryFile> Files, string Name)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			HttpFieldCookie Cookie;
 			TemporaryFile File;
@@ -220,7 +225,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task Restore(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			HttpFieldCookie Cookie;
 			TemporaryFile BackupFile;

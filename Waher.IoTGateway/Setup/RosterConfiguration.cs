@@ -221,20 +221,27 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Communication.Roster";
+
+		/// <summary>
 		/// Initializes the setup object.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			this.connectToJID = WebServer.Register("/Settings/ConnectToJID", null, this.ConnectToJID, true, false, true, Gateway.LoggedIn);
-			this.removeContact = WebServer.Register("/Settings/RemoveContact", null, this.RemoveContact, true, false, true, Gateway.LoggedIn);
-			this.unsubscribeContact = WebServer.Register("/Settings/UnsubscribeContact", null, this.UnsubscribeContact, true, false, true, Gateway.LoggedIn);
-			this.subscribeToContact = WebServer.Register("/Settings/SubscribeToContact", null, this.SubscribeToContact, true, false, true, Gateway.LoggedIn);
-			this.renameContact = WebServer.Register("/Settings/RenameContact", null, this.RenameContact, true, false, true, Gateway.LoggedIn);
-			this.updateContactGroups = WebServer.Register("/Settings/UpdateContactGroups", null, this.UpdateContactGroups, true, false, true, Gateway.LoggedIn);
-			this.getGroups = WebServer.Register("/Settings/GetGroups", null, this.GetGroups, true, false, true, Gateway.LoggedIn);
-			this.acceptRequest = WebServer.Register("/Settings/AcceptRequest", null, this.AcceptRequest, true, false, true, Gateway.LoggedIn);
-			this.declineRequest = WebServer.Register("/Settings/DeclineRequest", null, this.DeclineRequest, true, false, true, Gateway.LoggedIn);
+			HttpAuthenticationScheme Auth = Gateway.LoggedIn(this.ConfigPrivilege);
+
+			this.connectToJID = WebServer.Register("/Settings/ConnectToJID", null, this.ConnectToJID, true, false, true, Auth);
+			this.removeContact = WebServer.Register("/Settings/RemoveContact", null, this.RemoveContact, true, false, true, Auth);
+			this.unsubscribeContact = WebServer.Register("/Settings/UnsubscribeContact", null, this.UnsubscribeContact, true, false, true, Auth);
+			this.subscribeToContact = WebServer.Register("/Settings/SubscribeToContact", null, this.SubscribeToContact, true, false, true, Auth);
+			this.renameContact = WebServer.Register("/Settings/RenameContact", null, this.RenameContact, true, false, true, Auth);
+			this.updateContactGroups = WebServer.Register("/Settings/UpdateContactGroups", null, this.UpdateContactGroups, true, false, true, Auth);
+			this.getGroups = WebServer.Register("/Settings/GetGroups", null, this.GetGroups, true, false, true, Auth);
+			this.acceptRequest = WebServer.Register("/Settings/AcceptRequest", null, this.AcceptRequest, true, false, true, Auth);
+			this.declineRequest = WebServer.Register("/Settings/DeclineRequest", null, this.DeclineRequest, true, false, true, Auth);
 
 			return base.InitSetup(WebServer);
 		}
@@ -275,7 +282,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task ConnectToJID(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -328,7 +335,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task RemoveContact(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -353,7 +360,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task UnsubscribeContact(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -378,7 +385,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task SubscribeToContact(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -403,7 +410,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task RenameContact(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -430,7 +437,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task UpdateContactGroups(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -486,7 +493,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task GetGroups(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -553,7 +560,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task AcceptRequest(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -587,7 +594,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task DeclineRequest(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();

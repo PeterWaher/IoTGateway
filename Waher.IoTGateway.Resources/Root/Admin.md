@@ -53,7 +53,7 @@ MenuFooter();
 
 MenuHeader("Legal");
 MenuItem("Legal Identity","/Settings/LegalIdentity.md","Admin.Legal.ID");
-MenuItem("Personal Data","/Settings/PersonalData.md","");
+MenuItem("Personal Data","/Settings/PersonalData.md","Admin.Legal.PersonalData");
 MenuItem("Propose Contract","/ProposeContract.md","Admin.Legal.ProposeContract");
 MenuItem("Signature Requests","/SignatureRequests.md","Admin.Legal.SignatureRequests");
 MenuFooter();

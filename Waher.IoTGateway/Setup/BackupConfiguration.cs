@@ -73,8 +73,10 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override Task InitSetup(HttpServer WebServer)
 		{
-			WebServer.Register(this.exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, Gateway.LoggedIn));
-			WebServer.Register(this.keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, Gateway.LoggedIn));
+			HttpAuthenticationScheme Auth = Gateway.LoggedIn(this.ConfigPrivilege);
+
+			WebServer.Register(this.exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, Auth));
+			WebServer.Register(this.keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, Auth));
 			WebServer.Register(this.startExport = new StartExport());
 			WebServer.Register(this.startAnalyze = new StartAnalyze());
 			WebServer.Register(this.deleteExport = new DeleteExport());
@@ -83,6 +85,11 @@ namespace Waher.IoTGateway.Setup
 
 			return base.InitSetup(WebServer);
 		}
+
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Data.Backup";
 
 		/// <summary>
 		/// Unregisters the setup object.

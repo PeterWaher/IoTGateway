@@ -126,9 +126,14 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Communication.Notification";
+
 		private async Task TestNotificationAddresses(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();

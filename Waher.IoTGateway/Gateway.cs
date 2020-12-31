@@ -130,7 +130,6 @@ namespace Waher.IoTGateway
 		private static HttpxServer httpxServer = null;
 		private static CoapEndpoint coapEndpoint = null;
 		private static SystemConfiguration[] configurations;
-		private static LoggedIn loggedIn = null;
 		private static LoginAuditor loginAuditor = null;
 		private static Scheduler scheduler = null;
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
@@ -565,8 +564,6 @@ namespace Waher.IoTGateway
 
 					webServer.CustomError += WebServer_CustomError;
 
-					loggedIn = new LoggedIn(webServer);
-
 					SetupResources = new LinkedList<HttpResource>();
 
 					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
@@ -713,7 +710,6 @@ namespace Waher.IoTGateway
 					webServer.CustomError += WebServer_CustomError;
 
 					webServer.LoginAuditor = loginAuditor;
-					loggedIn = new LoggedIn(webServer);
 
 					foreach (SystemConfiguration Configuration in configurations)
 					{
@@ -738,8 +734,6 @@ namespace Waher.IoTGateway
 				}
 
 				Types.SetModuleParameter("HTTP", webServer);
-
-				loggedIn = new LoggedIn(webServer);
 
 				WriteWebServerOpenPorts();
 				webServer.OnNetworkChanged += (sender, e) => WriteWebServerOpenPorts();
@@ -2257,11 +2251,12 @@ namespace Waher.IoTGateway
 #endif
 
 		/// <summary>
-		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user.
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
+		/// the given set of privileges.
 		/// </summary>
-		public static LoggedIn LoggedIn
+		public static RequiredUserPrivileges LoggedIn(params string[] Privileges)
 		{
-			get { return loggedIn; }
+			return new RequiredUserPrivileges(webServer, Privileges);
 		}
 
 		/// <summary>
@@ -2277,10 +2272,37 @@ namespace Waher.IoTGateway
 		/// Makes sure a request is being made from a session with a successful user login.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
-		public static void AssertUserAuthenticated(HttpRequest Request)
+		/// <param name="Privilege">Required user privilege.</param>
+		public static void AssertUserAuthenticated(HttpRequest Request, string Privilege)
 		{
-			if (Request.Session is null || !Request.Session.TryGetVariable("User", out Variable v) || !(v.ValueObject is IUser))
+			if (Request.Session is null ||
+				!Request.Session.TryGetVariable("User", out Variable v) ||
+				!(v.ValueObject is IUser User) ||
+				!User.HasPrivilege(Privilege))
+			{
 				throw new ForbiddenException("Access denied.");
+			}
+		}
+
+		/// <summary>
+		/// Makes sure a request is being made from a session with a successful user login.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public static void AssertUserAuthenticated(HttpRequest Request, string[] Privileges)
+		{
+			if (Request.Session is null ||
+				!Request.Session.TryGetVariable("User", out Variable v) ||
+				!(v.ValueObject is IUser User))
+			{
+				throw new ForbiddenException("Access denied.");
+			}
+
+			foreach (string Privilege in Privileges)
+			{
+				if (!User.HasPrivilege(Privilege))
+					throw new ForbiddenException("Access denied.");
+			}
 		}
 
 		#endregion

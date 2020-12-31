@@ -162,11 +162,19 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Response">HTTP Response</param>
 		protected virtual async Task ConfigComplete(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 			
 			await this.MakeCompleted();
 			
 			Response.StatusCode = 200;
+		}
+
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected abstract string ConfigPrivilege
+		{
+			get;
 		}
 
 		/// <summary>

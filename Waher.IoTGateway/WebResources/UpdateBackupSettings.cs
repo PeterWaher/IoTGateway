@@ -53,7 +53,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 			if (!Request.HasData)
 				throw new BadRequestException();

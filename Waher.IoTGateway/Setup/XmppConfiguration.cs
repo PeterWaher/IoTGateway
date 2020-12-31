@@ -453,9 +453,14 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
+		/// <summary>
+		/// Minimum required privilege for a user to be allowed to change the configuration defined by the class.
+		/// </summary>
+		protected override string ConfigPrivilege => "Admin.Communication.XMPP";
+
 		private Task ConnectToHost(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
+			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -542,8 +547,6 @@ namespace Waher.IoTGateway.Setup
 
 		private Task RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
-			Gateway.AssertUserAuthenticated(Request);
-
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
 			return Response.Write(Base64Url.Encode(Gateway.NextBytes(32)));

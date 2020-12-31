@@ -117,6 +117,10 @@ namespace Waher.IoTGateway.WebResources
 					Request.Session["LoginError"] = sb.ToString();
 					throw new SeeOtherException(Request.Header.Referer.Value);
 
+				case LoginResultType.NoPassword:
+					Request.Session["LoginError"] = "No password provided.";
+					throw new SeeOtherException(Request.Header.Referer.Value);
+
 				case LoginResultType.InvalidCredentials:
 				default:
 					Request.Session["LoginError"] = "Invalid login credentials provided.";

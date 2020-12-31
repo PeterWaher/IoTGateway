@@ -142,6 +142,9 @@ namespace Waher.Security.Users
 		/// <returns>Login result.</returns>
 		public static async Task<LoginResult> Login(string UserName, string Password, string RemoteEndPoint, string Protocol)
 		{
+			if (string.IsNullOrEmpty(Password))
+				return new LoginResult();
+
 			if (!(loginAuditor is null))
 			{
 				DateTime? Next = await loginAuditor.GetEarliestLoginOpportunity(RemoteEndPoint, Protocol);

@@ -24,6 +24,11 @@
             User name or password incorrect
             </summary>
         </member>
+        <member name="F:Waher.Security.Users.LoginResultType.NoPassword">
+            <summary>
+            No password, or an ampty password provided.
+            </summary>
+        </member>
         <member name="F:Waher.Security.Users.LoginResultType.Success">
             <summary>
             Login successful. User object can be accessed using <see cref="P:Waher.Security.Users.LoginResult.User"/>
@@ -45,6 +50,11 @@
             Login attempt has been made.
             </summary>
             <param name="User">User object found and authenticated.</param>
+        </member>
+        <member name="M:Waher.Security.Users.LoginResult.#ctor">
+            <summary>
+            Empty password provided
+            </summary>
         </member>
         <member name="P:Waher.Security.Users.LoginResult.User">
             <summary>

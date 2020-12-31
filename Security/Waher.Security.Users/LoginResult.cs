@@ -25,6 +25,11 @@ namespace Waher.Security.Users
 		InvalidCredentials,
 
 		/// <summary>
+		/// No password, or an ampty password provided.
+		/// </summary>
+		NoPassword,
+
+		/// <summary>
 		/// Login successful. User object can be accessed using <see cref="LoginResult.User"/>
 		/// </summary>
 		Success
@@ -59,6 +64,16 @@ namespace Waher.Security.Users
 			this.user = User;
 			this.next = null;
 			this.type = User is null ? LoginResultType.InvalidCredentials : LoginResultType.Success;
+		}
+
+		/// <summary>
+		/// Empty password provided
+		/// </summary>
+		public LoginResult()
+		{
+			this.user = null;
+			this.next = null;
+			this.type = LoginResultType.NoPassword;
 		}
 
 		/// <summary>

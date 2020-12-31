@@ -121,6 +121,9 @@ namespace Waher.Security.Users
 		/// <returns>If the user has the corresponding privilege.</returns>
 		public bool HasPrivilege(string Privilege)
 		{
+			if (string.IsNullOrEmpty(Privilege))
+				return true;
+
 			lock (this.privileges)
 			{
 				if (this.privileges.TryGetValue(Privilege, out bool Result))

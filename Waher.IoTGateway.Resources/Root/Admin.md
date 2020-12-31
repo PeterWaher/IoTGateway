@@ -28,9 +28,9 @@ MenuFooter():=
 [[
 );
 
-MenuItem(Text,Url,Privilege):=
+MenuItem(Text,Url,Privileges[]):=
 (
-	if User.HasPrivilege(Privilege) then
+	if And([foreach Privilege in Privileges do User.HasPrivilege(Privilege)]) then
 		]]<div class="menuItem" onclick="OpenPage('((Url))')"><div class="menuItemContent">((Text))</div></div>
 [[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
 [[

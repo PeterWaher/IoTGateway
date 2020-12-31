@@ -1,4 +1,5 @@
 ﻿UserVariable: User
+Privilege: Admin.Legal.ID
 Login: /Login.md
 
 

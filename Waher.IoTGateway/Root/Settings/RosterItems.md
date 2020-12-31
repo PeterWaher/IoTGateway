@@ -1,4 +1,5 @@
 ﻿UserVariable: User
+Privilege: Admin.Communication.Roster
 Login: /Login.md
 
 {{

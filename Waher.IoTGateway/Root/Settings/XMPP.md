@@ -9,6 +9,7 @@ JavaScript: /Settings/Next.js
 JavaScript: /Sniffers/Sniffer.js
 CSS: /Settings/Config.cssx
 UserVariable: User
+Privilege: Admin.Communication.XMPP
 Login: /Login.md
 
 ========================================================================
@@ -161,7 +162,8 @@ Password is incorrect, or a new account was not permitted to be created.
 <button id='NextButton' type='button' onclick='Next()' style='display:((Config.Step>1 ? "inline-block" : "none"))'>Next</button>
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>
-<button type='button' onclick='OpenSniffer("/Sniffers/XMPP.md")'>Sniffer</button>
+]];
+if User.HasPrivilege("Admin.Communication.Sniffer") then ]]<button type='button' onclick='OpenSniffer("/Sniffers/XMPP.md")'>Sniffer</button>
 [[;}}
 
 </fieldset>

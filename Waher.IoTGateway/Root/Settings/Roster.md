@@ -10,6 +10,7 @@ JavaScript: /Settings/XMPP.js
 CSS: /Settings/Config.cssx
 Cache-Control: max-age=0, no-cache, no-store
 UserVariable: User
+Privilege: Admin.Communication.Roster
 Login: /Login.md
 Parameter: Group
 

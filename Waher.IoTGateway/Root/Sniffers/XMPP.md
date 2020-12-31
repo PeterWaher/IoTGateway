@@ -7,6 +7,8 @@ JavaScript: /Events.js
 JavaScript: Sniffer.js
 CSS: Sniffer.css
 UserVariable: User
+Privilege: Admin.Communication.Sniffer
+Privilege: Admin.Communication.XMPP
 Login: /Login.md
 Parameter: SnifferId
 

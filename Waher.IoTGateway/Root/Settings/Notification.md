@@ -8,6 +8,7 @@ JavaScript: /Settings/Notification.js
 JavaScript: /Settings/Next.js
 CSS: /Settings/Config.cssx
 UserVariable: User
+Privilege: Admin.Communication.Notification
 Login: /Login.md
 
 ========================================================================

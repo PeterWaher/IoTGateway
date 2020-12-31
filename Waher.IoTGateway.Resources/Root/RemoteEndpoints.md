@@ -7,6 +7,7 @@ Master: /Master.md
 Script: /Controls/SimpleTable.script
 UserVariable: User
 Login: /Login.md
+Privilege: Admin.Communication.Endpoints
 Parameter: BlockedOnly
 
 ================================================================================================================================

@@ -8,6 +8,7 @@ JavaScript: /Settings/Theme.js
 JavaScript: /Settings/Next.js
 CSS: /Settings/Config.cssx
 UserVariable: User
+Privilege: Admin.Presentation.Theme
 Login: /Login.md
 
 ========================================================================

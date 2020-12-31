@@ -7,6 +7,7 @@ JavaScript: Events.js
 JavaScript: SignatureRequest.js
 JavaScript: Settings/Next.js
 UserVariable: User
+Privilege: Admin.Legal.SignatureRequests
 Login: /Login.md
 Parameter: RequestId
 

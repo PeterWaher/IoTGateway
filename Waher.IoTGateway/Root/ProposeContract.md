@@ -6,6 +6,7 @@ Master: /Master.md
 JavaScript: Events.js
 JavaScript: ProposeContract.js
 UserVariable: User
+Privilege: Admin.Legal.ProposeContract
 Login: /Login.md
 
 ================================================================

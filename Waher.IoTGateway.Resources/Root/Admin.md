@@ -28,40 +28,41 @@ MenuFooter():=
 [[
 );
 
-MenuItem(Text,Url):=
+MenuItem(Text,Url,Privilege):=
 (
-	]]<div class="menuItem" onclick="OpenPage('((Url))')"><div class="menuItemContent">((Text))</div></div>
+	if User.HasPrivilege(Privilege) then
+		]]<div class="menuItem" onclick="OpenPage('((Url))')"><div class="menuItemContent">((Text))</div></div>
+[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
 [[
 );
 
 MenuHeader("Communication");
-MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1");
-MenuItem("Domain","/Settings/Domain.md");
-MenuItem("Notification","/Settings/Notification.md");
-MenuItem("Roster","/Settings/Roster.md");
-MenuItem("XMPP","/Settings/XMPP.md");
+MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1","Admin.Communication.Endpoints");
+MenuItem("Domain","/Settings/Domain.md","Admin.Communication.Domain");
+MenuItem("Notification","/Settings/Notification.md","Admin.Communication.Notification");
+MenuItem("Roster","/Settings/Roster.md","Admin.Communication.Roster");
+MenuItem("XMPP","/Settings/XMPP.md","Admin.Communication.XMPP");
 MenuFooter();
 
 MenuHeader("Data");
-MenuItem("Backup","/Settings/Backup.md");
-MenuItem("Database","/Settings/Database.md");
-MenuItem("Prompt","/Prompt.md");
-MenuItem("Restore","/Settings/Restore.md");
-MenuItem("Search Event Log","/EventLog.md");
+MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");
+MenuItem("Database","/Settings/Database.md","Admin.Data.Database");
+MenuItem("Prompt","/Prompt.md","Admin.Data.Prompt");
+MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
 MenuFooter();
 
 MenuHeader("Legal");
-MenuItem("Legal Identity","/Settings/LegalIdentity.md");
-MenuItem("Personal Data","/Settings/PersonalData.md");
-MenuItem("Propose Contract","/ProposeContract.md");
-MenuItem("Signature Requests","/SignatureRequests.md");
+MenuItem("Legal Identity","/Settings/LegalIdentity.md","Admin.Legal.ID");
+MenuItem("Personal Data","/Settings/PersonalData.md","");
+MenuItem("Propose Contract","/ProposeContract.md","Admin.Legal.ProposeContract");
+MenuItem("Signature Requests","/SignatureRequests.md","Admin.Legal.SignatureRequests");
 MenuFooter();
 
 MenuHeader("Presentation");
-MenuItem("Theme","/Settings/Theme.md");
+MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");
 MenuFooter();
 
 MenuHeader("Session");
-MenuItem("Logout","/Logout");
+MenuItem("Logout","/Logout","");
 MenuFooter();
 }}

@@ -1,4 +1,5 @@
 ﻿UserVariable: User
+Privilege: Admin.Communication.Sniffer
 Login: /Login.md
 
 <table cellspacing="0" cellpadding="2" border="0">

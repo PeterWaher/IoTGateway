@@ -4,6 +4,7 @@ Date: 2017-01-27
 Author: Peter Waher
 Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/Master.md"}}
 UserVariable: User
+Privilege: Admin.Data.Backup
 Login: /Login.md
 JavaScript: /Events.js
 JavaScript: /Settings/Backup.js

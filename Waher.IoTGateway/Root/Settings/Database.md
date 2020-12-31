@@ -8,6 +8,7 @@ JavaScript: /Settings/Database.js
 JavaScript: /Settings/Next.js
 CSS: /Settings/Config.cssx
 UserVariable: User
+Privilege: Admin.Data.Database
 Login: /Login.md
 
 ========================================================================

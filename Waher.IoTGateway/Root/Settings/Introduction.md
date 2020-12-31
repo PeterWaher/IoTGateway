@@ -6,6 +6,7 @@ Master: {{(Configuring:=Waher.IoTGateway.Gateway.Configuring) ? "Master.md" : "/
 JavaScript: /Events.js
 JavaScript: /Settings/Next.js
 UserVariable: User
+Privilege: Admin.Config.Introduction
 Login: /Login.md
 
 

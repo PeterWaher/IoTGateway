@@ -10,6 +10,7 @@ JavaScript: /Settings/XMPP.js
 JavaScript: /Settings/Next.js
 CSS: /Settings/Config.cssx
 UserVariable: User
+Privilege: Admin.Communication.Domain
 Login: /Login.md
 
 ========================================================================

@@ -1,4 +1,5 @@
 ﻿UserVariable: User
+Privilege: Admin.Data.Database
 Login: /Login.md
 
 <fieldset>

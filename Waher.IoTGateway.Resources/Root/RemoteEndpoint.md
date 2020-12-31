@@ -8,6 +8,7 @@ Javascript: RemoteEndpoint.js
 Javascript: /Events.js
 UserVariable: User
 Login: /Login.md
+Privilege: Admin.Communication.Endpoints
 Parameter: EP
 
 ================================================================================================================================

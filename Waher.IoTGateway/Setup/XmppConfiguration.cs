@@ -984,7 +984,7 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task CheckAdminAccount()
 		{
-			if (string.IsNullOrEmpty(this.password0) || !string.IsNullOrEmpty(this.passwordType))
+			if (string.IsNullOrEmpty(this.password0) && (!string.IsNullOrEmpty(this.passwordType) || string.IsNullOrEmpty(this.password)))
 				return;
 
 			User User = await Users.GetUser(this.account, true);

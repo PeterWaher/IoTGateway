@@ -337,7 +337,7 @@ namespace Waher.IoTGateway
 									try
 									{
 										DateTime TP = File.GetLastWriteTime(ExceptionFile);
-										if ((TP - Now).TotalDays > 90)
+										if ((Now - TP).TotalDays > 90)
 											File.Delete(ExceptionFile);
 										else
 										{

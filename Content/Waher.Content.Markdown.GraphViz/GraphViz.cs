@@ -315,7 +315,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title, out string MapFileName, out string Hash);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Svg, out string Title, out string MapFileName, out string Hash);
 			if (FileName is null)
 				return false;
 
@@ -374,7 +374,13 @@ namespace Waher.Content.Markdown.GraphViz
 			return true;
 		}
 
-		private string GetFileName(string Language, string[] Rows, out string Title, out string MapFileName, out string Hash)
+		private enum ResultType
+		{
+			Svg,
+			Png
+		}
+
+		private string GetFileName(string Language, string[] Rows, ResultType Type, out string Title, out string MapFileName, out string Hash)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -398,11 +404,23 @@ namespace Waher.Content.Markdown.GraphViz
 
 			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 			string FileName = Path.Combine(GraphVizFolder, Hash);
-			string SvgFileName = FileName + ".svg";
+			string ResultFileName;
+			
+			switch (Type)
+			{
+				case ResultType.Svg:
+				default:
+					ResultFileName = FileName + ".svg";
+					break;
+
+				case ResultType.Png:
+					ResultFileName = FileName + ".png";
+					break;
+			}
 
 			MapFileName = FileName + ".map";
 
-			if (File.Exists(SvgFileName))
+			if (File.Exists(ResultFileName))
 			{
 				if (!File.Exists(MapFileName))
 					MapFileName = null;
@@ -415,7 +433,7 @@ namespace Waher.Content.Markdown.GraphViz
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
-					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -Tsvg -q -o\"" + SvgFileName + "\" \"" + TxtFileName + "\"",
+					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -T" + Type.ToString().ToLower()+" -q -o\"" + ResultFileName + "\" \"" + TxtFileName + "\"",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -456,7 +474,7 @@ namespace Waher.Content.Markdown.GraphViz
 				}
 			}
 
-			return SvgFileName;
+			return ResultFileName;
 		}
 
 		/// <summary>
@@ -470,7 +488,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title, out string _, out string _);
+			this.GetFileName(Language, Rows, ResultType.Svg, out string Title, out string _, out string _);
 			Output.AppendLine(Title);
 
 			return true;
@@ -488,12 +506,13 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title, out string _, out string _);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string Title, out string _, out string _);
 			if (FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Stretch", "None");
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);
@@ -515,7 +534,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string _, out string _, out string _);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string _, out string _, out string _);
 			if (FileName is null)
 				return false;
 

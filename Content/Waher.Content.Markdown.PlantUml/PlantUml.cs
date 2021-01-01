@@ -3,26 +3,28 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
-using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
+using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Timing;
 using Waher.Security;
 
-namespace Waher.IoTGateway.CodeContent
+namespace Waher.Content.Markdown.PlantUml
 {
 	/// <summary>
 	/// Class managing PlantUML integration into Markdown documents.
 	/// </summary>
 	public class PlantUml : ICodeContent
 	{
+		private static readonly Random rnd = new Random();
+		private static Scheduler scheduler = null;
 		private static string jarPath = null;
 		private static string javaPath = null;
 		private static string plantUmlFolder = null;
+		private static string contentRootFolder = null;
 
 		/// <summary>
 		/// Class managing PlantUML integration into Markdown documents.
@@ -34,10 +36,30 @@ namespace Waher.IoTGateway.CodeContent
 		/// <summary>
 		/// Initializes the PlantUML-Markdown integration.
 		/// </summary>
-		public static void Init()
+		/// <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+		/// to the roof folder for the web content.</param>
+		public static void Init(string ContentRootFolder)
 		{
 			try
 			{
+				contentRootFolder = ContentRootFolder;
+
+				if (scheduler is null)
+				{
+					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+						scheduler = Scheduler;
+					else
+					{
+						scheduler = new Scheduler();
+
+						Log.Terminating += (sender, e) =>
+						{
+							scheduler?.Dispose();
+							scheduler = null;
+						};
+					}
+				}
+
 				SearchForInstallationFolder(out string JarPath, out string JavaPath);
 
 				if (string.IsNullOrEmpty(JarPath))
@@ -73,7 +95,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			jarPath = JarPath;
 			javaPath = JavaPath;
-			plantUmlFolder = Path.Combine(Gateway.RootFolder, "PlantUML");
+			plantUmlFolder = Path.Combine(contentRootFolder, "PlantUML");
 
 			if (!Directory.Exists(plantUmlFolder))
 				Directory.CreateDirectory(plantUmlFolder);
@@ -105,7 +127,10 @@ namespace Waher.IoTGateway.CodeContent
 			if (Count > 0)
 				Log.Informational(Count.ToString() + " old file(s) deleted.", plantUmlFolder);
 
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+			lock (rnd)
+			{
+				scheduler.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, null);
+			}
 		}
 
 		/// <summary>
@@ -115,14 +140,14 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="JavaPath">Path to Java VM.</param>
 		public static void SearchForInstallationFolder(out string JarPath, out string JavaPath)
 		{
-			string[] Folders = Gateway.GetFolders(new Environment.SpecialFolder[]
+			string[] Folders = FileSystem.GetFolders(new Environment.SpecialFolder[]
 				{
 					Environment.SpecialFolder.ProgramFiles,
 					Environment.SpecialFolder.ProgramFilesX86
 				});
 
-			JarPath = Gateway.FindLatestFile(Folders, "plantuml.jar", 1);
-			JavaPath = Gateway.FindLatestFile(Folders, "java.exe", 3);
+			JarPath = FileSystem.FindLatestFile(Folders, "plantuml.jar", 1);
+			JavaPath = FileSystem.FindLatestFile(Folders, "java.exe", 3);
 		}
 
 		/// <summary>
@@ -187,7 +212,7 @@ namespace Waher.IoTGateway.CodeContent
 			if (FileName is null)
 				return false;
 
-			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			FileName = FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!FileName.StartsWith("/"))
 				FileName = "/" + FileName;
 
@@ -239,7 +264,7 @@ namespace Waher.IoTGateway.CodeContent
 			sb.Append(Language);
 
 			string FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
-			string PlantUmlFolder = Path.Combine(Gateway.RootFolder, "PlantUML");
+			string PlantUmlFolder = Path.Combine(contentRootFolder, "PlantUML");
 
 			FileName = Path.Combine(PlantUmlFolder, FileName);
 

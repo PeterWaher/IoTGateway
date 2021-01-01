@@ -443,9 +443,25 @@
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj">
+      <Project>{a799d295-4eb2-4754-b0ff-455a881ff491}</Project>
+      <Name>Waher.Content.Markdown.GraphViz</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj">
+      <Project>{d6097310-d483-4f55-bf6d-503dbd31a584}</Project>
+      <Name>Waher.Content.Markdown.Layout2D</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj">
+      <Project>{82808905-5784-4a02-b137-a47b0142a46e}</Project>
+      <Name>Waher.Content.Markdown.PlantUml</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj">
+      <Project>{0179c5ca-dadb-4c1f-b219-44b9ab8380b4}</Project>
+      <Name>Waher.Content.SystemFiles</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>

@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Layout2D</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Layout2D.XmlLayout">
+            <summary>
+            Class managing 2D XML Layout integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.#ctor">
+            <summary>
+            Class managing 2D XML Layout integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Init(System.String)">
+            <summary>
+            Initializes the Layout2D-Markdown integration.
+            </summary>
+            <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+            to the roof folder for the web content.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Supports(System.String)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Language">Language.</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Register(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Is called on the object when an instance of the element has been created in a document.
+            </summary>
+            <param name="Document">Document containing the instance.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesHTML">
+            <summary>
+            If HTML is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesPlainText">
+            <summary>
+            If Plain Text is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Layout2D.XmlLayout.HandlesXAML">
+            <summary>
+            If XAML is handled.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Plain Text for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+    </members>
+</doc>

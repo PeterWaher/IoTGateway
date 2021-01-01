@@ -3,30 +3,58 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
-using Waher.Script;
+using Waher.Runtime.Timing;
 using Waher.Security;
 
-namespace Waher.IoTGateway.CodeContent
+namespace Waher.Content.Markdown.Layout2D
 {
 	/// <summary>
 	/// Class managing 2D XML Layout integration into Markdown documents.
 	/// </summary>
 	public class XmlLayout : ICodeContent
 	{
+		private static readonly Random rnd = new Random();
+		private static Scheduler scheduler = null;
 		private static string layoutFolder = null;
+		private static string contentRootFolder = null;
 
 		/// <summary>
 		/// Class managing 2D XML Layout integration into Markdown documents.
 		/// </summary>
 		public XmlLayout()
 		{
-			layoutFolder = Path.Combine(Gateway.RootFolder, "Layout");
+		}
+
+		/// <summary>
+		/// Initializes the Layout2D-Markdown integration.
+		/// </summary>
+		/// <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+		/// to the roof folder for the web content.</param>
+		public static void Init(string ContentRootFolder)
+		{
+			contentRootFolder = ContentRootFolder;
+			layoutFolder = Path.Combine(contentRootFolder, "Layout");
+
+			if (scheduler is null)
+			{
+				if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+					scheduler = Scheduler;
+				else
+				{
+					scheduler = new Scheduler();
+
+					Log.Terminating += (sender, e) =>
+					{
+						scheduler?.Dispose();
+						scheduler = null;
+					};
+				}
+			}
 
 			if (!Directory.Exists(layoutFolder))
 				Directory.CreateDirectory(layoutFolder);
@@ -58,7 +86,10 @@ namespace Waher.IoTGateway.CodeContent
 			if (Count > 0)
 				Log.Informational(Count.ToString() + " old file(s) deleted.", layoutFolder);
 
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+			lock (rnd)
+			{
+				scheduler.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, null);
+			}
 		}
 
 		/// <summary>
@@ -120,7 +151,7 @@ namespace Waher.IoTGateway.CodeContent
 			if (FileName is null)
 				return false;
 
-			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			FileName = FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!FileName.StartsWith("/"))
 				FileName = "/" + FileName;
 
@@ -173,7 +204,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 
-			string LayoutFolder = Path.Combine(Gateway.RootFolder, "Layout");
+			string LayoutFolder = Path.Combine(contentRootFolder, "Layout");
 			string FileName = Path.Combine(LayoutFolder, Hash);
 			string PngFileName = FileName + ".png";
 

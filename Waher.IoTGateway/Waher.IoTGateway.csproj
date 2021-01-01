@@ -243,8 +243,12 @@
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj" />

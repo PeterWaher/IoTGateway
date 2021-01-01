@@ -11,6 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.GraphViz;
+using Waher.Content.Markdown.Layout2D;
+using Waher.Content.Markdown.PlantUml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
@@ -72,6 +75,9 @@ namespace Waher.Client.WPF
 				typeof(Content.InternetContent).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
 				typeof(MarkdownDocument).Assembly,
+				typeof(GraphViz).Assembly,
+				typeof(XmlLayout).Assembly,
+				typeof(PlantUml).Assembly,
 				typeof(XML).Assembly,
 				typeof(Content.Xsl.XSL).Assembly,
 				typeof(SensorData).Assembly,
@@ -103,6 +109,13 @@ namespace Waher.Client.WPF
 
 			if (!Directory.Exists(appDataFolder))
 				Directory.CreateDirectory(appDataFolder);
+
+			Task T = Task.Run(() =>
+			{
+				GraphViz.Init(appDataFolder);
+				XmlLayout.Init(appDataFolder);
+				PlantUml.Init(appDataFolder);
+			});
 
 			InitializeComponent();
 			this.MainView.Load(this);

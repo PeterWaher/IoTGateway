@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.GraphViz</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.GraphViz.GraphViz">
+            <summary>
+            Class managing GraphViz integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.#ctor">
+            <summary>
+            Class managing GraphViz integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.Init(System.String)">
+            <summary>
+            Initializes the GraphViz-Markdown integration.
+            </summary>
+            <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+            to the roof folder for the web content.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.SetInstallationFolder(System.String)">
+            <summary>
+            Sets the installation folder of GraphViz.
+            </summary>
+            <param name="Folder">Installation folder.</param>
+            <exception cref="T:System.Exception">If trying to set the installation folder to a different folder than the one set previously.
+            The folder can only be set once, for security reasons.</exception>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.SearchForInstallationFolder">
+            <summary>
+            Searches for the installation folder on the local machine.
+            </summary>
+            <returns>Installation folder, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.Supports(System.String)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Language">Language.</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.Register(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Is called on the object when an instance of the element has been created in a document.
+            </summary>
+            <param name="Document">Document containing the instance.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.HandlesHTML">
+            <summary>
+            If HTML is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.HandlesPlainText">
+            <summary>
+            If Plain Text is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.HandlesXAML">
+            <summary>
+            If XAML is handled.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Plain Text for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+    </members>
+</doc>

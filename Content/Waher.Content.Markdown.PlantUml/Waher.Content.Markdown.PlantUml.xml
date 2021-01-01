@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.PlantUml</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.PlantUml.PlantUml">
+            <summary>
+            Class managing PlantUML integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.#ctor">
+            <summary>
+            Class managing PlantUML integration into Markdown documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.Init(System.String)">
+            <summary>
+            Initializes the PlantUML-Markdown integration.
+            </summary>
+            <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+            to the roof folder for the web content.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.SetPath(System.String,System.String)">
+            <summary>
+            Sets the full path of PlantUML.
+            </summary>
+            <param name="JarPath">Full path of plantuml.jar</param>
+            <param name="JavaPath">Full path of java.exe</param>
+            <exception cref="T:System.Exception">If trying to set the path to a different path than the one set previously.
+            The path can only be set once, for security reasons.</exception>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.SearchForInstallationFolder(System.String@,System.String@)">
+            <summary>
+            Searches for the installation folder on the local machine.
+            </summary>
+            <param name="JarPath">Path to PlantUML Jar file.</param>
+            <param name="JavaPath">Path to Java VM.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.Supports(System.String)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Language">Language.</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.Register(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Is called on the object when an instance of the element has been created in a document.
+            </summary>
+            <param name="Document">Document containing the instance.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesHTML">
+            <summary>
+            If HTML is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesPlainText">
+            <summary>
+            If Plain Text is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.PlantUml.PlantUml.HandlesXAML">
+            <summary>
+            If XAML is handled.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Plain Text for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+    </members>
+</doc>

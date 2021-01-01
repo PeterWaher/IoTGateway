@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
-using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Timing;
 using Waher.Security;
 
-namespace Waher.IoTGateway.CodeContent
+namespace Waher.Content.Markdown.GraphViz
 {
 	/// <summary>
 	/// Class managing GraphViz integration into Markdown documents.
 	/// </summary>
 	public class GraphViz : ICodeContent
 	{
+		private static readonly Random rnd = new Random();
+		private static Scheduler scheduler = null;
 		private static string installationFolder = null;
 		private static string graphVizFolder = null;
+		private static string contentRootFolder = null;
 		private static bool supportsDot = false;
 		private static bool supportsNeato = false;
 		private static bool supportsFdp = false;
@@ -39,10 +40,30 @@ namespace Waher.IoTGateway.CodeContent
 		/// <summary>
 		/// Initializes the GraphViz-Markdown integration.
 		/// </summary>
-		public static void Init()
+		/// <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
+		/// to the roof folder for the web content.</param>
+		public static void Init(string ContentRootFolder)
 		{
 			try
 			{
+				contentRootFolder = ContentRootFolder;
+
+				if (scheduler is null)
+				{
+					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+						scheduler = Scheduler;
+					else
+					{
+						scheduler = new Scheduler();
+
+						Log.Terminating += (sender, e) =>
+						{
+							scheduler?.Dispose();
+							scheduler = null;
+						};
+					}
+				}
+
 				string Folder = SearchForInstallationFolder();
 
 				if (string.IsNullOrEmpty(Folder))
@@ -86,7 +107,7 @@ namespace Waher.IoTGateway.CodeContent
 			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi.exe"));
 			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo.exe"));
 
-			graphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
+			graphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 
 			if (!Directory.Exists(graphVizFolder))
 				Directory.CreateDirectory(graphVizFolder);
@@ -118,7 +139,10 @@ namespace Waher.IoTGateway.CodeContent
 			if (Count > 0)
 				Log.Informational(Count.ToString() + " old file(s) deleted.", graphVizFolder);
 
-			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+			lock (rnd)
+			{
+				scheduler.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, null);
+			}
 		}
 
 		/// <summary>
@@ -295,7 +319,7 @@ namespace Waher.IoTGateway.CodeContent
 			if (FileName is null)
 				return false;
 
-			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			FileName = FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!FileName.StartsWith("/"))
 				FileName = "/" + FileName;
 
@@ -372,7 +396,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 
-			string GraphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
+			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 			string FileName = Path.Combine(GraphVizFolder, Hash);
 			string SvgFileName = FileName + ".svg";
 

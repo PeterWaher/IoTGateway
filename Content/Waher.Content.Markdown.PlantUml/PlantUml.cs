@@ -208,7 +208,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Svg, out string Title);
 			if (FileName is null)
 				return false;
 
@@ -243,7 +243,13 @@ namespace Waher.Content.Markdown.PlantUml
 			return true;
 		}
 
-		private string GetFileName(string Language, string[] Rows, out string Title)
+		private enum ResultType
+		{
+			Svg,
+			Png
+		}
+
+		private string GetFileName(string Language, string[] Rows, ResultType Type, out string Title)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -268,8 +274,21 @@ namespace Waher.Content.Markdown.PlantUml
 
 			FileName = Path.Combine(PlantUmlFolder, FileName);
 
-			string SvgFileName = FileName + ".svg";
-			if (!File.Exists(SvgFileName))
+			string ResultFileName;
+
+			switch (Type)
+			{
+				case ResultType.Svg:
+				default:
+					ResultFileName = FileName + ".svg";
+					break;
+
+				case ResultType.Png:
+					ResultFileName = FileName + ".png";
+					break;
+			}
+
+			if (!File.Exists(ResultFileName))
 			{
 				string TxtFileName = FileName + ".txt";
 				File.WriteAllText(TxtFileName, Graph, Encoding.UTF8);
@@ -277,7 +296,7 @@ namespace Waher.Content.Markdown.PlantUml
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = javaPath,
-					Arguments = "-jar \"" + jarPath + "\" -charset UTF-8 -tsvg -quiet \"" + TxtFileName + "\" \"" + SvgFileName + "\"",
+					Arguments = "-jar \"" + jarPath + "\" -charset UTF-8 -t" + Type.ToString().ToLower() + " -quiet \"" + TxtFileName + "\" \"" + ResultFileName + "\"",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -310,7 +329,7 @@ namespace Waher.Content.Markdown.PlantUml
 				}
 			}
 
-			return SvgFileName;
+			return ResultFileName;
 		}
 
 		/// <summary>
@@ -324,7 +343,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title);
+			this.GetFileName(Language, Rows, ResultType.Svg, out string Title);
 			Output.AppendLine(Title);
 
 			return true;
@@ -342,12 +361,13 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string Title);
 			if (FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Stretch", "None");
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);
@@ -369,7 +389,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string _);
+			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string _);
 			if (FileName is null)
 				return false;
 

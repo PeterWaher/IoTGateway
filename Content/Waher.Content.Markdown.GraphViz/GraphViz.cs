@@ -405,7 +405,7 @@ namespace Waher.Content.Markdown.GraphViz
 			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 			string FileName = Path.Combine(GraphVizFolder, Hash);
 			string ResultFileName;
-			
+
 			switch (Type)
 			{
 				case ResultType.Svg:
@@ -433,7 +433,7 @@ namespace Waher.Content.Markdown.GraphViz
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
-					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -T" + Type.ToString().ToLower()+" -q -o\"" + ResultFileName + "\" \"" + TxtFileName + "\"",
+					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -T" + Type.ToString().ToLower() + " -q -o\"" + ResultFileName + "\" \"" + TxtFileName + "\"",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,

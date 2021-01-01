@@ -275,14 +275,16 @@ namespace Waher.Client.WPF.Model
 				else
 				{
 					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						MultiFormatMessage(Markdown), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+						MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}
 			}
 		}
 
-		public static string MultiFormatMessage(MarkdownDocument Markdown)
+		public static string MultiFormatMessage(string PlainText, MarkdownDocument Markdown)
 		{
-			string PlainText = Markdown.GeneratePlainText().Trim();
+			if (PlainText is null)
+				PlainText = Markdown.GeneratePlainText().Trim();
+
 			string HTML = HtmlDocument.GetBody(Markdown.GenerateHTML()).Trim();
 			StringBuilder sb = new StringBuilder();
 

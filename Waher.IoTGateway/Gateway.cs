@@ -3080,7 +3080,11 @@ namespace Waher.IoTGateway
 		{
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
-				ParseMetaData = false
+				ParseMetaData = false,
+				HtmlSettings = new HtmlSettings()
+				{
+					XmlEntitiesOnly = true
+				}
 			};
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
 			string Text = Doc.GeneratePlainText();

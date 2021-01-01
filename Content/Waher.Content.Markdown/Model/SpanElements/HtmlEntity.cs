@@ -46,9 +46,42 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append('&');
-			Output.Append(this.entity);
-			Output.Append(';');
+			if (this.Document.Settings.HtmlSettings.XmlEntitiesOnly)
+			{
+				switch (this.entity)
+				{
+					case "quot":
+					case "amp":
+					case "apos":
+					case "lt":
+					case "gt":
+						Output.Append('&');
+						Output.Append(this.entity);
+						Output.Append(';');
+						break;
+
+					case "QUOT":
+					case "AMP":
+					case "LT":
+					case "GT":
+						Output.Append('&');
+						Output.Append(this.entity.ToLower());
+						Output.Append(';');
+						break;
+
+					default:
+						string s = Html.HtmlEntity.EntityToCharacter(this.entity);
+						if (!string.IsNullOrEmpty(s))
+							Output.Append(s);
+						break;
+				}
+			}
+			else
+			{
+				Output.Append('&');
+				Output.Append(this.entity);
+				Output.Append(';');
+			}
 		}
 
 		/// <summary>

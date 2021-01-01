@@ -147,6 +147,11 @@
             Javascript to execute when hashtag mark element is clicked.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.HtmlSettings.XmlEntitiesOnly">
+            <summary>
+            If typographical extensions should conform to XML entities (true), or if HTML entities can be used as well (false).
+            </summary>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownCodec">
             <summary>
             Markdown encoder.

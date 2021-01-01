@@ -103,6 +103,10 @@ namespace Waher.Client.WPF.Controls
 		{
 			return new MarkdownSettings(Emoji1_24x24, false)
 			{
+				HtmlSettings = new HtmlSettings()
+				{
+					XmlEntitiesOnly = true
+				},
 				XamlSettings = new XamlSettings()
 				{
 					TableCellRowBackgroundColor1 = "#20404040",

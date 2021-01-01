@@ -479,7 +479,7 @@ namespace Waher.Client.WPF.Model.Muc
 			if (Markdown is null)
 				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message);
 			else
-				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Markdown));
+				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Message, Markdown));
 		}
 
 		public override bool RemoveChild(TreeNode Node)

@@ -474,12 +474,15 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override bool CanChat => true;
 
-		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
+		public override void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			if (Markdown is null)
-				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message);
+				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message, string.Empty, ThreadId);
 			else
-				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Message, Markdown));
+			{
+				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Message, Markdown),
+					string.Empty, ThreadId);
+			}
 		}
 
 		public override bool RemoveChild(TreeNode Node)

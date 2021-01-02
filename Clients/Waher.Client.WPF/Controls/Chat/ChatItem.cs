@@ -28,7 +28,8 @@ namespace Waher.Client.WPF.Controls.Chat
 		private readonly ChatItemType type;
 		private readonly DateTime timestamp;
 		private readonly bool lastIsTable;
-		private readonly string from;
+		private readonly string threadId;
+		private string from;
 		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
@@ -42,11 +43,12 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <param name="Message">Message</param>
 		/// <param name="From">From where the message came.</param>
 		/// <param name="Markdown">Markdown, if available, or null if plain text.</param>
+		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="FormattedMessage">Formatted message.</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown,
+		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId,
 			Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
@@ -54,6 +56,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.timestamp = this.lastUpdated = Timestamp;
 			this.message = Message;
 			this.from = From;
+			this.threadId = ThreadId;
 
 			if (Markdown is null)
 			{
@@ -217,7 +220,16 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <summary>
 		/// Who sent the message.
 		/// </summary>
-		public string From => this.from;
+		public string From
+		{
+			get => this.from;
+			set => this.from = value;
+		}
+
+		/// <summary>
+		/// Thread ID
+		/// </summary>
+		public string ThreadId => this.threadId;
 
 		/// <summary>
 		/// Nick-name of sender.

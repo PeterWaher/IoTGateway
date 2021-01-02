@@ -274,6 +274,12 @@
             Markdown text. This text might differ slightly from the original text passed to the document.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.TransparentExceptionTypes">
+            <summary>
+            If an exception is thrown when processing script in markdown, and the exception is of
+            any of these types, the exception will be rethrown, instead of shown as an error in the generated output.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.Preprocess(System.String,Waher.Content.Markdown.MarkdownSettings,System.Type[])">
             <summary>
             Preprocesses markdown text.
@@ -692,6 +698,11 @@
             Finds hashtags in the document.
             </summary>
             <returns>Array of hashtags found in the document.</returns>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.Elements">
+            <summary>
+            Markdown elements making up the document.
+            </summary>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GetEnumerator">
             <summary>

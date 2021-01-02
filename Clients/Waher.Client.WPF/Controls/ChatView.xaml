@@ -10,10 +10,14 @@
         <StackPanel DockPanel.Dock="Bottom">
             <DockPanel Height="75">
                 <TextBlock DockPanel.Dock="Top" Margin="5,2,5,0">Enter text: (Markdown reference: <Hyperlink NavigateUri="https://waher.se/Markdown.md" Click="Hyperlink_Click">https://waher.se/Markdown.md</Hyperlink>)</TextBlock>
-                <Button Name="SendButton" Width="70" Height="20" Margin="5,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                        IsDefault="True" DockPanel.Dock="Right" Click="Send_Click">
-                    <Label Padding="0">Send</Label>
-                </Button>
+                <StackPanel DockPanel.Dock="Right" Width="80" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Button Name="SendButton" Width="80" Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsDefault="True" Click="Send_Click" Margin="0,5,0,5">
+                        <Label Padding="0">Send</Label>
+                    </Button>
+                    <ToggleButton x:Name="ConsolidateButton" Width="80" Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,5,0,5" IsChecked="{Binding Consolidate}">
+                        <Label Padding="0">Consolidate</Label>
+                    </ToggleButton>
+                </StackPanel>
                 <TextBox Name="Input" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="700" DockPanel.Dock="Bottom" TextWrapping="Wrap"
                          ToolTip="Enter text to send here. You can format the text using Markdown syntax." AcceptsTab="True" Height="50" 
                          AcceptsReturn="True" PreviewKeyDown="Input_PreviewKeyDown" />

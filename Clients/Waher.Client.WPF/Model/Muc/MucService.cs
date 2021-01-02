@@ -473,7 +473,8 @@ namespace Waher.Client.WPF.Model.Muc
 			MainWindow.UpdateGui(() =>
 			{
 				MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
-				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
+				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
+					IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
 			});
 		}
 
@@ -529,27 +530,27 @@ namespace Waher.Client.WPF.Model.Muc
 					switch (OccupantNode.Availability)
 					{
 						case Availability.Online:
-							View.Event("Online.", e.NickName);
+							View.Event("Online.", e.NickName, string.Empty);
 							break;
 
 						case Availability.Offline:
-							View.Event("Offline.", e.NickName);
+							View.Event("Offline.", e.NickName, string.Empty);
 							break;
 
 						case Availability.Away:
-							View.Event("Away.", e.NickName);
+							View.Event("Away.", e.NickName, string.Empty);
 							break;
 
 						case Availability.Chat:
-							View.Event("Ready to chat.", e.NickName);
+							View.Event("Ready to chat.", e.NickName, string.Empty);
 							break;
 
 						case Availability.DoNotDisturb:
-							View.Event("Busy.", e.NickName);
+							View.Event("Busy.", e.NickName, string.Empty);
 							break;
 
 						case Availability.ExtendedAway:
-							View.Event("Away (extended).", e.NickName);
+							View.Event("Away (extended).", e.NickName, string.Empty);
 							break;
 					}
 				}
@@ -579,82 +580,82 @@ namespace Waher.Client.WPF.Model.Muc
 						switch (Status)
 						{
 							case MucStatus.AffiliationChanged:
-								View.Event("New affiliation: " + e.Affiliation.ToString(), e.NickName);
+								View.Event("New affiliation: " + e.Affiliation.ToString(), e.NickName, string.Empty);
 								break;
 
 							case MucStatus.LoggingEnabled:
-								View.Event("This room logs messages.", e.NickName);
+								View.Event("This room logs messages.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.LoggingDisabled:
-								View.Event("This room does not log messages.", e.NickName);
+								View.Event("This room does not log messages.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.NickModified:
-								View.Event("Nick-name changed.", e.NickName);
+								View.Event("Nick-name changed.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RoomNonAnonymous:
-								View.Event("This room does not anonymous.", e.NickName);
+								View.Event("This room does not anonymous.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RoomSemiAnonymous:
-								View.Event("This room is semi-anonymous.", e.NickName);
+								View.Event("This room is semi-anonymous.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RoomAnonymous:
-								View.Event("This room does anonymous.", e.NickName);
+								View.Event("This room does anonymous.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.FullJidVisisble:
-								View.Event("All participants in this room have access to the full JID of each other.", e.NickName);
+								View.Event("All participants in this room have access to the full JID of each other.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.ShowsUnavailableMembers:
-								View.Event("This room displays unavailable members.", e.NickName);
+								View.Event("This room displays unavailable members.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.DoesNotShowUnavailableMembers:
-								View.Event("This room hieds unavailable members.", e.NickName);
+								View.Event("This room hieds unavailable members.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.NonPrivacyRelatedConfigurationChange:
-								View.Event("A configuration that does not affect privacy changed.", e.NickName);
+								View.Event("A configuration that does not affect privacy changed.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.OwnPresence:
 								break;
 
 							case MucStatus.Created:
-								View.Event("Room created.", e.NickName);
+								View.Event("Room created.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.Banned:
-								View.Event("Banned from the room.", e.NickName);
+								View.Event("Banned from the room.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.NewRoomNickName:
-								View.Event("New room nick-name.", e.NickName);
+								View.Event("New room nick-name.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.Kicked:
-								View.Event("Temporarily kicked from the room.", e.NickName);
+								View.Event("Temporarily kicked from the room.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RemovedDueToAffiliationChange:
-								View.Event("Removed from the room due to an affiliation change.", e.NickName);
+								View.Event("Removed from the room due to an affiliation change.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RemovedDueToNonMembership:
-								View.Event("Removed from the room, since no longer member.", e.NickName);
+								View.Event("Removed from the room, since no longer member.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RemovedDueToSystemShutdown:
-								View.Event("Removed from the room due to system shutdown.", e.NickName);
+								View.Event("Removed from the room due to system shutdown.", e.NickName, string.Empty);
 								break;
 
 							case MucStatus.RemovedDueToFailure:
-								View.Event("Removed from the room due to technical problems.", e.NickName);
+								View.Event("Removed from the room due to technical problems.", e.NickName, string.Empty);
 								break;
 						}
 					}
@@ -662,7 +663,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 				if (e.RoomDestroyed)
 				{
-					View?.Event("Room has been destroyed on the host.", e.NickName);
+					View?.Event("Room has been destroyed on the host.", e.NickName, string.Empty);
 
 					RoomNode.Parent.RemoveChild(RoomNode);
 					RoomNode.Parent.OnUpdated();
@@ -678,11 +679,11 @@ namespace Waher.Client.WPF.Model.Muc
 		private async Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
-			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, null, null, null);
+			RoomNode.GetOccupantNode(e.NickName, null, null, null);
 
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
-			MainWindow.currentInstance.ChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp);
+			MainWindow.currentInstance.ChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, IsMarkdown, Timestamp);
 		}
 
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
@@ -692,9 +693,9 @@ namespace Waher.Client.WPF.Model.Muc
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
 			if (IsMarkdown)
-				View?.Event(Message, string.Empty, new MarkdownDocument(Message, ChatView.GetMarkdownSettings()), Timestamp);
+				View?.Event(Message, string.Empty, new MarkdownDocument(Message, ChatView.GetMarkdownSettings()), Timestamp, e.ThreadID);
 			else
-				View?.Event(Message, string.Empty);
+				View?.Event(Message, string.Empty, e.ThreadID);
 		}
 
 	}

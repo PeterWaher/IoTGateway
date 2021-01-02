@@ -486,9 +486,10 @@ namespace Waher.Client.WPF.Model
 		/// Sends a chat message.
 		/// </summary>
 		/// <param name="Message">Text message to send.</param>
+		/// <param name="ThreadId">Thread ID for the messge.</param>
 		/// <param name="Markdown">Markdown document, if any, or null if plain text.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void SendChatMessage(string Message, MarkdownDocument Markdown)
+		public virtual void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			MainWindow.ErrorBox("You are not allowed to chat with this entity.");
 		}

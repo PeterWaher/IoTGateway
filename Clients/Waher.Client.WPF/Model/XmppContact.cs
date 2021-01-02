@@ -261,7 +261,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
+		public override void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode != null)
@@ -271,11 +271,11 @@ namespace Waher.Client.WPF.Model
 					To = this.bareJid;
 
 				if (Markdown is null)
-					XmppAccountNode.Client.SendChatMessage(To, Message);
+					XmppAccountNode.Client.SendChatMessage(To, Message, string.Empty, string.Empty, ThreadId);
 				else
 				{
 					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+						MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 				}
 			}
 		}

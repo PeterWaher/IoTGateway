@@ -219,6 +219,12 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.
+		/// </summary>
+		public Type[] TransparentExceptionTypes => this.transparentExceptionTypes;
+
+		/// <summary>
 		/// Preprocesses markdown text.
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
@@ -6004,6 +6010,11 @@ namespace Waher.Content.Markdown
 			Tags.Keys.CopyTo(Result, 0);
 			return Result;
 		}
+
+		/// <summary>
+		/// Markdown elements making up the document.
+		/// </summary>
+		public IEnumerable<MarkdownElement> Elements => this.elements;
 
 		/// <summary>
 		/// Gets an enumerator of root markdown elements in the document.

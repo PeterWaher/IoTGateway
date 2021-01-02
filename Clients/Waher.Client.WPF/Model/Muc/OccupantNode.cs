@@ -230,12 +230,15 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
+		public override void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			if (Markdown is null)
-				this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message);
+				this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message, string.Empty, ThreadId);
 			else
-				this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName, XmppContact.MultiFormatMessage(Message, Markdown));
+			{
+				this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName,
+					XmppContact.MultiFormatMessage(Message, Markdown), string.Empty, ThreadId);
+			}
 		}
 
 		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)

@@ -22,6 +22,7 @@
 			<xs:extension base="xs:string">
         <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
         <xs:attribute name="from" type="xs:string" use="optional"/>
+        <xs:attribute name="thread" type="xs:string" use="optional"/>
       </xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

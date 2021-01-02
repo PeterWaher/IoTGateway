@@ -170,7 +170,7 @@ namespace Waher.Client.WPF.Model.Legal
 			MainWindow.UpdateGui(() =>
 			{
 				MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e.From), XmppClient.GetBareJID(e.To),
-					Markdown.ToString(), true, DateTime.Now);
+					Markdown.ToString(), string.Empty, true, DateTime.Now);
 			});
 
 			return Task.CompletedTask;
@@ -230,7 +230,7 @@ namespace Waher.Client.WPF.Model.Legal
 							MainWindow.UpdateGui(() =>
 							{
 								MainWindow.currentInstance.ChatMessage(XmppClient.GetBareJID(e2.From), XmppClient.GetBareJID(e2.To),
-									Markdown.ToString(), true, DateTime.Now);
+									Markdown.ToString(), string.Empty, true, DateTime.Now);
 							});
 						}
 					}

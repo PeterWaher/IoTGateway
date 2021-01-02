@@ -443,6 +443,10 @@
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.csproj">
+      <Project>{4c105fae-978c-4c5a-9115-458f841c80d4}</Project>
+      <Name>Waher.Content.Markdown.Consolidation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj">
       <Project>{a799d295-4eb2-4754-b0ff-455a881ff491}</Project>
       <Name>Waher.Content.Markdown.GraphViz</Name>

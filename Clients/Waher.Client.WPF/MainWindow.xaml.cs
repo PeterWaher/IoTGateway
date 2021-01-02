@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Consolidation;
 using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Markdown.PlantUml;
@@ -75,6 +76,7 @@ namespace Waher.Client.WPF
 				typeof(Content.InternetContent).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
 				typeof(MarkdownDocument).Assembly,
+				typeof(ThreadConsolidation).Assembly,
 				typeof(GraphViz).Assembly,
 				typeof(XmlLayout).Assembly,
 				typeof(PlantUml).Assembly,
@@ -687,10 +689,10 @@ namespace Waher.Client.WPF
 		{
 			MessageEventArgs e = (MessageEventArgs)P;
 			ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
-			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, IsMarkdown, Timestamp);
+			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, e.ThreadID, IsMarkdown, Timestamp);
 		}
 
-		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp)
+		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp)
 		{
 			XmppAccountNode XmppAccountNode;
 
@@ -725,7 +727,7 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
-				ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+				ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 				return;
 			}
 
@@ -741,7 +743,7 @@ namespace Waher.Client.WPF
 						ChatView ChatView = new ChatView(ContactNode, false);
 						TabItem2.Content = ChatView;
 
-						ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+						ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 						return;
 					}
 					else
@@ -767,7 +769,7 @@ namespace Waher.Client.WPF
 							ChatView ChatView = new ChatView(ContactNode, false);
 							TabItem2.Content = ChatView;
 
-							ChatView.ChatMessageReceived(Message, FromBareJid, IsMarkdown, Timestamp, this);
+							ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 							return;
 						} 
 					}
@@ -801,8 +803,8 @@ namespace Waher.Client.WPF
 			return null;
 		}
 
-		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
-			ChatItemType Type, RoomNode Node, string Title)
+		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, 
+			DateTime Timestamp, ChatItemType Type, RoomNode Node, string Title)
 		{
 			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
 
@@ -818,20 +820,20 @@ namespace Waher.Client.WPF
 			switch (Type)
 			{
 				case ChatItemType.Transmitted:
-					ChatView.ChatMessageTransmitted(Message, out MarkdownDocument _);
+					ChatView.ChatMessageTransmitted(Message, ThreadId, out MarkdownDocument _);
 					break;
 
 				case ChatItemType.Received:
-					ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+					ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 					break;
 
 				case ChatItemType.Event:
-					ChatView.Event(Message, XmppClient.GetResource(FromFullJid));
+					ChatView.Event(Message, XmppClient.GetResource(FromFullJid), ThreadId);
 					break;
 			}
 		}
 
-		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, bool IsMarkdown, DateTime Timestamp,
+		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp,
 			OccupantNode Node, string Title)
 		{
 			foreach (TabItem TabItem in this.Tabs.Items)
@@ -847,7 +849,7 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
-				ChatView.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+				ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 				return;
 			}
 
@@ -857,7 +859,7 @@ namespace Waher.Client.WPF
 			ChatView ChatView2 = new ChatView(Node, true);
 			TabItem2.Content = ChatView2;
 
-			ChatView2.ChatMessageReceived(Message, FromFullJid, IsMarkdown, Timestamp, this);
+			ChatView2.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 		}
 
 		public void MucChatSubject(string FromFullJid, string ToBareJid, RoomNode Node, string Title)

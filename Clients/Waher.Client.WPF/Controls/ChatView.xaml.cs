@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +18,7 @@ using Microsoft.Win32;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Consolidation;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -30,10 +33,14 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class ChatView : UserControl, ITabView
 	{
+		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Emoji1LocalFiles emoji1_24x24 = null;
+
+		private readonly Dictionary<string, ThreadConsolidation> threads = new Dictionary<string, ThreadConsolidation>();
 		private readonly TreeNode node;
 		private Timer timer;
 		private bool muc;
+		private bool consolidate = true;
 
 		public ChatView(TreeNode Node, bool Muc)
 		{
@@ -52,6 +59,14 @@ namespace Waher.Client.WPF.Controls
 			}
 			else
 				this.timer = null;
+
+			this.DataContext = this;
+		}
+
+		public bool Consolidate
+		{
+			get => this.consolidate;
+			set => this.consolidate = value;
 		}
 
 		internal static void InitEmojis()
@@ -121,22 +136,28 @@ namespace Waher.Client.WPF.Controls
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
 
-			this.ChatMessageTransmitted(Msg, out MarkdownDocument Markdown);
+			byte[] Bin = new byte[16];
 
-			this.node.SendChatMessage(Msg, Markdown);
+			lock (rnd)
+			{
+				rnd.GetBytes(Bin);
+			}
+
+			string ThreadId = Convert.ToBase64String(Bin);
+
+			this.ChatMessageTransmitted(Msg, ThreadId, out MarkdownDocument Markdown);
+			this.node.SendChatMessage(Msg, ThreadId, Markdown);
 		}
 
-		public void ChatMessageTransmitted(string Message, out MarkdownDocument Markdown)
+		public void ChatMessageTransmitted(string Message, string ThreadId, out MarkdownDocument Markdown)
 		{
-			ChatItem Item;
-
 			if (Message.IndexOf('|') >= 0)
 			{
 				string s;
 				int c = this.ChatListView.Items.Count;
 
 				if (c > 0 &&
-					(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
+					this.ChatListView.Items[c - 1] is ChatItem Item &&
 					Item.Type == ChatItemType.Transmitted &&
 					string.IsNullOrWhiteSpace(Item.From) &&
 					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
@@ -170,22 +191,71 @@ namespace Waher.Client.WPF.Controls
 				Markdown = null;
 			}
 
-			Item = new ChatItem(ChatItemType.Transmitted, DateTime.Now, Message, string.Empty, Markdown, Colors.Black, Colors.Honeydew);
+			this.AddItem(ChatItemType.Transmitted, DateTime.Now, Message, string.Empty, Markdown, ThreadId, Colors.Black, Colors.Honeydew);
+		}
+
+		private ChatItem AddItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId, Color FgColor, Color BgColor)
+		{
+			ThreadConsolidation Consolidation;
+			ChatItem Item;
+			bool DoConsolidation;
+			bool Update;
+
+			if (DoConsolidation = (Type == ChatItemType.Received && this.consolidate && !string.IsNullOrEmpty(ThreadId)))
+			{
+				lock (this.threads)
+				{
+					if (this.threads.TryGetValue(ThreadId, out Consolidation))
+						Item = Consolidation.Tag as ChatItem;
+					else
+						Item = null;
+
+					if (Item is null)
+					{
+						Item = new ChatItem(Type, Timestamp, Message, From, Markdown, ThreadId, FgColor, BgColor);
+						Consolidation = new ThreadConsolidation(ThreadId)
+						{
+							Tag = Item
+						};
+						this.threads[ThreadId] = Consolidation;
+						Update = false;
+					}
+					else
+						Update = true;
+				}
+
+				if (Update)
+				{
+					if (Consolidation.Add(From, Markdown))
+						Item.From += "\r\n" + From;
+
+					MarkdownDocument Doc = new MarkdownDocument(Consolidation.GenerateMarkdown(), Markdown.Settings, Markdown.TransparentExceptionTypes);
+					Item.Update(Item.Message + "\r\n" + Message, Doc);
+					this.ChatListView.Items.Refresh();
+
+					return Item;
+				}
+			}
+			else
+				Item = new ChatItem(Type, Timestamp, Message, From, Markdown, ThreadId, FgColor, BgColor);
+			
 			ListViewItem ListViewItem = new ListViewItem()
 			{
 				Content = Item,
-				Foreground = new SolidColorBrush(Colors.Black),
-				Background = new SolidColorBrush(Colors.Honeydew),
+				Foreground = new SolidColorBrush(FgColor),
+				Background = new SolidColorBrush(BgColor),
 				Margin = new Thickness(0)
 			};
+			
 			this.ChatListView.Items.Add(ListViewItem);
 			this.ChatListView.ScrollIntoView(ListViewItem);
+
+			return Item;
 		}
 
-		public void ChatMessageReceived(string Message, string From, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
+		public void ChatMessageReceived(string Message, string From, string ThreadId, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
 		{
 			MarkdownDocument Markdown;
-			ChatItem Item;
 
 			if (IsMarkdown)
 			{
@@ -194,7 +264,7 @@ namespace Waher.Client.WPF.Controls
 					int c = this.ChatListView.Items.Count;
 
 					if (c > 0 &&
-						(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
+						this.ChatListView.Items[c - 1] is ChatItem Item &&
 						Item.Type == ChatItemType.Received &&
 						Item.From == From &&
 						(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
@@ -217,16 +287,7 @@ namespace Waher.Client.WPF.Controls
 			else
 				Markdown = null;
 
-			Item = new ChatItem(ChatItemType.Received, Timestamp, Message, From, Markdown, Colors.Black, Colors.AliceBlue);
-			ListViewItem ListViewItem = new ListViewItem()
-			{
-				Content = Item,
-				Foreground = new SolidColorBrush(Colors.Black),
-				Background = new SolidColorBrush(Colors.AliceBlue),
-				Margin = new Thickness(0)
-			};
-			this.ChatListView.Items.Add(ListViewItem);
-			this.ChatListView.ScrollIntoView(ListViewItem);
+			this.AddItem(ChatItemType.Received, Timestamp, Message, From, Markdown, ThreadId, Colors.Black, Colors.AliceBlue);
 		}
 
 		private void UserControl_GotFocus(object sender, RoutedEventArgs e)
@@ -312,6 +373,9 @@ namespace Waher.Client.WPF.Controls
 					if (!string.IsNullOrEmpty(ChatItem.From))
 						w.WriteAttributeString("from", ChatItem.FromStr);
 
+					if (!string.IsNullOrEmpty(ChatItem.ThreadId))
+						w.WriteAttributeString("thread", ChatItem.ThreadId);
+
 					w.WriteValue(ChatItem.Message);
 					w.WriteEndElement();
 				}
@@ -365,6 +429,7 @@ namespace Waher.Client.WPF.Controls
 			Color ForegroundColor;
 			Color BackgroundColor;
 			string From;
+			string ThreadId;
 
 			XSL.Validate(FileName, Xml, chatRoot, chatNamespace, schema);
 
@@ -399,6 +464,7 @@ namespace Waher.Client.WPF.Controls
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
 				From = XML.Attribute(E, "from");
+				ThreadId = XML.Attribute(E, "thread");
 
 				switch (Type)
 				{
@@ -430,16 +496,7 @@ namespace Waher.Client.WPF.Controls
 					Markdown = null;
 				}
 
-				ChatItem Item = new ChatItem(Type, Timestamp, E.InnerText, From, Markdown, ForegroundColor, BackgroundColor);
-				ListViewItem ListViewItem = new ListViewItem()
-				{
-					Content = Item,
-					Foreground = new SolidColorBrush(ForegroundColor),
-					Background = new SolidColorBrush(BackgroundColor),
-					Margin = new Thickness(0)
-				};
-				this.ChatListView.Items.Add(ListViewItem);
-				this.ChatListView.ScrollIntoView(ListViewItem);
+				this.AddItem(Type, Timestamp, E.InnerText, From, Markdown, ThreadId, ForegroundColor, BackgroundColor);
 			}
 		}
 
@@ -481,25 +538,16 @@ namespace Waher.Client.WPF.Controls
 			System.Diagnostics.Process.Start(Uri);
 		}
 
-		public void Event(string Message, string From)
+		public void Event(string Message, string From, string ThreadId)
 		{
-			this.Event(Message, From, null, DateTime.Now);
+			this.Event(Message, From, null, DateTime.Now, ThreadId);
 		}
 
-		public void Event(string Message, string From, MarkdownDocument Markdown, DateTime Timestamp)
+		public void Event(string Message, string From, MarkdownDocument Markdown, DateTime Timestamp, string ThreadId)
 		{
 			MainWindow.UpdateGui(() =>
 			{
-				ChatItem Item = new ChatItem(ChatItemType.Event, Timestamp, Message, From, Markdown, EventFgColor, EventBgColor);
-				ListViewItem ListViewItem = new ListViewItem()
-				{
-					Content = Item,
-					Foreground = new SolidColorBrush(EventFgColor),
-					Background = new SolidColorBrush(EventBgColor),
-					Margin = new Thickness(0)
-				};
-				this.ChatListView.Items.Add(ListViewItem);
-				this.ChatListView.ScrollIntoView(ListViewItem);
+				this.AddItem(ChatItemType.Event, Timestamp, Message, From, Markdown, ThreadId, EventFgColor, EventBgColor);
 			});
 		}
 
@@ -530,5 +578,6 @@ namespace Waher.Client.WPF.Controls
 				}, null);
 			}
 		}
+
 	}
 }

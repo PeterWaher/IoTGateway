@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.Markdown.Consolidation</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.Markdown.Consolidation.DocumentType">
+            <summary>
+            Type of markdown document.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.Empty">
+            <summary>
+            Empty document
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleNumber">
+            <summary>
+            Contains a single line containing a number.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleLine">
+            <summary>
+            Contains a single line of text.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleParagraph">
+            <summary>
+            Contains a single paragraph of text.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleCode">
+            <summary>
+            Contains one code section.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleTable">
+            <summary>
+            Contains one table.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.Complex">
+            <summary>
+            Contains complex content.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.DocumentInformation">
+            <summary>
+            Information about a document.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.DocumentInformation.#ctor(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Information about a document.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Markdown">
+            <summary>
+            Markdown document.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Type">
+            <summary>
+            Document type.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Rows">
+            <summary>
+            Rows
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.SourceState">
+            <summary>
+            Maintains the state of one source.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.#ctor(System.String)">
+            <summary>
+            Maintains the state of one source.
+            </summary>
+            <param name="Source">Source</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.Source">
+            <summary>
+            Source
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.FirstText">
+            <summary>
+            First document text.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.FirstDocument">
+            <summary>
+            First document.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.Documents">
+            <summary>
+            Available documents from source.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.Add(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Adds a markdown document from the source.
+            </summary>
+            <param name="Markdown">Markdown document.</param>
+            <returns>Consolidated document type.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.ThreadConsolidation">
+            <summary>
+            Consolidates Markdown from multiple sources, sharing the same thread.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.#ctor(System.String)">
+            <summary>
+            Consolidates Markdown from multiple sources, sharing the same thread.
+            </summary>
+            <param name="ThreadId">Thread ID</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.ThreadId">
+            <summary>
+            Thread ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Tag">
+            <summary>
+            External tag object that can be tagged to the object by its owner.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Add(System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.GenerateMarkdown">
+            <summary>
+            Generates consolidated markdown from all sources.
+            </summary>
+            <returns>Consolidated markdown.</returns>
+        </member>
+    </members>
+</doc>

@@ -243,6 +243,7 @@
   <Assembly fileName='Waher.Content.Html.dll'/>
   <Assembly fileName='Waher.Content.Images.dll'/>
   <Assembly fileName='Waher.Content.Markdown.dll'/>
+  <Assembly fileName='Waher.Content.Markdown.Consolidation.dll'/>
   <Assembly fileName='Waher.Content.Markdown.GraphViz.dll'/>
   <Assembly fileName='Waher.Content.Markdown.Layout2D.dll'/>
   <Assembly fileName='Waher.Content.Markdown.PlantUml.dll'/>

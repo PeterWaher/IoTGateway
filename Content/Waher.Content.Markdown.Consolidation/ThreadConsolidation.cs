@@ -31,6 +31,22 @@ namespace Waher.Content.Markdown.Consolidation
 		public string ThreadId => this.threadId;
 
 		/// <summary>
+		/// Consolidated sources.
+		/// </summary>
+		public string[] Sources
+		{
+			get
+			{
+				lock (this.sources)
+				{
+					string[] Result = new string[this.sources.Count];
+					this.sources.Keys.CopyTo(Result, 0);
+					return Result;
+				}
+			}
+		}
+
+		/// <summary>
 		/// External tag object that can be tagged to the object by its owner.
 		/// </summary>
 		public object Tag
@@ -102,7 +118,7 @@ namespace Waher.Content.Markdown.Consolidation
 							for (i = 0; i < c; i++)
 							{
 								j = d - i - 1;
-								if (Rows[d] != Rows0[d])
+								if (Rows[j] != Rows0[j])
 									break;
 							}
 
@@ -157,9 +173,9 @@ namespace Waher.Content.Markdown.Consolidation
 						{
 							Markdown.Append("| `");
 							Markdown.Append(P.Key);
-							Markdown.Append("` | `");
+							Markdown.Append("` | ");
 							Markdown.Append(P.Value.FirstText);
-							Markdown.AppendLine("` |");
+							Markdown.AppendLine(" |");
 						}
 						break;
 

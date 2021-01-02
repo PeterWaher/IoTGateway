@@ -30,6 +30,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		private readonly bool lastIsTable;
 		private readonly string threadId;
 		private string from;
+		private string fromStr;
 		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
@@ -56,6 +57,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.timestamp = this.lastUpdated = Timestamp;
 			this.message = Message;
 			this.from = From;
+			this.fromStr = GetShortFrom(From);
 			this.threadId = ThreadId;
 
 			if (Markdown is null)
@@ -223,7 +225,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		public string From
 		{
 			get => this.from;
-			set => this.from = value;
+			set => this.from = GetShortFrom(value);
 		}
 
 		/// <summary>
@@ -234,18 +236,38 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <summary>
 		/// Nick-name of sender.
 		/// </summary>
-		public string FromStr
+		public string FromStr => this.fromStr;
+
+		internal static string GetShortFrom(string From)
 		{
-			get
+			int i = From.IndexOfAny(Content.CommonTypes.CRLF);
+			if (i >= 0)
 			{
-				if (this.from is null)
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (string Row in From.Split(Content.CommonTypes.CRLF))
+				{
+					if (First)
+						First = false;
+					else
+						sb.AppendLine();
+
+					sb.Append(GetShortFrom(Row));
+				}
+
+				return sb.ToString();
+			}
+			else
+			{
+				if (From is null)
 					return string.Empty;
 
-				int i = this.from.IndexOf('/');
+				i = From.IndexOf('/');
 				if (i < 0)
-					return this.from;
-				
-				return this.from.Substring(i + 1);
+					return From;
+
+				return From.Substring(i + 1);
 			}
 		}
 

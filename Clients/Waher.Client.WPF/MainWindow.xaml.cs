@@ -24,6 +24,7 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
@@ -65,6 +66,7 @@ namespace Waher.Client.WPF
 		internal static MainWindow currentInstance = null;
 		private static string appDataFolder = null;
 		private static FilesProvider databaseProvider = null;
+		private static Scheduler scheduler = new Scheduler();
 		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new LinkedList<GuiUpdateTask>();
 
 		public MainWindow()
@@ -157,6 +159,8 @@ namespace Waher.Client.WPF
 			get { return appDataFolder; }
 		}
 
+		internal static Scheduler Scheduler => scheduler;
+		
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -215,6 +219,9 @@ namespace Waher.Client.WPF
 				e.Cancel = true;
 				return;
 			}
+
+			scheduler?.Dispose();
+			scheduler = null;
 
 			Registry.SetValue(registryKey, "WindowLeft", (int)this.Left, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowTop", (int)this.Top, RegistryValueKind.DWord);
@@ -813,8 +820,8 @@ namespace Waher.Client.WPF
 				TabItem TabItem2 = MainWindow.NewTab(Title);
 				this.Tabs.Items.Add(TabItem2);
 
-				ChatView ChatView2 = new ChatView(Node, true);
-				TabItem2.Content = ChatView2;
+				ChatView = new ChatView(Node, true);
+				TabItem2.Content = ChatView;
 			}
 
 			switch (Type)

@@ -72,7 +72,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 
 			this.markdown = Markdown;
-			
+
 			string s = Markdown.MarkdownText.Trim().Replace("\r\n", "\n").Replace('\r', '\n');
 			this.rows = s.Split('\n');
 
@@ -92,7 +92,7 @@ namespace Waher.Content.Markdown.Consolidation
 					{
 						if (this.rows.Length > 1)
 							this.type = DocumentType.SingleParagraph;
-						else if (CommonTypes.TryParse(this.rows[0], out double _))
+						else if (IsNumeric(this.rows[0]))
 							this.type = DocumentType.SingleNumber;
 						else
 							this.type = DocumentType.SingleLine;
@@ -101,6 +101,21 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 			else
 				this.type = DocumentType.Complex;
+		}
+
+		private static bool IsNumeric(string s)
+		{
+			if (s.StartsWith("<") && s.EndsWith(">"))
+			{
+				int i = s.IndexOf('>');
+				int j = s.LastIndexOf('<');
+
+				return (i < j && IsNumeric(s.Substring(i + 1, j - i - 1)));
+			}
+			else if (s.Length > 2 && s.StartsWith("`") && s.EndsWith("`"))
+				return IsNumeric(s.Substring(1, s.Length - 2));
+			else
+				return CommonTypes.TryParse(s, out double _);
 		}
 
 		/// <summary>

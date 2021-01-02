@@ -123,6 +123,11 @@
             Thread ID
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Sources">
+            <summary>
+            Consolidated sources.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Tag">
             <summary>
             External tag object that can be tagged to the object by its owner.

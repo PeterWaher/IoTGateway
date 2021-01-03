@@ -61,24 +61,27 @@ namespace Waher.Script.Persistence.Functions
 				int Columns = M.Rows + 1;
 				string[] Names = new string[Columns];
 				string[] Names0 = M.ColumnNames;
-				IElement[,] Elements = new IElement[Columns, Rows];
+				IElement[,] Elements = new IElement[Rows, Columns];
 				IElement[,] Elements0 = M.Values;
-				int x, y;
+				int Column, Row;
 
 				Names[0] = Names0[0];
-				for (x = 1; x < Columns; x++)
-					Names[x] = Elements[0, x - 1].AssociatedObjectValue?.ToString();
+				for (Column = 1; Column < Columns; Column++)
+					Names[Column] = Elements0[Column - 1, 0].AssociatedObjectValue?.ToString();
 
-				for (y = 0; y < Rows; y++)
-					Elements[0, y] = new StringValue(Names0[y + 1]);
+				for (Row = 0; Row < Rows; Row++)
+					Elements[Row, 0] = new StringValue(Names0[Row + 1]);
 
-				for (x = 1; x < Columns; x++)
+				for (Column = 1; Column < Columns; Column++)
 				{
-					for (y = 0; y < Rows; y++)
-						Elements[x, y] = Elements0[y + 1, x - 1];
+					for (Row = 0; Row < Rows; Row++)
+						Elements[Row, Column] = Elements0[Column - 1, Row + 1];
 				}
 
-				return new ObjectMatrix(Elements);
+				return new ObjectMatrix(Elements)
+				{
+					ColumnNames = Names
+				};
 			}
 			else
 				return Argument.Transpose();

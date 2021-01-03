@@ -157,7 +157,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
-						if (!string.IsNullOrEmpty(s) && s != "," && s != ";" && s != "HAVING" && s != "ORDER" && s != "OFFSET")
+						if (!string.IsNullOrEmpty(s) && s != "," && s != ";" && s != ")" && s != "]" && s != "}" && s != "HAVING" && s != "ORDER" && s != "OFFSET")
 						{
 							if (s == "AS")
 								Parser.NextToken();
@@ -165,10 +165,16 @@ namespace Waher.Script.Persistence.SQL.Parsers
 							Name = Parser.ParseNoWhiteSpace();
 							s = Parser.PeekNextToken().ToUpper();
 						}
-						else if (Node is VariableReference Ref)
-							Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
-						else if (Node is NamedMember NamedMember)
-							Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
+						else
+							Name = null;
+
+						if (Name is null)
+						{
+							if (Node is VariableReference Ref)
+								Name = new ConstantElement(new StringValue(Ref.VariableName), Node.Start, Node.Length, Node.Expression);
+							else if (Node is NamedMember NamedMember)
+								Name = new ConstantElement(new StringValue(NamedMember.Name), Node.Start, Node.Length, Node.Expression);
+						}
 
 						GroupBy.Add(Node);
 						GroupByNames.Add(Name);

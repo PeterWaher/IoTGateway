@@ -1773,6 +1773,7 @@ The following predefined variables are available in web pages hosted by the IoT 
 
 | Variable       | Description                                              |
 |:--------------:|----------------------------------------------------------|
+| `Domain`       | The domain on which the gateway is operating.            |
 | `Language`     | The language object of the current session.              |
 | `Namespace`    | The language namespace object of the current page.       |
 

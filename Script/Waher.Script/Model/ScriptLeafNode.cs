@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
-using Waher.Script.Objects;
-using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Model
 {

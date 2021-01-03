@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Script.Operators;
 
 namespace Waher.Script.Model
 {

@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Waher.Runtime.Inventory;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
-using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Model
 {

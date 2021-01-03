@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;

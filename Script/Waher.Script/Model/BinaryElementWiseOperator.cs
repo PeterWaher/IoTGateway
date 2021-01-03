@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Model
 {

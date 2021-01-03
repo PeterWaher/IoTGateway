@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Model

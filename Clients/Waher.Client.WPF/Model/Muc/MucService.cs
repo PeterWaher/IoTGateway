@@ -679,11 +679,12 @@ namespace Waher.Client.WPF.Model.Muc
 		private async Task MucClient_PrivateMessageReceived(object Sender, RoomOccupantMessageEventArgs e)
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
-			RoomNode.GetOccupantNode(e.NickName, null, null, null);
+			OccupantNode Occupant = RoomNode.GetOccupantNode(e.NickName, null, null, null);
 
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
-			MainWindow.currentInstance.ChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, IsMarkdown, Timestamp);
+			MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, 
+				IsMarkdown, Timestamp, Occupant, e.From);
 		}
 
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)

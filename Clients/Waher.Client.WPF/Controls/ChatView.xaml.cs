@@ -638,5 +638,10 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
+		public bool ContainsThread(string ThreadId)
+		{
+			return this.threads.ContainsKey(ThreadId);
+		}
+
 	}
 }

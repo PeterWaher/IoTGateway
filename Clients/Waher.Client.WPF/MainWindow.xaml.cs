@@ -843,6 +843,16 @@ namespace Waher.Client.WPF
 		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp,
 			OccupantNode Node, string Title)
 		{
+			if (!string.IsNullOrEmpty(ThreadId))
+			{
+				ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
+				if (!(ChatView is null) && ChatView.ContainsThread(ThreadId))
+				{
+					ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
+					return;
+				}
+			}
+
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				if (!(TabItem.Content is ChatView ChatView))

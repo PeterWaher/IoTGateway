@@ -63,6 +63,11 @@ namespace Waher.Client.WPF.Controls
 			this.DataContext = this;
 		}
 
+		public bool Muc
+		{
+			get => this.muc;
+		}
+
 		public bool Consolidate
 		{
 			get => this.consolidate;
@@ -133,17 +138,24 @@ namespace Waher.Client.WPF.Controls
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
 			string Msg = this.Input.Text;
+			string ThreadId;
+
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
 
-			byte[] Bin = new byte[16];
-
-			lock (rnd)
+			if (this.muc)
 			{
-				rnd.GetBytes(Bin);
-			}
+				byte[] Bin = new byte[16];
 
-			string ThreadId = Convert.ToBase64String(Bin);
+				lock (rnd)
+				{
+					rnd.GetBytes(Bin);
+				}
+
+				ThreadId = Convert.ToBase64String(Bin);
+			}
+			else
+				ThreadId = string.Empty;
 
 			this.ChatMessageTransmitted(Msg, ThreadId, out MarkdownDocument Markdown);
 			this.node.SendChatMessage(Msg, ThreadId, Markdown);
@@ -196,7 +208,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void AddItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId, Color FgColor, Color BgColor)
 		{
-			if (this.consolidate && !string.IsNullOrEmpty(ThreadId))
+			if (this.muc && this.consolidate && !string.IsNullOrEmpty(ThreadId))
 			{
 				switch (Type)
 				{
@@ -241,6 +253,8 @@ namespace Waher.Client.WPF.Controls
 									First = false;
 								else
 									sb.AppendLine();
+
+								sb.Append(Source);
 							}
 
 							MainWindow.UpdateGui(() =>

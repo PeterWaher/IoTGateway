@@ -14,7 +14,7 @@
                     <Button Name="SendButton" Width="80" Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsDefault="True" Click="Send_Click" Margin="0,5,0,5">
                         <Label Padding="0">Send</Label>
                     </Button>
-                    <ToggleButton x:Name="ConsolidateButton" Width="80" Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,5,0,5" IsChecked="{Binding Consolidate}">
+                    <ToggleButton x:Name="ConsolidateButton" Width="80" Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,5,0,5" IsChecked="{Binding Consolidate}" IsEnabled="{Binding Muc}">
                         <Label Padding="0">Consolidate</Label>
                     </ToggleButton>
                 </StackPanel>

@@ -257,7 +257,7 @@ namespace Waher.Content.Markdown.Model
 				if (Left)
 					s = s.Substring(1);
 
-				if (Right)
+				if (Right && !string.IsNullOrEmpty(s))
 					s = s.Substring(0, s.Length - 1);
 
 				foreach (char ch in s)

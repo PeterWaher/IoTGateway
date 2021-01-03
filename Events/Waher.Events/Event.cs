@@ -103,7 +103,7 @@ namespace Waher.Events
 			this.message = Exception.Message;
 			this.obj = Exception is IEventObject Obj && !string.IsNullOrEmpty(s = Obj.Object) ? s : Object;
 			this.actor = Exception is IEventActor Act && !string.IsNullOrEmpty(s = Act.Actor) ? s : Actor;
-			this.eventId = Exception is IEventId EvId && !string.IsNullOrEmpty(s = EvId.EventId) ? s : EventId;
+			this.eventId = Exception is IEventId EvId && !string.IsNullOrEmpty(s = EvId.EventId) ? s : string.IsNullOrEmpty(EventId) ? Exception.GetType().Name : EventId;
 			this.level = Exception is IEventLevel Lvl && Lvl.Level.HasValue ? Lvl.Level.Value : Level;
 			this.facility = Exception is IEventFacility EvFa && !string.IsNullOrEmpty(s = EvFa.Facility) ? s : Facility;
 			this.module = Exception is IEventModule Mod && !string.IsNullOrEmpty(s = Mod.Module) ? s : Module;

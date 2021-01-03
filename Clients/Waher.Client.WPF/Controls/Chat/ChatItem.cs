@@ -225,7 +225,11 @@ namespace Waher.Client.WPF.Controls.Chat
 		public string From
 		{
 			get => this.from;
-			set => this.from = GetShortFrom(value);
+			set
+			{
+				this.from = value;
+				this.fromStr = GetShortFrom(value);
+			}
 		}
 
 		/// <summary>
@@ -246,7 +250,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				StringBuilder sb = new StringBuilder();
 				bool First = true;
 
-				foreach (string Row in From.Split(Content.CommonTypes.CRLF))
+				foreach (string Row in From.Split(Content.CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
 				{
 					if (First)
 						First = false;

@@ -3281,9 +3281,13 @@ namespace Waher.IoTGateway
 			Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
 
 			HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+			IEnumerable<HtmlNode> Children = (Doc.Body ?? Doc.Root).Children;
 
-			foreach (HtmlNode N in (Doc.Body ?? Doc.Root).Children)
-				N.Export(Xml);
+			if (!(Children is null))
+			{
+				foreach (HtmlNode N in Children)
+					N.Export(Xml);
+			}
 
 			Xml.Append("</body></html>");
 		}

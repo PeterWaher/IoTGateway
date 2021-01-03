@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
-using Waher.Runtime.Inventory;
 using System.Runtime.ExceptionServices;
 using Waher.Events;
 
@@ -284,6 +283,13 @@ namespace Waher.Persistence.Files
 					this.current = default;
 					this.currentTypeCompatible = false;
 				}
+			}
+			catch (InconsistencyException ex)
+			{
+				this.current = default;
+				this.currentTypeCompatible = false;
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 			catch (Exception)
 			{

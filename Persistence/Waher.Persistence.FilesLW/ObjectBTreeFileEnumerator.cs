@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Inventory;
@@ -863,6 +864,14 @@ namespace Waher.Persistence.Files
 						this.currentTypeCompatible = false;
 						this.currentReader.Position = PosBak + Len;
 					}
+				}
+				catch (InconsistencyException ex)
+				{
+					this.current = default;
+					this.currentTypeCompatible = false;
+					this.currentReader.Position = PosBak + Len;
+
+					ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 				catch (Exception)
 				{

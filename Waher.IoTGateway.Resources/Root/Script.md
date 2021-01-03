@@ -1544,6 +1544,7 @@ The following functions are available in the `Waher.Script.Persistence` library.
 |----------|-------------|---------|
 | `DeleteObject(Obj)` | Deletes an object from the underlying persistence layer. | `Delete(Obj)` |
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
+| `Pivot(Result)` | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
 | `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
 | `UpdateObject(Obj)` | Updaes an object in the underlying persistence layer. | `UpdateObject(Obj)` |
 

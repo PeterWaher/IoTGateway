@@ -8623,6 +8623,65 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
+        <member name="T:Waher.Script.Model.FunctionOneMatrixVariable">
+            <summary>
+            Base class for funcions of one matrix variable.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Base class for funcions of one matrix variable.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrix(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrix(Waher.Script.Objects.Matrices.DoubleMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrix(Waher.Script.Objects.Matrices.ComplexMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrix(Waher.Script.Objects.Matrices.BooleanMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="P:Waher.Script.Model.FunctionOneMatrixVariable.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
         <member name="T:Waher.Script.Model.FunctionOneScalarVariable">
             <summary>
             Base class for funcions of one scalar variable.
@@ -11608,6 +11667,11 @@
         <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.ColumnNames">
             <summary>
             Contains optional column names.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.HasColumnNames">
+            <summary>
+            If the matrix has column names defined.
             </summary>
         </member>
         <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.Item(System.String)">

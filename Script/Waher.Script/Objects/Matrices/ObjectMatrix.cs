@@ -155,6 +155,11 @@ namespace Waher.Script.Objects.Matrices
 		}
 
 		/// <summary>
+		/// If the matrix has column names defined.
+		/// </summary>
+		public bool HasColumnNames => !(this.columnNames is null);
+
+		/// <summary>
 		/// Returns a named column vector.
 		/// </summary>
 		/// <param name="ColumnName">Name of column. Comparison is case insensitive.</param>

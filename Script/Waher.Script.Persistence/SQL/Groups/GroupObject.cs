@@ -100,6 +100,11 @@ namespace Waher.Script.Persistence.SQL.Groups
 
 				return Result;
 			}
+
+			set
+			{
+				this.groupedValues[Name] = value;
+			}
 		}
 
 		/// <summary>

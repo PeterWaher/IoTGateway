@@ -142,7 +142,22 @@ namespace Waher.Script.Persistence.SQL
 				foreach (KeyValuePair<ScriptNode, bool> Node in this.orderBy)
 				{
 					if (Node.Key is VariableReference Ref)
-						this.AddIfNotFound(Ref, Node.Value, OrderBy);
+					{
+						if (!(this.columnNames is null))
+						{
+							foreach (ScriptNode N in this.columnNames)
+							{
+								if (!(N is null) && N is VariableReference Ref2 && Ref2.VariableName == Ref.VariableName)
+								{
+									CalculatedOrder = true;
+									break;
+								}
+							}
+						}
+
+						if (!CalculatedOrder)
+							this.AddIfNotFound(Ref, Node.Value, OrderBy);
+					}
 					else
 					{
 						CalculatedOrder = true;
@@ -152,7 +167,9 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
-			Dictionary<string, int> Columns = new Dictionary<string, int>();
+			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
+			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
+			ScriptNode[] Columns2 = this.columns;
 			IResultSetEnumerator e;
 			RecordEnumerator e2;
 			int NrRecords = 0;
@@ -163,7 +180,20 @@ namespace Waher.Script.Persistence.SQL
 				for (i = 0; i < c; i++)
 				{
 					if (this.columns[i] is VariableReference Ref)
-						Columns[Ref.VariableName] = i;
+						ColumnIndices[Ref.VariableName] = i;
+					else if (this.columnNames[i] is VariableReference Ref2)
+					{
+						ColumnIndices[Ref2.VariableName] = i;
+
+						if (AdditionalFields is null)
+						{
+							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
+							Columns2 = (ScriptNode[])Columns2.Clone();
+						}
+
+						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
+						Columns2[i] = new VariableReference(Ref2.VariableName, Ref2.Start, Ref2.Length, Ref2.Expression);
+					}
 				}
 			}
 			else
@@ -176,15 +206,16 @@ namespace Waher.Script.Persistence.SQL
 				Top = int.MaxValue;
 			}
 			else
-				e = await Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
-
-			if (!(this.groupBy is null))
 			{
+				e = await Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
 				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames);
-
-				if (!(this.having is null))
-					e = new ConditionalEnumerator(e, Variables, this.having);
 			}
+
+			if (!(AdditionalFields is null))
+				e = new FieldAggregatorEnumerator(e, Variables, AdditionalFields?.ToArray());
+
+			if (!(this.having is null))
+				e = new ConditionalEnumerator(e, Variables, this.having);
 
 			if (CalculatedOrder)
 			{
@@ -212,9 +243,9 @@ namespace Waher.Script.Persistence.SQL
 				e = new MaxCountEnumerator(e, Top);
 
 			if (this.distinct)
-				e2 = new DistinctEnumerator(e, this.columns, Variables);
+				e2 = new DistinctEnumerator(e, Columns2, Variables);
 			else
-				e2 = new RecordEnumerator(e, this.columns, Variables);
+				e2 = new RecordEnumerator(e, Columns2, Variables);
 
 			while (await e2.MoveNextAsync())
 			{
@@ -222,7 +253,7 @@ namespace Waher.Script.Persistence.SQL
 				NrRecords++;
 			}
 
-			IElement[] Elements = new IElement[this.columns is null ? NrRecords : NrRecords * c];
+			IElement[] Elements = new IElement[Columns2 is null ? NrRecords : NrRecords * c];
 
 			i = 0;
 			foreach (IElement[] Record in Items)
@@ -239,13 +270,13 @@ namespace Waher.Script.Persistence.SQL
 
 			if (Elements.Length == 1)
 				return Elements[0];
-			else if (this.columns is null)
+			else if (Columns2 is null)
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 
 			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
 			string[] Names = new string[c];
 
-			foreach (KeyValuePair<string, int> P in Columns)
+			foreach (KeyValuePair<string, int> P in ColumnIndices)
 				Names[P.Value] = P.Key;
 
 			i = 0;

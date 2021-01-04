@@ -82,7 +82,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-			if (double.TryParse(Argument.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+			if (Expression.TryParse(Argument, out double d))
 				return new DoubleNumber(d);
 			else
 				throw new ScriptException("Not a double-precision floating point number.");

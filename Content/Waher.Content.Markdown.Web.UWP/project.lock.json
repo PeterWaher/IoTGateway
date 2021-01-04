@@ -2679,6 +2679,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -5341,6 +5342,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -8039,6 +8041,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -10710,6 +10713,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -13417,6 +13421,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -16088,6 +16093,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },
@@ -18795,6 +18801,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.2",
+          "System.Xml.XmlDocument": "4.3.0",
           "Waher.Script": "1.0.45"
         }
       },

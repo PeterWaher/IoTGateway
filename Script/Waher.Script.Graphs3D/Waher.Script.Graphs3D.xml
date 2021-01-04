@@ -9,6 +9,14 @@
             3D drawing area.
             </summary>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.#ctor">
+            <summary>
+            3D drawing area.
+            
+            By default, the camera is looking along the z-axis, with no projection, and no scaling.
+            The center of the canvas is located at origo.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Canvas3D.#ctor(System.Int32,System.Int32,System.Int32,SkiaSharp.SKColor)">
             <summary>
             3D drawing area.
@@ -742,61 +750,11 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Vector3)">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ImportGraph(System.Xml.XmlElement)">
             <summary>
-            Converts a <see cref="T:System.Numerics.Vector3"/> to an expression string that can be exported.
+            Imports graph specifics from XML.
             </summary>
-            <param name="v">Vector</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{System.Single})">
-            <summary>
-            Converts a <see cref="T:System.Single"/> array to an expression string that can be exported.
-            </summary>
-            <param name="v">Vector</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{System.Numerics.Vector3})">
-            <summary>
-            Converts a <see cref="T:System.Numerics.Vector3"/> array to an expression string that can be exported.
-            </summary>
-            <param name="v">Vectors</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Vector3[][])">
-            <summary>
-            Converts a <see cref="T:System.Numerics.Vector3"/> mesh to an expression string that can be exported.
-            </summary>
-            <param name="M">Mesh</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{SkiaSharp.SKColor})">
-            <summary>
-            Converts a <see cref="T:SkiaSharp.SKColor"/> array to an expression string that can be exported.
-            </summary>
-            <param name="v">Vectors</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Matrix4x4)">
-            <summary>
-            Converts a <see cref="T:System.Numerics.Matrix4x4"/> to an expression string that can be exported.
-            </summary>
-            <param name="M">Matrix</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(SkiaSharp.SKColor)">
-            <summary>
-            Converts a <see cref="T:SkiaSharp.SKColor"/> to an expression string that can be exported.
-            </summary>
-            <param name="Color">Color</param>
-            <returns>Expression string.</returns>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(Waher.Script.Graphs3D.PhongIntensity)">
-            <summary>
-            Converts a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> to an expression string that can be exported.
-            </summary>
-            <param name="Intensity">Intensity</param>
-            <returns>Expression string.</returns>
+            <param name="Xml">XML input.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
@@ -808,6 +766,11 @@
             Shader returning a constant color.
             </summary>
             <param name="Color">Color</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.ConstantColor.Color">
+            <summary>
+            Constant color.
+            </summary>
         </member>
         <member name="M:Waher.Script.Graphs3D.ConstantColor.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3,Waher.Script.Graphs3D.Canvas3D)">
             <summary>
@@ -1096,6 +1059,11 @@
         <member name="T:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4">
             <summary>
             Generates a <see cref="T:System.Numerics.Matrix4x4"/> object.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.argumentTypes16Scalar">
+            <summary>
+            Sixteen scalar parameters.
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
@@ -2033,12 +2001,11 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.ToString(System.Numerics.Vector4)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.ImportGraph(System.Xml.XmlElement)">
             <summary>
-            Converts a <see cref="T:System.Numerics.Vector4"/> to an expression string that can be exported.
+            Imports graph specifics from XML.
             </summary>
-            <param name="v">Vector</param>
-            <returns>Expression string.</returns>
+            <param name="Xml">XML input.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>
@@ -2073,12 +2040,6 @@
             If shader is 100% opaque.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.I3DShader.ToScript">
-            <summary>
-            Exports shader specifics to script.
-            </summary>
-            <returns>Exports the shader to parsable script.</returns>
-        </member>
         <member name="T:Waher.Script.Graphs3D.IPainter3D">
             <summary>
             Interface for 3D graph drawing functions.
@@ -2096,6 +2057,158 @@
             <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
             <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
             <param name="DrawingVolume">Current drawing volume.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.ConstantColorOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.ConstantColor"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.ConstantColorOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.ConstantColorOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.Matrix4x4">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.Output.Matrix4x4"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.PhongIntensityOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongIntensityOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongIntensityOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.PhongLightSourceOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.PhongLightSource"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongLightSourceOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongLightSourceOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.PhongMaterialOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.PhongMaterial"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongMaterialOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongMaterialOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.PhongShaderOutput">
+            <summary>
+            Converts values of type <see cref="T:Waher.Script.Graphs3D.PhongShader"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongShaderOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.PhongShaderOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.Vector3Output">
+            <summary>
+            Converts values of type <see cref="T:System.Numerics.Vector3"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Vector3Output.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Vector3Output.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Output.Vector4Output">
+            <summary>
+            Converts values of type <see cref="T:System.Numerics.Vector4"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Vector4Output.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Output.Vector4Output.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongIntensity">
             <summary>
@@ -2224,6 +2337,21 @@
             <param name="Ambient">Ambient intensity.</param>
             <param name="LightSources">Light sources.</param>
         </member>
+        <member name="P:Waher.Script.Graphs3D.PhongShader.Sources">
+            <summary>
+            Light Sources
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongShader.Ambient">
+            <summary>
+            Ambient settings
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.PhongShader.Material">
+            <summary>
+            Material settings.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs3D.PhongShader.GetColor(System.Single,System.Single,System.Single,System.Numerics.Vector3,Waher.Script.Graphs3D.Canvas3D)">
             <summary>
             Gets a color for a position.
@@ -2251,12 +2379,6 @@
             <summary>
             If shader is 100% opaque.
             </summary>
-        </member>
-        <member name="M:Waher.Script.Graphs3D.PhongShader.ToScript">
-            <summary>
-            Exports shader specifics to script.
-            </summary>
-            <returns>Exports the shader to parsable script.</returns>
         </member>
     </members>
 </doc>

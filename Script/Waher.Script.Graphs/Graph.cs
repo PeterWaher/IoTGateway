@@ -75,6 +75,16 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public abstract class Graph : SemiGroupElement
 	{
+		/// <summary>
+		/// http://waher.se/Schema/Graph.xsd
+		/// </summary>
+		public const string GraphNamespace = "http://waher.se/Schema/Graph.xsd";
+
+		/// <summary>
+		/// Graph
+		/// </summary>
+		public const string GraphLocalName = "Graph";
+
 		private bool sameScale = false;
 
 		/// <summary>
@@ -1179,7 +1189,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Output">XML output.</param>
 		public void ToXml(XmlWriter Output)
 		{
-			Output.WriteStartElement("Graph", "http://waher.se/Schema/Graph.xsd");
+			Output.WriteStartElement("Graph", GraphNamespace);
 			Output.WriteAttributeString("sameScale", this.sameScale ? "true" : "false");
 			Output.WriteAttributeString("type", this.GetType().FullName);
 
@@ -1193,5 +1203,35 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Output">XML output.</param>
 		public abstract void ExportGraph(XmlWriter Output);
+
+		/// <summary>
+		/// Imports graph specifics from XML.
+		/// </summary>
+		/// <param name="Xml">XML input.</param>
+		public abstract void ImportGraph(XmlElement Xml);
+
+		/// <summary>
+		/// Parses an element expression string.
+		/// </summary>
+		/// <param name="s">Expression</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Parsed element.</returns>
+		protected IElement Parse(string s, Variables Variables)
+		{
+			Expression Exp = new Expression(s);
+			IElement Result;
+
+			try
+			{
+				Result = Exp.Root.Evaluate(Variables);
+			}
+			catch (ScriptReturnValueException ex)
+			{
+				Result = ex.ReturnValue;
+			}
+
+			return Result;
+		}
+
 	}
 }

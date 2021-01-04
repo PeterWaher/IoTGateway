@@ -11,9 +11,17 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class GraphBitmap : Graph, IDisposable
 	{
-		private readonly SKImage bitmap;
-		private readonly int width;
-		private readonly int height;
+		private SKImage bitmap;
+		private int width;
+		private int height;
+
+		/// <summary>
+		/// Handles bitmap-based graphs.
+		/// </summary>
+		public GraphBitmap()
+			: base()
+		{
+		}
 
 		/// <summary>
 		/// Handles bitmap-based graphs.
@@ -96,7 +104,7 @@ namespace Waher.Script.Graphs
 			if (this.bitmap is null)
 				return new GraphBitmap(Bmp);
 
-			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width), 
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width),
 				Math.Max(Bmp.Height, this.height), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
@@ -208,5 +216,27 @@ namespace Waher.Script.Graphs
 
 			Output.WriteEndElement();
 		}
+
+		/// <summary>
+		/// Imports graph specifics from XML.
+		/// </summary>
+		/// <param name="Xml">XML input.</param>
+		public override void ImportGraph(XmlElement Xml)
+		{
+			this.width = int.Parse(Xml.GetAttribute("width"));
+			this.height = int.Parse(Xml.GetAttribute("height"));
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Png")
+				{
+					byte[] Data = Convert.FromBase64String(E.InnerText);
+					SKBitmap Bitmap = SKBitmap.Decode(Data);
+					this.bitmap = SKImage.FromBitmap(Bitmap);
+					break;
+				}
+			}
+		}
+
 	}
 }

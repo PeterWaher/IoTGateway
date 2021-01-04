@@ -11,6 +11,17 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 	public class Matrix4x4 : FunctionMultiVariate
 	{
 		/// <summary>
+		/// Sixteen scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes16Scalar = new ArgumentType[] 
+		{ 
+			ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
+			ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
+			ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
+			ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar
+		};
+
+		/// <summary>
 		/// Generates a <see cref="System.Numerics.Matrix4x4"/> object.
 		/// </summary>
 		/// <param name="M11">Element for row 1, column 1.</param>
@@ -38,7 +49,7 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 			ScriptNode M41, ScriptNode M42, ScriptNode M43, ScriptNode M44, 
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44 },
-				  argumentTypes4Scalar, Start, Length, Expression)
+				  argumentTypes16Scalar, Start, Length, Expression)
 		{
 		}
 

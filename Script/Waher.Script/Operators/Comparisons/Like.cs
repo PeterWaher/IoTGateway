@@ -55,14 +55,13 @@ namespace Waher.Script.Operators.Comparisons
 
 			string sl = L.Value;
 			string sr = R.Value;
-			string[] GroupNames;
 			Match M;
 
 			ExpressionTransform h = this.TransformExpression;
 			if (!(h is null))
 				sr = h(sr);
 
-			M = this.Matches(sl, sr, out GroupNames);
+			M = this.Matches(sl, sr, out string[] GroupNames);
 
 			if (M.Success)
 			{
@@ -75,7 +74,7 @@ namespace Waher.Script.Operators.Comparisons
 						{
 							string Value = G.Value;
 
-							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+							if (Expression.TryParse(Value, out double d))
 								Variables[GroupName] = d;
 							else
 								Variables[GroupName] = Value;
@@ -172,7 +171,7 @@ namespace Waher.Script.Operators.Comparisons
 								string Value = G.Value;
 								object ObjValue;
 
-								if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+								if (Expression.TryParse(Value, out double d))
 									ObjValue = d;
 								else
 									ObjValue = Value;

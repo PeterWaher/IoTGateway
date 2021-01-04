@@ -120,7 +120,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						{
 							Value = Part.Substring(i + 1);
 
-							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+							if (CommonTypes.TryParse(Value, out double d))
 								Variables[Part.Substring(0, i)] = d;
 							else if (bool.TryParse(Value, out bool b))
 								Variables[Part.Substring(0, i)] = b;

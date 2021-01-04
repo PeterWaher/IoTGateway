@@ -21,6 +21,11 @@ namespace Waher.Script.Graphs3D
 		}
 
 		/// <summary>
+		/// Constant color.
+		/// </summary>
+		public SKColor Color => this.color;
+
+		/// <summary>
 		/// Gets a color for a position.
 		/// </summary>
 		/// <param name="X">X-coordinate.</param>
@@ -64,7 +69,7 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Exports the shader to parsable script.</returns>
 		public string ToScript()
 		{
-			return "ConstantColor(" + Canvas3D.ToString(this.color) + ")";
+			return "ConstantColor(" + Expression.ToString(this.color) + ")";
 		}
 	}
 }

@@ -4238,6 +4238,39 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Tries to parse a double-precision floating-point value.
+		/// </summary>
+		/// <param name="s">String-representation</param>
+		/// <param name="Value">Parsed value.</param>
+		/// <returns>If parsing was successful.</returns>
+		public static bool TryParse(string s, out double Value)
+		{
+			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
+		/// Tries to parse a single-precision floating-point value.
+		/// </summary>
+		/// <param name="s">String-representation</param>
+		/// <param name="Value">Parsed value.</param>
+		/// <returns>If parsing was successful.</returns>
+		public static bool TryParse(string s, out float Value)
+		{
+			return float.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
+		/// Tries to parse a decimal-precision floating-point value.
+		/// </summary>
+		/// <param name="s">String-representation</param>
+		/// <param name="Value">Parsed value.</param>
+		/// <returns>If parsing was successful.</returns>
+		public static bool TryParse(string s, out decimal Value)
+		{
+			return decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
 		/// Converts a value to a string, that can be parsed as part of an expression.
 		/// </summary>
 		/// <param name="Value">Value</param>

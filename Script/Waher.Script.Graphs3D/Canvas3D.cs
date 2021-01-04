@@ -14,30 +14,40 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class Canvas3D : Graph
 	{
-		private readonly Guid id = Guid.NewGuid();
-		private readonly byte[] pixels;
-		private readonly float[] zBuffer;
-		private readonly float[] xBuf;
-		private readonly float[] yBuf;
-		private readonly float[] zBuf;
-		private readonly Vector3[] normalBuf;
-		private readonly SKColor[] colorBuf;
-		private readonly SKColor backgroundColor;
 		private readonly SortedDictionary<float, LinkedList<PolyRec>> transparentPolygons = new SortedDictionary<float, LinkedList<PolyRec>>(new BackToFront());
+		private Guid id = Guid.NewGuid();
+		private byte[] pixels;
+		private float[] zBuffer;
+		private float[] xBuf;
+		private float[] yBuf;
+		private float[] zBuf;
+		private Vector3[] normalBuf;
+		private SKColor[] colorBuf;
+		private SKColor backgroundColor;
 		private Vector3 viewerPosition;
 		private Matrix4x4 projectionTransformation;
 		private Matrix4x4 modelTransformation;
 		private Vector4 last = Vector4.Zero;
-		private readonly int width;
-		private readonly int height;
-		private readonly int overSampling;
-		private readonly int w;
-		private readonly int h;
-		private readonly int wm1;
-		private readonly int hm1;
-		private readonly int cx;
-		private readonly int cy;
+		private int width;
+		private int height;
+		private int overSampling;
+		private int w;
+		private int h;
+		private int wm1;
+		private int hm1;
+		private int cx;
+		private int cy;
 		private float distance;
+
+		/// <summary>
+		/// 3D drawing area.
+		/// 
+		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
+		/// The center of the canvas is located at origo.
+		/// </summary>
+		public Canvas3D()
+		{
+		}
 
 		/// <summary>
 		/// 3D drawing area.
@@ -2136,7 +2146,7 @@ namespace Waher.Script.Graphs3D
 					{
 						World = World,
 						Screen = Screen,
-						Normals2 = Normals2,
+						Normals = Normals2,
 						MinY = MinY,
 						MaxY = MaxY,
 						NrPolygons = NrPolygons,
@@ -2154,7 +2164,7 @@ namespace Waher.Script.Graphs3D
 			{
 				foreach (PolyRec Rec in List)
 				{
-					this.DrawPolygons(Rec.World, Rec.Screen, Rec.Normals2, Rec.MinY, Rec.MaxY,
+					this.DrawPolygons(Rec.World, Rec.Screen, Rec.Normals, Rec.MinY, Rec.MaxY,
 						Rec.NrPolygons, Rec.FrontShader, Rec.BackShader, Rec.InterpolateNormals);
 				}
 			}
@@ -2166,7 +2176,7 @@ namespace Waher.Script.Graphs3D
 		{
 			public Vector3[][] World;
 			public Vector3[][] Screen;
-			public Vector3[][] Normals2;
+			public Vector3[][] Normals;
 			public int MinY;
 			public int MaxY;
 			public int NrPolygons;
@@ -2183,7 +2193,7 @@ namespace Waher.Script.Graphs3D
 			}
 		}
 
-		private void DrawPolygons(Vector3[][] World, Vector3[][] Screen, Vector3[][] Normals2,
+		private void DrawPolygons(Vector3[][] World, Vector3[][] Screen, Vector3[][] Normals,
 			int MinY, int MaxY, int NrPolygons, I3DShader FrontShader, I3DShader BackShader, bool InterpolateNormals)
 		{
 			int NrRecs = MaxY - MinY + 1;
@@ -2252,7 +2262,7 @@ namespace Waher.Script.Graphs3D
 
 				if (InterpolateNormals)
 				{
-					vn = Normals2[j];
+					vn = Normals[j];
 					LastNormal = vn[NrNodes - 2];
 					CurrentNormal = vn[NrNodes - 1];
 				}
@@ -3407,19 +3417,13 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("height", this.height.ToString());
 			Output.WriteAttributeString("overSampling", this.height.ToString());
 			Output.WriteAttributeString("distance", Expression.ToString(this.distance));
-			Output.WriteAttributeString("bgColor", ToString(this.backgroundColor));
-			Output.WriteAttributeString("pos", ToString(this.viewerPosition));
+			Output.WriteAttributeString("bgColor", Expression.ToString(this.backgroundColor));
+			Output.WriteAttributeString("pos", Expression.ToString(this.viewerPosition));
 
-			Output.WriteElementString("Projection", ToString(this.projectionTransformation));
-			Output.WriteElementString("Model", ToString(this.modelTransformation));
+			Output.WriteElementString("Projection", Expression.ToString(this.projectionTransformation));
+			Output.WriteElementString("Model", Expression.ToString(this.modelTransformation));
 			Output.WriteElementString("Pixels", Convert.ToBase64String(this.pixels));
-			Output.WriteElementString("ZBuffer", ToString(this.zBuffer));
-			Output.WriteElementString("X", ToString(this.xBuf));
-			Output.WriteElementString("Y", ToString(this.yBuf));
-			Output.WriteElementString("Z", ToString(this.zBuf));
-			Output.WriteElementString("Last", Graph3D.ToString(this.last));
-			Output.WriteElementString("Normals", ToString(this.normalBuf));
-			Output.WriteElementString("Colors", ToString(this.colorBuf));
+			Output.WriteElementString("ZBuffer", Expression.ToString(this.zBuffer));
 
 			foreach (KeyValuePair<float, LinkedList<PolyRec>> P in this.transparentPolygons)
 			{
@@ -3436,7 +3440,7 @@ namespace Waher.Script.Graphs3D
 
 					if (!(Rec.FrontShader is null))
 					{
-						s = Rec.FrontShader.ToScript();
+						s = Expression.ToString(Rec.FrontShader);
 						if (!Shaders.TryGetValue(s, out int i))
 						{
 							i = NrShaders++;
@@ -3448,7 +3452,7 @@ namespace Waher.Script.Graphs3D
 
 					if (!(Rec.BackShader is null))
 					{
-						s = Rec.BackShader.ToScript();
+						s = Expression.ToString(Rec.BackShader);
 						if (!Shaders.TryGetValue(s, out int i))
 						{
 							i = NrShaders++;
@@ -3458,9 +3462,9 @@ namespace Waher.Script.Graphs3D
 						Output.WriteAttributeString("bs", i.ToString());
 					}
 
-					Output.WriteElementString("World", ToString(Rec.World));
-					Output.WriteElementString("Screen", ToString(Rec.Screen));
-					Output.WriteElementString("Normals2", ToString(Rec.Normals2));
+					Output.WriteElementString("World", Expression.ToString(Rec.World));
+					Output.WriteElementString("Screen", Expression.ToString(Rec.Screen));
+					Output.WriteElementString("Normals", Expression.ToString(Rec.Normals));
 
 					Output.WriteEndElement();
 				}
@@ -3480,209 +3484,213 @@ namespace Waher.Script.Graphs3D
 		}
 
 		/// <summary>
-		/// Converts a <see cref="Vector3"/> to an expression string that can be exported.
+		/// Imports graph specifics from XML.
 		/// </summary>
-		/// <param name="v">Vector</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(Vector3 v)
+		/// <param name="Xml">XML input.</param>
+		public override void ImportGraph(XmlElement Xml)
 		{
-			StringBuilder sb = new StringBuilder();
+			Variables Variables = new Variables();
+			Expression Exp;
 
-			sb.Append("Vector3(");
-			sb.Append(Expression.ToString(v.X));
-			sb.Append(',');
-			sb.Append(Expression.ToString(v.Y));
-			sb.Append(',');
-			sb.Append(Expression.ToString(v.Z));
-			sb.Append(')');
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Converts a <see cref="Single"/> array to an expression string that can be exported.
-		/// </summary>
-		/// <param name="v">Vector</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(IEnumerable<float> v)
-		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
-
-			sb.Append('[');
-
-			foreach (float Item in v)
+			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
+				switch (Attr.Name)
+				{
+					case "id":
+						this.id = Guid.Parse(Attr.Value);
+						break;
 
-				sb.Append(Expression.ToString(Item));
+					case "width":
+						this.width = int.Parse(Attr.Value);
+						break;
+
+					case "height":
+						this.height = int.Parse(Attr.Value);
+						break;
+
+					case "overSampling":
+						this.overSampling = int.Parse(Attr.Value);
+						break;
+
+					case "distance":
+						if (Expression.TryParse(Attr.Value, out float f))
+							this.distance = f;
+						break;
+
+					case "bgColor":
+						Exp = new Expression(Attr.Value);
+						this.backgroundColor = (SKColor)Exp.Evaluate(Variables);
+						break;
+
+					case "pos":
+						Exp = new Expression(Attr.Value);
+						this.viewerPosition = (Vector3)Exp.Evaluate(Variables);
+						break;
+				}
 			}
 
-			sb.Append(']');
+			if (this.width <= 0)
+				throw new ArgumentOutOfRangeException("Width must be a positive integer.");
 
-			return sb.ToString();
-		}
+			if (this.height <= 0)
+				throw new ArgumentOutOfRangeException("Height must be a positive integer.");
 
-		/// <summary>
-		/// Converts a <see cref="Vector3"/> array to an expression string that can be exported.
-		/// </summary>
-		/// <param name="v">Vectors</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(IEnumerable<Vector3> v)
-		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
+			if (this.overSampling <= 0)
+				throw new ArgumentOutOfRangeException("Oversampling must be a positive integer.");
 
-			sb.Append('[');
+			this.w = this.width * this.overSampling;
+			this.h = this.height * this.overSampling;
+			this.wm1 = this.w - 1;
+			this.hm1 = this.h - 1;
+			this.cx = this.w / 2;
+			this.cy = this.h / 2;
 
-			foreach (Vector3 Item in v)
+			this.ResetTransforms();
+
+			int i, c = this.w * this.h;
+
+			this.pixels = new byte[c * 4];
+			this.zBuffer = new float[c];
+			this.xBuf = new float[this.w];
+			this.yBuf = new float[this.w];
+			this.zBuf = new float[this.w];
+			this.normalBuf = new Vector3[this.w];
+			this.colorBuf = new SKColor[this.w];
+
+			Dictionary<int, I3DShader> Shaders = new Dictionary<int, I3DShader>();
+
+			foreach (XmlNode N in Xml.ChildNodes)
 			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
-
-				sb.Append(ToString(Item));
+				if (N is XmlElement E && E.LocalName == "Shader")
+				{
+					int Index = int.Parse(E.GetAttribute("index"));
+					Exp = new Expression(E.InnerText);
+					Shaders[Index] = (I3DShader)Exp.Evaluate(Variables);
+				}
 			}
 
-			sb.Append(']');
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "Projection":
+							Exp = new Expression(E.InnerText);
+							this.projectionTransformation = (Matrix4x4)Exp.Evaluate(Variables);
+							break;
 
-			return sb.ToString();
+						case "Model":
+							Exp = new Expression(E.InnerText);
+							this.modelTransformation = (Matrix4x4)Exp.Evaluate(Variables);
+							break;
+
+						case "Pixels":
+							this.pixels = Convert.FromBase64String(E.InnerText);
+							break;
+
+						case "ZBuffer":
+							Exp = new Expression(E.InnerText);
+							double[] v = (double[])Exp.Evaluate(Variables);
+
+							c = v.Length;
+							this.zBuffer = new float[c];
+
+							for (i = 0; i < c; i++)
+								this.zBuffer[i] = (float)v[i];
+							break;
+
+						case "Transparent":
+							Expression.TryParse(E.GetAttribute("z"), out float z);
+
+							LinkedList<PolyRec> Polygons = new LinkedList<PolyRec>();
+							this.transparentPolygons[z] = Polygons;
+
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E.LocalName == "P")
+								{
+									PolyRec P = new PolyRec();
+
+									foreach (XmlAttribute Attr2 in E2.Attributes)
+									{
+										switch (Attr2.Name)
+										{
+											case "minY":
+												P.MinY = int.Parse(Attr2.Value);
+												break;
+
+											case "maxY":
+												P.MaxY = int.Parse(Attr2.Value);
+												break;
+
+											case "nrPolygons":
+												P.NrPolygons = int.Parse(Attr2.Value);
+												break;
+
+											case "interpolateNormals":
+												P.InterpolateNormals = Attr2.Value == "true";
+												break;
+
+											case "fs":
+												P.FrontShader = Shaders[int.Parse(Attr2.Value)];
+												break;
+
+											case "bs":
+												P.BackShader = Shaders[int.Parse(Attr2.Value)];
+												break;
+										}
+									}
+
+									foreach (XmlNode N3 in E2.ChildNodes)
+									{
+										if (N2 is XmlElement E3)
+										{
+											switch (E3.LocalName)
+											{
+												case "World":
+													Exp = new Expression(E.InnerText);
+													P.World = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													break;
+
+												case "Screen":
+													Exp = new Expression(E.InnerText);
+													P.Screen = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													break;
+
+												case "Normals":
+													Exp = new Expression(E.InnerText);
+													P.Normals = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													break;
+											}
+										}
+									}
+
+									Polygons.AddLast(P);
+								}
+							}
+							break;
+					}
+				}
+			}
 		}
 
-		/// <summary>
-		/// Converts a <see cref="Vector3"/> mesh to an expression string that can be exported.
-		/// </summary>
-		/// <param name="M">Mesh</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(Vector3[][] M)
+		private static Vector3[][] ToVector3DoubleArray(IMatrix M)
 		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
+			int c = M.Rows;
+			int d = M.Columns;
+			int i, j;
+			Vector3[][] Result = new Vector3[c][];
 
-			sb.Append('[');
-
-			foreach (Vector3[] Item in M)
+			for (i = 0; i < c; i++)
 			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
+				Result[i] = new Vector3[d];
 
-				sb.Append(ToString(Item));
+				for (j = 0; j < d; j++)
+					Result[i][j] = (Vector3)(M.GetElement(i, j).AssociatedObjectValue);
 			}
 
-			sb.Append(']');
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Converts a <see cref="SKColor"/> array to an expression string that can be exported.
-		/// </summary>
-		/// <param name="v">Vectors</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(IEnumerable<SKColor> v)
-		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
-
-			sb.Append('[');
-
-			foreach (SKColor Item in v)
-			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
-
-				sb.Append(ToString(Item));
-			}
-
-			sb.Append(']');
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Converts a <see cref="Matrix4x4"/> to an expression string that can be exported.
-		/// </summary>
-		/// <param name="M">Matrix</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(Matrix4x4 M)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append("Matrix4x4(");
-			sb.Append(Expression.ToString(M.M11));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M12));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M13));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M14));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M21));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M22));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M23));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M24));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M31));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M32));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M33));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M34));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M41));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M42));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M43));
-			sb.Append(',');
-			sb.Append(Expression.ToString(M.M44));
-			sb.Append(')');
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Converts a <see cref="SKColor"/> to an expression string that can be exported.
-		/// </summary>
-		/// <param name="Color">Color</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(SKColor Color)
-		{
-			return "Color(\"" + Expression.ToString(Color) + "\")";
-		}
-
-		/// <summary>
-		/// Converts a <see cref="PhongIntensity"/> to an expression string that can be exported.
-		/// </summary>
-		/// <param name="Intensity">Intensity</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(PhongIntensity Intensity)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append("PhongIntensity(");
-			sb.Append(Expression.ToString(Intensity.Red));
-			sb.Append(',');
-			sb.Append(Expression.ToString(Intensity.Green));
-			sb.Append(',');
-			sb.Append(Expression.ToString(Intensity.Blue));
-			sb.Append(',');
-			sb.Append(Expression.ToString(Intensity.Alpha));
-			sb.Append(")");
-
-			return sb.ToString();
+			return Result;
 		}
 
 		#endregion

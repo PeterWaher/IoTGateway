@@ -146,7 +146,7 @@ namespace Waher.Content.Markdown.Web
 							if (Request.Header.TryGetQueryParameter(Parameter, out string Value))
 							{
 								Value = System.Net.WebUtility.UrlDecode(Value);
-								if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+								if (CommonTypes.TryParse(Value, out double d))
 									Session[Parameter] = d;
 								else if (bool.TryParse(Value, out b))
 									Session[Parameter] = b;

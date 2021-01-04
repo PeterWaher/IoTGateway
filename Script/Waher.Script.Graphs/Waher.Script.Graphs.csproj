@@ -32,6 +32,7 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />

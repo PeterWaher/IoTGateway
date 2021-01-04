@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using SkiaSharp;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -40,7 +41,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Base class for two-dimensional graphs.
 		/// </summary>
-		internal Graph2D()
+		public Graph2D()
 			: base()
 		{
 		}
@@ -740,8 +741,7 @@ namespace Waher.Script.Graphs
 
 				SKImage Result = Surface.Snapshot();
 
-				if (!(Font is null))
-					Font.Dispose();
+				Font?.Dispose();
 
 				AxisBrush.Dispose();
 				GridBrush.Dispose();
@@ -804,6 +804,100 @@ namespace Waher.Script.Graphs
 				Output.WriteElementString("Painter", Painter.GetType().FullName);
 
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Imports graph specifics from XML.
+		/// </summary>
+		/// <param name="Xml">XML input.</param>
+		public override void ImportGraph(XmlElement Xml)
+		{
+			Variables Variables = new Variables();
+
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "title":
+						this.title = Attr.Value;
+						break;
+
+					case "labelX":
+						this.labelX = Attr.Value;
+						break;
+
+					case "labelY":
+						this.labelY = Attr.Value;
+						break;
+
+					case "axisTypeX":
+						this.axisTypeX = Types.GetType(Attr.Value);
+						break;
+
+					case "axisTypeY":
+						this.axisTypeY = Types.GetType(Attr.Value);
+						break;
+
+					case "minX":
+						this.minX = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "maxX":
+						this.maxX = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "minY":
+						this.minY = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "maxY":
+						this.maxY = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "showXAxis":
+						this.showXAxis = Attr.Value == "true";
+						break;
+
+					case "showYAxis":
+						this.showYAxis = Attr.Value == "true";
+						break;
+
+					case "showGrid":
+						this.showGrid = Attr.Value == "true";
+						break;
+				}
+			}
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "X":
+							Expression Exp = new Expression(E.InnerText);
+							double[] v = (double[])Exp.Evaluate(Variables);
+							this.x.AddLast(new DoubleVector(v));
+							break;
+
+						case "Y":
+							Exp = new Expression(E.InnerText);
+							v = (double[])Exp.Evaluate(Variables);
+							this.y.AddLast(new DoubleVector(v));
+							break;
+
+						case "Parameters":
+							Exp = new Expression(E.InnerText);
+							object[] v2 = (object[])Exp.Evaluate(Variables);
+							this.parameters.AddLast(v2);
+							break;
+
+						case "Painter":
+							this.painters.AddLast((IPainter2D)Activator.CreateInstance(Types.GetType(E.InnerText)));
+							break;
+					}
+				}
+			}
 		}
 
 	}

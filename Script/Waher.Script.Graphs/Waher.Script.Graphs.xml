@@ -1361,6 +1361,16 @@
             Base class for graphs.
             </summary>
         </member>
+        <member name="F:Waher.Script.Graphs.Graph.GraphNamespace">
+            <summary>
+            http://waher.se/Schema/Graph.xsd
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.GraphLocalName">
+            <summary>
+            Graph
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph.#ctor">
             <summary>
             Base class for graphs.
@@ -1701,6 +1711,20 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.ImportGraph(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.Parse(System.String,Waher.Script.Variables)">
+            <summary>
+            Parses an element expression string.
+            </summary>
+            <param name="s">Expression</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Parsed element.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.Graph2D">
             <summary>
             Handles two-dimensional graphs.
@@ -1836,7 +1860,18 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ImportGraph(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.GraphBitmap">
+            <summary>
+            Handles bitmap-based graphs.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor">
             <summary>
             Handles bitmap-based graphs.
             </summary>
@@ -1911,6 +1946,12 @@
             Exports graph specifics to XML.
             </summary>
             <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.ImportGraph(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
         </member>
         <member name="T:Waher.Script.Graphs.GraphSettings">
             <summary>
@@ -2017,6 +2058,25 @@
             <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
             <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
             <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Output.ColorOutput">
+            <summary>
+            Converts values of type <see cref="T:SkiaSharp.SKColor"/> to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Output.ColorOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Output.ColorOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
         </member>
         <member name="T:Waher.Script.Graphs.SetOfGraphs">
             <summary>

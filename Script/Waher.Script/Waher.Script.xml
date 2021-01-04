@@ -2315,6 +2315,30 @@
             <param name="Value">Value</param>
             <returns>String representation of value.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.TryParse(System.String,System.Double@)">
+            <summary>
+            Tries to parse a double-precision floating-point value.
+            </summary>
+            <param name="s">String-representation</param>
+            <param name="Value">Parsed value.</param>
+            <returns>If parsing was successful.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.TryParse(System.String,System.Single@)">
+            <summary>
+            Tries to parse a single-precision floating-point value.
+            </summary>
+            <param name="s">String-representation</param>
+            <param name="Value">Parsed value.</param>
+            <returns>If parsing was successful.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.TryParse(System.String,System.Decimal@)">
+            <summary>
+            Tries to parse a decimal-precision floating-point value.
+            </summary>
+            <param name="s">String-representation</param>
+            <param name="Value">Parsed value.</param>
+            <returns>If parsing was successful.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.ToString(System.Numerics.Complex)">
             <summary>
             Converts a value to a string, that can be parsed as part of an expression.

@@ -14,6 +14,7 @@ namespace Waher.Script.Graphs3D
 		private readonly PhongLightSource[] sources;
 		private readonly PhongLightSource source;
 		private readonly PhongIntensity ambient;
+		private readonly PhongMaterial material;
 		private Vector3 sourcePosition;
 		private readonly float sourceDiffuseRed;
 		private readonly float sourceDiffuseGreen;
@@ -46,6 +47,7 @@ namespace Waher.Script.Graphs3D
 		public PhongShader(PhongMaterial Material, PhongIntensity Ambient,
 			params PhongLightSource[] LightSources)
 		{
+			this.material = Material;
 			this.ambient = Ambient;
 			this.sources = LightSources;
 
@@ -103,6 +105,21 @@ namespace Waher.Script.Graphs3D
 				}
 			}
 		}
+
+		/// <summary>
+		/// Light Sources
+		/// </summary>
+		public PhongLightSource[] Sources => this.sources;
+
+		/// <summary>
+		/// Ambient settings
+		/// </summary>
+		public PhongIntensity Ambient => this.ambient;
+
+		/// <summary>
+		/// Material settings.
+		/// </summary>
+		public PhongMaterial Material => this.material;
 
 		/// <summary>
 		/// Gets a color for a position.
@@ -566,48 +583,6 @@ namespace Waher.Script.Graphs3D
 		/// If shader is 100% opaque.
 		/// </summary>
 		public bool Opaque => this.opaque;
-
-		/// <summary>
-		/// Exports shader specifics to script.
-		/// </summary>
-		/// <returns>Exports the shader to parsable script.</returns>
-		public string ToScript()
-		{
-			StringBuilder sb = new StringBuilder();
-			bool First = true;
-
-			sb.Append("PhongShader(PhongMaterial(");
-			sb.Append(Expression.ToString(this.ambientReflectionConstant));
-			sb.Append(',');
-			sb.Append(Expression.ToString(this.diffuseReflectionConstant));
-			sb.Append(',');
-			sb.Append(Expression.ToString(this.specularReflectionConstant));
-			sb.Append(',');
-			sb.Append(Expression.ToString(this.shininess));
-			sb.Append("),");
-			sb.Append(Canvas3D.ToString(this.ambient));
-			sb.Append(",[");
-
-			foreach (PhongLightSource Source in this.sources)
-			{
-				if (First)
-					First = false;
-				else
-					sb.Append(',');
-
-				sb.Append("PhongLightSource(");
-				sb.Append(Canvas3D.ToString(Source.Diffuse));
-				sb.Append(',');
-				sb.Append(Canvas3D.ToString(Source.Specular));
-				sb.Append(',');
-				sb.Append(Canvas3D.ToString(Source.Position));
-				sb.Append(')');
-			}
-
-			sb.Append("])");
-
-			return sb.ToString();
-		}
 
 	}
 }

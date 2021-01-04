@@ -285,18 +285,21 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				byte[] Digest = H.ComputeHash(BinaryImage);
 				FileName = Path.Combine(Path.GetTempPath(), "tmp" + Base64Url.Encode(Digest) + ".tmp");
 			}
-			
-			File.WriteAllBytes(FileName, BinaryImage);
 
-			lock (synchObject)
+			if (!File.Exists(FileName))
 			{
-				if (temporaryFiles is null)
-				{
-					temporaryFiles = new Dictionary<string, bool>();
-					Log.Terminating += CurrentDomain_ProcessExit;
-				}
+				File.WriteAllBytes(FileName, BinaryImage);
 
-				temporaryFiles[FileName] = true;
+				lock (synchObject)
+				{
+					if (temporaryFiles is null)
+					{
+						temporaryFiles = new Dictionary<string, bool>();
+						Log.Terminating += CurrentDomain_ProcessExit;
+					}
+
+					temporaryFiles[FileName] = true;
+				}
 			}
 
 			return FileName;

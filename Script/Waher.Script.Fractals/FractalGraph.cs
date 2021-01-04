@@ -37,6 +37,14 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.
 		/// </summary>
+		public FractalGraph()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Defines a clickable fractal graph in the complex plane.
+		/// </summary>
 		/// <param name="Image">Fractal image.</param>
 		/// <param name="r0">Real part of upper left hand corner.</param>
 		/// <param name="i0">Imaginary part of upper left hand corner.</param>

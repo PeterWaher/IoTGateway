@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Xml;
 using SkiaSharp;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -13,7 +14,6 @@ using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.Sets;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 using Waher.Script.Units;
@@ -55,7 +55,7 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Base class for two-dimensional graphs.
 		/// </summary>
-		internal Graph3D()
+		public Graph3D()
 			: base()
 		{
 		}
@@ -1371,29 +1371,35 @@ namespace Waher.Script.Graphs3D
 			foreach (Vector4[,] M in this.normals)
 			{
 				StringBuilder sb = new StringBuilder();
-				int c = M.GetLength(0);
-				int d = M.GetLength(1);
-				int i, j;
 
-				sb.Append('[');
-				for (i = 0; i < c; i++)
+				if (M is null)
+					sb.Append("null");
+				else
 				{
-					if (i > 0)
-						sb.Append(',');
+					int c = M.GetLength(0);
+					int d = M.GetLength(1);
+					int i, j;
 
 					sb.Append('[');
-
-					for (j = 0; j < d; j++)
+					for (i = 0; i < c; i++)
 					{
-						if (j > 0)
+						if (i > 0)
 							sb.Append(',');
 
-						sb.Append(ToString(M[i, j]));
-					}
+						sb.Append('[');
 
+						for (j = 0; j < d; j++)
+						{
+							if (j > 0)
+								sb.Append(',');
+
+							sb.Append(Expression.ToString(M[i, j]));
+						}
+
+						sb.Append(']');
+					}
 					sb.Append(']');
 				}
-				sb.Append(']');
 
 				Output.WriteElementString("Normals", sb.ToString());
 			}
@@ -1401,32 +1407,169 @@ namespace Waher.Script.Graphs3D
 			foreach (object[] v in this.parameters)
 				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
 
-			foreach (IPainter2D Painter in this.painters)
+			foreach (IPainter3D Painter in this.painters)
 				Output.WriteElementString("Painter", Painter.GetType().FullName);
 
 			Output.WriteEndElement();
 		}
 
 		/// <summary>
-		/// Converts a <see cref="Vector4"/> to an expression string that can be exported.
+		/// Imports graph specifics from XML.
 		/// </summary>
-		/// <param name="v">Vector</param>
-		/// <returns>Expression string.</returns>
-		public static string ToString(Vector4 v)
+		/// <param name="Xml">XML input.</param>
+		public override void ImportGraph(XmlElement Xml)
 		{
-			StringBuilder sb = new StringBuilder();
+			Variables Variables = new Variables();
 
-			sb.Append("Vector4(");
-			sb.Append(Expression.ToString(v.X));
-			sb.Append(',');
-			sb.Append(Expression.ToString(v.Y));
-			sb.Append(',');
-			sb.Append(Expression.ToString(v.Z));
-			sb.Append(',');
-			sb.Append(Expression.ToString(v.W));
-			sb.Append(')');
+			foreach (XmlAttribute Attr in Xml.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "title":
+						this.title = Attr.Value;
+						break;
 
-			return sb.ToString();
+					case "labelX":
+						this.labelX = Attr.Value;
+						break;
+
+					case "labelY":
+						this.labelY = Attr.Value;
+						break;
+
+					case "labelZ":
+						this.labelZ = Attr.Value;
+						break;
+
+					case "axisTypeX":
+						this.axisTypeX = Types.GetType(Attr.Value);
+						break;
+
+					case "axisTypeY":
+						this.axisTypeY = Types.GetType(Attr.Value);
+						break;
+
+					case "axisTypeZ":
+						this.axisTypeZ = Types.GetType(Attr.Value);
+						break;
+
+					case "minX":
+						this.minX = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "maxX":
+						this.maxX = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "minY":
+						this.minY = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "maxY":
+						this.maxY = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "minZ":
+						this.minZ = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "maxZ":
+						this.maxZ = this.Parse(Attr.Value, Variables);
+						break;
+
+					case "showXAxis":
+						this.showXAxis = Attr.Value == "true";
+						break;
+
+					case "showYAxis":
+						this.showYAxis = Attr.Value == "true";
+						break;
+
+					case "showZAxis":
+						this.showZAxis = Attr.Value == "true";
+						break;
+
+					case "showGrid":
+						this.showGrid = Attr.Value == "true";
+						break;
+
+					case "angle":
+						if (Expression.TryParse(Attr.Value, out double d))
+							this.angle = d;
+						break;
+
+					case "inclination":
+						if (Expression.TryParse(Attr.Value, out d))
+							this.inclination = d;
+						break;
+
+					case "overSampling":
+						this.overSampling = int.Parse(Attr.Value);
+						break;
+				}
+			}
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "X":
+							Expression Exp = new Expression(E.InnerText);
+							IMatrix M = (IMatrix)Exp.Evaluate(Variables);
+							this.x.AddLast(M);
+							break;
+
+						case "Y":
+							Exp = new Expression(E.InnerText);
+							M = (IMatrix)Exp.Evaluate(Variables);
+							this.y.AddLast(M);
+							break;
+
+						case "Z":
+							Exp = new Expression(E.InnerText);
+							M = (IMatrix)Exp.Evaluate(Variables);
+							this.z.AddLast(M);
+							break;
+
+						case "Normals":
+							Exp = new Expression(E.InnerText);
+							M = (IMatrix)Exp.Evaluate(Variables);
+
+							int i, j, c, d;
+
+							if (M is null)
+								this.normals.AddLast((Vector4[,])null);
+							else
+							{
+								c = M.Rows;
+								d = M.Columns;
+								Vector4[,] M2 = new Vector4[c, d];
+
+								for (i = 0; i < c; i++)
+								{
+									for (j = 0; i < d; j++)
+										M2[i, j] = (Vector4)(M.GetElement(i, j).AssociatedObjectValue);
+								}
+
+								this.normals.AddLast(M2);
+							}
+							break;
+
+						case "Parameters":
+							Exp = new Expression(E.InnerText);
+							object[] v = (object[])Exp.Evaluate(Variables);
+							this.parameters.AddLast(v);
+							break;
+
+						case "Painter":
+							this.painters.AddLast((IPainter3D)Activator.CreateInstance(Types.GetType(E.InnerText)));
+							break;
+					}
+				}
+			}
 		}
+
 	}
 }

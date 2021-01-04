@@ -110,7 +110,7 @@ namespace Waher.Script.Fractals.ColorModels
                 Seed = gen.Next();
             }
 
-			Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+			Variables?.ConsoleOut?.WriteLine("Seed = " + Seed.ToString(), Variables);
 
 			return CreatePalette(N, BandSize, Seed, Node);
         }

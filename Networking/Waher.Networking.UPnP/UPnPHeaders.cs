@@ -30,22 +30,22 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPHeaders : IEnumerable<KeyValuePair<string, string>>
 	{
-		private Dictionary<string, string> headers = new Dictionary<string, string>();
-		private HttpDirection direction = HttpDirection.Unknown;
-		private string[] rows;
-		private string searchTarget = string.Empty;
-		private string server = string.Empty;
-		private string location = string.Empty;
-		private string uniqueServiceName = string.Empty;
-		private string verb = string.Empty;
-		private string parameter = string.Empty;
-		private string responseMessage = string.Empty;
-		private string host = string.Empty;
-		private string cacheControl = string.Empty;
-		private string notificationType = string.Empty;
-		private string notificationSubType = string.Empty;
-		private double httpVersion = 0;
-		private int responseCode = 0;
+		private readonly Dictionary<string, string> headers = new Dictionary<string, string>();
+		private readonly HttpDirection direction = HttpDirection.Unknown;
+		private readonly string[] rows;
+		private readonly string searchTarget = string.Empty;
+		private readonly string server = string.Empty;
+		private readonly string location = string.Empty;
+		private readonly string uniqueServiceName = string.Empty;
+		private readonly string verb = string.Empty;
+		private readonly string parameter = string.Empty;
+		private readonly string responseMessage = string.Empty;
+		private readonly string host = string.Empty;
+		private readonly string cacheControl = string.Empty;
+		private readonly string notificationType = string.Empty;
+		private readonly string notificationSubType = string.Empty;
+		private readonly double httpVersion = 0;
+		private readonly int responseCode = 0;
 
 		internal UPnPHeaders(string Header)
 		{
@@ -63,7 +63,7 @@ namespace Waher.Networking.UPnP
 					this.direction = HttpDirection.Request;
 					this.verb = P[0];
 					this.parameter = P[1];
-
+					
 					if (!double.TryParse(P[2].Substring(5).Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out this.httpVersion))
 						this.httpVersion = 0;
 				}
@@ -149,9 +149,7 @@ namespace Waher.Networking.UPnP
 		{
 			get
 			{
-				string Value;
-
-				if (this.headers.TryGetValue(Key, out Value))
+				if (this.headers.TryGetValue(Key, out string Value))
 					return Value;
 				else
 					return string.Empty;

@@ -1399,8 +1399,8 @@ prepare the input accordingly.
 
 Example:
 
-[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
-VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ))
+	[LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);
+	VerticalBars3D(Columns(LabelsX),Y,Rows(LabelsZ))
 
 ```async
 [LabelsX,LabelsZ,Y]:=Histogram2D([Normal(0,1,100000),Normal(0,1,100000)],-5,5,50,-5,5,50);

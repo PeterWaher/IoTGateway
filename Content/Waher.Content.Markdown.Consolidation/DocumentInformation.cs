@@ -51,7 +51,6 @@ namespace Waher.Content.Markdown.Consolidation
 	public class DocumentInformation
 	{
 		private readonly MarkdownDocument markdown;
-		private readonly int nrElements;
 		private readonly DocumentType type;
 		private readonly string[] rows;
 

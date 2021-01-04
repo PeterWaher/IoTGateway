@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
+using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -19,21 +21,6 @@ using Waher.Script.Units;
 namespace Waher.Script.Graphs3D
 {
 	/// <summary>
-	/// Delegate for 3D drawing callback methods.
-	/// </summary>
-	/// <param name="Canvas">Canvas to draw on.</param>
-	/// <param name="Points">Points to draw.</param>
-	/// <param name="Normals">Optional normals.</param>
-	/// <param name="Parameters">Graph-specific parameters.</param>
-	/// <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
-	/// <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
-	/// <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
-	/// <param name="DrawingVolume">Current drawing volume.</param>
-	public delegate void DrawCallback3D(Canvas3D Canvas, Vector4[,] Points,
-		Vector4[,] Normals, object[] Parameters, Vector4[,] PrevPoints,
-		Vector4[,] PrevNormals, object[] PrevParameters, DrawingVolume DrawingVolume);
-
-	/// <summary>
 	/// Handles three-dimensional graphs.
 	/// </summary>
 	public class Graph3D : Graph
@@ -43,7 +30,7 @@ namespace Waher.Script.Graphs3D
 		private readonly LinkedList<IMatrix> z = new LinkedList<IMatrix>();
 		private readonly LinkedList<Vector4[,]> normals = new LinkedList<Vector4[,]>();
 		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
-		private readonly LinkedList<DrawCallback3D> callbacks = new LinkedList<DrawCallback3D>();
+		private readonly LinkedList<IPainter3D> painters = new LinkedList<IPainter3D>();
 		private IElement minX, maxX;
 		private IElement minY, maxY;
 		private IElement minZ, maxZ;
@@ -80,13 +67,13 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Y">Y-axis</param>
 		/// <param name="Z">Z-axis</param>
 		/// <param name="Normals">Optional Normals</param>
-		/// <param name="PlotCallback">Callback method that performs the plotting.</param>
+		/// <param name="Painter">Painter of graph.</param>
 		/// <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
 		/// <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
 		/// <param name="ShowZeroZ">If the z-axis (z=0) should always be shown.</param>
 		/// <param name="Node">Node creating the graph.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph3D(IMatrix X, IMatrix Y, IMatrix Z, Vector4[,] Normals, DrawCallback3D PlotCallback,
+		public Graph3D(IMatrix X, IMatrix Y, IMatrix Z, Vector4[,] Normals, IPainter3D Painter,
 			bool ShowZeroX, bool ShowZeroY, bool ShowZeroZ, ScriptNode Node, params object[] Parameters)
 			: base()
 		{
@@ -147,7 +134,7 @@ namespace Waher.Script.Graphs3D
 				this.y.AddLast(Y);
 				this.z.AddLast(Z);
 				this.normals.AddLast(Normals);
-				this.callbacks.AddLast(PlotCallback);
+				this.painters.AddLast(Painter);
 				this.parameters.AddLast(Parameters);
 			}
 		}
@@ -395,8 +382,8 @@ namespace Waher.Script.Graphs3D
 			foreach (Vector4[,] M in this.normals)
 				Result.normals.AddLast(M);
 
-			foreach (DrawCallback3D Callback in this.callbacks)
-				Result.callbacks.AddLast(Callback);
+			foreach (IPainter3D Painter in this.painters)
+				Result.painters.AddLast(Painter);
 
 			foreach (object[] P in this.parameters)
 				Result.parameters.AddLast(P);
@@ -428,8 +415,8 @@ namespace Waher.Script.Graphs3D
 			foreach (Vector4[,] M in G.normals)
 				Result.normals.AddLast(M);
 
-			foreach (DrawCallback3D Callback in G.callbacks)
-				Result.callbacks.AddLast(Callback);
+			foreach (IPainter3D Painter in G.painters)
+				Result.painters.AddLast(Painter);
 
 			foreach (object[] P in G.parameters)
 				Result.parameters.AddLast(P);
@@ -479,7 +466,7 @@ namespace Waher.Script.Graphs3D
 				this.Equals(this.z.GetEnumerator(), G.z.GetEnumerator()) &&
 				this.Equals(this.normals?.GetEnumerator(), G.normals?.GetEnumerator()) &&
 				this.Equals(this.parameters.GetEnumerator(), G.parameters.GetEnumerator()) &&
-				this.Equals(this.callbacks.GetEnumerator(), G.callbacks.GetEnumerator()));
+				this.Equals(this.painters.GetEnumerator(), G.painters.GetEnumerator()));
 		}
 
 		private bool Equals(IEnumerator e1, IEnumerator e2)
@@ -546,8 +533,8 @@ namespace Waher.Script.Graphs3D
 			foreach (object Obj in this.parameters)
 				Result ^= Result << 5 ^ Obj.GetHashCode();
 
-			foreach (DrawCallback3D Callback in this.callbacks)
-				Result ^= Result << 5 ^ Callback.GetHashCode();
+			foreach (IPainter3D Painter in this.painters)
+				Result ^= Result << 5 ^ Painter.GetHashCode();
 
 			return Result;
 		}
@@ -657,29 +644,29 @@ namespace Waher.Script.Graphs3D
 			IEnumerator<IMatrix> ez = this.z.GetEnumerator();
 			IEnumerator<Vector4[,]> eN = this.normals.GetEnumerator();
 			IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
-			IEnumerator<DrawCallback3D> eCallbacks = this.callbacks.GetEnumerator();
+			IEnumerator<IPainter3D> ePainters = this.painters.GetEnumerator();
 			Vector4[,] Points;
 			Vector4[,] Normals;
 			Vector4[,] PrevPoints = null;
 			Vector4[,] PrevNormals = null;
 			object[] PrevParameters = null;
-			DrawCallback3D PrevCallback = null;
+			IPainter3D PrevPainter = null;
 
 			while (ex.MoveNext() && ey.MoveNext() && ez.MoveNext() &&
-				eN.MoveNext() && eParameters.MoveNext() && eCallbacks.MoveNext())
+				eN.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
 			{
 				Points = DrawingVolume.Scale(ex.Current, ey.Current, ez.Current);
 				Normals = eN.Current;
 
-				if (PrevCallback != null && eCallbacks.Current.Target.GetType() == PrevCallback.Target.GetType())
-					eCallbacks.Current(Canvas, Points, Normals, eParameters.Current, PrevPoints, PrevNormals, PrevParameters, DrawingVolume);
+				if (PrevPainter != null && ePainters.Current.GetType() == PrevPainter.GetType())
+					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, PrevPoints, PrevNormals, PrevParameters, DrawingVolume);
 				else
-					eCallbacks.Current(Canvas, Points, Normals, eParameters.Current, null, null, null, DrawingVolume);
+					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, null, null, null, DrawingVolume);
 
 				PrevPoints = Points;
 				PrevNormals = Normals;
 				PrevParameters = eParameters.Current;
-				PrevCallback = eCallbacks.Current;
+				PrevPainter = ePainters.Current;
 			}
 
 			Matrix4x4 M = Canvas.ModelTransformation;
@@ -1344,5 +1331,102 @@ namespace Waher.Script.Graphs3D
 					new Vector3(1000, 1000, 0)));
 		}
 
+		/// <summary>
+		/// Exports graph specifics to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportGraph(XmlWriter Output)
+		{
+			Output.WriteStartElement("Graph3D");
+			Output.WriteAttributeString("title", this.title);
+			Output.WriteAttributeString("labelX", this.labelX);
+			Output.WriteAttributeString("labelY", this.labelY);
+			Output.WriteAttributeString("labelZ", this.labelZ);
+			Output.WriteAttributeString("axisTypeX", this.axisTypeX.FullName);
+			Output.WriteAttributeString("axisTypeY", this.axisTypeY.FullName);
+			Output.WriteAttributeString("axisTypeZ", this.axisTypeZ.FullName);
+			Output.WriteAttributeString("minX", Expression.ToString(this.minX));
+			Output.WriteAttributeString("maxX", Expression.ToString(this.maxX));
+			Output.WriteAttributeString("minY", Expression.ToString(this.minY));
+			Output.WriteAttributeString("maxY", Expression.ToString(this.maxY));
+			Output.WriteAttributeString("minZ", Expression.ToString(this.minZ));
+			Output.WriteAttributeString("maxZ", Expression.ToString(this.maxZ));
+			Output.WriteAttributeString("showXAxis", this.showXAxis ? "true" : "false");
+			Output.WriteAttributeString("showYAxis", this.showYAxis ? "true" : "false");
+			Output.WriteAttributeString("showZAxis", this.showZAxis ? "true" : "false");
+			Output.WriteAttributeString("showGrid", this.showGrid ? "true" : "false");
+			Output.WriteAttributeString("angle", Expression.ToString(this.angle));
+			Output.WriteAttributeString("inclination", Expression.ToString(this.inclination));
+			Output.WriteAttributeString("overSampling", this.overSampling.ToString());
+
+			foreach (IVector v in this.x)
+				Output.WriteElementString("X", Expression.ToString(v));
+
+			foreach (IVector v in this.y)
+				Output.WriteElementString("Y", Expression.ToString(v));
+
+			foreach (IVector v in this.z)
+				Output.WriteElementString("Z", Expression.ToString(v));
+
+			foreach (Vector4[,] M in this.normals)
+			{
+				StringBuilder sb = new StringBuilder();
+				int c = M.GetLength(0);
+				int d = M.GetLength(1);
+				int i, j;
+
+				sb.Append('[');
+				for (i = 0; i < c; i++)
+				{
+					if (i > 0)
+						sb.Append(',');
+
+					sb.Append('[');
+
+					for (j = 0; j < d; j++)
+					{
+						if (j > 0)
+							sb.Append(',');
+
+						sb.Append(ToString(M[i, j]));
+					}
+
+					sb.Append(']');
+				}
+				sb.Append(']');
+
+				Output.WriteElementString("Normals", sb.ToString());
+			}
+
+			foreach (object[] v in this.parameters)
+				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
+
+			foreach (IPainter2D Painter in this.painters)
+				Output.WriteElementString("Painter", Painter.GetType().FullName);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Vector4"/> to an expression string that can be exported.
+		/// </summary>
+		/// <param name="v">Vector</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(Vector4 v)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Vector4(");
+			sb.Append(Expression.ToString(v.X));
+			sb.Append(',');
+			sb.Append(Expression.ToString(v.Y));
+			sb.Append(',');
+			sb.Append(Expression.ToString(v.Z));
+			sb.Append(',');
+			sb.Append(Expression.ToString(v.W));
+			sb.Append(')');
+
+			return sb.ToString();
+		}
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Xml;
 using SkiaSharp;
 using System.Globalization;
 using Waher.Script.Abstraction.Elements;
@@ -1136,5 +1138,60 @@ namespace Waher.Script.Graphs
 		// Need a calendar.  Culture’s irrelevent since we specify start day of week
 		private static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
+		/// <summary>
+		/// Exports the graph to XML.
+		/// </summary>
+		/// <returns>XML string.</returns>
+		public string ToXml()
+		{
+			StringBuilder Output = new StringBuilder();
+			this.ToXml(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports the graph to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public void ToXml(StringBuilder Output)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				Indent = true,
+				IndentChars = "\t",
+				NamespaceHandling = NamespaceHandling.OmitDuplicates,
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Entitize,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = true
+			};
+
+			using (XmlWriter Writer = XmlWriter.Create(Output, Settings))
+			{
+				this.ToXml(Writer);
+				Writer.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the graph to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public void ToXml(XmlWriter Output)
+		{
+			Output.WriteStartElement("Graph", "http://waher.se/Schema/Graph.xsd");
+			Output.WriteAttributeString("sameScale", this.sameScale ? "true" : "false");
+			Output.WriteAttributeString("type", this.GetType().FullName);
+
+			this.ExportGraph(Output);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Exports graph specifics to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public abstract void ExportGraph(XmlWriter Output);
 	}
 }

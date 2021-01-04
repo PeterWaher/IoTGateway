@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -134,19 +135,6 @@ namespace Waher.Script.Graphs3D
 			Result |= Color.Red;
 
 			return Result;
-		}
-
-		private static SKColor ToColor(uint Color)
-		{
-			byte R = (byte)Color;
-			Color >>= 8;
-			byte G = (byte)Color;
-			Color >>= 8;
-			byte B = (byte)Color;
-			Color >>= 8;
-			byte A = (byte)Color;
-
-			return new SKColor(R, G, B, A);
 		}
 
 		#endregion
@@ -3397,6 +3385,304 @@ namespace Waher.Script.Graphs3D
 					}, Shader, TwoSided);
 				}
 			}
+		}
+
+		#endregion
+
+		#region Exporting graph
+
+		/// <summary>
+		/// Exports graph specifics to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportGraph(XmlWriter Output)
+		{
+			Dictionary<string, int> Shaders = new Dictionary<string, int>();
+			string s;
+			int NrShaders = 0;
+
+			Output.WriteStartElement("Canvas3D");
+			Output.WriteAttributeString("id", this.id.ToString());
+			Output.WriteAttributeString("width", this.width.ToString());
+			Output.WriteAttributeString("height", this.height.ToString());
+			Output.WriteAttributeString("overSampling", this.height.ToString());
+			Output.WriteAttributeString("distance", Expression.ToString(this.distance));
+			Output.WriteAttributeString("bgColor", ToString(this.backgroundColor));
+			Output.WriteAttributeString("pos", ToString(this.viewerPosition));
+
+			Output.WriteElementString("Projection", ToString(this.projectionTransformation));
+			Output.WriteElementString("Model", ToString(this.modelTransformation));
+			Output.WriteElementString("Pixels", Convert.ToBase64String(this.pixels));
+			Output.WriteElementString("ZBuffer", ToString(this.zBuffer));
+			Output.WriteElementString("X", ToString(this.xBuf));
+			Output.WriteElementString("Y", ToString(this.yBuf));
+			Output.WriteElementString("Z", ToString(this.zBuf));
+			Output.WriteElementString("Last", Graph3D.ToString(this.last));
+			Output.WriteElementString("Normals", ToString(this.normalBuf));
+			Output.WriteElementString("Colors", ToString(this.colorBuf));
+
+			foreach (KeyValuePair<float, LinkedList<PolyRec>> P in this.transparentPolygons)
+			{
+				Output.WriteStartElement("Transparent");
+				Output.WriteAttributeString("z", Expression.ToString(P.Key));
+
+				foreach (PolyRec Rec in P.Value)
+				{
+					Output.WriteStartElement("P");
+					Output.WriteAttributeString("minY", Rec.MinY.ToString());
+					Output.WriteAttributeString("maxY", Rec.MaxY.ToString());
+					Output.WriteAttributeString("nrPolygons", Rec.NrPolygons.ToString());
+					Output.WriteAttributeString("interpolateNormals", Rec.InterpolateNormals ? "true" : "false");
+
+					if (!(Rec.FrontShader is null))
+					{
+						s = Rec.FrontShader.ToScript();
+						if (!Shaders.TryGetValue(s, out int i))
+						{
+							i = NrShaders++;
+							Shaders[s] = i;
+						}
+
+						Output.WriteAttributeString("fs", i.ToString());
+					}
+
+					if (!(Rec.BackShader is null))
+					{
+						s = Rec.BackShader.ToScript();
+						if (!Shaders.TryGetValue(s, out int i))
+						{
+							i = NrShaders++;
+							Shaders[s] = i;
+						}
+
+						Output.WriteAttributeString("bs", i.ToString());
+					}
+
+					Output.WriteElementString("World", ToString(Rec.World));
+					Output.WriteElementString("Screen", ToString(Rec.Screen));
+					Output.WriteElementString("Normals2", ToString(Rec.Normals2));
+
+					Output.WriteEndElement();
+				}
+
+				foreach (KeyValuePair<string, int> Shader in Shaders)
+				{
+					Output.WriteStartElement("Shader");
+					Output.WriteAttributeString("index", Shader.Value.ToString());
+					Output.WriteValue(Shader.Key);
+					Output.WriteEndElement();
+				}
+
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Vector3"/> to an expression string that can be exported.
+		/// </summary>
+		/// <param name="v">Vector</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(Vector3 v)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Vector3(");
+			sb.Append(Expression.ToString(v.X));
+			sb.Append(',');
+			sb.Append(Expression.ToString(v.Y));
+			sb.Append(',');
+			sb.Append(Expression.ToString(v.Z));
+			sb.Append(')');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Single"/> array to an expression string that can be exported.
+		/// </summary>
+		/// <param name="v">Vector</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(IEnumerable<float> v)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			sb.Append('[');
+
+			foreach (float Item in v)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append(Expression.ToString(Item));
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Vector3"/> array to an expression string that can be exported.
+		/// </summary>
+		/// <param name="v">Vectors</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(IEnumerable<Vector3> v)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			sb.Append('[');
+
+			foreach (Vector3 Item in v)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append(ToString(Item));
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Vector3"/> mesh to an expression string that can be exported.
+		/// </summary>
+		/// <param name="M">Mesh</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(Vector3[][] M)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			sb.Append('[');
+
+			foreach (Vector3[] Item in M)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append(ToString(Item));
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="SKColor"/> array to an expression string that can be exported.
+		/// </summary>
+		/// <param name="v">Vectors</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(IEnumerable<SKColor> v)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			sb.Append('[');
+
+			foreach (SKColor Item in v)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(',');
+
+				sb.Append(ToString(Item));
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Matrix4x4"/> to an expression string that can be exported.
+		/// </summary>
+		/// <param name="M">Matrix</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(Matrix4x4 M)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Matrix4x4(");
+			sb.Append(Expression.ToString(M.M11));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M12));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M13));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M14));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M21));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M22));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M23));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M24));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M31));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M32));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M33));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M34));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M41));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M42));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M43));
+			sb.Append(',');
+			sb.Append(Expression.ToString(M.M44));
+			sb.Append(')');
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a <see cref="SKColor"/> to an expression string that can be exported.
+		/// </summary>
+		/// <param name="Color">Color</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(SKColor Color)
+		{
+			return "Color(\"" + Expression.ToString(Color) + "\")";
+		}
+
+		/// <summary>
+		/// Converts a <see cref="PhongIntensity"/> to an expression string that can be exported.
+		/// </summary>
+		/// <param name="Intensity">Intensity</param>
+		/// <returns>Expression string.</returns>
+		public static string ToString(PhongIntensity Intensity)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("PhongIntensity(");
+			sb.Append(Expression.ToString(Intensity.Red));
+			sb.Append(',');
+			sb.Append(Expression.ToString(Intensity.Green));
+			sb.Append(',');
+			sb.Append(Expression.ToString(Intensity.Blue));
+			sb.Append(',');
+			sb.Append(Expression.ToString(Intensity.Alpha));
+			sb.Append(")");
+
+			return sb.ToString();
 		}
 
 		#endregion

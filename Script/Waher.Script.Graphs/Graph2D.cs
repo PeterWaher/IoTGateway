@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -15,18 +16,6 @@ using Waher.Script.Operators.Vectors;
 namespace Waher.Script.Graphs
 {
 	/// <summary>
-	/// Delegate for drawing callback methods.
-	/// </summary>
-	/// <param name="Canvas">Canvas to draw on.</param>
-	/// <param name="Points">Points to draw.</param>
-	/// <param name="Parameters">Graph-specific parameters.</param>
-	/// <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
-	/// <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
-	/// <param name="DrawingArea">Current drawing area.</param>
-	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
-		DrawingArea DrawingArea);
-
-	/// <summary>
 	/// Handles two-dimensional graphs.
 	/// </summary>
 	public class Graph2D : Graph
@@ -34,7 +23,7 @@ namespace Waher.Script.Graphs
 		private readonly LinkedList<IVector> x = new LinkedList<IVector>();
 		private readonly LinkedList<IVector> y = new LinkedList<IVector>();
 		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
-		private readonly LinkedList<DrawCallback> callbacks = new LinkedList<DrawCallback>();
+		private readonly LinkedList<IPainter2D> painters = new LinkedList<IPainter2D>();
 		private IElement minX, maxX;
 		private IElement minY, maxY;
 		private Type axisTypeX;
@@ -61,12 +50,12 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="X">X-axis</param>
 		/// <param name="Y">Y-axis</param>
-		/// <param name="PlotCallback">Callback method that performs the plotting.</param>
+		/// <param name="Painter">Painter of graph.</param>
 		/// <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
 		/// <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
 		/// <param name="Node">Node creating the graph.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, bool ShowZeroX, bool ShowZeroY,
+		public Graph2D(IVector X, IVector Y, IPainter2D Painter, bool ShowZeroX, bool ShowZeroY,
 			ScriptNode Node, params object[] Parameters)
 			: base()
 		{
@@ -138,7 +127,7 @@ namespace Waher.Script.Graphs
 					{
 						if (X2.First != null)
 						{
-							this.AddSegment(X, Y, X2, Y2, Node, PlotCallback, Parameters);
+							this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
 							X2 = new LinkedList<IElement>();
 							Y2 = new LinkedList<IElement>();
 						}
@@ -151,7 +140,7 @@ namespace Waher.Script.Graphs
 				}
 
 				if (X2.First != null)
-					this.AddSegment(X, Y, X2, Y2, Node, PlotCallback, Parameters);
+					this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
 			}
 			else
 			{
@@ -162,14 +151,14 @@ namespace Waher.Script.Graphs
 				{
 					this.x.AddLast(X);
 					this.y.AddLast(Y);
-					this.callbacks.AddLast(PlotCallback);
+					this.painters.AddLast(Painter);
 					this.parameters.AddLast(Parameters);
 				}
 			}
 		}
 
 		private void AddSegment(IVector X, IVector Y, ICollection<IElement> X2, ICollection<IElement> Y2,
-			ScriptNode Node, DrawCallback PlotCallback, params object[] Parameters)
+			ScriptNode Node, IPainter2D Painter, params object[] Parameters)
 		{
 			IVector X2V = (IVector)X.Encapsulate(X2, Node);
 			IVector Y2V = (IVector)Y.Encapsulate(Y2, Node);
@@ -187,7 +176,7 @@ namespace Waher.Script.Graphs
 
 			this.x.AddLast(X2V);
 			this.y.AddLast(Y2V);
-			this.callbacks.AddLast(PlotCallback);
+			this.painters.AddLast(Painter);
 			this.parameters.AddLast(Parameters);
 		}
 
@@ -343,8 +332,8 @@ namespace Waher.Script.Graphs
 			foreach (IVector v in this.y)
 				Result.y.AddLast(v);
 
-			foreach (DrawCallback Callback in this.callbacks)
-				Result.callbacks.AddLast(Callback);
+			foreach (IPainter2D Painter in this.painters)
+				Result.painters.AddLast(Painter);
 
 			foreach (object[] P in this.parameters)
 				Result.parameters.AddLast(P);
@@ -365,8 +354,8 @@ namespace Waher.Script.Graphs
 				Result.y.AddLast(v);
 			}
 
-			foreach (DrawCallback Callback in G.callbacks)
-				Result.callbacks.AddLast(Callback);
+			foreach (IPainter2D Painter in G.painters)
+				Result.painters.AddLast(Painter);
 
 			foreach (object[] P in G.parameters)
 				Result.parameters.AddLast(P);
@@ -406,7 +395,7 @@ namespace Waher.Script.Graphs
 				this.Equals(this.x.GetEnumerator(), G.x.GetEnumerator()) &&
 				this.Equals(this.y.GetEnumerator(), G.y.GetEnumerator()) &&
 				this.Equals(this.parameters.GetEnumerator(), G.parameters.GetEnumerator()) &&
-				this.Equals(this.callbacks.GetEnumerator(), G.callbacks.GetEnumerator()));
+				this.Equals(this.painters.GetEnumerator(), G.painters.GetEnumerator()));
 		}
 
 		private bool Equals(IEnumerator e1, IEnumerator e2)
@@ -453,8 +442,8 @@ namespace Waher.Script.Graphs
 			foreach (object Obj in this.parameters)
 				Result ^= Result << 5 ^ Obj.GetHashCode();
 
-			foreach (DrawCallback Callback in this.callbacks)
-				Result ^= Result << 5 ^ Callback.GetHashCode();
+			foreach (IPainter2D Painter in this.painters)
+				Result ^= Result << 5 ^ Painter.GetHashCode();
 
 			return Result;
 		}
@@ -729,24 +718,24 @@ namespace Waher.Script.Graphs
 				IEnumerator<IVector> ex = this.x.GetEnumerator();
 				IEnumerator<IVector> ey = this.y.GetEnumerator();
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
-				IEnumerator<DrawCallback> eCallbacks = this.callbacks.GetEnumerator();
+				IEnumerator<IPainter2D> ePainters = this.painters.GetEnumerator();
 				SKPoint[] Points;
 				SKPoint[] PrevPoints = null;
 				object[] PrevParameters = null;
-				DrawCallback PrevCallback = null;
+				IPainter2D PrevPainter = null;
 
-				while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && eCallbacks.MoveNext())
+				while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
 				{
 					Points = DrawingArea.Scale(ex.Current, ey.Current);
 
-					if (PrevCallback != null && eCallbacks.Current.Target.GetType() == PrevCallback.Target.GetType())
-						eCallbacks.Current(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
+					if (PrevPainter != null && ePainters.Current.GetType() == PrevPainter.GetType())
+						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
 					else
-						eCallbacks.Current(Canvas, Points, eParameters.Current, null, null, DrawingArea);
+						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, null, null, DrawingArea);
 
 					PrevPoints = Points;
 					PrevParameters = eParameters.Current;
-					PrevCallback = eCallbacks.Current;
+					PrevPainter = ePainters.Current;
 				}
 
 				SKImage Result = Surface.Snapshot();
@@ -780,6 +769,41 @@ namespace Waher.Script.Graphs
 			IElement Y2 = DrawingArea.DescaleY(Y);
 
 			return "[" + X2.ToString() + "," + Y2.ToString() + "]";
+		}
+
+		/// <summary>
+		/// Exports graph specifics to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportGraph(XmlWriter Output)
+		{
+			Output.WriteStartElement("Graph2D");
+			Output.WriteAttributeString("title", this.title);
+			Output.WriteAttributeString("labelX", this.labelX);
+			Output.WriteAttributeString("labelY", this.labelY);
+			Output.WriteAttributeString("axisTypeX", this.axisTypeX.FullName);
+			Output.WriteAttributeString("axisTypeY", this.axisTypeY.FullName);
+			Output.WriteAttributeString("minX", Expression.ToString(this.minX));
+			Output.WriteAttributeString("maxX", Expression.ToString(this.maxX));
+			Output.WriteAttributeString("minY", Expression.ToString(this.minY));
+			Output.WriteAttributeString("maxY", Expression.ToString(this.maxY));
+			Output.WriteAttributeString("showXAxis", this.showXAxis ? "true" : "false");
+			Output.WriteAttributeString("showYAxis", this.showYAxis ? "true" : "false");
+			Output.WriteAttributeString("showGrid", this.showGrid ? "true" : "false");
+
+			foreach (IVector v in this.x)
+				Output.WriteElementString("X", Expression.ToString(v));
+
+			foreach (IVector v in this.y)
+				Output.WriteElementString("Y", Expression.ToString(v));
+
+			foreach (object[] v in this.parameters)
+				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
+
+			foreach (IPainter2D Painter in this.painters)
+				Output.WriteElementString("Painter", Painter.GetType().FullName);
+
+			Output.WriteEndElement();
 		}
 
 	}

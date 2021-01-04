@@ -503,6 +503,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.HorizontalBarPainter">
+            <summary>
+            Plots a two-dimensional horizontal-bar chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.HorizontalBarPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.HorizontalBars">
             <summary>
             Plots a two-dimensional horizontal-bar chart.
@@ -605,6 +621,23 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DAreaPainter">
+            <summary>
+            Plots a two-dimensional stacked area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
         </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurve">
             <summary>
@@ -751,6 +784,62 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurveAreaPainter">
+            <summary>
+            Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurveAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter">
+            <summary>
+            Plots a two-dimensional curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.CreateSpline(SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.CreateSpline(SkiaSharp.SKPath,SkiaSharp.SKPoint[])">
+            <summary>
+            Creates a Spline path through a given set of points.
+            </summary>
+            <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+            <param name="Points">Points between which the spline will be created.</param>
+            <returns>Spline path.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter.GetCubicBezierCoefficients(System.Double[],System.Double[]@,System.Double[]@)">
+            <summary>
+            Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
+            </summary>
+            <param name="V">One set of coordinates.</param>
+            <param name="A">Corresponding coefficients for first control points.</param>
+            <param name="B">Corresponding coefficients for second control points.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredArea">
             <summary>
             Plots a two-dimensional layered area chart.
@@ -807,6 +896,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredAreaPainter">
+            <summary>
+            Plots a two-dimensional layered area chart.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveArea">
             <summary>
             Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
@@ -862,6 +968,23 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveAreaPainter">
+            <summary>
+            Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
+            https://en.wikipedia.org/wiki/Area_chart
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLayeredCurveAreaPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
         </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLine">
             <summary>
@@ -924,6 +1047,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter">
+            <summary>
+            Plots a two-dimensional line.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Plot2DLinePainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Polygon2D">
             <summary>
             Plots a two-dimensional polygon.
@@ -973,6 +1112,22 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Polygon2DPainter">
+            <summary>
+            Plots a two-dimensional polygon.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Polygon2DPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
         </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.Scatter2D">
             <summary>
@@ -1035,6 +1190,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.Scatter2DPainter">
+            <summary>
+            Plots a two-dimensional scatter graph.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.Scatter2DPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.VerticalBars">
             <summary>
             Plots a two-dimensional vertical-bar chart.
@@ -1081,6 +1252,22 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.VerticalBarsPainter">
+            <summary>
+            Plots a two-dimensional vertical-bar chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.VerticalBarsPainter.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
         </member>
         <member name="T:Waher.Script.Graphs.Functions.SameScale">
             <summary>
@@ -1490,16 +1677,29 @@
             <param name="Time">Time</param>
             <returns>Week number, according to ISO-8601.</returns>
         </member>
-        <member name="T:Waher.Script.Graphs.DrawCallback">
+        <member name="M:Waher.Script.Graphs.Graph.ToXml">
             <summary>
-            Delegate for drawing callback methods.
+            Exports the graph to XML.
             </summary>
-            <param name="Canvas">Canvas to draw on.</param>
-            <param name="Points">Points to draw.</param>
-            <param name="Parameters">Graph-specific parameters.</param>
-            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
-            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
-            <param name="DrawingArea">Current drawing area.</param>
+            <returns>XML string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToXml(System.Text.StringBuilder)">
+            <summary>
+            Exports the graph to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToXml(System.Xml.XmlWriter)">
+            <summary>
+            Exports the graph to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
         </member>
         <member name="T:Waher.Script.Graphs.Graph2D">
             <summary>
@@ -1511,13 +1711,13 @@
             Base class for two-dimensional graphs.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph2D.#ctor(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Graphs.DrawCallback,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
+        <member name="M:Waher.Script.Graphs.Graph2D.#ctor(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Graphs.IPainter2D,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
             <summary>
             Base class for two-dimensional graphs.
             </summary>
             <param name="X">X-axis</param>
             <param name="Y">Y-axis</param>
-            <param name="PlotCallback">Callback method that performs the plotting.</param>
+            <param name="Painter">Painter of graph.</param>
             <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
             <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
             <param name="Node">Node creating the graph.</param>
@@ -1630,6 +1830,12 @@
             <param name="States">State objects for the generated bitmap.</param>
             <returns>Script.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
         <member name="T:Waher.Script.Graphs.GraphBitmap">
             <summary>
             Handles bitmap-based graphs.
@@ -1699,6 +1905,12 @@
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
         </member>
         <member name="T:Waher.Script.Graphs.GraphSettings">
             <summary>
@@ -1789,6 +2001,22 @@
             <summary>
             Approximate number of labels along the Y-axis.
             </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.IPainter2D">
+            <summary>
+            Interface for 2D graph drawing functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter2D.DrawGraph(SkiaSharp.SKCanvas,SkiaSharp.SKPoint[],System.Object[],SkiaSharp.SKPoint[],System.Object[],Waher.Script.Graphs.DrawingArea)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingArea">Current drawing area.</param>
         </member>
         <member name="T:Waher.Script.Graphs.SetOfGraphs">
             <summary>

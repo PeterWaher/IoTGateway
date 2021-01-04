@@ -736,6 +736,68 @@
             <param name="Facets">Number of facets to use to (at least), to draw ellipsoid</param>
             <param name="Shader">Shader.</param>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Vector3)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector3"/> to an expression string that can be exported.
+            </summary>
+            <param name="v">Vector</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{System.Single})">
+            <summary>
+            Converts a <see cref="T:System.Single"/> array to an expression string that can be exported.
+            </summary>
+            <param name="v">Vector</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{System.Numerics.Vector3})">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector3"/> array to an expression string that can be exported.
+            </summary>
+            <param name="v">Vectors</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Vector3[][])">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector3"/> mesh to an expression string that can be exported.
+            </summary>
+            <param name="M">Mesh</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Collections.Generic.IEnumerable{SkiaSharp.SKColor})">
+            <summary>
+            Converts a <see cref="T:SkiaSharp.SKColor"/> array to an expression string that can be exported.
+            </summary>
+            <param name="v">Vectors</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(System.Numerics.Matrix4x4)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Matrix4x4"/> to an expression string that can be exported.
+            </summary>
+            <param name="M">Matrix</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(SkiaSharp.SKColor)">
+            <summary>
+            Converts a <see cref="T:SkiaSharp.SKColor"/> to an expression string that can be exported.
+            </summary>
+            <param name="Color">Color</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ToString(Waher.Script.Graphs3D.PhongIntensity)">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Graphs3D.PhongIntensity"/> to an expression string that can be exported.
+            </summary>
+            <param name="Intensity">Intensity</param>
+            <returns>Expression string.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
             Shader returning a constant color.
@@ -774,6 +836,12 @@
             <summary>
             If shader is 100% opaque.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.ConstantColor.ToScript">
+            <summary>
+            Exports shader specifics to script.
+            </summary>
+            <returns>Exports the shader to parsable script.</returns>
         </member>
         <member name="T:Waher.Script.Graphs3D.DrawingVolume">
             <summary>
@@ -1025,6 +1093,53 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Matrix4x4"/> object.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Generates a <see cref="T:System.Numerics.Matrix4x4"/> object.
+            </summary>
+            <param name="M11">Element for row 1, column 1.</param>
+            <param name="M12">Element for row 1, column 2.</param>
+            <param name="M13">Element for row 1, column 3.</param>
+            <param name="M14">Element for row 1, column 4.</param>
+            <param name="M21">Element for row 2, column 1.</param>
+            <param name="M22">Element for row 2, column 2.</param>
+            <param name="M23">Element for row 2, column 3.</param>
+            <param name="M24">Element for row 2, column 4.</param>
+            <param name="M31">Element for row 3, column 1.</param>
+            <param name="M32">Element for row 3, column 2.</param>
+            <param name="M33">Element for row 3, column 3.</param>
+            <param name="M34">Element for row 3, column 4.</param>
+            <param name="M41">Element for row 4, column 1.</param>
+            <param name="M42">Element for row 4, column 2.</param>
+            <param name="M43">Element for row 4, column 3.</param>
+            <param name="M44">Element for row 4, column 4.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Matrices.Matrix4x4.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Matrices.Rows">
             <summary>
             Creates a matrix whose rows have elements of the same value, each defined by 
@@ -1124,6 +1239,24 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.LineMesh3DPainter">
+            <summary>
+            Plots a three-dimensional line mesh.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.LineMesh3DPainter.DrawGraph(Waher.Script.Graphs3D.Canvas3D,System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],Waher.Script.Graphs3D.DrawingVolume)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
+        </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3D">
             <summary>
             Plots a three-dimensional surface mesh.
@@ -1182,6 +1315,24 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3DPainter">
+            <summary>
+            Plots a three-dimensional surface mesh.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.PolygonMesh3DPainter.DrawGraph(Waher.Script.Graphs3D.Canvas3D,System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],Waher.Script.Graphs3D.DrawingVolume)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Plots.Surface3D">
             <summary>
@@ -1242,6 +1393,24 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.Surface3DPainter">
+            <summary>
+            Plots a three-dimensional surface.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.Surface3DPainter.DrawGraph(Waher.Script.Graphs3D.Canvas3D,System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],Waher.Script.Graphs3D.DrawingVolume)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
+        </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3D">
             <summary>
             Plots a three-dimensional vertical bars chart.
@@ -1287,6 +1456,24 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3DPainter">
+            <summary>
+            Plots a three-dimensional vertical bars chart.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Functions.Plots.VerticalBars3DPainter.DrawGraph(Waher.Script.Graphs3D.Canvas3D,System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],Waher.Script.Graphs3D.DrawingVolume)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.Functions.Shading.ConstantColor">
             <summary>
@@ -1570,19 +1757,6 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.Graphs3D.DrawCallback3D">
-            <summary>
-            Delegate for 3D drawing callback methods.
-            </summary>
-            <param name="Canvas">Canvas to draw on.</param>
-            <param name="Points">Points to draw.</param>
-            <param name="Normals">Optional normals.</param>
-            <param name="Parameters">Graph-specific parameters.</param>
-            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
-            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
-            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
-            <param name="DrawingVolume">Current drawing volume.</param>
-        </member>
         <member name="T:Waher.Script.Graphs3D.Graph3D">
             <summary>
             Handles three-dimensional graphs.
@@ -1593,7 +1767,7 @@
             Base class for two-dimensional graphs.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.#ctor(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,System.Numerics.Vector4[0:,0:],Waher.Script.Graphs3D.DrawCallback3D,System.Boolean,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.#ctor(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,System.Numerics.Vector4[0:,0:],Waher.Script.Graphs3D.IPainter3D,System.Boolean,System.Boolean,System.Boolean,Waher.Script.Model.ScriptNode,System.Object[])">
             <summary>
             Base class for two-dimensional graphs.
             </summary>
@@ -1601,7 +1775,7 @@
             <param name="Y">Y-axis</param>
             <param name="Z">Z-axis</param>
             <param name="Normals">Optional Normals</param>
-            <param name="PlotCallback">Callback method that performs the plotting.</param>
+            <param name="Painter">Painter of graph.</param>
             <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
             <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
             <param name="ShowZeroZ">If the z-axis (z=0) should always be shown.</param>
@@ -1853,6 +2027,19 @@
             <param name="Argument">Argument value.</param>
             <returns>Shader object</returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.ToString(System.Numerics.Vector4)">
+            <summary>
+            Converts a <see cref="T:System.Numerics.Vector4"/> to an expression string that can be exported.
+            </summary>
+            <param name="v">Vector</param>
+            <returns>Expression string.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>
             Interface for 3D shaders.
@@ -1885,6 +2072,30 @@
             <summary>
             If shader is 100% opaque.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.I3DShader.ToScript">
+            <summary>
+            Exports shader specifics to script.
+            </summary>
+            <returns>Exports the shader to parsable script.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs3D.IPainter3D">
+            <summary>
+            Interface for 3D graph drawing functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.IPainter3D.DrawGraph(Waher.Script.Graphs3D.Canvas3D,System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],System.Numerics.Vector4[0:,0:],System.Numerics.Vector4[0:,0:],System.Object[],Waher.Script.Graphs3D.DrawingVolume)">
+            <summary>
+            Draws the graph on a canvas.
+            </summary>
+            <param name="Canvas">Canvas to draw on.</param>
+            <param name="Points">Points to draw.</param>
+            <param name="Normals">Optional normals.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevNormals">Optional normals of previous graph of same type (if available), null (if not available).</param>
+            <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+            <param name="DrawingVolume">Current drawing volume.</param>
         </member>
         <member name="T:Waher.Script.Graphs3D.PhongIntensity">
             <summary>
@@ -2040,6 +2251,12 @@
             <summary>
             If shader is 100% opaque.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.PhongShader.ToScript">
+            <summary>
+            Exports shader specifics to script.
+            </summary>
+            <returns>Exports the shader to parsable script.</returns>
         </member>
     </members>
 </doc>

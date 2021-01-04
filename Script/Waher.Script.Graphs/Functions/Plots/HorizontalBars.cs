@@ -80,65 +80,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(Values, Labels, this.DrawGraph, true, false, this,
+			return new Graph2D(Values, Labels, new HorizontalBarPainter(), true, false, this,
 				Color is null ? SKColors.Red : Color.AssociatedObjectValue);
 		}
-
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
-			DrawingArea DrawingArea)
-		{
-			SKPaint Brush = null;
-			SKPath Path = null;
-
-			try
-			{
-				Brush = new SKPaint()
-				{
-					Color = Graph.ToColor(Parameters[0]),
-					Style = SKPaintStyle.Fill
-				};
-				Path = new SKPath();
-
-				float HalfBarHeight = (-DrawingArea.Height - Points.Length) * 0.45f / Points.Length;
-				float x0, y0, x1, y1;
-				int i, c;
-
-				if (!(PrevPoints is null))
-				{
-					if ((c = PrevPoints.Length) != Points.Length)
-						PrevPoints = null;
-					else
-					{
-						for (i = 0; i < c; i++)
-						{
-							if (PrevPoints[i].Y != Points[i].Y)
-							{
-								PrevPoints = null;
-								break;
-							}
-						}
-					}
-				}
-
-				i = 0;
-				foreach (SKPoint Point in Points)
-				{
-					y0 = Point.Y - HalfBarHeight + 1;
-					x0 = Point.X;
-					y1 = Point.Y + HalfBarHeight - 1;
-					x1 = PrevPoints != null ? PrevPoints[i++].X : DrawingArea.OrigoX;
-
-					Canvas.DrawRect(new SKRect(x0, y0, x1, y1), Brush);
-				}
-
-				Canvas.DrawPath(Path, Brush);
-			}
-			finally
-			{
-				Brush?.Dispose();
-				Path?.Dispose();
-			}
-		}
-
 	}
 }

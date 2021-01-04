@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using SkiaSharp;
 
@@ -40,5 +39,12 @@ namespace Waher.Script.Graphs3D
 		{
 			get;
 		}
-    }
+
+		/// <summary>
+		/// Exports shader specifics to script.
+		/// </summary>
+		/// <returns>Exports the shader to parsable script.</returns>
+		string ToScript();
+
+	}
 }

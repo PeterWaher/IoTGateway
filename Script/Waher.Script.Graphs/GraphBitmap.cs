@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Xml;
 using SkiaSharp;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Graphs
@@ -189,6 +188,25 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public void Dispose()
 		{
+		}
+
+		/// <summary>
+		/// Exports graph specifics to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportGraph(XmlWriter Output)
+		{
+			Output.WriteStartElement("GraphBitmap");
+			Output.WriteAttributeString("width", this.width.ToString());
+			Output.WriteAttributeString("height", this.height.ToString());
+
+			using (SKData Data = this.bitmap.Encode(SKEncodedImageFormat.Png, 100))
+			{
+				byte[] Bin = Data.ToArray();
+				Output.WriteElementString("Png", Convert.ToBase64String(Bin));
+			}
+
+			Output.WriteEndElement();
 		}
 	}
 }

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Graphs.Functions.Plots
 {
@@ -99,66 +95,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(X, Y, this.DrawGraph, false, true, this,
+			return new Graph2D(X, Y, new Plot2DCurveAreaPainter(), false, true, this,
 				AreaColor is null ? new SKColor(SKColors.Red.Red, SKColors.Red.Green, SKColors.Red.Blue, 192) : AreaColor.AssociatedObjectValue);
 		}
-
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
-			DrawingArea DrawingArea)
-		{
-			SKPaint Brush = null;
-			SKPath Path = null;
-
-			try
-			{
-				Brush = new SKPaint()
-				{
-					Style = SKPaintStyle.Fill,
-					Color = Graph.ToColor(Parameters[0])
-				};
-				Path = new SKPath();
-
-				Path = Plot2DCurve.CreateSpline(Points);
-
-				if (PrevPoints is null)
-				{
-					IElement Zero;
-					ISet Set = DrawingArea.MinY.AssociatedSet;
-
-					if (Set is IGroup Group)
-						Zero = Group.AdditiveIdentity;
-					else
-						Zero = new DoubleNumber(0);
-
-					IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
-					IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
-
-					PrevPoints = DrawingArea.Scale(XAxis, YAxis);
-
-					if (DrawingArea.MinX is StringValue && DrawingArea.MaxX is StringValue)
-					{
-						PrevPoints[0].X = Points[0].X;
-						PrevPoints[1].X = Points[Points.Length - 1].X;
-					}
-				}
-
-				PrevPoints = (SKPoint[])PrevPoints.Clone();
-				Array.Reverse(PrevPoints);
-				Plot2DCurve.CreateSpline(Path, PrevPoints);
-
-				Path.LineTo(Points[0]);
-
-				Canvas.DrawPath(Path, Brush);
-			}
-			finally
-			{
-				if (!(Brush is null))
-					Brush.Dispose();
-
-				if (!(Path is null))
-					Path.Dispose();
-			}
-		}
-
 	}
 }

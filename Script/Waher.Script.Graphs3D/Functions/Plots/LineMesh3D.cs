@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
-using Waher.Script.Graphs;
 using Waher.Script.Model;
 
 namespace Waher.Script.Graphs3D.Functions.Plots
@@ -87,36 +84,8 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 
 			IElement Color = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph3D(X, Y, Z, null, this.DrawGraph, false, false, false, this,
+			return new Graph3D(X, Y, Z, null, new LineMesh3DPainter(), false, false, false, this,
 				Color is null ? SKColors.Red : Color.AssociatedObjectValue);
 		}
-
-		private void DrawGraph(Graphs3D.Canvas3D Canvas, Vector4[,] Points, Vector4[,] Normals,
-			object[] Parameters, Vector4[,] PrevPoints, Vector4[,] PrevNormals,
-			object[] PrevParameters, DrawingVolume DrawingVolume)
-		{
-			int i, c = Points.GetLength(0);
-			int j, d = Points.GetLength(1);
-			SKColor Color = Graph.ToColor(Parameters[0]);
-			Vector4[] Nodes = new Vector4[4];
-
-			c--;
-			d--;
-
-			for (i = 0; i < c; i++)
-			{
-				for (j = 0; j < d; j++)
-				{
-					Nodes[0] = Points[i, j];
-					Nodes[1] = Points[i + 1, j];
-					Nodes[2] = Points[i + 1, j + 1];
-					Nodes[3] = Points[i, j + 1];
-
-					if (Normals is null)
-						Canvas.PolyLine(Nodes, Color);
-				}
-			}
-		}
-
 	}
 }

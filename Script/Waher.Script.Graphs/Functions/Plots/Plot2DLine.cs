@@ -100,45 +100,9 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph2D(X, Y, this.DrawGraph, false, false, this,
+			return new Graph2D(X, Y, new Plot2DLinePainter(), false, false, this,
 				Color is null ? SKColors.Red : Color.AssociatedObjectValue,
 				Size is null ? 2.0 : Size.AssociatedObjectValue);
 		}
-
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
-			DrawingArea DrawingArea)
-		{
-			SKPaint Pen = null;
-			SKPath Path = null;
-			bool First = true;
-
-			try
-			{
-				Pen = Graph.ToPen(Parameters[0], Parameters[1]);
-				Path = new SKPath();
-
-				foreach (SKPoint Point in Points)
-				{
-					if (First)
-					{
-						First = false;
-						Path.MoveTo(Point);
-					}
-					else
-						Path.LineTo(Point);
-				}
-
-				Canvas.DrawPath(Path, Pen);
-			}
-			finally
-			{
-				if (!(Pen is null))
-					Pen.Dispose();
-
-				if (!(Path is null))
-					Path.Dispose();
-			}
-		}
-
 	}
 }

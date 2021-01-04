@@ -1244,11 +1244,13 @@ use the following helper functions.
 | Function                                  | Description                                           | Example                                   |
 |-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
 | `Columns(Values)`                         | Creates a square matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | [Example][ColumnsExample] |
+| `Matrix4x4(m11,m12,m13,m14,m21,...,m44)`  | Creates a Matrix4x4 object (from the `System.Numerics` namespace).                                                                    | [Example][Matrix4x4Example] |
 | `Rows(Values)`                            | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector.    | [Example][RowsExample] |
 | `Vector3(X,Y,Z)`                          | Creates a `Vector3` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector3Example] |
 | `Vector4(X,Y,Z,W)`                        | Creates a `Vector4` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector4Example] |
 
 [ColumnsExample]: Prompt.md?Expression=X%3A%3DColumns%280..10%29
+[Matrix4x4Example]: Prompt.md?Expression=Matrix4x4%281%2C0%2C0%2C0%2C0%2C1%2C0%2C0%2C0%2C0%2C1%2C0%2C0%2C0%2C0%2C1%29
 [RowsExample]: Prompt.md?Expression=Z%3A%3DRows%280..10%29
 [Vector3Example]: Prompt.md?Expression=Vector3%2810%2C20%2C30%29
 [Vector4Example]: Prompt.md?Expression=Vector4%2810%2C20%2C30%2C1%29

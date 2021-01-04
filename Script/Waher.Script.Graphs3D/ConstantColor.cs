@@ -57,5 +57,14 @@ namespace Waher.Script.Graphs3D
 		/// If shader is 100% opaque.
 		/// </summary>
 		public bool Opaque => this.color.Alpha == 255;
+
+		/// <summary>
+		/// Exports shader specifics to script.
+		/// </summary>
+		/// <returns>Exports the shader to parsable script.</returns>
+		public string ToScript()
+		{
+			return "ConstantColor(" + Canvas3D.ToString(this.color) + ")";
+		}
 	}
 }

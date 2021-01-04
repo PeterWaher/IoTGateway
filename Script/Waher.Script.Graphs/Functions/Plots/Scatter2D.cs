@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -100,29 +99,9 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph2D(X, Y, this.DrawGraph, false, false, this,
+			return new Graph2D(X, Y, new Scatter2DPainter(), false, false, this,
 				Color is null ? SKColors.Red : Color.AssociatedObjectValue,
 				Size is null ? 5.0 : Size.AssociatedObjectValue);
 		}
-
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
-			DrawingArea DrawingArea)
-		{
-			SKColor Color = Graph.ToColor(Parameters[0]);
-			float Size = (float)Expression.ToDouble(Parameters[1]);
-			SKPaint Brush = new SKPaint
-			{
-				FilterQuality = SKFilterQuality.High,
-				IsAntialias = true,
-				Style = SKPaintStyle.Fill,
-				Color = Color
-			};
-
-			foreach (SKPoint P in Points)
-				Canvas.DrawCircle(P.X, P.Y, Size, Brush);
-
-			Brush.Dispose();
-		}
-
 	}
 }

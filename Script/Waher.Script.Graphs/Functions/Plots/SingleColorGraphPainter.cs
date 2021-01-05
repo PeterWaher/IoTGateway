@@ -17,8 +17,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 			return (Parameters?.Length ?? 0) >= 1 &&
 				Parameters[0] is SKColor Color &&
 				Color.Red == Graph.DefaultColor.Red &&
-				Color.Red == Graph.DefaultColor.Green &&
-				Color.Red == Graph.DefaultColor.Blue;
+				Color.Green == Graph.DefaultColor.Green &&
+				Color.Blue == Graph.DefaultColor.Blue;
 		}
 
 		/// <summary>

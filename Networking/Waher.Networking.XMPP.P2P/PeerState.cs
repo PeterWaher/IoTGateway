@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class PeerState : ITextTransportLayer
 	{
-		private const int MaxFragmentSize = 1000000;
+		private const int MaxFragmentSize = 40000000;
 
 		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private readonly StringBuilder fragment = new StringBuilder();

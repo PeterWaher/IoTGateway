@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP
 	public class XmppComponent : Sniffable, IDisposable
 	{
 		private const int KeepAliveTimeSeconds = 30;
-		private const int MaxFragmentSize = 1000000;
+		private const int MaxFragmentSize = 40000000;
 
 		private readonly LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private readonly Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();

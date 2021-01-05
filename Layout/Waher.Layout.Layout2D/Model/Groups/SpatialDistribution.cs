@@ -60,6 +60,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 					else
 						this.cellLayout.Add(Child);
 				}
+
+				this.cellLayout.Flush();
 			}
 
 			return Relative;

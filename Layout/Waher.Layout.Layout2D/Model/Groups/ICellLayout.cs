@@ -17,6 +17,11 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		void Add(ILayoutElement Element);
 
 		/// <summary>
+		/// Flushes any waiting elements int he layout pipeline.
+		/// </summary>
+		void Flush();
+
+		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>

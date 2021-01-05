@@ -275,5 +275,11 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			this.Test("Test_40_HorizontalBars");
 		}
+
+		[TestMethod]
+		public void Test_41_FlexibleLegend()
+		{
+			this.Test("Test_41_FlexibleLegend");
+		}
 	}
 }

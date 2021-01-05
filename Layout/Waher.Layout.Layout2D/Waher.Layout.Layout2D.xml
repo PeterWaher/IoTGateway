@@ -5678,6 +5678,11 @@
             </summary>
             <param name="Element">Cell element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleHorizontalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to positions.
@@ -5726,6 +5731,11 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.FlexibleVerticalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -5827,6 +5837,11 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.GridCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.GridCells.TotWidth">
             <summary>
@@ -5942,6 +5957,11 @@
             </summary>
             <param name="Element">Cell element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.HorizontalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to positions.
@@ -5980,6 +6000,11 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.ICellLayout.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6134,6 +6159,11 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.OverlayCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6350,6 +6380,11 @@
             Adds a cell to the layout.
             </summary>
             <param name="Element">Cell element</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.Flush">
+            <summary>
+            Flushes any waiting elements int he layout pipeline.
+            </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.VerticalCells.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>

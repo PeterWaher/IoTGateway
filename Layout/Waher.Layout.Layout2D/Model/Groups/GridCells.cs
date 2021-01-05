@@ -166,6 +166,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			}
 		}
 
+		/// <summary>
+		/// Flushes any waiting elements int he layout pipeline.
+		/// </summary>
+		public void Flush()
+		{
+		}
+
 		private void SetElement(int X, int Y, int ColSpan, int RowSpan, ILayoutElement Element)
 		{
 			GridPadding P = new GridPadding(Element, 0, 0, X, Y, ColSpan, RowSpan);

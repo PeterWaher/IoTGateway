@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd" background="WhiteBackground" pen="BlackPen" font="Text" textColor="Black">
+  <SolidPen id="BlackPen" color="Black" width="1px"/>
+  <SolidBackground id="Graph0" color="#FF7F7F"/>
+  <SolidBackground id="Graph1" color="#FFBA7F"/>
+  <SolidBackground id="Graph2" color="#FFF57F"/>
+  <SolidBackground id="Graph3" color="#CDFF7F"/>
+  <SolidBackground id="Graph4" color="#93FF7F"/>
+  <SolidBackground id="Graph5" color="#7FFFA6"/>
+  <SolidBackground id="Graph6" color="#7FFFE1"/>
+  <SolidBackground id="Graph7" color="#7FE1FF"/>
+  <SolidBackground id="Graph8" color="#7FA6FF"/>
+  <SolidBackground id="Graph9" color="#937FFF"/>
+  <SolidBackground id="Graph10" color="#CD7FFF"/>
+  <SolidBackground id="Graph11" color="#FF7FF5"/>
+  <Flexible maxWidth="640px">
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph0">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="build.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph1">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="lab.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph2">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="fi.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph3">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="waher.se" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph4">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph5">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="peterdev" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph6">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="seven.br.fi.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph7">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="sb.br.fi.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph8">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="paiwise.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph9">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="stefanini.br.fi.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph10">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="br.fi.tagroot.io" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+    <Cell>
+      <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+        <RoundedRectangle radiusX="5mm" radiusY="5mm" fill="Graph11">
+          <Margins left="0.5em" right="0.5em" top="0.25em" bottom="0.25em">
+            <Label text="cybercity.online" x="50%" y="50%" halign="Center" valign="Center"/>
+          </Margins>
+        </RoundedRectangle>
+      </Margins>
+    </Cell>
+  </Flexible>
+</Layout2D>

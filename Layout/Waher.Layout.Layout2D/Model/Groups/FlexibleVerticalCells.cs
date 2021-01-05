@@ -60,29 +60,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		}
 
 		/// <summary>
-		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// Flushes any waiting elements int he layout pipeline.
 		/// </summary>
-		/// <param name="State">Current drawing state.</param>
-		public void MeasurePositions(DrawingState State)
-		{
-			this.Flush();
-
-			ILayoutElement Element;
-
-			foreach (Tuple<float, float, Padding[]> Row in this.columns)
-			{
-				foreach (Padding P in Row.Item3)
-				{
-					Element = P.Element;
-
-					Element.MeasurePositions(State);
-					P.OffsetX -= Element.Left ?? 0;
-					P.OffsetY -= Element.Top ?? 0;
-				}
-			}
-		}
-
-		private void Flush()
+		public void Flush()
 		{
 			if (this.currentColumn.Count > 0)
 			{
@@ -96,6 +76,27 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			this.maxWidth = 0;
 			this.y = 0;
+		}
+
+		/// <summary>
+		/// Measures layout entities and defines unassigned properties, related to positions.
+		/// </summary>
+		/// <param name="State">Current drawing state.</param>
+		public void MeasurePositions(DrawingState State)
+		{
+			ILayoutElement Element;
+
+			foreach (Tuple<float, float, Padding[]> Row in this.columns)
+			{
+				foreach (Padding P in Row.Item3)
+				{
+					Element = P.Element;
+
+					Element.MeasurePositions(State);
+					P.OffsetX -= Element.Left ?? 0;
+					P.OffsetY -= Element.Top ?? 0;
+				}
+			}
 		}
 
 		/// <summary>

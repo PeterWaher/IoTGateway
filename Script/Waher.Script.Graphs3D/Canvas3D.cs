@@ -3644,7 +3644,7 @@ namespace Waher.Script.Graphs3D
 
 									foreach (XmlNode N3 in E2.ChildNodes)
 									{
-										if (N2 is XmlElement E3)
+										if (N3 is XmlElement E3)
 										{
 											switch (E3.LocalName)
 											{

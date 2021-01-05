@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Events;
+using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -10,14 +12,12 @@ namespace Waher.Content.Markdown.Consolidation
 	/// </summary>
 	public class ThreadConsolidation
 	{
-		private readonly Regex tableHeadline = new Regex(@"^[|]?(:?-+:?[|]*)+$", RegexOptions.Singleline | RegexOptions.Compiled);
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
 		private readonly string threadId;
 		private DocumentType type = DocumentType.Empty;
 		private object tag = null;
 		private int nrTop = 0;
 		private int nrBottom = 0;
-		private int nrHeader = 0;
 
 		/// <summary>
 		/// Consolidates Markdown from multiple sources, sharing the same thread.
@@ -85,72 +85,59 @@ namespace Waher.Content.Markdown.Consolidation
 
 				this.nrTop = 0;
 				this.nrBottom = 0;
-				this.nrHeader = 0;
 
-				if (this.type == DocumentType.SingleCode || this.type == DocumentType.SingleTable)
+				switch (this.type)
 				{
-					int i, c, d, d0 = 0;
-					bool First = true;
-					string[] Rows0 = null;
-					string[] Rows;
+					case DocumentType.SingleCode:
+						int i, c, d, d0 = 0;
+						bool First = true;
+						string[] Rows0 = null;
+						string[] Rows;
 
-					foreach (SourceState Info in this.sources.Values)
-					{
-						Rows = Info.FirstDocument.Rows;
-						d = Rows.Length;
-
-						if (First)
+						foreach (SourceState Info in this.sources.Values)
 						{
-							First = false;
-							this.nrTop = this.nrBottom = d;
-							Rows0 = Rows;
-							d0 = d;
-							this.nrHeader = 0;
+							Rows = Info.FirstDocument.Rows;
+							d = Rows.Length;
 
-							for (i = 0; i < d; i++)
+							if (First)
 							{
-								if (this.tableHeadline.IsMatch(Rows[i]))
-									this.nrHeader = i + 1;
-								else if (this.nrHeader > 0)
-									break;
+								First = false;
+								this.nrTop = this.nrBottom = d;
+								Rows0 = Rows;
+								d0 = d;
+							}
+							else
+							{
+								c = Math.Min(this.nrTop, d);
+
+								for (i = 0; i < c; i++)
+								{
+									if (Rows[i] != Rows0[i])
+										break;
+								}
+
+								this.nrTop = i;
+
+								c = Math.Min(this.nrBottom, d);
+
+								for (i = 0; i < c; i++)
+								{
+									if (Rows[d - i - 1] != Rows0[d0 - i - 1])
+										break;
+								}
+
+								this.nrBottom = i;
 							}
 						}
-						else
-						{
-							c = Math.Min(this.nrTop, d);
 
-							for (i = 0; i < c; i++)
-							{
-								if (Rows[i] != Rows0[i])
-									break;
-							}
+						if (this.nrTop < 1 || this.nrBottom <= 1)
+							this.type = DocumentType.Complex;
+						break;
 
-							this.nrTop = i;
-
-							c = Math.Min(this.nrBottom, d);
-
-							for (i = 0; i < c; i++)
-							{
-								if (Rows[d - i - 1] != Rows0[d0 - i - 1])
-									break;
-							}
-
-							this.nrBottom = i;
-						}
-					}
-
-					switch (this.type)
-					{
-						case DocumentType.SingleCode:
-							if (this.nrTop < 1 || this.nrBottom <= 1)
-								this.type = DocumentType.Complex;
-							break;
-
-						case DocumentType.SingleTable:
-							if (this.nrTop < this.nrHeader)
-								this.type = DocumentType.Complex;
-							break;
-					}
+					case DocumentType.SingleXml:
+						if (this.sources.Count >= 2)
+							this.type = DocumentType.Complex;
+						break;
 				}
 			}
 
@@ -214,6 +201,7 @@ namespace Waher.Content.Markdown.Consolidation
 						break;
 
 					case DocumentType.SingleCode:
+					case DocumentType.SingleXml:
 
 						int j = 0;
 						int d = this.sources.Count;
@@ -238,91 +226,95 @@ namespace Waher.Content.Markdown.Consolidation
 
 					case DocumentType.SingleTable:
 
-						j = 0;
-						d = this.sources.Count;
+						ConsolidatedTable Table = null;
 
-						foreach (KeyValuePair<string, SourceState> P in this.sources)
+						try
 						{
-							string[] Rows = P.Value.FirstDocument.Rows;
-							int i = 0;
-							int c = Rows.Length;
-
-							j++;
-							if (j > 1)
-								i += this.nrTop;
-
-							if (j < d)
-								c -= this.nrBottom;
-
-							for (; i < c; i++)
+							foreach (KeyValuePair<string, SourceState> P in this.sources)
 							{
-								bool Headline = false;
-
-								if (i < this.nrHeader)
+								foreach (DocumentInformation Doc in P.Value.Documents)
 								{
-									if (tableHeadline.IsMatch(Rows[i]))
-									{
-										Markdown.Append("|---");
-										Headline = true;
-									}
-									else if (i == 0)
-										Markdown.Append("| Source ");
+									if (Table is null)
+										Table = new ConsolidatedTable(P.Key, Doc.Table);
 									else
-										Markdown.Append("| ");
+										Table.Add(P.Key, Doc.Table);
 								}
-								else if (i >= Rows.Length - this.nrBottom)
-									Markdown.Append("| ");
-								else
-								{
-									Markdown.Append("| `");
-									Markdown.Append(P.Key);
-									Markdown.Append("` ");
-								}
-
-								if (!Rows[i].StartsWith("|"))
-								{
-									Markdown.Append('|');
-									if (!Headline)
-										Markdown.Append(' ');
-								}
-
-								Markdown.AppendLine(Rows[i]);
 							}
+
+							Table?.Export(Markdown);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							this.GenerateComplexLocked(Markdown);
+						}
+						break;
+
+					case DocumentType.SingleGraph:
+						Graph G = null;
+
+						try
+						{
+							foreach (KeyValuePair<string, SourceState> P in this.sources)
+							{
+								foreach (DocumentInformation Doc in P.Value.Documents)
+								{
+									if (G is null)
+										G = Doc.Graph;
+									else
+										G = (Graph)G.AddRight(Doc.Graph);
+								}
+							}
+
+							Markdown.AppendLine("```Graph");
+							G.ToXml(Markdown);
+							Markdown.AppendLine();
+							Markdown.AppendLine("```");
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							this.GenerateComplexLocked(Markdown);
 						}
 						break;
 
 					case DocumentType.Complex:
 					default:
-						foreach (KeyValuePair<string, SourceState> P in this.sources)
-						{
-							Markdown.Append('`');
-							Markdown.Append(P.Key);
-							Markdown.AppendLine("`");
-							Markdown.AppendLine();
-
-							bool First = true;
-
-							foreach (DocumentInformation Doc in P.Value.Documents)
-							{
-								if (First)
-									First = false;
-								else
-									Markdown.AppendLine(":\t");
-
-								foreach (string Row in Doc.Rows)
-								{
-									Markdown.Append(":\t");
-									Markdown.AppendLine(Row);
-								}
-							}
-
-							Markdown.AppendLine();
-						}
+						this.GenerateComplexLocked(Markdown);
 						break;
 				}
 			}
 
 			return Markdown.ToString();
+		}
+
+		private void GenerateComplexLocked(StringBuilder Markdown)
+		{
+			foreach (KeyValuePair<string, SourceState> P in this.sources)
+			{
+				Markdown.Append('`');
+				Markdown.Append(P.Key);
+				Markdown.AppendLine("`");
+				Markdown.AppendLine();
+
+				bool First = true;
+
+				foreach (DocumentInformation Doc in P.Value.Documents)
+				{
+					if (First)
+						First = false;
+					else
+						Markdown.AppendLine(":\t");
+
+					foreach (string Row in Doc.Rows)
+					{
+						Markdown.Append(":\t");
+						Markdown.AppendLine(Row);
+					}
+				}
+
+				Markdown.AppendLine();
+			}
 		}
 
 	}

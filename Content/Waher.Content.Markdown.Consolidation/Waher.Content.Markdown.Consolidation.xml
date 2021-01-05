@@ -4,6 +4,53 @@
         <name>Waher.Content.Markdown.Consolidation</name>
     </assembly>
     <members>
+        <member name="T:Waher.Content.Markdown.Consolidation.ConsolidatedTable">
+            <summary>
+            Represents a consolidated table.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.#ctor(System.String,Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Represents a consolidated table.
+            </summary>
+            <param name="Source">Source of table.</param>
+            <param name="MarkdownTable">Markdown table.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrColumns">
+            <summary>
+            Number of columns.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrHeaderRows">
+            <summary>
+            Number of header rows.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.ConsolidatedTable.NrCellRows">
+            <summary>
+            Number of cell rows.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.GetAlignment(System.Int32)">
+            <summary>
+            Gets the alignment of a column.
+            </summary>
+            <param name="Column">Zero-based column index.</param>
+            <returns>Column alignment.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.Add(System.String,Waher.Content.Markdown.Model.BlockElements.Table)">
+            <summary>
+            Adds data from a Markdown table to the consolidated table.
+            </summary>
+            <param name="Source">Source of table.</param>
+            <param name="MarkdownTable">Table to add</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.ConsolidatedTable.Export(System.Text.StringBuilder)">
+            <summary>
+            Exports the consolidated table to Markdown.
+            </summary>
+            <param name="Markdown">Markdown output.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Consolidation.DocumentType">
             <summary>
             Type of markdown document.
@@ -39,6 +86,16 @@
             Contains one table.
             </summary>
         </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleGraph">
+            <summary>
+            Contains one graph.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleXml">
+            <summary>
+            Contains one block of XML
+            </summary>
+        </member>
         <member name="F:Waher.Content.Markdown.Consolidation.DocumentType.Complex">
             <summary>
             Contains complex content.
@@ -62,6 +119,16 @@
         <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Type">
             <summary>
             Document type.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Graph">
+            <summary>
+            Graph object, if <see cref="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleGraph"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Table">
+            <summary>
+            Table object, if <see cref="F:Waher.Content.Markdown.Consolidation.DocumentType.SingleTable"/>
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Rows">

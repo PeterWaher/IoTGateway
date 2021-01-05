@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
@@ -81,6 +80,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public string Id
 		{
 			get { return this.id; }
+		}
+
+		/// <summary>
+		/// Number of columns.
+		/// </summary>
+		public int Columns
+		{
+			get { return this.columns; }
 		}
 
 		/// <summary>

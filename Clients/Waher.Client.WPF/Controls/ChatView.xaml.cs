@@ -196,11 +196,19 @@ namespace Waher.Client.WPF.Controls
 
 			try
 			{
-				Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
+				new Waher.Script.Expression(Message);
+				Markdown = null;   // Expressions should not be parsed as markdown.
 			}
 			catch (Exception)
 			{
-				Markdown = null;
+				try
+				{
+					Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
+				}
+				catch (Exception)
+				{
+					Markdown = null;
+				}
 			}
 
 			this.AddItem(ChatItemType.Transmitted, DateTime.Now, Message, string.Empty, Markdown, ThreadId, Colors.Black, Colors.Honeydew);
@@ -208,7 +216,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void AddItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId, Color FgColor, Color BgColor)
 		{
-			if (this.muc && this.consolidate && !string.IsNullOrEmpty(ThreadId))
+			if (this.muc && !string.IsNullOrEmpty(ThreadId))
 			{
 				switch (Type)
 				{
@@ -227,6 +235,9 @@ namespace Waher.Client.WPF.Controls
 
 					case ChatItemType.Received:
 						ThreadConsolidation Consolidation;
+
+						if (!this.consolidate)
+							break;
 
 						lock (this.threads)
 						{

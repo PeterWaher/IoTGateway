@@ -2635,6 +2635,11 @@
             ID of table.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.Table.Columns">
+            <summary>
+            Number of columns.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateMarkdown(System.Text.StringBuilder)">
             <summary>
             Generates Markdown for the markdown element.

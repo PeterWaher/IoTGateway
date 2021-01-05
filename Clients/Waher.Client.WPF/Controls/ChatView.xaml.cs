@@ -36,7 +36,7 @@ namespace Waher.Client.WPF.Controls
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 
-		private readonly Dictionary<string, ThreadConsolidation> threads = new Dictionary<string, ThreadConsolidation>();
+		private readonly Dictionary<string, Consolidator> threads = new Dictionary<string, Consolidator>();
 		private readonly TreeNode node;
 		private Timer timer;
 		private bool muc;
@@ -221,11 +221,18 @@ namespace Waher.Client.WPF.Controls
 				switch (Type)
 				{
 					case ChatItemType.Transmitted:
+						int N;
+
+						if (this.node is RoomNode RoomNode)
+							N = RoomNode.NrOccupants;
+						else
+							N = 12;
+
 						lock (this.threads)
 						{
 							if (!this.threads.ContainsKey(ThreadId))
 							{
-								this.threads[ThreadId] = new ThreadConsolidation(ThreadId)
+								this.threads[ThreadId] = new Consolidator(ThreadId, N)
 								{
 									Tag = new ConsolidationTag()
 								};
@@ -234,7 +241,7 @@ namespace Waher.Client.WPF.Controls
 						break;
 
 					case ChatItemType.Received:
-						ThreadConsolidation Consolidation;
+						Consolidator Consolidation;
 
 						if (!this.consolidate)
 							break;

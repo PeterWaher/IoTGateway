@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SkiaSharp;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script.Graphs;
 
@@ -9,22 +11,27 @@ namespace Waher.Content.Markdown.Consolidation
 	/// <summary>
 	/// Consolidates Markdown from multiple sources, sharing the same thread.
 	/// </summary>
-	public class ThreadConsolidation
+	public class Consolidator
 	{
-		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
 		private readonly string threadId;
+		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
+		private Dictionary<string, KeyValuePair<SKColor, int>> legend = null;
 		private DocumentType type = DocumentType.Empty;
+		private SKColor[] palette = null;
 		private object tag = null;
 		private int nrTop = 0;
 		private int nrBottom = 0;
+		private int maxPaletteSize;
 
 		/// <summary>
 		/// Consolidates Markdown from multiple sources, sharing the same thread.
 		/// </summary>
 		/// <param name="ThreadId">Thread ID</param>
-		public ThreadConsolidation(string ThreadId)
+		/// <param name="MaxPaletteSize">Maximum PaletteSize</param>
+		public Consolidator(string ThreadId, int MaxPaletteSize)
 		{
 			this.threadId = ThreadId;
+			this.maxPaletteSize = MaxPaletteSize;
 		}
 
 		/// <summary>
@@ -254,10 +261,22 @@ namespace Waher.Content.Markdown.Consolidation
 
 						try
 						{
+							int i;
+
+							if (this.legend is null)
+								this.legend = new Dictionary<string, KeyValuePair<SKColor, int>>();
+
+							if (this.palette is null)
+								this.palette = CreatePalette(this.maxPaletteSize);
+
 							foreach (KeyValuePair<string, SourceState> P in this.sources)
 							{
 								foreach (DocumentInformation Doc in P.Value.Documents)
 								{
+									i = this.legend.Count % this.maxPaletteSize;
+									if (Doc.Graph.TrySetDefaultColor(this.palette[i]))
+										this.legend[P.Key] = new KeyValuePair<SKColor, int>(this.palette[i], i);
+
 									if (G is null)
 										G = Doc.Graph;
 									else
@@ -269,6 +288,54 @@ namespace Waher.Content.Markdown.Consolidation
 							G.ToXml(Markdown);
 							Markdown.AppendLine();
 							Markdown.AppendLine("```");
+
+							if (this.legend.Count > 0)
+							{
+								Markdown.AppendLine();
+								Markdown.AppendLine("```layout");
+								Markdown.AppendLine("<Layout2D xmlns=\"http://waher.se/Layout/Layout2D.xsd\"");
+								Markdown.AppendLine("background=\"WhiteBackground\" pen=\"BlackPen\"");
+								Markdown.AppendLine("font=\"Text\" textColor=\"Black\">");
+								Markdown.AppendLine("<SolidPen id=\"BlackPen\" color=\"Black\" width=\"1px\"/>");
+
+								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
+								{
+									Markdown.Append("<SolidBackground id=\"Graph");
+									Markdown.Append(P.Value.Value.ToString());
+									Markdown.Append("\" color=\"#");
+									Markdown.Append(P.Value.Key.Red.ToString("X2"));
+									Markdown.Append(P.Value.Key.Green.ToString("X2"));
+									Markdown.Append(P.Value.Key.Blue.ToString("X2"));
+
+									if (P.Value.Key.Alpha != 255)
+										Markdown.Append(P.Value.Key.Alpha.ToString("X2"));
+
+									Markdown.AppendLine("\"/>");
+								}
+
+								Markdown.AppendLine("<Grid columns=\"4\">");
+
+								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
+								{
+									Markdown.AppendLine("<Cell>");
+									Markdown.AppendLine("<Margins left=\"1mm\" top=\"1mm\" bottom=\"1mm\" right=\"1mm\">");
+									Markdown.Append("<RoundedRectangle radiusX=\"5mm\" radiusY=\"5mm\" fill=\"Graph");
+									Markdown.Append(P.Value.Value.ToString());
+									Markdown.AppendLine("\">");
+									Markdown.AppendLine("<Margins left=\"0.5em\" right=\"0.5em\" top=\"0.25em\" bottom=\"0.25em\">");
+									Markdown.Append("<Label text=\"");
+									Markdown.Append(XML.Encode(P.Key));
+									Markdown.AppendLine("\" x=\"50%\" y=\"50%\" halign=\"Center\" valign=\"Center\"/>");
+									Markdown.AppendLine("</Margins>");
+									Markdown.AppendLine("</RoundedRectangle>");
+									Markdown.AppendLine("</Margins>");
+									Markdown.AppendLine("</Cell>");
+								}
+
+								Markdown.AppendLine("</Grid>");
+								Markdown.AppendLine("</Layout2D>");
+								Markdown.AppendLine("```");
+							}
 						}
 						catch (Exception ex)
 						{
@@ -285,6 +352,23 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 
 			return Markdown.ToString();
+		}
+
+		/// <summary>
+		/// Creates a palette for graphs.
+		/// </summary>
+		/// <param name="N">Number of colors in palette.</param>
+		/// <returns>Palette</returns>
+		public static SKColor[] CreatePalette(int N)
+		{
+			SKColor[] Result = new SKColor[N];
+			double d = 360.0 / Math.Max(N, 12);
+			int i;
+
+			for (i = 0; i < N; i++)
+				Result[i] = SKColor.FromHsl((float)(d * i), 100, 75);
+
+			return Result;
 		}
 
 		private void GenerateComplexLocked(StringBuilder Markdown)

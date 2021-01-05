@@ -17,6 +17,7 @@ using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Markdown.PlantUml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Layout.Layout2D;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.MUC;
@@ -78,10 +79,11 @@ namespace Waher.Client.WPF
 				typeof(Content.InternetContent).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
 				typeof(MarkdownDocument).Assembly,
-				typeof(ThreadConsolidation).Assembly,
+				typeof(Consolidator).Assembly,
 				typeof(GraphViz).Assembly,
 				typeof(XmlLayout).Assembly,
 				typeof(PlantUml).Assembly,
+				typeof(Layout2DDocument).Assembly,
 				typeof(XML).Assembly,
 				typeof(Content.Xsl.XSL).Assembly,
 				typeof(SensorData).Assembly,

@@ -276,6 +276,7 @@ namespace Waher.Content.Markdown.Layout2D
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Stretch", "None");
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);

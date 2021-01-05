@@ -51,6 +51,54 @@
             </summary>
             <param name="Markdown">Markdown output.</param>
         </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.Consolidator">
+            <summary>
+            Consolidates Markdown from multiple sources, sharing the same thread.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.#ctor(System.String,System.Int32)">
+            <summary>
+            Consolidates Markdown from multiple sources, sharing the same thread.
+            </summary>
+            <param name="ThreadId">Thread ID</param>
+            <param name="MaxPaletteSize">Maximum PaletteSize</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.ThreadId">
+            <summary>
+            Thread ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.Sources">
+            <summary>
+            Consolidated sources.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.Tag">
+            <summary>
+            External tag object that can be tagged to the object by its owner.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GenerateMarkdown">
+            <summary>
+            Generates consolidated markdown from all sources.
+            </summary>
+            <returns>Consolidated markdown.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.CreatePalette(System.Int32)">
+            <summary>
+            Creates a palette for graphs.
+            </summary>
+            <param name="N">Number of colors in palette.</param>
+            <returns>Palette</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Consolidation.DocumentType">
             <summary>
             Type of markdown document.
@@ -173,46 +221,6 @@
             </summary>
             <param name="Markdown">Markdown document.</param>
             <returns>Consolidated document type.</returns>
-        </member>
-        <member name="T:Waher.Content.Markdown.Consolidation.ThreadConsolidation">
-            <summary>
-            Consolidates Markdown from multiple sources, sharing the same thread.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.#ctor(System.String)">
-            <summary>
-            Consolidates Markdown from multiple sources, sharing the same thread.
-            </summary>
-            <param name="ThreadId">Thread ID</param>
-        </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.ThreadId">
-            <summary>
-            Thread ID
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Sources">
-            <summary>
-            Consolidated sources.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Tag">
-            <summary>
-            External tag object that can be tagged to the object by its owner.
-            </summary>
-        </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.Add(System.String,Waher.Content.Markdown.MarkdownDocument)">
-            <summary>
-            Adds incoming markdown information.
-            </summary>
-            <param name="Source">Source of information.</param>
-            <param name="Markdown">Markdown document.</param>
-            <returns>If the source is new.</returns>
-        </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.ThreadConsolidation.GenerateMarkdown">
-            <summary>
-            Generates consolidated markdown from all sources.
-            </summary>
-            <returns>Consolidated markdown.</returns>
         </member>
     </members>
 </doc>

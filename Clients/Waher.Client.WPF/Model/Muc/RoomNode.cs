@@ -67,6 +67,17 @@ namespace Waher.Client.WPF.Model.Muc
 		public string Jid => this.roomId + "@" + this.domain;
 		public bool Entered => this.entered;
 		public bool Entering => this.entering;
+		
+		public int NrOccupants
+		{
+			get
+			{
+				lock (this.occupantByNick)
+				{
+					return this.occupantByNick.Count;
+				}
+			}
+		}
 
 		private void SetParameters()
 		{

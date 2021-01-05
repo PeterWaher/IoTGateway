@@ -200,6 +200,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Source);
+			Output.WriteAttributeString("Stretch", "None");
 
 			if (Width.HasValue)
 				Output.WriteAttributeString("Width", Width.Value.ToString());

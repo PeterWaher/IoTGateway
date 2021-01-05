@@ -247,6 +247,7 @@
               <File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
               <File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
               <File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
+              <File Id='Waher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.dll' Vital='yes'/>
               <File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.dll' Vital='yes'/>
@@ -301,6 +302,7 @@
               <RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' On='uninstall'/>
@@ -353,6 +355,7 @@
               <File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
               <File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
               <File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
+              <File Id='Waher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.pdb' Vital='yes'/>
               <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
@@ -413,6 +416,7 @@
               <RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>

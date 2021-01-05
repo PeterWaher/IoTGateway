@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Output;
@@ -8,7 +9,7 @@ namespace Waher.Script.Graphs3D.Output
 	/// <summary>
 	/// Converts values of type <see cref="Matrix4x4"/> to expression strings.
 	/// </summary>
-	public class Matrix4x4 : ICustomStringOutput
+	public class Matrix4x4Output : ICustomStringOutput
 	{
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Object"/>.
@@ -24,7 +25,7 @@ namespace Waher.Script.Graphs3D.Output
 		/// <returns>Expression string.</returns>
 		public string GetString(object Value)
 		{
-			System.Numerics.Matrix4x4 M = (System.Numerics.Matrix4x4)Value;
+			Matrix4x4 M = (Matrix4x4)Value;
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("Matrix4x4(");

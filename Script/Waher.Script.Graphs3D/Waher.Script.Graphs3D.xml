@@ -2077,19 +2077,19 @@
             <param name="Value">Value</param>
             <returns>Expression string.</returns>
         </member>
-        <member name="T:Waher.Script.Graphs3D.Output.Matrix4x4">
+        <member name="T:Waher.Script.Graphs3D.Output.Matrix4x4Output">
             <summary>
-            Converts values of type <see cref="T:Waher.Script.Graphs3D.Output.Matrix4x4"/> to expression strings.
+            Converts values of type <see cref="T:System.Numerics.Matrix4x4"/> to expression strings.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4.Supports(System.Type)">
+        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4Output.Supports(System.Type)">
             <summary>
             If the interface understands objects such as <paramref name="Object"/>.
             </summary>
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4.GetString(System.Object)">
+        <member name="M:Waher.Script.Graphs3D.Output.Matrix4x4Output.GetString(System.Object)">
             <summary>
             Gets a string representing a value.
             </summary>

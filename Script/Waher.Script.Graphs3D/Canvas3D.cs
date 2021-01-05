@@ -3415,7 +3415,7 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("id", this.id.ToString());
 			Output.WriteAttributeString("width", this.width.ToString());
 			Output.WriteAttributeString("height", this.height.ToString());
-			Output.WriteAttributeString("overSampling", this.height.ToString());
+			Output.WriteAttributeString("overSampling", this.overSampling.ToString());
 			Output.WriteAttributeString("distance", Expression.ToString(this.distance));
 			Output.WriteAttributeString("bgColor", Expression.ToString(this.backgroundColor));
 			Output.WriteAttributeString("pos", Expression.ToString(this.viewerPosition));

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Content.Markdown.Model.Atoms;
 
 namespace Waher.Content.Markdown.Model

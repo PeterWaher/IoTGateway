@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using System.Xml;
-using Waher.Content.Xml;
-using Waher.Events;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {

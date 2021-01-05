@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
-using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model
 {

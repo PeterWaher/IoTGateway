@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Text.RegularExpressions;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;

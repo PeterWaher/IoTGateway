@@ -196,7 +196,7 @@ namespace Waher.Script.Fractals.ColorModels
             return Result;
         }
 
-        private static Random gen = new Random();
+        private static readonly Random gen = new Random();
 
         public override string FunctionName
         {

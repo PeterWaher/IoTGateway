@@ -6,7 +6,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// <summary>
 	/// Plots a two-dimensional curve.
 	/// </summary>
-	public class Plot2DCurvePainter : IPainter2D
+	public class Plot2DCurvePainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

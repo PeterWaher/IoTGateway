@@ -101,7 +101,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
 			return new Graph2D(X, Y, new Plot2DLinePainter(), false, false, this,
-				Color is null ? SKColors.Red : Color.AssociatedObjectValue,
+				Color is null ? Graph.DefaultColor : Color.AssociatedObjectValue,
 				Size is null ? 2.0 : Size.AssociatedObjectValue);
 		}
 	}

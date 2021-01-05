@@ -11,7 +11,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// Plots a two-dimensional layered area chart.
 	/// https://en.wikipedia.org/wiki/Area_chart
 	/// </summary>
-	public class Plot2DLayeredAreaPainter : IPainter2D
+	public class Plot2DLayeredAreaPainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

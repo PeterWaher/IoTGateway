@@ -85,6 +85,11 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public const string GraphLocalName = "Graph";
 
+		/// <summary>
+		/// Default color: Red
+		/// </summary>
+		public static readonly SKColor DefaultColor = SKColors.Red;
+
 		private bool sameScale = false;
 
 		/// <summary>
@@ -1248,6 +1253,21 @@ namespace Waher.Script.Graphs
 
 			return Result;
 		}
+
+		/// <summary>
+		/// If graph uses default color
+		/// </summary>
+		public abstract bool UsesDefaultColor
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Tries to set the default color.
+		/// </summary>
+		/// <param name="Color">Default color.</param>
+		/// <returns>If possible to set.</returns>
+		public abstract bool TrySetDefaultColor(SKColor Color);
 
 	}
 }

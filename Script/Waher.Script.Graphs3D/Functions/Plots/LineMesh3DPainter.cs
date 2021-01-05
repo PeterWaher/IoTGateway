@@ -2,13 +2,14 @@
 using System.Numerics;
 using SkiaSharp;
 using Waher.Script.Graphs;
+using Waher.Script.Graphs.Functions.Plots;
 
 namespace Waher.Script.Graphs3D.Functions.Plots
 {
 	/// <summary>
 	/// Plots a three-dimensional line mesh.
 	/// </summary>
-	public class LineMesh3DPainter : IPainter3D
+	public class LineMesh3DPainter : SingleColorGraphPainter, IPainter3D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

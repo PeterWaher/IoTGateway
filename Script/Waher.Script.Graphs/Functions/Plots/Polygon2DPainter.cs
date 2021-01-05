@@ -6,7 +6,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// <summary>
 	/// Plots a two-dimensional polygon.
 	/// </summary>
-	public class Polygon2DPainter : IPainter2D
+	public class Polygon2DPainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

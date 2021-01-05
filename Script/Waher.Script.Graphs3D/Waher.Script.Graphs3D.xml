@@ -756,6 +756,18 @@
             </summary>
             <param name="Xml">XML input.</param>
         </member>
+        <member name="P:Waher.Script.Graphs3D.Canvas3D.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs3D.ConstantColor">
             <summary>
             Shader returning a constant color.
@@ -2006,6 +2018,18 @@
             Imports graph specifics from XML.
             </summary>
             <param name="Xml">XML input.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.Graph3D.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
         </member>
         <member name="T:Waher.Script.Graphs3D.I3DShader">
             <summary>

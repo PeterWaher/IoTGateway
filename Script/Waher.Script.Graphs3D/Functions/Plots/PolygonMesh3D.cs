@@ -1,7 +1,7 @@
 ﻿using System;
-using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs;
 using Waher.Script.Model;
 
 namespace Waher.Script.Graphs3D.Functions.Plots
@@ -104,7 +104,7 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 			IElement TwoSided = Arguments.Length <= 4 ? null : Arguments[4];
 
 			return new Graph3D(X, Y, Z, null, new PolygonMesh3DPainter(), false, false, false, this,
-				Shader is null ? SKColors.Red : Shader.AssociatedObjectValue,
+				Shader is null ? Graph.DefaultColor : Shader.AssociatedObjectValue,
 				TwoSided is null ? true : TwoSided.AssociatedObjectValue);
 		}
 	}

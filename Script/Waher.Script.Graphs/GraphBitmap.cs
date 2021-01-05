@@ -238,5 +238,20 @@ namespace Waher.Script.Graphs
 			}
 		}
 
+		/// <summary>
+		/// If graph uses default color
+		/// </summary>
+		public override bool UsesDefaultColor => false;
+
+		/// <summary>
+		/// Tries to set the default color.
+		/// </summary>
+		/// <param name="Color">Default color.</param>
+		/// <returns>If possible to set.</returns>
+		public override bool TrySetDefaultColor(SKColor Color)
+		{
+			return false;
+		}
+
 	}
 }

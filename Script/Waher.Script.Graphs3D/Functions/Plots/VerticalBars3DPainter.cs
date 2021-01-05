@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Numerics;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Graphs.Functions.Plots;
 
 namespace Waher.Script.Graphs3D.Functions.Plots
 {
 	/// <summary>
 	/// Plots a three-dimensional vertical bars chart.
 	/// </summary>
-	public class VerticalBars3DPainter : IPainter3D
+	public class VerticalBars3DPainter : SingleColorGraphPainter, IPainter3D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

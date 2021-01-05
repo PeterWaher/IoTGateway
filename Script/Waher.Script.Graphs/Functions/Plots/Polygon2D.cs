@@ -84,7 +84,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
 			return new Graph2D(X, Y, new Plot2DLinePainter(), false, false, this, 
-				Color is null ? SKColors.Red : Color.AssociatedObjectValue);
+				Color is null ? Graph.DefaultColor : Color.AssociatedObjectValue);
 		}
 	}
 }

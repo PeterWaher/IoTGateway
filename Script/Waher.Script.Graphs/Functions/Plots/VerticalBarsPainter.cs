@@ -6,7 +6,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// <summary>
 	/// Plots a two-dimensional vertical-bar chart.
 	/// </summary>
-	public class VerticalBarsPainter : IPainter2D
+	public class VerticalBarsPainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

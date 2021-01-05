@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Numerics;
+using Waher.Script.Graphs;
 
 namespace Waher.Script.Graphs3D
 {
 	/// <summary>
 	/// Interface for 3D graph drawing functions.
 	/// </summary>
-	public interface IPainter3D
+	public interface IPainter3D : IPainter
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

@@ -6,7 +6,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// <summary>
 	/// Plots a two-dimensional horizontal-bar chart.
 	/// </summary>
-	public class HorizontalBarPainter : IPainter2D
+	public class HorizontalBarPainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

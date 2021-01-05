@@ -6,7 +6,7 @@ namespace Waher.Script.Graphs
 	/// <summary>
 	/// Interface for 2D graph drawing functions.
 	/// </summary>
-	public interface IPainter2D
+	public interface IPainter2D : IPainter
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

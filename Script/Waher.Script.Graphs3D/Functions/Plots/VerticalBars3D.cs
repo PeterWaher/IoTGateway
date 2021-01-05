@@ -1,7 +1,7 @@
 ﻿using System;
-using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs;
 using Waher.Script.Model;
 
 namespace Waher.Script.Graphs3D.Functions.Plots
@@ -85,7 +85,7 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 			IElement Color = Arguments.Length <= 3 ? null : Arguments[3];
 
 			return new Graph3D(X, Y, Z, null, new VerticalBars3DPainter(), false, true, false, this,
-				Color is null ? SKColors.Red : Color.AssociatedObjectValue);
+				Color is null ? Graph.DefaultColor : Color.AssociatedObjectValue);
 		}
 	}
 }

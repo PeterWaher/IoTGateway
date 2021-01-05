@@ -1206,6 +1206,25 @@
             <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
             <param name="DrawingArea">Current drawing area.</param>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter">
+            <summary>
+            Painters for single-color graphs
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter.UsesDefaultColor(System.Object[])">
+            <summary>
+            If graph uses default color
+            </summary>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Plots.SingleColorGraphPainter.TrySetDefaultColor(SkiaSharp.SKColor,System.Object[])">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <returns>If possible to set.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Plots.VerticalBars">
             <summary>
             Plots a two-dimensional vertical-bar chart.
@@ -1369,6 +1388,11 @@
         <member name="F:Waher.Script.Graphs.Graph.GraphLocalName">
             <summary>
             Graph
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Graphs.Graph.DefaultColor">
+            <summary>
+            Default color: Red
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs.Graph.#ctor">
@@ -1732,6 +1756,18 @@
             <param name="v">Vector.</param>
             <returns>Array of objects.</returns>
         </member>
+        <member name="P:Waher.Script.Graphs.Graph.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.Graph2D">
             <summary>
             Handles two-dimensional graphs.
@@ -1873,6 +1909,18 @@
             </summary>
             <param name="Xml">XML input.</param>
         </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.GraphBitmap">
             <summary>
             Handles bitmap-based graphs.
@@ -1959,6 +2007,18 @@
             Imports graph specifics from XML.
             </summary>
             <param name="Xml">XML input.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.GraphBitmap.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.GraphBitmap.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
         </member>
         <member name="T:Waher.Script.Graphs.GraphSettings">
             <summary>
@@ -2049,6 +2109,25 @@
             <summary>
             Approximate number of labels along the Y-axis.
             </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.IPainter">
+            <summary>
+            Interface for graph drawing functions.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter.UsesDefaultColor(System.Object[])">
+            <summary>
+            If graph uses default color
+            </summary>
+            <param name="Parameters">Graph-specific parameters.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.IPainter.TrySetDefaultColor(SkiaSharp.SKColor,System.Object[])">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <param name="Parameters">Graph-specific parameters.</param>
+            <returns>If possible to set.</returns>
         </member>
         <member name="T:Waher.Script.Graphs.IPainter2D">
             <summary>

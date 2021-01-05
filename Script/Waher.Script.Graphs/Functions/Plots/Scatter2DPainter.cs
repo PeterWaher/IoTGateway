@@ -7,7 +7,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 	/// <summary>
 	/// Plots a two-dimensional scatter graph.
 	/// </summary>
-	public class Scatter2DPainter : IPainter2D
+	public class Scatter2DPainter : SingleColorGraphPainter, IPainter2D
 	{
 		/// <summary>
 		/// Draws the graph on a canvas.

@@ -895,5 +895,48 @@ namespace Waher.Script.Graphs
 			}
 		}
 
+		/// <summary>
+		/// If graph uses default color
+		/// </summary>
+		public override bool UsesDefaultColor
+		{
+			get
+			{
+				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
+				IEnumerator<IPainter2D> ePainter = this.painters.GetEnumerator();
+
+				while (eParameters.MoveNext() && ePainter.MoveNext())
+				{
+					if (!ePainter.Current.UsesDefaultColor(eParameters.Current))
+						return false;
+				}
+
+				return true;
+			}
+		}
+
+		/// <summary>
+		/// Tries to set the default color.
+		/// </summary>
+		/// <param name="Color">Default color.</param>
+		/// <returns>If possible to set.</returns>
+		public override bool TrySetDefaultColor(SKColor Color)
+		{
+			if (!this.UsesDefaultColor)
+				return false;
+
+			IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
+			IEnumerator<IPainter2D> ePainter = this.painters.GetEnumerator();
+			bool Result = true;
+
+			while (eParameters.MoveNext() && ePainter.MoveNext())
+			{
+				if (!ePainter.Current.TrySetDefaultColor(Color, eParameters.Current))
+					Result = false;
+			}
+
+			return Result;
+		}
+
 	}
 }

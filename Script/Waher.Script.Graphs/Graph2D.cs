@@ -875,21 +875,16 @@ namespace Waher.Script.Graphs
 					switch (E.LocalName)
 					{
 						case "X":
-							Expression Exp = new Expression(E.InnerText);
-							double[] v = (double[])Exp.Evaluate(Variables);
-							this.x.AddLast(new DoubleVector(v));
+							this.x.AddLast((IVector)this.Parse(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							Exp = new Expression(E.InnerText);
-							v = (double[])Exp.Evaluate(Variables);
-							this.y.AddLast(new DoubleVector(v));
+							this.y.AddLast((IVector)this.Parse(E.InnerText, Variables));
 							break;
 
 						case "Parameters":
-							Exp = new Expression(E.InnerText);
-							object[] v2 = (object[])Exp.Evaluate(Variables);
-							this.parameters.AddLast(v2);
+							IVector v = (IVector)this.Parse(E.InnerText, Variables);
+							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 
 						case "Painter":

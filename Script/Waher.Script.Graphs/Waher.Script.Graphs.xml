@@ -1725,6 +1725,13 @@
             <param name="Variables">Current set of variables.</param>
             <returns>Parsed element.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.ToObjectArray(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Gets an array of objects corresponding to the elements of a vector.
+            </summary>
+            <param name="v">Vector.</param>
+            <returns>Array of objects.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.Graph2D">
             <summary>
             Handles two-dimensional graphs.

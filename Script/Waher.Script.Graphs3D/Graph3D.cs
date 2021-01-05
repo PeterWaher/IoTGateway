@@ -1516,26 +1516,19 @@ namespace Waher.Script.Graphs3D
 					switch (E.LocalName)
 					{
 						case "X":
-							Expression Exp = new Expression(E.InnerText);
-							IMatrix M = (IMatrix)Exp.Evaluate(Variables);
-							this.x.AddLast(M);
+							this.x.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							Exp = new Expression(E.InnerText);
-							M = (IMatrix)Exp.Evaluate(Variables);
-							this.y.AddLast(M);
+							this.y.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
 							break;
 
 						case "Z":
-							Exp = new Expression(E.InnerText);
-							M = (IMatrix)Exp.Evaluate(Variables);
-							this.z.AddLast(M);
+							this.z.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
 							break;
 
 						case "Normals":
-							Exp = new Expression(E.InnerText);
-							M = (IMatrix)Exp.Evaluate(Variables);
+							IMatrix M = (IMatrix)this.Parse(E.InnerText, Variables);
 
 							int i, j, c, d;
 
@@ -1558,9 +1551,8 @@ namespace Waher.Script.Graphs3D
 							break;
 
 						case "Parameters":
-							Exp = new Expression(E.InnerText);
-							object[] v = (object[])Exp.Evaluate(Variables);
-							this.parameters.AddLast(v);
+							IVector v = (IVector)this.Parse(E.InnerText, Variables);
+							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 
 						case "Painter":

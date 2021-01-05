@@ -1233,5 +1233,21 @@ namespace Waher.Script.Graphs
 			return Result;
 		}
 
+		/// <summary>
+		/// Gets an array of objects corresponding to the elements of a vector.
+		/// </summary>
+		/// <param name="v">Vector.</param>
+		/// <returns>Array of objects.</returns>
+		protected object[] ToObjectArray(IVector v)
+		{
+			int i, c = v.Dimension;
+			object[] Result = new object[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = v.GetElement(i).AssociatedObjectValue;
+
+			return Result;
+		}
+
 	}
 }

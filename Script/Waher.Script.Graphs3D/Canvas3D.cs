@@ -3649,18 +3649,15 @@ namespace Waher.Script.Graphs3D
 											switch (E3.LocalName)
 											{
 												case "World":
-													Exp = new Expression(E.InnerText);
-													P.World = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													P.World = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
 													break;
 
 												case "Screen":
-													Exp = new Expression(E.InnerText);
-													P.Screen = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													P.Screen = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
 													break;
 
 												case "Normals":
-													Exp = new Expression(E.InnerText);
-													P.Normals = ToVector3DoubleArray((IMatrix)Exp.Evaluate(Variables));
+													P.Normals = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
 													break;
 											}
 										}

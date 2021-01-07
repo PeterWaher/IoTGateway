@@ -141,14 +141,23 @@ namespace Waher.Networking.XMPP.Authentication
 
 				byte[] HPass;
 
-				if (string.IsNullOrEmpty(Client.PasswordHash))
+				if (string.IsNullOrEmpty(Client.PasswordHash) || string.IsNullOrEmpty(Client.PasswordHashMethod))
 				{
 					HPass = H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password));
 					Client.PasswordHash = Convert.ToBase64String(HPass);
 					Client.PasswordHashMethod = this.HashMethodName;
 				}
 				else
-					HPass = Convert.FromBase64String(Client.PasswordHash);
+				{
+					try
+					{
+						HPass = Convert.FromBase64String(Client.PasswordHash);
+					}
+					catch (Exception)
+					{
+						throw new Exception("Invalid password hash provided.");
+					}
+				}
 
 				if (string.IsNullOrEmpty(Client.BareJID))
 					A1 = CONCAT(HPass, ":", Nonce, ":", ClientNonce);

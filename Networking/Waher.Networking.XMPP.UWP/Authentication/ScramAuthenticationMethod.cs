@@ -71,7 +71,16 @@ namespace Waher.Networking.XMPP.Authentication
 				Client.PasswordHashMethod = this.HashMethodName;
 			}
 			else
-				SaltedPassword = Convert.FromBase64String(Client.PasswordHash);
+			{
+				try
+				{
+					SaltedPassword = Convert.FromBase64String(Client.PasswordHash);
+				}
+				catch (Exception)
+				{
+					throw new Exception("Invalid password hash provided.");
+				}
+			}
 
 			byte[] ClientKey = HMAC(SaltedPassword, Encoding.UTF8.GetBytes("Client Key"));
 			byte[] StoredKey = H(ClientKey);

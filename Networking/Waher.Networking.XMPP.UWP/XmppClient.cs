@@ -400,8 +400,8 @@ namespace Waher.Networking.XMPP
 			this.host = this.domain = Host;
 			this.port = Port;
 			this.userName = UserName;
-			this.password = string.Empty;
-			this.passwordHash = PasswordHash;
+			this.password = string.IsNullOrEmpty(PasswordHashMethod) ? PasswordHash : string.Empty;
+			this.passwordHash = string.IsNullOrEmpty(PasswordHashMethod) ? string.Empty : PasswordHash;
 			this.passwordHashMethod = PasswordHashMethod;
 			this.language = Language;
 			this.state = XmppState.Offline;
@@ -499,8 +499,8 @@ namespace Waher.Networking.XMPP
 			this.host = this.domain = Host;
 			this.port = Port;
 			this.userName = UserName;
-			this.password = string.Empty;
-			this.passwordHash = PasswordHash;
+			this.password = string.IsNullOrEmpty(PasswordHashMethod) ? PasswordHash : string.Empty;
+			this.passwordHash = string.IsNullOrEmpty(PasswordHashMethod) ? string.Empty : PasswordHash;
 			this.passwordHashMethod = PasswordHashMethod;
 			this.language = Language;
 			this.state = XmppState.Offline;
@@ -1135,7 +1135,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 			finally
-			{ 
+			{
 				this.OnStateChanged -= StateEventHandler;
 			}
 
@@ -1295,8 +1295,8 @@ namespace Waher.Networking.XMPP
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
 			this.userName = UserName;
-			this.password = string.Empty;
-			this.passwordHash = PasswordHash;
+			this.password = string.IsNullOrEmpty(PasswordHashMethod) ? PasswordHash : string.Empty;
+			this.passwordHash = string.IsNullOrEmpty(PasswordHashMethod) ? string.Empty : PasswordHash;
 			this.passwordHashMethod = PasswordHashMethod;
 
 			this.Connect(this.domain);

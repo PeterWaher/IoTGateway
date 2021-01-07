@@ -1779,6 +1779,29 @@ The following predefined variables are available in web pages hosted by the IoT 
 | `Language`     | The language object of the current session.              |
 | `Namespace`    | The language namespace object of the current page.       |
 
+#### Gateway Service Extensions (Waher.IoTGateway.Svc)
+
+The following functions are available in the `Waher.IoTGateway.Svc` Windows Service host application library. Running the IoT Gateway
+as a Windows Service, adds these functions to the script engine.
+
+| Function                                                      | Description                                                                                                                                                                | Example |
+|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `DecPerformanceCounter(CategoryName[,Instance],CounterName)   | Decrements a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `DecPerformanceCounter("","","")` |
+| `IncPerformanceCounter(CategoryName[,Instance],CounterName)   | Increments a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `IncPerformanceCounter("","","")` |
+| `PerformanceCategory(CategoryName)                            | Returns a `System.Diagnostics.PerformanceCounterCategory` object, given the category name.                                                                                 | `PerformanceCategory("")` |
+| `PerformanceCounter(CategoryName[,Instance],CounterName)      | Returns a `System.Diagnostics.PerformanceCounter` object, given a performance category name and optional performance instance name, as well as a performance counter name. | `PerformanceCounter("","","")` |
+| `PerformanceCounterValue(CategoryName[,Instance],CounterName) | Returns a performance counter value, given a performance category name, optional instance name, as well as a counter name.                                                 | `PerformanceCounterValue("","","")` |
+| `PerformanceCounters(CategoryName[,Instance])                 | Returns an array of `System.Diagnostics.PerformanceCounter` objects within a given performance category, and optional performance instance.                                | `PerformanceCounters("","")` |
+| `PerformanceCounterNames(CategoryName[,Instance])             | Returns an array of names of performance counters within a given performance category, and optional performance instance.                                                  | `PerformanceCounterNames("","")` |
+| `PerformanceInstances(CategoryName)                           | Returns an array of performance counter instance names, given a performance category.                                                                                      | `PerformanceInstances("")` |
+
+The following predefined constants are also available:
+
+| Variable                   | Description                                                                  |
+|:--------------------------:|------------------------------------------------------------------------------|
+| `PerformanceCategories`    | Returns an array of `System.Diagnostics.PerformanceCounterCategory` objects. |
+| `PerformanceCategoryNames` | Returns an array of performance counter category names.                      |
+
 #### Serialization-related functions (Waher.Service.NeuroLedger)
 
 The following functions are available in the `Waher.Service.NeuroLedger` library, which is part of the Neuro-Ledger^TM.

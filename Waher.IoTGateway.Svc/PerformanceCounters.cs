@@ -104,6 +104,23 @@ namespace Waher.IoTGateway.Svc
 		}
 
 		/// <summary>
+		/// Gets available performance counters names, given their category name, and that the category does not consist of instances.
+		/// </summary>
+		/// <param name="CategoryName">Category name</param>
+		/// <returns>Available performance counters</returns>
+		public static string[] GetCounterNames(string CategoryName)
+		{
+			PerformanceCounter[] Counters = GetCounters(CategoryName);
+			int i, c = Counters.Length;
+			string[] Names = new string[c];
+
+			for (i = 0; i < c; i++)
+				Names[i] = Counters[i].CounterName;
+
+			return Names;
+		}
+
+		/// <summary>
 		/// Gets a performance counter, given its category name and counter name, and that the category does not consist of instances.
 		/// </summary>
 		/// <param name="CategoryName">Category name</param>
@@ -182,6 +199,23 @@ namespace Waher.IoTGateway.Svc
 				return new PerformanceCounter[0];
 
 			return InstanceRec.Counters;
+		}
+
+		/// <summary>
+		/// Gets available performance counter names, given their category and instance names.
+		/// </summary>
+		/// <param name="CategoryName">Category name</param>
+		/// <returns>Available performance counters</returns>
+		public static string[] GetCounterNames(string CategoryName, string InstanceName)
+		{
+			PerformanceCounter[] Counters = GetCounters(CategoryName, InstanceName);
+			int i, c = Counters.Length;
+			string[] Names = new string[c];
+
+			for (i = 0; i < c; i++)
+				Names[i] = Counters[i].CounterName;
+
+			return Names;
 		}
 
 		/// <summary>

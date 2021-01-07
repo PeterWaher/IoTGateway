@@ -15,13 +15,13 @@ namespace Waher.Content.Markdown.Consolidation
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
+		private readonly int maxPaletteSize;
 		private Dictionary<string, KeyValuePair<SKColor, int>> legend = null;
 		private DocumentType type = DocumentType.Empty;
 		private SKColor[] palette = null;
 		private object tag = null;
 		private int nrTop = 0;
 		private int nrBottom = 0;
-		private int maxPaletteSize;
 
 		/// <summary>
 		/// Consolidates Markdown from multiple sources, sharing the same thread.

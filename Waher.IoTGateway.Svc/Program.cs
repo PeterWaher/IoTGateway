@@ -42,7 +42,7 @@ namespace Waher.IoTGateway.Svc
 	{
         private static string instanceName = string.Empty;
 
-        public static string InstanceName => instanceName;
+		public static string InstanceName => instanceName;
 
 		public static int Main(string[] args)
 		{

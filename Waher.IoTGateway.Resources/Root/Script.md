@@ -132,6 +132,7 @@ There are also a set of predefined variables:
 | Variable               | Description                                              |
 |:----------------------:|----------------------------------------------------------|
 | `Now`                  | Current date and time                                    |
+| `Time`                 | Current time                                             |
 | `Today`                | Current date                                             |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
@@ -1778,6 +1779,8 @@ The following predefined variables are available in web pages hosted by the IoT 
 | `Domain`       | The domain on which the gateway is operating.            |
 | `Language`     | The language object of the current session.              |
 | `Namespace`    | The language namespace object of the current page.       |
+| `Runtime`      | Returns the time elapsed since the gateway was started.  |
+| `Started`      | Date and Time of when the gateway started.               |
 
 #### Gateway Service Extensions (Waher.IoTGateway.Svc)
 

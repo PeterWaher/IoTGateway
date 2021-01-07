@@ -110,6 +110,7 @@ namespace Waher.IoTGateway
 		private static readonly Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static readonly Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
 		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
+		private static readonly DateTime startTime = DateTime.Now;
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -164,6 +165,11 @@ namespace Waher.IoTGateway
 		private static bool stopped = false;
 
 		#region Life Cycle
+
+		/// <summary>
+		/// Timepoint of starting the gateway.
+		/// </summary>
+		public static DateTime StartTime => startTime;
 
 		/// <summary>
 		/// Starts the gateway.

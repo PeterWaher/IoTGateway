@@ -39,7 +39,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 		public IElement GetValueElement(Variables Variables)
 		{
 			if (!Variables.TryGetVariable("Language", out Variable v) ||
-				!(v.ValueObject is Runtime.Language.Language Language))
+				!(v.ValueObject is Waher.Runtime.Language.Language Language))
 			{
 				Language = GetLanguageAsync(Variables).Result;
 				Variables["Language"] = Language;
@@ -53,11 +53,11 @@ namespace Waher.IoTGateway.ScriptExtensions
 		/// </summary>
 		/// <param name="Session">Session variables.</param>
 		/// <returns>Language object</returns>
-		public static async Task<Runtime.Language.Language> GetLanguageAsync(Variables Session)
+		public static async Task<Waher.Runtime.Language.Language> GetLanguageAsync(Variables Session)
 		{
 			if (Session.TryGetVariable("Language", out Variable v))
 			{
-				if (v.ValueObject is Runtime.Language.Language Language)
+				if (v.ValueObject is Waher.Runtime.Language.Language Language)
 					return Language;
 				else if (v.ValueObject is string LanguageCode && !string.IsNullOrEmpty(LanguageCode))
 					return await Translator.GetLanguageAsync(LanguageCode);
@@ -70,7 +70,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 				{
 					List<string> Alternatives = new List<string>();
 
-					foreach (Runtime.Language.Language Language in await Translator.GetLanguagesAsync())
+					foreach (Waher.Runtime.Language.Language Language in await Translator.GetLanguagesAsync())
 						Alternatives.Add(Language.Code);
 
 					string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());

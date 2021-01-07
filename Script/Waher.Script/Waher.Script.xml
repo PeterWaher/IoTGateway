@@ -2073,6 +2073,32 @@
             </summary>
             <param name="Variables">Current set of variables.</param>
         </member>
+        <member name="T:Waher.Script.Constants.Time">
+            <summary>
+            Current time.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.Time.#ctor">
+            <summary>
+            Current time.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.Time.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.Time.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.Time.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
         <member name="T:Waher.Script.Constants.Today">
             <summary>
             Current date.

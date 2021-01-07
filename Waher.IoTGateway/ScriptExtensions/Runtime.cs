@@ -40,7 +40,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			return new DateTimeValue(Gateway.StartTime);
+			return new ObjectValue(DateTime.Now - Gateway.StartTime);
 		}
 
 	}

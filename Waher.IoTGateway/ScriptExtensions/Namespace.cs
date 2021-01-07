@@ -39,7 +39,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 		public IElement GetValueElement(Variables Variables)
 		{
 			if (Variables.TryGetVariable("Namespace", out Variable v) &&
-				v.ValueObject is Runtime.Language.Namespace Namespace)
+				v.ValueObject is Waher.Runtime.Language.Namespace Namespace)
 			{
 				if (Variables.TryGetVariable("Request", out v) &&
 					v.ValueObject is HttpRequest Request &&
@@ -62,13 +62,13 @@ namespace Waher.IoTGateway.ScriptExtensions
 		/// </summary>
 		/// <param name="Session">Session variables.</param>
 		/// <returns>Language object</returns>
-		public static async Task<Runtime.Language.Namespace> GetNamespaceAsync(Variables Session)
+		public static async Task<Waher.Runtime.Language.Namespace> GetNamespaceAsync(Variables Session)
 		{
-			Runtime.Language.Language Language = await ScriptExtensions.Language.GetLanguageAsync(Session);
+			Waher.Runtime.Language.Language Language = await ScriptExtensions.Language.GetLanguageAsync(Session);
 
 			if (Session.TryGetVariable("Namespace", out Variable v))
 			{
-				if (v.ValueObject is Runtime.Language.Namespace Namespace)
+				if (v.ValueObject is Waher.Runtime.Language.Namespace Namespace)
 					return Namespace;
 				else if (v.ValueObject is string NamespaceCode)
 					return await Language.GetNamespaceAsync(NamespaceCode);

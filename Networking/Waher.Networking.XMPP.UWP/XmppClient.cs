@@ -1135,7 +1135,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 			finally
-			{
+			{ 
 				this.OnStateChanged -= StateEventHandler;
 			}
 

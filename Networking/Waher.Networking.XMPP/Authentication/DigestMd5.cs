@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 				byte[] HPass;
 
-				if (string.IsNullOrEmpty(Client.PasswordHash))
+				if (string.IsNullOrEmpty(Client.PasswordHash) || string.IsNullOrEmpty(Client.PasswordHashMethod))
 				{
 					HPass = H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password));
 					Client.PasswordHash = Convert.ToBase64String(HPass);

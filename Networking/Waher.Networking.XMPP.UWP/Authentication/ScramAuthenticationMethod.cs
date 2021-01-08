@@ -64,7 +64,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 			byte[] SaltedPassword;
 
-			if (string.IsNullOrEmpty(Client.PasswordHash))
+			if (string.IsNullOrEmpty(Client.PasswordHash) || string.IsNullOrEmpty(Client.PasswordHashMethod))
 			{
 				SaltedPassword = Hi(Encoding.UTF8.GetBytes(Client.Password), this.salt, this.nrIterations);     // Client.Pasword.Normalize()	- Normalize method avaialble in .NET 2.0
 				Client.PasswordHash = Convert.ToBase64String(SaltedPassword);

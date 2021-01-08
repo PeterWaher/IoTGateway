@@ -75,7 +75,7 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 			{
-				GroupObject Obj = new GroupObject(new object[0], new object[0], new ScriptNode[0], this.variables);
+				GroupObject Obj = new GroupObject(new object[] { this.current }, new object[0], new ScriptNode[0], this.objectVariables);
 
 				foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
 					Obj[P.Key] = P.Value.Evaluate(this.objectVariables);

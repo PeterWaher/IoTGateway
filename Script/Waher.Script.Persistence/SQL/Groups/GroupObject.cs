@@ -72,16 +72,13 @@ namespace Waher.Script.Persistence.SQL.Groups
 				if (this.groupedValues.TryGetValue(Name, out object Value))
 					return Value;
 
-				object[] Result = new object[this.objectCount];
-				object Item;
-				int i;
-
-				for (i = 0; i < this.objectCount; i++)
+				if (this.objectCount == 1)
 				{
-					Item = this.objects[i];
+					object Result;
+					object Item = this.objects[0];
 
 					if (Item is null)
-						Result[i] = null;
+						Result = null;
 					else
 					{
 						if (this.properties is null)
@@ -90,15 +87,45 @@ namespace Waher.Script.Persistence.SQL.Groups
 							this.properties.Object = Item;
 
 						if (this.properties.TryGetValue(Name, out Value))
-							Result[i] = Value;
+							Result = Value;
 						else
-							Result[i] = null;
+							Result = null;
 					}
+
+					this.groupedValues[Name] = Result;
+
+					return Result;
 				}
+				else
+				{
+					object[] Result = new object[this.objectCount];
+					object Item;
+					int i;
 
-				this.groupedValues[Name] = Result;
+					for (i = 0; i < this.objectCount; i++)
+					{
+						Item = this.objects[i];
 
-				return Result;
+						if (Item is null)
+							Result[i] = null;
+						else
+						{
+							if (this.properties is null)
+								this.properties = new ObjectProperties(Item, this.variables);
+							else
+								this.properties.Object = Item;
+
+							if (this.properties.TryGetValue(Name, out Value))
+								Result[i] = Value;
+							else
+								Result[i] = null;
+						}
+					}
+
+					this.groupedValues[Name] = Result;
+
+					return Result;
+				}
 			}
 
 			set

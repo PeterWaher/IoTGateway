@@ -249,6 +249,39 @@
             <param name="Color">Color, if found.</param>
             <returns>If the string was successfully parsed.</returns>
         </member>
+        <member name="T:Waher.Script.Graphs.Functions.Colors.ColorGradient">
+            <summary>
+            Returns a color from a color gradient defined by a vector of colors and an interpolation constant 0&lt;=`p`&lt;=1.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.ColorGradient.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Returns a color from a color gradient defined by a vector of colors and an interpolation constant 0&lt;=`p`&lt;=1.
+            </summary>
+            <param name="Colors">Second color, or image.</param>
+            <param name="p">Blending factor in [0,1].</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.ColorGradient.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Colors.ColorGradient.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.ColorGradient.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Graphs.Functions.Colors.GrayScale">
             <summary>
             Converts a color into grayscale.

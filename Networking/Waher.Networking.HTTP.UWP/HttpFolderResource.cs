@@ -86,7 +86,7 @@ namespace Waher.Networking.HTTP
 		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, HostDomainOptions DomainOptions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: this(ResourceName, FolderPath, AllowPut, AllowDelete, AnonymousGET, UserSessions,
-				  HostDomainOptions.SameForAllDomains, new string[0], AuthenticationSchemes)
+				  DomainOptions, new string[0], AuthenticationSchemes)
 		{
 		}
 
@@ -236,6 +236,10 @@ namespace Waher.Networking.HTTP
 
 			string Host = Request.Header.Host?.Value ?? string.Empty;
 			string Folder;
+			int i = Host.IndexOf(':');
+
+			if (i > 0)
+				Host = Host.Substring(0, i);
 
 			if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
 			{

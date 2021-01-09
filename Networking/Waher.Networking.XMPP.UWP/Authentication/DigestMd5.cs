@@ -95,8 +95,8 @@ namespace Waher.Networking.XMPP.Authentication
 					}
 				}
 
-				bool Auth = Qops is null ? false : (Array.IndexOf<string>(Qops, "auth") >= 0);
-				bool AuthInt = Qops is null ? false : (Array.IndexOf<string>(Qops, "auth-int") >= 0);
+				bool Auth = !(Qops is null) && (Array.IndexOf<string>(Qops, "auth") >= 0);
+				bool AuthInt = !(Qops is null) && (Array.IndexOf<string>(Qops, "auth-int") >= 0);
 
 				StringBuilder sb = new StringBuilder();
 

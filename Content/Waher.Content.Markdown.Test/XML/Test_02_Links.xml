@@ -100,14 +100,14 @@
 		</Paragraph>
 		<Paragraph>
 			<InlineText>You can also write links, such as </InlineText>
-			<AutomaticLinkUrl url="http://littlesister.se/" />
+			<AutomaticLinkUrl url="http://lils.is/" />
 			<InlineText> inline.</InlineText>
 		</Paragraph>
 		<Paragraph>
 			<InlineText>Or on separate paragraphs:</InlineText>
 		</Paragraph>
 		<Paragraph>
-			<AutomaticLinkUrl url="http://littlesister.se/" />
+			<AutomaticLinkUrl url="http://lils.is/" />
 		</Paragraph>
 		<Paragraph>
 			<InlineText>Recognized multi-media content put on separate rows are automatically handled as multi-media:</InlineText>

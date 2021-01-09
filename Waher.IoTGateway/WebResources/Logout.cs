@@ -58,7 +58,10 @@ namespace Waher.IoTGateway.WebResources
 			Request.Session.Remove("User");
 			Request.Session.Remove("LoginError");
 
-			throw new SeeOtherException(Gateway.DefaultPage);
+			if (Gateway.TryGetDefaultPage(Request, out string DefaultPage))
+				throw new SeeOtherException(DefaultPage);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

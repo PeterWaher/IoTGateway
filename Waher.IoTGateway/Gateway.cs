@@ -144,11 +144,11 @@ namespace Waher.IoTGateway
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
 		private static CaseInsensitiveString ownerJid = null;
+		private static Dictionary<string, string> defaultPageByHostName = null;
 		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
-		private static string defaultPage;
 		private static string applicationName;
 		private static string exceptionFolder = null;
 		private static string exceptionFileName = null;
@@ -332,7 +332,10 @@ namespace Waher.IoTGateway
 								break;
 
 							case "DefaultPage":
-								defaultPage = E.InnerText;
+								if (defaultPageByHostName is null)
+									defaultPageByHostName = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+
+								defaultPageByHostName[XML.Attribute(E, "host")] = E.InnerText;
 								break;
 
 							case "ExportExceptions":
@@ -577,11 +580,11 @@ namespace Waher.IoTGateway
 
 					SetupResources = new LinkedList<HttpResource>();
 
-					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
-					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false))); // TODO: Add authentication mechanisms for PUT & DELETE.
-					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false)));   // Syntax highlighting library, provided by http://highlightjs.org
-					SetupResources.AddLast(webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true)));    // TODO: Add authentication mechanisms for PUT & DELETE.
-					SetupResources.AddLast(webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage)));
+					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains))); // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains))); // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains)));   // Syntax highlighting library, provided by http://highlightjs.org
+					SetupResources.AddLast(webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true, HostDomainOptions.UseDomainSubfolders)));    // TODO: Add authentication mechanisms for PUT & DELETE.
+					SetupResources.AddLast(webServer.Register("/", GoToDefaultPage));
 					SetupResources.AddLast(webServer.Register(new ClientEvents()));
 					SetupResources.AddLast(webServer.Register(new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(new Login()));
@@ -749,12 +752,12 @@ namespace Waher.IoTGateway
 				WriteWebServerOpenPorts();
 				webServer.OnNetworkChanged += (sender, e) => WriteWebServerOpenPorts();
 
-				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-				webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains));   // Syntax highlighting library, provided by http://highlightjs.org
+				webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true, HostDomainOptions.UseDomainSubfolders));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
-				webServer.Register("/", (req, resp) => throw new TemporaryRedirectException(defaultPage));
+				webServer.Register("/", GoToDefaultPage);
 				webServer.Register(new ClientEvents());
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());
@@ -782,7 +785,7 @@ namespace Waher.IoTGateway
 							string WebFolder = XML.Attribute(E, "webFolder");
 							string FolderPath = XML.Attribute(E, "folderPath");
 
-							webServer.Register(new HttpFolderResource(WebFolder, FolderPath, false, false, true, true));
+							webServer.Register(new HttpFolderResource(WebFolder, FolderPath, false, false, true, true, HostDomainOptions.SameForAllDomains));
 						}
 					}
 				}
@@ -975,6 +978,14 @@ namespace Waher.IoTGateway
 			}
 
 			return true;
+		}
+
+		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)
+		{
+			if (TryGetDefaultPage(Request, out string DefaultPage))
+				throw new TemporaryRedirectException(DefaultPage);
+			else
+				throw new NotFoundException("No default page defined.");
 		}
 
 		private class ModuleStartOrder : IComparer<IModule>
@@ -1838,15 +1849,6 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
-		/// Default page of gateway.
-		/// </summary>
-		public static string DefaultPage
-		{
-			get { return defaultPage; }
-			internal set { defaultPage = value; }
-		}
-
-		/// <summary>
 		/// Application Name.
 		/// </summary>
 		public static string ApplicationName
@@ -1940,6 +1942,48 @@ namespace Waher.IoTGateway
 		/// the application needs to close.
 		/// </summary>
 		public static event EventHandler OnTerminate = null;
+
+		/// <summary>
+		/// Tries to get the default page of a host.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="DefaultPage">Default page, if found.</param>
+		/// <returns>If a default page was found.</returns>
+		public static bool TryGetDefaultPage(HttpRequest Request, out string DefaultPage)
+		{
+			return TryGetDefaultPage(Request.Header.Host?.Value ?? string.Empty, out DefaultPage);
+		}
+
+		/// <summary>
+		/// Tries to get the default page of a host.
+		/// </summary>
+		/// <param name="Host">Host name.</param>
+		/// <param name="DefaultPage">Default page, if found.</param>
+		/// <returns>If a default page was found.</returns>
+		public static bool TryGetDefaultPage(string Host, out string DefaultPage)
+		{
+			if (defaultPageByHostName.TryGetValue(Host, out DefaultPage))
+				return true;
+
+			if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase) && defaultPageByHostName.TryGetValue(Host.Substring(4), out DefaultPage))
+				return true;
+
+			if (defaultPageByHostName.TryGetValue(string.Empty, out DefaultPage))
+				return true;
+
+			DefaultPage = string.Empty;
+			return false;
+		}
+
+		internal static void SetDefaultPages(params KeyValuePair<string, string>[] DefaultPages)
+		{
+			Dictionary<string, string> List = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+
+			foreach (KeyValuePair<string, string> P in DefaultPages)
+				List[P.Key] = P.Value;
+
+			defaultPageByHostName = List;
+		}
 
 		#endregion
 

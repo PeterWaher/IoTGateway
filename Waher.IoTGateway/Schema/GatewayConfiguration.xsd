@@ -14,10 +14,21 @@
 						<xs:documentation>Name of application.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="DefaultPage" type="xs:string">
+				<xs:element name="DefaultPage" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>Default web page.</xs:documentation>
 					</xs:annotation>
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="host" type="xs:string" use="optional">
+                  <xs:annotation>
+                    <xs:documentation>To which host name the default page relates to.</xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
 				</xs:element>
 				<xs:element name="Database">
 					<xs:annotation>

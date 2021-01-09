@@ -12,6 +12,27 @@ using Waher.Script;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
+	/// Options on how to handle domain names provided in the Host header.
+	/// </summary>
+	public enum HostDomainOptions
+	{
+		/// <summary>
+		/// Only provide access to files for specified domains.
+		/// </summary>
+		OnlySpecifiedDomains,
+
+		/// <summary>
+		/// All specified domains receive the same files.
+		/// </summary>
+		SameForAllDomains,
+
+		/// <summary>
+		/// If a subfolder exist for a specified host domain name, that subfolder will be used for the request.
+		/// </summary>
+		UseDomainSubfolders
+	}
+
+	/// <summary>
 	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
 	/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 	/// </summary>
@@ -21,8 +42,11 @@ namespace Waher.Networking.HTTP
 		private const int BufferSize = 32768;
 
 		private readonly Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
+		private readonly Dictionary<string, bool> definedDomains = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, string> folders = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private Dictionary<string, bool> allowTypeConversionFrom = null;
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+		private readonly HostDomainOptions domainOptions;
 		private readonly bool allowPut;
 		private readonly bool allowDelete;
 		private readonly bool anonymousGET;
@@ -30,7 +54,8 @@ namespace Waher.Networking.HTTP
 		private string folderPath;
 
 		/// <summary>
-		/// Publishes an embedded resource through HTTP GET.
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
+		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="FolderPath">Full path to folder to publish.</param>
@@ -41,6 +66,45 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
+			: this(ResourceName, FolderPath, AllowPut, AllowDelete, AnonymousGET, UserSessions,
+				  HostDomainOptions.SameForAllDomains, AuthenticationSchemes)
+		{
+		}
+
+		/// <summary>
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
+		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="FolderPath">Full path to folder to publish.</param>
+		/// <param name="AllowPut">If the PUT method should be allowed.</param>
+		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
+		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
+		/// <param name="UserSessions">If the resource uses user sessions.</param>
+		/// <param name="DomainOptions">Options on how to handle the Host header.</param>
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+			bool UserSessions, HostDomainOptions DomainOptions, params HttpAuthenticationScheme[] AuthenticationSchemes)
+			: this(ResourceName, FolderPath, AllowPut, AllowDelete, AnonymousGET, UserSessions,
+				  HostDomainOptions.SameForAllDomains, new string[0], AuthenticationSchemes)
+		{
+		}
+
+		/// <summary>
+		/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT and DELETE.
+		/// If PUT and DELETE are allowed, users (if authenticated) can update the contents of the folder.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="FolderPath">Full path to folder to publish.</param>
+		/// <param name="AllowPut">If the PUT method should be allowed.</param>
+		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
+		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
+		/// <param name="UserSessions">If the resource uses user sessions.</param>
+		/// <param name="DomainOptions">Options on how to handle the Host header.</param>
+		/// <param name="DomainNames">Pre-defined host names.</param>
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+			bool UserSessions, HostDomainOptions DomainOptions, string[] DomainNames, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.authenticationSchemes = AuthenticationSchemes;
@@ -48,6 +112,10 @@ namespace Waher.Networking.HTTP
 			this.allowDelete = AllowDelete;
 			this.anonymousGET = AnonymousGET;
 			this.userSessions = UserSessions;
+			this.domainOptions = DomainOptions;
+
+			foreach (string DomainName in DomainNames)
+				this.definedDomains[DomainName] = true;
 
 			this.FolderPath = FolderPath;
 
@@ -163,7 +231,47 @@ namespace Waher.Networking.HTTP
 			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
 				throw new ForbiddenException("Path control characters not permitted.");
 
-			return this.folderPath + s;
+			if (this.domainOptions == HostDomainOptions.SameForAllDomains)
+				return this.folderPath + s;
+
+			string Host = Request.Header.Host?.Value ?? string.Empty;
+			string Folder;
+
+			if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
+			{
+				lock (this.definedDomains)
+				{
+					if (!this.definedDomains.ContainsKey(Host))
+						throw new ForbiddenException("Access to this folder is not permitted on this domain.");
+				}
+
+				Folder = this.folderPath;
+			}
+			else
+			{
+				lock (this.folders)
+				{
+					if (!this.folders.TryGetValue(Host, out Folder))
+					{
+						Folder = this.folderPath + Path.DirectorySeparatorChar + Host;
+						if (!Directory.Exists(Folder))
+						{
+							if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
+							{
+								Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
+								if (!Directory.Exists(Folder))
+									Folder = this.folderPath;
+							}
+							else
+								Folder = this.folderPath;
+						}
+
+						this.folders[Host] = Folder;
+					}
+				}
+			}
+
+			return Folder + s;
 		}
 
 		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
@@ -206,7 +314,7 @@ namespace Waher.Networking.HTTP
 
 		private async Task RaiseFileNotFound(string FullPath, HttpRequest Request, HttpResponse Response)
 		{
-			NotFoundException ex = new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+			NotFoundException ex = new NotFoundException("File not found: " + Request.SubPath);
 			FileNotFoundEventHandler h = this.FileNotFound;
 
 			if (!(h is null))
@@ -908,7 +1016,7 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-				throw new NotFoundException("File not found: " + FullPath.Substring(this.folderPath.Length));
+				throw new NotFoundException("File not found: " + Request.SubPath);
 
 			await Response.SendResponse();
 			Response.Dispose();

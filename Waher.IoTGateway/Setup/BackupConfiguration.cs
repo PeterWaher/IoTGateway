@@ -75,8 +75,8 @@ namespace Waher.IoTGateway.Setup
 		{
 			HttpAuthenticationScheme Auth = Gateway.LoggedIn(this.ConfigPrivilege);
 
-			WebServer.Register(this.exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, Auth));
-			WebServer.Register(this.keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, Auth));
+			WebServer.Register(this.exportFolder = new HttpFolderResource("/Export", Export.FullExportFolder, false, false, false, true, HostDomainOptions.SameForAllDomains, Auth));
+			WebServer.Register(this.keyFolder = new HttpFolderResource("/Key", Export.FullKeyExportFolder, false, false, false, true, HostDomainOptions.SameForAllDomains, Auth));
 			WebServer.Register(this.startExport = new StartExport());
 			WebServer.Register(this.startAnalyze = new StartAnalyze());
 			WebServer.Register(this.deleteExport = new DeleteExport());

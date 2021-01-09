@@ -1700,6 +1700,8 @@ namespace Waher.IoTGateway.Setup
 
 			if (Doc.DocumentElement != null && Doc.DocumentElement.LocalName == "GatewayConfiguration")
 			{
+				List<KeyValuePair<string, string>> DefaultPages = null;
+
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
 					if (N is XmlElement E)
@@ -1714,12 +1716,31 @@ namespace Waher.IoTGateway.Setup
 
 							case "DefaultPage":
 								s = E.InnerText;
-								Gateway.DefaultPage = s;
-								Original.DocumentElement["DefaultPage"].InnerText = s;
+								string Host = XML.Attribute(E, "host");
+
+								if (DefaultPages is null)
+									DefaultPages = new List<KeyValuePair<string, string>>();
+
+								DefaultPages.Add(new KeyValuePair<string, string>(Host, s));
 								break;
 
 								// TODO: Ports ?
 								// TODO: FileFolders ?
+						}
+					}
+				}
+
+				if (!(DefaultPages is null))
+				{
+					Gateway.SetDefaultPages(DefaultPages.ToArray());
+
+					foreach (XmlNode N in Original.DocumentElement.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "DefaultPage")
+						{
+							string Host = XML.Attribute(E, "host");
+							if (Gateway.TryGetDefaultPage(Host, out string DefaultPage))
+								E.InnerText = DefaultPage;
 						}
 					}
 				}

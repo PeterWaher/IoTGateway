@@ -1,5 +1,4 @@
 ﻿using System;
-using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Graphs.Functions.Plots
 {

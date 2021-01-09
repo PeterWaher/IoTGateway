@@ -1,6 +1,5 @@
 ﻿using System;
 using SkiaSharp;
-using Waher.Script.Model;
 
 namespace Waher.Script.Graphs.Functions.Plots
 {

@@ -14,12 +14,12 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// <summary>
         /// Returns an array of performance counter instance names, given a performance category.
         /// </summary>
-        /// <param name="Argument">Argument.</param>
+        /// <param name="Category">Performance counter category.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public PerformanceInstances(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
+        public PerformanceInstances(ScriptNode Category, int Start, int Length, Expression Expression)
+            : base(Category, Start, Length, Expression)
         {
         }
 

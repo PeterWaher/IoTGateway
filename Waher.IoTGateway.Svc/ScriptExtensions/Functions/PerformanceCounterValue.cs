@@ -15,6 +15,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// Returns a performance counter value, given a performance category name, optional instance name, as well as a counter name.
         /// </summary>
         /// <param name="Category">Performance counter category.</param>
+        /// <param name="CounterName">Performance counter name.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         /// <param name="Expression">Expression containing script.</param>
@@ -27,10 +28,12 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// Returns a performance counter value, given a performance category name, optional instance name, as well as a counter name.
         /// </summary>
         /// <param name="Category">Performance counter category.</param>
+        /// <param name="InstanceName">Performance counter category instance name.</param>
+        /// <param name="CounterName">Performance counter name.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         /// <param name="Expression">Expression containing script.</param>
-        public PerformanceCounterValue(ScriptNode Category, ScriptNode CounterName, ScriptNode InstanceName, int Start, int Length, Expression Expression)
+        public PerformanceCounterValue(ScriptNode Category, ScriptNode InstanceName, ScriptNode CounterName, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { Category, InstanceName, CounterName }, argumentTypes3Scalar, Start, Length, Expression)
         {
         }

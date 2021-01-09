@@ -16,12 +16,12 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// <summary>
         /// Returns a <see cref="PerformanceCounterCategory"/> object, given the category name.
         /// </summary>
-        /// <param name="Argument">Argument.</param>
+        /// <param name="Category">Performance counter category.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public PerformanceCategory(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
+        public PerformanceCategory(ScriptNode Category, int Start, int Length, Expression Expression)
+            : base(Category, Start, Length, Expression)
         {
         }
 

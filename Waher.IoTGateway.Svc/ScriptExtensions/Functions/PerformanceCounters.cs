@@ -27,6 +27,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// Returns an array of <see cref="System.Diagnostics.PerformanceCounter"/> objects within a given performance category.
         /// </summary>
         /// <param name="Category">Performance counter category.</param>
+        /// <param name="InstanceName">Performance counter category instance name.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

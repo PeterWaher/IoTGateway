@@ -1847,6 +1847,7 @@
         <ComponentRef Id='TemplateFiles' />
         <ComponentRef Id='CactusRoseFiles'/>
         <ComponentRef Id='GothicPeacockFiles'/>
+        <ComponentRef Id='WinterDawnFiles'/>
         <ComponentRef Id='VideoFiles' />
         <ComponentRef Id='TransformFiles' />
         <ComponentRef Id='DefaultFiles'/>

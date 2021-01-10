@@ -8,20 +8,20 @@
 		<CSSX>WinterDawn.cssx</CSSX>
 		<TextColor>#000000</TextColor>
 		<BackgroundColor>#F8F8F8E6</BackgroundColor>
-		<HeaderColor>#47B86B</HeaderColor>
+		<HeaderColor>#399356</HeaderColor>
 		<HeaderTextColor>#FFFFFF</HeaderTextColor>
-		<ButtonColor>#47B86B</ButtonColor>
+		<ButtonColor>#399356</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
 		<MenuTextColor>#FFFFFF</MenuTextColor>
     <InsertColor>#00A00040</InsertColor>
     <DeleteColor>#A0000040</DeleteColor>
-		<LinkColorUnvisited>#47B86B</LinkColorUnvisited>
-		<LinkColorVisited>#47B86B</LinkColorVisited>
-		<LinkColorHot>#9AD8AE</LinkColorHot>
+		<LinkColorUnvisited>#399356</LinkColorUnvisited>
+		<LinkColorVisited>#399356</LinkColorVisited>
+		<LinkColorHot>#47B86B</LinkColorHot>
 		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
 	</BasicProperties>
 	<CustomProperties>
-		<Property name="PosColor" value="#47B86B"/>
+		<Property name="PosColor" value="#399356"/>
 		<Property name="PosSelectedColor" value="#B5E3C4"/>
 		<Property name="NegColor" value="#D83134"/>
 		<Property name="TagColor" value="#4C83AE"/>

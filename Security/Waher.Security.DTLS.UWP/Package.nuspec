@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Light-weight class library implementing Datagram Transport Layer Security (DTLS) Version 1.2, as defined in RFC 6347. Supports Pre-shared keys and AES CCM. Loosely coupled communication layer interface. DTLS over UDP has predefined interfaces.</description>
-    <copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2017-2021. All rights reserved.</copyright>
     <tags>security DTLS UDP</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.0.14"/>

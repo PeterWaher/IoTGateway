@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Publishes nodes representing SNMP devices on the local area network.</Description>
-    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Things/Waher.Things.Snmp</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

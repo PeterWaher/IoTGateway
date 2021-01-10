@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that serializes objects to binary form using meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled. Compatible with Waher.Persistence.Serialization.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Serialization.Compiled</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>

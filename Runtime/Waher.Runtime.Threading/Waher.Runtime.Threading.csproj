@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library that provides classes for usage in multi-threaded asynchronous environments providing multiple-read/single-write capabilities.</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Threading</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

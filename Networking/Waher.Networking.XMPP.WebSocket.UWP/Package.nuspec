@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Class library adding the XMPP WebSocket protocol alternative binding mechanism to the XMPP client defined in Waher.Networking.XMPP, as defined in RFC 7395: An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket.</description>
-    <copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2018-2021. All rights reserved.</copyright>
     <tags>networking communication xmpp websocket</tags>
     <dependencies>
 			<dependency id="System.Net.WebSockets.Client" version="4.3.2"/>

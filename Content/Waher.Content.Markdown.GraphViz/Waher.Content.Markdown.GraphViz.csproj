@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>The library extends the capabilities of the Markdown engine defined in Waher.Content.Markdown. It allows for real-time inclusion and generation of GraphViz (http://graphviz.org/) diagrams, if the software is installed on the system. Example: https://waher.se/Markdown.md#graphvizDiagrams</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown.GraphViz</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>

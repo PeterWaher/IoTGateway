@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Provides a simple HTML document parser that can be used to extract information from web pages. Social Meta-data can be easily extracted from page. Information is taken from Open Graph meta data or Twitter Card meta data, as well as standard HTML meta data.</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Html</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

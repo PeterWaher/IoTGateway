@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Contains theme files for the Cactus Rose theme.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.CactusRose</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

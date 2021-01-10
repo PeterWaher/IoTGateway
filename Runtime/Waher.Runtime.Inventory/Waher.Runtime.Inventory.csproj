@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library that keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Inventory</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

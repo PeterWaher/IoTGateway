@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Allows the publishing of web content using Markdown. The library converts Markdown documents in real-time to HTML when hosted using the web server defined in Waher.Networking.HTTP. Markdown parsing is made by the Waher.Content.Markdown library. Syntax supported: https://waher.se/Markdown.md.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown.Web</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

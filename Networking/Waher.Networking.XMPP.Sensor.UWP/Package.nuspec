@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Implements the XMPP IoT sensor data extesion as defined by the IEEE XMPP IoT Interface working group.</description>
-    <copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</copyright>
     <tags>networking communication xmpp iot sensor data ieee uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.29"/>

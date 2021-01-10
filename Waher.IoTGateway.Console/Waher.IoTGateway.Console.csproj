@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Runs the IoT Gateway as a console application.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

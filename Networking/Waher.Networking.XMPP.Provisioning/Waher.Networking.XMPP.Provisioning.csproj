@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <Description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>

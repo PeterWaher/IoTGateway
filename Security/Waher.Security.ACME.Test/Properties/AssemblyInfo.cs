@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Waher.Security.ACME.Test")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2018-2020. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2018-2021. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>UWP class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Markdown parsing is made by the Waher.Content.Markdown library. Syntax supported: https://waher.se/Markdown.md.</description>
-    <copyright>Copyright © Waher Data AB 2016-2020. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</copyright>
     <tags>networking communication http uwp</tags>
     <dependencies>
       <group targetFramework="UAP10.0">

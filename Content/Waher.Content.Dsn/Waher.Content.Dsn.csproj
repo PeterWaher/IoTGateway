@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Provides encoding and decoding of Delivery Status Notification (DSN) messages and message reports, as defined in RFC 3462 and 3464.</Description>
-    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Dsn</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

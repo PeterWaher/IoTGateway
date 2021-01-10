@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Class library implementing a WHOIS (RFC3912) client that can be used to query Regional Internet Registries for information relating to IP addresses, etc.</description>
-    <copyright>Copyright © Waher Data AB 2020. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2020-2021. All rights reserved.</copyright>
     <tags>networking communication WHOIS UWP</tags>
     <dependencies>
       <dependency id="Waher.Networking.UWP" version="1.0.20"/>

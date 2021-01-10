@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Description>Outputs events to the standard console output.</Description>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2015-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Events/Waher.Events.Console</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

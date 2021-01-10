@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Provides a client for managing and downloading software packages and software updates, as defined in the IEEE XMPP IoT extensions.</Description>
-    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Software</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

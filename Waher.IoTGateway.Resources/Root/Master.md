@@ -22,6 +22,6 @@ CSS: {{Theme.CSSX}}
 </main>
 <footer>
 <span>
-This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2020. All rights reserved.
+This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2021. All rights reserved.
 </span>
 </footer>

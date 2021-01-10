@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Implements SHA-3, as defined in NIST FIPS 202, including the general KECCAK algorithm and the SHAKE128, SHAKE256, RawSHAKE128 and RawSHAKE256 XOF functions.</Description>
-    <Copyright>Copyright © Waher Data AB 2019-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.SHA3</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

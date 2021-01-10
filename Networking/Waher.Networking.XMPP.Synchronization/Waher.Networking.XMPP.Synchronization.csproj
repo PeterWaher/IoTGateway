@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Implements the clock synchronization extesion as defined by the IEEE XMPP IoT Interface working group.</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2020. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Synchronization</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

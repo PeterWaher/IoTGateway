@@ -1,0 +1,18 @@
+﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+  <Folder name="Root">
+		<Folder name="Themes">
+			<Folder name="WinterDawn">
+				<Content fileName="WinterDawn.xml"/>
+				<Content fileName="WinterDawn.cssx"/>
+				<Content fileName="WinterDawn.png"/>
+				<Content fileName="WinterDawn800x800.png"/>
+				<Content fileName="WinterDawn800x800Dimmed.png"/>
+				<Content fileName="WinterDawn1600x1600.png"/>
+				<Content fileName="WinterDawn1600x1600Dimmed.png"/>
+				<Content fileName="WinterDawnBanner1400x425.png"/>
+				<Content fileName="WinterDawnBanner1900x500.png"/>
+				<Content fileName="WinterDawnBanner2000x600.png"/>
+			</Folder>
+		</Folder>
+  </Folder>
+</Module>

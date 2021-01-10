@@ -618,6 +618,7 @@
               <File Id='Waher.Security.Users.dll' Name='Waher.Security.Users.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.dll' Vital='yes'/>
               <File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
               <File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
+              <File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
               <File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
               <File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
               <File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
@@ -720,6 +721,7 @@
               <RemoveFile Id='RemoveWaher.Security.Users.dll' Name='Waher.Security.Users.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
@@ -1708,6 +1710,34 @@
                   <RemoveFile Id='RemoveGothicPeacock800x800Dimmed.png' Name='GothicPeacock800x800Dimmed.png' On='uninstall'/>
                   <RemoveFile Id='RemoveGothicPeacock1600x1600.png' Name='GothicPeacock1600x1600.png' On='uninstall'/>
                   <RemoveFile Id='RemoveGothicPeacock1600x1600Dimmed.png' Name='GothicPeacock1600x1600Dimmed.png' On='uninstall'/>
+                </Component>
+              </Directory>
+              <Directory Id='WinterDawn' Name='WinterDawn'>
+                <Component Id='WinterDawnFiles' Guid='84D79AA3-B199-43EF-8772-5C38DDF72F2D'>
+                  <CreateFolder>
+                    <util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+                  </CreateFolder>
+                  <RemoveFolder Id='RemoveWinterDawn' On='uninstall' />
+                  <File Id='WinterDawn.cssx' Name='WinterDawn.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.cssx'/>
+                  <File Id='WinterDawn.xml' Name='WinterDawn.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.xml'/>
+                  <File Id='WinterDawn.png' Name='WinterDawn.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn.png'/>
+                  <File Id='WinterDawnBanner1400x425.png' Name='WinterDawnBanner1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner1400x425.png' KeyPath='yes'/>
+                  <File Id='WinterDawnBanner1900x500.png' Name='WinterDawnBanner1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner1900x500.png'/>
+                  <File Id='WinterDawnBanner2000x600.png' Name='WinterDawnBanner2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawnBanner2000x600.png'/>
+                  <File Id='WinterDawn800x800.png' Name='WinterDawn800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn800x800.png'/>
+                  <File Id='WinterDawn800x800Dimmed.png' Name='WinterDawn800x800Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn800x800Dimmed.png'/>
+                  <File Id='WinterDawn1600x1600.png' Name='WinterDawn1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn1600x1600.png'/>
+                  <File Id='WinterDawn1600x1600Dimmed.png' Name='WinterDawn1600x1600Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\WinterDawn\WinterDawn1600x1600Dimmed.png'/>
+                  <RemoveFile Id='RemoveWinterDawn.cssx' Name='WinterDawn.cssx' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn.xml' Name='WinterDawn.xml' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn.png' Name='WinterDawn.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawnBanner1400x425.png' Name='WinterDawnBanner1400x425.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawnBanner1900x500.png' Name='WinterDawnBanner1900x500.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawnBanner2000x600.png' Name='WinterDawnBanner2000x600.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn800x800.png' Name='WinterDawn800x800.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn800x800Dimmed.png' Name='WinterDawn800x800Dimmed.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn1600x1600.png' Name='WinterDawn1600x1600.png' On='uninstall'/>
+                  <RemoveFile Id='RemoveWinterDawn1600x1600Dimmed.png' Name='WinterDawn1600x1600Dimmed.png' On='uninstall'/>
                 </Component>
               </Directory>
             </Directory>

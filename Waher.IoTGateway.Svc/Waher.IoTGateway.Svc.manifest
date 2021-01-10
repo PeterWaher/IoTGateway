@@ -331,6 +331,7 @@
   <Assembly fileName='Waher.Security.Users.dll'/>
   <Assembly fileName='Waher.Theme.CactusRose.dll'/>
   <Assembly fileName='Waher.Theme.GothicPeacock.dll'/>
+  <Assembly fileName='Waher.Theme.WinterDawn.dll'/>
   <Assembly fileName='Waher.Things.dll'/>
   <Assembly fileName='Waher.Things.IP.dll'/>
   <Assembly fileName='Waher.Things.Metering.dll'/>
@@ -635,6 +636,18 @@
         <Content fileName='GothicPeacock800x800Dimmed.png'/>
         <Content fileName='GothicPeacock1600x1600.png'/>
         <Content fileName='GothicPeacock1600x1600Dimmed.png'/>
+      </Folder>
+      <Folder name='WinterDawn'>
+        <Content fileName='WinterDawn.cssx'/>
+        <Content fileName='WinterDawn.xml'/>
+        <Content fileName='WinterDawn.png'/>
+        <Content fileName='WinterDawnBanner1400x425.png'/>
+        <Content fileName='WinterDawnBanner1900x500.png'/>
+        <Content fileName='WinterDawnBanner2000x600.png'/>
+        <Content fileName='WinterDawn800x800.png'/>
+        <Content fileName='WinterDawn800x800Dimmed.png'/>
+        <Content fileName='WinterDawn1600x1600.png'/>
+        <Content fileName='WinterDawn1600x1600Dimmed.png'/>
       </Folder>
     </Folder>
     <Folder name='Video'>

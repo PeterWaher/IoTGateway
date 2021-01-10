@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Theme id="WinterDawn" xmlns="http://waher.se/Schema/Theme.xsd">
+	<Presentation>
+		<Title>Winter Dawn</Title>
+		<Thumbnail width="480" height="270">WinterDawn.png</Thumbnail>
+	</Presentation>
+	<BasicProperties>
+		<CSSX>WinterDawn.cssx</CSSX>
+		<TextColor>#000000</TextColor>
+		<BackgroundColor>#F8F8F8E6</BackgroundColor>
+		<HeaderColor>#47B86B</HeaderColor>
+		<HeaderTextColor>#FFFFFF</HeaderTextColor>
+		<ButtonColor>#47B86B</ButtonColor>
+		<ButtonTextColor>#FFFFFF</ButtonTextColor>
+		<MenuTextColor>#FFFFFF</MenuTextColor>
+    <InsertColor>#00A00040</InsertColor>
+    <DeleteColor>#A0000040</DeleteColor>
+		<LinkColorUnvisited>#47B86B</LinkColorUnvisited>
+		<LinkColorVisited>#47B86B</LinkColorVisited>
+		<LinkColorHot>#9AD8AE</LinkColorHot>
+		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
+	</BasicProperties>
+	<CustomProperties>
+		<Property name="PosColor" value="#47B86B"/>
+		<Property name="PosSelectedColor" value="#B5E3C4"/>
+		<Property name="NegColor" value="#D83134"/>
+		<Property name="TagColor" value="#4C83AE"/>
+		<Property name="DropDownColor" value="#E4F0FE"/>
+		<Property name="RestrictionColor" value="#EB9500"/>
+		<Property name="PublishColor" value="#4CAF50"/>
+		<Property name="EditorColor" value="#68217A"/>
+	</CustomProperties>
+	<BackgroundImages>
+		<BackgroundImage width="1600" height="1600">WinterDawn1600x1600Dimmed.png</BackgroundImage>
+		<BackgroundImage width="800" height="800">WinterDawn800x800Dimmed.png</BackgroundImage>
+	</BackgroundImages>
+	<BannerImages>
+		<BannerImage width="1400" height="425">WinterDawnBanner1400x425.png</BannerImage>
+		<BannerImage width="1900" height="500">WinterDawnBanner1900x500.png</BannerImage>
+		<BannerImage width="2000" height="600">WinterDawnBanner2000x600.png</BannerImage>
+	</BannerImages>
+</Theme>

@@ -15,13 +15,13 @@ https://waher.se/Script.md#paletteGenerationFunctionsWaherScriptFractals</Descri
     <PackageIconUrl></PackageIconUrl>
     <PackageTags>script fractals</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <FileVersion>1.0.7</FileVersion>
-    <AssemblyVersion>1.0.7</AssemblyVersion>
+    <FileVersion>1.0.8</FileVersion>
+    <AssemblyVersion>1.0.8</AssemblyVersion>
     <Product>Waher.IoTGateway</Product>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Fractals</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

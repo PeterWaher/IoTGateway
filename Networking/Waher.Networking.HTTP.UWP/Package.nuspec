@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.HTTP.UWP</id>
-    <version>1.1.3</version>
+    <version>1.1.4</version>
     <title>Waher.Networking.HTTP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -16,13 +16,13 @@
     <tags>networking communication http uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.29"/>
-      <dependency id="Waher.Events" version="1.0.13"/>
+      <dependency id="Waher.Events" version="1.0.14"/>
       <dependency id="Waher.Events.Statistics" version="1.0.4"/>
       <dependency id="Waher.Networking.UWP" version="1.0.20"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.4"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Runtime.Temporary" version="1.0.0"/>
-      <dependency id="Waher.Script" version="1.0.45"/>
+      <dependency id="Waher.Script" version="1.0.46"/>
       <dependency id="Waher.Security" version="1.0.7"/>
       <dependency id="Waher.Security.LoginMonitor.UWP" version="1.0.1"/>
     </dependencies>

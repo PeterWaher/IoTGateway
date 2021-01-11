@@ -2679,7 +2679,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5355,7 +5355,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8067,7 +8067,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10752,7 +10752,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13473,7 +13473,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16158,7 +16158,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18879,7 +18879,7 @@
           "Waher.Runtime.Cache": "1.0.4"
         }
       },
-      "Waher.Runtime.Timing/1.0.3": {
+      "Waher.Runtime.Timing/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28995,7 +28995,7 @@
       "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj"
     },
-    "Waher.Runtime.Timing/1.0.3": {
+    "Waher.Runtime.Timing/1.0.4": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"

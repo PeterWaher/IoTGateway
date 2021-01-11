@@ -17,6 +17,14 @@
             <param name="EventMethod">Method to call when event is executed.</param>
             <param name="State">State object passed on to <paramref name="EventMethod"/>.</param>
         </member>
+        <member name="M:Waher.Runtime.Timing.ScheduledEvent.#ctor(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallbackAsync,System.Object)">
+            <summary>
+            Contains information about a scheduled event.
+            </summary>
+            <param name="When">When an event is to be executed.</param>
+            <param name="EventMethod">Method to call when event is executed.</param>
+            <param name="State">State object passed on to <paramref name="EventMethod"/>.</param>
+        </member>
         <member name="P:Waher.Runtime.Timing.ScheduledEvent.When">
             <summary>
             When an event is to be executed.
@@ -43,6 +51,12 @@
             </summary>
             <param name="State">State object to pass to the scheduled event.</param>
         </member>
+        <member name="T:Waher.Runtime.Timing.ScheduledEventCallbackAsync">
+            <summary>
+            Callback method for asynchronous scheduled events.
+            </summary>
+            <param name="State">State object to pass to the scheduled event.</param>
+        </member>
         <member name="T:Waher.Runtime.Timing.Scheduler">
             <summary>
             Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
@@ -61,6 +75,15 @@
             </summary>
         </member>
         <member name="M:Waher.Runtime.Timing.Scheduler.Add(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallback,System.Object)">
+            <summary>
+            Adds an event.
+            </summary>
+            <param name="When">When to execute the event.</param>
+            <param name="Callback">Method called when event is to be executed.</param>
+            <param name="State">State object bassed to <paramref name="Callback"/>.</param>
+            <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.Add(System.DateTime,Waher.Runtime.Timing.ScheduledEventCallbackAsync,System.Object)">
             <summary>
             Adds an event.
             </summary>

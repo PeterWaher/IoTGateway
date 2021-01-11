@@ -2691,6 +2691,18 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Schedules a one-time event.
+		/// </summary>
+		/// <param name="Callback">Method to call when event is due.</param>
+		/// <param name="When">When the event is to be executed.</param>
+		/// <param name="State">State object</param>
+		/// <returns>Timepoint of when event was scheduled.</returns>
+		public static DateTime ScheduleEvent(ScheduledEventCallbackAsync Callback, DateTime When, object State)
+		{
+			return scheduler?.Add(When, Callback, State) ?? DateTime.MinValue;
+		}
+
+		/// <summary>
 		/// Cancels a scheduled event.
 		/// </summary>
 		/// <param name="When">When event is scheduled</param>

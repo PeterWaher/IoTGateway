@@ -200,13 +200,23 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			Output.WriteStartElement("Image");
 			Output.WriteAttributeString("Source", Source);
-			Output.WriteAttributeString("Stretch", "None");
+
+			bool HasSize = false;
 
 			if (Width.HasValue)
+			{
 				Output.WriteAttributeString("Width", Width.Value.ToString());
+				HasSize = true;
+			}
 
 			if (Height.HasValue)
+			{
 				Output.WriteAttributeString("Height", Height.Value.ToString());
+				HasSize = true;
+			}
+
+			if (!HasSize)
+				Output.WriteAttributeString("Stretch", "None");
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);

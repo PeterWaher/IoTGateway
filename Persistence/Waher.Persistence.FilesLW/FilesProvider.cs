@@ -423,6 +423,8 @@ namespace Waher.Persistence.Files
 
 			this.serializers?.Dispose();
 			this.serializers = null;
+		
+			WriteTimestamp("Stop.txt");
 		}
 
 		#endregion
@@ -937,7 +939,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task SaveUnsaved()
+		private async Task<bool> SaveUnsaved()
 		{
 			ObjectBTreeFile[] Files;
 
@@ -945,7 +947,7 @@ namespace Waher.Persistence.Files
 			{
 				int c = this.hasUnsavedData.Count;
 				if (c == 0)
-					return;
+					return false;
 
 				Files = new ObjectBTreeFile[c];
 				this.hasUnsavedData.Keys.CopyTo(Files, 0);
@@ -957,6 +959,8 @@ namespace Waher.Persistence.Files
 				await File.LockWrite();
 				await File.EndWrite();   // Saves unsaved data.
 			}
+
+			return true;
 		}
 
 		internal bool InBulkMode(ObjectBTreeFile Caller)
@@ -1033,6 +1037,8 @@ namespace Waher.Persistence.Files
 						else
 							return File;
 					}
+					else if (this.master is null)
+						throw new InvalidOperationException("Provider has been stopped.");
 					else
 						this.files[CollectionName] = null;
 				}
@@ -3059,7 +3065,10 @@ namespace Waher.Persistence.Files
 				this.bulkCount = 0;
 			}
 
-			await this.SaveUnsaved();
+			while (await this.SaveUnsaved())
+				;
+
+			this.Dispose();
 		}
 
 		/// <summary>
@@ -3067,9 +3076,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task Flush()
 		{
-			await this.SaveUnsaved();
-
-			WriteTimestamp("Stop.txt");
+			while (await this.SaveUnsaved())
+				;
 		}
 
 		private void WriteTimestamp(string FileName)

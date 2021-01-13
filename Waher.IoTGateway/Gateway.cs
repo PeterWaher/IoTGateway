@@ -1650,15 +1650,15 @@ namespace Waher.IoTGateway
 			stopped = true;
 			try
 			{
+				scheduler?.Dispose();
+				scheduler = null;
+
 				await Types.StopAllModules();
 
 				Database.CollectionRepaired -= Database_CollectionRepaired;
 
 				if (StopInternalProvider)
 					await internalProvider.Stop();
-
-				scheduler?.Dispose();
-				scheduler = null;
 
 				startingServer?.Release();
 				startingServer?.Dispose();

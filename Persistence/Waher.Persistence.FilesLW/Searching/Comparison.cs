@@ -23,7 +23,15 @@ namespace Waher.Persistence.Files.Searching
 			Type yType = y.GetType();
 
 			if (xType == yType)
+            {
+				if (x is DateTime TPx && y is DateTime TPy && TPx.Kind != TPy.Kind)
+				{
+					x = TPx.ToLocalTime();
+					y = TPy.ToLocalTime();
+				}
+
 				return true;
+			}
 
 			uint xTypeCode = ObjectSerializer.GetFieldDataTypeCode(xType);
 			uint yTypeCode = ObjectSerializer.GetFieldDataTypeCode(yType);

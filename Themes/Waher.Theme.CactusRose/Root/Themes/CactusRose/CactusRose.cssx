@@ -1057,3 +1057,26 @@ mark
     border-radius: 0.3em;
     padding: 0.1em 0.3em;
 }
+
+abbr
+{
+    cursor: help;
+    position: relative;
+    text-decoration-color: ¤TagColor¤;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 2px;
+}
+
+abbr:hover::after 
+{
+    position: absolute;
+    top: 125%;
+    left: 25%;
+    display: block;
+    padding: 0.25em 0.5em;
+    background: ¤Blend(ButtonColor,BackgroundColor,0.75)¤;
+    border: 1px solid ¤ButtonColor¤
+    color:¤TextColor¤;
+    content: attr(data-title);
+}

@@ -3216,7 +3216,7 @@ namespace Waher.Script
 			}
 
 			ValueElement = Constant.GetValueElement(Variables);
-			return true;
+			return !(ValueElement is null);
 		}
 
 		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length,

@@ -1079,4 +1079,5 @@ abbr:hover::after
     border: 1px solid ¤ButtonColor¤
     color:¤TextColor¤;
     content: attr(data-title);
+    z-index: 1;
 }

@@ -1625,98 +1625,117 @@ namespace Waher.Content.Markdown
 									Text.Append(ch2);
 
 								Url = Text.ToString();
-								Text.Clear();
-
-								if (Url.StartsWith("<") && Url.EndsWith(">"))
-									Url = Url.Substring(1, Url.Length - 2);
-
-								if (ch2 <= ' ' || ch2 == 160)
+								if (Url.StartsWith("abbr:", StringComparison.CurrentCultureIgnoreCase))
 								{
-									ch2 = State.PeekNextNonWhitespaceChar();
-
-									if (ch2 == '"' || ch2 == '\'')
+									if (ch2 != ')' && ch2 != 0)
 									{
-										State.NextNonWhitespaceChar();
-										while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
-											Text.Append(ch3);
+										Text.Append(ch2);
 
-										ch2 = ch3;
-										Title = Text.ToString();
-										Text.Clear();
-									}
-									else
-										Title = string.Empty;
-								}
-
-								if (ch == '!')
-									this.ParseWidthHeight(State, out Width, out Height);
-								else
-									Width = Height = null;
-
-								while (ch2 != 0 && ch2 != ')')
-									ch2 = State.NextCharSameRow();
-
-								if (ch == '!')
-								{
-									List<MultimediaItem> Items = new List<MultimediaItem>()
-									{
-										new MultimediaItem(this, Url, Title, Width, Height)
-									};
-
-									if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
-										this.includesTableOfContents = true;
-
-									State.BackupState();
-									ch2 = State.NextNonWhitespaceChar();
-									while (ch2 == '(')
-									{
-										Title = string.Empty;
-
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ')')
 											Text.Append(ch2);
+									}
 
-										Url = Text.ToString();
-										Text.Clear();
+									Url = Text.ToString();
+									Text.Clear();
 
-										if (Url.StartsWith("<") && Url.EndsWith(">"))
-											Url = Url.Substring(1, Url.Length - 2);
+									Elements.AddLast(new Abbreviation(this, ChildElements, Url.Substring(5).Trim()));
+								}
+								else
+								{
+									Text.Clear();
 
-										if (ch2 <= ' ' || ch2 == 160)
+									if (Url.StartsWith("<") && Url.EndsWith(">"))
+										Url = Url.Substring(1, Url.Length - 2);
+
+									if (ch2 <= ' ' || ch2 == 160)
+									{
+										ch2 = State.PeekNextNonWhitespaceChar();
+
+										if (ch2 == '"' || ch2 == '\'')
 										{
-											ch2 = State.PeekNextNonWhitespaceChar();
+											State.NextNonWhitespaceChar();
+											while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
+												Text.Append(ch3);
 
-											if (ch2 == '"' || ch2 == '\'')
-											{
-												State.NextChar();
-												while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
-													Text.Append(ch3);
-
-												ch2 = ch3;
-												Title = Text.ToString();
-												Text.Clear();
-											}
-											else
-												Title = string.Empty;
+											ch2 = ch3;
+											Title = Text.ToString();
+											Text.Clear();
 										}
+										else
+											Title = string.Empty;
+									}
 
+									if (ch == '!')
 										this.ParseWidthHeight(State, out Width, out Height);
+									else
+										Width = Height = null;
 
-										while (ch2 != 0 && ch2 != ')')
-											ch2 = State.NextCharSameRow();
+									while (ch2 != 0 && ch2 != ')')
+										ch2 = State.NextCharSameRow();
 
-										Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
+									if (ch == '!')
+									{
+										List<MultimediaItem> Items = new List<MultimediaItem>()
+										{
+											new MultimediaItem(this, Url, Title, Width, Height)
+										};
 
-										State.DiscardBackup();
+										if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
+											this.includesTableOfContents = true;
+
 										State.BackupState();
 										ch2 = State.NextNonWhitespaceChar();
-									}
+										while (ch2 == '(')
+										{
+											Title = string.Empty;
 
-									State.RestoreState();
-									Elements.AddLast(new Multimedia(this, ChildElements, Elements.First is null && State.PeekNextChar() == 0,
-										Items.ToArray()));
+											while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
+												Text.Append(ch2);
+
+											Url = Text.ToString();
+
+											Text.Clear();
+
+											if (Url.StartsWith("<") && Url.EndsWith(">"))
+												Url = Url.Substring(1, Url.Length - 2);
+
+											if (ch2 <= ' ' || ch2 == 160)
+											{
+												ch2 = State.PeekNextNonWhitespaceChar();
+
+												if (ch2 == '"' || ch2 == '\'')
+												{
+													State.NextChar();
+													while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
+														Text.Append(ch3);
+
+													ch2 = ch3;
+													Title = Text.ToString();
+													Text.Clear();
+												}
+												else
+													Title = string.Empty;
+											}
+
+											this.ParseWidthHeight(State, out Width, out Height);
+
+											while (ch2 != 0 && ch2 != ')')
+												ch2 = State.NextCharSameRow();
+
+											Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
+
+											State.DiscardBackup();
+											State.BackupState();
+											ch2 = State.NextNonWhitespaceChar();
+										}
+
+										State.RestoreState();
+										Elements.AddLast(new Multimedia(this, ChildElements, Elements.First is null && State.PeekNextChar() == 0,
+											Items.ToArray()));
+									}
+									else
+										Elements.AddLast(new Link(this, ChildElements, Url, Title));
 								}
-								else
-									Elements.AddLast(new Link(this, ChildElements, Url, Title));
 							}
 							else if (ch2 == ':' && FirstCharOnLine)
 							{

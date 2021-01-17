@@ -166,6 +166,19 @@ http://waher.se/
 **Note**: Some of the multi-media interfaces supported, can also manage automatic links. If you include a web link that such a multimedia interface
 recognizes, the corresponding presentation will be used.
 
+#### Abbreviations
+
+You can define abbreviations in your text by writing links using the predefined `abbr` URI schema, as follows:
+
+    [LOL](abbr:Laugh out Loud) and [OMG](abbr:Oh My God) are two abbreviations commonly used in social networks.
+
+Result:
+
+[LOL](abbr:Laugh out Loud) and [OMG](abbr:Oh My God) are two abbreviations commonly used in social networks.
+
+**Note**: In ![HTML](abbr:Hyper Text Markup Language), the `<abbr>` tag is used. Instead of using the `title` attribute to present the
+definition, the `data-title` attribute is used. This allows the web designer to define how to present the definition, using CSS.
+
 #### Hashtags
 
 You can create #hashtags in markdown by adding a hash character (`#`) followed by a sequence of letters and/or numbers. No space characters
@@ -266,7 +279,6 @@ Smileys are supported in markdown text, and converted to the corresponding emoji
 
 HTML Entities are supported in markdown text, and converted to the corresponding UNICODE characters. For a list of 
 supported HTML entities, click [here](Entities.md).
-
 
 =========================================================================================================================================================
 

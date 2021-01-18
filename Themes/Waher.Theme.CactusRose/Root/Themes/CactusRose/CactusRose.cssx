@@ -796,6 +796,7 @@ input
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+    background-color: white;
 }
 
 input:focus
@@ -812,6 +813,7 @@ select
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+    background-color: white;
 }
 
 select:focus
@@ -834,6 +836,7 @@ textarea
 	-o-tab-size : 3;
 	tab-size : 3;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
+    background-color: white;
 }
 
 textarea:focus
@@ -902,6 +905,7 @@ input[type="checkbox"] + label:before
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
     box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+    background-color: white;
 }
 
 input[type="checkbox"] + label:before:focus

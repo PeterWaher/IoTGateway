@@ -193,7 +193,7 @@ namespace Waher.Content.Markdown.Web
 						break;
 					}
 
-					if (Session.TryGetVariable(P.Key, out v))
+					if (Session.TryGetVariable(P.Key, out v) && !(v.ValueObject is null))
 						User = v.ValueObject;
 					else
 					{
@@ -281,6 +281,9 @@ namespace Waher.Content.Markdown.Web
 
 					throw new ForbiddenException("Access denied.");
 				}
+
+				if (User is null)
+					throw new ForbiddenException("Access denied.");
 
 				Session[" User "] = User;
 			}

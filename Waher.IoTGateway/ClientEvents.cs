@@ -251,10 +251,10 @@ namespace Waher.IoTGateway
 			Type UserType;
 			object UserObject;
 
-			if (!(Session is null) && Session.TryGetVariable(" User ", out Variable UserVariable))
+			if (!(Session is null) && 
+				Session.TryGetVariable(" User ", out Variable UserVariable) &&
+				!((UserObject = UserId(UserVariable.ValueObject)) is null))
 			{
-				UserObject = UserId(UserVariable.ValueObject);
-
 				lock (usersByTabID)
 				{
 					if (!usersByTabID.TryGetValue(TabID, out object Obj2) || !Obj2.Equals(UserObject))

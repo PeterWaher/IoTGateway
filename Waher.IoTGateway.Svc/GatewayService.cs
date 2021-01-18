@@ -95,6 +95,11 @@ namespace Waher.IoTGateway.Svc
 					{
 						this.service.RequestAdditionalTime(2000);
 					}
+					catch (InvalidOperationException)
+					{
+						this.timer?.Dispose();
+						this.timer = null;
+					}
 					catch (Exception)
 					{
 						// Ignore

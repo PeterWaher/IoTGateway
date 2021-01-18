@@ -38,6 +38,11 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			}
 		}
 
+		/// <summary>
+		/// Regular expression
+		/// </summary>
+		public string Pattern => this.expression;
+
 		internal override void Serialize(StringBuilder Output)
 		{
 			Output.Append("<regex>");

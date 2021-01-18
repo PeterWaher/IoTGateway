@@ -40,7 +40,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="Label">Label</param>
 		/// <param name="Required">If the field is required.</param>
 		/// <param name="ValueStrings">Values for the field (string representations).</param>
-		/// <param name="Options">Options, as (Label,Value) pairs.</param>
+		/// <param name="Options">Options, as (Key=M2H Label, Value=M2M Value) pairs.</param>
 		/// <param name="Description">Description</param>
 		/// <param name="DataType">Data Type</param>
 		/// <param name="ValidationMethod">Validation Method</param>
@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP.DataForms
 		}
 
 		/// <summary>
-		/// Options, as (Label,Value) pairs.
+		/// Options, as (Key=M2H Label, Value=M2M Value) pairs.
 		/// </summary>
 		public KeyValuePair<string, string>[] Options { get { return this.options; } }
 
@@ -215,7 +215,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Sets the value, or values, of the field.
 		/// 
-		/// The values are not validated.
+		/// The values are validated.
 		/// </summary>
 		/// <param name="Value">Value(s).</param>
 		public void SetValue(params string[] Value)
@@ -340,9 +340,9 @@ namespace Waher.Networking.XMPP.DataForms
 						foreach (KeyValuePair<string, string> P in this.options)
 						{
 							Output.Append("<option label='");
-							Output.Append(XML.Encode(P.Value));
-							Output.Append("'><value>");
 							Output.Append(XML.Encode(P.Key));
+							Output.Append("'><value>");
+							Output.Append(XML.Encode(P.Value));
 							Output.Append("</value></option>");
 						}
 					}

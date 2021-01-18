@@ -897,6 +897,33 @@ namespace Waher.Networking.XMPP.DataForms
 		}
 
 		/// <summary>
+		/// Serializes the form, using the current form type.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public void Serialize(StringBuilder Output)
+		{
+			switch (this.type)
+			{
+				case FormType.Form:
+				default:
+					this.SerializeForm(Output);
+					break;
+
+				case FormType.Cancel:
+					this.SerializeCancel(Output);
+					break;
+
+				case FormType.Result:
+					this.SerializeResult(Output);
+					break;
+
+				case FormType.Submit:
+					this.SerializeSubmit(Output);
+					break;
+			}
+		}
+
+		/// <summary>
 		/// Serializes the form as a form submission.
 		/// </summary>
 		/// <param name="Output">Output to serialize the form to.</param>
@@ -904,6 +931,17 @@ namespace Waher.Networking.XMPP.DataForms
 		public int SerializeSubmit(StringBuilder Output)
 		{
 			return this.ExportXml(Output, "submit", true, false);
+		}
+
+		/// <summary>
+		/// Serializes the form as a form submission.
+		/// </summary>
+		/// <param name="Output">Output to serialize the form to.</param>
+		/// <param name="ValuesOnly">If only values are to be serialized (default=true)</param>
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeSubmit(StringBuilder Output, bool ValuesOnly)
+		{
+			return this.ExportXml(Output, "submit", ValuesOnly, !ValuesOnly);
 		}
 
 		/// <summary>
@@ -924,6 +962,17 @@ namespace Waher.Networking.XMPP.DataForms
 		public int SerializeCancel(StringBuilder Output)
 		{
 			return this.ExportXml(Output, "cancel", true, false);
+		}
+
+		/// <summary>
+		/// Serializes the form as a form cancellation.
+		/// </summary>
+		/// <param name="Output">Output to serialize the form to.</param>
+		/// <param name="ValuesOnly">If only values are to be serialized (default=true)</param>
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeCancel(StringBuilder Output, bool ValuesOnly)
+		{
+			return this.ExportXml(Output, "cancel", ValuesOnly, !ValuesOnly);
 		}
 
 		/// <summary>
@@ -1157,6 +1206,16 @@ namespace Waher.Networking.XMPP.DataForms
 		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
 		/// </summary>
 		public event DataFormEventHandler OnRemoteUpdate = null;
+
+		/// <summary>
+		/// Method to call when submitting form.
+		/// </summary>
+		public DataFormEventHandler OnSubmit => this.onSubmit;
+
+		/// <summary>
+		/// Method to call when cancelling form.
+		/// </summary>
+		public DataFormEventHandler OnCancel => this.onCancel;
 
 		/// <summary>
 		/// Removes excluded fields.

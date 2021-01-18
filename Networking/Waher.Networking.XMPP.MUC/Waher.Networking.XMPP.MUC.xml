@@ -948,6 +948,18 @@
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SubmitConfigurationForm(Waher.Networking.XMPP.DataForms.DataForm)">
+            <summary>
+            Submits a room configuration form.
+            </summary>
+            <param name="ConfigurationForm">Room configuration form.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.CancelConfigurationForm(Waher.Networking.XMPP.DataForms.DataForm)">
+            <summary>
+            Cancels a room configuration form.
+            </summary>
+            <param name="ConfigurationForm">Room configuration form.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfigurationAsync(System.String,System.String)">
             <summary>
             Gets the configuration form for a room.

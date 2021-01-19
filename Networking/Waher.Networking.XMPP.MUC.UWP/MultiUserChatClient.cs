@@ -508,48 +508,15 @@ namespace Waher.Networking.XMPP.MUC
 						if (N is XmlElement E && E.LocalName == "x" && E.NamespaceURI == XmppClient.NamespaceData)
 						{
 							Form = new DataForm(this.client, E,
-								(sender2, Form2) =>
-								{
-									StringBuilder Xml2 = new StringBuilder();
-
-									Xml2.Append("<query xmlns='");
-									Xml2.Append(NamespaceMucOwner);
-									Xml2.Append("'>");
-
-									Form2.SerializeSubmit(Xml2);
-
-									Xml2.Append("</query>");
-
-									this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
-									{
-										return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
-									}, null);
-
-									return Task.CompletedTask;
-								},
-								(sender2, Form2) =>
-								{
-									StringBuilder Xml2 = new StringBuilder();
-
-									Xml2.Append("<query xmlns='");
-									Xml2.Append(NamespaceMucOwner);
-									Xml2.Append("'>");
-
-									Form2.SerializeCancel(Xml2);
-
-									Xml2.Append("</query>");
-
-									this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
-									{
-										e3.Ok = false;
-										return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
-									}, null);
-
-									return Task.CompletedTask;
-								},
+								this.SubmitConfigurationForm,
+								this.CancelConfigurationForm,
 								e.From, e.To)
 							{
-								State = e.State
+								State = new ConfigState()
+								{
+									SubmissionCallback = SubmissionCallback,
+									State = e.State
+								}
 							};
 
 							break;
@@ -557,8 +524,111 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				return Callback(this, Form);
+				return Callback?.Invoke(this, Form) ?? Task.CompletedTask;
 			}, State);
+		}
+
+		private class ConfigState
+		{
+			public IqResultEventHandlerAsync SubmissionCallback;
+			public object State;
+		}
+
+		/// <summary>
+		/// Submits a room configuration form.
+		/// </summary>
+		/// <param name="ConfigurationForm">Room configuration form.</param>
+		public Task SubmitConfigurationForm(DataForm ConfigurationForm)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			ConfigurationForm.State = new ConfigState()
+			{
+				SubmissionCallback = (sender, e) =>
+				{
+					if (e.Ok)
+						Result.TrySetResult(true);
+					else
+						Result.TrySetException(e.StanzaError is null ? new Exception("Unable to configure room.") : e.StanzaError);
+						
+					return Task.CompletedTask;
+				}
+			};
+
+			this.SubmitConfigurationForm(this, ConfigurationForm);
+
+			return Result.Task;
+		}
+
+		private Task SubmitConfigurationForm(object Sender, DataForm ConfigurationForm)
+		{
+			StringBuilder Xml2 = new StringBuilder();
+			ConfigState State = ConfigurationForm.State as ConfigState;
+
+			Xml2.Append("<query xmlns='");
+			Xml2.Append(NamespaceMucOwner);
+			Xml2.Append("'>");
+
+			ConfigurationForm.SerializeSubmit(Xml2);
+
+			Xml2.Append("</query>");
+
+			this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
+			{
+				e3.State = State?.State;
+				return State?.SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
+			}, null);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Cancels a room configuration form.
+		/// </summary>
+		/// <param name="ConfigurationForm">Room configuration form.</param>
+		public Task CancelConfigurationForm(DataForm ConfigurationForm)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			ConfigurationForm.State = new ConfigState()
+			{
+				SubmissionCallback = (sender, e) =>
+				{
+					if (e.Ok)
+						Result.TrySetResult(true);
+					else
+						Result.TrySetException(e.StanzaError is null ? new Exception("Unable to cancel room configuration.") : e.StanzaError);
+
+					return Task.CompletedTask;
+				}
+			};
+
+			this.CancelConfigurationForm(this, ConfigurationForm);
+
+			return Result.Task;
+		}
+
+		private Task CancelConfigurationForm(object Sender, DataForm ConfigurationForm)
+		{
+			StringBuilder Xml2 = new StringBuilder();
+			ConfigState State = ConfigurationForm.State as ConfigState;
+
+			Xml2.Append("<query xmlns='");
+			Xml2.Append(NamespaceMucOwner);
+			Xml2.Append("'>");
+
+			ConfigurationForm.SerializeCancel(Xml2);
+
+			Xml2.Append("</query>");
+
+			this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
+			{
+				e3.Ok = false;
+				e3.State = State?.State;
+				return State?.SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
+			}, null);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -1515,7 +1585,7 @@ namespace Waher.Networking.XMPP.MUC
 
 				try
 				{
-					Callback(this, e2);
+					Callback?.Invoke(this, e2);
 				}
 				catch (Exception ex)
 				{

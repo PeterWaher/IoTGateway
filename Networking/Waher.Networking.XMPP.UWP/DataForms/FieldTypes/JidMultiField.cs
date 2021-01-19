@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="Label">Label</param>
 		/// <param name="Required">If the field is required.</param>
 		/// <param name="ValueStrings">Values for the field (string representations).</param>
-		/// <param name="Options">Options, as (Label,Value) pairs.</param>
+		/// <param name="Options">Options, as (Key=M2H Label, Value=M2M Value) pairs.</param>
 		/// <param name="Description">Description</param>
 		/// <param name="DataType">Data Type</param>
 		/// <param name="ValidationMethod">Validation Method</param>

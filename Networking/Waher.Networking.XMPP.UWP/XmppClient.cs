@@ -2286,25 +2286,107 @@ namespace Waher.Networking.XMPP
 		private Task MessageFormSubmitted(object _, DataForm Form)
 		{
 			MessageEventArgs e = (MessageEventArgs)Form.State;
+			this.SubmitForm(Form, e.Type, e.ThreadID, e.ParentThreadID);
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Submits a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		public void SubmitForm(DataForm Form)
+		{
+			this.SubmitForm(Form, MessageType.Normal, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Submits a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		public void SubmitForm(DataForm Form, MessageType MessageType)
+		{
+			this.SubmitForm(Form, MessageType, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Submits a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public void SubmitForm(DataForm Form, MessageType MessageType, string ThreadId)
+		{
+			this.SubmitForm(Form, MessageType, ThreadId, string.Empty);
+		}
+
+		/// <summary>
+		/// Submits a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SubmitForm(DataForm Form, MessageType MessageType, string ThreadId, string ParentThreadId)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Form.SerializeSubmit(Xml);
 
-			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, e.ThreadID, e.ParentThreadID);
-
-			return Task.CompletedTask;
+			this.SendMessage(MessageType, Form.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, ThreadId, ParentThreadId);
 		}
 
 		private Task MessageFormCancelled(object _, DataForm Form)
 		{
 			MessageEventArgs e = (MessageEventArgs)Form.State;
+			this.CancelForm(Form, e.Type, e.ThreadID, e.ParentThreadID);
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Cancels a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		public void CancelForm(DataForm Form)
+		{
+			this.CancelForm(Form, MessageType.Normal, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Cancels a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		public void CancelForm(DataForm Form, MessageType MessageType)
+		{
+			this.CancelForm(Form, MessageType, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Cancels a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public void CancelForm(DataForm Form, MessageType MessageType, string ThreadId)
+		{
+			this.CancelForm(Form, MessageType, ThreadId, string.Empty);
+		}
+
+		/// <summary>
+		/// Cancels a form back to the sender.
+		/// </summary>
+		/// <param name="Form">Data Form</param>
+		/// <param name="MessageType">Message type to use.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void CancelForm(DataForm Form, MessageType MessageType, string ThreadId, string ParentThreadId)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Form.SerializeCancel(Xml);
 
-			this.SendMessage(e.Type, Form.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, e.ThreadID, e.ParentThreadID);
-
-			return Task.CompletedTask;
+			this.SendMessage(MessageType, Form.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, ThreadId, ParentThreadId);
 		}
 
 		/// <summary>

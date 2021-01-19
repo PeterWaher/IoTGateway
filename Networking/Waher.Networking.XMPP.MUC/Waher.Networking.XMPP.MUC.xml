@@ -1871,6 +1871,14 @@
             <param name="RoomId">Room ID.</param>
             <param name="Domain">Domain of service hosting the room.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.RequestRole(System.String,System.String,Waher.Networking.XMPP.MUC.Role)">
+            <summary>
+            Requests privileges corresponding to a specific role in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Role">Requested role.</param>
+        </member>
         <member name="E:Waher.Networking.XMPP.MUC.MultiUserChatClient.OccupantRequest">
             <summary>
             Event raised when a request has been received from an occupant in a room.

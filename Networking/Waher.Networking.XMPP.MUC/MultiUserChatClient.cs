@@ -594,11 +594,7 @@ namespace Waher.Networking.XMPP.MUC
 			{
 				SubmissionCallback = (sender, e) =>
 				{
-					if (e.Ok)
-						Result.TrySetResult(true);
-					else
-						Result.TrySetException(e.StanzaError is null ? new Exception("Unable to cancel room configuration.") : e.StanzaError);
-
+					Result.TrySetResult(true);
 					return Task.CompletedTask;
 				}
 			};
@@ -2383,14 +2379,29 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		public void RequestVoice(string RoomId, string Domain)
 		{
+			this.RequestRole(RoomId, Domain, Role.Participant);
+		}
+
+		/// <summary>
+		/// Requests privileges corresponding to a specific role in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Role">Requested role.</param>
+		public void RequestRole(string RoomId, string Domain, Role Role)
+		{ 
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<x xmlns='");
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='submit'><field var='FORM_TYPE'>");
-			Xml.Append("<value>http://jabber.org/protocol/muc#request</value>");
+			Xml.Append("<value>");
+			Xml.Append(FormTypeRequest);
+			Xml.Append("</value>");
 			Xml.Append("</field><field var='muc#role' type='list-single'>");
-			Xml.Append("<value>participant</value></field></x>");
+			Xml.Append("<value>");
+			Xml.Append(Role.ToString().ToLower());
+			Xml.Append("</value></field></x>");
 
 			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain, Xml.ToString(),
 				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);

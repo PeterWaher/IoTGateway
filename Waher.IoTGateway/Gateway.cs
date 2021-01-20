@@ -434,7 +434,7 @@ namespace Waher.IoTGateway
 								break;
 
 							case "Database":
-								if (FirstStart)
+								if (FirstStart || !Database.HasProvider)
 								{
 									if (!(DatabaseProvider is null))
 										throw new Exception("Database provider already initiated.");

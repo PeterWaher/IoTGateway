@@ -1277,6 +1277,23 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
 		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password, string ThreadId)
 		{
+			this.InviteDirect(null, RoomId, Domain, BareJid, Reason, Language, Password, ThreadId);
+		}
+
+		/// <summary>
+		/// Sends a direct invitation to the room.
+		/// </summary>
+		/// <param name="Endpoint">End-to-End Encryption endpoint.</param>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="BareJid">Bare JID of entity to invite.</param>
+		/// <param name="Reason">Reason for sending the invitation.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="Password">Password required to enter room.</param>
+		/// <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
+		public void InviteDirect(IEndToEndEncryption Endpoint, string RoomId, string Domain, string BareJid, string Reason, string Language, 
+			string Password, string ThreadId)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<x xmlns='");
@@ -1306,8 +1323,16 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("'/>");
 
-			this.client.SendMessage(MessageType.Normal, BareJid, Xml.ToString(), string.Empty, string.Empty, Language,
-				string.Empty, string.Empty);
+			if (Endpoint is null)
+			{
+				this.client.SendMessage(MessageType.Normal, BareJid, Xml.ToString(), string.Empty, string.Empty, Language,
+					string.Empty, string.Empty);
+			}
+			else
+			{
+				Endpoint.SendMessage(this.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+					string.Empty, BareJid, Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty, null, null);
+			}
 		}
 
 		private async Task DirectInvitationMessageHandler(object Sender, MessageEventArgs e)

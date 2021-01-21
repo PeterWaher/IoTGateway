@@ -490,12 +490,12 @@
         </member>
         <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Affiliation">
             <summary>
-            User Affiliation in room.
+            User Affiliation in room, if provided.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.Role">
             <summary>
-            User role in room.
+            User role in room, if provided.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.MUC.UserPresenceEventArgs.RoomDestroyed">
@@ -1318,6 +1318,19 @@
             <summary>
             Sends a direct invitation to the room.
             </summary>
+            <param name="RoomId">Room ID</param>
+            <param name="Domain">Domain hosting the room.</param>
+            <param name="BareJid">Bare JID of entity to invite.</param>
+            <param name="Reason">Reason for sending the invitation.</param>
+            <param name="Language">Language</param>
+            <param name="Password">Password required to enter room.</param>
+            <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.InviteDirect(Waher.Networking.XMPP.IEndToEndEncryption,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a direct invitation to the room.
+            </summary>
+            <param name="Endpoint">End-to-End Encryption endpoint.</param>
             <param name="RoomId">Room ID</param>
             <param name="Domain">Domain hosting the room.</param>
             <param name="BareJid">Bare JID of entity to invite.</param>

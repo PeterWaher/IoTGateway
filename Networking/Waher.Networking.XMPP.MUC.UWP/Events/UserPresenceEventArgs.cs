@@ -15,8 +15,8 @@ namespace Waher.Networking.XMPP.MUC
 	/// </summary>
 	public class UserPresenceEventArgs : PresenceEventArgs
 	{
-		private readonly Affiliation affiliation;
-		private readonly Role role;
+		private readonly Affiliation? affiliation;
+		private readonly Role? role;
 		private readonly MucStatus[] status;
 		private readonly string roomId;
 		private readonly string domain;
@@ -81,14 +81,14 @@ namespace Waher.Networking.XMPP.MUC
 		public string Reason => this.reason;
 
 		/// <summary>
-		/// User Affiliation in room.
+		/// User Affiliation in room, if provided.
 		/// </summary>
-		public Affiliation Affiliation => this.affiliation;
+		public Affiliation? Affiliation => this.affiliation;
 
 		/// <summary>
-		/// User role in room.
+		/// User role in room, if provided.
 		/// </summary>
-		public Role Role => this.role;
+		public Role? Role => this.role;
 
 		/// <summary>
 		/// If room has been destroyed.

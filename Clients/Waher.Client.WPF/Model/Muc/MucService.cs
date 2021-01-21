@@ -580,7 +580,8 @@ namespace Waher.Client.WPF.Model.Muc
 						switch (Status)
 						{
 							case MucStatus.AffiliationChanged:
-								View.Event("New affiliation: " + e.Affiliation.ToString(), e.NickName, string.Empty);
+								if (e.Affiliation.HasValue)
+									View.Event("New affiliation: " + e.Affiliation.ToString(), e.NickName, string.Empty);
 								break;
 
 							case MucStatus.LoggingEnabled:

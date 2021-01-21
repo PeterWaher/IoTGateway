@@ -151,7 +151,7 @@ namespace Waher.Runtime.Timing
 		/// <summary>
 		/// Removes an event scheduled for a given point in time.
 		/// 
-		/// NOTE: It is important to use the timestamp returned when calling <see cref="Add"/>, not the original value, as these
+		/// NOTE: It is important to use the timestamp returned when calling Add, not the original value, as these
 		/// might differ by a few ticks to make all timestamps unique.
 		/// </summary>
 		/// <param name="When">Timstamp to remove.</param>

@@ -17,12 +17,12 @@
     <dependencies>
       <dependency id="Waher.Content" version="1.0.29"/>
       <dependency id="Waher.Events" version="1.0.14"/>
-      <dependency id="Waher.IoTGateway" version="1.1.10"/>
-      <dependency id="Waher.Networking.XMPP" version="1.1.6"/>
+      <dependency id="Waher.IoTGateway" version="1.1.11"/>
+      <dependency id="Waher.Networking.XMPP" version="1.1.7"/>
       <dependency id="Waher.Persistence" version="1.2.2"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
       <dependency id="Waher.Runtime.Language" version="1.0.4"/>
-      <dependency id="Waher.Script" version="1.0.46"/>
+      <dependency id="Waher.Script" version="1.0.47"/>
       <dependency id="Waher.Things" version="1.1.1"/>
       <dependency id="Waher.Things.Metering" version="1.1.2"/>
       <dependency id="Windows-Remote-Arduino" version="1.4.0"/>

@@ -408,7 +408,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private void SetAffiliation(Affiliation Affiliation)
 		{
-			this.MucClient.ConfigureOccupant(this.roomId, this.domain, this.jid, Affiliation, string.Empty, (sender, e) =>
+			this.MucClient.ConfigureOccupant(this.roomId, this.domain, XmppClient.GetBareJID(this.jid), Affiliation, string.Empty, (sender, e) =>
 			{
 				if (e.Ok)
 				{

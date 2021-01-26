@@ -2,8 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;

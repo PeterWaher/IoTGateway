@@ -1,9 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Net.Sockets;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;

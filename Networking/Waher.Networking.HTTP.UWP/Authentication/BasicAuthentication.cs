@@ -98,7 +98,11 @@ namespace Waher.Networking.HTTP.Authentication
 							break;
 
 						case "DIGEST-MD5":
-							Password = DigestAuthentication.ToHex(DigestAuthentication.H(UserName + ":" + this.realm + ":" + Password));
+							Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + this.realm + ":" + Password));
+							break;
+
+						case "DIGEST-SHA-256":
+							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + this.realm + ":" + Password));
 							break;
 
 						default:

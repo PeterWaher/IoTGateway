@@ -11,6 +11,29 @@ using Waher.Security.LoginMonitor;
 namespace Waher.Networking.HTTP.Authentication
 {
 	/// <summary>
+	/// Delegate to hash function.
+	/// </summary>
+	/// <param name="Data">Data to be hashed.</param>
+	/// <returns>Hash digest</returns>
+	public delegate byte[] HashFunctionString(string Data);
+
+	/// <summary>
+	/// Digest algorithm
+	/// </summary>
+	public enum DigestAlgorithm
+	{
+		/// <summary>
+		/// MD5 - obsolete
+		/// </summary>
+		MD5,
+
+		/// <summary>
+		/// SHA-256
+		/// </summary>
+		SHA256
+	}
+
+	/// <summary>
 	/// Digest authentication mechanism, as defined in RFC 2617:
 	/// https://tools.ietf.org/html/rfc2617
 	/// </summary>
@@ -22,6 +45,9 @@ namespace Waher.Networking.HTTP.Authentication
 		private readonly string opaque;
 		private readonly IUserSource users;
 		private readonly string realm;
+		private readonly DigestAlgorithm algorithm;
+		private readonly int digestBytes;
+		private readonly HashFunctionString h;
 
 		/// <summary>
 		/// Digest authentication mechanism, as defined in RFC 2617:
@@ -31,9 +57,9 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="Users">Collection of users to authenticate against.</param>
 		public DigestAuthentication(string Realm, IUserSource Users)
 #if WINDOWS_UWP
-			: this(false, Realm, Users)
+			: this(false, DigestAlgorithm.MD5, Realm, Users)
 #else
-			: this(false, 0, Realm, Users)
+			: this(false, 0, DigestAlgorithm.MD5, Realm, Users)
 #endif
 		{
 		}
@@ -44,9 +70,10 @@ namespace Waher.Networking.HTTP.Authentication
 		/// https://tools.ietf.org/html/rfc2617
 		/// </summary>
 		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="Algorithm">Digest Algorithm to use.</param>
 		/// <param name="Realm">Realm.</param>
 		/// <param name="Users">Collection of users to authenticate against.</param>
-		public DigestAuthentication(bool RequireEncryption, string Realm, IUserSource Users)
+		public DigestAuthentication(bool RequireEncryption, DigestAlgorithm Algorithm, string Realm, IUserSource Users)
 			: base(RequireEncryption)
 #else
 		/// <summary>
@@ -55,15 +82,32 @@ namespace Waher.Networking.HTTP.Authentication
 		/// </summary>
 		/// <param name="RequireEncryption">If encryption is required.</param>
 		/// <param name="MinStrength">Minimum security strength of algorithms used.</param>
+		/// <param name="Algorithm">Digest Algorithm to use.</param>
 		/// <param name="Realm">Realm.</param>
 		/// <param name="Users">Collection of users to authenticate against.</param>
-		public DigestAuthentication(bool RequireEncryption, int MinStrength, string Realm, IUserSource Users)
+		public DigestAuthentication(bool RequireEncryption, int MinStrength, DigestAlgorithm Algorithm, string Realm, IUserSource Users)
 			: base(RequireEncryption, MinStrength)
 #endif
 		{
+			this.algorithm = Algorithm;
 			this.realm = Realm;
 			this.users = Users;
-			this.opaque = this.NextRandomString(16);
+
+			switch (Algorithm)
+			{
+				case DigestAlgorithm.MD5:
+					this.digestBytes = 16;
+					this.h = H_MD5;
+					break;
+
+				case DigestAlgorithm.SHA256:
+				default:
+					this.digestBytes = 32;
+					this.h = H_SHA256;
+					break;
+			}
+
+			this.opaque = this.NextRandomString(this.digestBytes);
 		}
 
 		private byte[] NextBytes(int Nr)
@@ -90,7 +134,7 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <returns>Challenge string.</returns>
 		public override string GetChallenge()
 		{
-			string Nonce = this.NextRandomString(16);
+			string Nonce = this.NextRandomString(this.digestBytes);
 			DateTime Expires = DateTime.Now.AddMinutes(1);
 
 			while (true)
@@ -110,7 +154,30 @@ namespace Waher.Networking.HTTP.Authentication
 				Expires = Expires.AddTicks(b[0] & 15);
 			}
 
-			return "Digest realm=\"" + this.realm + "\", qop=\"auth,auth-int\", nonce=\"" + Nonce + "\", opaque=\"" + this.opaque + "\"";
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Digest realm=\"");
+			sb.Append(this.realm);
+			sb.Append("\", qop=\"auth,auth-int\", algorithm=");
+
+			switch (this.algorithm)
+			{
+				case DigestAlgorithm.MD5:
+					sb.Append("MD5");
+					break;
+
+				case DigestAlgorithm.SHA256:
+					sb.Append("SHA-256");
+					break;
+			}
+
+			sb.Append(", nonce=\"");
+			sb.Append(Nonce);
+			sb.Append("\", opaque=\"");
+			sb.Append(this.opaque);
+			sb.Append("\"");
+
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -123,6 +190,8 @@ namespace Waher.Networking.HTTP.Authentication
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
 			if (Authorization != null && Authorization.Value.StartsWith("Digest ", StringComparison.CurrentCultureIgnoreCase))
 			{
+				HashFunctionString H = H_MD5;
+				DigestAlgorithm Algorithm = DigestAlgorithm.MD5;
 				string UserName = null;
 				string Opaque = null;
 				string Realm = null;
@@ -131,7 +200,6 @@ namespace Waher.Networking.HTTP.Authentication
 				string Nc = null;
 				string Uri = null;
 				string Qop = null;
-				string[] QopItems;
 				string Response = null;
 				bool Auth = false;
 				bool AuthInt = false;
@@ -170,7 +238,7 @@ namespace Waher.Networking.HTTP.Authentication
 
 						case "qop":
 							Qop = P.Value;
-							QopItems = Qop.Split(',');
+							string[] QopItems = Qop.Split(',');
 
 							Auth = (Array.IndexOf(QopItems, "auth") >= 0);
 							AuthInt = (Array.IndexOf(QopItems, "auth-int") >= 0);
@@ -178,6 +246,24 @@ namespace Waher.Networking.HTTP.Authentication
 
 						case "response":
 							Response = P.Value;
+							break;
+
+						case "algorithm":
+							switch (P.Value)
+							{
+								case "MD5":
+									H = H_MD5;
+									Algorithm = DigestAlgorithm.MD5;
+									break;
+
+								case "SHA-256":
+									H = H_SHA256;
+									Algorithm = DigestAlgorithm.SHA256;
+									break;
+
+								default:
+									return null;
+							}
 							break;
 					}
 				}
@@ -254,7 +340,17 @@ namespace Waher.Networking.HTTP.Authentication
 						break;
 
 					case "DIGEST-MD5":
-						HA1 = User.PasswordHash;
+						if (Algorithm == DigestAlgorithm.MD5)
+							HA1 = User.PasswordHash;
+						else
+							return null;
+						break;
+
+					case "DIGEST-SHA-256":
+						if (Algorithm == DigestAlgorithm.SHA256)
+							HA1 = User.PasswordHash;
+						else
+							return null;
 						break;
 
 					default:
@@ -284,14 +380,14 @@ namespace Waher.Networking.HTTP.Authentication
 			return null;
 		}
 
-		internal static byte[] H(byte[] Data)
+		internal static byte[] H_MD5(string s)
 		{
-			return Hashes.ComputeMD5Hash(Data);
+			return Hashes.ComputeMD5Hash(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
-		internal static byte[] H(string s)
+		internal static byte[] H_SHA256(string s)
 		{
-			return H(InternetContent.ISO_8859_1.GetBytes(s));
+			return Hashes.ComputeSHA256Hash(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
 		internal static string ToHex(byte[] Hash)

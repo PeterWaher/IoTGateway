@@ -2480,6 +2480,15 @@
             <param name="Node">Script node making the request.</param>
             <returns>Converted value.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.ConvertTo(System.Object,System.Type,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Tries to conevert an object to a desired type.
+            </summary>
+            <param name="Obj">Object to convert.</param>
+            <param name="DesiredType">Desired type.</param>
+            <param name="Node">Script node making the request.</param>
+            <returns>Converted value.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.Preview(Waher.Script.Abstraction.Elements.IElement)">
             <summary>
             Reports a preview of the final result.

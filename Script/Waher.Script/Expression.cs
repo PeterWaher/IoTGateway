@@ -4770,7 +4770,51 @@ namespace Waher.Script
 		/// <returns>Converted value.</returns>
 		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
 		{
-			return Convert.ChangeType(Value.AssociatedObjectValue, DesiredType);    // TODO: Implement .NET type conversion.
+			return ConvertTo(Value.AssociatedObjectValue, DesiredType, Node);
+		}
+
+		/// <summary>
+		/// Tries to conevert an object to a desired type.
+		/// </summary>
+		/// <param name="Obj">Object to convert.</param>
+		/// <param name="DesiredType">Desired type.</param>
+		/// <param name="Node">Script node making the request.</param>
+		/// <returns>Converted value.</returns>
+		public static object ConvertTo(object Obj, Type DesiredType, ScriptNode Node)
+		{ 
+			if (Obj is null)
+				return null;
+
+			Type T = Obj.GetType();
+			if (T == DesiredType)
+				return Obj;
+
+			if (DesiredType.IsArray)
+			{
+				Type DesiredItemType = DesiredType.GetElementType();
+				Array Dest;
+
+				if (T.IsArray)
+				{
+					Array Source = (Array)Obj;
+					int c = Source.Length;
+					int i;
+					
+					Dest = (Array)Activator.CreateInstance(DesiredType, c);
+					
+					for (i = 0; i < c; i++)
+						Dest.SetValue(ConvertTo(Source.GetValue(i), DesiredItemType, Node), i);
+				}
+				else
+				{
+					Dest = (Array)Activator.CreateInstance(DesiredType, 1);
+					Dest.SetValue(ConvertTo(Obj, DesiredItemType, Node), 0);
+				}
+
+				return Dest;
+			}
+			else
+				return Convert.ChangeType(Obj, DesiredType);    // TODO: Implement .NET type conversion.
 		}
 
 		/// <summary>

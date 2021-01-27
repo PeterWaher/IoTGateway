@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -355,6 +356,39 @@ namespace Waher.Content.Markdown.Model
 		public char LastCharacter
 		{
 			get { return this.lastChar; }
+		}
+
+		public string UntilToken(string Token)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			int c = Token.Length;
+			char ch;
+
+			while ((ch = this.NextChar()) != 0)
+			{
+				if (char.ToUpper(ch) == Token[i])
+				{
+					i++;
+					if (i >= c)
+						return sb.ToString();
+				}
+				else
+				{
+					if (i > 0)
+					{
+						sb.Append(Token.Substring(0, i));
+						i = 0;
+					}
+
+					sb.Append(ch);
+				}
+			}
+
+			if (i > 0)
+				sb.Append(Token.Substring(0, i));
+
+			return sb.ToString();
 		}
 
 	}

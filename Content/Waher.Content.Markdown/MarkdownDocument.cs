@@ -17,8 +17,6 @@ using Waher.Events;
 using Waher.Script;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Waher.Content.Markdown
 {
@@ -1982,10 +1980,21 @@ namespace Waher.Content.Markdown
 						else if (Url.IndexOf('@') >= 0)
 							Elements.AddLast(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
 						else
+						{
 							Elements.AddLast(new InlineHTML(this, Url));
 
-						Text.Clear();
+							if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+							{
+								string s = State.UntilToken("</TEXTAREA>");
 
+								if (!string.IsNullOrEmpty(s))
+									Elements.AddLast(new InlineText(this, s));
+
+								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(2, 8) + ">"));
+							}
+						}
+
+						Text.Clear();
 						break;
 
 					case '>':

@@ -31,6 +31,8 @@ namespace Waher.Content
 		private static IContentPoster[] posters = null;
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, KeyValuePair<Grade, IContentEncoder>> encodersByType =
+			new Dictionary<string, KeyValuePair<Grade, IContentEncoder>>();
 		private readonly static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
@@ -57,6 +59,11 @@ namespace Waher.Content
 			lock (decoderByContentType)
 			{
 				decoderByContentType.Clear();
+			}
+
+			lock (encodersByType)
+			{
+				encodersByType.Clear();
 			}
 
 			lock (contentTypeByFileExtensions)
@@ -181,6 +188,35 @@ namespace Waher.Content
 		/// <returns>If the object can be encoded.</returns>
 		public static bool Encodes(object Object, out Grade Grade, out IContentEncoder Encoder, params string[] AcceptedContentTypes)
 		{
+			string Key;
+
+			if (AcceptedContentTypes is null || AcceptedContentTypes.Length == 0)
+				Key = Object.GetType().FullName;
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(Object.GetType().FullName);
+
+				foreach (string Accepted in AcceptedContentTypes)
+				{
+					sb.Append('|');
+					sb.Append(Accepted);
+				}
+
+				Key = sb.ToString();
+			}
+
+			lock (encodersByType)
+			{
+				if (encodersByType.TryGetValue(Key, out KeyValuePair<Grade, IContentEncoder> P))
+				{
+					Grade = P.Key;
+					Encoder = P.Value;
+					return !(Encoder is null);
+				}
+			}
+
 			Grade = Grade.NotAtAll;
 			Encoder = null;
 
@@ -191,6 +227,11 @@ namespace Waher.Content
 					Grade = Grade2;
 					Encoder = Encoder2;
 				}
+			}
+
+			lock (encodersByType)
+			{
+				encodersByType[Key] = new KeyValuePair<Grade, IContentEncoder>(Grade, Encoder);
 			}
 
 			return !(Encoder is null);

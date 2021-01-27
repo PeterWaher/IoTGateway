@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			if (this.Document.Settings.HtmlSettings.XmlEntitiesOnly)
+			if (this.Document.Settings.HtmlSettings?.XmlEntitiesOnly ?? true)
 			{
 				switch (this.entity)
 				{

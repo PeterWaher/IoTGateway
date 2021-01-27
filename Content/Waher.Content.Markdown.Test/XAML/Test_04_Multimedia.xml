@@ -1,9 +1,9 @@
 ﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Image: <InlineUIContainer BaselineAlignment="Center"><Image Source="/path/to/img.jpg" /></InlineUIContainer></TextBlock>
-	<Image Source="/path/to/img.jpg" />
-	<Image Source="/path/to/img.jpg" ToolTip="Optional title" />
-	<Image Source="url/to/image" ToolTip="Optional title attribute" />
-	<Image Source="url/to/image" ToolTip="Optional title attribute" />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Image: <InlineUIContainer BaselineAlignment="Center"><Image Source="/path/to/img.jpg" Stretch="None" /></InlineUIContainer></TextBlock>
+	<Image Source="/path/to/img.jpg" Stretch="None" />
+	<Image Source="/path/to/img.jpg" Stretch="None" ToolTip="Optional title" />
+	<Image Source="url/to/image" Stretch="None" ToolTip="Optional title attribute" />
+	<Image Source="url/to/image" Stretch="None" ToolTip="Optional title attribute" />
 	<Image Source="/path/to/img.jpg" Width="320" Height="200" />
 	<Image Source="/path/to/img.jpg" Width="320" Height="200" ToolTip="Optional title 2" />
 	<Image Source="url/to/image" Width="320" Height="200" ToolTip="Optional title attribute 2" />
@@ -13,13 +13,13 @@
 	<MediaElement Source="/local/music.mp3" LoadedBehavior="Play" />
 	<MediaElement Source="/local/video.mp4" Width="320" Height="200" />
 	<WebBrowser Source="https://www.youtube.com/embed/whBPLc8m4SU" Width="800" Height="600" />
-	<Image Source="img1.svg" />
+	<Image Source="img1.svg" Stretch="None" />
 	<Image Source="img1.svg" Width="320" Height="200" />
 	<Image Source="img1.svg" Width="320" Height="200" ToolTip="SVG" />
 	<MediaElement Source="audio1.mp3" LoadedBehavior="Play" />
 	<MediaElement Source="video1.mp4" />
 	<MediaElement Source="video1.mp4" Width="320" Height="200" />
-	<Image Source="img1.svg" />
+	<Image Source="img1.svg" Stretch="None" />
 	<Image Source="img1.svg" Width="320" Height="200" />
 	<Image Source="img1.svg" Width="320" Height="200" ToolTip="SVG" />
 	<MediaElement Source="audio1.mp3" LoadedBehavior="Play" />

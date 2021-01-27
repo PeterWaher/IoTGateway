@@ -173,7 +173,7 @@
 					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is a list item with two paragraphs.]]></Label>
 				</ContentView>
 				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the second paragraph in the list item. You&rsquo;re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.]]></Label>
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is the second paragraph in the list item. You’re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.]]></Label>
 				</ContentView>
 			</StackLayout>
 			<ContentView Padding="0,5,5,5" HorizontalOptions="Start" Grid.Column="0" Grid.Row="1">

@@ -1,6 +1,6 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here is some text containing a footnote<sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>. You can then continue your thought&hellip;]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here is some text containing a footnote<sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>. You can then continue your thought…]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Even go to a new paragraph and the footnotes with go to the bottom of the document<sup id="fnref-2"><a href="#fn-2" class="footnote-ref">2</a></sup>.]]></Label>

@@ -45,7 +45,7 @@
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[A backtick-delimited string in a code span: <code>`foo`</code>]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Please don&rsquo;t use any <code>&lt;blink&gt;</code> tags.]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Please don’t use any <code>&lt;blink&gt;</code> tags.]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<code>&amp;#8212;</code> is the decimal-encoded equivalent of <code>&amp;mdash;</code>.]]></Label>

@@ -9,7 +9,7 @@
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[a&#178;+b&#178;=c&#178;]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[a<sup>n</sup>+b<sup>n</sup>&ne;c<sup>n</sup>, n&geq;3]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[a<sup>n</sup>+b<sup>n</sup>≠c<sup>n</sup>, n≥3]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[a<sup>(b+c)/2</sup>=sqrt(a<sup>b</sup>a<sup>c</sup>)]]></Label>

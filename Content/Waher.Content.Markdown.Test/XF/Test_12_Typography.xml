@@ -1,23 +1,23 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[. .. &hellip; &hellip;.]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[. .. … ….]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[- &ndash; &mdash; &mdash;-]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[- – — —-]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Straight quotes " into &ldquo;curly&rdquo; quote HTML entities]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Straight quotes " into “curly” quote HTML entities]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Straight quotes ' into &lsquo;curly&rsquo; quote HTML entities]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Straight quotes ' into ‘curly’ quote HTML entities]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[&copy; &COPY; &reg; &REG; &copysr; &copysr; &oS; &circledS;]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[© © ® ® ℗ ℗ Ⓢ Ⓢ]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[&laquo; &Ll; &larr; &harr; &lArr; &hArr; &leq; &ne; &raquo; &Gg; &geq; &rarr; &rArr; &equiv; &MinusPlus; &PlusMinus;]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[« ⋘ ← ↔ ⇐ ⇔ ≤ ≠ » ⋙ ≥ → ⇒ ≡ ∓ ±]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[&LeftDoubleBracket; &RightDoubleBracket; &permil; &pertenk; &deg; &#185; &#178; &#179; <sup>4</sup> <sup>5</sup> <sup>6</sup> <sup>7</sup> <sup>8</sup> <sup>9</sup> &ordf; <sup>b</sup> <sup>c</sup> <sup>d</sup> <sup>e</sup> <sup>f</sup> <sup>g</sup> <sup>h</sup> <sup>i</sup> <sup>j</sup> <sup>k</sup> <sup>l</sup> <sup>m</sup> <sup>n</sup> &ordm; <sup>p</sup> <sup>q</sup> <sup>r</sup> <sup>s</sup> <sup>t</sup> <sup>u</sup> <sup>v</sup> <sup>w</sup> <sup>x</sup> <sup>y</sup> <sup>z</sup> <sup>A</sup> <sup>B</sup> <sup>C</sup> <sup>D</sup> <sup>E</sup> <sup>F</sup> <sup>G</sup> <sup>H</sup> <sup>I</sup> <sup>J</sup> <sup>K</sup> <sup>L</sup> <sup>M</sup> <sup>N</sup> <sup>O</sup> <sup>P</sup> <sup>Q</sup> <sup>R</sup> <sup>S</sup> <sup>T</sup> <sup>U</sup> <sup>V</sup> <sup>W</sup> <sup>X</sup> <sup>Y</sup> <sup>Z</sup> &trade; <sup>st</sup> <sup>nd</sup> <sup>rd</sup> <sup>th</sup>]]></Label>
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[⟦ ⟧ ‰ ‱ ° &#185; &#178; &#179; <sup>4</sup> <sup>5</sup> <sup>6</sup> <sup>7</sup> <sup>8</sup> <sup>9</sup> ª <sup>b</sup> <sup>c</sup> <sup>d</sup> <sup>e</sup> <sup>f</sup> <sup>g</sup> <sup>h</sup> <sup>i</sup> <sup>j</sup> <sup>k</sup> <sup>l</sup> <sup>m</sup> <sup>n</sup> º <sup>p</sup> <sup>q</sup> <sup>r</sup> <sup>s</sup> <sup>t</sup> <sup>u</sup> <sup>v</sup> <sup>w</sup> <sup>x</sup> <sup>y</sup> <sup>z</sup> <sup>A</sup> <sup>B</sup> <sup>C</sup> <sup>D</sup> <sup>E</sup> <sup>F</sup> <sup>G</sup> <sup>H</sup> <sup>I</sup> <sup>J</sup> <sup>K</sup> <sup>L</sup> <sup>M</sup> <sup>N</sup> <sup>O</sup> <sup>P</sup> <sup>Q</sup> <sup>R</sup> <sup>S</sup> <sup>T</sup> <sup>U</sup> <sup>V</sup> <sup>W</sup> <sup>X</sup> <sup>Y</sup> <sup>Z</sup> ™ <sup>st</sup> <sup>nd</sup> <sup>rd</sup> <sup>th</sup>]]></Label>
 	</ContentView>
 </StackLayout>

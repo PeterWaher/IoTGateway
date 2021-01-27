@@ -87,7 +87,7 @@
 					</Grid>
 				</ContentView>
 				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here&rsquo;s some example code:]]></Label>
+					<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Here’s some example code:]]></Label>
 				</ContentView>
 				<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 					<StackLayout Orientation="Vertical">

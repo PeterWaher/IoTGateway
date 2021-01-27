@@ -1417,6 +1417,23 @@ namespace Waher.Networking
 #endif
 		}
 
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Cipher strength. (Nr bits of brute force complexity required to break algorithm).
+		/// </summary>
+		public int CipherStrength => this.stream is SslStream SslStream && SslStream.IsEncrypted ? SslStream.CipherStrength : 0;
+
+		/// <summary>
+		/// Hash algorithm strength. (Nr bits of brute force complexity required to break algorithm).
+		/// </summary>
+		public int HashStrength => this.stream is SslStream SslStream && SslStream.IsEncrypted ? SslStream.HashStrength : 0;
+
+		/// <summary>
+		/// Key Exchange strength. (Nr bits of brute force complexity required to break algorithm).
+		/// </summary>
+		public int KeyExchangeStrength => this.stream is SslStream SslStream && SslStream.IsEncrypted ? SslStream.KeyExchangeStrength : 0;
+#endif
+
 		/// <summary>
 		/// Allows the caller to pause reading.
 		/// </summary>

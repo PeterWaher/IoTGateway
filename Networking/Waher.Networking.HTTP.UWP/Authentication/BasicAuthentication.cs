@@ -23,6 +23,36 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="Realm">Realm.</param>
 		/// <param name="Users">Collection of users to authenticate against.</param>
 		public BasicAuthentication(string Realm, IUserSource Users)
+#if WINDOWS_UWP
+			: this(false, Realm, Users)
+#else
+			: this(false, 0, Realm, Users)
+#endif
+		{
+		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Basic authentication mechanism, as defined in RFC 2617:
+		/// https://tools.ietf.org/html/rfc2617
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Collection of users to authenticate against.</param>
+		public BasicAuthentication(bool RequireEncryption, string Realm, IUserSource Users)
+			: base(RequireEncryption)
+#else
+		/// <summary>
+		/// Basic authentication mechanism, as defined in RFC 2617:
+		/// https://tools.ietf.org/html/rfc2617
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="MinStrength">Minimum security strength of algorithms used.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Collection of users to authenticate against.</param>
+		public BasicAuthentication(bool RequireEncryption, int MinStrength, string Realm, IUserSource Users)
+			: base(RequireEncryption, MinStrength)
+#endif
 		{
 			this.realm = Realm;
 			this.users = Users;

@@ -307,9 +307,9 @@ namespace Waher.Networking.HTTP
 							{
 								long Total;
 
-								if (Header.ContentLength != null)
+								if (!(Header.ContentLength is null))
 									Total = Header.ContentLength.ContentLength;
-								else if (Request.DataStream != null)
+								else if (!(Request.DataStream is null))
 									Total = Request.DataStream.Position;
 								else
 									Total = 0;
@@ -343,9 +343,9 @@ namespace Waher.Networking.HTTP
 							{
 								long Total;
 
-								if (Header.ContentLength != null)
+								if (!(Header.ContentLength is null))
 									Total = Header.ContentLength.ContentLength;
-								else if (Request.DataStream != null)
+								else if (!(Request.DataStream is null))
 									Total = Request.DataStream.Position;
 								else
 									Total = 0;

@@ -426,6 +426,21 @@
             If connection is encrypted or not.
             </summary>
         </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.CipherStrength">
+            <summary>
+            Cipher strength. (Nr bits of brute force complexity required to break algorithm).
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.HashStrength">
+            <summary>
+            Hash algorithm strength. (Nr bits of brute force complexity required to break algorithm).
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.BinaryTcpClient.KeyExchangeStrength">
+            <summary>
+            Key Exchange strength. (Nr bits of brute force complexity required to break algorithm).
+            </summary>
+        </member>
         <member name="M:Waher.Networking.BinaryTcpClient.PauseReading">
             <summary>
             Allows the caller to pause reading.

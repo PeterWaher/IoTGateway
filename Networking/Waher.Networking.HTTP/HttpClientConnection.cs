@@ -446,12 +446,31 @@ namespace Waher.Networking.HTTP
 						if (Request.User is null)
 						{
 							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
+							bool Encrypted = this.client.IsEncrypted;
+#if !WINDOWS_UWP
+							int Strength = Encrypted ? Math.Min(
+								Math.Min(this.client.CipherStrength, this.client.HashStrength), 
+								this.client.KeyExchangeStrength) : 0;
+#endif
 
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 							{
+								if (Scheme.RequireEncryption)
+								{
+									if (!Encrypted)
+										continue;
+
+#if !WINDOWS_UWP
+									if (Scheme.MinStrength > Strength)
+										continue;
+#endif
+								}
+
 								string Challenge = Scheme.GetChallenge();
-								if (!string.IsNullOrEmpty(Challenge))
-									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+								if (string.IsNullOrEmpty(Challenge))
+									continue;
+
+								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
 
 							await this.SendResponse(Request, null, new HttpException(401, "Unauthorized", "Unauthorized access prohibited."), false, Challenges.ToArray());

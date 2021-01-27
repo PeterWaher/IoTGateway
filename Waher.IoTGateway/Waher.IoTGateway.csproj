@@ -60,6 +60,8 @@
     <None Remove="Root\Settings\PersonalData\WebPages.md" />
     <None Remove="Root\Settings\Restore.js" />
     <None Remove="Root\Settings\Restore.md" />
+    <None Remove="Root\Settings\Role.md" />
+    <None Remove="Root\Settings\Roles.md" />
     <None Remove="Root\Settings\Roster.js" />
     <None Remove="Root\Settings\Roster.md" />
     <None Remove="Root\Settings\RosterItems.md" />
@@ -67,6 +69,8 @@
     <None Remove="Root\Settings\SignatureRequest.md" />
     <None Remove="Root\Settings\Theme.js" />
     <None Remove="Root\Settings\Theme.md" />
+    <None Remove="Root\Settings\User.md" />
+    <None Remove="Root\Settings\Users.md" />
     <None Remove="Root\Settings\XMPP.js" />
     <None Remove="Root\Settings\XMPP.md" />
     <None Remove="Root\Sniffers\Sniffer.css" />
@@ -95,6 +99,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Language\Waher.IoTGateway.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Users.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\User.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Role.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\Roles.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\RosterItems.md">

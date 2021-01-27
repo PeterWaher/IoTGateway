@@ -1,61 +1,65 @@
 ﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
-  <Assembly fileName="Waher.IoTGateway.dll"/>
-  <!-- Make sure content files are mirrored in the Waher.IoTGateway.Svc.manifest file as well. -->
-  <Folder name="Root">
-    <Content fileName="Copyright.md"/>
-    <Content fileName="Events.js"/>
-    <Content fileName="Login.md"/>
-    <Content fileName="ProposeContract.js"/>
-    <Content fileName="ProposeContract.md"/>
-    <Content fileName="SignatureRequest.js"/>
-    <Content fileName="SignatureRequest.md"/>
-    <Folder name="Settings">
-      <Content fileName="Backup.md"/>
-      <Content fileName="Backup.js"/>
-      <Content fileName="Config.cssx"/>
-      <Content fileName="Database.js"/>
-      <Content fileName="Database.md"/>
-      <Content fileName="Domain.js"/>
-      <Content fileName="Domain.md"/>
-      <Content fileName="Introduction.md"/>
-      <Content fileName="LegalIdentities.md"/>
-      <Content fileName="LegalIdentity.js"/>
-      <Content fileName="LegalIdentity.md"/>
-      <Content fileName="Master.md"/>
-      <Content fileName="Next.js"/>
-      <Content fileName="Notification.js"/>
-      <Content fileName="Notification.md"/>
-      <Content fileName="PersonalData.js"/>
-      <Content fileName="PersonalData.md"/>
-      <Content fileName="Restore.js"/>
-      <Content fileName="Restore.md"/>
-      <Content fileName="Roster.js"/>
-      <Content fileName="Roster.md"/>
-      <Content fileName="RosterItems.md"/>
-      <Content fileName="Theme.js"/>
-      <Content fileName="Theme.md"/>
-      <Content fileName="XMPP.js"/>
-      <Content fileName="XMPP.md"/>
-      <Folder name="Database">
-        <Content fileName="MongoDB.md"/>
-      </Folder>
-      <Folder name="PersonalData">
-        <Content fileName="Backups.md"/>
-        <Content fileName="LocalDatabase.md"/>
-        <Content fileName="LocalSensorsAndDevices.md"/>
-        <Content fileName="NetworkIdentity.md"/>
-        <Content fileName="WebPages.md"/>
-      </Folder>
-    </Folder>
-    <Folder name="Sniffers">
-      <Content fileName="Sniffer.css"/>
-      <Content fileName="Sniffer.js"/>
-      <Content fileName="Sniffer.md"/>
-      <Content fileName="XMPP.md"/>
-    </Folder>
-  </Folder>
-  <Folder name="Language">
-    <Content fileName="Waher.IoTGateway.en.lng"/>
-    <Content fileName="Waher.IoTGateway.es.lng"/>
-  </Folder>
+	<Assembly fileName="Waher.IoTGateway.dll"/>
+	<!-- Make sure content files are mirrored in the Waher.IoTGateway.Svc.manifest file as well. -->
+	<Folder name="Root">
+		<Content fileName="Copyright.md"/>
+		<Content fileName="Events.js"/>
+		<Content fileName="Login.md"/>
+		<Content fileName="ProposeContract.js"/>
+		<Content fileName="ProposeContract.md"/>
+		<Content fileName="SignatureRequest.js"/>
+		<Content fileName="SignatureRequest.md"/>
+		<Folder name="Settings">
+			<Content fileName="Backup.md"/>
+			<Content fileName="Backup.js"/>
+			<Content fileName="Config.cssx"/>
+			<Content fileName="Database.js"/>
+			<Content fileName="Database.md"/>
+			<Content fileName="Domain.js"/>
+			<Content fileName="Domain.md"/>
+			<Content fileName="Introduction.md"/>
+			<Content fileName="LegalIdentities.md"/>
+			<Content fileName="LegalIdentity.js"/>
+			<Content fileName="LegalIdentity.md"/>
+			<Content fileName="Master.md"/>
+			<Content fileName="Next.js"/>
+			<Content fileName="Notification.js"/>
+			<Content fileName="Notification.md"/>
+			<Content fileName="PersonalData.js"/>
+			<Content fileName="PersonalData.md"/>
+			<Content fileName="Restore.js"/>
+			<Content fileName="Restore.md"/>
+			<Content fileName="Role.md"/>
+			<Content fileName="Roles.md"/>
+			<Content fileName="Roster.js"/>
+			<Content fileName="Roster.md"/>
+			<Content fileName="RosterItems.md"/>
+			<Content fileName="Theme.js"/>
+			<Content fileName="Theme.md"/>
+			<Content fileName="User.md"/>
+			<Content fileName="Users.md"/>
+			<Content fileName="XMPP.js"/>
+			<Content fileName="XMPP.md"/>
+			<Folder name="Database">
+				<Content fileName="MongoDB.md"/>
+			</Folder>
+			<Folder name="PersonalData">
+				<Content fileName="Backups.md"/>
+				<Content fileName="LocalDatabase.md"/>
+				<Content fileName="LocalSensorsAndDevices.md"/>
+				<Content fileName="NetworkIdentity.md"/>
+				<Content fileName="WebPages.md"/>
+			</Folder>
+		</Folder>
+		<Folder name="Sniffers">
+			<Content fileName="Sniffer.css"/>
+			<Content fileName="Sniffer.js"/>
+			<Content fileName="Sniffer.md"/>
+			<Content fileName="XMPP.md"/>
+		</Folder>
+	</Folder>
+	<Folder name="Language">
+		<Content fileName="Waher.IoTGateway.en.lng"/>
+		<Content fileName="Waher.IoTGateway.es.lng"/>
+	</Folder>
 </Module>

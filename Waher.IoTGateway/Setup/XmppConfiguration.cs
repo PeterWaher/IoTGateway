@@ -1008,6 +1008,9 @@ namespace Waher.IoTGateway.Setup
 					new PrivilegePattern(".*", true)
 				};
 
+				if (string.IsNullOrEmpty(Role.Description))
+					Role.Description = "Administrator role. Has all privileges by default.";
+
 				await Database.Update(Role);
 			}
 		}

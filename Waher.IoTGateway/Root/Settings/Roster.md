@@ -37,11 +37,13 @@ these groups can provide a means for a more detailed authorization of access to 
 <div id='Roster'>
 <table>
 <thead>
+<tr>
 <th>Contact</th>
 <th colspan="2">Subscription</th>
 <th colspan="2">Available</th>
 <th>Groups</th>
 <th></th>
+</tr>
 </thead>
 <tbody>
 {{

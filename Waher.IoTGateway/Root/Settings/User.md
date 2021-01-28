@@ -64,6 +64,7 @@ if exists(Posted) then
 	
 	empty(Item.ObjectId) ? SaveNewObject(Item) : UpdateObject(Item);
 
+	Waher.Security.Users.Users.ClearCache();
 	ReloadPage("/Settings/Users.md");
 	
 	if Add then SeeOther("User.md?UserId="+Item.UserName);
@@ -114,6 +115,8 @@ The meaning of the meta-data is application-specific.</small>
 
 <button type="submit" class="posButton">{{Add?"Add":"Apply"}}</button>
 <button type="button" class="negButton" onclick="Reload('')">Cancel</button>
+
+<small>**Note**: Any changes made to the user will be available once the user logs out, and back in again.</small>
 
 </fieldset>
 </form>

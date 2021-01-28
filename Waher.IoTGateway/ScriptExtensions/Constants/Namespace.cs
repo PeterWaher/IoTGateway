@@ -62,7 +62,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <returns>Language object</returns>
 		public static async Task<Waher.Runtime.Language.Namespace> GetNamespaceAsync(Variables Session)
 		{
-			Waher.Runtime.Language.Language Language = await ScriptExtensions.Language.GetLanguageAsync(Session);
+			Waher.Runtime.Language.Language Language = await Constants.Language.GetLanguageAsync(Session);
 
 			if (Session.TryGetVariable("Namespace", out Variable v))
 			{

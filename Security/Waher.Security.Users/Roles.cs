@@ -73,5 +73,16 @@ namespace Waher.Security.Users
 			}
 		}
 
+		/// <summary>
+		/// Clears internal caches.
+		/// </summary>
+		public static void ClearCache()
+		{
+			lock (roles)
+			{
+				roles.Clear();
+			}
+		}
+
 	}
 }

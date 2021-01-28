@@ -217,6 +217,11 @@
             Loads all roles
             </summary>
         </member>
+        <member name="M:Waher.Security.Users.Roles.ClearCache">
+            <summary>
+            Clears internal caches.
+            </summary>
+        </member>
         <member name="T:Waher.Security.Users.User">
             <summary>
             Corresponds to a user in the system.
@@ -353,6 +358,11 @@
             <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
             <param name="Protocol">Protocol used for login.</param>
             <returns>Login result.</returns>
+        </member>
+        <member name="M:Waher.Security.Users.Users.ClearCache">
+            <summary>
+            Clears internal caches.
+            </summary>
         </member>
     </members>
 </doc>

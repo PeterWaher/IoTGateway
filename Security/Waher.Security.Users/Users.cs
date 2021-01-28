@@ -164,5 +164,16 @@ namespace Waher.Security.Users
 
 			return new LoginResult(User);
 		}
+
+		/// <summary>
+		/// Clears internal caches.
+		/// </summary>
+		public static void ClearCache()
+		{
+			lock (users)
+			{
+				users.Clear();
+			}
+		}
 	}
 }

@@ -52,6 +52,7 @@ if exists(Posted) then
 
 	empty(Role.ObjectId) ? SaveNewObject(Role) : UpdateObject(Role);
 
+	Waher.Security.Users.Roles.ClearCache();
 	ReloadPage("/Settings/Roles.md");
 	
 	if Add then SeeOther("Role.md?RoleId="+Role.Id);
@@ -96,6 +97,8 @@ privilege, the list is processed from top to bottom.</small>
 
 <button type="submit" class="posButton">{{Add?"Add":"Apply"}}</button>
 <button type="button" class="negButton" onclick="Reload('')">Cancel</button>
+
+<small>**Note**: Any changes made to a role will be available to users once they log out, and back in again.</small>
 
 </fieldset>
 </form>

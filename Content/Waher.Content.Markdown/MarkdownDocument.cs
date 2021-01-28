@@ -1974,7 +1974,19 @@ namespace Waher.Content.Markdown
 							Elements.AddLast(new InlineCode(this, Url));
 						}
 						else if (Url.StartsWith("</") || Url.IndexOf(' ') >= 0)
+						{
 							Elements.AddLast(new InlineHTML(this, Url));
+
+							if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
+							{
+								string s = State.UntilToken("</TEXTAREA>");
+
+								if (!string.IsNullOrEmpty(s))
+									Elements.AddLast(new InlineText(this, s));
+
+								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+							}
+						}
 						else if (Url.IndexOf(':') >= 0)
 							Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
 						else if (Url.IndexOf('@') >= 0)
@@ -1990,7 +2002,7 @@ namespace Waher.Content.Markdown
 								if (!string.IsNullOrEmpty(s))
 									Elements.AddLast(new InlineText(this, s));
 
-								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(2, 8) + ">"));
+								Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
 							}
 						}
 

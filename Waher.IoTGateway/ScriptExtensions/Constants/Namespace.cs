@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
-using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Constants
 {
 	/// <summary>
 	/// Points to the language namespace object for the current page.

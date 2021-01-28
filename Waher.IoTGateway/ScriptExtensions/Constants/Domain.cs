@@ -4,7 +4,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Constants
 {
 	/// <summary>
 	/// Domain constant, contains the value of the gateway domain.

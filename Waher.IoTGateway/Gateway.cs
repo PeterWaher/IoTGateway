@@ -3507,7 +3507,7 @@ namespace Waher.IoTGateway
 			if (Session is null)
 				return new WebMenuItem[0];
 
-			Language Language = ScriptExtensions.Language.GetLanguageAsync(Session).Result;
+			Language Language = ScriptExtensions.Constants.Language.GetLanguageAsync(Session).Result;
 
 			if (Session is null ||
 				!Session.TryGetVariable(UserVariable, out Variable v) ||

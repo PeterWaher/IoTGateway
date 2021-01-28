@@ -4,17 +4,17 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions
+namespace Waher.IoTGateway.ScriptExtensions.Constants
 {
 	/// <summary>
-	/// Returns the time elapsed since the gateway was started.
+	/// Date and Time of when the gateway started.
 	/// </summary>
-	public class Runtime : IConstant
+	public class Started : IConstant
 	{
 		/// <summary>
-		/// Returns the time elapsed since the gateway was started.
+		/// Date and Time of when the gateway started.
 		/// </summary>
-		public Runtime()
+		public Started()
 		{
 		}
 
@@ -23,7 +23,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 		/// </summary>
 		public string ConstantName
 		{
-			get { return "Runtime"; }
+			get { return "Started"; }
 		}
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace Waher.IoTGateway.ScriptExtensions
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			return new ObjectValue(DateTime.Now - Gateway.StartTime);
+			return new DateTimeValue(Gateway.StartTime);
 		}
 
 	}

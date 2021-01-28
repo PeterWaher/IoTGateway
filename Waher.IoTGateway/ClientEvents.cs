@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;

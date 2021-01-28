@@ -16,10 +16,10 @@
     <tags>security authentication jwt uwp</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.0.14"/>
-      <dependency id="Waher.Content" version="1.0.29"/>
-      <dependency id="Waher.Networking.HTTP.UWP" version="1.1.4"/>
+      <dependency id="Waher.Content" version="1.0.30"/>
+      <dependency id="Waher.Networking.HTTP.UWP" version="1.1.5"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.14"/>
-			<dependency id="Waher.Security" version="1.0.7"/>
+			<dependency id="Waher.Security" version="1.0.8"/>
       <dependency id="Waher.Security.JWS" version="1.0.5"/>
       <dependency id="Waher.Security.LoginMonitor.UWP" version="1.0.1"/>
     </dependencies>

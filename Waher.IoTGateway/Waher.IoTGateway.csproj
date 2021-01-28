@@ -32,6 +32,9 @@
     <None Remove="Language\Waher.IoTGateway.es.lng" />
     <None Remove="Root\Backup.js" />
     <None Remove="Root\Backup.md" />
+    <None Remove="Root\Controls\SimpleTable.script" />
+    <None Remove="Root\Controls\SimpleTree.cssx" />
+    <None Remove="Root\Controls\SimpleTree.js" />
     <None Remove="Root\Copyright.md" />
     <None Remove="Root\Events.js" />
     <None Remove="Root\Login.md" />
@@ -43,6 +46,7 @@
     <None Remove="Root\Settings\Database\MongoDB.md" />
     <None Remove="Root\Settings\Domain.js" />
     <None Remove="Root\Settings\Domain.md" />
+    <None Remove="Root\Settings\ExpandPrivilege.ws" />
     <None Remove="Root\Settings\Introduction.md" />
     <None Remove="Root\Settings\LegalIdentities.md" />
     <None Remove="Root\Settings\LegalIdentity.js" />
@@ -103,6 +107,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Language\Waher.IoTGateway.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Controls\SimpleTable.script">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Controls\SimpleTree.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Controls\SimpleTree.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Settings\ExpandPrivilege.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\Users.js">

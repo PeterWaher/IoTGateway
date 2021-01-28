@@ -1541,6 +1541,20 @@
 								<RemoveFile Id='Removelogo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' On='uninstall'/>
 							</Component>
 						</Directory>
+						<Directory Id='Controls' Name='Controls'>
+							<Component Id='ControlFiles' Guid='9c6c1624-b970-4770-9245-798252976610'>
+								<CreateFolder>
+									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+								</CreateFolder>
+								<RemoveFolder Id='SettingsFiles' On='uninstall' />
+								<File Id='SimpleTable.script' Name='SimpleTable.script' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTable.script' Vital='yes' KeyPath='yes'/>
+								<File Id='SimpleTree.cssx' Name='SimpleTree.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.cssx' Vital='yes'/>
+								<File Id='SimpleTree.js' Name='SimpleTree.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.js' Vital='yes'/>
+								<RemoveFile Id='RemoveSimpleTable.script' Name='SimpleTable.script' On='uninstall'/>
+								<RemoveFile Id='RemoveSimpleTree.cssx' Name='SimpleTree.cssx' On='uninstall'/>
+								<RemoveFile Id='RemoveSimpleTree.js' Name='SimpleTree.js' On='uninstall'/>
+							</Component>
+						</Directory>
 						<Directory Id='Settings' Name='Settings'>
 							<Component Id='SettingsFiles' Guid='13A2665D-91CB-45D3-9739-0236C82065FD'>
 								<CreateFolder>
@@ -1554,6 +1568,7 @@
 								<File Id='Database.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Database.md'/>
 								<File Id='Domain.js' Name='Domain.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.js'/>
 								<File Id='Domain.md' Name='Domain.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Domain.md'/>
+								<File Id='ExpandPrivilege.ws' Name='ExpandPrivilege.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\ExpandPrivilege.ws'/>
 								<File Id='Introduction.md' Name='Introduction.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Introduction.md'/>
 								<File Id='LegalIdentities.md' Name='LegalIdentities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentities.md'/>
 								<File Id='LegalIdentity.js' Name='LegalIdentity.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\LegalIdentity.js'/>
@@ -1588,6 +1603,7 @@
 								<RemoveFile Id='RemoveDatabase.md' Name='Database.md' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.js' Name='Domain.js' On='uninstall'/>
 								<RemoveFile Id='RemoveDomain.md' Name='Domain.md' On='uninstall'/>
+								<RemoveFile Id='RemoveExpandPrivilege.ws' Name='ExpandPrivilege.ws' On='uninstall'/>
 								<RemoveFile Id='RemoveIntroduction.md' Name='Introduction.md' On='uninstall'/>
 								<RemoveFile Id='RemoveLegalIdentities.md' Name='LegalIdentities.md' On='uninstall'/>
 								<RemoveFile Id='RemoveLegalIdentity.js' Name='LegalIdentity.js' On='uninstall'/>
@@ -1856,6 +1872,7 @@
 				<ComponentRef Id='RootFiles' />
 				<ComponentRef Id='AudioFiles' />
 				<ComponentRef Id='ImageFiles' />
+				<ComponentRef Id="ControlFiles"/>
 				<ComponentRef Id='SettingsFiles' />
 				<ComponentRef Id='SnifferFiles' />
 				<ComponentRef Id='DatabaseFiles'/>

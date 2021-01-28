@@ -3,8 +3,10 @@ Description: Allows editing of a role.
 Date: 2021-01-27
 Author: Peter Waher
 Master: /Master.md
+Javascript: /Controls/SimpleTree.js
 JavaScript: /Settings/Next.js
 JavaScript: /Events.js
+CSS: /Controls/SimpleTree.cssx
 CSS: /Settings/Config.cssx
 Cache-Control: max-age=0, no-cache, no-store
 UserVariable: User
@@ -102,3 +104,20 @@ privilege, the list is processed from top to bottom.</small>
 
 </fieldset>
 </form>
+
+Registered Privileges
+=======================
+
+Privileges are registered dynamically, as services check for them. They are organized in a tree-structure, with root privileges and
+sub-privileges (or child privileges), delimited by period (`.`) characters. You can browse the privileges requested so far, below.
+
+<ul class="SimpleTree">
+{{
+RootPrivileges:=select * from Waher.Security.Users.Privilege where ParentFullId="";
+foreach Privilege in RootPrivileges do
+	]]<li class="Expandable" onclick="ExpandNode(event,this)" data-id="((Privilege.FullId))" data-expand="ExpandPrivilege.ws" 
+	data-collapsedimg="((HtmlAttributeEncode(MarkdownToHtml(":file_folder:") ) ))" 
+	data-expandedimg="((HtmlAttributeEncode(MarkdownToHtml(":open_file_folder:") ) ))"><span class="ItemImage">:file_folder:</span> `((Privilege.LocalId))`</li>
+[[
+}}
+</ul>

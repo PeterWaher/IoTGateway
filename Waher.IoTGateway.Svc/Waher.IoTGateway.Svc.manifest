@@ -559,6 +559,11 @@
 			<Content fileName='glass_ping-Go445-1207030150.mp3'/>
 			<Content fileName='glass_ping-Go445-1207030150.wav'/>
 		</Folder>
+		<Folder name="Controls">
+			<Content fileName="SimpleTable.script"/>
+			<Content fileName="SimpleTree.cssx"/>
+			<Content fileName="SimpleTree.js"/>
+		</Folder>
 		<Folder name='Images'>
 			<Content fileName='logo-WaherDataAB-200x39.png'/>
 			<Content fileName='logo-WaherDataAB-300x58.png'/>
@@ -573,6 +578,7 @@
 			<Content fileName='Database.md'/>
 			<Content fileName='Domain.js'/>
 			<Content fileName='Domain.md'/>
+			<Content fileName="ExpandPrivilege.ws"/>
 			<Content fileName='Introduction.md'/>
 			<Content fileName="LegalIdentities.md"/>
 			<Content fileName="LegalIdentity.js"/>

@@ -1,0 +1,32 @@
+﻿PrepareTable(GetScript):=
+(
+	if !exists(Page.Table) then 
+		Page.Table:=GetScript is System.String ? eval(GetScript) : GetScript();
+
+	if exists(Posted) then
+	(
+		if exists(Page.Order) and Page.Order=Posted.data then
+			Page.Order:="-"+Page.Order
+		else
+			Page.Order:=Posted.data;
+	
+		Page.Table:=Sort(Page.Table,Page.Order);
+	);
+
+	""
+);
+
+Header(Title,Order):=
+(
+	s:="<a onclick='POST(\"" + Order + "\")'>" + Title;
+	
+	if exists(Page.Order) then
+	(
+		if Page.Order=Order then
+			s+=" ▲"
+		else if Page.Order="-"+Order then
+			s+=" ▼";
+	);
+
+	s + "</a>";
+);

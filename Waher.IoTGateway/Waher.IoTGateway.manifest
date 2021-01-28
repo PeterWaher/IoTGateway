@@ -9,6 +9,11 @@
 		<Content fileName="ProposeContract.md"/>
 		<Content fileName="SignatureRequest.js"/>
 		<Content fileName="SignatureRequest.md"/>
+		<Folder name="Controls">
+			<Content fileName="SimpleTable.script"/>
+			<Content fileName="SimpleTree.cssx"/>
+			<Content fileName="SimpleTree.js"/>
+		</Folder>
 		<Folder name="Settings">
 			<Content fileName="Backup.md"/>
 			<Content fileName="Backup.js"/>
@@ -17,6 +22,7 @@
 			<Content fileName="Database.md"/>
 			<Content fileName="Domain.js"/>
 			<Content fileName="Domain.md"/>
+			<Content fileName="ExpandPrivilege.ws"/>
 			<Content fileName="Introduction.md"/>
 			<Content fileName="LegalIdentities.md"/>
 			<Content fileName="LegalIdentity.js"/>

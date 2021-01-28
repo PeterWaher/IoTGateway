@@ -1,0 +1,45 @@
+﻿ul.SimpleTree
+{
+	list-style: none;
+}
+
+li.Expandable:before
+{
+	cursor:pointer;
+	content: '\229e';
+	margin: 0 1em;
+}
+
+li.Expandable
+{
+	cursor:pointer;
+}
+
+li.Collapsable:before
+{
+	cursor:pointer;
+	content: '\229f';
+	margin: 0 1em;
+}
+
+li.Collapsable
+{
+	cursor:pointer;
+}
+
+span.ItemImage img
+{
+	max-height:1em;
+}
+
+li.Leaf:before
+{
+	cursor:default;
+	content: '';
+	margin: 0 1em;
+}
+
+li.Leaf
+{
+	cursor:default;
+}

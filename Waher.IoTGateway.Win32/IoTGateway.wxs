@@ -1546,7 +1546,7 @@
 								<CreateFolder>
 									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 								</CreateFolder>
-								<RemoveFolder Id='SettingsFiles' On='uninstall' />
+								<RemoveFolder Id='ControlFiles' On='uninstall' />
 								<File Id='SimpleTable.script' Name='SimpleTable.script' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTable.script' Vital='yes' KeyPath='yes'/>
 								<File Id='SimpleTree.cssx' Name='SimpleTree.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.cssx' Vital='yes'/>
 								<File Id='SimpleTree.js' Name='SimpleTree.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.js' Vital='yes'/>

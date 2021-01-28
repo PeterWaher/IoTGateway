@@ -1566,7 +1566,9 @@
 								<File Id='Restore.js' Name='Restore.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.js'/>
 								<File Id='Restore.md' Name='Restore.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Restore.md'/>
 								<File Id='Role.md' Name='Role.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Role.md'/>
+								<File Id='Roles.js' Name='Roles.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roles.js'/>
 								<File Id='Roles.md' Name='Roles.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roles.md'/>
+								<File Id='Roles.ws' Name='Roles.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roles.ws'/>
 								<File Id='Roster.js' Name='Roster.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.js'/>
 								<File Id='Roster.md' Name='Roster.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Roster.md'/>
 								<File Id='RosterItems.md' Name='RosterItems.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\RosterItems.md'/>
@@ -1574,7 +1576,9 @@
 								<File Id='Theme.js' Name='Theme.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.js'/>
 								<File Id='Theme.md' Name='Theme.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Theme.md'/>
 								<File Id='User.md' Name='User.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\User.md'/>
+								<File Id='Users.js' Name='Users.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Users.js'/>
 								<File Id='Users.md' Name='Users.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Users.md'/>
+								<File Id='Users.ws' Name='Users.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Users.ws'/>
 								<File Id='XMPP.js' Name='XMPP.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.js'/>
 								<File Id='XMPP.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\XMPP.md'/>
 								<RemoveFile Id='RemoveBackup.js' Name='Backup.js' On='uninstall'/>
@@ -1596,7 +1600,9 @@
 								<RemoveFile Id='RemoveRestore.js' Name='Restore.js' On='uninstall'/>
 								<RemoveFile Id='RemoveRestore.md' Name='Restore.md' On='uninstall'/>
 								<RemoveFile Id='RemoveRole.md' Name='Role.md' On='uninstall'/>
+								<RemoveFile Id='RemoveRoles.js' Name='Roles.js' On='uninstall'/>
 								<RemoveFile Id='RemoveRoles.md' Name='Roles.md' On='uninstall'/>
+								<RemoveFile Id='RemoveRoles.ws' Name='Roles.ws' On='uninstall'/>
 								<RemoveFile Id='RemoveRoster.js' Name='Roster.js' On='uninstall'/>
 								<RemoveFile Id='RemoveRoster.md' Name='Roster.md' On='uninstall'/>
 								<RemoveFile Id='RemoveRosterItems.md' Name='RosterItems.md' On='uninstall'/>
@@ -1604,7 +1610,9 @@
 								<RemoveFile Id='RemoveTheme.js' Name='Theme.js' On='uninstall'/>
 								<RemoveFile Id='RemoveTheme.md' Name='Theme.md' On='uninstall'/>
 								<RemoveFile Id='RemoveUser.md' Name='User.md' On='uninstall'/>
+								<RemoveFile Id='RemoveUsers.js' Name='Users.js' On='uninstall'/>
 								<RemoveFile Id='RemoveUsers.md' Name='Users.md' On='uninstall'/>
+								<RemoveFile Id='RemoveUsers.ws' Name='Users.ws' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.js' Name='XMPP.js' On='uninstall'/>
 								<RemoveFile Id='RemoveXMPP.md' Name='XMPP.md' On='uninstall'/>
 							</Component>

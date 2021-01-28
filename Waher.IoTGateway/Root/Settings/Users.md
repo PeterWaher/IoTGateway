@@ -3,6 +3,7 @@ Description: Displays available users
 Date: 2021-01-27
 Author: Peter Waher
 Master: /Master.md
+JavaScript: Users.js
 JavaScript: /Settings/Next.js
 JavaScript: /TargetBlank.js
 JavaScript: /Events.js
@@ -25,6 +26,7 @@ Following table displays available users, and the corresponding roles they have.
 <th>User</th>
 <th>Role\(s)</th>
 <th>Meta-data</th>
+<th>Actions</th>
 </tr>
 </thead>
 <tbody>
@@ -45,7 +47,9 @@ foreach Item in Users do
 			]]`((Tag.Name))` = `((Tag.Value))`<br/>[[;
 	);
 	
-	]]</td></tr>
+	]]</td><td>
+<button type="button" class="negButtonSm" onclick="DeleteUser('((Item.UserName))')">Delete</button>
+</td></tr>
 [[;
 )
 }}

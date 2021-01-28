@@ -3,6 +3,7 @@ Description: Displays available roles
 Date: 2021-01-27
 Author: Peter Waher
 Master: /Master.md
+JavaScript: Roles.js
 JavaScript: /Settings/Next.js
 JavaScript: /TargetBlank.js
 JavaScript: /Events.js
@@ -25,6 +26,7 @@ Following table displays available roles, and the corresponding privileges they 
 <th>Role</th>
 <th>Description</th>
 <th>Privileges</th>
+<th>Actions</th>
 </tr>
 </thead>
 <tbody>
@@ -49,6 +51,8 @@ foreach Role in Roles do
 
 	]]
 
+</td><td>
+<button type="button" class="negButtonSm" onclick="DeleteRole('((Role.Id))')">Delete</button>
 </td></tr>
 [[;
 )

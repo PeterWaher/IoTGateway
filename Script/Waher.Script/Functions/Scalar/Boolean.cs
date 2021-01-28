@@ -82,27 +82,31 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-			Argument = Argument.ToLower();
+			bool? Value = ToBoolean(Argument.ToLower());
 
-			bool Value;
-
-			if (Argument == "1" || Argument == "true" || Argument == "yes" || Argument == "on")
-				Value = true;
-			else if (Argument == "0" || Argument == "false" || Argument == "no" || Argument == "off")
-				Value = false;
+            if (Value.HasValue)
+              return new BooleanValue(Value.Value);
 			else
 				throw new ScriptException("Not a boolean value.");
-
-            return new BooleanValue(Value);
 		}
 
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+        internal static bool? ToBoolean(string Value)
+		{
+            if (Value == "1" || Value == "true" || Value == "yes" || Value == "on")
+                return true;
+            else if (Value == "0" || Value == "false" || Value == "no" || Value == "off" || string.IsNullOrEmpty(Value))
+                return false;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override IElement EvaluateScalar(IElement Argument, Variables Variables)
         {
             return this.EvaluateScalar(Argument.ToString(), Variables);
         }

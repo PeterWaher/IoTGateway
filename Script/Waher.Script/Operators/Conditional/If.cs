@@ -59,6 +59,8 @@ namespace Waher.Script.Operators.Conditional
                 return b.Value;
             else if (Value is DoubleNumber d)
                 return d.Value != 0;
+            else if (Value is StringValue s)
+                return Functions.Scalar.Boolean.ToBoolean(s.Value);
             else
                 return null;
         }

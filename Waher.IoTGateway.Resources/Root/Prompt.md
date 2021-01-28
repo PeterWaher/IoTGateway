@@ -17,7 +17,7 @@ script syntax. Press `ENTER` evaluate the script you're writing. Press `SHIFT`+`
 editor accepts `TAB` characters.
 
 Script:  
-<textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">{Expression}</textarea>
+<textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">{{Expression}}</textarea>
 
 <button type="submit" onclick="EvaluateExpression();">Evaluate</button>
 <button type="button" onclick="ClearAll();">Clear</button>

@@ -76,10 +76,10 @@ DNS every time you get a new IP address. This can be automated if the network pr
 </p>
 
 <label for="CheckIpScript">[Script](https://waher.se/Script.md) returning the current IP Address:</label>  
-<textarea id="CheckIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{Config.CheckIpScript}</textarea>
+<textarea id="CheckIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{{Config.CheckIpScript}}</textarea>
 
 <label for="UpdateIpScript">[Script](https://waher.se/Script.md) updating an IP Address in the DNS:</label>  
-<textarea id="UpdateIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{Config.UpdateIpScript}</textarea>
+<textarea id="UpdateIpScript" autofocus="autofocus" wrap="hard" onkeydown="return DynamicDnsScriptUpdated(this,event);">{{Config.UpdateIpScript}}</textarea>
 
 **Note**: During the execution of the update script, the following variables are available: `Account` and `Password` contain the account
 name and password parameters provided below. The `IP` variable contains the current IP address, as a string. The `Domain` variable

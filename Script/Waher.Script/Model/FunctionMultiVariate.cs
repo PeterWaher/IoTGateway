@@ -13,6 +13,16 @@ namespace Waher.Script.Model
 	public abstract class FunctionMultiVariate : Function
 	{
 		/// <summary>
+		/// Zero parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes0 = new ArgumentType[0];
+
+		/// <summary>
+		/// One scalar parameter.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes1Normal = new ArgumentType[] { ArgumentType.Normal };
+
+		/// <summary>
 		/// One scalar parameter.
 		/// </summary>
 		protected static readonly ArgumentType[] argumentTypes1Scalar = new ArgumentType[] { ArgumentType.Scalar };

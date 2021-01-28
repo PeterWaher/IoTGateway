@@ -23,7 +23,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Encode(ScriptNode Object, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Object }, new ArgumentType[] { ArgumentType.Normal }, Start, Length, Expression)
+			: base(new ScriptNode[] { Object }, argumentTypes1Normal, Start, Length, Expression)
 		{
 		}
 

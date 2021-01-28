@@ -22,7 +22,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Count(ScriptNode Vector, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Vector }, new ArgumentType[] { ArgumentType.Normal }, Start, Length, Expression)
+			: base(new ScriptNode[] { Vector }, argumentTypes1Normal, Start, Length, Expression)
 		{
 		}
 

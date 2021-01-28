@@ -8583,6 +8583,16 @@
             Base class for multivariate funcions.
             </summary>
         </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes0">
+            <summary>
+            Zero parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Normal">
+            <summary>
+            One scalar parameter.
+            </summary>
+        </member>
         <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Scalar">
             <summary>
             One scalar parameter.

@@ -4,6 +4,8 @@ Date: 2021-01-27
 Author: Peter Waher
 Master: /Master.md
 JavaScript: /Settings/Next.js
+JavaScript: /TargetBlank.js
+JavaScript: /Events.js
 CSS: /Settings/Config.cssx
 Cache-Control: max-age=0, no-cache, no-store
 UserVariable: User
@@ -49,3 +51,5 @@ foreach Item in Users do
 }}
 </tbody>
 </table>
+
+<button type="button" class="posButton" onclick="OpenPage('User.md?Add=1')">Add</button>

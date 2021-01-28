@@ -1773,6 +1773,16 @@ The following predefined variables are available in such web content files:
 
 #### Gateway Extensions (Waher.IoTGateway)
 
+The following functions are available in web pages hosted by the IoT Gateway:
+
+| Function                            | Description |
+|-------------------------------------|-------------|
+| GetTabIDs([Page[,QueryFilter]])     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
+| GetTabIDs(Pages)                    | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
+| GetTabIDs(User)                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
+| ReloadPage(...)                     | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
+| PushEvent(..., Event, Data)         | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
+
 The following predefined variables are available in web pages hosted by the IoT Gateway:
 
 | Variable       | Description                                              |

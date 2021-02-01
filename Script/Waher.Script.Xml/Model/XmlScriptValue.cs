@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {
@@ -61,9 +62,31 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			string s = EvaluateString(this.node, Variables);
-			if (!string.IsNullOrEmpty(s))
-				Parent.AppendChild(Document.CreateTextNode(s));
+			IElement Element = this.node.Evaluate(Variables);
+			this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
 		}
+
+		private void AppendChild(XmlDocument Document, XmlElement Parent, object Value)
+		{
+			if (Value is null)
+				return;
+
+			if (Value is string s)
+				Parent.AppendChild(Document.CreateTextNode(s));
+			if (Value is XmlDocument Doc)
+				Parent.AppendChild(Document.ImportNode(Doc.DocumentElement, true));
+			else if (Value is XmlElement E)
+				Parent.AppendChild(Document.ImportNode(E, true));
+			else if (Value is IEnumerable A)
+			{
+				IEnumerator e = A.GetEnumerator();
+
+				while (e.MoveNext())
+					this.AppendChild(Document, Parent, e.Current);
+			}
+			else
+				Parent.AppendChild(Document.CreateTextNode(Expression.ToString(Value)));
+		}
+
 	}
 }

@@ -2240,9 +2240,9 @@ DROP COLLECTION
 The `Waher.Script.Xml` library extends the script engine to understand XML embedded in the script.
 Attribute values are always considered to be script. You can provide constant strings, as usual,
 but also provide script to dynamically populate your XML document with contents and calculations
-based on current variable values. In element text values, you can also embed script between the
-special `<[` and `]>` operators, or the corresponding `<(` and `)>` operators. Element names and
-attribute names are always interpreted literally. If you need to create dynamic XML, you can build
+based on current variable values. In element values, you can also embed script between the special 
+`<[` and `]>` operators, or the corresponding `<(` and `)>` operators. Element names and attribute 
+names are always interpreted literally. If you need to create dynamic XML, you can build
 a string, and use the `Xml()` function to convert it to an XML document.
 
 #### XML Document
@@ -2264,19 +2264,6 @@ You can also specify CDATA and comment sections in the code:
 		<![CDATA[Hello World.]]>
 		<!-- This is a comment -->
 	</a>
-
-#### Embedded expressions
-
-To embed expressions in element text values, use the `<[` and `]>` operators, or the corresponding 
-`<(` and `)>` operators:
-
-	a:=2;
-	b:=3;
-	Doc:=<Root>
-		<p>a=<[a]></p>
-		<p>b=<[b]></p>
-		<p>a+b=<[a+b]></p>
-	</Root>
 
 #### Attribute values
 
@@ -2318,6 +2305,72 @@ optional fields to XML using pattern matching:
 The resulting XML would look like:
 
 	<Claim name="Kalle" age="50" profession="Bus Driver" xmlns="https://example.org/Test"/>
+
+#### Embedded expressions
+
+To embed expressions in element text values, use the `<[` and `]>` operators, or the corresponding 
+`<(` and `)>` operators:
+
+	a:=2;
+	b:=3;
+	Doc:=<Root>
+		<p>a=<[a]></p>
+		<p>b=<[b]></p>
+		<p>a+b=<[a+b]></p>
+	</Root>
+
+Script you embed can itself return XML. By using this feature, you can create dynamic XML content.
+You can also return vectors, sets, or other enumerated types. By doing so, each item of the enumeration
+will be added in sequence. In the following example, an array of small XML elements is embedded in a
+root element.
+
+	v:=1..10;
+	<x><[[foreach x in v do <y value=x sqr=x^2/>]]></x>
+
+The result would be as follows (new-lines and indentation added for readability):
+
+```:xml
+<x>
+	<y value="1" sqr="1" />
+	<y value="2" sqr="4" />
+	<y value="3" sqr="9" />
+	<y value="4" sqr="16" />
+	<y value="5" sqr="25" />
+	<y value="6" sqr="36" />
+	<y value="7" sqr="49" />
+	<y value="8" sqr="64" />
+	<y value="9" sqr="81" />
+	<y value="10" sqr="100" />
+</x>
+```
+
+Embedded XML and script can be nested to any level. The following example creates a simple multiplication table (kept short for brevity):
+
+	x:=1..5;
+	y:=1..5;
+	<MultTable>
+		<[[foreach a in x do <x value=a>
+			<[[foreach b in y do <y value=b prod=(a*b)/>]]>
+		</x>]]>
+	</MultTable>
+
+The result of this script is as follows. Here, whitespace is included in the script definition above, and is not added afterwards for readability.
+
+```:xml
+<MultTable>
+	<x value="1">
+		<y value="1" prod="1" /><y value="2" prod="2" /><y value="3" prod="3" /><y value="4" prod="4" /><y value="5" prod="5" />
+	</x><x value="2">
+		<y value="1" prod="2" /><y value="2" prod="4" /><y value="3" prod="6" /><y value="4" prod="8" /><y value="5" prod="10" />
+	</x><x value="3">
+		<y value="1" prod="3" /><y value="2" prod="6" /><y value="3" prod="9" /><y value="4" prod="12" /><y value="5" prod="15" />
+	</x><x value="4">
+		<y value="1" prod="4" /><y value="2" prod="8" /><y value="3" prod="12" /><y value="4" prod="16" /><y value="5" prod="20" />
+	</x><x value="5">
+		<y value="1" prod="5" /><y value="2" prod="10" /><y value="3" prod="15" /><y value="4" prod="20" /><y value="5" prod="25" />
+	</x>
+</MultTable>
+```
 
 =========================================================================================================================================================
 

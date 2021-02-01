@@ -59,7 +59,7 @@ namespace Waher.Script.Xml.Model
 				if (Value is null)
 					return null;
 				else
-					return Expression.ToString(Element.AssociatedObjectValue);
+					return Expression.ToString(Value);
 			}
 		}
 	}

@@ -52,7 +52,16 @@ if exists(Posted) then
 	Role.Description:=Posted.Description ??? "";
 	Role.Privileges:=Privileges.ToArray();
 
-	empty(Role.ObjectId) ? SaveNewObject(Role) : UpdateObject(Role);
+	if empty(Role.ObjectId) then
+	(
+		SaveNewObject(Role);
+		LogInformation("Role created.",{"Object":Role.Id,"Actor":User.UserName});
+	)
+	else
+	(
+		UpdateObject(Role);
+		LogInformation("Role updated.",{"Object":Role.Id,"Actor":User.UserName});
+	);
 
 	Waher.Security.Users.Roles.ClearCache();
 	ReloadPage("/Settings/Roles.md");

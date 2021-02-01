@@ -62,7 +62,16 @@ if exists(Posted) then
 
 	Item.RoleIds:=(Posted.Roles???"").Split(Waher.Content.CommonTypes.CRLF,System.StringSplitOptions.RemoveEmptyEntries);
 	
-	empty(Item.ObjectId) ? SaveNewObject(Item) : UpdateObject(Item);
+	if empty(Item.ObjectId) then
+	(
+		SaveNewObject(Item);
+		LogInformation("User created.",{"Object":Item.UserName,"Actor":User.UserName});
+	)
+	else
+	(
+		UpdateObject(Item);
+		LogInformation("User updated.",{"Object":Item.UserName,"Actor":User.UserName});
+	);
 
 	Waher.Security.Users.Users.ClearCache();
 	ReloadPage("/Settings/Users.md");

@@ -16,7 +16,7 @@
     <tags>networking communication xmpp iot concentrator ieee</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.30"/>
-      <dependency id="Waher.Content.Xml" version="1.0.11"/>
+      <dependency id="Waher.Content.Xml" version="1.0.12"/>
       <dependency id="Waher.Events" version="1.0.14"/>
       <dependency id="Waher.Networking.UWP" version="1.0.21"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.1.8"/>

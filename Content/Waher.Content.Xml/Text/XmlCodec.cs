@@ -139,7 +139,7 @@ namespace Waher.Content.Xml.Text
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is XmlDocument)
+			if (Object is XmlDocument || Object is XmlElement)
 			{
 				if (InternetContent.IsAccepted(XmlContentTypes, AcceptedContentTypes))
 				{
@@ -165,7 +165,14 @@ namespace Waher.Content.Xml.Text
 		{
 			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
 			{
-				XmlDocument Doc = (XmlDocument)Object;
+				if (!(Object is XmlDocument Doc))
+				{
+					Doc = new XmlDocument();
+
+					if (Object is XmlElement E)
+						Doc.AppendChild(Doc.ImportNode(E, true));
+				}
+
 				MemoryStream ms = null;
 				XmlWriterSettings Settings;
 				XmlWriter w = null;

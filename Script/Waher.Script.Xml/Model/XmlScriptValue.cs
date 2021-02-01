@@ -73,7 +73,7 @@ namespace Waher.Script.Xml.Model
 
 			if (Value is string s)
 				Parent.AppendChild(Document.CreateTextNode(s));
-			if (Value is XmlDocument Doc)
+			else if (Value is XmlDocument Doc)
 				Parent.AppendChild(Document.ImportNode(Doc.DocumentElement, true));
 			else if (Value is XmlElement E)
 				Parent.AppendChild(Document.ImportNode(E, true));

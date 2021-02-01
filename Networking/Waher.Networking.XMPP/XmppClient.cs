@@ -3957,6 +3957,22 @@ namespace Waher.Networking.XMPP
 		/// <param name="Type">Type of IQ stanza to send.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		public uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandlerAsync Callback, object State)
+		{
+			return this.SendIq(Id, To, Xml, Type, Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
+				this.defaultMaxRetryTimeout);
+		}
+
+		/// <summary>
+		/// Sends an IQ stanza.
+		/// </summary>
+		/// <param name="Id">Optional ID attribute of IQ stanza.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Type">Type of IQ stanza to send.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 

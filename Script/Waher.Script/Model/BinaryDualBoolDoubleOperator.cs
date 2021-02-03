@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -35,18 +36,9 @@ namespace Waher.Script.Model
 		{
 			IElement L = this.left.Evaluate(Variables);
 			IElement R = null;
-
-			if (this.bothDouble.HasValue && this.bothDouble.Value)
-			{
-				if (L is DoubleNumber DL && R is DoubleNumber DR)
-					return this.Evaluate(DL.Value, DR.Value);
-				else
-					this.bothDouble = false;
-			}
-
+			IElement Result;
 			BooleanValue BL = L as BooleanValue;
 			BooleanValue BR;
-			IElement Result;
 
 			if (this.bothBool.HasValue && this.bothBool.Value && !(BL is null))
 			{
@@ -55,9 +47,7 @@ namespace Waher.Script.Model
 				if (!(Result is null))
 					return Result;
 
-				if (R is null)
-					R = this.right.Evaluate(Variables);
-
+				R = this.right.Evaluate(Variables);
 				BR = R as BooleanValue;
 
 				if (!(BR is null))
@@ -65,47 +55,72 @@ namespace Waher.Script.Model
 				else
 					this.bothBool = false;
 			}
-			else
+
+			if (R is null)
 			{
-				if (R is null)
-					R = this.right.Evaluate(Variables);
-
-				BR = R as BooleanValue;
-
-				if (!(BL is null) && !(BR is null))
+				if (!(BL is null) && !this.bothBool.HasValue)
 				{
-					if (!this.bothBool.HasValue)
-						this.bothBool = true;
+					try
+					{
+						R = this.right.Evaluate(Variables);
+						BR = R as BooleanValue;
 
-					return this.Evaluate(BL.Value, BR.Value);
+						if (!(BR is null))
+						{
+							this.bothBool = true;
+							return this.Evaluate(BL.Value, BR.Value);
+						}
+						else
+							this.bothBool = false;
+					}
+					catch (Exception ex)
+					{
+						Result = this.EvaluateOptimizedResult(BL.Value);
+						if (Result is null)
+							ExceptionDispatchInfo.Capture(ex).Throw();
+						else
+						{
+							this.bothBool = true;
+							return Result;
+						}
+					}
 				}
 				else
+					R = this.right.Evaluate(Variables);
+			}
+
+			if (this.bothDouble.HasValue)
+			{
+				if (this.bothDouble.Value)
 				{
-					this.bothBool = false;
-
 					if (L is DoubleNumber DL && R is DoubleNumber DR)
-					{
-						if (!this.bothDouble.HasValue)
-							this.bothDouble = true;
-
 						return this.Evaluate(DL.Value, DR.Value);
-					}
 					else
-						return this.Evaluate(L, R, Variables);
+						this.bothDouble = false;
 				}
+			}
+			else
+			{
+				if (L is DoubleNumber DL && R is DoubleNumber DR)
+				{
+					this.bothDouble = true;
+					return this.Evaluate(DL.Value, DR.Value);
+				}
+				else
+					this.bothDouble = false;
 			}
 
 			return this.Evaluate(L, R, Variables);
 		}
 
-        /// <summary>
-        /// Evaluates the operator on scalar operands.
-        /// </summary>
-        /// <param name="Left">Left value.</param>
-        /// <param name="Right">Right value.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result</returns>
-        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
 			if (Left is BooleanValue BL && Right is BooleanValue BR)
 				return this.Evaluate(BL.Value, BR.Value);

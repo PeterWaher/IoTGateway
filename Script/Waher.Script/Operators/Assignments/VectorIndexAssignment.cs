@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -54,17 +55,21 @@ namespace Waher.Script.Operators.Assignments
 				if (Object is null)
 					throw new ScriptRuntimeException("Vector is null.", this);
 
-				Type T = Object.GetType();
-				if (!VectorIndex.TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
-					throw new ScriptRuntimeException("Vector element assignment operates on vectors.", this);
-
-				if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))
-				{
-					ItemProperty.SetValue(Object, Value.AssociatedObjectValue, new object[] { IndexValue });
-					return Value;
-				}
+				if (Object is IDictionary<string, IElement> ObjExNihilo)
+					ObjExNihilo[Index.AssociatedObjectValue?.ToString()] = Value;
 				else
-					throw new ScriptRuntimeException("Provided index value not compatible with expected index type.", this);
+				{
+					Type T = Object.GetType();
+					if (!VectorIndex.TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
+						throw new ScriptRuntimeException("Vector element assignment operates on vectors.", this);
+
+					if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))
+						ItemProperty.SetValue(Object, Value.AssociatedObjectValue, new object[] { IndexValue });
+					else
+						throw new ScriptRuntimeException("Provided index value not compatible with expected index type.", this);
+				}
+
+				return Value;
 			}
 			else
 				throw new ScriptRuntimeException("Vector element assignment can only be performed on vectors or on objects with a suitable index property defined.", this);

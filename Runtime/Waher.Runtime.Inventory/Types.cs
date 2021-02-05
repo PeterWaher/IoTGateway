@@ -1065,7 +1065,18 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
 		public static void RegisterSingleton(object Object, params object[] Arguments)
 		{
-			SingletonAttribute.RegisterSingleton(Object, Arguments);
+			SingletonAttribute.Register(Object, Arguments);
+		}
+
+		/// <summary>
+		/// Checks if a singleton type (with optional associated arguments) is registered.
+		/// </summary>
+		/// <param name="Type">Singleton type</param>
+		/// <param name="Arguments">Any constructor arguments associated with the type.</param>
+		/// <returns>If such a singleton type is registered.</returns>
+		public static bool IsSingletonRegistered(Type Type, params object[] Arguments)
+		{
+			return SingletonAttribute.IsRegistered(Type, Arguments);
 		}
 
 	}

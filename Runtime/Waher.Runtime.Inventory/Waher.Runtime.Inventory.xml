@@ -87,12 +87,20 @@
             <param name="Arguments">Constructor arguments.</param>
             <returns>Instance of <paramref name="Type"/>.</returns>
         </member>
-        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.RegisterSingleton(System.Object,System.Object[])">
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.Register(System.Object,System.Object[])">
             <summary>
             Registers a singleton instance of a type.
             </summary>
             <param name="Object">Singleton objcet instance.</param>
             <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.IsRegistered(System.Type,System.Object[])">
+            <summary>
+            Checks if a singleton type (with optional associated arguments) is registered.
+            </summary>
+            <param name="Type">Singleton type</param>
+            <param name="Arguments">Any constructor arguments associated with the type.</param>
+            <returns>If such a singleton type is registered.</returns>
         </member>
         <member name="T:Waher.Runtime.Inventory.Types">
             <summary>
@@ -375,6 +383,14 @@
             </summary>
             <param name="Object">Singleton objcet instance.</param>
             <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.IsSingletonRegistered(System.Type,System.Object[])">
+            <summary>
+            Checks if a singleton type (with optional associated arguments) is registered.
+            </summary>
+            <param name="Type">Singleton type</param>
+            <param name="Arguments">Any constructor arguments associated with the type.</param>
+            <returns>If such a singleton type is registered.</returns>
         </member>
     </members>
 </doc>

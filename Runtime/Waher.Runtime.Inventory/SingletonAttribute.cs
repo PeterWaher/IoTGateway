@@ -76,7 +76,7 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		/// <param name="Object">Singleton objcet instance.</param>
 		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
-		public static void RegisterSingleton(object Object, params object[] Arguments)
+		public static void Register(object Object, params object[] Arguments)
 		{
 			SingletonKey Key = new SingletonKey(Object.GetType(), Arguments);
 
@@ -89,6 +89,21 @@ namespace Waher.Runtime.Inventory
 			}
 		}
 
+		/// <summary>
+		/// Checks if a singleton type (with optional associated arguments) is registered.
+		/// </summary>
+		/// <param name="Type">Singleton type</param>
+		/// <param name="Arguments">Any constructor arguments associated with the type.</param>
+		/// <returns>If such a singleton type is registered.</returns>
+		public static bool IsRegistered(Type Type, params object[] Arguments)
+		{
+			SingletonKey Key = new SingletonKey(Type, Arguments);
+
+			lock (instances)
+			{
+				return instances.ContainsKey(Key);
+			}
+		}
 
 		private class SingletonKey
 		{

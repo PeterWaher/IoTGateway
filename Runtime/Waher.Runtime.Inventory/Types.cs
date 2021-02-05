@@ -1058,5 +1058,15 @@ namespace Waher.Runtime.Inventory
 			return Instantiate(GetType(TypeName), Arguments);
 		}
 
+		/// <summary>
+		/// Registers a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton objcet instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		public static void RegisterSingleton(object Object, params object[] Arguments)
+		{
+			SingletonAttribute.RegisterSingleton(Object, Arguments);
+		}
+
 	}
 }

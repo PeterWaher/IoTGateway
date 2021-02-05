@@ -87,6 +87,13 @@
             <param name="Arguments">Constructor arguments.</param>
             <returns>Instance of <paramref name="Type"/>.</returns>
         </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.RegisterSingleton(System.Object,System.Object[])">
+            <summary>
+            Registers a singleton instance of a type.
+            </summary>
+            <param name="Object">Singleton objcet instance.</param>
+            <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+        </member>
         <member name="T:Waher.Runtime.Inventory.Types">
             <summary>
             Static class that dynamically manages types and interfaces available in the runtime environment.
@@ -361,6 +368,13 @@
             <param name="TypeName">Full name of type of objects to return.</param>
             <param name="Arguments">Constructor arguments.</param>
             <returns>Instance of object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.RegisterSingleton(System.Object,System.Object[])">
+            <summary>
+            Registers a singleton instance of a type.
+            </summary>
+            <param name="Object">Singleton objcet instance.</param>
+            <param name="Arguments">Any constructor arguments associated with the object instance.</param>
         </member>
     </members>
 </doc>

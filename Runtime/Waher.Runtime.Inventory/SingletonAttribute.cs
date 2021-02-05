@@ -71,6 +71,25 @@ namespace Waher.Runtime.Inventory
 			}
 		}
 
+		/// <summary>
+		/// Registers a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton objcet instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		public static void RegisterSingleton(object Object, params object[] Arguments)
+		{
+			SingletonKey Key = new SingletonKey(Object.GetType(), Arguments);
+
+			lock (instances)
+			{
+				if (instances.ContainsKey(Key))
+					throw new InvalidOperationException("Singleton already registered.");
+
+				instances[Key] = Object;
+			}
+		}
+
+
 		private class SingletonKey
 		{
 			public readonly Type type;

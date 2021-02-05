@@ -3996,7 +3996,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Sniffers
+		#region Sniffers & Events
 
 		/// <summary>
 		/// Creates a web sniffer, and adds it to a sniffable object.
@@ -4007,7 +4007,7 @@ namespace Waher.IoTGateway
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		/// <returns>Web Sniffer object.</returns>
+		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, HttpRequest Request, ISniffable Sniffable, string UserVariable, params string[] Privileges)
 		{
 			return AddWebSniffer(SnifferId, Request, BinaryPresentationMethod.ByteCount, Sniffable, UserVariable, Privileges);
@@ -4023,7 +4023,7 @@ namespace Waher.IoTGateway
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		/// <returns>Web Sniffer object.</returns>
+		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, HttpRequest Request, BinaryPresentationMethod BinaryPresentationMethod,
 			ISniffable Sniffable, string UserVariable, params string[] Privileges)
 		{
@@ -4041,7 +4041,7 @@ namespace Waher.IoTGateway
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		/// <returns>Web Sniffer object.</returns>
+		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, HttpRequest Request, TimeSpan MaxLife,
 			BinaryPresentationMethod BinaryPresentationMethod, ISniffable Sniffable, string UserVariable, params string[] Privileges)
 		{
@@ -4064,7 +4064,7 @@ namespace Waher.IoTGateway
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		/// <returns>Web Sniffer object.</returns>
+		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife,
 			BinaryPresentationMethod BinaryPresentationMethod, ISniffable Sniffable, string UserVariable, params string[] Privileges)
 		{
@@ -4086,6 +4086,70 @@ namespace Waher.IoTGateway
 			}
 
 			return "\r\n\r\n![Sniffer](/Sniffers/Sniffer.md)\r\n\r\n";
+		}
+
+		/// <summary>
+		/// Creates a web event sink, and registers it with <see cref="Log"/>.
+		/// </summary>
+		/// <param name="SinkId">Event Sink ID</param>
+		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static void AddWebEventSink(string SinkId, HttpRequest Request, string UserVariable, params string[] Privileges)
+		{
+			AddWebEventSink(SinkId, Request, TimeSpan.FromHours(1), UserVariable, Privileges);
+		}
+
+		/// <summary>
+		/// Creates a web event sink, and registers it with <see cref="Log"/>.
+		/// </summary>
+		/// <param name="SinkId">Event Sink ID</param>
+		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
+		/// <param name="MaxLife">Maximum life of event sink.</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static void AddWebEventSink(string SinkId, HttpRequest Request, TimeSpan MaxLife, string UserVariable, params string[] Privileges)
+		{
+			string Resource = Request.Header.ResourcePart;
+			int i = Resource.IndexOfAny(new char[] { '?', '#' });
+			if (i > 0)
+				Resource = Resource.Substring(0, i);
+
+			AddWebEventSink(SinkId, Resource, MaxLife, UserVariable, Privileges);
+		}
+
+		/// <summary>
+		/// Creates a web event sink, and registers it with <see cref="Log"/>.
+		/// </summary>
+		/// <param name="SinkId">Event Sink ID</param>
+		/// <param name="PageResource">Resource of page displaying the events.</param>
+		/// <param name="MaxLife">Maximum life of event sink.</param>
+		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
+		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
+		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
+		/// <returns>Web Sniffer object.</returns>
+		public static void AddWebEventSink(string SinkId, string PageResource, TimeSpan MaxLife, string UserVariable, params string[] Privileges)
+		{
+			bool Found = false;
+
+			foreach (IEventSink Sink in Log.Sinks)
+			{
+				if (Sink is WebEventSink WebEventSink && WebEventSink.ObjectID == SinkId)
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (!Found)
+			{
+				WebEventSink Sink = new WebEventSink(SinkId, PageResource, MaxLife, UserVariable, Privileges);
+				Log.Register(Sink);
+			}
 		}
 
 		#endregion

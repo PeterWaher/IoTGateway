@@ -618,6 +618,9 @@
 			</Folder>
 		</Folder>
 		<Folder name="Sniffers">
+			<Content fileName="EventLog.cssx"/>
+			<Content fileName="EventLog.js"/>
+			<Content fileName="EventLog.md"/>
 			<Content fileName="Sniffer.css"/>
 			<Content fileName="Sniffer.js"/>
 			<Content fileName="Sniffer.md"/>

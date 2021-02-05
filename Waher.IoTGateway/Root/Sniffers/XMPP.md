@@ -21,4 +21,4 @@ On this page, you can follow the [XMPP](https://xmpp.org/) communication made fr
 The sniffer will automatically be terminated after some time to avoid performance degradation and leaks. Sniffers should only be
 used as a tool for troubleshooting.
 
-{{GW:=Waher.IoTGateway.Gateway;GW.AddWebSniffer(SnifferId,Request,GW.XmppClient,"User",["Sniffers"])}}
+{{GW:=Waher.IoTGateway.Gateway;GW.AddWebSniffer(SnifferId,Request,GW.XmppClient,"User",["Admin.Communication.Sniffer"])}}

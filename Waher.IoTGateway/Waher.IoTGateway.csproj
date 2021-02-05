@@ -81,6 +81,9 @@
     <None Remove="Root\Settings\Users.ws" />
     <None Remove="Root\Settings\XMPP.js" />
     <None Remove="Root\Settings\XMPP.md" />
+    <None Remove="Root\Sniffers\EventLog.cssx" />
+    <None Remove="Root\Sniffers\EventLog.js" />
+    <None Remove="Root\Sniffers\EventLog.md" />
     <None Remove="Root\Sniffers\Sniffer.css" />
     <None Remove="Root\Sniffers\Sniffer.js" />
     <None Remove="Root\Sniffers\Sniffer.md" />
@@ -158,6 +161,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\ProposeContract.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Sniffers\EventLog.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Sniffers\EventLog.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Sniffers\EventLog.cssx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Sniffers\Sniffer.md">

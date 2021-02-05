@@ -47,6 +47,7 @@ MenuFooter();
 MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");
 MenuItem("Database","/Settings/Database.md","Admin.Data.Database");
+MenuItem("Events","/Sniffers/EventLog.md","Admin.Data.Events");
 MenuItem("Prompt","/Prompt.md","Admin.Data.Prompt");
 MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
 MenuFooter();

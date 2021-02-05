@@ -65,6 +65,28 @@
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
         </member>
+        <member name="T:Waher.Runtime.Inventory.SingletonAttribute">
+            <summary>
+            Defines a class or struct as singleton. This means that when instantiated, using <see cref="M:Waher.Runtime.Inventory.Types.Instantiate(System.Type,System.Object[])"/>,
+            the same instance will be returned. Singleton instances will be disposed by the <see cref="T:Waher.Runtime.Inventory.Types"/> class, when the
+            application ends, if they implement <see cref="T:System.IDisposable"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.#ctor">
+            <summary>
+            Defines a class or struct as singleton. This means that when instantiated, using <see cref="M:Waher.Runtime.Inventory.Types.Instantiate(System.Type,System.Object[])"/>,
+            the same instance will be returned. Singleton instances will be disposed by the <see cref="T:Waher.Runtime.Inventory.Types"/> class, when the
+            application ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.Instantiate(System.Type,System.Object[])">
+            <summary>
+            Returns an instance of the type <paramref name="Type"/>.
+            </summary>
+            <param name="Type">Type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <paramref name="Type"/>.</returns>
+        </member>
         <member name="T:Waher.Runtime.Inventory.Types">
             <summary>
             Static class that dynamically manages types and interfaces available in the runtime environment.
@@ -315,6 +337,30 @@
             <param name="StringValue">String representation of enumeration value.</param>
             <param name="Value">Value, if parsed.</param>
             <returns>If the string value could be parsed to an enumeration value of the given type.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Instantiate``1(System.Object[])">
+            <summary>
+            Returns an instance of the type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Type of objects to return.</typeparam>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Instantiate(System.Type,System.Object[])">
+            <summary>
+            Returns an instance of the type <paramref name="Type"/>.
+            </summary>
+            <param name="Type">Type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <paramref name="Type"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Instantiate(System.String,System.Object[])">
+            <summary>
+            Returns an instance of the type defined by the full name <paramref name="TypeName"/>.
+            </summary>
+            <param name="TypeName">Full name of type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of object.</returns>
         </member>
     </members>
 </doc>

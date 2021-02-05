@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 
@@ -366,6 +365,8 @@ namespace Waher.Runtime.Inventory
 					moduleParameters.Clear();
 				}
 			}
+
+			SingletonAttribute.Clear();
 		}
 
 		/// <summary>
@@ -436,7 +437,7 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						Tasks.Add(StartModule(Module2, 60000));	// 1 min timeout
+						Tasks.Add(StartModule(Module2, 60000)); // 1 min timeout
 					}
 					catch (Exception ex)
 					{
@@ -1013,9 +1014,48 @@ namespace Waher.Runtime.Inventory
 
 			object[] P = new object[] { StringValue, null };
 			bool Result = (bool)TryParse.Invoke(null, P);
-			
+
 			Value = (Enum)P[1];
 			return Result;
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to return.</typeparam>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <typeparamref name="T"/>.</returns>
+		public static T Instantiate<T>(params object[] Arguments)
+		{
+			return (T)Instantiate(typeof(T), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>.
+		/// </summary>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object Instantiate(Type Type, params object[] Arguments)
+		{
+			TypeInfo TI = Type.GetTypeInfo();
+			SingletonAttribute Singleton = TI.GetCustomAttribute<SingletonAttribute>(true);
+
+			if (Singleton is null)
+				return Activator.CreateInstance(Type, Arguments);
+			else
+				return Singleton.Instantiate(Type, Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>.
+		/// </summary>
+		/// <param name="TypeName">Full name of type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of object.</returns>
+		public static object Instantiate(string TypeName, params object[] Arguments)
+		{
+			return Instantiate(GetType(TypeName), Arguments);
 		}
 
 	}

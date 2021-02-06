@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -209,6 +210,7 @@ namespace Waher.Content.Markdown.Consolidation
 					case DocumentType.SingleCode:
 					case DocumentType.SingleXml:
 
+						List<string> ConsolidatedRows = new List<string>();
 						int j = 0;
 						int d = this.sources.Count;
 
@@ -226,8 +228,14 @@ namespace Waher.Content.Markdown.Consolidation
 								c -= this.nrBottom;
 
 							for (; i < c; i++)
-								Markdown.AppendLine(Rows[i]);
+								ConsolidatedRows.Add(Rows[i]);
 						}
+
+						if (ConsolidatedRows[0].StartsWith("```dot", StringComparison.OrdinalIgnoreCase))
+							OptimizeDotEdges(ConsolidatedRows);
+
+						foreach (string Row in ConsolidatedRows)
+							Markdown.AppendLine(Row);
 						break;
 
 					case DocumentType.SingleTable:
@@ -352,6 +360,90 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 
 			return Markdown.ToString();
+		}
+
+		private static readonly Regex dotEdge = new Regex("^(?'A'(\"[^\"]*\"|'[^']*'|[^\\s]*))\\s*->\\s*(?'B'(\"[^\"]*\"|'[^']*'|[^\\s]*))\\s*([\\[](?'Note'[^\\]]*)[\\]]\\s*)?;\\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+		private static void OptimizeDotEdges(List<string> Rows)
+		{
+			Match[] Matches;
+			Match M;
+			string Row, Row2, A, B, Note;
+			int i, j, c = Rows.Count;
+			bool Changed = false;
+
+			Matches = new Match[c];
+
+			for (i = 0; i < c; i++)
+			{
+				Row = Rows[i];
+				M = Matches[i];
+				if (M is null)
+				{
+					M = dotEdge.Match(Row);
+					Matches[i] = M;
+				}
+
+				if (!M.Success || M.Index > 0 || M.Length < Row.Length)
+					continue;
+
+				A = M.Groups["A"].Value;
+				B = M.Groups["B"].Value;
+				Note = M.Groups["Note"].Value;
+
+				for (j = i + 1; j < c; j++)
+				{
+					Row2 = Rows[j];
+					M = Matches[j];
+					if (M is null)
+					{
+						M = dotEdge.Match(Row2);
+						Matches[j] = M;
+					}
+
+					if (M.Success &&
+						M.Index == 0 &&
+						M.Length == Row.Length &&
+						M.Groups["A"].Value == B &&
+						M.Groups["B"].Value == A &&
+						M.Groups["Note"].Value == Note)
+					{
+						StringBuilder sb = new StringBuilder();
+
+						sb.Append(A);
+						sb.Append(" -> ");
+						sb.Append(B);
+						sb.Append(" [");
+						sb.Append(Note);
+
+						if (!string.IsNullOrEmpty(Note))
+							sb.Append(", ");
+
+						sb.Append("dir=both];");
+
+						Rows[i] = sb.ToString();
+						Matches[i] = null;
+						Rows[j] = string.Empty;
+						Matches[j] = null;
+						Changed = true;
+						break;
+					}
+				}
+			}
+
+			if (Changed)
+			{
+				for (i = 0; i < c;)
+				{
+					if (string.IsNullOrEmpty(Rows[i]))
+					{
+						Rows.RemoveAt(i);
+						c--;
+					}
+					else
+						i++;
+				}
+			}
 		}
 
 		/// <summary>

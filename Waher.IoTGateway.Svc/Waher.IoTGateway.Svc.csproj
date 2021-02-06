@@ -71,14 +71,12 @@
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
-    <ProjectReference Include="..\Networking\Waher.Networking.LWM2M\Waher.Networking.LWM2M.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.UPnP\Waher.Networking.UPnP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.WHOIS\Waher.Networking.WHOIS.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj" />
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />

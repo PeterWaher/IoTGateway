@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 			finally
 			{
-				await this.syncObject.EndWrite();
+				await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
 			}
 		}
 
@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 			finally
 			{
-				await this.syncObject.EndWrite();
+				await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
 			}
 		}
 
@@ -265,7 +265,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				finally
 				{
-					await this.syncObject.EndWrite();
+					await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
 				}
 			}
 		}
@@ -294,7 +294,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				finally
 				{
-					await this.syncObject.EndWrite();
+					await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
 				}
 			}
 		}

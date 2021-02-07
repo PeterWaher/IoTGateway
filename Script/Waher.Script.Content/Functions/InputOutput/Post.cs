@@ -70,7 +70,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 
 			object Result = InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
 
-			return new ObjectValue(Result);
+			return Expression.Encapsulate(Result);
 		}
 	}
 }

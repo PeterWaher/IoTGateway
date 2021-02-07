@@ -106,7 +106,7 @@ namespace Waher.Script.Content.Functions.Encoding
 				return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Rows, MaxCols, this);
 			}
 			else
-				return new ObjectValue(Decoded);
+				return Expression.Encapsulate(Decoded);
 		}
 
 		/// <summary>

@@ -4129,7 +4129,7 @@ namespace Waher.Script
 
 			try
 			{
-				Result = this.root.Evaluate(Variables);
+				Result = this.root?.Evaluate(Variables) ?? ObjectValue.Null;
 			}
 			catch (ScriptReturnValueException ex)
 			{

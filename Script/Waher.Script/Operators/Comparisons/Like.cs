@@ -80,6 +80,8 @@ namespace Waher.Script.Operators.Comparisons
 								Variables[GroupName] = Value;
 
 							Variables[GroupName + "_STR"] = Value;
+							Variables[GroupName + "_POS"] = G.Index;
+							Variables[GroupName + "_LEN"] = G.Length;
 						}
 					}
 				}

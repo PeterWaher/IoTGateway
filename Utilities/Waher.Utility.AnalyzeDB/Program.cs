@@ -2,11 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Xml;
-using Waher.Content;
-using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Files;
-using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 

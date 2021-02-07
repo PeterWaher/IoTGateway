@@ -41,7 +41,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 		public IElement GetValueElement(Variables Variables)
 		{
 			if (!Variables.TryGetVariable(" LastPost ", out Variable v))
-				return new ObjectValue(null);
+				return ObjectValue.Null;
 
 			IElement Result = v.ValueElement;
 
@@ -51,7 +51,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 				!(v.ValueObject is HttpRequest Request) ||
 				string.Compare(SubPath, Request.SubPath, true) != 0)
 			{
-				return new ObjectValue(null);
+				return ObjectValue.Null;
 			}
 
 			return Result;

@@ -456,6 +456,7 @@ The [Utilities](Utilities) folder contains applications that help the developer 
 | **Waher.Utility.GetEmojiCatalog**  | .NET 4.6.2    |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
 | **Waher.Utility.Install**          | .NET Core 2.2 |       | The [Waher.Utility.Install](Utilities/Waher.Utility.Install) is a command-line tool that helps you install pluggable modules into the IoT Gateway. |
 | **Waher.Utility.RegEx**            | .NET Core 2.2 |       | The [Waher.Utility.RegEx](Utilities/Waher.Utility.RegEx) is a command-line tool that helps you find content in files using regular expressions, and optionally either export the findings or replace them with something else. |
+| **Waher.Utility.RunScript**        | .NET Core 2.2 |       | The [Waher.Utility.RunScript](Utilities/Waher.Utility.RunScript) is a command-line tool that allows you to execute script. |
 | **Waher.Utility.Sign**             | .NET Core 2.2 |       | The [Waher.Utility.Sign](Utilities/Waher.Utility.Sign) is a command-line tool that helps you sign files using asymmetric keys. |
 | **Waher.Utility.Transform**        | .NET Core 2.2 |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.RunScript": {
+      "commandName": "Project",
+      "commandLineArgs": "-i ..\\..\\..\\..\\..\\Waher.IoTGateway.Build\\SetBuildDateTime.script"
+    }
+  }
+}

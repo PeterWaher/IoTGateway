@@ -1,0 +1,19 @@
+FileName:="C:\\My Projects\\Registration.cs";
+s:=LoadFile(FileName,"text/plain");
+TP:=Now;
+Changed:=false;
+
+if s like ".*public static readonly string BuildDate = \"(?'DateStr'[^\"]*)\";.*" then
+(
+	s:=s.Remove(DateStr_POS,DateStr_LEN).Insert(DateStr_POS, TP.ToShortDateString());
+	Changed:=true;
+);
+
+if s like ".*public static readonly string BuildTime = \"(?'TimeStr'[^\"]*)\";.*" then
+(
+	s:=s.Remove(TimeStr_POS,TimeStr_LEN).Insert(TimeStr_POS, TP.ToLongTimeString());
+	Changed:=true;
+);
+
+if Changed then
+	SaveFile(s, FileName);

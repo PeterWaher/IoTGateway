@@ -495,7 +495,7 @@ namespace Waher.Networking.XMPP.Avatar
 		{
 			Avatar Result;
 
-			if (string.IsNullOrEmpty(BareJid) || BareJid == this.client.BareJID)
+			if (string.IsNullOrEmpty(BareJid) || string.Compare(BareJid, this.client.BareJID, true) == 0)
 			{
 				if (this.localAvatar is null)
 					return this.defaultAvatar;

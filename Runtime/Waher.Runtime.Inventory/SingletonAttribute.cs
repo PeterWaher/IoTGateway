@@ -74,7 +74,7 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Registers a singleton instance of a type.
 		/// </summary>
-		/// <param name="Object">Singleton objcet instance.</param>
+		/// <param name="Object">Singleton object instance.</param>
 		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
 		public static void Register(object Object, params object[] Arguments)
 		{
@@ -86,6 +86,22 @@ namespace Waher.Runtime.Inventory
 					throw new InvalidOperationException("Singleton already registered.");
 
 				instances[Key] = Object;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton object instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		/// <returns>If the instance was found and removed.</returns>
+		public static bool Unregister(object Object, params object[] Arguments)
+		{
+			SingletonKey Key = new SingletonKey(Object.GetType(), Arguments);
+
+			lock (instances)
+			{
+				return instances.Remove(Key);
 			}
 		}
 

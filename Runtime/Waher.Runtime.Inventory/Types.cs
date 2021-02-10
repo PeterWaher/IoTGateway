@@ -1038,7 +1038,22 @@ namespace Waher.Runtime.Inventory
 		/// <returns>Instance of <paramref name="Type"/>.</returns>
 		public static object Instantiate(Type Type, params object[] Arguments)
 		{
+			if (Type is null)
+				throw new ArgumentException("Type cannot be null.", nameof(Type));
+
 			TypeInfo TI = Type.GetTypeInfo();
+
+			if (TI.IsInterface)
+			{
+				if (DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out Type DefaultImplementation))
+				{
+					Type = DefaultImplementation;
+					TI = Type.GetTypeInfo();
+				}
+				else
+					throw new ArgumentException("Interface " + Type.FullName + " lacks a default implementation.", nameof(Type));
+			}
+
 			SingletonAttribute Singleton = TI.GetCustomAttribute<SingletonAttribute>(true);
 
 			if (Singleton is null)
@@ -1061,11 +1076,22 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Registers a singleton instance of a type.
 		/// </summary>
-		/// <param name="Object">Singleton objcet instance.</param>
+		/// <param name="Object">Singleton object instance.</param>
 		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
 		public static void RegisterSingleton(object Object, params object[] Arguments)
 		{
 			SingletonAttribute.Register(Object, Arguments);
+		}
+
+		/// <summary>
+		/// Unregisters a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton object instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		/// <returns>If the instance was found and removed.</returns>
+		public static bool UnregisterSingleton(object Object, params object[] Arguments)
+		{
+			return SingletonAttribute.Unregister(Object, Arguments);
 		}
 
 		/// <summary>
@@ -1077,6 +1103,48 @@ namespace Waher.Runtime.Inventory
 		public static bool IsSingletonRegistered(Type Type, params object[] Arguments)
 		{
 			return SingletonAttribute.IsRegistered(Type, Arguments);
+		}
+
+		/// <summary>
+		/// Registers a default implementation for an interface. Such a registration takes presedence of any default implementations
+		/// provided by the <see cref="DefaultImplementationAttribute"/> associated with the interface definition.
+		/// </summary>
+		/// <param name="From">Type of interface.</param>
+		/// <param name="To">Default implementation.</param>
+		public static void RegisterDefaultImplementation(Type From, Type To)
+		{
+			DefaultImplementationAttribute.RegisterDefaultImplementation(From, To);
+		}
+
+		/// <summary>
+		/// Tries to get the default implementation for an interface.
+		/// </summary>
+		/// <param name="Type">Type of interface.</param>
+		/// <param name="DefaultImplementation">Default implementation to use for interface.</param>
+		/// <returns>If a default implementation was found.</returns>
+		public static bool TryGetDefaultImplementation(Type Type, out Type DefaultImplementation)
+		{
+			return DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out DefaultImplementation);
+		}
+
+		/// <summary>
+		/// Checks if an interface has a default implementation registered.
+		/// </summary>
+		/// <param name="Type">Type of interface.</param>
+		/// <returns>If a default implementation was registered.</returns>
+		public static bool IsDefaultImplementationRegistered(Type Type)
+		{
+			return TryGetDefaultImplementation(Type, out _);
+		}
+
+		/// <summary>
+		/// Unregisters a default implementation for an interface.
+		/// </summary>
+		/// <param name="From">Type of interface.</param>
+		/// <param name="To">Default implementation.</param>
+		public static void UnregisterDefaultImplementation(Type From, Type To)
+		{
+			DefaultImplementationAttribute.UnregisterDefaultImplementation(From, To);
 		}
 
 	}

@@ -4,6 +4,46 @@
         <name>Waher.Runtime.Inventory</name>
     </assembly>
     <members>
+        <member name="T:Waher.Runtime.Inventory.DefaultImplementationAttribute">
+            <summary>
+            Defines a default implementation for an interface. If a request to instantiate an interface is made,
+            the default implementation will be instantiated.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.DefaultImplementationAttribute.#ctor(System.Type)">
+            <summary>
+            Defines a default implementation for an interface. If a request to instantiate an interface is made,
+            the default implementation will be instantiated.
+            </summary>
+            <param name="Type">Type to instantiate.</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.DefaultImplementationAttribute.Type">
+            <summary>
+            Type to instantiate.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.DefaultImplementationAttribute.RegisterDefaultImplementation(System.Type,System.Type)">
+            <summary>
+            Registers a default implementation for an interface.
+            </summary>
+            <param name="From">Type of interface.</param>
+            <param name="To">Default implementation.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.DefaultImplementationAttribute.UnregisterDefaultImplementation(System.Type,System.Type)">
+            <summary>
+            Unregisters a default implementation for an interface.
+            </summary>
+            <param name="From">Type of interface.</param>
+            <param name="To">Default implementation.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.DefaultImplementationAttribute.TryGetDefaultImplementation(System.Type,System.Type@)">
+            <summary>
+            Tries to get the default implementation for an interface.
+            </summary>
+            <param name="Type">Type of interface.</param>
+            <param name="DefaultImplementation">Default implementation to use for interface.</param>
+            <returns>If a default implementation was found.</returns>
+        </member>
         <member name="T:Waher.Runtime.Inventory.Grade">
             <summary>
             Grade enumeration
@@ -91,8 +131,16 @@
             <summary>
             Registers a singleton instance of a type.
             </summary>
-            <param name="Object">Singleton objcet instance.</param>
+            <param name="Object">Singleton object instance.</param>
             <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.Unregister(System.Object,System.Object[])">
+            <summary>
+            Unregisters a singleton instance of a type.
+            </summary>
+            <param name="Object">Singleton object instance.</param>
+            <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+            <returns>If the instance was found and removed.</returns>
         </member>
         <member name="M:Waher.Runtime.Inventory.SingletonAttribute.IsRegistered(System.Type,System.Object[])">
             <summary>
@@ -381,8 +429,16 @@
             <summary>
             Registers a singleton instance of a type.
             </summary>
-            <param name="Object">Singleton objcet instance.</param>
+            <param name="Object">Singleton object instance.</param>
             <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.UnregisterSingleton(System.Object,System.Object[])">
+            <summary>
+            Unregisters a singleton instance of a type.
+            </summary>
+            <param name="Object">Singleton object instance.</param>
+            <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+            <returns>If the instance was found and removed.</returns>
         </member>
         <member name="M:Waher.Runtime.Inventory.Types.IsSingletonRegistered(System.Type,System.Object[])">
             <summary>
@@ -391,6 +447,36 @@
             <param name="Type">Singleton type</param>
             <param name="Arguments">Any constructor arguments associated with the type.</param>
             <returns>If such a singleton type is registered.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.RegisterDefaultImplementation(System.Type,System.Type)">
+            <summary>
+            Registers a default implementation for an interface. Such a registration takes presedence of any default implementations
+            provided by the <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> associated with the interface definition.
+            </summary>
+            <param name="From">Type of interface.</param>
+            <param name="To">Default implementation.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.TryGetDefaultImplementation(System.Type,System.Type@)">
+            <summary>
+            Tries to get the default implementation for an interface.
+            </summary>
+            <param name="Type">Type of interface.</param>
+            <param name="DefaultImplementation">Default implementation to use for interface.</param>
+            <returns>If a default implementation was found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.IsDefaultImplementationRegistered(System.Type)">
+            <summary>
+            Checks if an interface has a default implementation registered.
+            </summary>
+            <param name="Type">Type of interface.</param>
+            <returns>If a default implementation was registered.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.UnregisterDefaultImplementation(System.Type,System.Type)">
+            <summary>
+            Unregisters a default implementation for an interface.
+            </summary>
+            <param name="From">Type of interface.</param>
+            <param name="To">Default implementation.</param>
         </member>
     </members>
 </doc>

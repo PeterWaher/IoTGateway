@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -470,5 +471,142 @@ namespace Waher.Runtime.Settings
 
 		#endregion
 
+		#region Batch Get
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Matching settings found.</returns>
+		public static Dictionary<string, object> GetWhere(Filter Filter)
+		{
+			return GetWhereAsync(Filter).Result;
+		}
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Matching settings found.</returns>
+		public static async Task<Dictionary<string, object>> GetWhereAsync(Filter Filter)
+		{
+			Dictionary<string, object> Result = new Dictionary<string, object>();
+
+			foreach (Setting Setting in await Database.Find<Setting>(Filter))
+				Result[Setting.Key] = Setting.GetValueObject();
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <returns>Matching settings found.</returns>
+		public static Dictionary<string, object> GetWhereKeyLikeRegEx(string KeyPattern)
+		{
+			return GetWhere(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <returns>Matching settings found.</returns>
+		public static Task<Dictionary<string, object>> GetWhereKeyLikeRegExAsync(string KeyPattern)
+		{
+			return GetWhereAsync(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <returns>Matching settings found.</returns>
+		public static Dictionary<string, object> GetWhereKeyLike(string Key, string Wildcard)
+		{
+			return GetWhere(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		/// <summary>
+		/// Gets available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <returns>Matching settings found.</returns>
+		public static Task<Dictionary<string, object>> GetWhereKeyLikeAsync(string Key, string Wildcard)
+		{
+			return GetWhereAsync(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		#endregion
+
+		#region Batch Delete
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static int DeleteWhere(Filter Filter)
+		{
+			return DeleteWhereAsync(Filter).Result;
+		}
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static async Task<int> DeleteWhereAsync(Filter Filter)
+		{
+			int Result = 0;
+
+			foreach (Setting Setting in await Database.FindDelete<Setting>(Filter))
+				Result++;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static int DeleteWhereKeyLikeRegEx(string KeyPattern)
+		{
+			return DeleteWhere(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static Task<int> DeleteWhereKeyLikeRegExAsync(string KeyPattern)
+		{
+			return DeleteWhereAsync(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static int DeleteWhereKeyLike(string Key, string Wildcard)
+		{
+			return DeleteWhere(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		/// <summary>
+		/// Deletes available settings, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <returns>Number of settings deleted.</returns>
+		public static Task<int> DeleteWhereKeyLikeAsync(string Key, string Wildcard)
+		{
+			return DeleteWhereAsync(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		#endregion
 	}
 }

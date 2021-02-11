@@ -42,5 +42,14 @@ namespace Waher.Runtime.Settings.SettingObjects
 			get { return this.value; }
 			set { this.value = value; }
 		}
+
+		/// <summary>
+		/// Gets the value of the setting, as an object.
+		/// </summary>
+		/// <returns>Value object.</returns>
+		public override object GetValueObject()
+		{
+			return this.value;
+		}
 	}
 }

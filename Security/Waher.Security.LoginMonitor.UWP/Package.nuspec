@@ -19,7 +19,7 @@
       <dependency id="Waher.Networking.UWP" version="1.0.21"/>
       <dependency id="Waher.Networking.WHOIS.UWP" version="1.0.0"/>
       <dependency id="Waher.Persistence" version="1.2.3"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.17"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.18"/>
       <dependency id="Waher.Security" version="1.0.8"/>
 		</dependencies>
   </metadata>

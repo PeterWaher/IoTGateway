@@ -330,6 +330,7 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type          | Project description |
 |------------------------------------|---------------|---------------------|
+| **Waher.Runtime.Inventory.Test**   | .NET Core 2.2 | The [Waher.Runtime.Inventory.Test](Runtime/Waher.Runtime.Inventory.Test) project contains unit tests for the [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project. |
 | **Waher.Runtime.Language.Test**    | .NET Core 2.2 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
 | **Waher.Runtime.Text.Test**        | .NET Core 2.2 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
 | **Waher.Runtime.Threading.Test**   | .NET Core 2.2 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |

@@ -8,7 +8,7 @@ namespace Waher.Runtime.Inventory
 	/// Defines a default implementation for an interface. If a request to instantiate an interface is made,
 	/// the default implementation will be instantiated.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 	public class DefaultImplementationAttribute : Attribute
 	{
 		private static readonly Dictionary<Type, Type> defaultImplementationOverrides = new Dictionary<Type, Type>();

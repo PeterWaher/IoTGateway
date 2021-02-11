@@ -1106,6 +1106,9 @@ namespace Waher.Runtime.Inventory
 		public static object Create(bool ReturnNullIfFail, Type Type, params object[] Arguments)
 		{
 			TypeInfo TI = Type.GetTypeInfo();
+			if (TI.IsPrimitive)
+				return Activator.CreateInstance(Type);
+
 			ParameterInfo[] Parameters;
 			int i, NrParams, NrArgs = Arguments.Length;
 			Type[] ArgType = NrArgs == 0 ? null : new Type[NrArgs];
@@ -1150,9 +1153,9 @@ namespace Waher.Runtime.Inventory
 
 						for (; i < NrParams; i++)
 							Arguments[i] = Instantiate(ReturnNullIfFail, Parameters[i].ParameterType);
-
-						return CI.Invoke(Arguments);
 					}
+
+					return CI.Invoke(Arguments);
 				}
 			}
 

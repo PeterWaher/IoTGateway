@@ -1020,36 +1020,68 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
-		/// Returns an instance of the type <typeparamref name="T"/>.
+		/// Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
 		/// </summary>
 		/// <typeparam name="T">Type of objects to return.</typeparam>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
 		/// <param name="Arguments">Constructor arguments.</param>
 		/// <returns>Instance of <typeparamref name="T"/>.</returns>
-		public static T Instantiate<T>(params object[] Arguments)
+		public static T Instantiate<T>(bool ReturnNullIfFail, params object[] Arguments)
 		{
-			return (T)Instantiate(typeof(T), Arguments);
+			return (T)Instantiate(ReturnNullIfFail, typeof(T), Arguments);
 		}
 
 		/// <summary>
-		/// Returns an instance of the type <paramref name="Type"/>.
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
 		/// </summary>
 		/// <param name="Type">Type of objects to return.</param>
 		/// <param name="Arguments">Constructor arguments.</param>
 		/// <returns>Instance of <paramref name="Type"/>.</returns>
 		public static object Instantiate(Type Type, params object[] Arguments)
 		{
+			return Instantiate(false, Type, Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object Instantiate(bool ReturnNullIfFail, Type Type, params object[] Arguments)
+		{
 			if (Type is null)
-				throw new ArgumentException("Type cannot be null.", nameof(Type));
+			{
+				if (ReturnNullIfFail)
+					return null;
+				else
+					throw new ArgumentException("Type cannot be null.", nameof(Type));
+			}
 
 			TypeInfo TI = Type.GetTypeInfo();
 
-			if (TI.IsInterface)
+			if (TI.IsInterface || TI.IsAbstract)
 			{
 				if (DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out Type DefaultImplementation))
 				{
 					Type = DefaultImplementation;
 					TI = Type.GetTypeInfo();
 				}
+				else if (ReturnNullIfFail)
+					return null;
 				else
 					throw new ArgumentException("Interface " + Type.FullName + " lacks a default implementation.", nameof(Type));
 			}
@@ -1057,20 +1089,108 @@ namespace Waher.Runtime.Inventory
 			SingletonAttribute Singleton = TI.GetCustomAttribute<SingletonAttribute>(true);
 
 			if (Singleton is null)
-				return Activator.CreateInstance(Type, Arguments);
+				return Create(ReturnNullIfFail, Type, Arguments);
 			else
-				return Singleton.Instantiate(Type, Arguments);
+				return Singleton.Instantiate(ReturnNullIfFail, Type, Arguments);
 		}
 
 		/// <summary>
-		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>.
+		/// Returns an instance of the type <paramref name="Type"/>. Creates an instance of a type.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object Create(bool ReturnNullIfFail, Type Type, params object[] Arguments)
+		{
+			TypeInfo TI = Type.GetTypeInfo();
+			ParameterInfo[] Parameters;
+			int i, NrParams, NrArgs = Arguments.Length;
+			Type[] ArgType = NrArgs == 0 ? null : new Type[NrArgs];
+			int Pass;
+
+			for (i = 0; i < NrArgs; i++)
+				ArgType[i] = Arguments[i]?.GetType();
+
+			// Pass 0: Use first public constructor whose parameters match arguments exactly
+			// Pass 1: Use first constructor whose parameters match provided arguments exactly, but that allows instantiation of arguments not provided.
+
+			for (Pass = 0; Pass < 2; Pass++)
+			{
+				foreach (ConstructorInfo CI in TI.DeclaredConstructors)
+				{
+					if (Pass == 0 && !CI.IsPublic)
+						continue;
+
+					if (CI.IsStatic)
+						continue;
+
+					if (CI.ContainsGenericParameters)
+						continue;
+
+					Parameters = CI.GetParameters();
+					NrParams = Parameters.Length;
+					if ((Pass == 0 && NrParams != NrArgs) || (Pass == 1 && NrParams < NrArgs))
+						continue;
+
+					for (i = 0; i < NrArgs; i++)
+					{
+						if (!(ArgType[i] is null) && ArgType[i] != Parameters[i].ParameterType)
+							break;
+					}
+
+					if (i < NrArgs)
+						continue;
+
+					if (NrArgs < NrParams)
+					{
+						Array.Resize<object>(ref Arguments, NrParams);
+
+						for (; i < NrParams; i++)
+							Arguments[i] = Instantiate(ReturnNullIfFail, Parameters[i].ParameterType);
+
+						return CI.Invoke(Arguments);
+					}
+				}
+			}
+
+			if (ReturnNullIfFail)
+				return null;
+			else
+				throw new MissingMethodException("Constructor not found matching provided arguments.");
+		}
+
+		/// <summary>
+		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
 		/// </summary>
 		/// <param name="TypeName">Full name of type of objects to return.</param>
 		/// <param name="Arguments">Constructor arguments.</param>
 		/// <returns>Instance of object.</returns>
 		public static object Instantiate(string TypeName, params object[] Arguments)
 		{
-			return Instantiate(GetType(TypeName), Arguments);
+			return Instantiate(false, GetType(TypeName), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="TypeName">Full name of type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of object.</returns>
+		public static object Instantiate(bool ReturnNullIfFail, string TypeName, params object[] Arguments)
+		{
+			return Instantiate(ReturnNullIfFail, GetType(TypeName), Arguments);
 		}
 
 		/// <summary>

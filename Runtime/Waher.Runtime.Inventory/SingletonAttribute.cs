@@ -52,23 +52,39 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Returns an instance of the type <paramref name="Type"/>.
 		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
 		/// <param name="Type">Type of objects to return.</param>
 		/// <param name="Arguments">Constructor arguments.</param>
 		/// <returns>Instance of <paramref name="Type"/>.</returns>
-		public object Instantiate(Type Type, params object[] Arguments)
+		public object Instantiate(bool ReturnNullIfFail, Type Type, params object[] Arguments)
 		{
 			SingletonKey Key = new SingletonKey(Type, Arguments);
+			object Object;
 
 			lock (instances)
 			{
-				if (instances.TryGetValue(Key, out object Object))
+				if (instances.TryGetValue(Key, out Object))
 					return Object;
-
-				Object = Activator.CreateInstance(Type, Arguments);
-				instances[Key] = Object;
-
-				return Object;
 			}
+
+			Object = Types.Create(ReturnNullIfFail, Type, Arguments);
+			if (Object is null)
+				return null;
+
+			lock (instances)
+			{
+				if (instances.TryGetValue(Key, out object Object2))
+				{
+					if (Object is IDisposable Disposable)
+						Disposable.Dispose();
+
+					return Object2;
+				}
+
+				instances[Key] = Object;
+			}
+
+			return Object;
 		}
 
 		/// <summary>

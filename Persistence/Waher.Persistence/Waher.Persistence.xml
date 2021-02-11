@@ -3087,6 +3087,14 @@
             </summary>
             <param name="CollectionName">Name of collection.</param>
         </member>
+        <member name="M:Waher.Persistence.Database.WildcardToRegex(System.String,System.String)">
+            <summary>
+            Converts a wildcard string to a regular expression string.
+            </summary>
+            <param name="s">String</param>
+            <param name="Wildcard">Wildcard</param>
+            <returns>Regular expression</returns>
+        </member>
         <member name="T:Waher.Persistence.Exceptions.CollectionException">
             <summary>
             Exception related to a collection.

@@ -2038,14 +2038,6 @@
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.WildcardToRegex(System.String,System.String)">
-            <summary>
-            Converts a wildcard string to a regular expression string.
-            </summary>
-            <param name="s">String</param>
-            <param name="Wildcard">Wildcardd</param>
-            <returns>Regular expression</returns>
-        </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.

@@ -208,6 +208,94 @@
             <param name="Key">Key name.</param>
             <returns>If a setting was found with the given name and deleted.</returns>
         </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhere(Waher.Persistence.Filters.Filter)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="Filter">Search filter.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhereAsync(Waher.Persistence.Filters.Filter)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="Filter">Search filter.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhereKeyLikeRegEx(System.String)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhereKeyLikeRegExAsync(System.String)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhereKeyLike(System.String,System.String)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="Key">Return settings whose keys match this wildcard expression.</param>
+            <param name="Wildcard">What wildcard has been used.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetWhereKeyLikeAsync(System.String,System.String)">
+            <summary>
+            Gets available settings, matching a search filter.
+            </summary>
+            <param name="Key">Return settings whose keys match this wildcard expression.</param>
+            <param name="Wildcard">What wildcard has been used.</param>
+            <returns>Matching settings found.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhere(Waher.Persistence.Filters.Filter)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="Filter">Search filter.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhereAsync(Waher.Persistence.Filters.Filter)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="Filter">Search filter.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhereKeyLikeRegEx(System.String)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhereKeyLikeRegExAsync(System.String)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhereKeyLike(System.String,System.String)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="Key">Delete settings whose keys match this wildcard expression.</param>
+            <param name="Wildcard">What wildcard has been used.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteWhereKeyLikeAsync(System.String,System.String)">
+            <summary>
+            Deletes available settings, matching a search filter.
+            </summary>
+            <param name="Key">Delete settings whose keys match this wildcard expression.</param>
+            <param name="Wildcard">What wildcard has been used.</param>
+            <returns>Number of settings deleted.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.BooleanSetting">
             <summary>
             Boolean setting object.
@@ -229,6 +317,12 @@
             <summary>
             Value.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.BooleanSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
         </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.DateTimeSetting">
             <summary>
@@ -252,6 +346,12 @@
             Value.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DateTimeSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.DoubleSetting">
             <summary>
             Double setting object.
@@ -274,6 +374,12 @@
             Value.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.DoubleSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.Int64Setting">
             <summary>
             Int64 setting object.
@@ -295,6 +401,12 @@
             <summary>
             Value.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Int64Setting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
         </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.Setting">
             <summary>
@@ -322,6 +434,12 @@
             Key name.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.Setting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.StringSetting">
             <summary>
             String setting object.
@@ -344,6 +462,12 @@
             Value.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.StringSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
         <member name="T:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting">
             <summary>
             TimeSpan setting object.
@@ -365,6 +489,12 @@
             <summary>
             Value.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.TimeSpanSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
         </member>
     </members>
 </doc>

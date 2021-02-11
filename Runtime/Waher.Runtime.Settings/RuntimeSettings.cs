@@ -521,7 +521,8 @@ namespace Waher.Runtime.Settings
 		/// <summary>
 		/// Gets available settings, matching a search filter.
 		/// </summary>
-		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <param name="Key">Return settings whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
 		/// <returns>Matching settings found.</returns>
 		public static Dictionary<string, object> GetWhereKeyLike(string Key, string Wildcard)
 		{
@@ -531,7 +532,8 @@ namespace Waher.Runtime.Settings
 		/// <summary>
 		/// Gets available settings, matching a search filter.
 		/// </summary>
-		/// <param name="KeyPattern">Return settings whose keys match this regular expression.</param>
+		/// <param name="Key">Return settings whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
 		/// <returns>Matching settings found.</returns>
 		public static Task<Dictionary<string, object>> GetWhereKeyLikeAsync(string Key, string Wildcard)
 		{
@@ -590,7 +592,8 @@ namespace Waher.Runtime.Settings
 		/// <summary>
 		/// Deletes available settings, matching a search filter.
 		/// </summary>
-		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <param name="Key">Delete settings whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
 		/// <returns>Number of settings deleted.</returns>
 		public static int DeleteWhereKeyLike(string Key, string Wildcard)
 		{
@@ -600,7 +603,8 @@ namespace Waher.Runtime.Settings
 		/// <summary>
 		/// Deletes available settings, matching a search filter.
 		/// </summary>
-		/// <param name="KeyPattern">Delete settings whose keys match this regular expression.</param>
+		/// <param name="Key">Delete settings whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
 		/// <returns>Number of settings deleted.</returns>
 		public static Task<int> DeleteWhereKeyLikeAsync(string Key, string Wildcard)
 		{

@@ -1111,11 +1111,11 @@ namespace Waher.Runtime.Inventory
 
 			ParameterInfo[] Parameters;
 			int i, NrParams, NrArgs = Arguments.Length;
-			Type[] ArgType = NrArgs == 0 ? null : new Type[NrArgs];
+			TypeInfo[] ArgType = NrArgs == 0 ? null : new TypeInfo[NrArgs];
 			int Pass;
 
 			for (i = 0; i < NrArgs; i++)
-				ArgType[i] = Arguments[i]?.GetType();
+				ArgType[i] = Arguments[i]?.GetType().GetTypeInfo();
 
 			// Pass 0: Use first public constructor whose parameters match arguments exactly
 			// Pass 1: Use first constructor whose parameters match provided arguments exactly, but that allows instantiation of arguments not provided.
@@ -1140,7 +1140,7 @@ namespace Waher.Runtime.Inventory
 
 					for (i = 0; i < NrArgs; i++)
 					{
-						if (!(ArgType[i] is null) && ArgType[i] != Parameters[i].ParameterType)
+						if (!(ArgType[i] is null) && !Parameters[i].ParameterType.GetTypeInfo().IsAssignableFrom(ArgType[i]))
 							break;
 					}
 

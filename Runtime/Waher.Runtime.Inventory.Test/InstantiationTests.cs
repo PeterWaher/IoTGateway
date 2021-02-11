@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Runtime.Inventory.Test.Definitions;
 
@@ -160,6 +161,25 @@ namespace Waher.Runtime.Inventory.Test
 			IExample Example3 = Types.Instantiate<IExample>(false);
 			Assert.IsNotNull(Example3);
 			Assert.AreEqual(9.0, Example3.f(3));
+		}
+
+		[TestMethod]
+		public void Test_15_ParamsSealed()
+		{
+			ParamsArguments ParamsArguments = Types.Instantiate<ParamsArguments>(false,
+				typeof(InstantiationTests).Assembly,
+				new Assembly[] { typeof(Types).Assembly },
+				new SealedClass[] { new SealedClass("A", "B", "C") });
+			Assert.IsNotNull(ParamsArguments);
+		}
+
+		[TestMethod]
+		public void Test_16_NullArguments()
+		{
+			TwoArguments Obj = Types.Instantiate<TwoArguments>(false, 1, null);
+			Assert.IsNotNull(Obj);
+			Assert.AreEqual(1, Obj.N);
+			Assert.IsNull(Obj.S);
 		}
 	}
 }

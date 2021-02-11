@@ -376,7 +376,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="NickName">Nickname to use in the chat room.</param>
+		/// <param name="NickName">Nickname used in the chat room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void LeaveRoom(string RoomId, string Domain, string NickName,

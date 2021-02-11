@@ -302,14 +302,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 						return new FilterFieldLesserOrEqualTo(FieldName, Value);
 					else if (Conditions is Operators.Comparisons.Like Like)
 					{
-						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 						return new FilterFieldLikeRegEx(FieldName, RegEx);
 					}
 					else if (Conditions is Operators.Comparisons.NotLike NotLike)
 					{
-						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
 				}
@@ -340,14 +340,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 						return new FilterFieldGreaterOrEqualTo(FieldName, Value);
 					else if (Conditions is Operators.Comparisons.Like Like)
 					{
-						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						Like.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 						return new FilterFieldLikeRegEx(FieldName, RegEx);
 					}
 					else if (Conditions is Operators.Comparisons.NotLike NotLike)
 					{
-						string RegEx = WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						NotLike.TransformExpression += (Expression) => WildcardToRegex(Expression, "%");
+						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+						NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 					}
 				}
@@ -412,54 +412,6 @@ namespace Waher.Script.Persistence.SQL.Sources
 			else
 				return Node;
 		}
-
-		/// <summary>
-		/// Converts a wildcard string to a regular expression string.
-		/// </summary>
-		/// <param name="s">String</param>
-		/// <param name="Wildcard">Wildcardd</param>
-		/// <returns>Regular expression</returns>
-		public static string WildcardToRegex(string s, string Wildcard)
-		{
-			string[] Parts = s.Split(new string[] { Wildcard }, StringSplitOptions.None);
-			StringBuilder RegEx = new StringBuilder();
-			bool First = true;
-			int i, j, c;
-
-			foreach (string Part in Parts)
-			{
-				if (First)
-					First = false;
-				else
-					RegEx.Append(".*");
-
-				i = 0;
-				c = Part.Length;
-				while (i < c)
-				{
-					j = Part.IndexOfAny(regexSpecialCharaters, i);
-					if (j < i)
-					{
-						RegEx.Append(Part.Substring(i));
-						i = c;
-					}
-					else
-					{
-						if (j > i)
-							RegEx.Append(Part.Substring(i, j - i));
-
-						RegEx.Append('\\');
-						RegEx.Append(Part[j]);
-
-						i = j + 1;
-					}
-				}
-			}
-
-			return RegEx.ToString();
-		}
-
-		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
 
 		/// <summary>
 		/// Updates a set of objects.

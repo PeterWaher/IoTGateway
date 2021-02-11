@@ -211,13 +211,13 @@ namespace Waher.Script.Persistence.Functions
 			else if (Node is Like)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx = TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterFieldLikeRegEx(FieldName, RegEx);
 			}
 			else if (Node is NotLike)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx = TypeSource.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
+				string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
 				return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 			}
 			else

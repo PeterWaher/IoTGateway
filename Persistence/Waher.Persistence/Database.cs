@@ -1068,5 +1068,53 @@ namespace Waher.Persistence
 			return Provider.DropCollection(CollectionName);
 		}
 
+		/// <summary>
+		/// Converts a wildcard string to a regular expression string.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <param name="Wildcard">Wildcard</param>
+		/// <returns>Regular expression</returns>
+		public static string WildcardToRegex(string s, string Wildcard)
+		{
+			string[] Parts = s.Split(new string[] { Wildcard }, StringSplitOptions.None);
+			StringBuilder RegEx = new StringBuilder();
+			bool First = true;
+			int i, j, c;
+
+			foreach (string Part in Parts)
+			{
+				if (First)
+					First = false;
+				else
+					RegEx.Append(".*");
+
+				i = 0;
+				c = Part.Length;
+				while (i < c)
+				{
+					j = Part.IndexOfAny(regexSpecialCharaters, i);
+					if (j < i)
+					{
+						RegEx.Append(Part.Substring(i));
+						i = c;
+					}
+					else
+					{
+						if (j > i)
+							RegEx.Append(Part.Substring(i, j - i));
+
+						RegEx.Append('\\');
+						RegEx.Append(Part[j]);
+
+						i = j + 1;
+					}
+				}
+			}
+
+			return RegEx.ToString();
+		}
+
+		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
+
 	}
 }

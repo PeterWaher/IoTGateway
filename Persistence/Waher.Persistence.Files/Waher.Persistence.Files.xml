@@ -133,6 +133,11 @@
             </summary>
             <param name="BlockLimit">Number of blocks in file.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.FileOfBlocks.FlushAsync">
+            <summary>
+            Flushes changes to the underlying device.
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Files.CustomKeyHandler">
             <summary>
             Delegate for custom key callback methods.

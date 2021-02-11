@@ -247,7 +247,7 @@ namespace Waher.Security.LoginMonitor
 						i++;
 						if (i >= this.nrIntervals)
 						{
-							await this.Block(EP, Reason);
+							await this.Block(EP, Reason, Protocol);
 							return true;
 						}
 					}
@@ -298,7 +298,7 @@ namespace Waher.Security.LoginMonitor
 
 			if (i >= this.nrIntervals)
 			{
-				await this.Block(EP, "No more allowed login attempts.");
+				await this.Block(EP, "No more allowed login attempts.", Protocol);
 				return DateTime.MaxValue;
 			}
 
@@ -309,14 +309,16 @@ namespace Waher.Security.LoginMonitor
 				return Next;
 		}
 
-		private async Task Block(RemoteEndpoint EP, string Reason)
+		private async Task Block(RemoteEndpoint EP, string Reason, string Protocol)
 		{
 			if (!EP.Blocked)
 			{
 				EP.Blocked = true;
 				EP.Reason = Reason;
 
-				KeyValuePair<string, object>[] Tags = await EP.Annotate(new KeyValuePair<string, object>("Reason", Reason));
+				KeyValuePair<string, object>[] Tags = await EP.Annotate(
+					new KeyValuePair<string, object>("Reason", Reason),
+					new KeyValuePair<string, object>("Protocol", Protocol));
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("Remote endpoint blocked.");

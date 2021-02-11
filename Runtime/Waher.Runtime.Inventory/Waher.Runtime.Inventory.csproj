@@ -6,17 +6,17 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library that keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface.</Description>
+    <Description>Class library that keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface, and can find the best implementation to process a task or item. It can be used to implement an Inversion of Control Pattern, and helps instantiate interfaces, abstract classes and normal classes, including recursively instantiating constructor arguments. Handles singleton types.</Description>
     <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Inventory</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>inventory reflection runtime</PackageTags>
+    <PackageTags>inventory reflection runtime IoC singleton interface</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.16</AssemblyVersion>
-    <FileVersion>1.0.16</FileVersion>
-    <Version>1.0.16</Version>
+    <AssemblyVersion>1.0.17</AssemblyVersion>
+    <FileVersion>1.0.17</FileVersion>
+    <Version>1.0.17</Version>
     <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Runtime\Waher.Runtime.Inventory\</UpgradeBackupLocation>

@@ -566,6 +566,7 @@ namespace Waher.Persistence.Files
 					this.blocksToSave.Clear();
 					this.blocksAdded = 0;
 					this.blockLimit = this.file.BlockLimit;
+					await this.file.FlushAsync();
 				}
 			}
 		}

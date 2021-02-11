@@ -193,5 +193,21 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Flushes changes to the underlying device.
+		/// </summary>
+		public async Task FlushAsync()
+		{
+			await this.fileAccess.WaitAsync();
+			try
+			{
+				await this.file.FlushAsync();
+			}
+			finally
+			{
+				this.fileAccess.Release();
+			}
+		}
+
 	}
 }

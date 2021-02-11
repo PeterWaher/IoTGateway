@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 
@@ -1162,7 +1163,35 @@ namespace Waher.Runtime.Inventory
 			if (ReturnNullIfFail)
 				return null;
 			else
-				throw new MissingMethodException("Constructor not found matching provided arguments.");
+			{
+				StringBuilder Msg = new StringBuilder();
+
+				Msg.Append("Unable to instantiate an object of type ");
+				Msg.Append(Type.FullName);
+				Msg.Append(". ");
+
+				if (NrArgs == 0)
+					Msg.Append("No arguments provided.");
+				else
+				{
+					Msg.Append("Argument types provided: ");
+
+					for (i = 0; i < NrArgs; i++)
+					{
+						object Obj = Arguments[i];
+
+						if (i > 0)
+							Msg.Append(", ");
+
+						if (Obj is null)
+							Msg.Append("null");
+						else
+							Msg.Append(Msg.GetType().FullName);
+					}
+				}
+
+				throw new MissingMethodException(Msg.ToString());
+			}
 		}
 
 		/// <summary>

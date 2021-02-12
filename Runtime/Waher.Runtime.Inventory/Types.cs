@@ -1186,7 +1186,7 @@ namespace Waher.Runtime.Inventory
 						if (Obj is null)
 							Msg.Append("null");
 						else
-							Msg.Append(Msg.GetType().FullName);
+							Msg.Append(Obj.GetType().FullName);
 					}
 				}
 

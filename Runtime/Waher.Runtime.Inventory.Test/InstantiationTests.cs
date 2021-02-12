@@ -181,5 +181,13 @@ namespace Waher.Runtime.Inventory.Test
 			Assert.AreEqual(1, Obj.N);
 			Assert.IsNull(Obj.S);
 		}
+
+		[TestMethod]
+		public void Test_17_ParamsSingleton()
+		{
+			ParamsExample ParamsExample = Types.Instantiate<ParamsExample>(false,
+				(object)(new SealedClass[] { new SealedClass("A", "B", "C") }));
+			Assert.IsNotNull(ParamsExample);
+		}
 	}
 }

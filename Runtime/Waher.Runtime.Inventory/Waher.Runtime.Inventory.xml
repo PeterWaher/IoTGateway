@@ -402,6 +402,17 @@
             <param name="Value">Value, if parsed.</param>
             <returns>If the string value could be parsed to an enumeration value of the given type.</returns>
         </member>
+        <member name="M:Waher.Runtime.Inventory.Types.Create(System.Boolean,System.Type,System.Object[])">
+            <summary>
+            Returns an instance of the type <paramref name="Type"/>. Creates an instance of a type.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>.
+            </summary>
+            <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+            <param name="Type">Type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <paramref name="Type"/>.</returns>
+        </member>
         <member name="M:Waher.Runtime.Inventory.Types.Instantiate``1(System.Boolean,System.Object[])">
             <summary>
             Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
@@ -440,17 +451,6 @@
             <param name="Arguments">Constructor arguments.</param>
             <returns>Instance of <paramref name="Type"/>.</returns>
         </member>
-        <member name="M:Waher.Runtime.Inventory.Types.Create(System.Boolean,System.Type,System.Object[])">
-            <summary>
-            Returns an instance of the type <paramref name="Type"/>. Creates an instance of a type.
-            If the constructor requires arguments, these are instantiated as necessary, if not provided
-            in <paramref name="Arguments"/>.
-            </summary>
-            <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
-            <param name="Type">Type of objects to return.</param>
-            <param name="Arguments">Constructor arguments.</param>
-            <returns>Instance of <paramref name="Type"/>.</returns>
-        </member>
         <member name="M:Waher.Runtime.Inventory.Types.Instantiate(System.String,System.Object[])">
             <summary>
             Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
@@ -470,6 +470,84 @@
             in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
             <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
             singleton classes, interfaces or abstract classes.
+            </summary>
+            <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+            <param name="TypeName">Full name of type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.InstantiateDefault``1(System.Boolean,System.Object[])">
+            <summary>
+            Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
+            <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
+            singleton classes, interfaces or abstract classes.
+            
+            If providing arguments when creating a singleton instance, the result will be registered as 
+            the default singleton instance, for cases when the type is instantiated without arguments.
+            </summary>
+            <typeparam name="T">Type of objects to return.</typeparam>
+            <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.InstantiateDefault(System.Type,System.Object[])">
+            <summary>
+            Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
+            <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
+            singleton classes, interfaces or abstract classes.
+            
+            If providing arguments when creating a singleton instance, the result will be registered as 
+            the default singleton instance, for cases when the type is instantiated without arguments.
+            </summary>
+            <param name="Type">Type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <paramref name="Type"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.InstantiateDefault(System.Boolean,System.Type,System.Object[])">
+            <summary>
+            Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
+            <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
+            singleton classes, interfaces or abstract classes.
+            
+            If providing arguments when creating a singleton instance, the result will be registered as 
+            the default singleton instance, for cases when the type is instantiated without arguments.
+            </summary>
+            <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+            <param name="Type">Type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of <paramref name="Type"/>.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.InstantiateDefault(System.String,System.Object[])">
+            <summary>
+            Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
+            <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
+            singleton classes, interfaces or abstract classes.
+            
+            If providing arguments when creating a singleton instance, the result will be registered as 
+            the default singleton instance, for cases when the type is instantiated without arguments.
+            </summary>
+            <param name="TypeName">Full name of type of objects to return.</param>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>Instance of object.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.InstantiateDefault(System.Boolean,System.String,System.Object[])">
+            <summary>
+            Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+            If the constructor requires arguments, these are instantiated as necessary, if not provided
+            in <paramref name="Arguments"/>. Attributes <see cref="T:Waher.Runtime.Inventory.SingletonAttribute"/> and
+            <see cref="T:Waher.Runtime.Inventory.DefaultImplementationAttribute"/> can be used to control instantiation of
+            singleton classes, interfaces or abstract classes.
+            
+            If providing arguments when creating a singleton instance, the result will be registered as 
+            the default singleton instance, for cases when the type is instantiated without arguments.
             </summary>
             <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
             <param name="TypeName">Full name of type of objects to return.</param>

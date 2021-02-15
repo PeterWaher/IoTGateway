@@ -1021,81 +1021,6 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
-		/// Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
-		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
-		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
-		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
-		/// singleton classes, interfaces or abstract classes.
-		/// </summary>
-		/// <typeparam name="T">Type of objects to return.</typeparam>
-		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
-		/// <param name="Arguments">Constructor arguments.</param>
-		/// <returns>Instance of <typeparamref name="T"/>.</returns>
-		public static T Instantiate<T>(bool ReturnNullIfFail, params object[] Arguments)
-		{
-			return (T)Instantiate(ReturnNullIfFail, typeof(T), Arguments);
-		}
-
-		/// <summary>
-		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
-		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
-		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
-		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
-		/// singleton classes, interfaces or abstract classes.
-		/// </summary>
-		/// <param name="Type">Type of objects to return.</param>
-		/// <param name="Arguments">Constructor arguments.</param>
-		/// <returns>Instance of <paramref name="Type"/>.</returns>
-		public static object Instantiate(Type Type, params object[] Arguments)
-		{
-			return Instantiate(false, Type, Arguments);
-		}
-
-		/// <summary>
-		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
-		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
-		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
-		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
-		/// singleton classes, interfaces or abstract classes.
-		/// </summary>
-		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
-		/// <param name="Type">Type of objects to return.</param>
-		/// <param name="Arguments">Constructor arguments.</param>
-		/// <returns>Instance of <paramref name="Type"/>.</returns>
-		public static object Instantiate(bool ReturnNullIfFail, Type Type, params object[] Arguments)
-		{
-			if (Type is null)
-			{
-				if (ReturnNullIfFail)
-					return null;
-				else
-					throw new ArgumentException("Type cannot be null.", nameof(Type));
-			}
-
-			TypeInfo TI = Type.GetTypeInfo();
-
-			if (TI.IsInterface || TI.IsAbstract)
-			{
-				if (DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out Type DefaultImplementation))
-				{
-					Type = DefaultImplementation;
-					TI = Type.GetTypeInfo();
-				}
-				else if (ReturnNullIfFail)
-					return null;
-				else
-					throw new ArgumentException("Interface " + Type.FullName + " lacks a default implementation.", nameof(Type));
-			}
-
-			SingletonAttribute Singleton = TI.GetCustomAttribute<SingletonAttribute>(true);
-
-			if (Singleton is null)
-				return Create(ReturnNullIfFail, Type, Arguments);
-			else
-				return Singleton.Instantiate(ReturnNullIfFail, Type, Arguments);
-		}
-
-		/// <summary>
 		/// Returns an instance of the type <paramref name="Type"/>. Creates an instance of a type.
 		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
 		/// in <paramref name="Arguments"/>.
@@ -1195,6 +1120,81 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to return.</typeparam>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <typeparamref name="T"/>.</returns>
+		public static T Instantiate<T>(bool ReturnNullIfFail, params object[] Arguments)
+		{
+			return (T)Instantiate(ReturnNullIfFail, typeof(T), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// </summary>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object Instantiate(Type Type, params object[] Arguments)
+		{
+			return Instantiate(false, Type, Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object Instantiate(bool ReturnNullIfFail, Type Type, params object[] Arguments)
+		{
+			if (Type is null)
+			{
+				if (ReturnNullIfFail)
+					return null;
+				else
+					throw new ArgumentException("Type cannot be null.", nameof(Type));
+			}
+
+			TypeInfo TI = Type.GetTypeInfo();
+
+			if (TI.IsInterface || TI.IsAbstract)
+			{
+				if (DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out Type DefaultImplementation))
+				{
+					Type = DefaultImplementation;
+					TI = Type.GetTypeInfo();
+				}
+				else if (ReturnNullIfFail)
+					return null;
+				else
+					throw new ArgumentException("Interface " + Type.FullName + " lacks a default implementation.", nameof(Type));
+			}
+
+			SingletonAttribute Singleton = TI.GetCustomAttribute<SingletonAttribute>(true);
+
+			if (Singleton is null)
+				return Create(ReturnNullIfFail, Type, Arguments);
+			else
+				return Singleton.Instantiate(ReturnNullIfFail, Type, Arguments);
+		}
+
+		/// <summary>
 		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
 		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
 		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
@@ -1223,6 +1223,106 @@ namespace Waher.Runtime.Inventory
 		public static object Instantiate(bool ReturnNullIfFail, string TypeName, params object[] Arguments)
 		{
 			return Instantiate(ReturnNullIfFail, GetType(TypeName), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <typeparamref name="T"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// 
+		/// If providing arguments when creating a singleton instance, the result will be registered as 
+		/// the default singleton instance, for cases when the type is instantiated without arguments.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to return.</typeparam>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <typeparamref name="T"/>.</returns>
+		public static T InstantiateDefault<T>(bool ReturnNullIfFail, params object[] Arguments)
+		{
+			return (T)InstantiateDefault(ReturnNullIfFail, typeof(T), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// 
+		/// If providing arguments when creating a singleton instance, the result will be registered as 
+		/// the default singleton instance, for cases when the type is instantiated without arguments.
+		/// </summary>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object InstantiateDefault(Type Type, params object[] Arguments)
+		{
+			return InstantiateDefault(false, Type, Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type <paramref name="Type"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// 
+		/// If providing arguments when creating a singleton instance, the result will be registered as 
+		/// the default singleton instance, for cases when the type is instantiated without arguments.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="Type">Type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of <paramref name="Type"/>.</returns>
+		public static object InstantiateDefault(bool ReturnNullIfFail, Type Type, params object[] Arguments)
+		{
+			object Result = Instantiate(ReturnNullIfFail, Type, Arguments);
+			if (Result is null)
+				return null;
+
+			if (!(Arguments is null) && Arguments.Length > 0 && !(Type.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
+				RegisterSingleton(Result);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// 
+		/// If providing arguments when creating a singleton instance, the result will be registered as 
+		/// the default singleton instance, for cases when the type is instantiated without arguments.
+		/// </summary>
+		/// <param name="TypeName">Full name of type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of object.</returns>
+		public static object InstantiateDefault(string TypeName, params object[] Arguments)
+		{
+			return InstantiateDefault(false, GetType(TypeName), Arguments);
+		}
+
+		/// <summary>
+		/// Returns an instance of the type defined by the full name <paramref name="TypeName"/>. If one needs to be created, it is.
+		/// If the constructor requires arguments, these are instantiated as necessary, if not provided
+		/// in <paramref name="Arguments"/>. Attributes <see cref="SingletonAttribute"/> and
+		/// <see cref="DefaultImplementationAttribute"/> can be used to control instantiation of
+		/// singleton classes, interfaces or abstract classes.
+		/// 
+		/// If providing arguments when creating a singleton instance, the result will be registered as 
+		/// the default singleton instance, for cases when the type is instantiated without arguments.
+		/// </summary>
+		/// <param name="ReturnNullIfFail">If null should be returned instead for throwing exceptions.</param>
+		/// <param name="TypeName">Full name of type of objects to return.</param>
+		/// <param name="Arguments">Constructor arguments.</param>
+		/// <returns>Instance of object.</returns>
+		public static object InstantiateDefault(bool ReturnNullIfFail, string TypeName, params object[] Arguments)
+		{
+			return InstantiateDefault(ReturnNullIfFail, GetType(TypeName), Arguments);
 		}
 
 		/// <summary>

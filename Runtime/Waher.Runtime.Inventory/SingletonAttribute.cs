@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Events;
 
 namespace Waher.Runtime.Inventory
@@ -180,6 +181,30 @@ namespace Waher.Runtime.Inventory
 				}
 
 				return Result;
+			}
+
+			public override string ToString()
+			{
+				StringBuilder sb = new StringBuilder();
+				int i, c;
+
+				sb.Append(this.type.FullName);
+				sb.Append('(');
+
+				for (i = 0, c = this.arguments?.Length ?? 0; i < c; i++)
+				{
+					if (i > 0)
+						sb.Append(", ");
+
+					if (this.arguments[i] is null)
+						sb.Append("null");
+					else
+						sb.Append(this.arguments[i].GetType().FullName);
+				}
+
+				sb.Append(')');
+
+				return sb.ToString();
 			}
 		}
 	}

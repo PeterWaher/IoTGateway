@@ -7,6 +7,6 @@ namespace Waher.Runtime.Inventory.Test.Definitions
 	[DefaultImplementation(typeof(Example))]
 	public abstract class ExampleBase : IExample
 	{
-		public abstract double f(double x);
+		public abstract double Eval(double x);
 	}
 }

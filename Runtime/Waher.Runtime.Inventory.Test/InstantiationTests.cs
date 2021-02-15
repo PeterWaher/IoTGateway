@@ -8,7 +8,7 @@ namespace Waher.Runtime.Inventory.Test
 	public class InstantiationTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(InstantiationTests).Assembly);
 		}
@@ -81,7 +81,7 @@ namespace Waher.Runtime.Inventory.Test
 		{
 			IExample Obj = Types.Instantiate<IExample>(false);
 			Assert.IsNotNull(Obj);
-			Assert.AreEqual(9.0, Obj.f(3));
+			Assert.AreEqual(9.0, Obj.Eval(3));
 		}
 
 		[TestMethod]
@@ -89,7 +89,7 @@ namespace Waher.Runtime.Inventory.Test
 		{
 			IExample Obj = Types.Instantiate<Example>(false);
 			Assert.IsNotNull(Obj);
-			Assert.AreEqual(9.0, Obj.f(3));
+			Assert.AreEqual(9.0, Obj.Eval(3));
 		}
 
 		[TestMethod]
@@ -148,19 +148,19 @@ namespace Waher.Runtime.Inventory.Test
 		{
 			IExample Example1 = Types.Instantiate<IExample>(false);
 			Assert.IsNotNull(Example1);
-			Assert.AreEqual(9.0, Example1.f(3));
+			Assert.AreEqual(9.0, Example1.Eval(3));
 
 			Types.RegisterDefaultImplementation(typeof(IExample), typeof(Example2));
 
 			IExample Example2 = Types.Instantiate<IExample>(false);
 			Assert.IsNotNull(Example2);
-			Assert.AreEqual(6.0, Example2.f(3));
+			Assert.AreEqual(6.0, Example2.Eval(3));
 
 			Types.UnregisterDefaultImplementation(typeof(IExample), typeof(Example2));
 
 			IExample Example3 = Types.Instantiate<IExample>(false);
 			Assert.IsNotNull(Example3);
-			Assert.AreEqual(9.0, Example3.f(3));
+			Assert.AreEqual(9.0, Example3.Eval(3));
 		}
 
 		[TestMethod]

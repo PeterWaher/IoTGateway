@@ -15,6 +15,7 @@ namespace Waher.Runtime.Inventory.Test.Definitions
             this.appAssembly = appAssembly;
             this.additionalAssemblies = additionalAssemblies;
             this.domains = domains;
+            instance = this;
         }
 
         /// <inheritdoc/>

@@ -6,6 +6,6 @@ namespace Waher.Runtime.Inventory.Test.Definitions
 {
 	public class Example : ExampleBase
 	{
-		public override double f(double x) => x * x;
+		public override double Eval(double x) => x * x;
 	}
 }

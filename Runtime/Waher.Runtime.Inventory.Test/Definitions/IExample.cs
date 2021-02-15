@@ -7,6 +7,6 @@ namespace Waher.Runtime.Inventory.Test.Definitions
 	[DefaultImplementation(typeof(Example))]
 	public interface IExample
 	{
-		double f(double x);
+		double Eval(double x);
 	}
 }

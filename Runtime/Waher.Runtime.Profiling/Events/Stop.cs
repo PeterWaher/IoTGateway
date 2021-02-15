@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Runtime.Profiling.Events
 {
@@ -13,9 +11,16 @@ namespace Waher.Runtime.Profiling.Events
 		/// Processing stops.
 		/// </summary>
 		/// <param name="Ticks">Elapsed ticks.</param>
-		public Stop(long Ticks)
-			: base(Ticks)
+		/// <param name="Thread">Profiler thread generating the event.</param>
+		public Stop(long Ticks, ProfilerThread Thread)
+			: base(Ticks, Thread)
 		{
 		}
+
+		/// <inheritdoc/>
+		public override string EventType => "Stop";
+
+		/// <inheritdoc/>
+		public override string PlantUmlState => "{hidden}";
 	}
 }

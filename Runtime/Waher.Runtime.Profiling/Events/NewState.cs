@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Xml;
 
 namespace Waher.Runtime.Profiling.Events
 {
@@ -16,8 +15,9 @@ namespace Waher.Runtime.Profiling.Events
 		/// </summary>
 		/// <param name="Ticks">Elapsed ticks.</param>
 		/// <param name="State">String representation of the new state.</param>
-		public NewState(long Ticks, string State)
-			: base(Ticks)
+		/// <param name="Thread">Profiler thread generating the event.</param>
+		public NewState(long Ticks, string State, ProfilerThread Thread)
+			: base(Ticks, Thread)
 		{
 			this.state = State;
 		}
@@ -26,5 +26,19 @@ namespace Waher.Runtime.Profiling.Events
 		/// String representation of the new state.
 		/// </summary>
 		public string State => this.state;
+
+		/// <inheritdoc/>
+		public override string EventType => "NewState";
+
+		/// <inheritdoc/>
+		public override void ExportXmlAttributes(XmlWriter Output, ProfilerEvent Previous, TimeUnit TimeUnit)
+		{
+			Output.WriteAttributeString("state", this.state);
+
+			base.ExportXmlAttributes(Output, Previous, TimeUnit);
+		}
+
+		/// <inheritdoc/>
+		public override string PlantUmlState => this.state;
 	}
 }

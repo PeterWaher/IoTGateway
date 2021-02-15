@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
+    <ProjectReference Include="..\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Contains tools for profiling sequences of actions in multiple threads. Results are accumulated, and can be exported to text, XML or as PlantUML Diagrams.</Description>
+    <Description>Contains tools for profiling sequences of actions in multiple threads. Results are accumulated, and can be exported to XML or as PlantUML Diagrams.</Description>
     <Copyright>Copyright © Waher Data AB 2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Profiling</PackageProjectUrl>

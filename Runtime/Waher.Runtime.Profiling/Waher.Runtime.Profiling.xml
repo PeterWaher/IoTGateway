@@ -1,0 +1,616 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Profiling</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Profiling.Events.Event">
+            <summary>
+            Event occurred
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Event.#ctor(System.Int64,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Event occurred
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Name">Name of event.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Event.Name">
+            <summary>
+            Name of event.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Event.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Event.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Event.ExportPlantUml(Waher.Runtime.Profiling.Export.PlantUmlStates)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Event.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Event.ExportPlantUmlPreparation">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.Exception">
+            <summary>
+            Exception occurred
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Exception.#ctor(System.Int64,System.Exception,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Exception occurred
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Exception">Exception object.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Exception.ExceptionObject">
+            <summary>
+            Exception object.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Exception.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Exception.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Exception.ExportPlantUml(Waher.Runtime.Profiling.Export.PlantUmlStates)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Exception.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Exception.ExportPlantUmlPreparation">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.Idle">
+            <summary>
+            Thread goes idle.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Idle.#ctor(System.Int64,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Thread goes idle.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Idle.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Idle.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.NewState">
+            <summary>
+            Thread changes state.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.NewState.#ctor(System.Int64,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Thread changes state.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="State">String representation of the new state.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewState.State">
+            <summary>
+            String representation of the new state.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewState.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.NewState.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewState.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.ProfilerEvent">
+            <summary>
+            Abstract base class for profiler events.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.#ctor(System.Int64,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Abstract base class for profiler events.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.ProfilerEvent.Ticks">
+            <summary>
+            Elapsed ticks.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.ProfilerEvent.Thread">
+            <summary>
+            Profiler thread generating the event.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.ProfilerEvent.EventType">
+            <summary>
+            Type of event.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.ExportXml(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports the event to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+            <param name="Previous">Previous event. null=First event in thread.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports event attributes to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+            <param name="Previous">Previous event. null=First event in thread.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.ExportPlantUml(Waher.Runtime.Profiling.Export.PlantUmlStates)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="States">PlantUML States</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.ProfilerEvent.PlantUmlState">
+            <summary>
+            PlantUML state representing event.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.ExportPlantUmlPreparation">
+            <summary>
+            Prepares the event for export to PlantUML
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.Start">
+            <summary>
+            Processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Start.#ctor(System.Int64,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Processing starts.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Start.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Start.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Events.Stop">
+            <summary>
+            Processing stops.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Stop.#ctor(System.Int64,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Processing stops.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Stop.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Stop.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Export.PlantUmlStates">
+            <summary>
+            Contains internal states used during generation of PlantUML diagram.s
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.Export.PlantUmlStates.TimeUnit">
+            <summary>
+            Time unit.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.Export.PlantUmlStates.ByTime">
+            <summary>
+            Event parts of diagrams.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.Export.PlantUmlStates.Summary">
+            <summary>
+            Summary part of diagrams.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.PlantUmlStates.#ctor(Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Contains internal states used during generation of PlantUML diagram.s
+            </summary>
+            <param name="TimeUnit">Time unit.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.PlantUmlStates.GetBuilder(System.Int64)">
+            <summary>
+            Gets the PlantUML output <see cref="T:System.Text.StringBuilder"/> associated with a time-point.
+            </summary>
+            <param name="Ticks">Tick count of builder.</param>
+            <returns>PlantUML export <see cref="T:System.Text.StringBuilder"/>.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.TimeUnit">
+            <summary>
+            Options for presenting time in reports.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.DynamicPerEvent">
+            <summary>
+            A time unit is selected based on amount of time, for particular event.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.DynamicPerThread">
+            <summary>
+            A time unit is selected based on amount of time, for particular thread.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.DynamicPerProfiling">
+            <summary>
+            A time unit is selected based on amount of time, for entire profiling.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.MicroSeconds">
+            <summary>
+            Time is presented in microseconds
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.MilliSeconds">
+            <summary>
+            Time is presented in milliseconds
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.Seconds">
+            <summary>
+            Time is presented in seconds
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.Minutes">
+            <summary>
+            Time is presented in minutes
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.Hours">
+            <summary>
+            Time is presented in hours
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.TimeUnit.Days">
+            <summary>
+            Time is presented in days
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Profiler">
+            <summary>
+            Class that keeps track of events and timing.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.#ctor">
+            <summary>
+            Class that keeps track of events and timing.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.#ctor(System.String)">
+            <summary>
+            Class that keeps track of events and timing.
+            </summary>
+            <param name="Name">Name of main thread.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.#ctor(Waher.Runtime.Profiling.ProfilerThreadType)">
+            <summary>
+            Class that keeps track of events and timing.
+            </summary>
+            <param name="Type">Type of profiler thread.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.#ctor(System.String,Waher.Runtime.Profiling.ProfilerThreadType)">
+            <summary>
+            Class that keeps track of events and timing.
+            </summary>
+            <param name="Name">Name of main thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Profiler.MainThread">
+            <summary>
+            Main thread.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.CreateThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType)">
+            <summary>
+            Creates a new profiler thread.
+            </summary>
+            <param name="Name">Name of profiler thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <returns>Profiler thread reference.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.CreateThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Creates a new profiler thread.
+            </summary>
+            <param name="Name">Name of profiler thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <param name="Parent">Parent thread.</param>
+            <returns>Profiler thread reference.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Start">
+            <summary>
+            Starts measuring time.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Stop">
+            <summary>
+            Stops measuring time.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Profiler.ElapsedTicks">
+            <summary>
+            Elapsed ticks since start.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.NewState(System.String)">
+            <summary>
+            Main Thread changes state.
+            </summary>
+            <param name="State">String representation of the new state.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Idle">
+            <summary>
+            Main Thread goes idle.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Event(System.String)">
+            <summary>
+            Event occurred on main thread
+            </summary>
+            <param name="Name">Name of event.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Exception(System.Exception)">
+            <summary>
+            Event occurred on main thread
+            </summary>
+            <param name="Exception">Exception object.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ToSeconds(System.Int64)">
+            <summary>
+            Number of seconds, corresponding to a measured number of high-frequency clock ticks.
+            </summary>
+            <param name="Ticks">Ticks</param>
+            <returns>Number of seconds.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ToTime(System.Int64,Waher.Runtime.Profiling.ProfilerThread,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Time (amount, unit), corresponding to a measured number of high-frequency clock ticks.
+            </summary>
+            <param name="Ticks">Ticks</param>
+            <param name="Thread">Thread associated with event.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>Corresponding time.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ToTimeStr(System.Int64,Waher.Runtime.Profiling.ProfilerThread,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            String representation of time, corresponding to a measured number of high-frequency clock ticks.
+            </summary>
+            <param name="Ticks">Ticks</param>
+            <param name="Thread">Thread associated with event.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>Corresponding time as a string.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ExportXml(Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to XML.
+            </summary>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>XML</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ExportXml(System.Xml.XmlWriter,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ExportPlantUml(Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>PlantUML</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ExportPlantUml(System.Text.StringBuilder,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="Output">PlantUML output.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.ExportPlantUml(System.Text.StringBuilder,Waher.Runtime.Profiling.TimeUnit,System.Int32)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="Output">PlantUML output.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+            <param name="GoalWidth">Goal width of diagram, in pixels.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.GetEventOrdinal(System.String)">
+            <summary>
+            Gets the ordinal for an event.
+            </summary>
+            <param name="Event">Event</param>
+            <returns>Event Ordinal</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.GetExceptionOrdinal(System.Exception)">
+            <summary>
+            Gets the ordinal for a type of exception.
+            </summary>
+            <param name="Exception">Exception object.</param>
+            <returns>Exception Type Ordinal</returns>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.ProfilerThreadType">
+            <summary>
+            Type of profiler thread.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.Sequential">
+            <summary>
+            Documents the flow of states along time.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.StateMachine">
+            <summary>
+            Documents the changes between states.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.ProfilerThread">
+            <summary>
+            Class that keeps track of events and timing for one thread.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.#ctor(System.String,System.Int32,Waher.Runtime.Profiling.ProfilerThreadType,Waher.Runtime.Profiling.Profiler)">
+            <summary>
+            Class that keeps track of events and timing for one thread.
+            </summary>
+            <param name="Name">Name of thread.</param>
+            <param name="Order">Order created.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <param name="Profiler">Profiler reference.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.#ctor(System.String,System.Int32,Waher.Runtime.Profiling.ProfilerThreadType,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Class that keeps track of events and timing for one thread.
+            </summary>
+            <param name="Name">Name of thread.</param>
+            <param name="Order">Order created.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <param name="Parent">Parent thread.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Name">
+            <summary>
+            Name of thread.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Order">
+            <summary>
+            Order created.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Type">
+            <summary>
+            Type of profiler thread.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Profiler">
+            <summary>
+            Profiler reference.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Parent">
+            <summary>
+            Parent profiler thread, if any.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.StartedAt">
+            <summary>
+            Ticks when thread was started.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.StoppedAt">
+            <summary>
+            Ticks when thread was stopped.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.CreateSubThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType)">
+            <summary>
+            Creates a new profiler thread.
+            </summary>
+            <param name="Name">Name of profiler thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <returns>Profiler thread reference.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.NewState(System.String)">
+            <summary>
+            Thread changes state.
+            </summary>
+            <param name="State">String representation of the new state.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Idle">
+            <summary>
+            Thread goes idle.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Event(System.String)">
+            <summary>
+            Event occurred
+            </summary>
+            <param name="Name">Name of event.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Exception(System.Exception)">
+            <summary>
+            Exception occurred
+            </summary>
+            <param name="Exception">Exception object.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Start">
+            <summary>
+            Processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Stop">
+            <summary>
+            Processing starts.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.ExportXml(System.Xml.XmlWriter,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.ExportPlantUmlDescription(System.Text.StringBuilder,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="Output">PlantUML output.</param>
+            <param name="TimeUnit">Time unit to use.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.ProfilerThread.Key">
+            <summary>
+            Thread key in diagrams.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.ExportPlantUmlEvents(Waher.Runtime.Profiling.Export.PlantUmlStates)">
+            <summary>
+            Exports events to PlantUML.
+            </summary>
+            <param name="States">PlantUML States</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.ToTime(System.Int64,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            Time (amount, unit), corresponding to a measured number of high-frequency clock ticks.
+            </summary>
+            <param name="Ticks">Ticks</param>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>Corresponding time.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.ToTimeStr(System.Int64,Waher.Runtime.Profiling.TimeUnit)">
+            <summary>
+            String representation of time, corresponding to a measured number of high-frequency clock ticks.
+            </summary>
+            <param name="Ticks">Ticks</param>
+            <param name="TimeUnit">Time unit to use.</param>
+            <returns>Corresponding time as a string.</returns>
+        </member>
+    </members>
+</doc>

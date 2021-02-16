@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.Serialization
 {
 	/// <summary>
 	/// Generic object. Contains a sequence of properties.
 	/// </summary>
+	[ArchivingTime("ArchivingTime")]
 	public sealed class GenericObject : ICollection<KeyValuePair<string, object>>
 	{
 		private IEnumerable<KeyValuePair<string, object>> properties = new LinkedList<KeyValuePair<string, object>>();
 		private Dictionary<string, object> propertiesByName = null;
 		private string collectionName = null;
 		private string typeName = null;
+		private int archivingTime = 0;
 		private bool propertiesUpdated = false;
 		private Guid objectId = Guid.Empty;
 
@@ -77,6 +78,16 @@ namespace Waher.Persistence.Serialization
 		{
 			get { return this.objectId; }
 			set { this.objectId = value; }
+		}
+
+		/// <summary>
+		/// Archiving time, in days. 0=No archiving. <see cref="int.MaxValue"/>=No time limit.
+		/// </summary>
+		[DefaultValue(0)]
+		public int ArchivingTime
+		{
+			get { return this.archivingTime; }
+			set { this.archivingTime = value; }
 		}
 
 		/// <summary>

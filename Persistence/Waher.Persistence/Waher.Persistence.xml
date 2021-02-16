@@ -5040,6 +5040,11 @@
             Object ID
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Serialization.GenericObject.ArchivingTime">
+            <summary>
+            Archiving time, in days. 0=No archiving. <see cref="F:System.Int32.MaxValue"/>=No time limit.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Serialization.GenericObject.GetEnumerator">
             <summary>
             <see cref="M:System.Collections.Generic.IEnumerable`1.GetEnumerator"/>

@@ -204,6 +204,7 @@ namespace Waher.Persistence.Serialization
 			}
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			int? ArchivingTime = null;
 
 			while (true)
 			{
@@ -227,107 +228,117 @@ namespace Waher.Persistence.Serialization
 
 				FieldDataType = Reader.ReadBits(6);
 
-				switch (FieldDataType)
+				if (FieldDataType == ObjectSerializer.TYPE_INT32 && FieldName == "ArchivingTime" && !ArchivingTime.HasValue)
+					ArchivingTime = Reader.ReadInt32();
+				else
 				{
-					case ObjectSerializer.TYPE_BOOLEAN:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadBoolean()));
-						break;
+					switch (FieldDataType)
+					{
+						case ObjectSerializer.TYPE_BOOLEAN:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadBoolean()));
+							break;
 
-					case ObjectSerializer.TYPE_BYTE:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByte()));
-						break;
+						case ObjectSerializer.TYPE_BYTE:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByte()));
+							break;
 
-					case ObjectSerializer.TYPE_INT16:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt16()));
-						break;
+						case ObjectSerializer.TYPE_INT16:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt16()));
+							break;
 
-					case ObjectSerializer.TYPE_INT32:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt32()));
-						break;
+						case ObjectSerializer.TYPE_INT32:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt32()));
+							break;
 
-					case ObjectSerializer.TYPE_INT64:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt64()));
-						break;
+						case ObjectSerializer.TYPE_INT64:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt64()));
+							break;
 
-					case ObjectSerializer.TYPE_SBYTE:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSByte()));
-						break;
+						case ObjectSerializer.TYPE_SBYTE:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSByte()));
+							break;
 
-					case ObjectSerializer.TYPE_UINT16:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt16()));
-						break;
+						case ObjectSerializer.TYPE_UINT16:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt16()));
+							break;
 
-					case ObjectSerializer.TYPE_UINT32:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt32()));
-						break;
+						case ObjectSerializer.TYPE_UINT32:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt32()));
+							break;
 
-					case ObjectSerializer.TYPE_UINT64:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt64()));
-						break;
+						case ObjectSerializer.TYPE_UINT64:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt64()));
+							break;
 
-					case ObjectSerializer.TYPE_DECIMAL:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDecimal()));
-						break;
+						case ObjectSerializer.TYPE_DECIMAL:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDecimal()));
+							break;
 
-					case ObjectSerializer.TYPE_DOUBLE:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDouble()));
-						break;
+						case ObjectSerializer.TYPE_DOUBLE:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDouble()));
+							break;
 
-					case ObjectSerializer.TYPE_SINGLE:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSingle()));
-						break;
+						case ObjectSerializer.TYPE_SINGLE:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSingle()));
+							break;
 
-					case ObjectSerializer.TYPE_DATETIME:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTime()));
-						break;
+						case ObjectSerializer.TYPE_DATETIME:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTime()));
+							break;
 
-					case ObjectSerializer.TYPE_DATETIMEOFFSET:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTimeOffset()));
-						break;
+						case ObjectSerializer.TYPE_DATETIMEOFFSET:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTimeOffset()));
+							break;
 
-					case ObjectSerializer.TYPE_TIMESPAN:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadTimeSpan()));
-						break;
+						case ObjectSerializer.TYPE_TIMESPAN:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadTimeSpan()));
+							break;
 
-					case ObjectSerializer.TYPE_CHAR:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadChar()));
-						break;
+						case ObjectSerializer.TYPE_CHAR:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadChar()));
+							break;
 
-					case ObjectSerializer.TYPE_STRING:
-					case ObjectSerializer.TYPE_ENUM:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadString()));
-						break;
+						case ObjectSerializer.TYPE_STRING:
+						case ObjectSerializer.TYPE_ENUM:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadString()));
+							break;
 
-					case ObjectSerializer.TYPE_CI_STRING:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, new CaseInsensitiveString(Reader.ReadString())));
-						break;
+						case ObjectSerializer.TYPE_CI_STRING:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, new CaseInsensitiveString(Reader.ReadString())));
+							break;
 
-					case ObjectSerializer.TYPE_BYTEARRAY:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByteArray()));
-						break;
+						case ObjectSerializer.TYPE_BYTEARRAY:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByteArray()));
+							break;
 
-					case ObjectSerializer.TYPE_GUID:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadGuid()));
-						break;
+						case ObjectSerializer.TYPE_GUID:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadGuid()));
+							break;
 
-					case ObjectSerializer.TYPE_NULL:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, null));
-						break;
+						case ObjectSerializer.TYPE_NULL:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, null));
+							break;
 
-					case ObjectSerializer.TYPE_ARRAY:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.ReadGenericArray(Reader)));
-						break;
+						case ObjectSerializer.TYPE_ARRAY:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.ReadGenericArray(Reader)));
+							break;
 
-					case ObjectSerializer.TYPE_OBJECT:
-						Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.Deserialize(Reader, FieldDataType, true)));
-						break;
+						case ObjectSerializer.TYPE_OBJECT:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.Deserialize(Reader, FieldDataType, true)));
+							break;
 
-					default:
-						throw new Exception("Unrecognized data type: " + FieldDataType.ToString());
+						default:
+							throw new Exception("Unrecognized data type: " + FieldDataType.ToString());
+					}
 				}
 			}
 
-			return new GenericObject(CollectionName, TypeName, ObjectId, Properties);
+			GenericObject Result = new GenericObject(CollectionName, TypeName, ObjectId, Properties);
+
+			if (ArchivingTime.HasValue)
+				Result.ArchivingTime = ArchivingTime.Value;
+
+			return Result;
 		}
 
 		private async Task<Array> ReadGenericArray(IDeserializer Reader)
@@ -578,6 +589,17 @@ namespace Waher.Persistence.Serialization
 
 					if (Embedded)
 						Writer.Write(string.IsNullOrEmpty(TypedValue.CollectionName) ? this.Context.DefaultCollectionName : TypedValue.CollectionName);
+				}
+
+				if (TypedValue.ArchivingTime != 0)
+				{
+					if (Normalized)
+						Writer.WriteVariableLengthUInt64(await this.Context.GetFieldCode(TypedValue.CollectionName, "ArchivingTime"));
+					else
+						Writer.Write("ArchivingTime");
+
+					Writer.WriteBits(ObjectSerializer.TYPE_INT32, 6);
+					Writer.Write((int)TypedValue.ArchivingTime);
 				}
 
 				foreach (KeyValuePair<string, object> Property in TypedValue)
